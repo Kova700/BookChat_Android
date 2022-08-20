@@ -4,6 +4,7 @@ import android.app.Application
 import com.example.bookchat.api.ApiClient
 import com.example.bookchat.api.ApiInterface
 import com.example.bookchat.utils.NetworkManager
+import com.kakao.sdk.common.KakaoSdk
 
 class App : Application() {
     // context를 가지지 않는곳에서 context를 필요로 할 때를 위해서 정의
@@ -21,6 +22,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        KakaoSdk.init(this, BuildConfig.KAKAO_APP_KEY)
         inject()
     }
 
