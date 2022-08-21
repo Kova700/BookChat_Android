@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabColorSchemeParams
@@ -13,9 +12,9 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityLoginBinding
+import com.example.bookchat.kakao.KakaoSDK
 import com.example.bookchat.utils.Constants.GOOGLE_LOGIN
 import com.example.bookchat.utils.Constants.KAKAO_LOGIN
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.LoginType
 import com.example.bookchat.utils.SharedPreferenceManager
 
@@ -62,19 +61,24 @@ class LoginActivity : AppCompatActivity() {
         handleIntent(intent)
     }
 
+    //구글 임시로 살려둠
     fun openWeb(loginType : LoginType){
-        val uri = when(loginType){
-            LoginType.KAKAO ->{ KAKAO_LOGIN }
-            LoginType.GOOGLE ->{ GOOGLE_LOGIN }
-        }
-        if(sdkVersionCheck()){ //브라우저로 진행
-            val intent = Intent(Intent.ACTION_VIEW,Uri.parse(uri))
-            startActivity(intent)
-            finish()
-            return
-        }
-        //크롬 커스텀 탭으로 진행
-        openCustomTab(uri)
+//        val uri = when(loginType){
+//            LoginType.KAKAO ->{ KAKAO_LOGIN }
+//            LoginType.GOOGLE ->{ GOOGLE_LOGIN }
+//        }
+//        if(sdkVersionCheck()){ //브라우저로 진행
+//            val intent = Intent(Intent.ACTION_VIEW,Uri.parse(uri))
+//            startActivity(intent)
+//            finish()
+//            return
+//        }
+//        //크롬 커스텀 탭으로 진행
+//        openCustomTab(uri)
+    }
+    fun startKakaoLogin(){
+        val kakaoSdk = KakaoSDK(this)
+        kakaoSdk.login()
     }
 
     private fun openCustomTab(uri :String){

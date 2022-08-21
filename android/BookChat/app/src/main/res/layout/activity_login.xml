@@ -25,13 +25,13 @@
 
         <android.widget.Button
             android:id="@+id/loginKakao_iv"
+            android:layout_width="310dp"
+            android:layout_height="48dp"
             android:layout_below="@id/Applogo_iv"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="30dp"
-            android:layout_width="310dp"
-            android:layout_height="48dp"
             android:background="@drawable/kakaologin_png"
-            android:onClick="@{()->activity.openWeb(loginType.KAKAO)}"/>
+            android:onClick="@{()->activity.startKakaoLogin()}" />
 
         <android.widget.Button
             android:id="@+id/loginGoogle_iv"

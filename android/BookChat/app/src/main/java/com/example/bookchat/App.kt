@@ -22,7 +22,10 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        KakaoSdk.init(this, BuildConfig.KAKAO_APP_KEY)
+        KakaoSdk.init(
+            context = this,
+            appKey = BuildConfig.KAKAO_APP_KEY
+        )
         inject()
     }
 
