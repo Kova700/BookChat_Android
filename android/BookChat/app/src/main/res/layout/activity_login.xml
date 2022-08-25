@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable
             name="loginType"
@@ -8,40 +11,120 @@
             name="activity"
             type="com.example.bookchat.activities.LoginActivity" />
     </data>
-    <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         tools:context=".activities.LoginActivity">
 
+        <Button
+            android:id="@+id/googleLogin_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="35dp"
+            android:layout_marginEnd="35dp"
+            android:layout_marginBottom="68dp"
+            android:backgroundTint="#FFFFFF"
+            android:drawableLeft="@drawable/ic_google_icon"
+            android:fontFamily="@font/notosanskr_medium"
+            android:stateListAnimator="@null"
+            android:text="구글로 시작하기"
+            android:textColor="#747474"
+            android:textSize="16sp"
+            app:iconPadding="-6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:strokeColor="#F5F5F5"
+            app:strokeWidth="1.5dp" />
+
         <ImageView
-            android:id="@+id/Applogo_iv"
-            android:layout_centerInParent="true"
-            android:layout_width="230dp"
+            android:id="@+id/imageView2"
+            android:layout_width="228dp"
             android:layout_height="47dp"
-            android:src="@drawable/bookchatlogo_login"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.278"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.276"
+            app:srcCompat="@drawable/ic_bookchat_logo" />
 
-        <android.widget.Button
-            android:id="@+id/loginKakao_iv"
-            android:layout_width="310dp"
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="233dp"
+            android:layout_height="87dp"
+            android:fontFamily="@font/notosanskr_regular"
+            android:text="책으로 연결되는 우리\n이제부터 북챗으로 대화해요"
+            android:textColor="#222222"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/imageView2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.286"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.813" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="35dp"
+            android:layout_marginEnd="35dp"
+            android:layout_marginBottom="132dp"
+            android:backgroundTint="#FEE500"
+            android:drawableLeft="@drawable/ic_kakao_icon"
+            android:fontFamily="@font/notosanskr_medium"
+            android:stateListAnimator="@null"
+            android:text="카카오로 시작하기"
+            android:textColor="#392020"
+            android:textSize="16sp"
+            app:iconPadding="-10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="142dp"
             android:layout_height="48dp"
-            android:layout_below="@id/Applogo_iv"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
-            android:background="@drawable/kakaologin_png"
-            android:onClick="@{()->activity.startKakaoLogin()}" />
+            android:layout_marginBottom="-10dp"
+            android:background="@drawable/fast_login_background"
+            app:layout_constraintBottom_toTopOf="@+id/button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView2"
+            app:layout_constraintVertical_bias="1.0">
 
-        <android.widget.Button
-            android:id="@+id/loginGoogle_iv"
-            android:layout_below="@id/loginKakao_iv"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:layout_width="310dp"
-            android:layout_height="48dp"
-            android:background="@drawable/googlelogin_png"
-            android:onClick="@{()->activity.openWeb(loginType.GOOGLE)}"/>
+            <ImageView
+                android:id="@+id/imageView5"
+                android:layout_width="11dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="18dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.39"
+                app:srcCompat="@drawable/ic_lightning" />
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="9dp"
+                android:fontFamily="@font/notosanskr_regular"
+                android:gravity="center"
+                android:text="3초만에 빠른 회원가입"
+                android:textColor="#222222"
+                android:textSize="9sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView5"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.32999998" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
