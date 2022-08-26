@@ -59,19 +59,19 @@
 
             <EditText
                 android:id="@+id/searchText_et"
-                android:visibility="invisible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="38dp"
-                android:layout_marginRight="64dp"
                 android:layout_marginTop="23dp"
+                android:layout_marginRight="64dp"
                 android:background="@android:color/transparent"
                 android:fontFamily="@font/jua_regular"
                 android:hint="책을 검색해주세요!"
-                android:inputType="text"
                 android:imeOptions="actionDone"
+                android:inputType="text"
+                android:textColor="#12121D"
                 android:textColorHint="#B0B0B4"
-                android:textColor="#12121D"/>
+                android:visibility="invisible" />
 
             <ImageView
                 android:id="@+id/search_option_btn"

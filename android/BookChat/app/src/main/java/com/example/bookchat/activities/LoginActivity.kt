@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabColorSchemeParams
@@ -15,6 +16,7 @@ import com.example.bookchat.databinding.ActivityLoginBinding
 import com.example.bookchat.kakao.KakaoSDK
 import com.example.bookchat.utils.Constants.GOOGLE_LOGIN
 import com.example.bookchat.utils.Constants.KAKAO_LOGIN
+import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.LoginType
 import com.example.bookchat.utils.SharedPreferenceManager
 
@@ -77,8 +79,10 @@ class LoginActivity : AppCompatActivity() {
 //        openCustomTab(uri)
     }
     fun startKakaoLogin(){
-        val kakaoSdk = KakaoSDK(this)
-        kakaoSdk.login()
+        Log.d(TAG, "LoginActivity: startKakaoLogin() - called")
+        startActivity(Intent(this,SignUpActivity::class.java))
+//        val kakaoSdk = KakaoSDK(this)
+//        kakaoSdk.login()
     }
 
     private fun openCustomTab(uri :String){

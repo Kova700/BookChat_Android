@@ -14,8 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BookChat">
         <activity
+            android:name=".activities.SignUpActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.SplashActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
