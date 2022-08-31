@@ -57,9 +57,11 @@
             app:layout_constraintVertical_bias="0.104">
 
             <ImageView
-                android:id="@+id/imageView4"
+                android:id="@+id/userProfile_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:scaleType="fitXY"
+                android:background="@drawable/profile_background_rounded"
                 app:srcCompat="@drawable/ic_default_profile" />
 
             <ImageButton

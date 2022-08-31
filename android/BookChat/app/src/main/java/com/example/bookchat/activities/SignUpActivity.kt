@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
+import com.bumptech.glide.Glide
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySignUpBinding
 import com.example.bookchat.utils.Constants.TAG
@@ -31,7 +32,6 @@ class SignUpActivity : AppCompatActivity() {
     private var isNotShort = false
     private var isNotDuplicate = false
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up)
@@ -40,6 +40,7 @@ class SignUpActivity : AppCompatActivity() {
         }
         setEditText()
         setFocus()
+        binding.userProfileIv.clipToOutline = true
         //onActivityResult로 갤러리에서 이미지 가져와야함
     }
 
@@ -149,22 +150,7 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     fun clickProfileBtn(){
-
-//        val intent = Intent(Intent.ACTION_GET_CONTENT)
-//        intent.setType("image/*")
-
-        if (isPermissionGiven()){
-            //권한 등록이 되어있다면 갤러리 진입
-            Log.d(TAG, "SignUpActivity: clickProfileBtn() 권한체크 완료!(모든 권한을 가지고 있음)- called")
-            return
-        }
-        //권한이 등록이 안되어있다면 권한 요청
         launchPermissions()
-    }
-
-    private fun isPermissionGiven(): Boolean{
-        return (ContextCompat.checkSelfPermission(this,android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
-                && (ContextCompat.checkSelfPermission(this,android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
     }
 
     private fun launchPermissions() {
@@ -181,26 +167,47 @@ class SignUpActivity : AppCompatActivity() {
 
         val deniedList = result.filter { !it.value }.map { it.key }
 
-        if(deniedList.isNotEmpty()){
-            //명시적 거부 -> DENIED , 다시 묻지 않음(두 번 거부) -> EXPLAINED
-            val map = deniedList.groupBy { permission ->
-                if (shouldShowRequestPermissionRationale(permission)) "DENIED" else "EXPLAINED"
-            }
+        when{
+            deniedList.isNotEmpty() -> {
+                //명시적 거부 -> DENIED , 다시 묻지 않음(두 번 거부) -> EXPLAINED
+                val map = deniedList.groupBy { permission ->
+                    if (shouldShowRequestPermissionRationale(permission)) "DENIED" else "EXPLAINED"
+                }
 
-            map["DENIED"]?.let{
-                Toast.makeText(this,"[사진 및 미디어]\n권한을 허용해주세요.",Toast.LENGTH_LONG).show()
-            }
+                map["DENIED"]?.let{
+                    Toast.makeText(this,"[사진 및 미디어]\n권한을 허용해주세요.",Toast.LENGTH_LONG).show()
+                }
 
-            map["EXPLAINED"]?.let {
-                Toast.makeText(this,"[권한] - [파일 및 미디어]\n권한을 허용해주세요.",Toast.LENGTH_LONG).show()
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                this.packageName.also { name ->
-                    val uri = Uri.fromParts("package", name, null)
-                    intent.data = uri
-                    startActivity(intent)
+                map["EXPLAINED"]?.let {
+                    Toast.makeText(this,"[권한] - [파일 및 미디어]\n권한을 허용해주세요.",Toast.LENGTH_LONG).show()
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    this.packageName.also { name ->
+                        val uri = Uri.fromParts("package", name, null)
+                        intent.data = uri
+                        startActivity(intent)
+                    }
                 }
             }
+            //모든 권한 허용 확인
+            else -> openGallery()
         }
+    }
+
+    val activityResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
+            if(activityResult.resultCode == RESULT_OK){
+                val intent = activityResult.data
+                val uri = intent?.data ?: "NO DATA"
+                Glide.with(this)
+                    .load(uri)
+                    .into(binding.userProfileIv)
+            }
+        }
+
+    private fun openGallery(){
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.setType("image/*")
+        activityResultLauncher.launch(intent)
     }
 
     fun clickBackBtn() {
