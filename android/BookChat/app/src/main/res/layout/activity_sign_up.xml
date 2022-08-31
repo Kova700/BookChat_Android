@@ -72,6 +72,7 @@
                 android:background="@drawable/getpicture_btn_back"
                 android:baselineAlignBottom="true"
                 android:elevation="3dp"
+                android:onClick="@{() -> activity.clickProfileBtn()}"
                 app:srcCompat="@drawable/ic_getpicture_btn" />
         </FrameLayout>
 
