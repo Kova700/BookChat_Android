@@ -12,6 +12,7 @@ import android.provider.Settings
 import android.text.InputFilter
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -186,8 +187,12 @@ class SignUpActivity : AppCompatActivity() {
                 if (shouldShowRequestPermissionRationale(permission)) "DENIED" else "EXPLAINED"
             }
 
+            map["DENIED"]?.let{
+                Toast.makeText(this,"[사진 및 미디어]\n권한을 허용해주세요.",Toast.LENGTH_LONG).show()
+            }
+
             map["EXPLAINED"]?.let {
-                Log.d(TAG, "SignUpActivity: EXPLAINED() - called")
+                Toast.makeText(this,"[권한] - [파일 및 미디어]\n권한을 허용해주세요.",Toast.LENGTH_LONG).show()
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 this.packageName.also { name ->
                     val uri = Uri.fromParts("package", name, null)
