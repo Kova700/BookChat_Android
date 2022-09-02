@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BookChat">
         <activity
-            android:name=".ImageCropActivity"
+            android:name=".activities.ImageCropActivity"
             android:exported="false" />
         <activity
             android:name=".activities.SelectTasteActivity"
