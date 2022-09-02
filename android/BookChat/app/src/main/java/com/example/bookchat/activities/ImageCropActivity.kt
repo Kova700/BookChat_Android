@@ -27,16 +27,29 @@ class ImageCropActivity : AppCompatActivity() {
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.R) //버전 분기 필요
     fun clickFinishBtn(){
         Log.d(TAG, "ImageCropActivity: clickFinishBtn() - called")
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        val bitmap :Bitmap = binding.cropImageView.getCroppedImage(500,500)!! //사이즈 조정필요
-        bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS,80,byteArrayOutputStream)
+        val bitmap :Bitmap = binding.cropImageView.getCroppedImage(300,300)!! // 임시 300
+        val byteArray = getByteArray(bitmap)
         val intent = Intent(this@ImageCropActivity,SignUpActivity::class.java)
-        intent.putExtra("bitmap",byteArrayOutputStream.toString().toByteArray())
-        setResult(1,intent)
+        intent.putExtra("image",byteArray)
+        setResult(RESULT_OK,intent)
         finish()
+    }
+
+    private fun bitmapToByteArray(bitmap: Bitmap, compressFormat :Bitmap.CompressFormat) :ByteArray{
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(compressFormat,80,stream) //임시 80
+        return stream.toByteArray()
+    }
+
+    private fun getByteArray(bitmap :Bitmap) :ByteArray{
+        return if(sdkVersionIsMoreR()) bitmapToByteArray(bitmap,Bitmap.CompressFormat.WEBP_LOSSLESS)
+        else bitmapToByteArray(bitmap,Bitmap.CompressFormat.WEBP)
+    }
+
+    private fun sdkVersionIsMoreR() :Boolean{
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     }
 
 }

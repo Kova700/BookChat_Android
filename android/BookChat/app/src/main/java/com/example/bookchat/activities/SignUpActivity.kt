@@ -2,13 +2,14 @@ package com.example.bookchat.activities
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
 import android.provider.Settings
 import android.text.InputFilter
 import android.util.Log
@@ -16,18 +17,14 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import com.bumptech.glide.Glide
-import com.canhub.cropper.CropImage
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageView
 import com.canhub.cropper.options
-import com.example.bookchat.ImageCropActivity
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySignUpBinding
 import com.example.bookchat.utils.Constants.TAG
@@ -200,61 +197,39 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-//    val activityResultLauncher =
-//        registerForActivityResult(CropImageContract()) { result ->
-//            if(result.isSuccessful){
-//                val uriContent = result.uriContent
-//                val uriFilPath = result.getUriFilePath(this)
-//                Glide.with(this)
-//                    .load(uriContent)
-//                    .into(binding.userProfileIv)
-//            }
-//        }
-
-//    private fun openGallery(){
-////        val intent = Intent(Intent.ACTION_GET_CONTENT)
-////        intent.setType("image/*")
-//        activityResultLauncher.launch(
-//            options {
-//                setGuidelines(CropImageView.Guidelines.ON)
-//            }
-//        )
-//    }
-
     val activityResultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
-            if(activityResult.resultCode == RESULT_OK){
-                val intent = activityResult.data
-                val uri = intent?.data ?: "NO DATA".toUri()
-                //가져온 uri로 cropActivity 호출해서 받은 crop 이미지로 Glide 출력
-                openCropActivity(uri.toString())
-//                val cropIntent = Intent()
-
-
-//                Glide.with(this)
-//                    .load(uri)
-//                    .into(binding.userProfileIv)
-            }
+        registerForActivityResult(ActivityResultContracts.GetContent()) { resultUri ->
+            openCropActivity(resultUri!!)
         }
 
     val cropActivityResultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
-            if(activityResult.resultCode == RESULT_OK){
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if(result.resultCode == RESULT_OK){
                 //크롭된 이미지 가져오기기
+                val intent = result.data
+                val bitmapByteArray = intent?.getByteArrayExtra("image") ?: byteArrayOf()
+                val bitmap = byteArrayToBitmap(bitmapByteArray)
+                //유저 객체에 bitmap 실어야함
+
+                Glide.with(this)
+                    .asBitmap()
+                    .load(bitmap)
+                    .into(binding.userProfileIv)
            }
         }
 
     private fun openGallery(){
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.setType("image/*")
-        activityResultLauncher.launch(intent)
+        activityResultLauncher.launch("image/*")
     }
 
-    private fun openCropActivity(uri :String){
-        val intent = Intent(this,ImageCropActivity::class.java)
-        intent.putExtra("uri",uri)
-        startActivity(intent)
-//        cropActivityResultLauncher.launch(intent)
+    private fun openCropActivity(uri :Uri){
+        val intent = Intent(this, ImageCropActivity::class.java)
+        intent.putExtra("uri",uri.toString())
+        cropActivityResultLauncher.launch(intent)
+    }
+
+    private fun byteArrayToBitmap(byteArray: ByteArray) :Bitmap{
+        return BitmapFactory.decodeByteArray(byteArray,0,byteArray.size)
     }
 
     fun clickBackBtn() {

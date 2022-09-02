@@ -60,7 +60,7 @@
                 android:id="@+id/userProfile_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:scaleType="fitXY"
+                android:scaleType="fitCenter"
                 android:background="@drawable/profile_background_rounded"
                 app:srcCompat="@drawable/ic_default_profile" />
 
