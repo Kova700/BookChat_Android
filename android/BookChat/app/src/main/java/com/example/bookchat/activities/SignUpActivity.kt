@@ -27,6 +27,7 @@ import com.canhub.cropper.CropImageView
 import com.canhub.cropper.options
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySignUpBinding
+import com.example.bookchat.repository.DupCheckRepository
 import com.example.bookchat.utils.Constants.TAG
 import java.util.regex.Pattern
 
@@ -103,53 +104,45 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     fun clickStartBtn(){
-
-        startActivity(Intent(this,SelectTasteActivity::class.java))
-
-        //일단 가입 api부터 만들고
-//        if (isNotShort){
-//            if (isNotDuplicate){
-//                //인텐트에 유저 객체 실어야함
-//                val intent = Intent(this,SelectTasteActivity::class.java)
+        if (isNotShort){
+            duplicateCheck() //사용가능을 받아놓은 사이에 다른 유저가 닉네임을 가져갈 수 있음으로 누를때마다 검사하는게 맞을듯
+            if (isNotDuplicate){  //비동기 속도차이에 의해 최초엔 false로 인식하고 작동 안함
+                //인텐트에 유저 객체 실어야함
+                val intent = Intent(this,SelectTasteActivity::class.java)
 //                tempUser
 //                intent.putExtra("User",)
-//                startActivity(intent) //유저 이름 가지고 페이지 이동해야함
-//                //액티비티를 종료해야할까 말아야할까
-//                return
-//            }
-//
-//            //서버에게 중복성 검사하고 응답 받아야함
-//            //응답에따라 "이미 사용중인 닉네임입니다." OR "사용 가능한 닉네임입니다.
-//            //isNotDuplicate 갱신
-//            duplicateCheck()
-//        }
-
-
-        //길이 검사통과했는지 체크하고
-        //통과했으면 클릭 누르면 중복성 검사 하고
-        //중복성검사 마저 통과했다면 다음페이지로 넘어가야함
-        //텍스트 변경시 다시 중복검사 해야함
-
+                startActivity(intent) //유저 이름 가지고 페이지 이동해야함
+                //액티비티를 종료해야할까 말아야할까
+                return
+            }
+        }
     }
 
-    //과도한 요청 보낼시 서버에서 막음
     fun duplicateCheck() {
         //서버한테 중복 검사 요청
-
-        //닉네임 사용가능 여부가 True 라면
-        isNotDuplicate = true
-        with(binding){
-            nickNameLayout.background = ResourcesCompat.getDrawable(resources,R.drawable.nickname_input_back_blue,null)
-            checkResultTv.setTextColor(Color.parseColor("#5648FF"))
-            checkResultTv.text = "사용 가능한 닉네임입니다."
-        }
-
-        //닉네임 사용가능 여부가 False 라면
-        isNotDuplicate = false
-        with(binding){
-            nickNameLayout.background = ResourcesCompat.getDrawable(resources,R.drawable.nickname_input_back_red,null)
-            checkResultTv.setTextColor(Color.parseColor("#FF004D"))
-            checkResultTv.text = "이미 사용 중인 닉네임 입니다."
+        val repository = DupCheckRepository()
+        repository.duplicateCheck { dupCheckResult ->
+            when(dupCheckResult){
+                true -> {
+                    //닉네임 사용가능 여부가 True 라면
+                    isNotDuplicate = true
+                    with(binding){
+                        nickNameLayout.background = ResourcesCompat.getDrawable(resources,R.drawable.nickname_input_back_blue,null)
+                        checkResultTv.setTextColor(Color.parseColor("#5648FF"))
+                        checkResultTv.text = "사용 가능한 닉네임입니다."
+                    }
+                }
+                false ->{
+                    //닉네임 사용가능 여부가 False 라면
+                    isNotDuplicate = false
+                    with(binding){
+                        nickNameLayout.background = ResourcesCompat.getDrawable(resources,R.drawable.nickname_input_back_red,null)
+                        checkResultTv.setTextColor(Color.parseColor("#FF004D"))
+                        checkResultTv.text = "이미 사용 중인 닉네임 입니다."
+                    }
+                }
+            }
+            Log.d(TAG, "SignUpActivity: duplicateCheck() - called")
         }
     }
 
