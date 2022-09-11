@@ -9,7 +9,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class UesrRepository{
+class UserRepository{
     fun getUserProfile(callback : (User) -> Unit){
         if(!isNetworkConnected()) {
             Toast.makeText(App.instance.applicationContext,"네트워크가 연결되어 있지 않습니다.\n네트워크를 연결해주세요.", Toast.LENGTH_SHORT).show()
