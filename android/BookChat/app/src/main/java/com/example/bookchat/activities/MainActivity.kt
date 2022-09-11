@@ -16,6 +16,7 @@ import com.example.bookchat.databinding.ActivityMainBinding
 import com.example.bookchat.utils.ActivityType
 import com.example.bookchat.utils.Constants.TOKEN_PATH
 import com.example.bookchat.viewmodel.MainViewModel
+import com.example.bookchat.viewmodel.ViewModelFactory
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -27,7 +28,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        mainViewModel = ViewModelProvider(this,ViewModelFactory()).get(MainViewModel::class.java)
         with(binding){
             lifecycleOwner =this@MainActivity
             activity = this@MainActivity

@@ -13,7 +13,7 @@ import androidx.paging.LoadStates
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.bookchat.App
 import com.example.bookchat.Paging.BookSearchResultPagingLoadStateAdapter
-import com.example.bookchat.viewmodel.BookSearchResultViewModelFactory
+import com.example.bookchat.viewmodel.ViewModelFactory
 import com.example.bookchat.R
 import com.example.bookchat.adapter.SearchResultBookAdapter
 import com.example.bookchat.data.Book
@@ -60,9 +60,7 @@ class SearchResultActivity : AppCompatActivity() {
     }
 
     private fun initViewModel(){
-        val repository = BookRepository()
-        val viewModelFactory = BookSearchResultViewModelFactory(repository)
-        searchResultViewModel = ViewModelProvider(this@SearchResultActivity,viewModelFactory).get(SearchResultViewModel::class.java)
+        searchResultViewModel = ViewModelProvider(this,ViewModelFactory()).get(SearchResultViewModel::class.java)
     }
 
     private fun initRcyView(binding : ActivitySearchResultBinding){
