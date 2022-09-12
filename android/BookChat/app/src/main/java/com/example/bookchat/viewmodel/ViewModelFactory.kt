@@ -12,24 +12,23 @@ class ViewModelFactory() : ViewModelProvider.Factory {
 
     //싱글톤으로 구조 수정 필요할 듯
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        when(modelClass){
-            MainViewModel::class -> {
-                userRepository = UserRepository()
-                return MainViewModel(userRepository) as T
-            }
+        val a = MainViewModel::class.java
 
-            SearchResultViewModel::class -> {
-                bookRepository = BookRepository()
-                return SearchResultViewModel(bookRepository) as T
-            }
-
-            LoginViewModel::class ->{
-                userRepository = UserRepository()
-                return LoginViewModel(userRepository) as T
-            }
-
-            else -> throw IllegalArgumentException("unknown model class")
+        if(modelClass.isAssignableFrom(MainViewModel::class.java)){
+            userRepository = UserRepository()
+            return MainViewModel(userRepository) as T
         }
 
+        if(modelClass.isAssignableFrom(SearchResultViewModel::class.java)){
+            bookRepository = BookRepository()
+            return SearchResultViewModel(bookRepository) as T
+        }
+
+        if(modelClass.isAssignableFrom(LoginViewModel::class.java)){
+            userRepository = UserRepository()
+            return LoginViewModel(userRepository) as T
+        }
+
+        throw IllegalArgumentException("unknown model class : ${modelClass}")
     }
 }
