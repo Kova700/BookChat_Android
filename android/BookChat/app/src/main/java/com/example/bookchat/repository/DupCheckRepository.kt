@@ -38,6 +38,7 @@ class DupCheckRepository {
 
         override fun onFailure(call: Call<Any>, t: Throwable) {
             Log.d(TAG, "CallbackAction: onResponse() - Fail(통신 실패) response.body() : ${t.message}")
+            callback(false)
         }
 
     }

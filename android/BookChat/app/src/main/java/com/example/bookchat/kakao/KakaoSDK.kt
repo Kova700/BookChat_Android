@@ -15,10 +15,10 @@ class KakaoSDK(val context :Context) {
     private val userApiClient = UserApiClient.instance
     private val authApiClient = AuthApiClient.instance
 
-    suspend fun login(){
+    suspend fun login() : Boolean{
         if (isAvailableToken()){
             Log.d(TAG, "KakaoSDK: login() Token O- called")
-            return
+            return true
         }
         Log.d(TAG, "KakaoSDK: login() Token x- called")
         kakaoLogin()
@@ -69,6 +69,11 @@ class KakaoSDK(val context :Context) {
             }
         }
         return result
+    }
+
+    fun getIdToken() : String?{
+        val idToken = authApiClient.tokenManagerProvider.manager.getToken()?.idToken
+        return idToken?.let { "Bearer $idToken" }
     }
 
     fun tokenErrorHandler(error :Throwable){
