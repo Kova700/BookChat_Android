@@ -10,6 +10,9 @@
         <variable
             name="activity"
             type="com.example.bookchat.activities.LoginActivity" />
+        <variable
+            name="viewModel"
+            type="com.example.bookchat.viewmodel.LoginViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -76,7 +79,7 @@
             android:backgroundTint="#FEE500"
             android:drawableLeft="@drawable/ic_kakao_icon"
             android:fontFamily="@font/notosanskr_medium"
-            android:onClick="@{()->activity.startKakaoLogin()}"
+            android:onClick="@{()->viewModel.requestKakaoLogin()}"
             android:text="카카오로 시작하기"
             android:textColor="#392020"
             android:textSize="16sp"

@@ -38,7 +38,6 @@ object ApiClient {
                 delegate.convert(it)
             }
         }
-
     }
 
 }

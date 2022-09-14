@@ -6,10 +6,10 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.MediaStore
 import android.provider.Settings
 import android.text.InputFilter
 import android.util.Log
@@ -18,21 +18,35 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.net.toUri
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.canhub.cropper.CropImageContract
-import com.canhub.cropper.CropImageView
-import com.canhub.cropper.options
 import com.example.bookchat.R
+import com.example.bookchat.data.UserSignUpRequestDto
 import com.example.bookchat.databinding.ActivitySignUpBinding
 import com.example.bookchat.repository.DupCheckRepository
 import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.viewmodel.SelectTasteViewModel
+import com.example.bookchat.viewmodel.SignUpViewModel
+import com.example.bookchat.viewmodel.ViewModelFactory
+import com.kakao.sdk.user.UserApiClient
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okio.BufferedSink
+import java.io.ByteArrayOutputStream
 import java.util.regex.Pattern
+import kotlin.coroutines.resume
 
 class SignUpActivity : AppCompatActivity() {
     private lateinit var binding : ActivitySignUpBinding
+    private lateinit var signUpViewModel : SignUpViewModel
     private lateinit var imm :InputMethodManager
     private var isNotShort = false
     private var isNotDuplicate = false
@@ -40,16 +54,19 @@ class SignUpActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up)
+        signUpViewModel = ViewModelProvider(this, ViewModelFactory()).get(SignUpViewModel::class.java)
         with(binding){
+            lifecycleOwner = this@SignUpActivity
             activity = this@SignUpActivity
+            viewModel = signUpViewModel
         }
         setEditText()
         setFocus()
-        binding.userProfileIv.clipToOutline = true
-        //onActivityResult로 갤러리에서 이미지 가져와야함
+        binding.userProfileIv.clipToOutline = true // 이거 기능 확인해보자.
     }
 
     //이거 바인딩 어뎁터로 설정이 가능할거 같은데?
+    //혹은 ViewModel로 UI 설정 가능
     private fun setEditText(){
         val specialFilter = InputFilter{ source, _, _, _, _, _ ->
             val regex = "^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ\\u318D\\u119E\\u11A2\\u2022\\u2025a\\u00B7\\uFE55\\uFF1A]+$"
@@ -57,6 +74,8 @@ class SignUpActivity : AppCompatActivity() {
             if (pattern.matcher(source).matches()){
                 return@InputFilter source //통과되는 문자일 때 (입력값 그대로 출력)
             }
+            signUpViewModel._isSpecialCharInText.value = false
+            //특수문자 입력시 UI 수정해야함 ( 레이아웃 테두리, 텍스트뷰 ) <= 이놈들 객체를 어떻게 뽑지
             with(binding){
                 nickNameLayout.background = ResourcesCompat.getDrawable(resources,R.drawable.nickname_input_back_red,null)
                 checkResultTv.setTextColor(Color.parseColor("#FF004D"))
@@ -64,10 +83,12 @@ class SignUpActivity : AppCompatActivity() {
             }
             "" //통과되지 않는 문자일 때 대체 문자
         }
+
         with(binding){
             nickNameEt.filters = arrayOf(specialFilter)
             nickNameEt.addTextChangedListener {
-                isNotDuplicate = false //검사 다시해야함
+                //글자가 수정될때마다 중복, 길이 검사 초기화
+                isNotDuplicate = false
                 lengthCheck()
             }
         }
@@ -104,45 +125,97 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     fun clickStartBtn(){
-        if (isNotShort){
-            duplicateCheck() //사용가능을 받아놓은 사이에 다른 유저가 닉네임을 가져갈 수 있음으로 누를때마다 검사하는게 맞을듯
-            if (isNotDuplicate){  //비동기 속도차이에 의해 최초엔 false로 인식하고 작동 안함
-                //인텐트에 유저 객체 실어야함
-                val intent = Intent(this,SelectTasteActivity::class.java)
-//                tempUser
-//                intent.putExtra("User",)
-                startActivity(intent) //유저 이름 가지고 페이지 이동해야함
-                //액티비티를 종료해야할까 말아야할까
-                return
+        lifecycleScope.launch{
+            if (isNotShort){
+                if (isNotDuplicate){
+                    goSelectTasteActivity()
+                    return@launch
+                }
+                duplicateCheck()
             }
+            lengthCheck()
         }
     }
 
-    fun duplicateCheck() {
-        //서버한테 중복 검사 요청
-        val repository = DupCheckRepository()
-        repository.duplicateCheck { dupCheckResult ->
-            when(dupCheckResult){
-                true -> {
-                    //닉네임 사용가능 여부가 True 라면
-                    isNotDuplicate = true
-                    with(binding){
-                        nickNameLayout.background = ResourcesCompat.getDrawable(resources,R.drawable.nickname_input_back_blue,null)
-                        checkResultTv.setTextColor(Color.parseColor("#5648FF"))
-                        checkResultTv.text = "사용 가능한 닉네임입니다."
-                    }
+    private suspend fun goSelectTasteActivity(){
+        val userEmail = withContext(lifecycleScope.coroutineContext) { getUserEmail() }
+        val userProfilBitmap = binding.userProfileIv.drawable.toBitmap(300,300)
+
+        val signUpDto = UserSignUpRequestDto(
+            nickname = binding.nickNameEt.text.toString(), //데이터 체크
+            userEmail = userEmail,
+            oauth2Provider = "kakao", //임시
+            defaultProfileImageType = 1, //임시
+            userProfileImage = null,
+        )
+        val intent = Intent(this,SelectTasteActivity::class.java)
+        intent.putExtra("signUpDto" , signUpDto)
+        val byteArray = getByteArray(userProfilBitmap)
+        intent.putExtra("userProfileImg",byteArray)
+        //readingTastes, Img 입력 받아야함
+        startActivity(intent)
+    }
+
+    private fun getByteArray(bitmap :Bitmap) :ByteArray{
+        return if(sdkVersionIsMoreR()) bitmapToByteArray(bitmap,Bitmap.CompressFormat.WEBP_LOSSLESS)
+        else bitmapToByteArray(bitmap,Bitmap.CompressFormat.WEBP)
+    }
+
+    private fun bitmapToByteArray(bitmap: Bitmap, compressFormat :Bitmap.CompressFormat) :ByteArray{
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(compressFormat,100,stream) //임시 100
+        return stream.toByteArray()
+    }
+
+    //WEBP 비손실 압축 버전 분기 목적
+    private fun sdkVersionIsMoreR() :Boolean{
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+    }
+
+    suspend fun getUserEmail() :String{
+        //나중에 객체 생성하는 부분 다 싱글톤으로 정리하기 (그냥 Object로 KAKAOSDK 만들면 안되나?)
+        val userEmail = suspendCancellableCoroutine<String> { continuation ->
+            UserApiClient.instance.me { user, error ->
+                error?.let {
+                    Log.d(TAG, "SignUpActivity: getUserEmail() - error : $error  - \"사용자 정보 요청 실패\"")
                 }
-                false ->{
-                    //닉네임 사용가능 여부가 False 라면
-                    isNotDuplicate = false
-                    with(binding){
-                        nickNameLayout.background = ResourcesCompat.getDrawable(resources,R.drawable.nickname_input_back_red,null)
-                        checkResultTv.setTextColor(Color.parseColor("#FF004D"))
-                        checkResultTv.text = "이미 사용 중인 닉네임 입니다."
-                    }
+                user?.let {
+                    continuation.resume(user.kakaoAccount?.email!!)
                 }
             }
-            Log.d(TAG, "SignUpActivity: duplicateCheck() - called")
+        }
+        Log.d(TAG, "SignUpActivity: getUserEmail() - userEmail : $userEmail")
+        return userEmail
+    }
+
+    //서버한테 중복 검사 요청
+    suspend fun duplicateCheck() {
+        Log.d(TAG, "SignUpActivity: duplicateCheck() - called - isNotDuplicate : $isNotDuplicate")
+        val repository = DupCheckRepository() //이거도 싱글톤으로 뭔가 수정해야할 느낌
+        isNotDuplicate = suspendCancellableCoroutine<Boolean> { continuation ->
+            repository.duplicateCheck { dupCheckResult ->
+                when(dupCheckResult){
+                    true -> {
+                        //닉네임 사용가능 여부가 True 라면
+                        with(binding){
+                            nickNameLayout.background = ResourcesCompat.getDrawable(resources,R.drawable.nickname_input_back_blue,null)
+                            checkResultTv.setTextColor(Color.parseColor("#5648FF"))
+                            checkResultTv.text = "사용 가능한 닉네임입니다."
+                        }
+                        continuation.resume(true)
+                    }
+                    false ->{
+                        //닉네임 사용가능 여부가 False 라면
+                        with(binding){
+                            nickNameLayout.background = ResourcesCompat.getDrawable(resources,R.drawable.nickname_input_back_red,null)
+                            checkResultTv.setTextColor(Color.parseColor("#FF004D"))
+                            checkResultTv.text = "이미 사용 중인 닉네임 입니다."
+                        }
+                        continuation.resume(false)
+                    }
+                }
+                Log.d(TAG, "SignUpActivity: duplicateCheck() - 검사 완료 - isNotDuplicate : $isNotDuplicate")
+            }
         }
     }
 

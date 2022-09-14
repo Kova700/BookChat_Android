@@ -6,6 +6,9 @@
         <variable
             name="activity"
             type="com.example.bookchat.activities.SignUpActivity" />
+        <variable
+            name="viewModel"
+            type="com.example.bookchat.viewmodel.SignUpViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

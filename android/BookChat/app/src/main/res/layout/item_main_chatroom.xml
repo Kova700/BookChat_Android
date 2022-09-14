@@ -56,12 +56,12 @@
             android:layout_width="85dp"
             android:layout_height="85dp"
             app:cardCornerRadius="16dp">
-            <ImageView
+            <!--<ImageView
                 android:id="@+id/bookImg"
                 android:layout_width="85dp"
                 android:layout_height="85dp"
                 android:scaleType="fitXY"
-                android:src="@drawable/ex_walle"/>
+                android:src="@drawable/ex_walle"/>-->
         </androidx.cardview.widget.CardView>
 
         <View

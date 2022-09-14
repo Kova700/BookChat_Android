@@ -15,10 +15,11 @@ class KakaoSDK(val context :Context) {
     private val userApiClient = UserApiClient.instance
     private val authApiClient = AuthApiClient.instance
 
-    suspend fun login() : Boolean{
+    //성공 여부로 분기 작업해야함
+    suspend fun login(){
         if (isAvailableToken()){
             Log.d(TAG, "KakaoSDK: login() Token O- called")
-            return true
+            return
         }
         Log.d(TAG, "KakaoSDK: login() Token x- called")
         kakaoLogin()

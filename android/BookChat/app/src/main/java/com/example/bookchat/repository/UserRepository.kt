@@ -25,7 +25,7 @@ class UserRepository{
             userEmail = userInfo.userEmail,
             oauth2Provider = userInfo.oauth2Provider,
             defaultProfileImageType = userInfo.defaultProfileImageType,
-            userProfileImage = userInfo.userProfileImage,
+            userProfileImage = userInfo.userProfileImage!!,
             readingTastes = userInfo.readingTastes
         )
         call.enqueue(signUpCallback(callback))

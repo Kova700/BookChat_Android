@@ -29,6 +29,14 @@ class ViewModelFactory() : ViewModelProvider.Factory {
             return LoginViewModel(userRepository) as T
         }
 
+        if(modelClass.isAssignableFrom(SelectTasteViewModel::class.java)){
+            return SelectTasteViewModel() as T
+        }
+
+        if(modelClass.isAssignableFrom(SignUpViewModel::class.java)){
+            return SignUpViewModel() as T
+        }
+
         throw IllegalArgumentException("unknown model class : ${modelClass}")
     }
 }
