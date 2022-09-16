@@ -11,8 +11,8 @@ import kotlinx.coroutines.*
 import kotlin.coroutines.resume
 
 object KakaoSDK {
-    private val userApiClient = UserApiClient.instance
-    private val authApiClient = AuthApiClient.instance
+    private val userApiClient by lazy { UserApiClient.instance }
+    private val authApiClient by lazy { AuthApiClient.instance }
 
     //성공 여부로 분기 작업해야함
     suspend fun login(){
