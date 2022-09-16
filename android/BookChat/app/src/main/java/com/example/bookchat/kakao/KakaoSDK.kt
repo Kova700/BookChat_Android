@@ -1,7 +1,7 @@
 package com.example.bookchat.kakao
 
-import android.content.Context
 import android.util.Log
+import com.example.bookchat.App
 import com.example.bookchat.utils.Constants.TAG
 import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.auth.model.OAuthToken
@@ -9,9 +9,8 @@ import com.kakao.sdk.common.model.*
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.*
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
-class KakaoSDK(val context :Context) {
+object KakaoSDK {
     private val userApiClient = UserApiClient.instance
     private val authApiClient = AuthApiClient.instance
 
@@ -41,7 +40,7 @@ class KakaoSDK(val context :Context) {
     }
 
     fun kakaoLogin() {
-        val isKakaoTalkLoginAvailable = userApiClient.isKakaoTalkLoginAvailable(context)
+        val isKakaoTalkLoginAvailable = userApiClient.isKakaoTalkLoginAvailable(App.instance.applicationContext)
         if (isKakaoTalkLoginAvailable) {
             Log.d(TAG, "KakaoSDK: kakaoLogin() KakaoTalk o- called")
             kakaoLoginWithKakaoTalk()
@@ -109,7 +108,7 @@ class KakaoSDK(val context :Context) {
 
 
     fun kakaoLoginWithKakaoTalk(){
-        userApiClient.loginWithKakaoTalk(context) { token, error ->
+        userApiClient.loginWithKakaoTalk(App.instance.applicationContext) { token, error ->
             error?.let {
                 kakaoLoginErrorHandler(error)
                 kakaoLoginWithKakaoAccount()
@@ -136,7 +135,7 @@ class KakaoSDK(val context :Context) {
 
     fun kakaoLoginWithKakaoAccount(){
         Log.d(TAG, "KakaoSDK: kakaoLoginWithKakaoAccount() - called")
-        userApiClient.loginWithKakaoAccount(context, callback = kakaoAcountCallback)
+        userApiClient.loginWithKakaoAccount(App.instance.applicationContext, callback = kakaoAcountCallback)
     }
 
     fun kakaoLoginErrorHandler(error :Throwable) {

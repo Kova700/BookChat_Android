@@ -7,15 +7,13 @@ import okhttp3.Response
 import java.io.IOException
 
 class AppInterceptor : Interceptor {
-    lateinit var kakaoSDK : KakaoSDK
 
     @Throws(IOException::class)
     override fun intercept(
         chain: Interceptor.Chain // chain : 가로채지기 직전의 요청에 대한 정보가 모두 들어있음
     ): Response{
         //구조가 좀 비효율적임 수정하면 좋을 듯
-        kakaoSDK = KakaoSDK(App.instance.applicationContext) //컨택스트 가능한지 오류 확인해야함
-        val kakaoIdToken = kakaoSDK.getIdToken() //카카오 구글 분기해서 보내야함
+        val kakaoIdToken = KakaoSDK.getIdToken() //카카오 구글 분기해서 보내야함
         val googleIdToken = " " //수정해야함
         val idToken = kakaoIdToken ?: googleIdToken
         

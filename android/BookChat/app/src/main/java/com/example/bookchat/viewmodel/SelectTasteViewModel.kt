@@ -36,11 +36,11 @@ class SelectTasteViewModel :ViewModel() {
     }
 
     val tasteConverter = hashMapOf<String,ReadingTaste>(
-        "경제" to ReadingTaste.Economy , "철학" to ReadingTaste.Philosophy , "역사" to ReadingTaste.History ,
-        "여행" to ReadingTaste.Travel , "건강" to ReadingTaste.Health , "취미" to ReadingTaste.Hobby ,
-        "인문" to ReadingTaste.Humanities , "소설" to ReadingTaste.Novel, "예술" to ReadingTaste.Art ,
-        "디자인" to ReadingTaste.Design , "개발" to ReadingTaste.Development , "과학" to ReadingTaste.Science ,
-        "잡지" to ReadingTaste.Magazine , "종교" to ReadingTaste.Religion , "인물" to ReadingTaste.Character
+        "경제" to ReadingTaste.ECONOMY , "철학" to ReadingTaste.PHILOSOPHY , "역사" to ReadingTaste.HISTORY ,
+        "여행" to ReadingTaste.TRAVEL , "건강" to ReadingTaste.HEALTH , "취미" to ReadingTaste.HOBBY ,
+        "인문" to ReadingTaste.HUMANITIES , "소설" to ReadingTaste.NOVEL, "예술" to ReadingTaste.ART ,
+        "디자인" to ReadingTaste.DESIGN , "개발" to ReadingTaste.DEVELOPMENT , "과학" to ReadingTaste.SCIENCE ,
+        "잡지" to ReadingTaste.MAGAZINE , "종교" to ReadingTaste.RELIGION , "인물" to ReadingTaste.CHARACTER
     )
 
 }

@@ -41,8 +41,6 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var binding : ActivitySignUpBinding
     private lateinit var signUpViewModel : SignUpViewModel
     private lateinit var imm :InputMethodManager
-    private var isNotShort = false
-    private var isNotDuplicate = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +51,7 @@ class SignUpActivity : AppCompatActivity() {
             activity = this@SignUpActivity
             viewModel = signUpViewModel
         }
-       binding.userProfileIv.clipToOutline = true // 이거 기능 확인해보자.
+        binding.userProfileIv.clipToOutline = true // 이거 기능 확인해보자.
         setFocus()
 
         signUpViewModel.goSelectTasteActivity = {
@@ -106,7 +104,6 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     suspend fun getUserEmail() :String{
-        //나중에 객체 생성하는 부분 다 싱글톤으로 정리하기 (그냥 Object로 KAKAOSDK 만들면 안되나?)
         val userEmail = suspendCancellableCoroutine<String> { continuation ->
             UserApiClient.instance.me { user, error ->
                 error?.let {
@@ -170,7 +167,6 @@ class SignUpActivity : AppCompatActivity() {
             openCropActivity(resultUri!!)
         }
 
-    //이런 데이터를 액티비티 안통하고 뷰모델에서 뷰모델끼리 옮기기 위해서 Channel을 사용하는건가?
     private val cropActivityResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if(result.resultCode == RESULT_OK){
@@ -178,7 +174,6 @@ class SignUpActivity : AppCompatActivity() {
                 val intent = result.data
                 val bitmapByteArray = intent?.getByteArrayExtra("image") ?: byteArrayOf()
                 val bitmap = byteArrayToBitmap(bitmapByteArray)
-                //유저 객체에 bitmap 실어야함
 
                 Glide.with(this)
                     .asBitmap()

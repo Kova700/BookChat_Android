@@ -24,8 +24,6 @@ import com.example.bookchat.viewmodel.ViewModelFactory
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
-    //토큰있으면 자동 로그인 없으면 다시 웹으로 토큰 받아오는거 구현
-    //리프레시 토큰 교체하는거 구현해야함
     private lateinit var binding : ActivityLoginBinding
     private lateinit var loginViewModel : LoginViewModel
 
@@ -33,7 +31,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
         loginViewModel = ViewModelProvider(this, ViewModelFactory()).get(LoginViewModel::class.java)
-        loginViewModel.startKakaoLogin = { lifecycleScope.launch{ KakaoSDK(this@LoginActivity).login() } }
+        loginViewModel.startKakaoLogin = { lifecycleScope.launch{ KakaoSDK.login() } }
         loginViewModel.loginSuccessCallBack = { startActivity(Intent(this,SignUpActivity::class.java)) }
 
         with(binding){
@@ -41,68 +39,14 @@ class LoginActivity : AppCompatActivity() {
             activity = this@LoginActivity
             viewModel = loginViewModel
         }
-        //handleIntent(intent)
         checkToken()
     }
 
-//    private fun handleIntent(intent: Intent) {
-//        val FinalUri: Uri? = intent.data
-//        val token = FinalUri?.getQueryParameter("token")
-//        if (token.isNullOrEmpty()){ return }
-//        SharedPreferenceManager.saveToken(token)
-//        val intent = Intent(this, MainActivity::class.java)
-//        startActivity(intent)
-//        finish()
-//    }
-
     private fun checkToken() {
-        //카카오로 수정해야함
-//        if(SharedPreferenceManager.isTokenEmpty()){
-//            Toast.makeText(this,"로그인 정보가 없습니다.\n로그인을 진행해주세요.",Toast.LENGTH_LONG).show()
-//            return
-//        }
-//        //불러온 토큰의 기간이 만료된거라면 새로운 리프레시토큰을 요청해야함
-//        Toast.makeText(this,"로그인 정보를 불러옵니다.",Toast.LENGTH_SHORT).show()
-//        val intent = Intent(this, MainActivity::class.java)
-//        startActivity(intent)
-//        finish()
+
+        //현재 토큰 확인하고 만료되지 않은 토큰있으면 북챗로그인 시도
+        //토큰이 없으면 무반응
+            //로그인 버튼 누르면 SDK 통해서 토큰 받아서 로그인 시도
     }
 
-    //현재 액티비티가 살아있고, 재호출되는 경우 onCreate()대신 호출됨
-//    override fun onNewIntent(intent: Intent) {
-//        super.onNewIntent(intent)
-//        handleIntent(intent)
-//    }
-
-    //구글 임시로 살려둠
-    fun openWeb(loginType : LoginType){
-//        val uri = when(loginType){
-//            LoginType.KAKAO ->{ KAKAO_LOGIN }
-//            LoginType.GOOGLE ->{ GOOGLE_LOGIN }
-//        }
-//        if(sdkVersionCheck()){ //브라우저로 진행
-//            val intent = Intent(Intent.ACTION_VIEW,Uri.parse(uri))
-//            startActivity(intent)
-//            finish()
-//            return
-//        }
-//        //크롬 커스텀 탭으로 진행
-//        openCustomTab(uri)
-    }
-
-//    private fun openCustomTab(uri :String){
-//        val params = CustomTabColorSchemeParams.Builder()
-//            .setToolbarColor(ContextCompat.getColor(this, R.color.black))
-//        CustomTabsIntent.Builder()
-//            .setDefaultColorSchemeParams(params.build())
-//            .setShowTitle(false)
-//            .setInstantAppsEnabled(true)
-//            .build()
-//            .launchUrl(this, Uri.parse(uri))
-//    }
-
-//    private fun sdkVersionCheck() :Boolean{
-//        return Build.VERSION.SDK_INT == Build.VERSION_CODES.S ||
-//                Build.VERSION.SDK_INT == Build.VERSION_CODES.S_V2
-//    }
 }
