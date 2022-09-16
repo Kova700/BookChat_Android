@@ -12,34 +12,34 @@ class ViewModelFactory() : ViewModelProvider.Factory {
     private lateinit var userRepository : UserRepository
     private lateinit var dupCheckRepository : DupCheckRepository
 
-    //싱글톤으로 구조 수정 필요할 듯
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        val a = MainViewModel::class.java
 
-        if(modelClass.isAssignableFrom(MainViewModel::class.java)){
-            userRepository = UserRepository()
-            return MainViewModel(userRepository) as T
+        when{
+            modelClass.isAssignableFrom(MainViewModel::class.java) -> {
+                userRepository = UserRepository()
+                return MainViewModel(userRepository) as T
+            }
+
+            modelClass.isAssignableFrom(SearchResultViewModel::class.java) -> {
+                bookRepository = BookRepository()
+                return SearchResultViewModel(bookRepository) as T
+            }
+
+            modelClass.isAssignableFrom(LoginViewModel::class.java) -> {
+                userRepository = UserRepository()
+                return LoginViewModel(userRepository) as T
+            }
+
+            modelClass.isAssignableFrom(SelectTasteViewModel::class.java) -> {
+                return SelectTasteViewModel() as T
+            }
+
+            modelClass.isAssignableFrom(SignUpViewModel::class.java) -> {
+                dupCheckRepository = DupCheckRepository()
+                return SignUpViewModel(dupCheckRepository) as T
+            }
+
+            else -> throw IllegalArgumentException("unknown model class : ${modelClass}")
         }
-
-        if(modelClass.isAssignableFrom(SearchResultViewModel::class.java)){
-            bookRepository = BookRepository()
-            return SearchResultViewModel(bookRepository) as T
-        }
-
-        if(modelClass.isAssignableFrom(LoginViewModel::class.java)){
-            userRepository = UserRepository()
-            return LoginViewModel(userRepository) as T
-        }
-
-        if(modelClass.isAssignableFrom(SelectTasteViewModel::class.java)){
-            return SelectTasteViewModel() as T
-        }
-
-        if(modelClass.isAssignableFrom(SignUpViewModel::class.java)){
-            dupCheckRepository = DupCheckRepository()
-            return SignUpViewModel(dupCheckRepository) as T
-        }
-
-        throw IllegalArgumentException("unknown model class : ${modelClass}")
     }
 }
