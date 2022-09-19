@@ -42,22 +42,22 @@ object DataBindingAdapter {
     @BindingAdapter("setTextViewFromCheckResult")
     fun setTextViewFromCheckResult(textView :TextView, nameCheckStatus: NameCheckStatus){
         when(nameCheckStatus){
-            NameCheckStatus.default -> {
+            NameCheckStatus.Default -> {
                 textView.text = ""
             }
-            NameCheckStatus.isShort -> {
+            NameCheckStatus.IsShort -> {
                 textView.setTextColor(Color.parseColor("#FF004D"))
                 textView.text = "최소 2자리 이상 입력해 주세요."
             }
-            NameCheckStatus.isDuplicate ->{
+            NameCheckStatus.IsDuplicate ->{
                 textView.setTextColor(Color.parseColor("#FF004D"))
                 textView.text = "이미 사용 중인 닉네임 입니다."
             }
-            NameCheckStatus.isSpecialCharInText -> {
+            NameCheckStatus.IsSpecialCharInText -> {
                 textView.setTextColor(Color.parseColor("#FF004D"))
                 textView.text = "특수문자는 사용 불가능합니다."
             }
-            NameCheckStatus.isPerfect -> {
+            NameCheckStatus.IsPerfect -> {
                 textView.setTextColor(Color.parseColor("#5648FF"))
                 textView.text = "사용 가능한 닉네임입니다."
             }
@@ -68,15 +68,15 @@ object DataBindingAdapter {
     @BindingAdapter("setLayoutFromCheckResult")
     fun setLayoutFromCheckResult(layout :LinearLayout, nameCheckStatus: NameCheckStatus){
         when(nameCheckStatus){
-            NameCheckStatus.default ->{
+            NameCheckStatus.Default ->{
                 layout.background = ResourcesCompat.getDrawable(App.instance.resources,R.drawable.nickname_input_back_white,null)
             }
-            NameCheckStatus.isShort,
-            NameCheckStatus.isDuplicate,
-            NameCheckStatus.isSpecialCharInText -> {
+            NameCheckStatus.IsShort,
+            NameCheckStatus.IsDuplicate,
+            NameCheckStatus.IsSpecialCharInText -> {
                 layout.background = ResourcesCompat.getDrawable(App.instance.resources,R.drawable.nickname_input_back_red,null)
             }
-            NameCheckStatus.isPerfect -> {
+            NameCheckStatus.IsPerfect -> {
                 layout.background = ResourcesCompat.getDrawable(App.instance.resources,R.drawable.nickname_input_back_blue,null)
             }
         }

@@ -1,5 +1,9 @@
 package com.example.bookchat.utils
 
-enum class NameCheckStatus {
-    default, isShort, isDuplicate, isSpecialCharInText, isPerfect
+sealed class NameCheckStatus {
+    object Default :NameCheckStatus()
+    object IsShort :NameCheckStatus()
+    object IsDuplicate :NameCheckStatus()
+    object IsSpecialCharInText :NameCheckStatus()
+    object IsPerfect :NameCheckStatus()
 }

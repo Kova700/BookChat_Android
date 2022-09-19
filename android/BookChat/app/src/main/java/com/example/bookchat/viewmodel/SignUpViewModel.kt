@@ -21,7 +21,7 @@ class SignUpViewModel(private var dupCheckRepository : DupCheckRepository) :View
     lateinit var goSelectTasteActivity : suspend () -> Unit
     private var _isNotNameShort = MutableLiveData<Boolean?>(false)
     private var _isNotNameDuplicate = MutableLiveData<Boolean?>(false)
-    private var _nameCheckStatus = MutableLiveData<NameCheckStatus>(NameCheckStatus.default)
+    private var _nameCheckStatus = MutableLiveData<NameCheckStatus>(NameCheckStatus.Default)
 
     val isNotNameShort : LiveData<Boolean?>
         get() = _isNotNameShort
@@ -43,11 +43,11 @@ class SignUpViewModel(private var dupCheckRepository : DupCheckRepository) :View
 
     fun lengthCheck(inputedText :String){
         if (inputedText.length < 2){
-            _nameCheckStatus.value = NameCheckStatus.isShort
+            _nameCheckStatus.value = NameCheckStatus.IsShort
             _isNotNameShort.value = false
             return
         }
-        _nameCheckStatus.value = NameCheckStatus.default
+        _nameCheckStatus.value = NameCheckStatus.Default
         _isNotNameShort.value = true
     }
 
@@ -57,7 +57,7 @@ class SignUpViewModel(private var dupCheckRepository : DupCheckRepository) :View
         if (pattern.matcher(source).matches()){
             return@InputFilter source //통과되는 문자일 때 (입력값 그대로 출력)
         }
-        _nameCheckStatus.value = NameCheckStatus.isSpecialCharInText
+        _nameCheckStatus.value = NameCheckStatus.IsSpecialCharInText
         "" //통과되지 않는 문자일 때 대체 문자
     })
 
@@ -81,11 +81,11 @@ class SignUpViewModel(private var dupCheckRepository : DupCheckRepository) :View
             dupCheckRepository.duplicateCheck { dupCheckResult ->
                 when(dupCheckResult){
                     true -> {
-                        _nameCheckStatus.value = NameCheckStatus.isPerfect
+                        _nameCheckStatus.value = NameCheckStatus.IsPerfect
                         continuation.resume(true)
                     }
                     false ->{
-                        _nameCheckStatus.value = NameCheckStatus.isDuplicate
+                        _nameCheckStatus.value = NameCheckStatus.IsDuplicate
                         continuation.resume(false)
                     }
                 }

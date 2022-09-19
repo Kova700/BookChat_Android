@@ -1,16 +1,18 @@
 package com.example.bookchat.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.bookchat.kakao.KakaoSDK
 import com.example.bookchat.repository.UserRepository
 import com.example.bookchat.utils.Constants.TAG
 import com.kakao.sdk.auth.AuthApiClient
+import kotlinx.coroutines.launch
 
 class LoginViewModel(private val userRepository : UserRepository) : ViewModel(){
-
-    lateinit var startKakaoLogin : () -> Unit
-    lateinit var startGoogleLogin : () -> Unit
     lateinit var loginSuccessCallBack :() -> Unit //토큰 가져왔으면 페이지 이동 실행
+    private val _isLoginResult = MutableLiveData<Boolean>()
 
     //카카오로부터 토큰 받아오기
     fun requestKakaoLogin(){
@@ -32,10 +34,14 @@ class LoginViewModel(private val userRepository : UserRepository) : ViewModel(){
         Log.d(TAG, "LoginViewModel: requestKakaoLogin() - called - AuthApiClient.instance.hasToken() : ${AuthApiClient.instance.hasToken()}")
         loginSuccessCallBack()
     }
+
+    fun startKakaoLogin(){
+        viewModelScope.launch {
+            KakaoSDK.login()
+        }
+    }
     
     fun requestGoogleLogin(){
-        //액티비티에서 startGoogleLogin() 정의 받아야함
-        startGoogleLogin()
     }
 
     //카카오로부터 토큰 받아오고
