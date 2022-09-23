@@ -13,7 +13,6 @@ class App : Application() {
         lateinit var instance : App
             private set //외부 수정 불가
     }
-
     lateinit var networkManager: NetworkManager
     lateinit var apiInterface :ApiInterface
 

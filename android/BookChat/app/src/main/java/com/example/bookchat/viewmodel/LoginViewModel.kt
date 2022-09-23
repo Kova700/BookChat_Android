@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.kakao.KakaoSDK
 import com.example.bookchat.repository.UserRepository
 import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.DataStoreManager
+import com.example.bookchat.utils.LoginType
 import com.kakao.sdk.auth.AuthApiClient
 import kotlinx.coroutines.launch
 
@@ -17,6 +19,7 @@ class LoginViewModel(private val userRepository : UserRepository) : ViewModel(){
     //카카오로부터 토큰 받아오기
     fun requestKakaoLogin(){
         startKakaoLogin()
+
         //받아온 결과에 따라 분기 처리
         //토큰을 카카오로부터 가져왔든 로컬로부터 가져왔든
         // 성공적으로 가져왔으면 서버에게 로그인 요청 보내기 (회원정보 달라고 요청)
@@ -37,6 +40,7 @@ class LoginViewModel(private val userRepository : UserRepository) : ViewModel(){
 
     fun startKakaoLogin(){
         viewModelScope.launch {
+            DataStoreManager.setTokenType(LoginType.KAKAO)
             KakaoSDK.login()
         }
     }

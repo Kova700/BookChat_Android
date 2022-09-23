@@ -29,6 +29,9 @@ class LoginActivity : AppCompatActivity() {
             viewModel = loginViewModel
         }
 
+        //자동로그인
+        //DataStore에 토큰타입이 저장되어 있다면 해당 토큰으로 자동 로그인 시도
+
 //        lifecycleScope.launch {
 //            checkToken()
 //        }
