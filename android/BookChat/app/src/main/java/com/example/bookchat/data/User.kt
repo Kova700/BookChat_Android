@@ -4,10 +4,12 @@ import com.google.gson.annotations.SerializedName
 
 //DTO
 data class User(
-    @SerializedName("userName")
-    val userName: String,
+    @SerializedName("userNickname")
+    val userNickname: String,
     @SerializedName("userEmail")
     val userEmail: String,
     @SerializedName("userProfileImageUri")
-    val userProfileImageUri: String
+    val userProfileImageUri: String,
+    @SerializedName("defaultProfileImageType")
+    val defaultProfileImageType: Int
 )
