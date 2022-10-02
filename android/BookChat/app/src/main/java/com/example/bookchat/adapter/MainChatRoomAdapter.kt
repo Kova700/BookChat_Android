@@ -17,7 +17,7 @@ class MainChatRoomAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
     }
 
     override fun getItemCount(): Int {
-        return 10
+        return 3
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {

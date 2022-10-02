@@ -40,11 +40,11 @@ class MainActivity : AppCompatActivity() {
 
     fun clickMenu() {
         with(binding){
-            if(drawerlayout.isDrawerOpen(Gravity.RIGHT)) {
-                drawerlayout.closeDrawer(Gravity.RIGHT)
-                return
-            }
-            drawerlayout.openDrawer(Gravity.RIGHT)
+//            if(drawerlayout.isDrawerOpen(Gravity.RIGHT)) {
+//                drawerlayout.closeDrawer(Gravity.RIGHT)
+//                return
+//            }
+//            drawerlayout.openDrawer(Gravity.RIGHT)
         }
     }
     fun changePage(activityType: ActivityType) {
@@ -76,17 +76,17 @@ class MainActivity : AppCompatActivity() {
         if (token.exists()) token.delete()
     }
     private fun getUserInfo(){
-        binding.profile.clipToOutline = true //프로필 라운딩
+//        binding.profile.clipToOutline = true //프로필 라운딩
         binding.userModel?.activityInitialization()
     }
     private fun initRecyclerView(){
         with(binding){
             chatRoomAdapter = MainChatRoomAdapter()
-            chatRoomRecyclerView.adapter = chatRoomAdapter
-            chatRoomRecyclerView.setHasFixedSize(true)
-            chatRoomRecyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
-            val snapHelper = LinearSnapHelper()
-            snapHelper.attachToRecyclerView(chatRoomRecyclerView)
+            todayChatRoomListView.adapter = chatRoomAdapter
+            todayChatRoomListView.setHasFixedSize(true)
+            todayChatRoomListView.layoutManager = LinearLayoutManager(this@MainActivity)
+//            val snapHelper = LinearSnapHelper()
+//            snapHelper.attachToRecyclerView(chatRoomRecyclerView)
         }
     }
 }

@@ -21,7 +21,7 @@ class MainViewModel(private val userRepository: UserRepository) : ViewModel(){
 
     fun getUserInfo(){
         if (_user.value == null){
-            userRepository.getUserProfile{ user: User -> _user.value = user}   //user 받아올 콜백 메서드 전달
+//            userRepository.getUserProfile{ user: User -> _user.value = user}   //user 받아올 콜백 메서드 전달
             Log.d(TAG, "MainViewModel: getUserInfo() - 값 불러오기 완료")
         }
     }

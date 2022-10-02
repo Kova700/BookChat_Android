@@ -6,7 +6,7 @@
     <data>
         <variable
             name="loginType"
-            type="com.example.bookchat.utils.LoginType" />
+            type="com.example.bookchat.utils.IdTokenProvider" />
         <variable
             name="activity"
             type="com.example.bookchat.activities.LoginActivity" />
@@ -35,7 +35,7 @@
 
         <TextView
             android:id="@+id/textView"
-            android:layout_width="233dp"
+            android:layout_width="wrap_content"
             android:layout_height="87dp"
             android:fontFamily="@font/notosanskr_regular"
             android:text="책으로 연결되는 우리\n이제부터 북챗으로 대화해요"
@@ -79,7 +79,7 @@
             android:backgroundTint="#FEE500"
             android:drawableLeft="@drawable/ic_kakao_icon"
             android:fontFamily="@font/notosanskr_medium"
-            android:onClick="@{()->viewModel.requestKakaoLogin()}"
+            android:onClick="@{()->viewModel.startKakaoLogin()}"
             android:text="카카오로 시작하기"
             android:textColor="#392020"
             android:textSize="16sp"

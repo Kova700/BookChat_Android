@@ -21,28 +21,14 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
         loginViewModel = ViewModelProvider(this, ViewModelFactory()).get(LoginViewModel::class.java)
-        loginViewModel.loginSuccessCallBack = { startActivity(Intent(this,SignUpActivity::class.java)) }
+        loginViewModel.loginSuccessCallBack = { startActivity(Intent(this,SignUpActivity::class.java)); finish() }
 
         with(binding){
             lifecycleOwner = this@LoginActivity
             activity = this@LoginActivity
             viewModel = loginViewModel
         }
-
-        //자동로그인
-        //DataStore에 토큰타입이 저장되어 있다면 해당 토큰으로 자동 로그인 시도
-
-//        lifecycleScope.launch {
-//            checkToken()
-//        }
-
     }
 
-//    private suspend fun checkToken() {
-//        if (KakaoSDK.isAvailableToken()){
-//            startActivity(Intent(this,MainActivity::class.java))
-//            finish()
-//        }
-//    }
 
 }
