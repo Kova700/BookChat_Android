@@ -50,22 +50,27 @@
 
         <FrameLayout
             android:id="@+id/frameLayout2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView2"
             app:layout_constraintVertical_bias="0.104">
-
-            <ImageView
-                android:id="@+id/userProfile_iv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:scaleType="fitCenter"
-                android:background="@drawable/profile_background_rounded"
-                app:srcCompat="@drawable/ic_default_profile" />
+            
+            <androidx.cardview.widget.CardView
+                android:layout_gravity="center"
+                app:cardCornerRadius="35dp"
+                android:layout_width="90dp"
+                android:layout_height="90dp">
+                <ImageView
+                    android:id="@+id/userProfile_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/ic_default_profile_img1" />
+            </androidx.cardview.widget.CardView>
 
             <ImageButton
                 android:id="@+id/imageButton2"
