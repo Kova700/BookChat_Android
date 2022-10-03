@@ -52,7 +52,7 @@ class SelectTasteActivity : AppCompatActivity() {
 
     private fun getFinalSignUpUserDto(){
         val bitmapMultipartBody = BitmapToRequestBody(userProfilBitmap)
-        val userProfileImageMultiPart =  MultipartBody.Part.createFormData("userProfileImg","${signUpUserDto.userEmail}_profle",bitmapMultipartBody)
+        val userProfileImageMultiPart =  MultipartBody.Part.createFormData("userProfileImg","profle_img",bitmapMultipartBody)
         signUpUserDto.userProfileImage = userProfileImageMultiPart
         Log.d(TAG, "SelectTasteActivity: getFinalSignUpUserDto() - signUpUserDto : $signUpUserDto")
     }
@@ -81,9 +81,9 @@ class SelectTasteActivity : AppCompatActivity() {
     }
 
     fun clickFinshBtn() {
-        val userRepository = UserRepository() //임시
+        // userRepository = UserRepository() //임시
         //이거 객체 만들어 졌는지 안만들어졌는지 확인하고 보낼 수 있게 동시성 정리
-        userRepository.signUp({ Log.d(TAG, "SelectTasteActivity: 회원가입 통신")},signUpUserDto)
+        //userRepository.signUp({ Log.d(TAG, "SelectTasteActivity: 회원가입 통신")},signUpUserDto)
         val intent = Intent(this,MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK //새로운 태스크 생성
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK) // 실행 액티비티 외 모두 제거

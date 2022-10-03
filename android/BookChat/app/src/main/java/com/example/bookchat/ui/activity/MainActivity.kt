@@ -3,17 +3,15 @@ package com.example.bookchat.activities
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.view.Gravity
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
 import com.example.bookchat.R
 import com.example.bookchat.adapter.MainChatRoomAdapter
 import com.example.bookchat.databinding.ActivityMainBinding
-import com.example.bookchat.utils.ActivityType
 import com.example.bookchat.utils.Constants.TOKEN_PATH
 import com.example.bookchat.viewmodel.MainViewModel
 import com.example.bookchat.viewmodel.ViewModelFactory
@@ -32,10 +30,39 @@ class MainActivity : AppCompatActivity() {
         with(binding){
             lifecycleOwner =this@MainActivity
             activity = this@MainActivity
-            userModel = mainViewModel
+            viewModel = mainViewModel
         }
             getUserInfo()
             initRecyclerView()
+
+//        binding.bottomNavigationView.setOnItemSelectedListener { item ->
+//            changeFragment(
+//                when(item.itemId){
+//                    R.id.home_navi_icon -> {
+//
+//                    }
+//                    R.id.bookshelf_navi_icon -> {
+//
+//                    }
+//                    R.id.search_navi_icon -> {
+//
+//                    }
+//                    R.id.chat_navi_icon -> {
+//
+//                    }
+//                    R.id.mypage_navi_icon -> {
+//
+//                    }
+//                }
+//            )
+//        }
+
+    }
+    private fun changeFragment(fragment: Fragment) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.main_frame, fragment)
+            .commit()
     }
 
     fun clickMenu() {
@@ -47,14 +74,14 @@ class MainActivity : AppCompatActivity() {
 //            drawerlayout.openDrawer(Gravity.RIGHT)
         }
     }
-    fun changePage(activityType: ActivityType) {
-        val targetActivity = when(activityType) {
-            ActivityType.bookShelfActivity -> { BookShelfActivity::class.java }
-            ActivityType.searchActivity -> { SearchActivity::class.java }
-        }
-        val intent = Intent(this, targetActivity)
-        startActivity(intent)
-    }
+//    fun changePage(activityType: ActivityType) {
+//        val targetActivity = when(activityType) {
+//            ActivityType.bookShelfActivity -> { BookShelfActivity::class.java }
+//            ActivityType.searchActivity -> { SearchActivity::class.java }
+//        }
+//        val intent = Intent(this, targetActivity)
+//        startActivity(intent)
+//    }
     fun clickSignOut(){
         val dialog = AlertDialog.Builder(this,android.R.style.Theme_DeviceDefault_Light_Dialog)
         dialog.setTitle("정말 로그아웃하시겠습니까?")
@@ -77,7 +104,7 @@ class MainActivity : AppCompatActivity() {
     }
     private fun getUserInfo(){
 //        binding.profile.clipToOutline = true //프로필 라운딩
-        binding.userModel?.activityInitialization()
+//        binding.userModel?.activityInitialization()
     }
     private fun initRecyclerView(){
         with(binding){

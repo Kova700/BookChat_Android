@@ -51,17 +51,14 @@ class SignUpActivity : AppCompatActivity() {
             activity = this@SignUpActivity
             viewModel = signUpViewModel
         }
-        binding.userProfileIv.clipToOutline = true // 이거 기능 확인해보자.
         setFocus()
 
         signUpViewModel.goSelectTasteActivity = {
-            val userEmail = withContext(lifecycleScope.coroutineContext) { getUserEmail() }
+//            val userEmail = withContext(lifecycleScope.coroutineContext) { getUserEmail() }
             val userProfilBitmap = binding.userProfileIv.drawable.toBitmap(300,300)
 
             val signUpDto = UserSignUpRequestDto(
                 nickname = binding.nickNameEt.text.toString(), //데이터 체크
-                userEmail = userEmail,
-                oauth2Provider = "kakao", //임시
                 defaultProfileImageType = 1, //임시
                 userProfileImage = null,
             )
