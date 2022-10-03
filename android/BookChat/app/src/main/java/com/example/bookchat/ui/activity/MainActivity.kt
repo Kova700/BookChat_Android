@@ -1,7 +1,6 @@
-package com.example.bookchat.activities
+package com.example.bookchat.ui.activity
 
 import android.content.DialogInterface
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
 import com.example.bookchat.adapter.MainChatRoomAdapter
 import com.example.bookchat.databinding.ActivityMainBinding
+import com.example.bookchat.ui.fragment.*
 import com.example.bookchat.utils.Constants.TOKEN_PATH
 import com.example.bookchat.viewmodel.MainViewModel
 import com.example.bookchat.viewmodel.ViewModelFactory
@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityMainBinding
     private lateinit var mainViewModel: MainViewModel
-    private lateinit var chatRoomAdapter: MainChatRoomAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,32 +32,24 @@ class MainActivity : AppCompatActivity() {
             activity = this@MainActivity
             viewModel = mainViewModel
         }
-            getUserInfo()
-            initRecyclerView()
-
-//        binding.bottomNavigationView.setOnItemSelectedListener { item ->
-//            changeFragment(
-//                when(item.itemId){
-//                    R.id.home_navi_icon -> {
-//
-//                    }
-//                    R.id.bookshelf_navi_icon -> {
-//
-//                    }
-//                    R.id.search_navi_icon -> {
-//
-//                    }
-//                    R.id.chat_navi_icon -> {
-//
-//                    }
-//                    R.id.mypage_navi_icon -> {
-//
-//                    }
-//                }
-//            )
-//        }
-
+        changeFragment(HomeFragment())
+        setBottomNavigation()
     }
+
+    fun setBottomNavigation(){
+        //이미 살아있는 Fragment 객체가 있으면 그 상태를 불러오는게 Best (스크롤 상태까지 그대로)
+        binding.bottomNavigationView.setOnItemSelectedListener { item ->
+                when(item.itemId){
+                    R.id.home_navi_icon -> { changeFragment(HomeFragment()) }
+                    R.id.bookshelf_navi_icon -> { changeFragment(BookShelfFragment()) }
+                    R.id.search_navi_icon -> { changeFragment(SearchFragment()) }
+                    R.id.chat_navi_icon -> { changeFragment(ChatFragment()) }
+                    R.id.mypage_navi_icon -> { changeFragment(MyPageFragment()) }
+                }
+            true
+        }
+    }
+
     private fun changeFragment(fragment: Fragment) {
         supportFragmentManager
             .beginTransaction()
@@ -106,14 +98,5 @@ class MainActivity : AppCompatActivity() {
 //        binding.profile.clipToOutline = true //프로필 라운딩
 //        binding.userModel?.activityInitialization()
     }
-    private fun initRecyclerView(){
-        with(binding){
-            chatRoomAdapter = MainChatRoomAdapter()
-            todayChatRoomListView.adapter = chatRoomAdapter
-            todayChatRoomListView.setHasFixedSize(true)
-            todayChatRoomListView.layoutManager = LinearLayoutManager(this@MainActivity)
-//            val snapHelper = LinearSnapHelper()
-//            snapHelper.attachToRecyclerView(chatRoomRecyclerView)
-        }
-    }
+
 }
