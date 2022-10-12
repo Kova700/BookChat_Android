@@ -1,8 +1,9 @@
 package com.example.bookchat.data
 
-import com.example.bookchat.utils.IdTokenProvider
+import com.example.bookchat.utils.OAuth2Provider
 
 data class IdToken(
     val token : String,
-    var idTokenProvider: IdTokenProvider
+    var oAuth2Provider: OAuth2Provider
 )
+
