@@ -1,35 +1,70 @@
 package com.example.bookchat.utils
 
 import android.content.Context
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.stringPreferencesKey
+import android.util.Log
+import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.bookchat.App
+import com.example.bookchat.data.IdToken
+import com.example.bookchat.data.Token
+import com.example.bookchat.utils.Constants.TAG
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.*
 import java.io.IOException
 
 //보관해야하는 값
-    //1. 어떤 종류의 토큰을 가지고 있는지
-        // 둘다 가지고 있다면 최근에 로그인했던 종류의 토큰으로 로그인 진행
-    //2. 검색 히스토리
+//1. 북챗 토큰 (암호화 추가해야함)
+//2. 검색 히스토리
 
 object DataStoreManager {
 
-    private val Context.dataStore  by preferencesDataStore(name = "DATASTORE")
-    private val tokenKey = stringPreferencesKey("TOKEN_INFO")
-    private val historyKey = stringPreferencesKey("Search_HISTORY")
+    private val Context.dataStore  by preferencesDataStore("DATASTORE_KEY")
+    private val idTokenKey = stringPreferencesKey("ID_TOKEN_KEY")
+    private val bookChatTokenKey = stringPreferencesKey("BOOKCHAT_TOKEN_KEY")
+    private val searchHistoryKey = stringPreferencesKey("SEARCH_HISTORY_KEY")
 
-    //로그아웃시에 토큰 타입 지우는 로직 추가해야함
 
-    suspend fun getTokenType() :String?{
-        val preferences = readDataStore()
-        return preferences.firstOrNull()?.get(tokenKey)
+    //북챗 토큰 (추후 암호화 추가)
+    suspend fun getBookchatToken() :Token{
+        val tokenString = readDataStore().firstOrNull()?.get(bookChatTokenKey)
+        Log.d(TAG, "DataStoreManager: getBookchatToken() - tokenString : $tokenString")
+        if (tokenString.isNullOrBlank()) throw Exception("Saved token does not exist")
+        val token = Gson().fromJson(tokenString,Token::class.java)
+        return token
     }
 
-    suspend fun setTokenType(value: LoginType){
-        setDataStore(tokenKey,value.name)
+    suspend fun saveBookchatToken(token :Token){
+        val tokenString = Gson().toJson(token)
+        setDataStore(bookChatTokenKey,tokenString)
+    }
+
+    //ID토큰
+    suspend fun getIdToken() : IdToken{
+        val idTokenString = readDataStore().firstOrNull()?.get(idTokenKey)
+        if (idTokenString.isNullOrBlank()) throw Exception("Saved IdToken does not exist")
+        val idToken = Gson().fromJson(idTokenString,IdToken::class.java)
+        return idToken
+    }
+
+    suspend fun saveIdToken(idToken: IdToken){
+        val idTokenString = Gson().toJson(idToken)
+        setDataStore(idTokenKey,idTokenString)
+    }
+
+    suspend fun deleteBookchatToken(){
+        removeDataStore(bookChatTokenKey)
+    }
+
+    suspend fun deleteIdToken(){
+        removeDataStore(idTokenKey)
+    }
+
+    suspend fun <T : Any> removeDataStore(
+        preferencesKey: Preferences.Key<T>,
+    ){
+        App.instance.applicationContext.dataStore.edit { preferences ->
+            preferences.remove(preferencesKey)
+        }
     }
 
     suspend fun <T : Any> setDataStore(
