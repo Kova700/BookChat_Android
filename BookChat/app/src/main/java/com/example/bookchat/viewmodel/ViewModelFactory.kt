@@ -15,9 +15,9 @@ class ViewModelFactory() : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
 
         when{
-            modelClass.isAssignableFrom(MainViewModel::class.java) -> {
+            modelClass.isAssignableFrom(HomeViewModel::class.java) -> {
                 userRepository = UserRepository()
-                return MainViewModel(userRepository) as T
+                return HomeViewModel(userRepository) as T
             }
 
             modelClass.isAssignableFrom(SearchResultViewModel::class.java) -> {
