@@ -1,18 +1,97 @@
 package com.example.bookchat.kakao
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import com.example.bookchat.App
+import com.example.bookchat.data.IdToken
 import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.DataStoreManager
+import com.example.bookchat.utils.OAuth2Provider
 import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.*
 import com.kakao.sdk.user.UserApiClient
+import com.kakao.sdk.user.model.AccessTokenInfo
 import kotlinx.coroutines.*
 import kotlin.coroutines.resume
 
 object KakaoSDK {
     private val userApiClient by lazy { UserApiClient.instance }
     private val authApiClient by lazy { AuthApiClient.instance }
+
+    /* ID토큰사용 -> 북챗 토큰 사용으로 정책수정으로 인한 코드 수정 필요 */
+
+    //매번 서버에게 요청을 보내기 전에 토큰 만료여부 확인 만료시에는 카카오서버 갱신 로직에의해 자동 갱신
+    suspend fun isAvailableToken() :Boolean{
+        val tokenInfoResult = suspendCancellableCoroutine<Result<AccessTokenInfo>> { continuation ->
+            userApiClient.accessTokenInfo { tokenInfo, error ->
+                continuation.resume(getTokenInfoResult(tokenInfo, error))
+            }
+        }
+        Log.d(TAG, "KakaoSDK: isAvailableToken() - tokenInfoResult : $tokenInfoResult")
+//        if (tokenInfoResult.isFailure) tokenInfoErrorHandler(tokenInfoResult.exceptionOrNull())
+        return tokenInfoResult.isSuccess
+    }
+
+    suspend fun kakaoLogin(context : Context) {
+        val isKakaoTalkLoginAvailable =
+            userApiClient.isKakaoTalkLoginAvailable(context)
+        if (isKakaoTalkLoginAvailable) {
+            kakaoLoginWithKakaoTalk(context)
+            return
+        }
+        kakaoLoginWithKakaoAccount(context)
+    }
+
+    private suspend fun kakaoLoginWithKakaoTalk(context :Context){
+        val kakaoTalkLoginResult = suspendCancellableCoroutine<Result<OAuthToken>> { continuation ->
+            userApiClient.loginWithKakaoTalk(context) { token, error ->
+                continuation.resume(getTokenResult(token, error))
+            }
+        }
+
+        if(kakaoTalkLoginResult.isFailure) throw Exception("kakaoTalkLoginResult is Fail(${ kakaoTalkLoginResult.onFailure { it.cause } })")
+        Log.d(TAG, "KakaoSDK: kakaoLoginWithKakaoTalk() kakaoTalkLoginResult : $kakaoTalkLoginResult- called")
+        if (kakaoTalkLoginResult.isSuccess){ kakaoTalkLoginResult.map { tokenLoging(it)} } //테스트용 로그
+    }
+
+    suspend fun kakaoLoginWithKakaoAccount(context :Context){
+        val kakaoAccountLoginResult = suspendCancellableCoroutine<Result<OAuthToken>> { continuation ->
+            userApiClient.loginWithKakaoAccount(context){ token, error ->
+                continuation.resume(getTokenResult(token, error))
+            }
+        }
+        if(kakaoAccountLoginResult.isFailure) throw Exception("kakaoAccountLoginResult is Fail(${ kakaoAccountLoginResult.onFailure { it.message } })")
+        if (kakaoAccountLoginResult.isSuccess){ kakaoAccountLoginResult.map { tokenLoging(it)} } //테스트용 로그
+    }
+
+    //테스트용 로그
+    private suspend fun tokenLoging(token :OAuthToken){
+
+        Log.d(TAG, "KakaoSDK: kakaoAcountCallback 카카오 로그인 성공 accessToken : ${token.accessToken}")
+        Log.d(TAG, "KakaoSDK: kakaoAcountCallback 카카오 로그인 성공 refreshToken : ${token.refreshToken}")
+        Log.d(TAG, "KakaoSDK: kakaoAcountCallback 카카오 로그인 성공 idToken : ${token.idToken}")
+        //id토큰 캐싱해야함
+        DataStoreManager.saveIdToken(IdToken("Bearer ${token.idToken}", OAuth2Provider.KAKAO) )
+    }
+
+    private fun getTokenResult(token : OAuthToken?, error :Throwable?) :Result<OAuthToken>{
+        return when{
+            token != null -> Result.success(token)
+            error != null -> Result.failure(error)
+            else -> Result.failure(Exception("token and error is null"))
+        }
+    }
+
+    private fun getTokenInfoResult(tokenInfo : AccessTokenInfo?, error :Throwable?) :Result<AccessTokenInfo>{
+        return when{
+            error != null -> Result.failure(error)
+            tokenInfo == null -> Result.failure(Exception("Token info is null"))
+            tokenInfo.expiresIn <= 0 -> Result.failure(Exception("Token is expired"))
+            else -> Result.success(tokenInfo)
+        }
+    }
 
     //성공 여부로 분기 작업해야함
     suspend fun login(){
@@ -39,141 +118,67 @@ object KakaoSDK {
         }
     }
 
-    fun kakaoLogin() {
-        val isKakaoTalkLoginAvailable = userApiClient.isKakaoTalkLoginAvailable(App.instance.applicationContext)
-        if (isKakaoTalkLoginAvailable) {
-            Log.d(TAG, "KakaoSDK: kakaoLogin() KakaoTalk o- called")
-            kakaoLoginWithKakaoTalk()
-            return
-        }
-        Log.d(TAG, "KakaoSDK: kakaoLogin() KakaoTalk x- called")
-        kakaoLoginWithKakaoAccount()
-    }
-
-    //매번 서버에게 요청을 보내기 전에 토큰 만료여부 확인
-    suspend fun isAvailableToken() :Boolean{
-        Log.d(TAG, "KakaoSDK: isAvailableToken() - called")
-        //accessTokenInfo호출할 때마다 토큰이 갱신된다하지만 확인해봐야함
-
-        val result = suspendCancellableCoroutine<Boolean> { continuation ->
-            userApiClient.accessTokenInfo { tokenInfo, error ->
-                error?.let { tokenErrorHandler(error) }
-                tokenInfo?.let {
-                    Log.i(TAG, "토큰 정보" +
-                            "\n회원번호: ${tokenInfo.id}" +
-                            "\n만료시간: ${tokenInfo.expiresIn} 초" +
-                            "\n앱 ID: ${tokenInfo.appId}"
-                    )
-                    continuation.resume(tokenInfo.expiresIn > 0)
-                } ?: continuation.resume(false)
-            }
-        }
-        return result
-    }
-
-    fun getIdToken() : String?{
-        val idToken = authApiClient.tokenManagerProvider.manager.getToken()?.idToken
-        return idToken?.let { "Bearer $idToken" }
-    }
-
-    fun tokenErrorHandler(error :Throwable){
-        Log.d(TAG, "KakaoSDK: tokenErrorHandler() - error : $error ")
-        when{
-            isInvalidToken(error) ->{
-                //로그인 필요
-                Log.d(TAG, "KakaoSDK: tokenErrorHandler() - called (토큰 사용불가 혹은 토큰 없음)")
-//                kakaoLogin()
-            }
-            else -> {}
-        }
-    }
-    //카카오톡 로그인 성공하면 끝
-    //카카오톡 로그인 실패하면 에러 핸들링 할 거 있으면 하고 없으면 카카오 계정 로그인 시도
-    //카카오 계정 로그인 성공하면 끝
-    //카카오 계정 로그인 실패하면
-    //로그인 실패로 에러 핸들링
-
-    //로그인 성공해서 토큰을 서버에 넘겨줬는데 가입된 계저이면 유저 정보 가져오고
-    //가입되지 않은 계정이면 회원가입 진행
-
-    //로그인 버튼을 눌렀다.
-    //유효한 토큰이 있으면 서버로 토큰을 보내 유저 정보를 가져온다.
-    //유효한 토큰이 없다면 카카오로부터 다시 토큰을 받아온다.
-    //서버한테 토큰을 보내 유저 정보를 다시 가져온다.
-
-    //서버에게 매 요청시 토큰 만료시간 확인 하고 요청 보냄
-
-    //토큰 유효성 검증 부분
-    //자동으로 SDK에서 검증해준다는게 뭔말일까
-
-
-    fun kakaoLoginWithKakaoTalk(){
-        userApiClient.loginWithKakaoTalk(App.instance.applicationContext) { token, error ->
-            error?.let {
-                kakaoLoginErrorHandler(error)
-                kakaoLoginWithKakaoAccount()
-            }
-            token?.let {
-                Log.d(TAG, "TestActivity: onCreate() 카카오톡으로 로그인 성공 (${token.accessToken})- called")
-                //토큰 저장 성공
-            }
-        }
-    }
-
-    //카카오 계정으로 로그인 예외 처리 (추후 콜백 -> 코루틴으로 리펙토링)
-    private val kakaoAcountCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
-        error?.let {
-            Log.d(TAG, "카카오계정으로 로그인 실패 error : $error")
-            kakaoLoginErrorHandler(error)
-        }
-        token?.let {
-            Log.d(TAG, "KakaoSDK: kakaoAcountCallback 카카오계정으로 로그인 성공 accessToken : ${token.accessToken}")
-            Log.d(TAG, "KakaoSDK: kakaoAcountCallback 카카오계정으로 로그인 성공 refreshToken : ${token.refreshToken}")
-            Log.d(TAG, "KakaoSDK: kakaoAcountCallback 카카오계정으로 로그인 성공 idToken : ${token.idToken}")
-        }
-    }
-
-    fun kakaoLoginWithKakaoAccount(){
-        Log.d(TAG, "KakaoSDK: kakaoLoginWithKakaoAccount() - called")
-        userApiClient.loginWithKakaoAccount(App.instance.applicationContext, callback = kakaoAcountCallback)
-    }
-
-    fun kakaoLoginErrorHandler(error :Throwable) {
-        Log.d(TAG, "KakaoSDK: kakaoLoginErrorHandler() - called")
+    private fun kakaoLoginErrorHandler(error :Throwable?) {
         when{
             isClientCancel(error) -> {
+                Toast.makeText(App.instance.applicationContext,"카카오 로그인 실패 - 사용자 취소", Toast.LENGTH_SHORT).show()
                 Log.d(TAG, "KakaoSDK: kakaoLoginErrorHandler() - isClientCancel -called")
             }
             isClientAccessDenied(error) -> {
+                Toast.makeText(App.instance.applicationContext,"카카오 로그인 실패 - 사용자 접근 거부", Toast.LENGTH_SHORT).show()
                 Log.d(TAG, "KakaoSDK: kakaoLoginErrorHandler() - isClientAccessDenied - called")
             }
             isNotExistKakaoTalkAcount(error) -> {
+                Toast.makeText(App.instance.applicationContext,"카카오 로그인 실패 - 카카오톡에 로그인된 계정이 없음",
+                    Toast.LENGTH_SHORT).show()
                 Log.d(TAG, "KakaoSDK: kakaoLoginErrorHandler() - isNotExistKakaoTalkAcount -called")
-                kakaoLoginWithKakaoAccount()
             }
             else -> {
-                Log.d(TAG, "KakaoSDK: kakaoLoginErrorHandler() - else - called")}
+                Toast.makeText(App.instance.applicationContext,"카카오 로그인 실패 - 잠시 후 다시 시도해 주세요.",
+                    Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "KakaoSDK: kakaoLoginErrorHandler() - else - called")
+            }
+        }
+    }
+
+    private fun tokenInfoErrorHandler(error :Throwable?){
+        when{
+            isInvalidToken(error) ->{
+                Log.d(TAG, "KakaoSDK: tokenInfoErrorHandler() - called (토큰 사용불가 혹은 토큰 없음)")
+                //토큰이 없으면 회원가입진행
+            }
+            else -> {
+                Log.d(TAG, "KakaoSDK: tokenErrorHandler() - called( 에러 발생 )")
+            }
         }
     }
 
     //무효한 토큰 (정보를 볼 수 없음)
-    fun isInvalidToken(error :Throwable) :Boolean{
+    private fun isInvalidToken(error :Throwable?) :Boolean{
         return error is KakaoSdkError && error.isInvalidTokenError()
+    }
+
+    //회원 탈퇴
+    fun kakaoWithdraw(){
+        userApiClient.unlink { error ->
+            error?.let { Log.d(TAG, "KakaoSDK: unlink() - 연결 끊기 실패. SDK에서 토큰 삭제됨 error : ${error}") }
+                ?: run { Log.d(TAG, "KakaoSDK: unlink() - 연결 끊기 성공. SDK에서 토큰 삭제됨") }
+        }
     }
 
     // 사용자가 카카오톡 설치 후 디바이스 권한 요청 화면에서 로그인을 취소한 경우,
     // 의도적인 로그인 취소로 보고 카카오계정으로 로그인 시도 없이 로그인 취소로 처리 (예: 뒤로 가기)
-    private fun isClientCancel(error : Throwable) :Boolean{
+    private fun isClientCancel(error : Throwable?) :Boolean{
         return error is ClientError && error.reason == ClientErrorCause.Cancelled
     }
 
     //카카오톡에 카카오계정이 로그인 되어있는지?
-    private fun isNotExistKakaoTalkAcount(error : Throwable) :Boolean{
+    private fun isNotExistKakaoTalkAcount(error : Throwable?) :Boolean{
         return error is AuthError && error.reason == AuthErrorCause.Unknown
     }
 
     //사용자가 권한 동의하지 않음
-    private fun isClientAccessDenied(error : Throwable) :Boolean{
+    private fun isClientAccessDenied(error : Throwable?) :Boolean{
         return error is AuthError && error.reason == AuthErrorCause.AccessDenied
     }
 }

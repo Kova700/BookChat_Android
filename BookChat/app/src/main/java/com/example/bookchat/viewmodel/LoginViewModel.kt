@@ -1,54 +1,95 @@
 package com.example.bookchat.viewmodel
 
+import android.content.Context
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bookchat.App
 import com.example.bookchat.kakao.KakaoSDK
 import com.example.bookchat.repository.UserRepository
+import com.example.bookchat.response.*
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
-import com.example.bookchat.utils.LoginType
-import com.kakao.sdk.auth.AuthApiClient
 import kotlinx.coroutines.launch
 
 class LoginViewModel(private val userRepository : UserRepository) : ViewModel(){
-    lateinit var loginSuccessCallBack :() -> Unit //토큰 가져왔으면 페이지 이동 실행
-    private val _isLoginResult = MutableLiveData<Boolean>()
+    lateinit var goMainActivityCallBack :() -> Unit //토큰 가져왔으면 페이지 이동 실행 (이거 이전해야함 UninitializedPropertyAccessException 나올 수 있음)
+    lateinit var goSignUpActivityCallBack :() -> Unit
+    private var recursiveChecker = false //임시 (구조 개선 필요)
 
-    //카카오로부터 토큰 받아오기
-    fun requestKakaoLogin(){
-        startKakaoLogin()
+    //onFailure에 빠트린 예외처리는 없는지 다른 예외가 나올 수도 있는데 해당 예외만 처리되게 되어있는지 다시 확인해볼 것
 
-        //받아온 결과에 따라 분기 처리
-        //토큰을 카카오로부터 가져왔든 로컬로부터 가져왔든
-        // 성공적으로 가져왔으면 서버에게 로그인 요청 보내기 (회원정보 달라고 요청)
-            //서버가 토큰을 뜯어보고 회원가입된 유저가 아니다 싶으면 오류 응답 코드를 보냄
-                // -> 회원가입 액티비티로 화면 이동
-                    // -> 회원가입 API로 유저 ID 토큰과 사용자 기입 정보를 실어서 회원가입 진행
-            //서버가 토큰 뜯어보고 회원가입된 유저다 싶으면 유저 정보를 실은 JSON을 응답으로 보내줌
-                // -> 메인 액티비티로 화면이동
-                    // -> 유저정보 화면에 뿌려줌
-
-        //일단 회원가입부터 만들어보자
-
-
-        // 성공적으로 가져오지 못했으면
-        Log.d(TAG, "LoginViewModel: requestKakaoLogin() - called - AuthApiClient.instance.hasToken() : ${AuthApiClient.instance.hasToken()}")
-        loginSuccessCallBack()
-    }
-
-    fun startKakaoLogin(){
+    init {
         viewModelScope.launch {
-            DataStoreManager.setTokenType(LoginType.KAKAO)
-            KakaoSDK.login()
+            runCatching{ DataStoreManager.getBookchatToken() }
+                .onSuccess { requestUserInfo() }
         }
     }
-    
-    fun requestGoogleLogin(){
+
+    private fun requestUserInfo() = viewModelScope.launch {
+        Log.d(TAG, "LoginViewModel: requestUserInfo() - called")
+        runCatching{ userRepository.getUserProfile() }
+            .onSuccess { goMainActivityCallBack() }
+            .onFailure { failHandler(it) }
     }
 
-    //카카오로부터 토큰 받아오고
-    //받은 토큰으로 북챗 서버에 요청을 보내야함
+    //Status Code별 Exception handle
+    private fun failHandler(exception: Throwable) {
+        when(exception){
+            is TokenExpiredException -> requestTokenRenewal()
+            is UnauthorizedOrBlockedUserException -> {
+                Log.d(TAG, "LoginViewModel: failHandler() - unauthorizedOrBlockedUserException")
+            }
+            is ResponseBodyEmptyException -> {
+                Log.d(TAG, "LoginViewModel: failHandler() - ResponseBodyEmptyException")
+            }
+            is NetworkIsNotConnectedException -> {
+                Log.d(TAG, "LoginViewModel: failHandler() - NetworkIsNotConnectedException")
+            }
+            else -> {
+                Log.d(TAG, "LoginViewModel: failHandler() - elseException")}
+        }
+    }
 
+    private fun requestTokenRenewal() = viewModelScope.launch {
+        Log.d(TAG, "LoginViewModel: requestTokenRenewal() - called")
+        runCatching{ userRepository.requestTokenRenewal() }
+            .onSuccess { if (recursiveChecker == false) requestUserInfo(); recursiveChecker = true }
+            .onFailure { Log.d(TAG, "LoginViewModel: requestTokenRenewal() - onFailure : $it") }
+    }
+
+    fun startKakaoLogin(context : Context) = viewModelScope.launch {
+        Log.d(TAG, "LoginViewModel: startKakaoLogin() - called")
+        runCatching{ KakaoSDK.kakaoLogin(context) } //요놈이 예외없이 잘 실행되었다면 성공이 , 예외가 터졌다면 Faile이 실행됨
+            .onSuccess { bookchatLogin() }
+            .onFailure {
+                Log.d(TAG, "LoginViewModel: startKakaoLogin() - onFailure - $it")
+                //회원가입 해야함 (회원가입 페이지로 이동)
+                //카카오 SDK에서 오류혹은 그외 오류 발생시 사이드 이펙트 확인
+                //카카오톡은 깔려있으나 계정연결이 없는 경우 등등
+                KakaoSDK.kakaoLoginWithKakaoAccount(context)
+            }
+    }
+
+    fun bookchatLogin() = viewModelScope.launch {
+        runCatching{ userRepository.signIn() }
+            .onSuccess {
+                Log.d(TAG, "LoginViewModel: bookchatLogin() - onSuccess")
+                requestUserInfo()
+            }
+            .onFailure {
+                Log.d(TAG, "LoginViewModel: bookchatLogin() - onFailure $it")
+                when(it){
+                    is NeedToSignUpException -> goSignUpActivityCallBack()
+                    is UnauthorizedOrBlockedUserException -> Toast.makeText(App.instance.applicationContext,"차단된 사용자 입니다.\n24시간 후에 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
+                    else -> Log.d(TAG, "LoginViewModel: bookchatLogin() - elseException : $it")
+                }
+
+            }
+    }
+
+    fun requestGoogleLogin()= viewModelScope.launch {
+        Log.d(TAG, "LoginViewModel: requestGoogleLogin() - called")
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.bookchat.api
 
 import com.example.bookchat.data.BookSearchResultDto
+import com.example.bookchat.data.Token
 import com.example.bookchat.data.User
 import com.example.bookchat.utils.OAuth2Provider
 import com.example.bookchat.utils.ReadingTaste
@@ -14,6 +15,11 @@ interface ApiInterface {
     //이름 중복체크
     @GET("/v1/api/users/profile/nickname")
     fun nicknameDuplicateCheck() :Call<Any>
+
+    @POST("/v1/api/auth/token")
+    suspend fun requestTokenRenewal(
+        @Body refreshToken :String
+    ): Response<Token>
 
     //헤더명 수정해야함
     //회원가입
@@ -34,9 +40,17 @@ interface ApiInterface {
         @Header("Authorization") accessToken :String // 북챗 JWT 토큰
     ) : Response<Unit>
 
-    //유저정보 가져오기 (DTO 수정 필요)
+    //헤더명 수정해야함
+    @POST("/v1/api/users/signin")
+    suspend fun signIn(
+        @Header("Authorization") idToken :String,
+        @Header("provider_type") oAuth2Provider :OAuth2Provider
+    ) : Response<Token>
+
     @GET("/v1/api/users/profile")
-    fun getUserProfile() : Call<User>
+    suspend fun getUserProfile(
+        @Header("Authorization") token :String, //임시로 인터셉터 안씀
+    ) : Response<User>
 
     //제목으로 도서 검색 => 통합 쿼리 검색 api로 수정해야함
     @GET("/v1/api/books")
