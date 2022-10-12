@@ -1,6 +1,11 @@
 package com.example.bookchat.data
 
+import com.google.gson.annotations.SerializedName
+import java.io.Serializable
+
 data class Token(
-    var access :String,
-    var refresh :String
-)
+    @SerializedName("accessToken")
+    var accessToken :String,
+    @SerializedName("refreshToken")
+    val refreshToken :String
+) : Serializable

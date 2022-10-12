@@ -29,6 +29,11 @@ interface ApiInterface {
         @Part("readingTastes") readingTastes: List<@JvmSuppressWildcards ReadingTaste>? = null
     ) :Response<Unit>
 
+    @DELETE("/v1/api/users")
+    suspend fun withdraw(
+        @Header("Authorization") accessToken :String // 북챗 JWT 토큰
+    ) : Response<Unit>
+
     //유저정보 가져오기 (DTO 수정 필요)
     @GET("/v1/api/users/profile")
     fun getUserProfile() : Call<User>

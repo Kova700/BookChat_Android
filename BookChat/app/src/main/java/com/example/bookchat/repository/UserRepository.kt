@@ -42,6 +42,24 @@ class UserRepository{
         }
     }
 
+    suspend fun signOut(){
+        Log.d(TAG, "UserRepository: signOut() - called")
+        //저장된 북챗 JWT 토큰 / ID 토큰 삭제
+        DataStoreManager.deleteBookchatToken()
+        DataStoreManager.deleteIdToken()
+    }
+
+    suspend fun withdraw() {
+        //회원 탈퇴후 재가입 가능 기간 정책 결정해야함
+        //+ 재가입할때 캐시되어있는 User 정보 어떻게 할건지 결정
+        val bookchatToken = DataStoreManager.getBookchatToken()
+        val response = App.instance.apiInterface.withdraw(bookchatToken.accessToken)
+        Log.d(TAG, "UserRepository: withdraw() - response.code : ${response.code()}")
+        when(response.code()){
+            200 -> signOut()
+        }
+    }
+
 
 /*아래 다 수정*/
 
