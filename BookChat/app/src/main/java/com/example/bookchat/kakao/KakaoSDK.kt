@@ -93,16 +93,6 @@ object KakaoSDK {
         }
     }
 
-    //성공 여부로 분기 작업해야함
-    suspend fun login(){
-        if (isAvailableToken()){
-            Log.d(TAG, "KakaoSDK: login() Token O- called")
-            return
-        }
-        Log.d(TAG, "KakaoSDK: login() Token x- called")
-        kakaoLogin()
-    }
-
     fun logout(){
         userApiClient.logout { error ->
             error?.let { Log.d(TAG, "KakaoSDK: logout() - 로그아웃 실패. SDK에서 토큰 삭제됨 error : ${error}") }
