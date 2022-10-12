@@ -6,50 +6,65 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
-import com.example.bookchat.adapter.MainChatRoomAdapter
 import com.example.bookchat.databinding.ActivityMainBinding
 import com.example.bookchat.ui.fragment.*
 import com.example.bookchat.utils.Constants.TOKEN_PATH
-import com.example.bookchat.viewmodel.MainViewModel
-import com.example.bookchat.viewmodel.ViewModelFactory
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityMainBinding
-    private lateinit var mainViewModel: MainViewModel
-
+    private val homeFragment by lazy { makeFragment(HomeFragment()) }
+    private val bookShelfFragment by lazy { makeFragment(BookShelfFragment()) }
+    private val searchFragment by lazy { makeFragment(SearchFragment()) }
+    private val chatFragment by lazy { makeFragment(ChatFragment()) }
+    private val myPageFragment by lazy { makeFragment(MyPageFragment()) }
+    private val fragmentList by lazy { listOf(homeFragment, bookShelfFragment, searchFragment, chatFragment, myPageFragment) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        mainViewModel = ViewModelProvider(this,ViewModelFactory()).get(MainViewModel::class.java)
         with(binding){
             lifecycleOwner =this@MainActivity
             activity = this@MainActivity
-            viewModel = mainViewModel
         }
-        changeFragment(HomeFragment())
+        inflateNewFragment(homeFragment)
         setBottomNavigation()
     }
 
     fun setBottomNavigation(){
-        //이미 살아있는 Fragment 객체가 있으면 그 상태를 불러오는게 Best (스크롤 상태까지 그대로)
         binding.bottomNavigationView.setOnItemSelectedListener { item ->
-                when(item.itemId){
-                    R.id.home_navi_icon -> { changeFragment(HomeFragment()) }
-                    R.id.bookshelf_navi_icon -> { changeFragment(BookShelfFragment()) }
-                    R.id.search_navi_icon -> { changeFragment(SearchFragment()) }
-                    R.id.chat_navi_icon -> { changeFragment(ChatFragment()) }
-                    R.id.mypage_navi_icon -> { changeFragment(MyPageFragment()) }
-                }
+            when(item.itemId){
+                R.id.home_navi_icon -> inflateOldFragment(homeFragment)
+                R.id.bookshelf_navi_icon -> inflateOldFragment(bookShelfFragment)
+                R.id.search_navi_icon -> inflateOldFragment(searchFragment)
+                R.id.chat_navi_icon -> inflateOldFragment(chatFragment)
+                R.id.mypage_navi_icon -> inflateOldFragment(myPageFragment)
+            }
             true
         }
     }
 
+    private fun makeFragment(fragment :Fragment) :Fragment{
+        supportFragmentManager.beginTransaction().add(R.id.main_frame,fragment).commit()
+        return fragment
+    }
+
+    private fun inflateOldFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().show(fragment).commit()
+        fragmentList.filter { !it.javaClass.isAssignableFrom(fragment.javaClass) }
+            .forEach { supportFragmentManager.beginTransaction().hide(it).commit() }
+    }
+
+    private fun inflateNewFragment(fragment: Fragment) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.main_frame, fragment)
+            .commit()
+    }
+
+/*아래 삭제 예정*/
     private fun changeFragment(fragment: Fragment) {
         supportFragmentManager
             .beginTransaction()
