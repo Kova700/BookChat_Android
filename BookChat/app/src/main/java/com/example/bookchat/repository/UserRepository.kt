@@ -5,12 +5,46 @@ import android.widget.Toast
 import com.example.bookchat.App
 import com.example.bookchat.data.User
 import com.example.bookchat.data.UserSignUpDto
+import com.example.bookchat.response.BadRequestException
+import com.example.bookchat.response.TokenExpiredException
 import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.DataStoreManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class UserRepository{
+
+    suspend fun signUp(userInfo : UserSignUpDto) {
+        Log.d(TAG, "UserRepository: signUp() - called")
+        if(!isNetworkConnected()) {
+            //추후에 스낵바 혹은 유튜브처럼 구현
+            Toast.makeText(App.instance.applicationContext,"네트워크가 연결되어 있지 않습니다.\n네트워크를 연결해주세요.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val idToken = DataStoreManager.getIdToken()
+        Log.d(TAG, "UserRepository: signUp() - idToken.token : ${idToken.token} , idToken.idTokenProvider : ${idToken.oAuth2Provider}")
+        Log.d(TAG, "UserRepository: signUp() - userInfo : $userInfo")
+        val response = App.instance.apiInterface.signUp(
+            idToken = idToken.token,
+            idTokenProvider = idToken.oAuth2Provider,
+            nickname = userInfo.nickname,
+            defaultProfileImageType = userInfo.defaultProfileImageType,
+            userProfileImage = userInfo.userProfileImage,
+//            readingTastes = userInfo.readingTastes
+        )
+        Log.d(TAG, "UserRepository: signUp() - response : $response ")
+        when(response.code()){
+            200 -> {}
+            400 -> throw BadRequestException(response.errorBody()?.string())
+            401 -> throw TokenExpiredException(response.errorBody()?.string())
+            else -> throw Exception(" ${response.code()} Exception ")
+        }
+    }
+
+
+/*아래 다 수정*/
+
     //콜백 전부 코루틴으로 수정
     fun signUp(
         callback : (Boolean) -> Unit,

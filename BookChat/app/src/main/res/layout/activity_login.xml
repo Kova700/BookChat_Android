@@ -6,7 +6,7 @@
     <data>
         <variable
             name="loginType"
-            type="com.example.bookchat.utils.IdTokenProvider" />
+            type="com.example.bookchat.utils.OAuth2Provider" />
         <variable
             name="activity"
             type="com.example.bookchat.activities.LoginActivity" />
