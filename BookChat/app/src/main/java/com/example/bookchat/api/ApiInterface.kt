@@ -2,10 +2,8 @@ package com.example.bookchat.api
 
 import com.example.bookchat.data.BookSearchResultDto
 import com.example.bookchat.data.User
-import com.example.bookchat.data.UserSignUpRequestDto
 import com.example.bookchat.utils.ReadingTaste
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*

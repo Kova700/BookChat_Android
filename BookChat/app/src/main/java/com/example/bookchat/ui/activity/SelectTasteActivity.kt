@@ -9,9 +9,8 @@ import android.util.Log
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.bookchat.R
-import com.example.bookchat.data.UserSignUpRequestDto
+import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.databinding.ActivitySelectTasteBinding
-import com.example.bookchat.repository.UserRepository
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.SelectTasteViewModel
 import com.example.bookchat.viewmodel.ViewModelFactory
@@ -23,7 +22,7 @@ import okio.BufferedSink
 class SelectTasteActivity : AppCompatActivity() {
     private lateinit var binding :ActivitySelectTasteBinding
     private lateinit var selectTasteViewModel: SelectTasteViewModel
-    private lateinit var signUpUserDto :UserSignUpRequestDto
+    private lateinit var signUpUserDto :UserSignUpDto
     private lateinit var userProfilBitmap : Bitmap
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +40,7 @@ class SelectTasteActivity : AppCompatActivity() {
     }
 
     private fun getSignUpUserDtoFromIntent(){
-        signUpUserDto = intent.getSerializableExtra("signUpDto") as UserSignUpRequestDto
+        signUpUserDto = intent.getSerializableExtra("signUpDto") as UserSignUpDto
         Log.d(TAG, "SelectTasteActivity: getSignUpUserDtoFromIntent() - signUpUserDto : $signUpUserDto")
     }
 

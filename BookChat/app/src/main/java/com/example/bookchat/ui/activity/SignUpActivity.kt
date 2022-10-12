@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -16,24 +15,18 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.bookchat.R
-import com.example.bookchat.data.UserSignUpRequestDto
+import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.databinding.ActivitySignUpBinding
-import com.example.bookchat.repository.DupCheckRepository
 import com.example.bookchat.utils.Constants.TAG
-import com.example.bookchat.utils.NameCheckStatus
 import com.example.bookchat.viewmodel.SignUpViewModel
 import com.example.bookchat.viewmodel.ViewModelFactory
 import com.kakao.sdk.user.UserApiClient
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import kotlin.coroutines.resume
 
@@ -57,7 +50,7 @@ class SignUpActivity : AppCompatActivity() {
 //            val userEmail = withContext(lifecycleScope.coroutineContext) { getUserEmail() }
             val userProfilBitmap = binding.userProfileIv.drawable.toBitmap(300,300)
 
-            val signUpDto = UserSignUpRequestDto(
+            val signUpDto = UserSignUpDto(
                 nickname = binding.nickNameEt.text.toString(), //데이터 체크
                 defaultProfileImageType = 1, //임시
                 userProfileImage = null,

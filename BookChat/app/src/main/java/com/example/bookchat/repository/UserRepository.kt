@@ -4,7 +4,7 @@ import android.util.Log
 import android.widget.Toast
 import com.example.bookchat.App
 import com.example.bookchat.data.User
-import com.example.bookchat.data.UserSignUpRequestDto
+import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.utils.Constants.TAG
 import retrofit2.Call
 import retrofit2.Callback
@@ -14,7 +14,7 @@ class UserRepository{
     //콜백 전부 코루틴으로 수정
     fun signUp(
         callback : (Boolean) -> Unit,
-        userInfo : UserSignUpRequestDto
+        userInfo : UserSignUpDto
     ){
         if(!isNetworkConnected()) {
             Toast.makeText(App.instance.applicationContext,"네트워크가 연결되어 있지 않습니다.\n네트워크를 연결해주세요.", Toast.LENGTH_SHORT).show()
