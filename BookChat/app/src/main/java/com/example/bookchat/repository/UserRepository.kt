@@ -139,5 +139,24 @@ class UserRepository{
         }
     }
 
+    suspend fun requestNameDuplicateCheck(nickName : String) {
+        if(!isNetworkConnected()) {
+            Toast.makeText(App.instance.applicationContext,"네트워크가 연결되어 있지 않습니다.\n네트워크를 연결해주세요.", Toast.LENGTH_SHORT).show()
+            throw NetworkIsNotConnectedException()
+        }
+        val response = App.instance.apiInterface.requestNameDuplicateCheck(nickName)
+        Log.d(TAG, "UserRepository: requestNameDuplicateCheck() - response.code() : ${response.code()}")
+        when(response.code()){
+            200 -> {
+                Log.d(TAG, "UserRepository: requestNameDuplicateCheck() - 200")
+            }
+            else -> throw Exception("${response.errorBody()?.string()}")
+        }
+    }
+
+    private fun isNetworkConnected() :Boolean{
+        return App.instance.networkManager.checkNetworkState()
+    }
+
 }
 

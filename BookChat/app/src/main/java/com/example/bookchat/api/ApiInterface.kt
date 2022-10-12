@@ -12,9 +12,10 @@ import retrofit2.http.*
 
 interface ApiInterface {
 
-    //이름 중복체크
     @GET("/v1/api/users/profile/nickname")
-    fun nicknameDuplicateCheck() :Call<Any>
+    suspend fun requestNameDuplicateCheck(
+        @Query("nickname") nickname :String
+    ) :Response<Unit>
 
     @POST("/v1/api/auth/token")
     suspend fun requestTokenRenewal(
