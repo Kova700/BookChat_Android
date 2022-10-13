@@ -34,7 +34,7 @@ object KakaoSDK {
         return tokenInfoResult.isSuccess
     }
 
-    suspend fun kakaoLogin(context : Context) {
+    suspend fun kakaoLogin(context :Context) {
         val isKakaoTalkLoginAvailable =
             userApiClient.isKakaoTalkLoginAvailable(context)
         if (isKakaoTalkLoginAvailable) {
@@ -93,39 +93,22 @@ object KakaoSDK {
         }
     }
 
-    fun logout(){
-        userApiClient.logout { error ->
-            error?.let { Log.d(TAG, "KakaoSDK: logout() - 로그아웃 실패. SDK에서 토큰 삭제됨 error : ${error}") }
-                ?: run { Log.d(TAG, "KakaoSDK: logout() - 로그아웃 성공. SDK에서 토큰 삭제됨") }
-        }
-    }
-
-    //회원 탈퇴
-    fun withdraw(){
-        userApiClient.unlink { error ->
-            error?.let { Log.d(TAG, "KakaoSDK: unlink() - 연결 끊기 실패. SDK에서 토큰 삭제됨 error : ${error}") }
-                ?: run { Log.d(TAG, "KakaoSDK: unlink() - 연결 끊기 성공. SDK에서 토큰 삭제됨") }
-        }
-    }
-
     private fun kakaoLoginErrorHandler(error :Throwable?) {
         when{
             isClientCancel(error) -> {
-                Toast.makeText(App.instance.applicationContext,"카카오 로그인 실패 - 사용자 취소", Toast.LENGTH_SHORT).show()
+                Toast.makeText(App.instance.applicationContext,"카카오 로그인 실패 - 사용자 취소",Toast.LENGTH_SHORT).show()
                 Log.d(TAG, "KakaoSDK: kakaoLoginErrorHandler() - isClientCancel -called")
             }
             isClientAccessDenied(error) -> {
-                Toast.makeText(App.instance.applicationContext,"카카오 로그인 실패 - 사용자 접근 거부", Toast.LENGTH_SHORT).show()
+                Toast.makeText(App.instance.applicationContext,"카카오 로그인 실패 - 사용자 접근 거부",Toast.LENGTH_SHORT).show()
                 Log.d(TAG, "KakaoSDK: kakaoLoginErrorHandler() - isClientAccessDenied - called")
             }
             isNotExistKakaoTalkAcount(error) -> {
-                Toast.makeText(App.instance.applicationContext,"카카오 로그인 실패 - 카카오톡에 로그인된 계정이 없음",
-                    Toast.LENGTH_SHORT).show()
+                Toast.makeText(App.instance.applicationContext,"카카오 로그인 실패 - 카카오톡에 로그인된 계정이 없음",Toast.LENGTH_SHORT).show()
                 Log.d(TAG, "KakaoSDK: kakaoLoginErrorHandler() - isNotExistKakaoTalkAcount -called")
             }
             else -> {
-                Toast.makeText(App.instance.applicationContext,"카카오 로그인 실패 - 잠시 후 다시 시도해 주세요.",
-                    Toast.LENGTH_SHORT).show()
+                Toast.makeText(App.instance.applicationContext,"카카오 로그인 실패 - 잠시 후 다시 시도해 주세요.",Toast.LENGTH_SHORT).show()
                 Log.d(TAG, "KakaoSDK: kakaoLoginErrorHandler() - else - called")
             }
         }
@@ -146,6 +129,13 @@ object KakaoSDK {
     //무효한 토큰 (정보를 볼 수 없음)
     private fun isInvalidToken(error :Throwable?) :Boolean{
         return error is KakaoSdkError && error.isInvalidTokenError()
+    }
+
+    fun kakaoLogout(){
+        userApiClient.logout { error ->
+            error?.let { Log.d(TAG, "KakaoSDK: logout() - 로그아웃 실패. SDK에서 토큰 삭제됨 error : ${error}") }
+                ?: run { Log.d(TAG, "KakaoSDK: logout() - 로그아웃 성공. SDK에서 토큰 삭제됨") }
+        }
     }
 
     //회원 탈퇴
