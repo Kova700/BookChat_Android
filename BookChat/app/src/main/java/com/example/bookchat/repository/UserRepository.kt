@@ -9,9 +9,6 @@ import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.response.*
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class UserRepository{
 

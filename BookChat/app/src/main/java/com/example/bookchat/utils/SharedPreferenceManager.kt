@@ -12,6 +12,7 @@ import com.google.gson.Gson
 import java.util.*
 import kotlin.collections.ArrayList
 
+/*삭제 예정*/
 object SharedPreferenceManager {
 
     //EncryptedSharedPreferences 인스턴스 생성
