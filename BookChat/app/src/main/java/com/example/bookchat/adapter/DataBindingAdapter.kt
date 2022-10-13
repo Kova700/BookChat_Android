@@ -10,7 +10,7 @@ import com.example.bookchat.R
 import com.example.bookchat.utils.NameCheckStatus
 
 object DataBindingAdapter {
-    
+
     /**이미지뷰 이미지 설정(URL)*/
     @JvmStatic
     @BindingAdapter("loadUrl")
@@ -36,7 +36,7 @@ object DataBindingAdapter {
         return
     }
 
-    /**회원가입 :닉네임 입력창 상황별 UI설정*/
+    /**회원가입 :닉네임 검사 상황별 안내문구*/
     //텍스트 (색 , 글자)
     @JvmStatic
     @BindingAdapter("setTextViewFromCheckResult")
@@ -63,6 +63,8 @@ object DataBindingAdapter {
             }
         }
     }
+
+    /**회원가입 :닉네임 검사 상황별 테두리 색상*/
     //레이아웃 (테두리)
     @JvmStatic
     @BindingAdapter("setLayoutFromCheckResult")
@@ -81,17 +83,4 @@ object DataBindingAdapter {
             }
         }
     }
-
-//    /**갤러리 사용자 권한 요청 설정*/
-//    @JvmStatic
-//    @BindingAdapter("requestPermission")
-//    fun requestPermission() {
-//
-//    }
-
-
-    // 현재 상황별 Enum 클래스 만들고
-    // ViewModel의  _nameCheckResult객체를 내가 바꾸고 싶은 위젯의 바인딩어댑터 함수에 집어넣고
-    // 바인딩어댑터 함수는 전달 받은 객체의 타입이 뭐냐에 따라 보여주고 싶은 UI 형태를 보여주는거지
-    // 상황이 바뀔때마다 라이브데이터로 정의된 _nameCheckResult객체를 수정하면 UI도 자동으로 바뀌는거지
 }
