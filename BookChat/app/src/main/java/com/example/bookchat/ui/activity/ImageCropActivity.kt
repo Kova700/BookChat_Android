@@ -1,12 +1,11 @@
-package com.example.bookchat.activities
+package com.example.bookchat.ui.activity
 
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import com.example.bookchat.R
@@ -31,7 +30,7 @@ class ImageCropActivity : AppCompatActivity() {
         Log.d(TAG, "ImageCropActivity: clickFinishBtn() - called")
         val bitmap :Bitmap = binding.cropImageView.getCroppedImage(300,300)!! // 임시 300
         val byteArray = getByteArray(bitmap)
-        val intent = Intent(this@ImageCropActivity,SignUpActivity::class.java)
+        val intent = Intent(this@ImageCropActivity, SignUpActivity::class.java)
         intent.putExtra("image",byteArray)
         setResult(RESULT_OK,intent)
         finish()

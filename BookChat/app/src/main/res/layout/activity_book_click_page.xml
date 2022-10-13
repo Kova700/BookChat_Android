@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--Lagercy-->
 <layout>
     <data>
         <variable
             name="activity"
-            type="com.example.bookchat.activities.BookClickPageActivity" />
+            type="com.example.bookchat.ui.activity.BookClickPageActivity" />
         <variable
             name="viewModel"
             type="com.example.bookchat.viewmodel.SearchResultBookPageViewModel" />

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--Legercy-->
 <layout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -9,7 +10,7 @@
 
         <variable
             name="activity"
-            type="com.example.bookchat.activities.SearchResultActivity" />
+            type="com.example.bookchat.ui.activity.SearchResultActivity" />
 
         <variable
             name="totalCount"

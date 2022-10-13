@@ -5,7 +5,7 @@
     <data>
         <variable
             name="activity"
-            type="com.example.bookchat.activities.SelectTasteActivity" />
+            type="com.example.bookchat.ui.activity.SelectTasteActivity" />
 
         <variable
             name="viewModel"
@@ -14,81 +14,74 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".activities.SelectTasteActivity">
+        tools:context=".ui.activity.SelectTasteActivity">
 
         <!--버튼 위치 앞페이지랑 맞추기-->
 
         <Button
             android:id="@+id/startBookchat_btn"
+            setButtonColor="@{viewModel.isTastesEmpty()}"
             android:layout_width="match_parent"
             android:layout_height="57dp"
-            android:layout_marginStart="35dp"
-            android:layout_marginEnd="35dp"
-            android:enabled="false"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
             android:backgroundTint="#D9D9D9"
-            setButtonColor="@{viewModel.isTastesEmpty()}"
-            android:onClick="@{() -> activity.clickFinshBtn()}"
+            android:enabled="false"
+            android:onClick="@{() -> viewModel.signUp()}"
             android:text="북챗 시작하기"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView4"
-            app:layout_constraintVertical_bias="0.53" />
+            app:layout_constraintTop_toBottomOf="@+id/chipGroup3" />
 
         <TextView
             android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="12dp"
             android:fontFamily="@font/notosanskr_regular"
             android:text="나의 독서 취향을\n선택해 주세요."
             android:textColor="#222222"
             android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.099" />
+            app:layout_constraintStart_toStartOf="@+id/imageButton3"
+            app:layout_constraintTop_toBottomOf="@+id/imageButton3" />
 
         <ImageButton
             android:id="@+id/imageButton3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
-            android:background="?android:selectableItemBackground"
+            android:layout_marginStart="22dp"
+            android:layout_marginTop="27dp"
+            android:background="#00ff0000"
             android:elevation="10dp"
             android:onClick="@{()->activity.clickBackBtn()}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.01999998"
             app:srcCompat="@drawable/ic_back_btn" />
 
         <LinearLayout
             android:id="@+id/chipGroup1"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginStart="35dp"
-            android:layout_marginEnd="35dp"
-            app:layout_constraintBottom_toTopOf="@+id/startBookchat_btn"
+            android:layout_marginStart="27dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="27dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView4"
-            app:layout_constraintVertical_bias="0.0">
+            app:layout_constraintTop_toBottomOf="@+id/textView4">
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip1"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
                 android:onClick="@{(view) -> viewModel.clickTaste(view)}"
                 android:text="경제"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                app:rippleColor="@android:color/transparent"
                 android:textColor="@color/chip_state_text_color"
                 app:chipStrokeColor="@color/chip_state_strok_color"
                 app:chipStrokeWidth="1dp"
@@ -102,12 +95,13 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip2"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
-                android:text="철학"
                 android:onClick="@{(chip) -> viewModel.clickTaste(chip)}"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="철학"
+                app:rippleColor="@android:color/transparent"
                 android:textColor="@color/chip_state_text_color"
                 app:chipStrokeColor="@color/chip_state_strok_color"
                 app:chipStrokeWidth="1dp"
@@ -121,12 +115,13 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip3"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
-                android:text="역사"
                 android:onClick="@{(chip) -> viewModel.clickTaste(chip)}"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="역사"
+                app:rippleColor="@android:color/transparent"
                 android:textColor="@color/chip_state_text_color"
                 app:chipStrokeColor="@color/chip_state_strok_color"
                 app:chipStrokeWidth="1dp"
@@ -140,12 +135,13 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip4"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
-                android:text="여행"
                 android:onClick="@{(chip) -> viewModel.clickTaste(chip)}"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="여행"
+                app:rippleColor="@android:color/transparent"
                 android:textColor="@color/chip_state_text_color"
                 app:chipStrokeColor="@color/chip_state_strok_color"
                 app:chipStrokeWidth="1dp"
@@ -159,12 +155,13 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip5"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
-                android:text="건강"
                 android:onClick="@{(chip) -> viewModel.clickTaste(chip)}"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="건강"
+                app:rippleColor="@android:color/transparent"
                 android:textColor="@color/chip_state_text_color"
                 app:chipStrokeColor="@color/chip_state_strok_color"
                 app:chipStrokeWidth="1dp"
@@ -177,23 +174,22 @@
             android:id="@+id/chipGroup2"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginStart="35dp"
-            android:layout_marginEnd="35dp"
-            app:layout_constraintBottom_toTopOf="@+id/startBookchat_btn"
+            android:layout_marginStart="27dp"
+            android:layout_marginEnd="27dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/chipGroup1"
-            app:layout_constraintVertical_bias="0.0">
+            app:layout_constraintTop_toBottomOf="@+id/chipGroup1">
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip6"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
-                android:text="취미"
                 android:onClick="@{(chip) -> viewModel.clickTaste(chip)}"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="취미"
+                app:rippleColor="@android:color/transparent"
                 android:textColor="@color/chip_state_text_color"
                 app:chipStrokeColor="@color/chip_state_strok_color"
                 app:chipStrokeWidth="1dp"
@@ -207,12 +203,13 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip7"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
-                android:text="인문"
                 android:onClick="@{(chip) -> viewModel.clickTaste(chip)}"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="인문"
+                app:rippleColor="@android:color/transparent"
                 android:textColor="@color/chip_state_text_color"
                 app:chipStrokeColor="@color/chip_state_strok_color"
                 app:chipStrokeWidth="1dp"
@@ -226,12 +223,13 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip8"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
-                android:text="소설"
                 android:onClick="@{(chip) -> viewModel.clickTaste(chip)}"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="소설"
+                app:rippleColor="@android:color/transparent"
                 android:textColor="@color/chip_state_text_color"
                 app:chipStrokeColor="@color/chip_state_strok_color"
                 app:chipStrokeWidth="1dp"
@@ -245,12 +243,13 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip9"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
-                android:text="예술"
                 android:onClick="@{(chip) -> viewModel.clickTaste(chip)}"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="예술"
+                app:rippleColor="@android:color/transparent"
                 android:textColor="@color/chip_state_text_color"
                 app:chipStrokeColor="@color/chip_state_strok_color"
                 app:chipStrokeWidth="1dp"
@@ -264,12 +263,13 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip10"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
-                android:text="디자인"
                 android:onClick="@{(chip) -> viewModel.clickTaste(chip)}"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="디자인"
+                app:rippleColor="@android:color/transparent"
                 android:textColor="@color/chip_state_text_color"
                 app:chipStrokeColor="@color/chip_state_strok_color"
                 app:chipStrokeWidth="1dp"
@@ -282,23 +282,22 @@
             android:id="@+id/chipGroup3"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginStart="35dp"
-            android:layout_marginEnd="35dp"
-            app:layout_constraintBottom_toTopOf="@+id/startBookchat_btn"
+            android:layout_marginStart="27dp"
+            android:layout_marginEnd="27dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/chipGroup2"
-            app:layout_constraintVertical_bias="0.0">
+            app:layout_constraintTop_toBottomOf="@+id/chipGroup2">
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip11"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
-                android:text="개발"
                 android:onClick="@{(chip) -> viewModel.clickTaste(chip)}"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="개발"
+                app:rippleColor="@android:color/transparent"
                 android:textColor="@color/chip_state_text_color"
                 app:chipStrokeColor="@color/chip_state_strok_color"
                 app:chipStrokeWidth="1dp"
@@ -312,12 +311,13 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip12"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
-                android:text="과학"
                 android:onClick="@{(chip) -> viewModel.clickTaste(chip)}"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="과학"
+                app:rippleColor="@android:color/transparent"
                 android:textColor="@color/chip_state_text_color"
                 app:chipStrokeColor="@color/chip_state_strok_color"
                 app:chipStrokeWidth="1dp"
@@ -331,12 +331,13 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip13"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
-                android:text="잡지"
                 android:onClick="@{(chip) -> viewModel.clickTaste(chip)}"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="잡지"
+                app:rippleColor="@android:color/transparent"
                 android:textColor="@color/chip_state_text_color"
                 app:chipStrokeColor="@color/chip_state_strok_color"
                 app:chipStrokeWidth="1dp"
@@ -350,12 +351,13 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip14"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
-                android:text="종교"
                 android:onClick="@{(chip) -> viewModel.clickTaste(chip)}"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="종교"
+                app:rippleColor="@android:color/transparent"
                 android:textColor="@color/chip_state_text_color"
                 app:chipStrokeColor="@color/chip_state_strok_color"
                 app:chipStrokeWidth="1dp"
@@ -369,12 +371,13 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip15"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
-                android:text="인물"
                 android:onClick="@{(chip) -> viewModel.clickTaste(chip)}"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="인물"
+                app:rippleColor="@android:color/transparent"
                 android:textColor="@color/chip_state_text_color"
                 app:chipStrokeColor="@color/chip_state_strok_color"
                 app:chipStrokeWidth="1dp"

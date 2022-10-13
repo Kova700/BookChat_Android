@@ -9,7 +9,7 @@
             type="com.example.bookchat.utils.OAuth2Provider" />
         <variable
             name="activity"
-            type="com.example.bookchat.activities.LoginActivity" />
+            type="com.example.bookchat.ui.activity.LoginActivity" />
         <variable
             name="viewModel"
             type="com.example.bookchat.viewmodel.LoginViewModel" />
@@ -18,7 +18,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".activities.LoginActivity">
+        tools:context=".ui.activity.LoginActivity">
 
 
         <ImageView
@@ -58,6 +58,7 @@
             android:drawableLeft="@drawable/ic_google_icon"
             android:fontFamily="@font/notosanskr_medium"
             android:text="구글로 시작하기"
+            android:stateListAnimator="@null"
             android:textColor="#747474"
             android:textSize="16sp"
             app:iconPadding="-6dp"
@@ -79,8 +80,9 @@
             android:backgroundTint="#FEE500"
             android:drawableLeft="@drawable/ic_kakao_icon"
             android:fontFamily="@font/notosanskr_medium"
-            android:onClick="@{()->viewModel.startKakaoLogin()}"
+            android:onClick="@{()->activity.startKakoLogin()}"
             android:text="카카오로 시작하기"
+            android:stateListAnimator="@null"
             android:textColor="#392020"
             android:textSize="16sp"
             app:iconPadding="-10dp"

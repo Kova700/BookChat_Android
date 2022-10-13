@@ -6,12 +6,12 @@
     <data>
         <variable
             name="activity"
-            type="com.example.bookchat.activities.ImageCropActivity" />
+            type="com.example.bookchat.ui.activity.ImageCropActivity" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".activities.ImageCropActivity">
+        tools:context=".ui.activity.ImageCropActivity">
 
         <Button
             android:id="@+id/getCropImageBtn"

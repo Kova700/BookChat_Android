@@ -1,4 +1,4 @@
-package com.example.bookchat.activities
+package com.example.bookchat.ui.activity
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity

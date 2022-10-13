@@ -16,16 +16,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BookChat">
         <activity
-            android:name=".activities.ImageCropActivity"
+            android:name=".ui.activity.ImageCropActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.SelectTasteActivity"
+            android:name=".ui.activity.SelectTasteActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.SignUpActivity"
+            android:name=".ui.activity.SignUpActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.SplashActivity"
+            android:name=".ui.activity.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,22 +34,23 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.SearchResultActivity"
+            android:name=".ui.activity.SearchResultActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.BookClickPageActivity"
+            android:name=".ui.activity.BookClickPageActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.SearchActivity"
+            android:name=".ui.activity.SearchActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.BookShelfActivity"
+            android:name=".ui.activity.BookShelfActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".ui.activity.MainActivity"
+            android:launchMode="singleTask"
             android:exported="true" />
         <activity
-            android:name=".activities.LoginActivity"
+            android:name=".ui.activity.LoginActivity"
             android:exported="true"
             android:launchMode="singleTop">
             <intent-filter android:autoVerify="true">
