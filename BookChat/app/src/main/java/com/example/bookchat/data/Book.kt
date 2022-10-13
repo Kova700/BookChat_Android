@@ -15,4 +15,4 @@ data class Book(
     val publisher: String,
     @SerializedName("bookCoverImageUrl")
     val bookCoverImageUrl: String
-) : Serializable // Intent간 객체 전달을 위해서
+) : Serializable
