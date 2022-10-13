@@ -34,6 +34,13 @@ class LoginViewModel(private val userRepository : UserRepository) : ViewModel(){
             .onFailure { failHandler(it) }
     }
 
+    private fun requestTokenRenewal() = viewModelScope.launch {
+        Log.d(TAG, "LoginViewModel: requestTokenRenewal() - called")
+        runCatching{ userRepository.requestTokenRenewal() }
+            .onSuccess { if (recursiveChecker == false) requestUserInfo(); recursiveChecker = true }
+            .onFailure { Log.d(TAG, "LoginViewModel: requestTokenRenewal() - onFailure : $it") }
+    }
+
     //Status Code별 Exception handle
     private fun failHandler(exception: Throwable) {
         when(exception){
@@ -52,14 +59,7 @@ class LoginViewModel(private val userRepository : UserRepository) : ViewModel(){
         }
     }
 
-    private fun requestTokenRenewal() = viewModelScope.launch {
-        Log.d(TAG, "LoginViewModel: requestTokenRenewal() - called")
-        runCatching{ userRepository.requestTokenRenewal() }
-            .onSuccess { if (recursiveChecker == false) requestUserInfo(); recursiveChecker = true }
-            .onFailure { Log.d(TAG, "LoginViewModel: requestTokenRenewal() - onFailure : $it") }
-    }
-
-    fun startKakaoLogin(context : Context) = viewModelScope.launch {
+    fun startKakaoLogin(context :Context) = viewModelScope.launch {
         Log.d(TAG, "LoginViewModel: startKakaoLogin() - called")
         runCatching{ KakaoSDK.kakaoLogin(context) } //요놈이 예외없이 잘 실행되었다면 성공이 , 예외가 터졌다면 Faile이 실행됨
             .onSuccess { bookchatLogin() }
@@ -92,4 +92,5 @@ class LoginViewModel(private val userRepository : UserRepository) : ViewModel(){
     fun requestGoogleLogin()= viewModelScope.launch {
         Log.d(TAG, "LoginViewModel: requestGoogleLogin() - called")
     }
+
 }
