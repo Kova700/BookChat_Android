@@ -3,14 +3,12 @@ package com.example.bookchat.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.bookchat.repository.BookRepository
-import com.example.bookchat.repository.DupCheckRepository
 import com.example.bookchat.repository.UserRepository
 
 // 뷰모델에 인자를 넘겨주기 위한 팩토리 메서드
 class ViewModelFactory() : ViewModelProvider.Factory {
     private lateinit var bookRepository : BookRepository
     private lateinit var userRepository : UserRepository
-    private lateinit var dupCheckRepository : DupCheckRepository
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
 
@@ -31,12 +29,13 @@ class ViewModelFactory() : ViewModelProvider.Factory {
             }
 
             modelClass.isAssignableFrom(SelectTasteViewModel::class.java) -> {
-                return SelectTasteViewModel() as T
+                userRepository = UserRepository()
+                return SelectTasteViewModel(userRepository) as T
             }
 
             modelClass.isAssignableFrom(SignUpViewModel::class.java) -> {
-                dupCheckRepository = DupCheckRepository()
-                return SignUpViewModel(dupCheckRepository) as T
+                userRepository = UserRepository()
+                return SignUpViewModel(userRepository) as T
             }
 
             else -> throw IllegalArgumentException("unknown model class : ${modelClass}")

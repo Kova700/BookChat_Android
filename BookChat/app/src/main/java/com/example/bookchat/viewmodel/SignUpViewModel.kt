@@ -1,27 +1,26 @@
 package com.example.bookchat.viewmodel
 
+import android.graphics.Bitmap
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.bookchat.repository.DupCheckRepository
+import androidx.lifecycle.*
+import com.example.bookchat.data.UserSignUpDto
+import com.example.bookchat.repository.UserRepository
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.NameCheckStatus
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.regex.Pattern
-import kotlin.coroutines.resume
 
-class SignUpViewModel(private var dupCheckRepository : DupCheckRepository) :ViewModel() {
+class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() {
 
     lateinit var goSelectTasteActivity : suspend () -> Unit
     private var _isNotNameShort = MutableLiveData<Boolean?>(false)
     private var _isNotNameDuplicate = MutableLiveData<Boolean?>(false)
     private var _nameCheckStatus = MutableLiveData<NameCheckStatus>(NameCheckStatus.Default)
+    var _signUpDto = MutableLiveData<UserSignUpDto>(UserSignUpDto( defaultProfileImageType = (1..5).random()) )
+    var _userProfilBitmap = MutableLiveData<Bitmap>()
 
     val isNotNameShort : LiveData<Boolean?>
         get() = _isNotNameShort
@@ -30,7 +29,6 @@ class SignUpViewModel(private var dupCheckRepository : DupCheckRepository) :View
     val nameCheckStatus : LiveData<NameCheckStatus>
         get() = _nameCheckStatus
 
-
     val editTextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
@@ -38,6 +36,7 @@ class SignUpViewModel(private var dupCheckRepository : DupCheckRepository) :View
             //글자가 수정될 때마다 검사 기록 초기화
             lengthCheck(s.toString())
             _isNotNameDuplicate.value = false
+            Log.d(TAG, "SignUpViewModel: afterTextChanged() - _signUpDto : ${_signUpDto.value}")
         }
     }
 
@@ -68,31 +67,25 @@ class SignUpViewModel(private var dupCheckRepository : DupCheckRepository) :View
                     goSelectTasteActivity()
                     return@launch
                 }
-                duplicateCheck()
+                _signUpDto.value?.nickname?.let { requestNameDuplicateCheck(it) }
                 return@launch
             }
             lengthCheck("")
         }
     }
 
-    //서버한테 중복 검사 요청
-    private suspend fun duplicateCheck() {
-        _isNotNameDuplicate.value = suspendCancellableCoroutine<Boolean> { continuation ->
-            dupCheckRepository.duplicateCheck { dupCheckResult ->
-                when(dupCheckResult){
-                    true -> {
-                        _nameCheckStatus.value = NameCheckStatus.IsPerfect
-                        continuation.resume(true)
-                    }
-                    false ->{
-                        _nameCheckStatus.value = NameCheckStatus.IsDuplicate
-                        continuation.resume(false)
-                    }
-                }
-                Log.d(TAG, "SignUpViewModel: duplicateCheck() - 검사 완료 - _nameCheckStatus.value : ${_nameCheckStatus.value}")
-                Log.d(TAG, "SignUpViewModel: duplicateCheck() - 검사 완료 - _isNotNameDuplicate.value : ${_isNotNameDuplicate.value}")
+    private suspend fun requestNameDuplicateCheck(nickName :String) {
+        Log.d(TAG, "SignUpViewModel: requestNameDuplicateCheck() - called")
+        runCatching { userRepository.requestNameDuplicateCheck(nickName) }
+            .onSuccess {
+                _nameCheckStatus.value = NameCheckStatus.IsPerfect
+                _isNotNameDuplicate.value = true
             }
-        }
+            .onFailure {
+                Log.d(TAG, "SignUpViewModel: requestNameDuplicateCheck() Exception : $it")
+                _nameCheckStatus.value = NameCheckStatus.IsDuplicate
+                _isNotNameDuplicate.value = false
+            }
     }
 
 }
