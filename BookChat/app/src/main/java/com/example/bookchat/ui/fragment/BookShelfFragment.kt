@@ -24,12 +24,12 @@ class BookShelfFragment : Fragment() {
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_book_shelf,container,false)
 
-//        val pagerAdapter = PagerFragmentStateAdapter(requireActivity())
-//        pagerAdapter.addFragment(ReadingBookTabFragment())
-//        pagerAdapter.addFragment(CompleteBookTabFragment())
-//        pagerAdapter.addFragment(WishBookTabFragment())
-//
-//        binding.viewPager.adapter = pagerAdapter
+        val pagerAdapter = PagerFragmentStateAdapter(requireActivity())
+        pagerAdapter.addFragment(ReadingBookTabFragment())
+        pagerAdapter.addFragment(CompleteBookTabFragment())
+        pagerAdapter.addFragment(WishBookTabFragment())
+
+        binding.viewPager.adapter = pagerAdapter
 
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
