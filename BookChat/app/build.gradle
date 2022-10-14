@@ -76,4 +76,6 @@ dependencies {
     implementation 'com.github.CanHub:Android-Image-Cropper:4.3.1'
     //Preferences DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+    //SimpleRatingBar (임시)
+    implementation 'com.github.ome450901:SimpleRatingBar:1.5.1'
 }
