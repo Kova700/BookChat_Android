@@ -34,18 +34,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activity.SearchResultActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.BookClickPageActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.SearchActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.BookShelfActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.activity.MainActivity"
             android:launchMode="singleTask"
             android:exported="true" />
