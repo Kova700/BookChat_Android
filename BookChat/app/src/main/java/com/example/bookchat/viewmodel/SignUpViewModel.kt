@@ -11,6 +11,7 @@ import com.example.bookchat.repository.UserRepository
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.NameCheckStatus
 import kotlinx.coroutines.launch
+import java.util.*
 import java.util.regex.Pattern
 
 class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() {
@@ -19,7 +20,8 @@ class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() 
     private var _isNotNameShort = MutableLiveData<Boolean?>(false)
     private var _isNotNameDuplicate = MutableLiveData<Boolean?>(false)
     private var _nameCheckStatus = MutableLiveData<NameCheckStatus>(NameCheckStatus.Default)
-    var _signUpDto = MutableLiveData<UserSignUpDto>(UserSignUpDto( defaultProfileImageType = (1..5).random()) )
+    val randomInteger = Random().nextInt(5) + 1
+    var _signUpDto = MutableLiveData<UserSignUpDto>(UserSignUpDto( defaultProfileImageType = randomInteger) )
     var _userProfilBitmap = MutableLiveData<Bitmap>()
 
     val isNotNameShort : LiveData<Boolean?>
@@ -62,15 +64,17 @@ class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() 
 
     fun clickStartBtn() {
         viewModelScope.launch {
-            if (_isNotNameShort.value == true){
-                if (_isNotNameDuplicate.value == true){
-                    goSelectTasteActivity()
-                    return@launch
-                }
-                _signUpDto.value?.nickname?.let { requestNameDuplicateCheck(it) }
-                return@launch
-            }
-            lengthCheck("")
+            goSelectTasteActivity()
+
+//            if (_isNotNameShort.value == true){
+//                if (_isNotNameDuplicate.value == true){
+//                    goSelectTasteActivity()
+//                    return@launch
+//                }
+//                _signUpDto.value?.nickname?.let { requestNameDuplicateCheck(it) }
+//                return@launch
+//            }
+//            lengthCheck("")
         }
     }
 
