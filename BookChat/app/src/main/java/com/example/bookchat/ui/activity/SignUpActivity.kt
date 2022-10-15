@@ -15,12 +15,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.drawable.toBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.bookchat.R
-import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.databinding.ActivitySignUpBinding
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.SignUpViewModel
@@ -46,20 +44,16 @@ class SignUpActivity : AppCompatActivity() {
         }
         setFocus()
 
+        //회원가입(프로필설정페이지)에서 다음페이지로 넘어갈 콜백 메서드 지정 중 (임시)
         signUpViewModel.goSelectTasteActivity = {
-//            val userEmail = withContext(lifecycleScope.coroutineContext) { getUserEmail() }
-            val userProfilBitmap = binding.userProfileIv.drawable.toBitmap(300,300)
-
-            val signUpDto = UserSignUpDto(
-                nickname = binding.nickNameEt.text.toString(), //데이터 체크
-                defaultProfileImageType = 1, //임시
-                userProfileImage = null,
-            )
-            val intent = Intent(this,SelectTasteActivity::class.java)
+            val userProfilBitmap = signUpViewModel._userProfilBitmap.value
+            Log.d(TAG, "SignUpActivity: onCreate() userProfilBitmap : $userProfilBitmap- called")
+            val signUpDto = signUpViewModel._signUpDto.value
+            val intent = Intent(this, SelectTasteActivity::class.java)
+            val byteArray = userProfilBitmap?.let { getByteArray(it) }
             intent.putExtra("signUpDto" , signUpDto)
-            val byteArray = getByteArray(userProfilBitmap)
             intent.putExtra("userProfileImg",byteArray)
-            //readingTastes, Img 입력 받아야함
+            //SelectTasteActivity에서 readingTastes, Img 입력 받아야함
             startActivity(intent)
         }
 
@@ -93,7 +87,7 @@ class SignUpActivity : AppCompatActivity() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     }
 
-    suspend fun getUserEmail() :String{
+    suspend fun getUserEmail() :String{ //삭제 예정
         val userEmail = suspendCancellableCoroutine<String> { continuation ->
             UserApiClient.instance.me { user, error ->
                 error?.let {
@@ -164,12 +158,13 @@ class SignUpActivity : AppCompatActivity() {
                 val intent = result.data
                 val bitmapByteArray = intent?.getByteArrayExtra("image") ?: byteArrayOf()
                 val bitmap = byteArrayToBitmap(bitmapByteArray)
+                signUpViewModel._userProfilBitmap.value = bitmap
 
                 Glide.with(this)
                     .asBitmap()
                     .load(bitmap)
                     .into(binding.userProfileIv)
-           }
+            }
         }
 
     private fun openGallery(){
