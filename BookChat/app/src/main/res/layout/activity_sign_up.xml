@@ -64,7 +64,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/ic_default_profile_img1" />
+                    loadByteArray="@{viewModel.userProfilByteArray}"/>
             </androidx.cardview.widget.CardView>
 
             <ImageButton

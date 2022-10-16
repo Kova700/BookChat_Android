@@ -1,11 +1,13 @@
 package com.example.bookchat.viewmodel
 
-import android.graphics.Bitmap
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.repository.UserRepository
 import com.example.bookchat.utils.Constants.TAG
@@ -20,10 +22,11 @@ class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() 
     private var _isNotNameShort = MutableLiveData<Boolean?>(false)
     private var _isNotNameDuplicate = MutableLiveData<Boolean?>(false)
     private var _nameCheckStatus = MutableLiveData<NameCheckStatus>(NameCheckStatus.Default)
-    val randomInteger = Random().nextInt(5) + 1
-    var _signUpDto = MutableLiveData<UserSignUpDto>(UserSignUpDto( defaultProfileImageType = randomInteger) )
-    var _userProfilByteArray = MutableLiveData<ByteArray>()
+    var _signUpDto = MutableLiveData<UserSignUpDto>(UserSignUpDto( defaultProfileImageType = Random().nextInt(5) + 1) )
+    var _userProfilByteArray = MutableLiveData<ByteArray>(byteArrayOf())
 
+    val userProfilByteArray : LiveData<ByteArray>
+        get() = _userProfilByteArray
     val nameCheckStatus : LiveData<NameCheckStatus>
         get() = _nameCheckStatus
 

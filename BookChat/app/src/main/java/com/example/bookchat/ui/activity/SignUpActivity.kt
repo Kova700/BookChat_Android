@@ -141,12 +141,6 @@ class SignUpActivity : AppCompatActivity() {
                 val intent = result.data
                 val bitmapByteArray = intent?.getByteArrayExtra(EXTRA_USER_PROFILE_BYTE_ARRAY1) ?: byteArrayOf()
                 signUpViewModel._userProfilByteArray.value = bitmapByteArray
-                val bitmap = byteArrayToBitmap(bitmapByteArray)
-
-                Glide.with(this)
-                    .asBitmap()
-                    .load(bitmap)
-                    .into(binding.userProfileIv)
             }
         }
 

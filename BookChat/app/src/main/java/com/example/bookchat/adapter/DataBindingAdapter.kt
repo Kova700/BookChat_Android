@@ -1,7 +1,11 @@
 package com.example.bookchat.adapter
 
+import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.widget.*
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
@@ -19,6 +23,18 @@ object DataBindingAdapter {
             .load(url)
             .placeholder(R.drawable.default_img)
             .error(R.drawable.default_img)
+            .into(imageView)
+    }
+
+    /**이미지뷰 이미지 설정(ByteArray)*/
+    @JvmStatic
+    @BindingAdapter("loadByteArray")
+    fun loadByteArray(imageView: ImageView, byteArray: ByteArray){
+        val bitmap = BitmapFactory.decodeByteArray(byteArray,0,byteArray.size)
+        Glide.with(imageView.context)
+            .load(bitmap)
+            .placeholder(R.drawable.ic_default_profile_img1)
+            .error(R.drawable.ic_default_profile_img1)
             .into(imageView)
     }
 
