@@ -59,10 +59,9 @@ class SignUpActivity : AppCompatActivity() {
 
         //회원가입(프로필설정페이지)에서 다음페이지로 넘어갈 콜백 메서드 지정 중 (임시)
         signUpViewModel.goSelectTasteActivity = {
-            val userProfilBitmap = signUpViewModel._userProfilBitmap.value
             val signUpDto = signUpViewModel._signUpDto.value
+            val byteArray = signUpViewModel._userProfilByteArray.value
             val intent = Intent(this, SelectTasteActivity::class.java)
-            val byteArray = userProfilBitmap?.let { getByteArray(it) }
             intent.putExtra(EXTRA_SIGNUP_DTO , signUpDto)
             intent.putExtra(EXTRA_USER_PROFILE_BYTE_ARRAY2,byteArray)
             startActivity(intent)
@@ -80,22 +79,6 @@ class SignUpActivity : AppCompatActivity() {
         Handler(Looper.getMainLooper()).postDelayed({
             imm.showSoftInput(binding.nickNameEt,0)
         },200)
-    }
-
-    private fun getByteArray(bitmap :Bitmap) :ByteArray{
-        return if(sdkVersionIsMoreR()) bitmapToByteArray(bitmap,Bitmap.CompressFormat.WEBP_LOSSLESS)
-        else bitmapToByteArray(bitmap,Bitmap.CompressFormat.WEBP)
-    }
-
-    private fun bitmapToByteArray(bitmap: Bitmap, compressFormat :Bitmap.CompressFormat) :ByteArray{
-        val stream = ByteArrayOutputStream()
-        bitmap.compress(compressFormat,100,stream) //임시 100
-        return stream.toByteArray()
-    }
-
-    //WEBP 비손실 압축 버전 분기 목적
-    private fun sdkVersionIsMoreR() :Boolean{
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     }
 
     fun clickProfileBtn(){
@@ -157,8 +140,8 @@ class SignUpActivity : AppCompatActivity() {
                 //크롭된 이미지 가져오기기
                 val intent = result.data
                 val bitmapByteArray = intent?.getByteArrayExtra(EXTRA_USER_PROFILE_BYTE_ARRAY1) ?: byteArrayOf()
+                signUpViewModel._userProfilByteArray.value = bitmapByteArray
                 val bitmap = byteArrayToBitmap(bitmapByteArray)
-                signUpViewModel._userProfilBitmap.value = bitmap
 
                 Glide.with(this)
                     .asBitmap()

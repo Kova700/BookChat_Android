@@ -22,7 +22,7 @@ class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() 
     private var _nameCheckStatus = MutableLiveData<NameCheckStatus>(NameCheckStatus.Default)
     val randomInteger = Random().nextInt(5) + 1
     var _signUpDto = MutableLiveData<UserSignUpDto>(UserSignUpDto( defaultProfileImageType = randomInteger) )
-    var _userProfilBitmap = MutableLiveData<Bitmap>()
+    var _userProfilByteArray = MutableLiveData<ByteArray>()
 
     val nameCheckStatus : LiveData<NameCheckStatus>
         get() = _nameCheckStatus
