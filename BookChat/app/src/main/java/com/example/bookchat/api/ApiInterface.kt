@@ -3,13 +3,14 @@ package com.example.bookchat.api
 import com.example.bookchat.data.BookSearchResultDto
 import com.example.bookchat.data.Token
 import com.example.bookchat.data.User
-import com.example.bookchat.utils.OAuth2Provider
-import com.example.bookchat.utils.ReadingTaste
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiInterface {
+    //API 테스트
+    //@POST("/3862dd02-166b-4975-9a3c-1666ebd4fcfa")
 
     @GET("/v1/api/users/profile/nickname")
     suspend fun requestNameDuplicateCheck(
@@ -21,38 +22,30 @@ interface ApiInterface {
         @Body refreshToken :String
     ): Response<Token>
 
-    //헤더명 수정해야함
     //회원가입
     @Multipart
     @POST("/v1/api/users/signup")
     suspend fun signUp(
-        @Header("Authorization") idToken :String,
-        @Header("provider_type") idTokenProvider :OAuth2Provider,
+        @Header("OIDC") idToken :String,
         @Part userProfileImage: MultipartBody.Part? = null,
-        @Part(value = "nickname") nickname: String,
-        @Part("defaultProfileImageType") defaultProfileImageType: Int,
-        @Part("readingTastes") readingTastes: List<@JvmSuppressWildcards ReadingTaste>? = null
+        @Part("userSignUpRequestDto") userSignUpRequestDto: RequestBody
     ) :Response<Unit>
 
-    //헤더명 수정해야함
     @POST("/v1/api/users/signin")
     suspend fun signIn(
-        @Header("Authorization") idToken :String,
-        @Header("provider_type") oAuth2Provider :OAuth2Provider
+        @Header("OIDC") idToken :String,
+        @Body oauth2Provider :RequestBody
     ) : Response<Token>
 
     @DELETE("/v1/api/users")
     suspend fun withdraw(
-        @Header("Authorization") accessToken :String // 북챗 JWT 토큰
     ) : Response<Unit>
 
     @GET("/v1/api/users/profile")
     suspend fun getUserProfile(
-        @Header("Authorization") token :String, //임시로 인터셉터 안씀
     ) : Response<User>
 
     //제목으로 도서 검색 => 통합 쿼리 검색 api로 수정해야함
-    //북챗토큰으로 수정
     @GET("/v1/api/books")
     suspend fun getBookFromTitle(
         @Query("title") title:String,
