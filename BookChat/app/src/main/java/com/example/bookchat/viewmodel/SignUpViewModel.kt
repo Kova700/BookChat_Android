@@ -24,10 +24,6 @@ class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() 
     var _signUpDto = MutableLiveData<UserSignUpDto>(UserSignUpDto( defaultProfileImageType = randomInteger) )
     var _userProfilBitmap = MutableLiveData<Bitmap>()
 
-    val isNotNameShort : LiveData<Boolean?>
-        get() = _isNotNameShort
-    val isNotNameDuplicate : LiveData<Boolean?>
-        get() = _isNotNameDuplicate
     val nameCheckStatus : LiveData<NameCheckStatus>
         get() = _nameCheckStatus
 
@@ -35,7 +31,6 @@ class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() 
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
         override fun afterTextChanged(s: Editable) {
-            //글자가 수정될 때마다 검사 기록 초기화
             lengthCheck(s.toString())
             _isNotNameDuplicate.value = false
             Log.d(TAG, "SignUpViewModel: afterTextChanged() - _signUpDto : ${_signUpDto.value}")
@@ -64,17 +59,15 @@ class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() 
 
     fun clickStartBtn() {
         viewModelScope.launch {
-            goSelectTasteActivity()
-
-//            if (_isNotNameShort.value == true){
-//                if (_isNotNameDuplicate.value == true){
-//                    goSelectTasteActivity()
-//                    return@launch
-//                }
-//                _signUpDto.value?.nickname?.let { requestNameDuplicateCheck(it) }
-//                return@launch
-//            }
-//            lengthCheck("")
+            if (_isNotNameShort.value == true){
+                if (_isNotNameDuplicate.value == true){
+                    goSelectTasteActivity()
+                    return@launch
+                }
+                _signUpDto.value?.nickname?.let { requestNameDuplicateCheck(it) }
+                return@launch
+            }
+            lengthCheck("")
         }
     }
 
