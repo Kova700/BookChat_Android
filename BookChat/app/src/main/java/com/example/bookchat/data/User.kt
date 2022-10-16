@@ -2,7 +2,6 @@ package com.example.bookchat.data
 
 import com.google.gson.annotations.SerializedName
 
-//DTO
 data class User(
     @SerializedName("userNickname")
     val userNickname: String,

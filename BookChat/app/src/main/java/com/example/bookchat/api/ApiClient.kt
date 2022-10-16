@@ -12,6 +12,7 @@ object ApiClient {
 
     fun getApiClient(): Retrofit {
         return Retrofit.Builder()
+//            .baseUrl("https://webhook.site/") //API 테스트
             .baseUrl(DOMAIN)
             .client(provideOkHttpClient(AppInterceptor())) //OkHttp 클라이언트 주입
             .addConverterFactory(GsonConverterFactory.create())
@@ -22,7 +23,7 @@ object ApiClient {
         interceptor: Interceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
-            .addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)) //로그용 임시
             .addInterceptor(interceptor)
             .build()
     }
