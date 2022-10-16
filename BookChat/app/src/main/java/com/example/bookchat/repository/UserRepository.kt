@@ -89,6 +89,7 @@ class UserRepository{
         Log.d(TAG, "UserRepository: withdraw() - response.code : ${response.code()}")
         when(response.code()){
             200 -> signOut()
+            401 -> throw TokenExpiredException(response.errorBody()?.string())
             else -> throw Exception(getExceptionMessage(response.code(),response.errorBody()?.string()))
         }
     }
@@ -113,6 +114,7 @@ class UserRepository{
         }
     }
 
+    //추후 Response 인터셉터에서 호출해야함 (안 넣으면 모든 ViewModel에 다 적어줘야함)
     suspend fun requestTokenRenewal() : Token {
         Log.d(TAG, "UserRepository: requestTokenRenewal() - called")
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
