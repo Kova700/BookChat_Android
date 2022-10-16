@@ -45,4 +45,8 @@ class App : Application() {
     fun getCachedUser() :User?{
         return cachedUser
     }
+
+    fun deleteCachedUser() {
+        cachedUser = null
+    }
 }
