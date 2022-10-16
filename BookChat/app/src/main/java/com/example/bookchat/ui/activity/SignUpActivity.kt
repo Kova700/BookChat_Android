@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySignUpBinding
+import com.example.bookchat.ui.activity.ImageCropActivity.Companion.EXTRA_USER_PROFILE_BYTE_ARRAY1
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.SignUpViewModel
 import com.example.bookchat.viewmodel.ViewModelFactory
@@ -28,7 +29,19 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.ByteArrayOutputStream
 import kotlin.coroutines.resume
 
+const val DENIED = "DENIED"
+const val EXPLAINED = "EXPLAINED"
+const val SCHEME_PACKAGE = "package"
+const val LAUNCHER_INPUT_IMAGE = "image/*"
+
 class SignUpActivity : AppCompatActivity() {
+
+    companion object{
+        const val EXTRA_USER_PROFILE_URI = "EXTRA_USER_PROFILE_URI"
+        const val EXTRA_SIGNUP_DTO = "EXTRA_SIGNUP_DTO"
+        const val EXTRA_USER_PROFILE_BYTE_ARRAY2 = "EXTRA_USER_PROFILE_BYTE_ARRAY2"
+    }
+
     private lateinit var binding : ActivitySignUpBinding
     private lateinit var signUpViewModel : SignUpViewModel
     private lateinit var imm :InputMethodManager
@@ -47,13 +60,11 @@ class SignUpActivity : AppCompatActivity() {
         //회원가입(프로필설정페이지)에서 다음페이지로 넘어갈 콜백 메서드 지정 중 (임시)
         signUpViewModel.goSelectTasteActivity = {
             val userProfilBitmap = signUpViewModel._userProfilBitmap.value
-            Log.d(TAG, "SignUpActivity: onCreate() userProfilBitmap : $userProfilBitmap- called")
             val signUpDto = signUpViewModel._signUpDto.value
             val intent = Intent(this, SelectTasteActivity::class.java)
             val byteArray = userProfilBitmap?.let { getByteArray(it) }
-            intent.putExtra("signUpDto" , signUpDto)
-            intent.putExtra("userProfileImg",byteArray)
-            //SelectTasteActivity에서 readingTastes, Img 입력 받아야함
+            intent.putExtra(EXTRA_SIGNUP_DTO , signUpDto)
+            intent.putExtra(EXTRA_USER_PROFILE_BYTE_ARRAY2,byteArray)
             startActivity(intent)
         }
 
@@ -87,21 +98,6 @@ class SignUpActivity : AppCompatActivity() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     }
 
-    suspend fun getUserEmail() :String{ //삭제 예정
-        val userEmail = suspendCancellableCoroutine<String> { continuation ->
-            UserApiClient.instance.me { user, error ->
-                error?.let {
-                    Log.d(TAG, "SignUpActivity: getUserEmail() - error : $error  - \"사용자 정보 요청 실패\"")
-                }
-                user?.let {
-                    continuation.resume(user.kakaoAccount?.email!!)
-                }
-            }
-        }
-        Log.d(TAG, "SignUpActivity: getUserEmail() - userEmail : $userEmail")
-        return userEmail
-    }
-
     fun clickProfileBtn(){
         launchPermissions()
     }
@@ -116,18 +112,18 @@ class SignUpActivity : AppCompatActivity() {
             deniedList.isNotEmpty() -> {
                 //명시적 거부 -> DENIED , 다시 묻지 않음(두 번 거부) -> EXPLAINED
                 val map = deniedList.groupBy { permission ->
-                    if (shouldShowRequestPermissionRationale(permission)) "DENIED" else "EXPLAINED"
+                    if (shouldShowRequestPermissionRationale(permission)) DENIED else EXPLAINED
                 }
 
-                map["DENIED"]?.let{
-                    Toast.makeText(this,"[사진 및 미디어]\n권한을 허용해주세요.",Toast.LENGTH_LONG).show()
+                map[DENIED]?.let{
+                    Toast.makeText(this,R.string.message_permission_DENIED,Toast.LENGTH_LONG).show()
                 }
 
-                map["EXPLAINED"]?.let {
-                    Toast.makeText(this,"[권한] - [파일 및 미디어]\n권한을 허용해주세요.",Toast.LENGTH_LONG).show()
+                map[EXPLAINED]?.let {
+                    Toast.makeText(this,R.string.message_permission_EXPLAINED,Toast.LENGTH_LONG).show()
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                     this.packageName.also { name ->
-                        val uri = Uri.fromParts("package", name, null)
+                        val uri = Uri.fromParts(SCHEME_PACKAGE, name, null)
                         intent.data = uri
                         startActivity(intent)
                     }
@@ -151,12 +147,16 @@ class SignUpActivity : AppCompatActivity() {
             openCropActivity(resultUri!!)
         }
 
+    private fun openGallery(){
+        activityResultLauncher.launch(LAUNCHER_INPUT_IMAGE)
+    }
+
     private val cropActivityResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if(result.resultCode == RESULT_OK){
                 //크롭된 이미지 가져오기기
                 val intent = result.data
-                val bitmapByteArray = intent?.getByteArrayExtra("image") ?: byteArrayOf()
+                val bitmapByteArray = intent?.getByteArrayExtra(EXTRA_USER_PROFILE_BYTE_ARRAY1) ?: byteArrayOf()
                 val bitmap = byteArrayToBitmap(bitmapByteArray)
                 signUpViewModel._userProfilBitmap.value = bitmap
 
@@ -167,13 +167,9 @@ class SignUpActivity : AppCompatActivity() {
             }
         }
 
-    private fun openGallery(){
-        activityResultLauncher.launch("image/*")
-    }
-
     private fun openCropActivity(uri :Uri){
         val intent = Intent(this, ImageCropActivity::class.java)
-        intent.putExtra("uri",uri.toString())
+        intent.putExtra(EXTRA_USER_PROFILE_URI,uri.toString())
         cropActivityResultLauncher.launch(intent)
     }
 

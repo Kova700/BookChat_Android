@@ -10,10 +10,16 @@ import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityImageCropBinding
+import com.example.bookchat.ui.activity.SignUpActivity.Companion.EXTRA_USER_PROFILE_URI
 import com.example.bookchat.utils.Constants.TAG
 import java.io.ByteArrayOutputStream
 
 class ImageCropActivity : AppCompatActivity() {
+
+    companion object{
+        const val EXTRA_USER_PROFILE_BYTE_ARRAY1 = "EXTRA_USER_PROFILE_BYTE_ARRAY1"
+    }
+
     private lateinit var binding : ActivityImageCropBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,17 +27,17 @@ class ImageCropActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_image_crop)
         binding.activity = this
 
-        val uri = intent.getStringExtra("uri")!!.toUri()
+        val uri = intent.getStringExtra(EXTRA_USER_PROFILE_URI)!!.toUri()
         binding.cropImageView.setImageUriAsync(uri)
 
     }
 
     fun clickFinishBtn(){
         Log.d(TAG, "ImageCropActivity: clickFinishBtn() - called")
-        val bitmap :Bitmap = binding.cropImageView.getCroppedImage(300,300)!! // 임시 300
+        val bitmap :Bitmap = binding.cropImageView.getCroppedImage(200,200)!!
         val byteArray = getByteArray(bitmap)
         val intent = Intent(this@ImageCropActivity, SignUpActivity::class.java)
-        intent.putExtra("image",byteArray)
+        intent.putExtra(EXTRA_USER_PROFILE_BYTE_ARRAY1,byteArray)
         setResult(RESULT_OK,intent)
         finish()
     }
