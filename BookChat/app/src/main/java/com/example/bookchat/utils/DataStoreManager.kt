@@ -23,17 +23,16 @@ object DataStoreManager {
     private val bookChatTokenKey = stringPreferencesKey("BOOKCHAT_TOKEN_KEY")
     private val searchHistoryKey = stringPreferencesKey("SEARCH_HISTORY_KEY")
 
-
     //북챗 토큰 (추후 암호화 추가)
     suspend fun getBookchatToken() :Token{
         val tokenString = readDataStore().firstOrNull()?.get(bookChatTokenKey)
-        Log.d(TAG, "DataStoreManager: getBookchatToken() - tokenString : $tokenString")
         if (tokenString.isNullOrBlank()) throw Exception("Saved token does not exist")
         val token = Gson().fromJson(tokenString,Token::class.java)
         return token
     }
 
     suspend fun saveBookchatToken(token :Token){
+        token.accessToken = "Bearer ${token.accessToken}"
         val tokenString = Gson().toJson(token)
         setDataStore(bookChatTokenKey,tokenString)
     }
