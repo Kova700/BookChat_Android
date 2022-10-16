@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
+import com.example.bookchat.R
 import com.example.bookchat.kakao.KakaoSDK
 import com.example.bookchat.repository.UserRepository
 import com.example.bookchat.response.*
@@ -23,7 +24,7 @@ class LoginViewModel(private val userRepository : UserRepository) : ViewModel(){
     init {
         viewModelScope.launch {
             runCatching{ DataStoreManager.getBookchatToken() }
-                .onSuccess { requestUserInfo() }
+                .onSuccess { requestUserInfo() } //유저 정보 가져오기 성공했는데 콜백을 가져올 LoginActivity가 없는 상황에 위에 에러가 터짐
         }
     }
 
@@ -52,16 +53,18 @@ class LoginViewModel(private val userRepository : UserRepository) : ViewModel(){
                 Log.d(TAG, "LoginViewModel: failHandler() - ResponseBodyEmptyException")
             }
             is NetworkIsNotConnectedException -> {
-                Log.d(TAG, "LoginViewModel: failHandler() - NetworkIsNotConnectedException")
+                //추후에 스낵바 혹은 유튜브처럼 구현
+                Toast.makeText(App.instance.applicationContext,R.string.message_error_network_toast, Toast.LENGTH_SHORT).show()
             }
             else -> {
-                Log.d(TAG, "LoginViewModel: failHandler() - elseException")}
+                Toast.makeText(App.instance.applicationContext, R.string.message_error_else_toast, Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "LoginViewModel: failHandler() - $exception")}
         }
     }
 
     fun startKakaoLogin(context :Context) = viewModelScope.launch {
         Log.d(TAG, "LoginViewModel: startKakaoLogin() - called")
-        runCatching{ KakaoSDK.kakaoLogin(context) } //요놈이 예외없이 잘 실행되었다면 성공이 , 예외가 터졌다면 Faile이 실행됨
+        runCatching{ KakaoSDK.kakaoLogin(context) }
             .onSuccess { bookchatLogin() }
             .onFailure {
                 Log.d(TAG, "LoginViewModel: startKakaoLogin() - onFailure - $it")
@@ -82,7 +85,7 @@ class LoginViewModel(private val userRepository : UserRepository) : ViewModel(){
                 Log.d(TAG, "LoginViewModel: bookchatLogin() - onFailure $it")
                 when(it){
                     is NeedToSignUpException -> goSignUpActivityCallBack()
-                    is UnauthorizedOrBlockedUserException -> Toast.makeText(App.instance.applicationContext,"차단된 사용자 입니다.\n24시간 후에 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
+                    is UnauthorizedOrBlockedUserException -> Toast.makeText(App.instance.applicationContext,R.string.message_blocked_user, Toast.LENGTH_SHORT).show()
                     else -> Log.d(TAG, "LoginViewModel: bookchatLogin() - elseException : $it")
                 }
 

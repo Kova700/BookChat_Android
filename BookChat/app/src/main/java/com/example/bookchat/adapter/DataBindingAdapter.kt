@@ -63,19 +63,19 @@ object DataBindingAdapter {
             }
             NameCheckStatus.IsShort -> {
                 textView.setTextColor(Color.parseColor("#FF004D"))
-                textView.text = "최소 2자리 이상 입력해 주세요."
+                textView.text = R.string.message_name_check_status_short.toString()
             }
             NameCheckStatus.IsDuplicate ->{
                 textView.setTextColor(Color.parseColor("#FF004D"))
-                textView.text = "이미 사용 중인 닉네임 입니다."
+                textView.text = R.string.message_name_check_status_duplicate.toString()
             }
             NameCheckStatus.IsSpecialCharInText -> {
                 textView.setTextColor(Color.parseColor("#FF004D"))
-                textView.text = "특수문자는 사용 불가능합니다."
+                textView.text = R.string.message_name_check_status_special_char.toString()
             }
             NameCheckStatus.IsPerfect -> {
                 textView.setTextColor(Color.parseColor("#5648FF"))
-                textView.text = "사용 가능한 닉네임입니다."
+                textView.text = R.string.message_name_check_status_perfect.toString()
             }
         }
     }

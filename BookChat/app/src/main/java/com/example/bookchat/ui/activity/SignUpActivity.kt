@@ -5,29 +5,21 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
-import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import com.bumptech.glide.Glide
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySignUpBinding
 import com.example.bookchat.ui.activity.ImageCropActivity.Companion.EXTRA_USER_PROFILE_BYTE_ARRAY1
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.SignUpViewModel
 import com.example.bookchat.viewmodel.ViewModelFactory
-import com.kakao.sdk.user.UserApiClient
-import kotlinx.coroutines.suspendCancellableCoroutine
-import java.io.ByteArrayOutputStream
-import kotlin.coroutines.resume
 
 const val DENIED = "DENIED"
 const val EXPLAINED = "EXPLAINED"
@@ -99,11 +91,11 @@ class SignUpActivity : AppCompatActivity() {
                 }
 
                 map[DENIED]?.let{
-                    Toast.makeText(this,R.string.message_permission_DENIED,Toast.LENGTH_LONG).show()
+                    Toast.makeText(this,R.string.message_permission_denied,Toast.LENGTH_LONG).show()
                 }
 
                 map[EXPLAINED]?.let {
-                    Toast.makeText(this,R.string.message_permission_EXPLAINED,Toast.LENGTH_LONG).show()
+                    Toast.makeText(this,R.string.message_permission_explained,Toast.LENGTH_LONG).show()
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                     this.packageName.also { name ->
                         val uri = Uri.fromParts(SCHEME_PACKAGE, name, null)
