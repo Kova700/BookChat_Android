@@ -1,13 +1,13 @@
 package com.example.bookchat.utils
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.bookchat.App
 import com.example.bookchat.data.IdToken
 import com.example.bookchat.data.Token
-import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.response.IdTokenDoseNotExistException
+import com.example.bookchat.response.TokenDoseNotExistException
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.*
 import java.io.IOException
@@ -26,7 +26,7 @@ object DataStoreManager {
     //북챗 토큰 (추후 암호화 추가)
     suspend fun getBookchatToken() :Token{
         val tokenString = readDataStore().firstOrNull()?.get(bookChatTokenKey)
-        if (tokenString.isNullOrBlank()) throw Exception("Saved token does not exist")
+        if (tokenString.isNullOrBlank())  throw TokenDoseNotExistException()
         val token = Gson().fromJson(tokenString,Token::class.java)
         return token
     }
@@ -37,10 +37,10 @@ object DataStoreManager {
         setDataStore(bookChatTokenKey,tokenString)
     }
 
-    //ID토큰
+    //ID토큰 (추후 암호화 추가)
     suspend fun getIdToken() : IdToken{
         val idTokenString = readDataStore().firstOrNull()?.get(idTokenKey)
-        if (idTokenString.isNullOrBlank()) throw Exception("Saved IdToken does not exist")
+        if (idTokenString.isNullOrBlank()) throw IdTokenDoseNotExistException()
         val idToken = Gson().fromJson(idTokenString,IdToken::class.java)
         return idToken
     }
@@ -68,8 +68,8 @@ object DataStoreManager {
 
     suspend fun <T : Any> setDataStore(
         preferencesKey: Preferences.Key<T>,
-        value: T)
-    {
+        value: T
+    ) {
         App.instance.applicationContext.dataStore.edit { preferences ->
             preferences[preferencesKey] = value
         }
