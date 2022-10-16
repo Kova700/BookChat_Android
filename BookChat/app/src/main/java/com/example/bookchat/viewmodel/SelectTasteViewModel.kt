@@ -31,13 +31,10 @@ class SelectTasteViewModel(private val userRepository : UserRepository) :ViewMod
     val isTastesEmpty : LiveData<Boolean>
         get() = _isTastesEmpty
 
-    val signUpDto : LiveData<UserSignUpDto>
-        get() = _signUpDto
-
     fun signUp() = viewModelScope.launch {
+        _signUpDto.value?.readingTastes = selectedTastes
         Log.d(TAG, "SelectTasteViewModel: signUp() - called : userDto : ${_signUpDto.value}")
-//        _signUpDto.value?.readingTastes = selectedTastes
-        runCatching{ userRepository.signUp(_signUpDto.value!!) } //!! 표시 임시
+        runCatching{ _signUpDto.value?.let { userRepository.signUp(it) } } //!! 표시 임시
             .onSuccess { signIn() }
             .onFailure { Log.d(TAG, "SelectTasteViewModel: signUp() - onFailure $it") }
     }
@@ -79,19 +76,17 @@ class SelectTasteViewModel(private val userRepository : UserRepository) :ViewMod
                 Log.d(TAG, "LoginViewModel: failHandler() - ResponseBodyEmptyException")
             }
             is NetworkIsNotConnectedException -> {
-                Log.d(TAG, "LoginViewModel: failHandler() - NetworkIsNotConnectedException")
+                //추후에 스낵바 혹은 유튜브처럼 구현
+                Toast.makeText(App.instance.applicationContext,"네트워크가 연결되어 있지 않습니다.\n네트워크를 연결해주세요.", Toast.LENGTH_SHORT).show()
             }
             else -> {
                 Log.d(TAG, "LoginViewModel: failHandler() - Exception : $exception")}
         }
     }
 
-
-    fun clickTaste(view: View) {
-        val chip = view as Chip
-        val taste = chip.text.toString()
-        if (selectedTastes.contains(tasteConverter[taste])) selectedTastes.remove(tasteConverter[taste])
-        else selectedTastes.add(tasteConverter[taste]!!)
+    fun clickTaste(pickedReadingTaste: ReadingTaste) {
+        if (selectedTastes.contains(pickedReadingTaste)) selectedTastes.remove(pickedReadingTaste)
+        else selectedTastes.add(pickedReadingTaste)
         emptyCheck()
         Log.d(TAG, "SelectTasteViewModel: clickTaste() - selectedTastes : $selectedTastes")
     }
@@ -103,13 +98,4 @@ class SelectTasteViewModel(private val userRepository : UserRepository) :ViewMod
         }
         _isTastesEmpty.value = false
     }
-
-    val tasteConverter = hashMapOf<String,ReadingTaste>(
-        "경제" to ReadingTaste.ECONOMY , "철학" to ReadingTaste.PHILOSOPHY , "역사" to ReadingTaste.HISTORY ,
-        "여행" to ReadingTaste.TRAVEL , "건강" to ReadingTaste.HEALTH , "취미" to ReadingTaste.HOBBY ,
-        "인문" to ReadingTaste.HUMANITIES , "소설" to ReadingTaste.NOVEL, "예술" to ReadingTaste.ART ,
-        "디자인" to ReadingTaste.DESIGN , "개발" to ReadingTaste.DEVELOPMENT , "과학" to ReadingTaste.SCIENCE ,
-        "잡지" to ReadingTaste.MAGAZINE , "종교" to ReadingTaste.RELIGION , "인물" to ReadingTaste.CHARACTER
-    )
-
 }
