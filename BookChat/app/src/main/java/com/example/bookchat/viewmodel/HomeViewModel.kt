@@ -13,10 +13,11 @@ import com.example.bookchat.repository.UserRepository
 import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.response.ResponseBodyEmptyException
 import com.example.bookchat.response.TokenExpiredException
-import com.example.bookchat.response.UnauthorizedOrBlockedUserException
+import com.example.bookchat.response.ForbiddenException
 import com.example.bookchat.utils.Constants
 import kotlinx.coroutines.launch
 
+/*임시 (수정 전)*/
 class HomeViewModel(private val userRepository: UserRepository) : ViewModel(){
     lateinit var goLoginActivityCallBack : () -> Unit
     private var recursiveChecker = false //임시 (구조 개선 필요)
@@ -49,7 +50,7 @@ class HomeViewModel(private val userRepository: UserRepository) : ViewModel(){
     private fun requestTokenRenewal() = viewModelScope.launch {
         Log.d(Constants.TAG, "LoginViewModel: requestTokenRenewal() - called")
         runCatching{ userRepository.requestTokenRenewal() }
-            .onSuccess { if (recursiveChecker == false) requestWithdraw(); recursiveChecker = true } //두번쨰 실패했을때는 아무것도 알 수 없음..
+            .onSuccess { if (recursiveChecker == false) requestWithdraw(); recursiveChecker = true }
             .onFailure {
                 failHandler(it)
                 Log.d(Constants.TAG, "LoginViewModel: requestTokenRenewal() - onFailure : $it")
@@ -60,7 +61,7 @@ class HomeViewModel(private val userRepository: UserRepository) : ViewModel(){
     private fun failHandler(exception: Throwable) {
         when(exception){
             is TokenExpiredException -> requestTokenRenewal()
-            is UnauthorizedOrBlockedUserException -> {
+            is ForbiddenException -> {
                 Log.d(Constants.TAG, "LoginViewModel: failHandler() - unauthorizedOrBlockedUserException")
             }
             is ResponseBodyEmptyException -> {
@@ -69,10 +70,10 @@ class HomeViewModel(private val userRepository: UserRepository) : ViewModel(){
             is NetworkIsNotConnectedException -> {
                 //추후에 스낵바 혹은 유튜브처럼 구현
                 Toast.makeText(App.instance.applicationContext,
-                    R.string.message_error_network_toast, Toast.LENGTH_SHORT).show()
+                    R.string.message_error_network, Toast.LENGTH_SHORT).show()
             }
             else -> {
-                Toast.makeText(App.instance.applicationContext, R.string.message_error_else_toast, Toast.LENGTH_SHORT).show()
+                Toast.makeText(App.instance.applicationContext, R.string.message_error_else, Toast.LENGTH_SHORT).show()
                 Log.d(Constants.TAG, "LoginViewModel: failHandler() - $exception")}
         }
     }

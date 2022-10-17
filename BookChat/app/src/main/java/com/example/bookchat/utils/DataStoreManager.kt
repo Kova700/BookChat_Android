@@ -1,6 +1,7 @@
 package com.example.bookchat.utils
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.bookchat.App
@@ -8,6 +9,7 @@ import com.example.bookchat.data.IdToken
 import com.example.bookchat.data.Token
 import com.example.bookchat.response.IdTokenDoseNotExistException
 import com.example.bookchat.response.TokenDoseNotExistException
+import com.example.bookchat.utils.Constants.TAG
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.*
 import java.io.IOException
@@ -28,6 +30,7 @@ object DataStoreManager {
         val tokenString = readDataStore().firstOrNull()?.get(bookChatTokenKey)
         if (tokenString.isNullOrBlank())  throw TokenDoseNotExistException()
         val token = Gson().fromJson(tokenString,Token::class.java)
+        Log.d(TAG, "DataStoreManager: getBookchatToken() - token : $token")
         return token
     }
 
@@ -42,6 +45,7 @@ object DataStoreManager {
         val idTokenString = readDataStore().firstOrNull()?.get(idTokenKey)
         if (idTokenString.isNullOrBlank()) throw IdTokenDoseNotExistException()
         val idToken = Gson().fromJson(idTokenString,IdToken::class.java)
+        Log.d(TAG, "DataStoreManager: getIdToken() - idToken : $idToken")
         return idToken
     }
 
