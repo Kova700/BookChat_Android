@@ -2,8 +2,6 @@ package com.example.bookchat.ui.activity
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -15,11 +13,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySignUpBinding
 import com.example.bookchat.ui.activity.ImageCropActivity.Companion.EXTRA_USER_PROFILE_BYTE_ARRAY1
+import com.example.bookchat.viewmodel.LoginViewModel
 import com.example.bookchat.viewmodel.SignUpViewModel
+import com.example.bookchat.viewmodel.SignUpViewModel.SignUpEvent
 import com.example.bookchat.viewmodel.ViewModelFactory
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 
 const val DENIED = "DENIED"
 const val EXPLAINED = "EXPLAINED"
@@ -33,7 +36,6 @@ class SignUpActivity : AppCompatActivity() {
         const val EXTRA_SIGNUP_DTO = "EXTRA_SIGNUP_DTO"
         const val EXTRA_USER_PROFILE_BYTE_ARRAY2 = "EXTRA_USER_PROFILE_BYTE_ARRAY2"
     }
-
     private lateinit var binding : ActivitySignUpBinding
     private lateinit var signUpViewModel : SignUpViewModel
     private lateinit var imm :InputMethodManager
@@ -44,21 +46,13 @@ class SignUpActivity : AppCompatActivity() {
         signUpViewModel = ViewModelProvider(this, ViewModelFactory()).get(SignUpViewModel::class.java)
         with(binding){
             lifecycleOwner = this@SignUpActivity
-            activity = this@SignUpActivity
             viewModel = signUpViewModel
         }
         setFocus()
 
-        //회원가입(프로필설정페이지)에서 다음페이지로 넘어갈 콜백 메서드 지정 중 (임시)
-        signUpViewModel.goSelectTasteActivity = {
-            val signUpDto = signUpViewModel._signUpDto.value
-            val byteArray = signUpViewModel._userProfilByteArray.value
-            val intent = Intent(this, SelectTasteActivity::class.java)
-            intent.putExtra(EXTRA_SIGNUP_DTO , signUpDto)
-            intent.putExtra(EXTRA_USER_PROFILE_BYTE_ARRAY2,byteArray)
-            startActivity(intent)
+        lifecycleScope.launch {
+            signUpViewModel.eventFlow.collect { event -> handleEvent(event) }
         }
-
     }
 
     private fun setFocus(){
@@ -73,29 +67,22 @@ class SignUpActivity : AppCompatActivity() {
         },200)
     }
 
-    fun clickProfileBtn(){
-        launchPermissions()
-    }
-
     private val requestPermissions = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ){ result: Map<String, Boolean> -> //권한별 결과값 Boolean값으로 가짐
 
         val deniedList = result.filter { !it.value }.map { it.key }
-
         when{
-            deniedList.isNotEmpty() -> {
-                //명시적 거부 -> DENIED , 다시 묻지 않음(두 번 거부) -> EXPLAINED
+            deniedList.isNotEmpty() -> { //명시적 거부 : DENIED / 다시 묻지 않음(두 번 거부) : EXPLAINED
                 val map = deniedList.groupBy { permission ->
-                    if (shouldShowRequestPermissionRationale(permission)) DENIED else EXPLAINED
-                }
+                    if (shouldShowRequestPermissionRationale(permission)) DENIED else EXPLAINED }
 
                 map[DENIED]?.let{
-                    Toast.makeText(this,R.string.message_permission_denied,Toast.LENGTH_LONG).show()
+                    Snackbar.make(binding.signUpLayout,R.string.message_permission_denied, Snackbar.LENGTH_LONG).show()
                 }
 
                 map[EXPLAINED]?.let {
-                    Toast.makeText(this,R.string.message_permission_explained,Toast.LENGTH_LONG).show()
+                    Snackbar.make(binding.signUpLayout,R.string.message_permission_explained, Snackbar.LENGTH_LONG).show()
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                     this.packageName.also { name ->
                         val uri = Uri.fromParts(SCHEME_PACKAGE, name, null)
@@ -104,7 +91,6 @@ class SignUpActivity : AppCompatActivity() {
                     }
                 }
             }
-            //모든 권한 허용 확인
             else -> openGallery()
         }
     }
@@ -142,11 +128,15 @@ class SignUpActivity : AppCompatActivity() {
         cropActivityResultLauncher.launch(intent)
     }
 
-    private fun byteArrayToBitmap(byteArray: ByteArray) :Bitmap{
-        return BitmapFactory.decodeByteArray(byteArray,0,byteArray.size)
-    }
-
-    fun clickBackBtn() {
-        finish()
+    private fun handleEvent(event: SignUpEvent) = when(event) {
+        is SignUpEvent.UnknownError -> { Snackbar.make(binding.signUpLayout,R.string.message_error_else,Snackbar.LENGTH_SHORT).show() }
+        is SignUpEvent.PermissionCheck -> launchPermissions()
+        is SignUpEvent.MoveToBack -> finish()
+        is SignUpEvent.MoveToSelectTaste -> {
+            val intent = Intent(this, SelectTasteActivity::class.java)
+            intent.putExtra(EXTRA_SIGNUP_DTO , event.signUpDto)
+            intent.putExtra(EXTRA_USER_PROFILE_BYTE_ARRAY2,event.userProfilByteArray)
+            startActivity(intent)
+        }
     }
 }

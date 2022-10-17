@@ -42,7 +42,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun handleEvent(event: LoginEvent) = when(event) {
         is LoginEvent.MoveToMain -> { startActivity(Intent(this, MainActivity::class.java)); finish() }
-        is LoginEvent.MoveToSignUp -> { startActivity(Intent(this, SignUpActivity::class.java)); finish() }
+        is LoginEvent.MoveToSignUp -> { startActivity(Intent(this, SignUpActivity::class.java)); }
         is LoginEvent.Forbidden -> { Snackbar.make(binding.loginLayout,R.string.message_forbidden,Snackbar.LENGTH_SHORT).show() }
         is LoginEvent.NetworkError -> { Snackbar.make(binding.loginLayout,R.string.message_error_network,Snackbar.LENGTH_SHORT).show() }
         is LoginEvent.UnknownError -> { Snackbar.make(binding.loginLayout,R.string.message_error_else,Snackbar.LENGTH_SHORT).show() }
