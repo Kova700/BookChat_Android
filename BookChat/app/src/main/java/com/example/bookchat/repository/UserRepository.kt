@@ -4,13 +4,13 @@ import UserSignUpRequestDto
 import android.util.Log
 import android.widget.Toast
 import com.example.bookchat.App
+import com.example.bookchat.R
 import com.example.bookchat.data.Token
 import com.example.bookchat.data.User
 import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.response.*
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
-import com.example.bookchat.utils.OAuth2Provider
 import com.google.gson.Gson
 import okhttp3.MediaType
 import okhttp3.RequestBody
@@ -39,8 +39,7 @@ class UserRepository{
                 throw ResponseBodyEmptyException(response.errorBody()?.string())
             }
             404 ->  throw NeedToSignUpException(response.errorBody()?.string())
-            403 ->  throw UnauthorizedOrBlockedUserException(response.errorBody()?.string())
-            else -> throw Exception(getExceptionMessage(response.code(),response.errorBody()?.string()))
+            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
         }
     }
 
@@ -69,9 +68,8 @@ class UserRepository{
         Log.d(TAG, "UserRepository: signUp() - response : $response ")
         when(response.code()){
             200 -> { }
-            400 -> throw BadRequestException(response.errorBody()?.string())
             401 -> throw TokenExpiredException(response.errorBody()?.string())
-            else -> throw Exception(getExceptionMessage(response.code(),response.errorBody()?.string()))
+            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
         }
     }
 
@@ -90,13 +88,13 @@ class UserRepository{
         when(response.code()){
             200 -> signOut()
             401 -> throw TokenExpiredException(response.errorBody()?.string())
-            else -> throw Exception(getExceptionMessage(response.code(),response.errorBody()?.string()))
+            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
         }
     }
 
     suspend fun getUserProfile() :User{
         Log.d(TAG, "UserRepository: getUserProfile() - called")
-        if(!isNetworkConnected()) Toast.makeText(App.instance.applicationContext,"네트워크가 연결되어 있지 않습니다.\n네트워크를 연결해주세요.", Toast.LENGTH_SHORT).show()
+        if(!isNetworkConnected()) Toast.makeText(App.instance.applicationContext, R.string.message_error_network, Toast.LENGTH_SHORT).show()
 
         val cachedUser = App.instance.getCachedUser()
         cachedUser?.let { return cachedUser }
@@ -110,11 +108,10 @@ class UserRepository{
                 throw ResponseBodyEmptyException(response.errorBody()?.string())
             }
             401 -> throw TokenExpiredException(response.errorBody()?.string())
-            else -> throw Exception(getExceptionMessage(response.code(),response.errorBody()?.string()))
+            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
         }
     }
 
-    //추후 Response 인터셉터에서 호출해야함 (안 넣으면 모든 ViewModel에 다 적어줘야함)
     suspend fun requestTokenRenewal() : Token {
         Log.d(TAG, "UserRepository: requestTokenRenewal() - called")
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
@@ -128,11 +125,10 @@ class UserRepository{
                 token?.let { DataStoreManager.saveBookchatToken(token); return token }
                 throw ResponseBodyEmptyException(response.errorBody()?.string())
             }
-            else -> throw Exception(getExceptionMessage(response.code(),response.errorBody()?.string()))
+            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
         }
     }
 
-    //닉네임 중복인경우와 아닌경우 예외들때 분기 처리 필요함
     suspend fun requestNameDuplicateCheck(nickName : String) {
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
@@ -141,7 +137,7 @@ class UserRepository{
         when(response.code()){
             200 -> { }
             409 -> throw NickNameDuplicateException(response.errorBody()?.string())
-            else -> throw Exception(getExceptionMessage(response.code(),response.errorBody()?.string()))
+            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
         }
     }
 
@@ -154,7 +150,7 @@ class UserRepository{
         return requestBody
     }
 
-    private fun getExceptionMessage(responseCode :Int, responseErrorBody :String?) :String {
+    private fun createExceptionMessage(responseCode :Int, responseErrorBody :String?) :String {
         return "responseCode : $responseCode , responseErrorBody : $responseErrorBody"
     }
 
