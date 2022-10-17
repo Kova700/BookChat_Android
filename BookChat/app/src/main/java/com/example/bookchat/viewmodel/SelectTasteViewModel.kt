@@ -1,13 +1,11 @@
 package com.example.bookchat.viewmodel
 
 import android.util.Log
-import android.view.View
 import android.widget.Toast
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
+import com.example.bookchat.R
 import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.repository.UserRepository
 import com.example.bookchat.response.NetworkIsNotConnectedException
@@ -16,23 +14,24 @@ import com.example.bookchat.response.TokenExpiredException
 import com.example.bookchat.response.UnauthorizedOrBlockedUserException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.ReadingTaste
-import com.google.android.material.chip.Chip
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SelectTasteViewModel(private val userRepository : UserRepository) :ViewModel() {
     lateinit var goMainActivityCallBack :() -> Unit
 
     private val selectedTastes = ArrayList<ReadingTaste>()
-    private val _isTastesEmpty = MutableLiveData<Boolean>(true)
+    private val _isTastesEmpty = MutableStateFlow<Boolean>(true)
     private var recursiveChecker = false //임시 (구조 개선 필요)
 
-    var _signUpDto = MutableLiveData<UserSignUpDto>()
+    var _signUpDto = MutableStateFlow<UserSignUpDto>(UserSignUpDto()) //초기값 임시
 
-    val isTastesEmpty : LiveData<Boolean>
+    val isTastesEmpty : StateFlow<Boolean>
         get() = _isTastesEmpty
 
     fun signUp() = viewModelScope.launch {
-        _signUpDto.value?.readingTastes = selectedTastes
+        _signUpDto.value.readingTastes = selectedTastes
         Log.d(TAG, "SelectTasteViewModel: signUp() - called : userDto : ${_signUpDto.value}")
         runCatching{ _signUpDto.value?.let { userRepository.signUp(it) } } //!! 표시 임시
             .onSuccess { signIn() }
@@ -76,8 +75,7 @@ class SelectTasteViewModel(private val userRepository : UserRepository) :ViewMod
                 Log.d(TAG, "LoginViewModel: failHandler() - ResponseBodyEmptyException")
             }
             is NetworkIsNotConnectedException -> {
-                //추후에 스낵바 혹은 유튜브처럼 구현
-                Toast.makeText(App.instance.applicationContext,"네트워크가 연결되어 있지 않습니다.\n네트워크를 연결해주세요.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(App.instance.applicationContext, R.string.message_error_network_toast, Toast.LENGTH_SHORT).show()
             }
             else -> {
                 Log.d(TAG, "LoginViewModel: failHandler() - Exception : $exception")}

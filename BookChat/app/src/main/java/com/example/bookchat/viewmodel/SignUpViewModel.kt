@@ -4,14 +4,14 @@ import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.repository.UserRepository
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.NameCheckStatus
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.regex.Pattern
@@ -19,23 +19,22 @@ import java.util.regex.Pattern
 class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() {
 
     lateinit var goSelectTasteActivity : suspend () -> Unit
-    private var _isNotNameShort = MutableLiveData<Boolean?>(false)
-    private var _isNotNameDuplicate = MutableLiveData<Boolean?>(false)
-    private var _nameCheckStatus = MutableLiveData<NameCheckStatus>(NameCheckStatus.Default)
-    var _signUpDto = MutableLiveData<UserSignUpDto>(UserSignUpDto( defaultProfileImageType = Random().nextInt(5) + 1) )
-    var _userProfilByteArray = MutableLiveData<ByteArray>(byteArrayOf())
+    private var isNotNameShort = false
+    private var isNotNameDuplicate = false
+    var _signUpDto = MutableStateFlow<UserSignUpDto>(UserSignUpDto( defaultProfileImageType = Random().nextInt(5) + 1) )
 
-    val userProfilByteArray : LiveData<ByteArray>
-        get() = _userProfilByteArray
-    val nameCheckStatus : LiveData<NameCheckStatus>
-        get() = _nameCheckStatus
+    private var _nameCheckStatus = MutableStateFlow<NameCheckStatus>(NameCheckStatus.Default)
+    val nameCheckStatus = _nameCheckStatus.asStateFlow()
+
+    var _userProfilByteArray = MutableStateFlow<ByteArray>(byteArrayOf())
+    val userProfilByteArray = _userProfilByteArray.asStateFlow()
 
     val editTextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
         override fun afterTextChanged(s: Editable) {
             lengthCheck(s.toString())
-            _isNotNameDuplicate.value = false
+            isNotNameDuplicate = false
             Log.d(TAG, "SignUpViewModel: afterTextChanged() - _signUpDto : ${_signUpDto.value}")
         }
     }
@@ -43,11 +42,11 @@ class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() 
     fun lengthCheck(inputedText :String){
         if (inputedText.length < 2){
             _nameCheckStatus.value = NameCheckStatus.IsShort
-            _isNotNameShort.value = false
+            isNotNameShort = false
             return
         }
         _nameCheckStatus.value = NameCheckStatus.Default
-        _isNotNameShort.value = true
+        isNotNameShort = true
     }
 
     val specialCharFilter = arrayOf(InputFilter{ source, _, _, _, _, _ ->
@@ -62,12 +61,12 @@ class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() 
 
     fun clickStartBtn() {
         viewModelScope.launch {
-            if (_isNotNameShort.value == true){
-                if (_isNotNameDuplicate.value == true){
+            if (isNotNameShort){
+                if (isNotNameDuplicate){
                     goSelectTasteActivity()
                     return@launch
                 }
-                _signUpDto.value?.nickname?.let { requestNameDuplicateCheck(it) }
+                requestNameDuplicateCheck(_signUpDto.value.nickname)
                 return@launch
             }
             lengthCheck("")
@@ -79,12 +78,12 @@ class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() 
         runCatching { userRepository.requestNameDuplicateCheck(nickName) }
             .onSuccess {
                 _nameCheckStatus.value = NameCheckStatus.IsPerfect
-                _isNotNameDuplicate.value = true
+                isNotNameDuplicate = true
             }
             .onFailure {
                 Log.d(TAG, "SignUpViewModel: requestNameDuplicateCheck() Exception : $it")
                 _nameCheckStatus.value = NameCheckStatus.IsDuplicate
-                _isNotNameDuplicate.value = false
+                isNotNameDuplicate = false
             }
     }
 
