@@ -63,19 +63,19 @@ object DataBindingAdapter {
             }
             NameCheckStatus.IsShort -> {
                 textView.setTextColor(Color.parseColor("#FF004D"))
-                textView.text = R.string.message_name_check_status_short.toString()
+                textView.text = App.instance.resources.getString(R.string.message_name_check_status_short)
             }
             NameCheckStatus.IsDuplicate ->{
                 textView.setTextColor(Color.parseColor("#FF004D"))
-                textView.text = R.string.message_name_check_status_duplicate.toString()
+                textView.text = App.instance.resources.getString(R.string.message_name_check_status_duplicate)
             }
             NameCheckStatus.IsSpecialCharInText -> {
                 textView.setTextColor(Color.parseColor("#FF004D"))
-                textView.text = R.string.message_name_check_status_special_char.toString()
+                textView.text = App.instance.resources.getString(R.string.message_name_check_status_special_char)
             }
             NameCheckStatus.IsPerfect -> {
                 textView.setTextColor(Color.parseColor("#5648FF"))
-                textView.text = R.string.message_name_check_status_perfect.toString()
+                textView.text = App.instance.resources.getString(R.string.message_name_check_status_perfect)
             }
         }
     }
