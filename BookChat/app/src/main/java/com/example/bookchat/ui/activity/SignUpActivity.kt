@@ -24,18 +24,8 @@ import com.example.bookchat.viewmodel.ViewModelFactory
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
-const val DENIED = "DENIED"
-const val EXPLAINED = "EXPLAINED"
-const val SCHEME_PACKAGE = "package"
-const val LAUNCHER_INPUT_IMAGE = "image/*"
-
 class SignUpActivity : AppCompatActivity() {
 
-    companion object{
-        const val EXTRA_USER_PROFILE_URI = "EXTRA_USER_PROFILE_URI"
-        const val EXTRA_SIGNUP_DTO = "EXTRA_SIGNUP_DTO"
-        const val EXTRA_USER_PROFILE_BYTE_ARRAY2 = "EXTRA_USER_PROFILE_BYTE_ARRAY2"
-    }
     private lateinit var binding : ActivitySignUpBinding
     private lateinit var signUpViewModel : SignUpViewModel
     private lateinit var imm :InputMethodManager
@@ -139,4 +129,15 @@ class SignUpActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+
+    companion object{
+        const val DENIED = "DENIED"
+        const val EXPLAINED = "EXPLAINED"
+        const val SCHEME_PACKAGE = "package"
+        const val LAUNCHER_INPUT_IMAGE = "image/*"
+        const val EXTRA_USER_PROFILE_URI = "EXTRA_USER_PROFILE_URI"
+        const val EXTRA_SIGNUP_DTO = "EXTRA_SIGNUP_DTO"
+        const val EXTRA_USER_PROFILE_BYTE_ARRAY2 = "EXTRA_USER_PROFILE_BYTE_ARRAY2"
+    }
+
 }

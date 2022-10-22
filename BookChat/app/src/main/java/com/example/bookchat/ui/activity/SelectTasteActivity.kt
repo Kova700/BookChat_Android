@@ -20,11 +20,8 @@ import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
-const val CONTENT_TYPE_IMAGE_WEBP = "image/webp"
-const val IMAGE_FILE_NAME = "profle_img"
-const val IMAGE_MULTIPART_NAME = "userProfileImage"
-
 class SelectTasteActivity : AppCompatActivity() {
+
     private lateinit var binding :ActivitySelectTasteBinding
     private lateinit var selectTasteViewModel: SelectTasteViewModel
     private lateinit var signUpUserDto :UserSignUpDto
@@ -77,6 +74,12 @@ class SelectTasteActivity : AppCompatActivity() {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)
         }
+    }
+
+    companion object{
+        const val CONTENT_TYPE_IMAGE_WEBP = "image/webp"
+        const val IMAGE_FILE_NAME = "profle_img"
+        const val IMAGE_MULTIPART_NAME = "userProfileImage"
     }
 
 }

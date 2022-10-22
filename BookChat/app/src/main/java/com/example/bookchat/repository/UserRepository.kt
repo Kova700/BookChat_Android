@@ -15,9 +15,6 @@ import com.google.gson.Gson
 import okhttp3.MediaType
 import okhttp3.RequestBody
 
-const val CONTENT_TYPE_JSON = "application/json; charset=utf-8"
-const val JSON_KEY_OAUTH2PROVIDER = "oauth2Provider"
-
 class UserRepository{
 
     suspend fun signIn() {
@@ -30,7 +27,7 @@ class UserRepository{
             contentType = CONTENT_TYPE_JSON
         )
 
-        val response = App.instance.apiInterface.signIn(idToken.token,requestBody)
+        val response = App.instance.userApiInterface.signIn(idToken.token,requestBody)
         Log.d(TAG, "UserRepository: signIn() - response : ${response}")
         when(response.code()){
             200 -> {
@@ -60,7 +57,7 @@ class UserRepository{
             contentType = CONTENT_TYPE_JSON
         )
 
-        val response = App.instance.apiInterface.signUp(
+        val response = App.instance.userApiInterface.signUp(
             idToken = idToken.token,
             userProfileImage = userSignUpDto.userProfileImage,
             userSignUpRequestDto = requestBody
@@ -83,7 +80,7 @@ class UserRepository{
     //회원 탈퇴 후 재가입 가능 기간 정책 결정해야함
     suspend fun withdraw() {
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
-        val response = App.instance.apiInterface.withdraw()
+        val response = App.instance.userApiInterface.withdraw()
         Log.d(TAG, "UserRepository: withdraw() - response.code : ${response.code()}")
         when(response.code()){
             200 -> signOut()
@@ -99,7 +96,7 @@ class UserRepository{
         val cachedUser = App.instance.getCachedUser()
         cachedUser?.let { return cachedUser }
 
-        val response = App.instance.apiInterface.getUserProfile()
+        val response = App.instance.userApiInterface.getUserProfile()
         Log.d(TAG, "UserRepository: getUserProfile() - response : $response")
         when(response.code()){
             200 -> {
@@ -117,7 +114,7 @@ class UserRepository{
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val oldToken = DataStoreManager.getBookchatToken()
-        val response = App.instance.apiInterface.requestTokenRenewal(oldToken.refreshToken)
+        val response = App.instance.userApiInterface.requestTokenRenewal(oldToken.refreshToken)
         Log.d(TAG, "UserRepository: requestTokenRenewal() - response.code() : ${response.code()}")
         when(response.code()){
             200 -> {
@@ -132,7 +129,7 @@ class UserRepository{
     suspend fun requestNameDuplicateCheck(nickName : String) {
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-        val response = App.instance.apiInterface.requestNameDuplicateCheck(nickName)
+        val response = App.instance.userApiInterface.requestNameDuplicateCheck(nickName)
         Log.d(TAG, "UserRepository: requestNameDuplicateCheck() - response.code() : ${response.code()}")
         when(response.code()){
             200 -> { }
@@ -156,6 +153,11 @@ class UserRepository{
 
     private fun isNetworkConnected() :Boolean{
         return App.instance.isNetworkConnected()
+    }
+
+    companion object {
+        const val CONTENT_TYPE_JSON = "application/json; charset=utf-8"
+        const val JSON_KEY_OAUTH2PROVIDER = "oauth2Provider"
     }
 
 }
