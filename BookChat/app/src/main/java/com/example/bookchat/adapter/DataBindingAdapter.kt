@@ -49,7 +49,6 @@ object DataBindingAdapter {
         }
         button.setBackgroundColor(Color.parseColor("#5648FF"))
         button.isEnabled = true
-        return
     }
 
     /**회원가입 :닉네임 검사 상황별 안내문구*/

@@ -60,60 +60,54 @@ class SignUpActivity : AppCompatActivity() {
         imm.hideSoftInputFromWindow(windowToken,InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
-    private val requestPermissions = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ){ result: Map<String, Boolean> ->
-
-        val deniedList = result.filter { !it.value }.map { it.key }
-        when{
-            deniedList.isNotEmpty() -> {
-                val map = deniedList.groupBy { permission ->
-                    if (shouldShowRequestPermissionRationale(permission)) DENIED else EXPLAINED }
-
-                map[DENIED]?.let{
-                    Snackbar.make(binding.signUpLayout,R.string.message_permission_denied, Snackbar.LENGTH_LONG).show()
-                }
-
-                map[EXPLAINED]?.let {
-                    Snackbar.make(binding.signUpLayout,R.string.message_permission_explained, Snackbar.LENGTH_LONG).show()
-                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    this.packageName.also { name ->
-                        val uri = Uri.fromParts(SCHEME_PACKAGE, name, null)
-                        intent.data = uri
-                        startActivity(intent)
-                    }
-                }
-            }
-            else -> openGallery()
-        }
-    }
-
     private fun launchPermissions() {
         val permissions = arrayOf(
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
         closeKeyboard(binding.nickNameEt.windowToken)
-        requestPermissions.launch(permissions) //권한 검사 및 요청
+        requestPermissions.launch(permissions)
     }
 
-    private val activityResultLauncher =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { resultUri ->
-            openCropActivity(resultUri!!)
+    private val requestPermissions = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ){ result: Map<String, Boolean> ->
+        val deniedPermissionList = result.filter { !it.value }.map { it.key }
+        if (deniedPermissionList.isNotEmpty()) {
+            deniedPermissionHandler(deniedPermissionList)
+            return@registerForActivityResult
+        }
+        openGallery()
+    }
+
+    private fun deniedPermissionHandler(
+        deniedPermissionList : List<String>
+    ){
+        val map = deniedPermissionList.groupBy { permission ->
+            if (shouldShowRequestPermissionRationale(permission)) DENIED else EXPLAINED
         }
 
-    private fun openGallery(){
-        activityResultLauncher.launch(LAUNCHER_INPUT_IMAGE)
+        map[DENIED]?.let{
+            Snackbar.make(binding.signUpLayout,R.string.message_permission_denied, Snackbar.LENGTH_LONG).show()
+            return
+        }
+
+        map[EXPLAINED]?.let {
+            Snackbar.make(binding.signUpLayout,R.string.message_permission_explained, Snackbar.LENGTH_LONG).show()
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            val uri = Uri.fromParts(SCHEME_PACKAGE, this.packageName, null)
+            intent.data = uri
+            startActivity(intent)
+        }
     }
 
-    private val cropActivityResultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if(result.resultCode == RESULT_OK){
-                //크롭된 이미지 가져오기기
-                val intent = result.data
-                val bitmapByteArray = intent?.getByteArrayExtra(EXTRA_USER_PROFILE_BYTE_ARRAY1) ?: byteArrayOf()
-                signUpViewModel._userProfilByteArray.value = bitmapByteArray
-            }
+    private fun openGallery(){
+        galleryActivityResultLauncher.launch(LAUNCHER_INPUT_IMAGE)
+    }
+
+    private val galleryActivityResultLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { resultUri ->
+            resultUri?.let { openCropActivity(it) }
         }
 
     private fun openCropActivity(uri :Uri){
@@ -121,6 +115,15 @@ class SignUpActivity : AppCompatActivity() {
         intent.putExtra(EXTRA_USER_PROFILE_URI,uri.toString())
         cropActivityResultLauncher.launch(intent)
     }
+
+    private val cropActivityResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if(result.resultCode == RESULT_OK){
+                val intent = result.data
+                val bitmapByteArray = intent?.getByteArrayExtra(EXTRA_USER_PROFILE_BYTE_ARRAY1) ?: byteArrayOf()
+                signUpViewModel._userProfilByteArray.value = bitmapByteArray
+            }
+        }
 
     private fun handleEvent(event: SignUpEvent) = when(event) {
         is SignUpEvent.UnknownError -> { Snackbar.make(binding.signUpLayout,R.string.message_error_else,Snackbar.LENGTH_SHORT).show() }
@@ -136,8 +139,8 @@ class SignUpActivity : AppCompatActivity() {
 
     companion object{
         const val DELAY_TIME = 200L
-        const val DENIED = "DENIED" //명시적 거부 : DENIED
-        const val EXPLAINED = "EXPLAINED" //다시 묻지 않음(두 번 거부) : EXPLAINED
+        const val DENIED = "DENIED" //처음 거부 : DENIED
+        const val EXPLAINED = "EXPLAINED" //두 번째 거부 (다시 묻지 않음) : EXPLAINED
         const val SCHEME_PACKAGE = "package"
         const val LAUNCHER_INPUT_IMAGE = "image/*"
         const val EXTRA_USER_PROFILE_URI = "EXTRA_USER_PROFILE_URI"

@@ -16,7 +16,11 @@ class SplashActivity : AppCompatActivity() {
             val intent = Intent(this,LoginActivity::class.java)
             startActivity(intent)
             finish()
-        },2000)
+        },SPLASH_DURATION)
 
+    }
+    
+    companion object{
+        const val SPLASH_DURATION = 2000L
     }
 }

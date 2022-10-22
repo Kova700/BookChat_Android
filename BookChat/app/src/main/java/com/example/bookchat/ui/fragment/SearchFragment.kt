@@ -21,5 +21,4 @@ class SearchFragment : Fragment()  {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search,container,false)
         return binding.root
     }
-
 }

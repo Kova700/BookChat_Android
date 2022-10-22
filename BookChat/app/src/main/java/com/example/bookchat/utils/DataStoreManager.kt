@@ -20,51 +20,56 @@ import java.io.IOException
 
 object DataStoreManager {
 
-    private val Context.dataStore  by preferencesDataStore("DATASTORE_KEY")
-    private val idTokenKey = stringPreferencesKey("ID_TOKEN_KEY")
-    private val bookChatTokenKey = stringPreferencesKey("BOOKCHAT_TOKEN_KEY")
-    private val searchHistoryKey = stringPreferencesKey("SEARCH_HISTORY_KEY")
+    private const val DATASTORE_KEY = "DATASTORE_KEY"
+    private const val ID_TOKEN_KEY = "ID_TOKEN_KEY"
+    private const val BOOKCHAT_TOKEN_KEY = "BOOKCHAT_TOKEN_KEY"
+    private const val SEARCH_HISTORY_KEY = "SEARCH_HISTORY_KEY"
+
+    private val Context.dataStore by preferencesDataStore(DATASTORE_KEY)
+    private val idTokenKey = stringPreferencesKey(ID_TOKEN_KEY)
+    private val bookChatTokenKey = stringPreferencesKey(BOOKCHAT_TOKEN_KEY)
+    private val searchHistoryKey = stringPreferencesKey(SEARCH_HISTORY_KEY)
 
     //북챗 토큰 (추후 암호화 추가)
-    suspend fun getBookchatToken() :Token{
+    suspend fun getBookchatToken(): Token {
         val tokenString = readDataStore().firstOrNull()?.get(bookChatTokenKey)
-        if (tokenString.isNullOrBlank())  throw TokenDoseNotExistException()
-        val token = Gson().fromJson(tokenString,Token::class.java)
+        if (tokenString.isNullOrBlank()) throw TokenDoseNotExistException()
+        val token = Gson().fromJson(tokenString, Token::class.java)
         Log.d(TAG, "DataStoreManager: getBookchatToken() - token : $token")
         return token
     }
 
-    suspend fun saveBookchatToken(token :Token){
+    suspend fun saveBookchatToken(token: Token) {
         token.accessToken = "Bearer ${token.accessToken}"
         val tokenString = Gson().toJson(token)
-        setDataStore(bookChatTokenKey,tokenString)
+        setDataStore(bookChatTokenKey, tokenString)
     }
 
     //ID토큰 (추후 암호화 추가)
-    suspend fun getIdToken() : IdToken{
+    suspend fun getIdToken(): IdToken {
         val idTokenString = readDataStore().firstOrNull()?.get(idTokenKey)
         if (idTokenString.isNullOrBlank()) throw IdTokenDoseNotExistException()
-        val idToken = Gson().fromJson(idTokenString,IdToken::class.java)
+        val idToken = Gson().fromJson(idTokenString, IdToken::class.java)
         Log.d(TAG, "DataStoreManager: getIdToken() - idToken : $idToken")
         return idToken
     }
 
-    suspend fun saveIdToken(idToken: IdToken){
+    suspend fun saveIdToken(idToken: IdToken) {
         val idTokenString = Gson().toJson(idToken)
-        setDataStore(idTokenKey,idTokenString)
+        setDataStore(idTokenKey, idTokenString)
     }
 
-    suspend fun deleteBookchatToken(){
+    suspend fun deleteBookchatToken() {
         removeDataStore(bookChatTokenKey)
     }
 
-    suspend fun deleteIdToken(){
+    suspend fun deleteIdToken() {
         removeDataStore(idTokenKey)
     }
 
     suspend fun <T : Any> removeDataStore(
         preferencesKey: Preferences.Key<T>,
-    ){
+    ) {
         App.instance.applicationContext.dataStore.edit { preferences ->
             preferences.remove(preferencesKey)
         }
@@ -82,11 +87,8 @@ object DataStoreManager {
     private fun readDataStore(): Flow<Preferences> {
         return App.instance.applicationContext.dataStore.data
             .catch { exception ->
-                if (exception is IOException) {
-                    emit(emptyPreferences())
-                } else {
-                    throw exception
-                }
+                if (exception is IOException) emit(emptyPreferences())
+                else throw exception
             }
     }
 

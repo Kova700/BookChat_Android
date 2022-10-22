@@ -24,9 +24,7 @@ class ReadingBookTabFragment :Fragment() {
         with(binding){
             lifecycleOwner = this@ReadingBookTabFragment
         }
-
         initRecyclerView()
-
 
         return binding.root
     }
