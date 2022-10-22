@@ -2,7 +2,8 @@ package com.example.bookchat
 
 import android.app.Application
 import com.example.bookchat.api.ApiClient
-import com.example.bookchat.api.ApiInterface
+import com.example.bookchat.api.BookApiInterface
+import com.example.bookchat.api.UserApiInterface
 import com.example.bookchat.data.User
 import com.example.bookchat.utils.NetworkManager
 import com.kakao.sdk.common.KakaoSdk
@@ -14,7 +15,8 @@ class App : Application() {
             private set
     }
     lateinit var networkManager: NetworkManager
-    lateinit var apiInterface :ApiInterface
+    lateinit var userApiInterface :UserApiInterface
+    lateinit var bookApiInterface :BookApiInterface
 
     private var cachedUser : User? = null
 
@@ -31,7 +33,8 @@ class App : Application() {
 
     private fun inject() {
         networkManager = NetworkManager()
-        apiInterface = ApiClient.getApiClient().create(ApiInterface::class.java)
+        userApiInterface = ApiClient.getApiClient().create(UserApiInterface::class.java)
+        bookApiInterface = ApiClient.getApiClient().create(BookApiInterface::class.java)
     }
 
     fun isNetworkConnected() :Boolean{
