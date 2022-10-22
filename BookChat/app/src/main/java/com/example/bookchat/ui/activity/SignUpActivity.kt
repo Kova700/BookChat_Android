@@ -5,10 +5,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
 import android.os.Looper
 import android.provider.Settings
+import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -17,7 +18,6 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySignUpBinding
 import com.example.bookchat.ui.activity.ImageCropActivity.Companion.EXTRA_USER_PROFILE_BYTE_ARRAY1
-import com.example.bookchat.viewmodel.LoginViewModel
 import com.example.bookchat.viewmodel.SignUpViewModel
 import com.example.bookchat.viewmodel.SignUpViewModel.SignUpEvent
 import com.example.bookchat.viewmodel.ViewModelFactory
@@ -47,23 +47,26 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun setFocus(){
         binding.nickNameEt.requestFocus()
-        openKeyboard()
+        openKeyboard(binding.nickNameEt)
     }
 
-    private fun openKeyboard() {
+    private fun openKeyboard(view :View) {
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         Handler(Looper.getMainLooper()).postDelayed({
-            imm.showSoftInput(binding.nickNameEt,0)
-        },200)
+            imm.showSoftInput(view,InputMethodManager.SHOW_IMPLICIT)
+        },DELAY_TIME)
+    }
+    private fun closeKeyboard(windowToken :IBinder) {
+        imm.hideSoftInputFromWindow(windowToken,InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
     private val requestPermissions = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ){ result: Map<String, Boolean> -> //권한별 결과값 Boolean값으로 가짐
+    ){ result: Map<String, Boolean> ->
 
         val deniedList = result.filter { !it.value }.map { it.key }
         when{
-            deniedList.isNotEmpty() -> { //명시적 거부 : DENIED / 다시 묻지 않음(두 번 거부) : EXPLAINED
+            deniedList.isNotEmpty() -> {
                 val map = deniedList.groupBy { permission ->
                     if (shouldShowRequestPermissionRationale(permission)) DENIED else EXPLAINED }
 
@@ -90,6 +93,7 @@ class SignUpActivity : AppCompatActivity() {
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
+        closeKeyboard(binding.nickNameEt.windowToken)
         requestPermissions.launch(permissions) //권한 검사 및 요청
     }
 
@@ -131,8 +135,9 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     companion object{
-        const val DENIED = "DENIED"
-        const val EXPLAINED = "EXPLAINED"
+        const val DELAY_TIME = 200L
+        const val DENIED = "DENIED" //명시적 거부 : DENIED
+        const val EXPLAINED = "EXPLAINED" //다시 묻지 않음(두 번 거부) : EXPLAINED
         const val SCHEME_PACKAGE = "package"
         const val LAUNCHER_INPUT_IMAGE = "image/*"
         const val EXTRA_USER_PROFILE_URI = "EXTRA_USER_PROFILE_URI"
