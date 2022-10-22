@@ -45,6 +45,7 @@ class LoginActivity : AppCompatActivity() {
         is LoginEvent.MoveToSignUp -> { startActivity(Intent(this, SignUpActivity::class.java)); }
         is LoginEvent.Forbidden -> { Snackbar.make(binding.loginLayout,R.string.message_forbidden,Snackbar.LENGTH_SHORT).show() }
         is LoginEvent.NetworkError -> { Snackbar.make(binding.loginLayout,R.string.message_error_network,Snackbar.LENGTH_SHORT).show() }
+        is LoginEvent.KakaoLoginFail -> { Snackbar.make(binding.loginLayout,R.string.message_kakao_login_fail,Snackbar.LENGTH_SHORT).show() }
         is LoginEvent.UnknownError -> { Snackbar.make(binding.loginLayout,R.string.message_error_else,Snackbar.LENGTH_SHORT).show() }
     }
 
