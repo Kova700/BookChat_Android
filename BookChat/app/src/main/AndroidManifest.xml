@@ -17,15 +17,19 @@
         android:theme="@style/Theme.BookChat">
         <activity
             android:name=".ui.activity.ImageCropActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".ui.activity.SelectTasteActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".ui.activity.SignUpActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".ui.activity.SplashActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,10 +39,12 @@
         </activity>
         <activity
             android:name=".ui.activity.MainActivity"
+            android:screenOrientation="portrait"
             android:launchMode="singleTask"
             android:exported="true" />
         <activity
             android:name=".ui.activity.LoginActivity"
+            android:screenOrientation="portrait"
             android:exported="true"
             android:launchMode="singleTop">
             <intent-filter android:autoVerify="true">
