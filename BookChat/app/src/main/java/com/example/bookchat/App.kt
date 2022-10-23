@@ -1,6 +1,7 @@
 package com.example.bookchat
 
 import android.app.Application
+import androidx.appcompat.app.AppCompatDelegate
 import com.example.bookchat.api.ApiClient
 import com.example.bookchat.api.BookApiInterface
 import com.example.bookchat.api.UserApiInterface
@@ -23,6 +24,7 @@ class App : Application() {
     //액티비티 , 리시버 , 서비스가 생성되기 전에 어플리케이션이 시작 중일 때 실행됨
     override fun onCreate() {
         super.onCreate()
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         instance = this
         KakaoSdk.init(
             context = this,
