@@ -1,6 +1,7 @@
 package com.example.bookchat.ui.fragment
 
 import android.animation.AnimatorInflater
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.databinding.DataBindingUtil
@@ -18,7 +20,9 @@ import com.example.bookchat.utils.Constants.TAG
 
 class SearchFragment : Fragment() {
 
-    lateinit var binding: FragmentSearchBinding
+    private lateinit var binding: FragmentSearchBinding
+    private val imm by lazy { requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
+
     var isclickedSearchWindow = false
 
     override fun onCreateView(
@@ -47,10 +51,16 @@ class SearchFragment : Fragment() {
 
         val windowAnimator = AnimatorInflater.loadAnimator(requireContext(),R.animator.clicked_searchwindow_animator)
         windowAnimator.apply {
-            setTarget(binding.searhWindow)
-            binding.searhWindow.pivotX = 0.0f
-            binding.searhWindow.pivotY = 0.0f
+            setTarget(binding.searchWindow)
+            binding.searchWindow.pivotX = 0.0f
+            binding.searchWindow.pivotY = 0.0f
             binding.backBtn.visibility = VISIBLE
+            doOnStart {
+                binding.searchEditText.isEnabled = true
+                binding.searchEditText.requestFocus()
+                openKeyboard(binding.searchEditText)
+                binding.animationTouchEventView.visibility = INVISIBLE
+            }
             start()
         }
         val btnAnimator = AnimatorInflater.loadAnimator(requireContext(),R.animator.clicked_searchwindow_btn_animator)
@@ -65,7 +75,6 @@ class SearchFragment : Fragment() {
             setTarget(binding.searchEditText)
             binding.searchEditText.pivotX = 0.0f
             binding.searchEditText.pivotY = 0.0f
-            doOnEnd { binding.searchEditText.isEnabled = true }
             start()
         }
     }
@@ -77,9 +86,9 @@ class SearchFragment : Fragment() {
 
         val windowAnimator = AnimatorInflater.loadAnimator(requireContext(),R.animator.unclicked_searchwindow_animator)
         windowAnimator.apply {
-            setTarget(binding.searhWindow)
-            binding.searhWindow.pivotX = 0.0f
-            binding.searhWindow.pivotY = 0.0f
+            setTarget(binding.searchWindow)
+            binding.searchWindow.pivotX = 0.0f
+            binding.searchWindow.pivotY = 0.0f
             doOnStart {
                 binding.backBtn.visibility = INVISIBLE
                 binding.searchEditText.setText("")
@@ -99,8 +108,13 @@ class SearchFragment : Fragment() {
             setTarget(binding.searchEditText)
             binding.searchEditText.pivotX = 0.0f
             binding.searchEditText.pivotY = 0.0f
+            doOnEnd { binding.animationTouchEventView.visibility = VISIBLE }
             start()
         }
-
     }
+
+    private fun openKeyboard(view :View) {
+        imm.showSoftInput(view,InputMethodManager.SHOW_IMPLICIT)
+    }
+
 }
