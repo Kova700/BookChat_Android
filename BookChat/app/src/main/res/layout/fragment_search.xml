@@ -25,6 +25,16 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_back_btn" />
 
+        <ImageView
+            android:id="@+id/animation_touchEvent_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="#00000000"
+            android:elevation="30dp"
+            android:onClick="@{() -> fragment.clickSearchWindow()}"
+            app:layout_constraintBottom_toBottomOf="@+id/constraintLayout4"
+            app:layout_constraintTop_toTopOf="@+id/constraintLayout4" />
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout4"
             android:layout_width="0dp"
@@ -35,7 +45,7 @@
             app:layout_constraintTop_toTopOf="@+id/back_btn">
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/searh_window"
+                android:id="@+id/search_window"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginStart="20dp"
@@ -44,7 +54,6 @@
                 android:layout_marginBottom="10dp"
                 app:cardCornerRadius="25dp"
                 app:cardElevation="5dp"
-                android:onClick="@{() -> fragment.clickSearchWindow()}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -53,24 +62,25 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/search_itemLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginStart="24dp"
                 android:layout_marginEnd="24dp"
                 android:elevation="10dp"
-                app:layout_constraintBottom_toBottomOf="@+id/searh_window"
+                app:layout_constraintBottom_toBottomOf="@+id/search_window"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/searh_window">
+                app:layout_constraintTop_toTopOf="@+id/search_window">
 
                 <ImageButton
                     android:id="@+id/search_btn"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:background="?android:selectableItemBackgroundBorderless"
                     android:scaleType="fitXY"
-                    android:src="@drawable/ic_search_navi_btn"
+                    android:src="@drawable/ic_search_window_searcn_btn"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -85,9 +95,9 @@
                     android:layout_marginEnd="70dp"
                     android:layout_marginBottom="10dp"
                     android:background="@android:color/transparent"
-                    android:enabled="false"
                     android:fontFamily="@font/notosanskr_regular"
                     android:hint="도서명을 입력해주세요."
+                    android:enabled="false"
                     android:inputType="text"
                     android:textColor="#222222"
                     android:textColorHint="#B1B3B8"
