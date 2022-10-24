@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="readingTaste"
+            type="com.example.bookchat.utils.ReadingTaste" />
+        <variable
+            name="activity"
+            type="com.example.bookchat.ui.activity.SelectTasteActivity" />
+        <variable
+            name="viewModel"
+            type="com.example.bookchat.viewmodel.SelectTasteViewModel" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/selectTasteLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.activity.SelectTasteActivity">
+
+        <!--버튼 위치 앞페이지랑 맞추기-->
+
+        <Button
+            android:id="@+id/startBookchat_btn"
+            setButtonColor="@{viewModel.isTastesEmpty()}"
+            android:layout_width="match_parent"
+            android:layout_height="57dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            android:backgroundTint="#D9D9D9"
+            android:enabled="false"
+            android:onClick="@{() -> viewModel.signUp()}"
+            android:text="북챗 시작하기"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chipGroup3" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/notosanskr_regular"
+            android:text="나의 독서 취향을\n선택해 주세요."
+            android:textColor="#222222"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="@+id/imageButton3"
+            app:layout_constraintTop_toBottomOf="@+id/imageButton3" />
+
+        <ImageButton
+            android:id="@+id/imageButton3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="22dp"
+            android:layout_marginTop="27dp"
+            android:background="#00ff0000"
+            android:elevation="10dp"
+            android:onClick="@{()->viewModel.clickBackBtn()}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_back_btn" />
+
+        <LinearLayout
+            android:id="@+id/chipGroup1"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginStart="27dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="27dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView4">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip1"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:onClick="@{(view) -> viewModel.clickTaste(readingTaste.ECONOMY)}"
+                android:text="경제"
+                app:rippleColor="@android:color/transparent"
+                android:textColor="@color/chip_state_text_color"
+                app:chipStrokeColor="@color/chip_state_strok_color"
+                app:chipStrokeWidth="1dp"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="177dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip2"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:onClick="@{(chip) -> viewModel.clickTaste(readingTaste.PHILOSOPHY)}"
+                android:text="철학"
+                app:rippleColor="@android:color/transparent"
+                android:textColor="@color/chip_state_text_color"
+                app:chipStrokeColor="@color/chip_state_strok_color"
+                app:chipStrokeWidth="1dp"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="177dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip3"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:onClick="@{(chip) -> viewModel.clickTaste(readingTaste.HISTORY)}"
+                android:text="역사"
+                app:rippleColor="@android:color/transparent"
+                android:textColor="@color/chip_state_text_color"
+                app:chipStrokeColor="@color/chip_state_strok_color"
+                app:chipStrokeWidth="1dp"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="177dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip4"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:onClick="@{(chip) -> viewModel.clickTaste(readingTaste.TRAVEL)}"
+                android:text="여행"
+                app:rippleColor="@android:color/transparent"
+                android:textColor="@color/chip_state_text_color"
+                app:chipStrokeColor="@color/chip_state_strok_color"
+                app:chipStrokeWidth="1dp"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="177dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip5"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:onClick="@{(chip) -> viewModel.clickTaste(readingTaste.HEALTH)}"
+                android:text="건강"
+                app:rippleColor="@android:color/transparent"
+                android:textColor="@color/chip_state_text_color"
+                app:chipStrokeColor="@color/chip_state_strok_color"
+                app:chipStrokeWidth="1dp"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="177dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/chipGroup2"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginStart="27dp"
+            android:layout_marginEnd="27dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chipGroup1">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip6"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:onClick="@{(chip) -> viewModel.clickTaste(readingTaste.HOBBY)}"
+                android:text="취미"
+                app:rippleColor="@android:color/transparent"
+                android:textColor="@color/chip_state_text_color"
+                app:chipStrokeColor="@color/chip_state_strok_color"
+                app:chipStrokeWidth="1dp"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="177dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip7"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:onClick="@{(chip) -> viewModel.clickTaste(readingTaste.HUMANITIES)}"
+                android:text="인문"
+                app:rippleColor="@android:color/transparent"
+                android:textColor="@color/chip_state_text_color"
+                app:chipStrokeColor="@color/chip_state_strok_color"
+                app:chipStrokeWidth="1dp"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="177dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip8"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:onClick="@{(chip) -> viewModel.clickTaste(readingTaste.NOVEL)}"
+                android:text="소설"
+                app:rippleColor="@android:color/transparent"
+                android:textColor="@color/chip_state_text_color"
+                app:chipStrokeColor="@color/chip_state_strok_color"
+                app:chipStrokeWidth="1dp"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="177dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip9"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:onClick="@{(chip) -> viewModel.clickTaste(readingTaste.ART)}"
+                android:text="예술"
+                app:rippleColor="@android:color/transparent"
+                android:textColor="@color/chip_state_text_color"
+                app:chipStrokeColor="@color/chip_state_strok_color"
+                app:chipStrokeWidth="1dp"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="177dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip10"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:onClick="@{(chip) -> viewModel.clickTaste(readingTaste.DESIGN)}"
+                android:text="디자인"
+                app:rippleColor="@android:color/transparent"
+                android:textColor="@color/chip_state_text_color"
+                app:chipStrokeColor="@color/chip_state_strok_color"
+                app:chipStrokeWidth="1dp"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="177dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/chipGroup3"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginStart="27dp"
+            android:layout_marginEnd="27dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chipGroup2">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip11"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:onClick="@{(chip) -> viewModel.clickTaste(readingTaste.DEVELOPMENT)}"
+                android:text="개발"
+                app:rippleColor="@android:color/transparent"
+                android:textColor="@color/chip_state_text_color"
+                app:chipStrokeColor="@color/chip_state_strok_color"
+                app:chipStrokeWidth="1dp"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="177dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip12"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:onClick="@{(chip) -> viewModel.clickTaste(readingTaste.SCIENCE)}"
+                android:text="과학"
+                app:rippleColor="@android:color/transparent"
+                android:textColor="@color/chip_state_text_color"
+                app:chipStrokeColor="@color/chip_state_strok_color"
+                app:chipStrokeWidth="1dp"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="177dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip13"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:onClick="@{(chip) -> viewModel.clickTaste(readingTaste.MAGAZINE)}"
+                android:text="잡지"
+                app:rippleColor="@android:color/transparent"
+                android:textColor="@color/chip_state_text_color"
+                app:chipStrokeColor="@color/chip_state_strok_color"
+                app:chipStrokeWidth="1dp"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="177dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip14"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:onClick="@{(chip) -> viewModel.clickTaste(readingTaste.RELIGION)}"
+                android:text="종교"
+                app:rippleColor="@android:color/transparent"
+                android:textColor="@color/chip_state_text_color"
+                app:chipStrokeColor="@color/chip_state_strok_color"
+                app:chipStrokeWidth="1dp"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="177dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip15"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:onClick="@{(chip) -> viewModel.clickTaste(readingTaste.CHARACTER)}"
+                android:text="인물"
+                app:rippleColor="@android:color/transparent"
+                android:textColor="@color/chip_state_text_color"
+                app:chipStrokeColor="@color/chip_state_strok_color"
+                app:chipStrokeWidth="1dp"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="177dp" />
+
+        </LinearLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
