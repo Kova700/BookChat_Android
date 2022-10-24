@@ -86,10 +86,7 @@ object DataStoreManager {
 
     private fun readDataStore(): Flow<Preferences> {
         return App.instance.applicationContext.dataStore.data
-            .catch { exception ->
-                if (exception is IOException) emit(emptyPreferences())
-                else throw exception
-            }
+            .catch { exception -> if (exception is IOException) emit(emptyPreferences()) }
     }
 
 }

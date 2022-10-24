@@ -62,15 +62,16 @@ class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() 
     })
 
     fun clickStartBtn() = viewModelScope.launch {
-        if (isNotNameShortFlag){
-            if (isNotNameDuplicateFlag){
-                startEvent(SignUpEvent.MoveToSelectTaste(_signUpDto.value,_userProfilByteArray.value))
-                return@launch
-            }
-            requestNameDuplicateCheck(_signUpDto.value.nickname)
-            return@launch
-        }
+        if (isNotNameShortFlag) isNotNameDuplicate(isNotNameDuplicateFlag)
         renewNameCheckStatus("")
+    }
+
+    private suspend fun isNotNameDuplicate(isNotNameDuplicateFlag :Boolean){
+        if (isNotNameDuplicateFlag){
+            startEvent(SignUpEvent.MoveToSelectTaste(_signUpDto.value,_userProfilByteArray.value))
+            return
+        }
+        requestNameDuplicateCheck(_signUpDto.value.nickname)
     }
 
     private suspend fun requestNameDuplicateCheck(nickName :String) {
