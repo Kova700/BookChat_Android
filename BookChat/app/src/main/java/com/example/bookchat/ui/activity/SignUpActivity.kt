@@ -28,7 +28,7 @@ class SignUpActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivitySignUpBinding
     private lateinit var signUpViewModel : SignUpViewModel
-    private lateinit var imm :InputMethodManager
+    private val imm by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,11 +51,11 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun openKeyboard(view :View) {
-        imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         Handler(Looper.getMainLooper()).postDelayed({
             imm.showSoftInput(view,InputMethodManager.SHOW_IMPLICIT)
         },DELAY_TIME)
     }
+
     private fun closeKeyboard(windowToken :IBinder) {
         imm.hideSoftInputFromWindow(windowToken,InputMethodManager.HIDE_NOT_ALWAYS)
     }
