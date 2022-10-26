@@ -62,7 +62,10 @@ class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() 
     })
 
     fun clickStartBtn() = viewModelScope.launch {
-        if (isNotNameShortFlag) isNotNameDuplicate(isNotNameDuplicateFlag)
+        if (isNotNameShortFlag) {
+            isNotNameDuplicate(isNotNameDuplicateFlag)
+            return@launch
+        }
         renewNameCheckStatus("")
     }
 
