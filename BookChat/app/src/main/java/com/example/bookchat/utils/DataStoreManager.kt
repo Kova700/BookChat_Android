@@ -42,6 +42,7 @@ object DataStoreManager {
     suspend fun saveBookchatToken(token: Token) {
         token.accessToken = "Bearer ${token.accessToken}"
         val tokenString = Gson().toJson(token)
+        Log.d(TAG, "DataStoreManager: saveBookchatToken() - called")
         setDataStore(bookChatTokenKey, tokenString)
     }
 
