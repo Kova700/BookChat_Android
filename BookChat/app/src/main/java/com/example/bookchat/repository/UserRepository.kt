@@ -109,7 +109,7 @@ class UserRepository{
         }
     }
 
-    suspend fun requestTokenRenewal() : Token {
+    suspend fun requestTokenRenewal(){
         Log.d(TAG, "UserRepository: requestTokenRenewal() - called")
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
@@ -119,7 +119,7 @@ class UserRepository{
         when(response.code()){
             200 -> {
                 val token = response.body()
-                token?.let { DataStoreManager.saveBookchatToken(token); return token }
+                token?.let { DataStoreManager.saveBookchatToken(token); return }
                 throw ResponseBodyEmptyException(response.errorBody()?.string())
             }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
