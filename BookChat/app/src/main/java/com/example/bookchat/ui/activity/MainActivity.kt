@@ -43,6 +43,14 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
+    private fun addOrReplaceFragment(newFragment: Fragment, tag :String) {
+        if (newFragment.isAdded) {
+            replaceFragment(newFragment,tag)
+            return
+        }
+        addFragment(newFragment,tag)
+    }
+
     private fun addFragment(newFragment: Fragment, tag :String) {
         Log.d(TAG, "MainActivity: addFragment() - called")
 //        supportFragmentManager.popBackStackImmediate(tag, FragmentManager.POP_BACK_STACK_INCLUSIVE) //이거 사용을 좀 정리해야함
@@ -69,32 +77,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun addOrReplaceFragment(newFragment: Fragment, tag :String) {
-        if (newFragment.isAdded) {
-            replaceFragment(newFragment,tag)
-            return
-        }
-        addFragment(newFragment,tag)
-    }
-
     private fun getInflatedFragmentList() :List<Fragment>{
         return supportFragmentManager.fragments.filter { it.isVisible }
     }
 
-    private fun getInflatedBottomNaviFragment(inflatedFragmentList :List<Fragment>) :Fragment{
-        return inflatedFragmentList.filter { fragment -> fragment.tag in bottomNaviFragmentTags}[0]
+    private fun getInflatedBottomNaviFragment(inflatedFragmentList :List<Fragment>) :Fragment?{
+        return inflatedFragmentList.firstOrNull { fragment -> fragment.tag in bottomNaviFragmentTags }
     }
 
     private fun updateBottomNaviIcon(){
         val inflatedBottomNaviFragment = getInflatedBottomNaviFragment(getInflatedFragmentList())
 
-        when(inflatedBottomNaviFragment.tag){
+        when(inflatedBottomNaviFragment?.tag){
             FRAGMENT_TAG_HOME -> { binding.bottomNavigationView.menu.findItem(R.id.home_navi_icon).isChecked = true }
             FRAGMENT_TAG_BOOKSHELF -> { binding.bottomNavigationView.menu.findItem(R.id.bookshelf_navi_icon).isChecked = true }
             FRAGMENT_TAG_SEARCH -> { binding.bottomNavigationView.menu.findItem(R.id.search_navi_icon).isChecked = true }
             FRAGMENT_TAG_CHAT -> { binding.bottomNavigationView.menu.findItem(R.id.chat_navi_icon).isChecked = true }
             FRAGMENT_TAG_MY_PAGE -> { binding.bottomNavigationView.menu.findItem(R.id.mypage_navi_icon).isChecked = true }
         }
+
         Log.d(TAG, "MainActivity: updateBottomNaviIcon() - hollCheckList\n" +
                 "${binding.bottomNavigationView.menu.findItem(R.id.home_navi_icon).isChecked}\n" +
                 "${binding.bottomNavigationView.menu.findItem(R.id.bookshelf_navi_icon).isChecked}\n" +
