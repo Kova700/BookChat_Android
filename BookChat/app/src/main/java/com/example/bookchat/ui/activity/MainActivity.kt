@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityMainBinding
 import com.example.bookchat.ui.fragment.*
@@ -20,6 +21,8 @@ class MainActivity : AppCompatActivity() {
     private val chatFragment by lazy { ChatFragment() }
     private val myPageFragment by lazy { MyPageFragment() }
 
+    private val bottomNaviFragmentStack = ArrayDeque<Fragment>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -27,12 +30,12 @@ class MainActivity : AppCompatActivity() {
             lifecycleOwner = this@MainActivity
         }
 
-        addOrReplaceFragment(homeFragment,FRAGMENT_TAG_HOME)
-        binding.bottomNavigationView.setOnItemSelectedListener(bottomNaviItemSelectedListener)
+        setBottomNavigation()
+        addFragment(homeFragment,FRAGMENT_TAG_HOME)
     }
 
-    private val bottomNaviItemSelectedListener =
-        NavigationBarView.OnItemSelectedListener { item ->
+    private fun setBottomNavigation(){
+        val bottomNaviItemSelectedListener = NavigationBarView.OnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.home_navi_icon -> { addOrReplaceFragment(homeFragment,FRAGMENT_TAG_HOME) }
                 R.id.bookshelf_navi_icon -> { addOrReplaceFragment(bookShelfFragment,FRAGMENT_TAG_BOOKSHELF) }
@@ -42,10 +45,13 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+        binding.bottomNavigationView.setOnItemSelectedListener(bottomNaviItemSelectedListener)
+    }
+
 
     private fun addOrReplaceFragment(newFragment: Fragment, tag :String) {
         if (newFragment.isAdded) {
-            replaceFragment(newFragment,tag)
+            replaceFragment(newFragment)
             return
         }
         addFragment(newFragment,tag)
@@ -53,28 +59,63 @@ class MainActivity : AppCompatActivity() {
 
     private fun addFragment(newFragment: Fragment, tag :String) {
         Log.d(TAG, "MainActivity: addFragment() - called")
-//        supportFragmentManager.popBackStackImmediate(tag, FragmentManager.POP_BACK_STACK_INCLUSIVE) //이거 사용을 좀 정리해야함
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         with(fragmentTransaction){
             setReorderingAllowed(true)
-            getInflatedFragmentList().forEach { fragment -> hide(fragment) }
+            stackNowFragment()
+            hideFragments(fragmentTransaction)
             add(R.id.main_frame, newFragment,tag)
-            addToBackStack(tag)
-            commit()
+            commitNow()
         }
     }
 
-    private fun replaceFragment(newFragment: Fragment, tag :String) {
+    private fun replaceFragment(newFragment: Fragment) {
+        if(newFragment.isVisible) return
         Log.d(TAG, "MainActivity: replaceFragment() - called")
-//        supportFragmentManager.popBackStackImmediate(tag, FragmentManager.POP_BACK_STACK_INCLUSIVE) //이거 사용을 좀 정리해야함
+
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         with(fragmentTransaction){
             setReorderingAllowed(true)
-            getInflatedFragmentList().forEach { fragment -> hide(fragment) }
+            stackNowFragment()
+            hideFragments(fragmentTransaction)
             show(newFragment)
-            addToBackStack(tag)
-            commit()
+            commitNow()
         }
+    }
+
+    private fun replaceFragmentInStack(newFragment: Fragment) {
+        if(newFragment.isVisible) return
+        Log.d(TAG, "MainActivity: replaceFragment() - called")
+
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        with(fragmentTransaction){
+            setReorderingAllowed(true)
+            hideFragments(fragmentTransaction)
+            show(newFragment)
+            commitNow()
+        }
+    }
+
+    private fun hideFragments(fragmentTransaction : FragmentTransaction){
+        val inflatedFragmentList = getInflatedFragmentList()
+        inflatedFragmentList.forEach { fragment -> fragmentTransaction.hide(fragment) }
+    }
+
+    private fun stackNowFragment(){
+        val fragment = getInflatedBottomNaviFragment(getInflatedFragmentList()) ?: return
+        if (bottomNaviFragmentStack.contains(fragment)) removeFragmentInStack(fragment)
+        addFragmentInStack(fragment)
+        Log.d(TAG, "MainActivity: stackFragment() - bottomNaviFragmentStack : $bottomNaviFragmentStack")
+    }
+
+    private fun addFragmentInStack(fragment: Fragment){
+        if (bottomNaviFragmentStack.contains(fragment)) return
+        bottomNaviFragmentStack.add(fragment)
+    }
+
+    private fun removeFragmentInStack(fragment: Fragment){
+        if(fragment == homeFragment) return
+        bottomNaviFragmentStack.remove(fragment)
     }
 
     private fun getInflatedFragmentList() :List<Fragment>{
@@ -87,27 +128,31 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateBottomNaviIcon(){
         val inflatedBottomNaviFragment = getInflatedBottomNaviFragment(getInflatedFragmentList())
-
+        val bottomNavigationView = binding.bottomNavigationView.menu
         when(inflatedBottomNaviFragment?.tag){
-            FRAGMENT_TAG_HOME -> { binding.bottomNavigationView.menu.findItem(R.id.home_navi_icon).isChecked = true }
-            FRAGMENT_TAG_BOOKSHELF -> { binding.bottomNavigationView.menu.findItem(R.id.bookshelf_navi_icon).isChecked = true }
-            FRAGMENT_TAG_SEARCH -> { binding.bottomNavigationView.menu.findItem(R.id.search_navi_icon).isChecked = true }
-            FRAGMENT_TAG_CHAT -> { binding.bottomNavigationView.menu.findItem(R.id.chat_navi_icon).isChecked = true }
-            FRAGMENT_TAG_MY_PAGE -> { binding.bottomNavigationView.menu.findItem(R.id.mypage_navi_icon).isChecked = true }
+            FRAGMENT_TAG_HOME -> { bottomNavigationView.findItem(R.id.home_navi_icon).isChecked = true }
+            FRAGMENT_TAG_BOOKSHELF -> { bottomNavigationView.findItem(R.id.bookshelf_navi_icon).isChecked = true }
+            FRAGMENT_TAG_SEARCH -> { bottomNavigationView.findItem(R.id.search_navi_icon).isChecked = true }
+            FRAGMENT_TAG_CHAT -> { bottomNavigationView.findItem(R.id.chat_navi_icon).isChecked = true }
+            FRAGMENT_TAG_MY_PAGE -> { bottomNavigationView.findItem(R.id.mypage_navi_icon).isChecked = true }
         }
-
-        Log.d(TAG, "MainActivity: updateBottomNaviIcon() - hollCheckList\n" +
-                "${binding.bottomNavigationView.menu.findItem(R.id.home_navi_icon).isChecked}\n" +
-                "${binding.bottomNavigationView.menu.findItem(R.id.bookshelf_navi_icon).isChecked}\n" +
-                "${binding.bottomNavigationView.menu.findItem(R.id.search_navi_icon).isChecked}\n" +
-                "${binding.bottomNavigationView.menu.findItem(R.id.chat_navi_icon).isChecked}\n" +
-                "${binding.bottomNavigationView.menu.findItem(R.id.mypage_navi_icon).isChecked}\n" +
-                "최종 클릭 확인 ")
     }
 
+    private fun inflateFragmentInStack(){
+        val fragment = bottomNaviFragmentStack.removeLastOrNull() ?: return
+        replaceFragmentInStack(fragment)
+        Log.d(TAG, "MainActivity: inflateFragmentInStack() - bottomNaviFragmentStack : $bottomNaviFragmentStack")
+    }
+
+    //자식 FragmentBackStack 다 털고 BottomNaviFragmentBackStack 털어야 함
     override fun onBackPressed() {
-        super.onBackPressed()
-        updateBottomNaviIcon()
+        Log.d(TAG, "MainActivity: onBackPressed() - called")
+        supportFragmentManager.popBackStackImmediate()
+        if(supportFragmentManager.backStackEntryCount == 0){
+            if (bottomNaviFragmentStack.isEmpty()) super.onBackPressed()
+            inflateFragmentInStack()
+            updateBottomNaviIcon()
+        }
     }
 
     companion object{
@@ -122,7 +167,4 @@ class MainActivity : AppCompatActivity() {
 
     //로그 다지우고
     //백스텍 다 끝나고 "'뒤로' 버튼을 한 번 더 누르면 종료됩니다." 구현
-    //인스타그램처럼 스택 최대 바텀 버튼 수 만큼 관리 가능하게 구현
-    ////addFragment실행후 뒤로가기 하면 add된 애들 다 사라지니까 다시 다른 fragment 누르면 replaceFragment가 아닌 addFragment가 호출됨(오류 없을까 생각)
-
 }
