@@ -24,7 +24,7 @@ class BookShelfFragment : Fragment() {
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_book_shelf,container,false)
 
-        val pagerAdapter = PagerFragmentStateAdapter(requireActivity())
+        val pagerAdapter = PagerFragmentStateAdapter(this)
         pagerAdapter.addFragment(ReadingBookTabFragment())
         pagerAdapter.addFragment(CompleteBookTabFragment())
         pagerAdapter.addFragment(WishBookTabFragment())
@@ -35,6 +35,8 @@ class BookShelfFragment : Fragment() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 Log.d(TAG, "BookShelfFragment: onPageSelected() - Page ${position+1}")
+                Log.d(TAG, "BookShelfFragment: onCreateView() - parentFragmentManager : ${parentFragmentManager.fragments}")
+                Log.d(TAG, "BookShelfFragment: onCreateView() - childFragmentManager : ${childFragmentManager.fragments}")
             }
         })
 
