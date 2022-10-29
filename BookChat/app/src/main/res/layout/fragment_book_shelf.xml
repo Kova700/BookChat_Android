@@ -34,19 +34,8 @@
                 android:layout_marginEnd="25dp"
                 android:background="?android:selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_search_btn"
-                app:layout_constraintBottom_toBottomOf="@+id/imageButton4"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/imageButton4" />
-
-            <ImageButton
-                android:id="@+id/imageButton4"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_marginEnd="8dp"
-                android:background="?android:selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_plus_btn"
                 app:layout_constraintBottom_toBottomOf="@+id/textView16"
-                app:layout_constraintEnd_toStartOf="@+id/imageButton5"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/textView16" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
