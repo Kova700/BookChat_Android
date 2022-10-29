@@ -2,12 +2,8 @@ package com.example.bookchat.viewmodel
 
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.switchMap
 import com.example.bookchat.repository.BookRepository
-import com.example.bookchat.utils.Constants
 import com.example.bookchat.utils.SearchTapStatus
 import kotlinx.coroutines.flow.*
 

@@ -2,6 +2,7 @@ package com.example.bookchat.adapter
 
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -12,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.utils.NameCheckStatus
+import com.example.bookchat.utils.SearchTapStatus
 
 object DataBindingAdapter {
 
@@ -97,5 +99,15 @@ object DataBindingAdapter {
                 layout.background = ResourcesCompat.getDrawable(App.instance.resources,R.drawable.nickname_input_back_blue,null)
             }
         }
+    }
+
+    @JvmStatic
+    @BindingAdapter("setSearchDeleteBtnVisible")
+    fun setSearchDeleteBtnVisible(view: View, searchTapStatus : SearchTapStatus){
+        if (searchTapStatus !is SearchTapStatus.Searching) {
+            view.visibility = View.INVISIBLE
+            return
+        }
+        view.visibility = View.VISIBLE
     }
 }
