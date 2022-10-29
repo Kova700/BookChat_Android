@@ -22,6 +22,7 @@ import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.SearchTapStatus
 import com.example.bookchat.viewmodel.SearchViewModel
 import com.example.bookchat.viewmodel.ViewModelFactory
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class SearchFragment : Fragment() {
@@ -47,7 +48,7 @@ class SearchFragment : Fragment() {
         with(binding){
             lifecycleOwner = this@SearchFragment
             fragment = this@SearchFragment //viewModel로 옮길 수 있으면 다 옮기기
-            viewmodel = searchViewModel
+            viewModel = searchViewModel
         }
 
         return binding.root
@@ -59,7 +60,8 @@ class SearchFragment : Fragment() {
     ) {
 
         lifecycleScope.launch {
-            searchViewModel.searchTapStatus.collect{ searchTapStatus->
+            searchViewModel._searchTapStatus.collect{ searchTapStatus->
+                Log.d(TAG, "SearchFragment: _searchTapStatus.collec - searchTapStatus : $searchTapStatus")
                 handleFrgment(searchTapStatus)
             }
         }
@@ -91,6 +93,7 @@ class SearchFragment : Fragment() {
         Log.d(TAG, "SearchFragment: clickedSearchWindow() - called")
         if (isClickedSearchWindow) return
         isClickedSearchWindow = true
+        searchViewModel._searchTapStatus.value = SearchTapStatus.History
 
         val windowAnimator = AnimatorInflater.loadAnimator(requireContext(),R.animator.clicked_searchwindow_animator)
         windowAnimator.apply {
@@ -126,7 +129,7 @@ class SearchFragment : Fragment() {
     fun clickBackBtn(){
         Log.d(TAG, "SearchFragment: clickBackBtn() - called")
         if (!isClickedSearchWindow) return
-        isClickedSearchWindow = false
+
 
         val windowAnimator = AnimatorInflater.loadAnimator(requireContext(),R.animator.unclicked_searchwindow_animator)
         windowAnimator.apply {
@@ -136,6 +139,8 @@ class SearchFragment : Fragment() {
             doOnStart {
                 binding.backBtn.visibility = INVISIBLE
                 binding.searchEditText.setText("")
+                isClickedSearchWindow = false
+                searchViewModel._searchTapStatus.value = SearchTapStatus.Default
                 binding.searchEditText.isEnabled = false
             }
             start()

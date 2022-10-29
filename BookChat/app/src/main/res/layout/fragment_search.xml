@@ -5,7 +5,9 @@
         <variable
             name="fragment"
             type="com.example.bookchat.ui.fragment.SearchFragment" />
-
+        <variable
+            name="viewModel"
+            type="com.example.bookchat.viewmodel.SearchViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -97,6 +99,8 @@
                     android:background="@android:color/transparent"
                     android:fontFamily="@font/notosanskr_regular"
                     android:hint="도서명을 입력해주세요."
+                    android:text="@={viewModel._searchKeyWord}"
+                    app:addTextChangedListener="@{viewModel.editTextWatcher}"
                     android:enabled="false"
                     android:inputType="text"
                     android:textColor="#222222"
@@ -130,6 +134,7 @@
         <!--최근검색어 Fragment (검색창 누르면)-->
         <!--관련도서명 Fragment (검색어가 입력되면)-->
         <!--검색결과   Fragment (엔터 누르면)-->
+        <!--DatabindingAdapter 연결해서 ViewModel Status에 맞는 화면 보여주기-->
        <FrameLayout
            android:id="@+id/searchPage_layout"
             android:layout_width="match_parent"
