@@ -14,16 +14,28 @@ import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentSearchBinding
 import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.SearchTapStatus
+import com.example.bookchat.viewmodel.SearchViewModel
+import com.example.bookchat.viewmodel.ViewModelFactory
+import kotlinx.coroutines.launch
 
 class SearchFragment : Fragment() {
 
     private lateinit var binding: FragmentSearchBinding
+    private lateinit var searchViewModel: SearchViewModel
     private val imm by lazy { requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
-    var isclickedSearchWindow = false
+    private val defaultTapFragment by lazy { SearchTapDefaultFragment() }
+    private val historyTapFragment by lazy { SearchTapHistoryFragment() }
+    private val searchingTapFragment by lazy { SearchTapSearchingFragment() }
+    private val resultTapFragment by lazy { SearchTapResultFragment() }
+
+    var isClickedSearchWindow = false //이거 뷰 디스트로이 됐다가 다시 나타나면 터시 안됨 수정필요함
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,7 +43,13 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false)
-        binding.fragment = this@SearchFragment
+        searchViewModel = ViewModelProvider(this, ViewModelFactory()).get(SearchViewModel::class.java)
+        with(binding){
+            lifecycleOwner = this@SearchFragment
+            fragment = this@SearchFragment //viewModel로 옮길 수 있으면 다 옮기기
+            viewmodel = searchViewModel
+        }
+
         return binding.root
     }
 
@@ -39,15 +57,40 @@ class SearchFragment : Fragment() {
         view: View,
         savedInstanceState: Bundle?
     ) {
+
+        lifecycleScope.launch {
+            searchViewModel.searchTapStatus.collect{ searchTapStatus->
+                handleFrgment(searchTapStatus)
+            }
+        }
+
         super.onViewCreated(view, savedInstanceState)
-        //검색창 클릭되면 애니메이션 작동
-        //뒤로가기버튼 Visible
     }
 
+    private fun handleFrgment(searchTapStatus :SearchTapStatus) =
+        when(searchTapStatus){
+            SearchTapStatus.Default -> { replaceFragment(defaultTapFragment, FRAGMENT_TAG_DEFAULT) }
+            SearchTapStatus.History -> { replaceFragment(historyTapFragment, FRAGMENT_TAG_HISTORY) }
+            SearchTapStatus.Searching -> { replaceFragment(searchingTapFragment, FRAGMENT_TAG_SEARCHING) }
+            SearchTapStatus.Result -> { replaceFragment(resultTapFragment, FRAGMENT_TAG_RESULT) }
+            SearchTapStatus.Loading -> { }
+        }
+
+    private fun replaceFragment(newFragment :Fragment, tag :String){
+        val fragmentTransaction = childFragmentManager.beginTransaction()
+        with(fragmentTransaction){
+            setReorderingAllowed(true)
+            replace(R.id.searchPage_layout,newFragment,tag)
+            addToBackStack(tag)
+            commit()
+        }
+    }
+
+    /* 애니메이션 처리 전부 MotionLayout으로 마이그레이션 예정 */
     fun clickSearchWindow(){
         Log.d(TAG, "SearchFragment: clickedSearchWindow() - called")
-        if (isclickedSearchWindow) return
-        isclickedSearchWindow = true
+        if (isClickedSearchWindow) return
+        isClickedSearchWindow = true
 
         val windowAnimator = AnimatorInflater.loadAnimator(requireContext(),R.animator.clicked_searchwindow_animator)
         windowAnimator.apply {
@@ -79,10 +122,11 @@ class SearchFragment : Fragment() {
         }
     }
 
+    /* 애니메이션 처리 전부 MotionLayout으로 마이그레이션 예정 */
     fun clickBackBtn(){
         Log.d(TAG, "SearchFragment: clickBackBtn() - called")
-        if (!isclickedSearchWindow) return
-        isclickedSearchWindow = false
+        if (!isClickedSearchWindow) return
+        isClickedSearchWindow = false
 
         val windowAnimator = AnimatorInflater.loadAnimator(requireContext(),R.animator.unclicked_searchwindow_animator)
         windowAnimator.apply {
@@ -115,6 +159,15 @@ class SearchFragment : Fragment() {
 
     private fun openKeyboard(view :View) {
         imm.showSoftInput(view,InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    companion object {
+        const val FRAGMENT_TAG_DEFAULT = "Default"
+        const val FRAGMENT_TAG_HISTORY = "History"
+        const val FRAGMENT_TAG_SEARCHING = "Searching"
+        const val FRAGMENT_TAG_RESULT = "Result"
+//        const val FRAGMENT_TAG_LOADING = "Loading"
+        //로딩은 Frgment로 구성하는게 아니라 그냥 프로그레스 바로 구성
     }
 
 }
