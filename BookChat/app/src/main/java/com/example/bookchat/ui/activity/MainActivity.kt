@@ -2,6 +2,7 @@ package com.example.bookchat.ui.activity
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private val myPageFragment by lazy { MyPageFragment() }
 
     private val bottomNaviFragmentStack = ArrayDeque<Fragment>()
+    private var backPressedTime :Long= 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +60,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addFragment(newFragment: Fragment, tag :String) {
-        Log.d(TAG, "MainActivity: addFragment() - called")
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         with(fragmentTransaction){
             setReorderingAllowed(true)
@@ -71,7 +72,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun replaceFragment(newFragment: Fragment) {
         if(newFragment.isVisible) return
-        Log.d(TAG, "MainActivity: replaceFragment() - called")
 
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         with(fragmentTransaction){
@@ -84,9 +84,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun replaceFragmentInStack(newFragment: Fragment) {
-        if(newFragment.isVisible) return
-        Log.d(TAG, "MainActivity: replaceFragment() - called")
-
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         with(fragmentTransaction){
             setReorderingAllowed(true)
@@ -105,7 +102,6 @@ class MainActivity : AppCompatActivity() {
         val fragment = getInflatedBottomNaviFragment(getInflatedFragmentList()) ?: return
         if (bottomNaviFragmentStack.contains(fragment)) removeFragmentInStack(fragment)
         addFragmentInStack(fragment)
-        Log.d(TAG, "MainActivity: stackFragment() - bottomNaviFragmentStack : $bottomNaviFragmentStack")
     }
 
     private fun addFragmentInStack(fragment: Fragment){
@@ -141,18 +137,32 @@ class MainActivity : AppCompatActivity() {
     private fun inflateFragmentInStack(){
         val fragment = bottomNaviFragmentStack.removeLastOrNull() ?: return
         replaceFragmentInStack(fragment)
-        Log.d(TAG, "MainActivity: inflateFragmentInStack() - bottomNaviFragmentStack : $bottomNaviFragmentStack")
     }
 
     //자식 FragmentBackStack 다 털고 BottomNaviFragmentBackStack 털어야 함
     override fun onBackPressed() {
         Log.d(TAG, "MainActivity: onBackPressed() - called")
-        supportFragmentManager.popBackStackImmediate()
-        if(supportFragmentManager.backStackEntryCount == 0){
-            if (bottomNaviFragmentStack.isEmpty()) super.onBackPressed()
-            inflateFragmentInStack()
-            updateBottomNaviIcon()
+        if(supportFragmentManager.backStackEntryCount != 0){
+            supportFragmentManager.popBackStackImmediate()
+            return
         }
+        backPressEvent()
+        inflateFragmentInStack()
+        updateBottomNaviIcon()
+    }
+
+    private fun backPressEvent() {
+        if (!bottomNaviFragmentStack.isEmpty()) return
+
+        val toast = Toast.makeText(this, R.string.message_back_press, Toast.LENGTH_SHORT)
+        if (System.currentTimeMillis() > backPressedTime + 2000){
+            backPressedTime = System.currentTimeMillis()
+            toast.show()
+            return
+        }
+
+        toast.cancel()
+        super.onBackPressed()
     }
 
     companion object{
@@ -165,6 +175,4 @@ class MainActivity : AppCompatActivity() {
             listOf(FRAGMENT_TAG_HOME, FRAGMENT_TAG_BOOKSHELF, FRAGMENT_TAG_SEARCH, FRAGMENT_TAG_CHAT, FRAGMENT_TAG_MY_PAGE)
     }
 
-    //로그 다지우고
-    //백스텍 다 끝나고 "'뒤로' 버튼을 한 번 더 누르면 종료됩니다." 구현
 }
