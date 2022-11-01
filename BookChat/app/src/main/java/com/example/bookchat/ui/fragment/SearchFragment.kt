@@ -3,13 +3,16 @@ package com.example.bookchat.ui.fragment
 import android.animation.AnimatorInflater
 import android.content.Context
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.databinding.DataBindingUtil
@@ -22,7 +25,6 @@ import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.SearchTapStatus
 import com.example.bookchat.viewmodel.SearchViewModel
 import com.example.bookchat.viewmodel.ViewModelFactory
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class SearchFragment : Fragment() {
@@ -56,17 +58,17 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?
-    ) {
+        savedInstanceState: Bundle?) {
 
-        lifecycleScope.launch {
-            searchViewModel._searchTapStatus.collect{ searchTapStatus->
-                Log.d(TAG, "SearchFragment: _searchTapStatus.collec - searchTapStatus : $searchTapStatus")
-                handleFrgment(searchTapStatus)
-            }
-        }
-
+        collectSearchTapStatus()
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun collectSearchTapStatus() = viewLifecycleOwner.lifecycleScope.launch {
+        searchViewModel._searchTapStatus.collect{ searchTapStatus->
+            Log.d(TAG, "SearchFragment: _searchTapStatus.collect - searchTapStatus : $searchTapStatus")
+            handleFrgment(searchTapStatus)
+        }
     }
 
     private fun handleFrgment(searchTapStatus :SearchTapStatus) =
@@ -74,10 +76,14 @@ class SearchFragment : Fragment() {
             SearchTapStatus.Default -> { replaceFragment(defaultTapFragment, FRAGMENT_TAG_DEFAULT) }
             SearchTapStatus.History -> { replaceFragment(historyTapFragment, FRAGMENT_TAG_HISTORY) }
             SearchTapStatus.Searching -> { replaceFragment(searchingTapFragment, FRAGMENT_TAG_SEARCHING) }
-            SearchTapStatus.Result -> { replaceFragment(resultTapFragment, FRAGMENT_TAG_RESULT) }
+            SearchTapStatus.Result -> {
+                closeKeyboard(binding.searchEditText.windowToken)
+                replaceFragment(resultTapFragment, FRAGMENT_TAG_RESULT)
+            }
             SearchTapStatus.Loading -> { }
         }
 
+    //스택관리 어떻게 할래 (교체버튼 누를떄 마다 지금 스택 쌓이는중)
     private fun replaceFragment(newFragment :Fragment, tag :String){
         val fragmentTransaction = childFragmentManager.beginTransaction()
         with(fragmentTransaction){
@@ -130,7 +136,6 @@ class SearchFragment : Fragment() {
         Log.d(TAG, "SearchFragment: clickBackBtn() - called")
         if (!isClickedSearchWindow) return
 
-
         val windowAnimator = AnimatorInflater.loadAnimator(requireContext(),R.animator.unclicked_searchwindow_animator)
         windowAnimator.apply {
             setTarget(binding.searchWindow)
@@ -164,6 +169,10 @@ class SearchFragment : Fragment() {
 
     private fun openKeyboard(view :View) {
         imm.showSoftInput(view,InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    private fun closeKeyboard(windowToken : IBinder) {
+        imm.hideSoftInputFromWindow(windowToken,InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
     companion object {

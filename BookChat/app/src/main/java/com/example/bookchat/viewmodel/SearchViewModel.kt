@@ -2,6 +2,8 @@ package com.example.bookchat.viewmodel
 
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.KeyEvent
+import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -51,6 +53,10 @@ class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
 //        searchChatRoom(keyword) //페이징 시작
     }
 
+    val keyboardEnterListener = TextView.OnEditorActionListener{ _, _, _ ->
+        clickSearchbtn()
+        false
+    }
 
     private suspend fun searchBooks(keyword :String) {
         //각자 책부분 채팅부분 로딩 프로그래스바 만들어서 서로 로딩상태 두개로 구분 해서 결과 기다리는 표시하기

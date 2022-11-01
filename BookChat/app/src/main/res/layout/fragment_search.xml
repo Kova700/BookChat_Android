@@ -102,6 +102,7 @@
                     android:hint="도서명을 입력해주세요."
                     android:text="@={viewModel._searchKeyWord}"
                     app:addTextChangedListener="@{viewModel.editTextWatcher}"
+                    setEnterListener="@{viewModel.keyboardEnterListener}"
                     android:enabled="false"
                     android:inputType="text"
                     android:textColor="#222222"

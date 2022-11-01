@@ -3,10 +3,7 @@ package com.example.bookchat.adapter
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.view.View
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
@@ -39,6 +36,13 @@ object DataBindingAdapter {
             .error(R.drawable.ic_default_profile_img1)
             .into(imageView)
     }
+    /** EditText 엔터이벤트 등록*/
+    @JvmStatic
+    @BindingAdapter("setEnterListener")
+    fun setEnterListener(editText : EditText, listener : TextView.OnEditorActionListener){
+        editText.setOnEditorActionListener(listener)
+    }
+
 
     /**독서취향 : 제출 버튼 색상 설정*/
     @JvmStatic
