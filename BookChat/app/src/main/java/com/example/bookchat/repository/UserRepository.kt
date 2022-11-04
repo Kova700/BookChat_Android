@@ -1,11 +1,10 @@
 package com.example.bookchat.repository
 
-import UserSignUpRequestDto
+import UserSignUpRequest
 import android.util.Log
 import android.widget.Toast
 import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.data.Token
 import com.example.bookchat.data.User
 import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.response.*
@@ -45,7 +44,7 @@ class UserRepository{
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val idToken = DataStoreManager.getIdToken()
-        val userSignUpRequestDto = UserSignUpRequestDto(
+        val userSignUpRequest = UserSignUpRequest(
             oauth2Provider = idToken.oAuth2Provider,
             nickname = userSignUpDto.nickname,
             defaultProfileImageType = userSignUpDto.defaultProfileImageType,
@@ -53,14 +52,14 @@ class UserRepository{
         )
 
         val requestBody = getRequestBody(
-            content = userSignUpRequestDto,
+            content = userSignUpRequest,
             contentType = CONTENT_TYPE_JSON
         )
 
         val response = App.instance.userApiInterface.signUp(
             idToken = idToken.token,
             userProfileImage = userSignUpDto.userProfileImage,
-            userSignUpRequestDto = requestBody
+            userSignUpRequest = requestBody
         )
         Log.d(TAG, "UserRepository: signUp() - response : $response ")
         when(response.code()){

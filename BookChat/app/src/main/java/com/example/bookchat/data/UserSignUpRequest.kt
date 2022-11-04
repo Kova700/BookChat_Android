@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import okhttp3.MultipartBody
 import java.io.Serializable
 
-data class UserSignUpRequestDto(
+data class UserSignUpRequest(
     @SerializedName("oauth2Provider")
     val oauth2Provider : OAuth2Provider,
     @SerializedName("nickname")

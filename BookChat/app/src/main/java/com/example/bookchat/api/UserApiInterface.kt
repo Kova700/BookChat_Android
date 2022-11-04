@@ -27,7 +27,7 @@ interface UserApiInterface {
     suspend fun signUp(
         @Header("OIDC") idToken :String,
         @Part userProfileImage: MultipartBody.Part? = null,
-        @Part("userSignUpRequestDto") userSignUpRequestDto: RequestBody
+        @Part("userSignUpRequest") userSignUpRequest: RequestBody
     ) :Response<Unit>
 
     @POST("/v1/api/users/signin")
