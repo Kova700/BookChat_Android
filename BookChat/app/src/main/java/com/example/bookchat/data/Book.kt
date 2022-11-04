@@ -10,7 +10,7 @@ data class Book(
     @SerializedName("title")
     var title: String,
     @SerializedName("author")
-    val author: ArrayList<String> = ArrayList<String>(), //작가가 공동저자일 수도 있으니 배열로 선언
+    val author: ArrayList<String>, //작가가 공동저자일 수도 있으니 배열로 선언
     @SerializedName("publisher")
     val publisher: String,
     @SerializedName("bookCoverImageUrl")
