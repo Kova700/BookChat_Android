@@ -64,7 +64,6 @@ class UserRepository{
         Log.d(TAG, "UserRepository: signUp() - response : $response ")
         when(response.code()){
             200 -> { }
-            401 -> throw TokenExpiredException(response.errorBody()?.string())
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
         }
     }
@@ -83,7 +82,6 @@ class UserRepository{
         Log.d(TAG, "UserRepository: withdraw() - response.code : ${response.code()}")
         when(response.code()){
             200 -> signOut()
-            401 -> throw TokenExpiredException(response.errorBody()?.string())
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
         }
     }
@@ -103,7 +101,6 @@ class UserRepository{
                 user?.let { App.instance.cacheUser(user); return user }
                 throw ResponseBodyEmptyException(response.errorBody()?.string())
             }
-            401 -> throw TokenExpiredException(response.errorBody()?.string())
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
         }
     }
