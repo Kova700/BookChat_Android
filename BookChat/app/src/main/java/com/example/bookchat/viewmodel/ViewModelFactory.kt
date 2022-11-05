@@ -6,7 +6,7 @@ import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.repository.UserRepository
 
 // 뷰모델에 인자를 넘겨주기 위한 팩토리 메서드
-class ViewModelFactory() : ViewModelProvider.Factory {
+class ViewModelFactory(val searchKeyword : String = "") : ViewModelProvider.Factory {
     private val userRepository by lazy { UserRepository() }
     private val bookRepository by lazy { BookRepository() }
 
@@ -31,6 +31,10 @@ class ViewModelFactory() : ViewModelProvider.Factory {
 
             modelClass.isAssignableFrom(SearchViewModel::class.java) -> {
                 return SearchViewModel(bookRepository) as T
+            }
+
+            modelClass.isAssignableFrom(SearchDetailViewModel::class.java) -> {
+                return SearchDetailViewModel(bookRepository,searchKeyword) as T
             }
 
             else -> throw IllegalArgumentException("unknown model class : ${modelClass}")

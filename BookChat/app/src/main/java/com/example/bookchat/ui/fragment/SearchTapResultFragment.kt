@@ -6,19 +6,24 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
 import com.example.bookchat.adapter.MainChatRoomAdapter
-import com.example.bookchat.adapter.WishBookTabAdapter
+import com.example.bookchat.adapter.SearchResultBookSimpleAdapter
+import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.FragmentSearchTapResultBinding
+import com.example.bookchat.viewmodel.SearchViewModel
+import com.example.bookchat.viewmodel.ViewModelFactory
 
 /*추후 확장이 필요하다 느끼면 ViewModel로 로직 이동*/
 class SearchTapResultFragment : Fragment() {
     private lateinit var binding :FragmentSearchTapResultBinding
+    private lateinit var searchResultBookSimpleAdapter : SearchResultBookSimpleAdapter
+    private lateinit var searchViewModel: SearchViewModel
 
     private lateinit var chatRoomAdapter: MainChatRoomAdapter // 임시
-    private lateinit var wishBookAdapter : WishBookTabAdapter // 임시
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,21 +32,56 @@ class SearchTapResultFragment : Fragment() {
     ): View? {
         //검색결과 가져와야함
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search_tap_result, container, false)
-        initRecyclerView()
+        searchViewModel = ViewModelProvider(requireParentFragment(), ViewModelFactory()).get(SearchViewModel::class.java)
+        binding.viewmodel = searchViewModel
+        binding.lifecycleOwner = this
+
+        initAdapter()
+        initRcv()
+        requireParentFragment()
         return binding.root
     }
 
-    private fun initRecyclerView(){
-        with(binding){
-            chatRoomAdapter = MainChatRoomAdapter()
-            searchResultChatRoomRcv.adapter = chatRoomAdapter
-            searchResultChatRoomRcv.setHasFixedSize(true)
-            searchResultChatRoomRcv.layoutManager = LinearLayoutManager(requireContext())
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+    }
 
-            wishBookAdapter = WishBookTabAdapter()
-            searchResultBookRcv.adapter = wishBookAdapter
-            searchResultBookRcv.setHasFixedSize(true)
-            searchResultBookRcv.layoutManager = GridLayoutManager(requireContext(),3) //중앙정렬 해야함 Or 개수 화면에 따라 늘어나게 설정
+    private fun initAdapter(){
+        initSearchResultBookAdapter()
+        initSearchResultChatRoomAdapter()
+    }
+
+    private fun initRcv(){
+        initSearchResultBookRcv()
+        initSearchResultChatRoomRcv()
+    }
+
+    private fun initSearchResultBookRcv(){
+        with(binding){
+            searchResultBookSimpleRcv.adapter = searchResultBookSimpleAdapter
+            searchResultBookSimpleRcv.setHasFixedSize(true)
+            searchResultBookSimpleRcv.layoutManager = GridLayoutManager(requireContext(),3) //중앙정렬 해야함 Or 개수 화면에 따라 늘어나게 설정
         }
+    }
+    private fun initSearchResultChatRoomRcv(){
+        with(binding){
+            searchResultChatRoomSimpleRcv.adapter = chatRoomAdapter
+            searchResultChatRoomSimpleRcv.setHasFixedSize(true)
+            searchResultChatRoomSimpleRcv.layoutManager = LinearLayoutManager(requireContext())
+        }
+    }
+
+    private fun initSearchResultBookAdapter(){
+        val bookItemClickListener = object: SearchResultBookSimpleAdapter.OnItemClickListener{
+            override fun onItemClick(book : Book) {
+                // 책 다이얼로그 출력
+            }
+        }
+        searchResultBookSimpleAdapter = SearchResultBookSimpleAdapter()
+        searchResultBookSimpleAdapter.setItemClickListener(bookItemClickListener)
+    }
+
+    private fun initSearchResultChatRoomAdapter(){
+        chatRoomAdapter = MainChatRoomAdapter() //임시
     }
 }

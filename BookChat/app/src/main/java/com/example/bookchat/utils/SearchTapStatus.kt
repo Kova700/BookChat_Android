@@ -6,4 +6,5 @@ sealed class SearchTapStatus{
     object Searching :SearchTapStatus() //관련 도서명
     object Loading :SearchTapStatus() //isLoading
     object Result :SearchTapStatus() //ShowResult
+    object Detail :SearchTapStatus() //ShowResult
 }

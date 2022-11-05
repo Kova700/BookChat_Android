@@ -82,7 +82,7 @@
                     android:layout_marginStart="20dp"
                     android:background="?android:selectableItemBackgroundBorderless"
                     android:scaleType="fitXY"
-                    android:onClick="@{() -> viewModel.clickSearchbtn()}"
+                    android:onClick="@{() -> viewModel.searchKeyword()}"
                     android:src="@drawable/ic_search_window_searcn_btn"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
