@@ -7,7 +7,6 @@ import com.example.bookchat.App
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.Meta
 import com.example.bookchat.response.ResponseBodyEmptyException
-import com.example.bookchat.response.TokenExpiredException
 import com.example.bookchat.utils.Constants.TAG
 
 class SearchResultBookDetailPagingSource(
@@ -35,7 +34,6 @@ class SearchResultBookDetailPagingSource(
                 }
                 return LoadResult.Error(ResponseBodyEmptyException(response.errorBody()?.string()))
             }
-            //401 -> throw TokenExpiredException(response.errorBody()?.string())
             else -> return LoadResult.Error(Exception(createExceptionMessage(response.code(),response.errorBody()?.string())))
         }
 

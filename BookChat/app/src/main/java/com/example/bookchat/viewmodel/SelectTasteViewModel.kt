@@ -1,16 +1,12 @@
 package com.example.bookchat.viewmodel
 
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.App
-import com.example.bookchat.R
 import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.repository.UserRepository
-import com.example.bookchat.response.NetworkIsNotConnectedException
-import com.example.bookchat.response.TokenExpiredException
 import com.example.bookchat.response.ForbiddenException
+import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.ReadingTaste
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,7 +20,6 @@ class SelectTasteViewModel(private val userRepository : UserRepository) :ViewMod
     val eventFlow = _eventFlow.asSharedFlow()
 
     private val selectedTastes = ArrayList<ReadingTaste>()
-    private var recursiveChecker = false //임시 (구조 개선 필요)
 
     private val _isTastesEmpty = MutableStateFlow<Boolean>(true)
     val isTastesEmpty = _isTastesEmpty.asStateFlow()
@@ -49,13 +44,6 @@ class SelectTasteViewModel(private val userRepository : UserRepository) :ViewMod
         Log.d(TAG, "LoginViewModel: requestUserInfo() - called")
         runCatching{ userRepository.getUserProfile() }
             .onSuccess { startEvent(SelectTasteEvent.MoveToMain) }
-            .onFailure { failHandler(it) }
-    }
-
-    private fun requestTokenRenewal() = viewModelScope.launch {
-        Log.d(TAG, "LoginViewModel: requestTokenRenewal() - called")
-        runCatching{ userRepository.requestTokenRenewal() }
-            .onSuccess { if (recursiveChecker == false) requestUserInfo(); recursiveChecker = true }
             .onFailure { failHandler(it) }
     }
 
@@ -92,7 +80,6 @@ class SelectTasteViewModel(private val userRepository : UserRepository) :ViewMod
     private fun failHandler(exception: Throwable) {
         Log.d(TAG, "SelectTasteViewModel: failHandler() - called")
         when(exception){
-            is TokenExpiredException -> requestTokenRenewal()
             is ForbiddenException -> startEvent(SelectTasteEvent.Forbidden)
             is NetworkIsNotConnectedException -> startEvent(SelectTasteEvent.NetworkError)
             else -> startEvent(SelectTasteEvent.UnknownError)

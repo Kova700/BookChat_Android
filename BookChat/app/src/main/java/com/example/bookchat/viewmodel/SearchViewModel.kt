@@ -7,15 +7,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import com.example.bookchat.App
 import com.example.bookchat.data.Book
 import com.example.bookchat.repository.BookRepository
-import com.example.bookchat.response.TokenExpiredException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.SearchTapStatus
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {

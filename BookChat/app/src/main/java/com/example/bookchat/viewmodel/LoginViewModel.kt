@@ -20,8 +20,6 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
     private val _eventFlow = MutableSharedFlow<LoginEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    private var recursiveChecker = false //임시 (구조 개선 필요)
-
     init {
         viewModelScope.launch {
             runCatching { DataStoreManager.getBookchatToken() }
@@ -33,13 +31,6 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
         Log.d(TAG, "LoginViewModel: requestUserInfo() - called")
         runCatching { userRepository.getUserProfile() }
             .onSuccess { startEvent(LoginEvent.MoveToMain) }
-            .onFailure { failHandler(it) }
-    }
-
-    private fun requestTokenRenewal() = viewModelScope.launch {
-        Log.d(TAG, "LoginViewModel: requestTokenRenewal() - called")
-        runCatching { userRepository.requestTokenRenewal() }
-            .onSuccess { if (recursiveChecker == false) requestUserInfo(); recursiveChecker = true }
             .onFailure { failHandler(it) }
     }
 
@@ -76,7 +67,6 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
     private fun failHandler(exception: Throwable) {
         Log.d(TAG, "LoginViewModel: failHandler() - exception : $exception")
         when (exception) {
-            is TokenExpiredException -> requestTokenRenewal()
             is NeedToSignUpException -> startEvent(LoginEvent.MoveToSignUp)
             is ForbiddenException -> startEvent(LoginEvent.Forbidden)
             is NetworkIsNotConnectedException -> startEvent(LoginEvent.NetworkError)
