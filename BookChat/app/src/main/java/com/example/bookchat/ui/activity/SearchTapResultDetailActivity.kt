@@ -3,9 +3,12 @@ package com.example.bookchat.ui.activity
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
+import androidx.paging.LoadStates
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.bookchat.R
 import com.example.bookchat.adapter.SearchResultBookDetailAdapter
@@ -53,6 +56,15 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
         }
         searchResultBookDetailAdapter = SearchResultBookDetailAdapter()
         searchResultBookDetailAdapter.setItemClickListener(bookItemClickListener)
+        searchResultBookDetailAdapter.addLoadStateListener { combinedLoadStates ->
+            if (isLoadResultEmpty(combinedLoadStates.source)) {
+                binding.emptyResultImg.isVisible = true
+                binding.emptyResultText.isVisible = true
+                return@addLoadStateListener
+            }
+            binding.emptyResultImg.isVisible = false
+            binding.emptyResultText.isVisible = false
+        }
     }
 
     private fun initSearchResultDetailRcv(){
@@ -61,6 +73,12 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
             searchResultDetailRcv.setHasFixedSize(true)
             searchResultDetailRcv.layoutManager = GridLayoutManager(this@SearchTapResultDetailActivity,3)
         }
+    }
+
+    private fun isLoadResultEmpty(loadStates : LoadStates) :Boolean{
+        return (loadStates.refresh is LoadState.NotLoading)
+                && (loadStates.append.endOfPaginationReached)
+                && (searchResultBookDetailAdapter.itemCount < 1)
     }
 
     private fun getSearchKeyWord(): String? {
