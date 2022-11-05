@@ -11,19 +11,22 @@ import com.example.bookchat.App
 import com.example.bookchat.data.Book
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.LoadState
 import com.example.bookchat.utils.SearchTapStatus
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
 
     val _searchTapStatus = MutableStateFlow<SearchTapStatus>(SearchTapStatus.Default)
-
     val _searchKeyWord = MutableStateFlow<String>("")
 
     var simpleBooksearchResult : List<Book> = listOf()
     var bookSearchResultTotalItemCount = 0.toString()
     var previousKeyword = ""
+
+    var resultLoadState = MutableStateFlow<LoadState>(LoadState.Default)
 
     val editTextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -60,8 +63,10 @@ class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
 
     //책 6개만 호출
     private suspend fun simpleSearchBooks(keyword :String){
+        resultLoadState.value = LoadState.Loading
         runCatching { bookRepository.simpleSearchBooks(keyword) }
             .onSuccess { booksearchResult ->
+                resultLoadState.value = LoadState.Result
                 simpleBooksearchResult =  booksearchResult.bookResponses
                 bookSearchResultTotalItemCount = booksearchResult.meta.totalCount.toString()
                 previousKeyword = keyword

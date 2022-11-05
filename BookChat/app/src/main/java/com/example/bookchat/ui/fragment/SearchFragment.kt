@@ -47,8 +47,9 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false)
-        searchViewModel = ViewModelProvider(this, ViewModelFactory()).get(SearchViewModel::class.java)
-        with(binding){
+        searchViewModel =
+            ViewModelProvider(this, ViewModelFactory()).get(SearchViewModel::class.java)
+        with(binding) {
             lifecycleOwner = this@SearchFragment
             fragment = this@SearchFragment //viewModel로 옮길 수 있으면 다 옮기기
             viewModel = searchViewModel
@@ -59,58 +60,71 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?) {
+        savedInstanceState: Bundle?
+    ) {
 
         collectSearchTapStatus()
         super.onViewCreated(view, savedInstanceState)
     }
 
     private fun collectSearchTapStatus() = viewLifecycleOwner.lifecycleScope.launch {
-        searchViewModel._searchTapStatus.collect{ searchTapStatus->
+        searchViewModel._searchTapStatus.collect { searchTapStatus ->
             Log.d(TAG, "SearchFragment: _searchTapStatus.collect - searchTapStatus : $searchTapStatus")
             handleSearchTapStatus(searchTapStatus)
         }
     }
 
-    private fun handleSearchTapStatus(searchTapStatus :SearchTapStatus) =
-        when(searchTapStatus){
-            SearchTapStatus.Default -> { replaceFragment(defaultTapFragment, FRAGMENT_TAG_DEFAULT) }
-            SearchTapStatus.History -> { replaceFragment(historyTapFragment, FRAGMENT_TAG_HISTORY) }
-            SearchTapStatus.Searching -> { replaceFragment(searchingTapFragment, FRAGMENT_TAG_SEARCHING) }
+    private fun handleSearchTapStatus(searchTapStatus: SearchTapStatus) =
+        when (searchTapStatus) {
+            SearchTapStatus.Default -> {
+                replaceFragment(defaultTapFragment, FRAGMENT_TAG_DEFAULT)
+            }
+            SearchTapStatus.History -> {
+                replaceFragment(historyTapFragment, FRAGMENT_TAG_HISTORY)
+            }
+            SearchTapStatus.Searching -> {
+                replaceFragment(searchingTapFragment, FRAGMENT_TAG_SEARCHING)
+            }
             SearchTapStatus.Result -> {
                 closeKeyboard(binding.searchEditText)
                 replaceFragment(resultTapFragment, FRAGMENT_TAG_RESULT)
             }
-            SearchTapStatus.Detail -> { moveToDetailActivity() }
-            SearchTapStatus.Loading -> { }
+            SearchTapStatus.Detail -> {
+                moveToDetailActivity()
+            }
         }
 
-    private fun moveToDetailActivity(){
+    private fun moveToDetailActivity() {
         Log.d(TAG, "SearchFragment: moveToDetailActivity() - called")
-        val intent = Intent(requireContext(),SearchTapResultDetailActivity::class.java)
-        intent.putExtra(EXTRA_SEARCH_KEYWORD,searchViewModel._searchKeyWord.value)
-        intent.putExtra(EXTRA_SEARCH_RESULT_ITEM_COUNT,searchViewModel.bookSearchResultTotalItemCount)
+        val intent = Intent(requireContext(), SearchTapResultDetailActivity::class.java)
+        intent.putExtra(EXTRA_SEARCH_KEYWORD, searchViewModel._searchKeyWord.value)
+        intent.putExtra(
+            EXTRA_SEARCH_RESULT_ITEM_COUNT,
+            searchViewModel.bookSearchResultTotalItemCount
+        )
         startActivity(intent)
     }
 
-    private fun replaceFragment(newFragment :Fragment, tag :String){
+    private fun replaceFragment(newFragment: Fragment, tag: String) {
         val childFragmentTransaction = childFragmentManager.beginTransaction()
-        with(childFragmentTransaction){
+        with(childFragmentTransaction) {
             setReorderingAllowed(true)
-            replace(R.id.searchPage_layout,newFragment,tag)
+            replace(R.id.searchPage_layout, newFragment, tag)
             commit()
         }
     }
 
-
     /* 애니메이션 처리 전부 MotionLayout으로 마이그레이션 예정 */
-    fun clickSearchWindow(){
+    fun clickSearchWindow() {
         Log.d(TAG, "SearchFragment: clickedSearchWindow() - called")
         if (isClickedSearchWindow) return
         isClickedSearchWindow = true
         searchViewModel._searchTapStatus.value = SearchTapStatus.History
 
-        val windowAnimator = AnimatorInflater.loadAnimator(requireContext(),R.animator.clicked_searchwindow_animator)
+        val windowAnimator = AnimatorInflater.loadAnimator(
+            requireContext(),
+            R.animator.clicked_searchwindow_animator
+        )
         windowAnimator.apply {
             setTarget(binding.searchWindow)
             binding.searchWindow.pivotX = 0.0f
@@ -124,14 +138,20 @@ class SearchFragment : Fragment() {
             }
             start()
         }
-        val btnAnimator = AnimatorInflater.loadAnimator(requireContext(),R.animator.clicked_searchwindow_btn_animator)
+        val btnAnimator = AnimatorInflater.loadAnimator(
+            requireContext(),
+            R.animator.clicked_searchwindow_btn_animator
+        )
         btnAnimator.apply {
             setTarget(binding.searchBtn)
             binding.searchBtn.pivotX = 0.0f
             binding.searchBtn.pivotY = 0.0f
             start()
         }
-        val etAnimator = AnimatorInflater.loadAnimator(requireContext(),R.animator.clicked_searchwindow_et_animator)
+        val etAnimator = AnimatorInflater.loadAnimator(
+            requireContext(),
+            R.animator.clicked_searchwindow_et_animator
+        )
         etAnimator.apply {
             setTarget(binding.searchEditText)
             binding.searchEditText.pivotX = 0.0f
@@ -141,11 +161,14 @@ class SearchFragment : Fragment() {
     }
 
     /* 애니메이션 처리 전부 MotionLayout으로 마이그레이션 예정 */
-    fun clickBackBtn(){
+    fun clickBackBtn() {
         Log.d(TAG, "SearchFragment: clickBackBtn() - called")
         if (!isClickedSearchWindow) return
 
-        val windowAnimator = AnimatorInflater.loadAnimator(requireContext(),R.animator.unclicked_searchwindow_animator)
+        val windowAnimator = AnimatorInflater.loadAnimator(
+            requireContext(),
+            R.animator.unclicked_searchwindow_animator
+        )
         windowAnimator.apply {
             setTarget(binding.searchWindow)
             binding.searchWindow.pivotX = 0.0f
@@ -159,14 +182,20 @@ class SearchFragment : Fragment() {
             }
             start()
         }
-        val btnAnimator = AnimatorInflater.loadAnimator(requireContext(),R.animator.unclicked_searchwindow_btn_animator)
+        val btnAnimator = AnimatorInflater.loadAnimator(
+            requireContext(),
+            R.animator.unclicked_searchwindow_btn_animator
+        )
         btnAnimator.apply {
             setTarget(binding.searchBtn)
             binding.searchBtn.pivotX = 0.0f
             binding.searchBtn.pivotY = 0.0f
             start()
         }
-        val etAnimator = AnimatorInflater.loadAnimator(requireContext(),R.animator.unclicked_searchwindow_et_animator)
+        val etAnimator = AnimatorInflater.loadAnimator(
+            requireContext(),
+            R.animator.unclicked_searchwindow_et_animator
+        )
         etAnimator.apply {
             setTarget(binding.searchEditText)
             binding.searchEditText.pivotX = 0.0f
@@ -176,21 +205,21 @@ class SearchFragment : Fragment() {
         }
     }
 
-    fun clearSearchWindow(){
+    fun clearSearchWindow() {
         binding.searchEditText.setText("")
     }
 
-    private fun openKeyboard(view :View) {
-        imm.showSoftInput(view,InputMethodManager.SHOW_IMPLICIT)
+    private fun openKeyboard(view: View) {
+        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun closeKeyboard(editText: EditText) {
         editText.clearFocus()
-        imm.hideSoftInputFromWindow(editText.windowToken,InputMethodManager.HIDE_NOT_ALWAYS)
+        imm.hideSoftInputFromWindow(editText.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
     override fun onResume() {
-        if (searchViewModel._searchTapStatus.value == SearchTapStatus.Detail){
+        if (searchViewModel._searchTapStatus.value == SearchTapStatus.Detail) {
             searchViewModel._searchTapStatus.value = SearchTapStatus.Result
         }
         super.onResume()
@@ -201,8 +230,6 @@ class SearchFragment : Fragment() {
         const val FRAGMENT_TAG_HISTORY = "History"
         const val FRAGMENT_TAG_SEARCHING = "Searching"
         const val FRAGMENT_TAG_RESULT = "Result"
-        //        const val FRAGMENT_TAG_LOADING = "Loading"
-        //로딩은 Frgment로 구성하는게 아니라 그냥 프로그레스 바로 구성
         const val EXTRA_SEARCH_KEYWORD = "EXTRA_SEARCH_KEYWORD"
         const val EXTRA_SEARCH_RESULT_ITEM_COUNT = "EXTRA_SEARCH_RESULT_ITEM_COUNT"
     }
