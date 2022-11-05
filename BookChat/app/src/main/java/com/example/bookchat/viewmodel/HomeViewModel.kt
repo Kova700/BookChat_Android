@@ -10,10 +10,9 @@ import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.User
 import com.example.bookchat.repository.UserRepository
+import com.example.bookchat.response.ForbiddenException
 import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.response.ResponseBodyEmptyException
-import com.example.bookchat.response.TokenExpiredException
-import com.example.bookchat.response.ForbiddenException
 import com.example.bookchat.utils.Constants
 import kotlinx.coroutines.launch
 
@@ -47,20 +46,9 @@ class HomeViewModel(private val userRepository: UserRepository) : ViewModel(){
             }
     }
 
-    private fun requestTokenRenewal() = viewModelScope.launch {
-        Log.d(Constants.TAG, "LoginViewModel: requestTokenRenewal() - called")
-        runCatching{ userRepository.requestTokenRenewal() }
-            .onSuccess { if (recursiveChecker == false) requestWithdraw(); recursiveChecker = true }
-            .onFailure {
-                failHandler(it)
-                Log.d(Constants.TAG, "LoginViewModel: requestTokenRenewal() - onFailure : $it")
-            }
-    }
-
     //Status Code별 Exception handle (임시)
     private fun failHandler(exception: Throwable) {
         when(exception){
-            is TokenExpiredException -> requestTokenRenewal()
             is ForbiddenException -> {
                 Log.d(Constants.TAG, "LoginViewModel: failHandler() - unauthorizedOrBlockedUserException")
             }

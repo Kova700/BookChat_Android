@@ -105,23 +105,6 @@ class UserRepository{
         }
     }
 
-    suspend fun requestTokenRenewal(){
-        Log.d(TAG, "UserRepository: requestTokenRenewal() - called")
-        if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
-        val oldToken = DataStoreManager.getBookchatToken()
-        val response = App.instance.userApiInterface.requestTokenRenewal(oldToken.refreshToken)
-        Log.d(TAG, "UserRepository: requestTokenRenewal() - response.code() : ${response.code()}")
-        when(response.code()){
-            200 -> {
-                val token = response.body()
-                token?.let { DataStoreManager.saveBookchatToken(token); return }
-                throw ResponseBodyEmptyException(response.errorBody()?.string())
-            }
-            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
-        }
-    }
-
     suspend fun requestNameDuplicateCheck(nickName : String) {
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
