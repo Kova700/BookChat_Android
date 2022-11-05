@@ -88,10 +88,9 @@ class UserRepository{
 
     suspend fun getUserProfile() :User{
         Log.d(TAG, "UserRepository: getUserProfile() - called")
-        if(!isNetworkConnected()) Toast.makeText(App.instance.applicationContext, R.string.message_error_network, Toast.LENGTH_SHORT).show()
-
         val cachedUser = App.instance.getCachedUser()
         cachedUser?.let { return cachedUser }
+        if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val response = App.instance.userApiInterface.getUserProfile()
         Log.d(TAG, "UserRepository: getUserProfile() - response : $response")

@@ -6,6 +6,7 @@ import androidx.paging.PagingState
 import com.example.bookchat.App
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.Meta
+import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.response.ResponseBodyEmptyException
 import com.example.bookchat.utils.Constants.TAG
 
@@ -14,6 +15,8 @@ class SearchResultBookDetailPagingSource(
 ) :PagingSource<Int, Book>(){
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Book> {
+        if(!isNetworkConnected()) return LoadResult.Error(NetworkIsNotConnectedException())
+
         val page = params.key ?: STARTING_PAGE_INDEX
 
         val response = App.instance.bookApiInterface.getBookFromTitle(
@@ -22,7 +25,6 @@ class SearchResultBookDetailPagingSource(
             page = page.toString(),
         )
 
-        //토큰 만료 예외처리 해줘야함
         when(response.code()){
             200 -> {
                 val bookSearchResultDto = response.body()
@@ -65,6 +67,9 @@ class SearchResultBookDetailPagingSource(
         return "responseCode : $responseCode , responseErrorBody : $responseErrorBody"
     }
 
+    private fun isNetworkConnected() :Boolean{
+        return App.instance.isNetworkConnected()
+    }
 
     companion object{
         private const val STARTING_PAGE_INDEX = 1
