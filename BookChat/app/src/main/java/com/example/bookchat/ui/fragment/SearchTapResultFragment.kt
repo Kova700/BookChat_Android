@@ -30,7 +30,6 @@ class SearchTapResultFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        //검색결과 가져와야함
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search_tap_result, container, false)
         searchViewModel = ViewModelProvider(requireParentFragment(), ViewModelFactory()).get(SearchViewModel::class.java)
         binding.viewmodel = searchViewModel

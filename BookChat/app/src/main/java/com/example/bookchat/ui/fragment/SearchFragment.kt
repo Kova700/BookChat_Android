@@ -87,8 +87,6 @@ class SearchFragment : Fragment() {
 
     private fun moveToDetailActivity(){
         Log.d(TAG, "SearchFragment: moveToDetailActivity() - called")
-        //돌아왔을때 Status도 돌아와야함
-        //backStack으로 돌아왔을 때 책 데이터랑 , 검색창 모양, Status 유지되게 수정
         val intent = Intent(requireContext(),SearchTapResultDetailActivity::class.java)
         intent.putExtra(EXTRA_SEARCH_KEYWORD,searchViewModel._searchKeyWord.value)
         intent.putExtra(EXTRA_SEARCH_RESULT_ITEM_COUNT,searchViewModel.bookSearchResultTotalItemCount)
@@ -188,7 +186,9 @@ class SearchFragment : Fragment() {
     }
 
     override fun onResume() {
-        searchViewModel._searchTapStatus.value = SearchTapStatus.Result
+        if (searchViewModel._searchTapStatus.value == SearchTapStatus.Detail){
+            searchViewModel._searchTapStatus.value = SearchTapStatus.Result
+        }
         super.onResume()
     }
 
