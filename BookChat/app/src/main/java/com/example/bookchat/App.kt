@@ -15,9 +15,9 @@ class App : Application() {
         lateinit var instance : App
             private set
     }
-    lateinit var networkManager: NetworkManager
-    lateinit var userApiInterface :UserApiInterface
-    lateinit var bookApiInterface :BookApiInterface
+    val networkManager by lazy { NetworkManager() }
+    val userApiInterface by lazy { ApiClient.getApiClient().create(UserApiInterface::class.java) }
+    val bookApiInterface by lazy { ApiClient.getApiClient().create(BookApiInterface::class.java) }
 
     private var cachedUser : User? = null
 
@@ -30,13 +30,6 @@ class App : Application() {
             context = this,
             appKey = BuildConfig.KAKAO_APP_KEY
         )
-        inject()
-    }
-
-    private fun inject() {
-        networkManager = NetworkManager()
-        userApiInterface = ApiClient.getApiClient().create(UserApiInterface::class.java)
-        bookApiInterface = ApiClient.getApiClient().create(BookApiInterface::class.java)
     }
 
     fun isNetworkConnected() :Boolean{
