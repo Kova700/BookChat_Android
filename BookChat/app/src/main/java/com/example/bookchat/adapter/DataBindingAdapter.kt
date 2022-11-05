@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
+import com.example.bookchat.utils.LoadState
 import com.example.bookchat.utils.NameCheckStatus
 import com.example.bookchat.utils.SearchTapStatus
 
@@ -131,6 +132,28 @@ object DataBindingAdapter {
                     (recyclerView.adapter as SearchResultBookSimpleAdapter).books = books
                 }
             }
+        }
+    }
+
+    /**ProgressBar Viisbilty 설정*/
+    @JvmStatic
+    @BindingAdapter("setProgressBarVisibility")
+    fun setProgressBarVisibility(view: View, loadState: LoadState){
+        when(loadState){
+            LoadState.Default,
+            LoadState.Result -> view.visibility = View.INVISIBLE
+            LoadState.Loading -> view.visibility = View.VISIBLE
+        }
+    }
+
+    /**RecyclerView Viisbilty 설정*/
+    @JvmStatic
+    @BindingAdapter("setRcvVisibility")
+    fun setRcvVisibility(view: View, loadState: LoadState){
+        when(loadState){
+            LoadState.Default,
+            LoadState.Result -> view.visibility = View.VISIBLE
+            LoadState.Loading -> view.visibility = View.INVISIBLE
         }
     }
 }
