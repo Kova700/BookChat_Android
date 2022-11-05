@@ -185,12 +185,17 @@ class SearchFragment : Fragment() {
         imm.hideSoftInputFromWindow(windowToken,InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
+    override fun onResume() {
+        searchViewModel._searchTapStatus.value = SearchTapStatus.Result
+        super.onResume()
+    }
+
     companion object {
         const val FRAGMENT_TAG_DEFAULT = "Default"
         const val FRAGMENT_TAG_HISTORY = "History"
         const val FRAGMENT_TAG_SEARCHING = "Searching"
         const val FRAGMENT_TAG_RESULT = "Result"
-//        const val FRAGMENT_TAG_LOADING = "Loading"
+        //        const val FRAGMENT_TAG_LOADING = "Loading"
         //로딩은 Frgment로 구성하는게 아니라 그냥 프로그레스 바로 구성
         const val EXTRA_SEARCH_KEYWORD = "EXTRA_SEARCH_KEYWORD"
         const val EXTRA_SEARCH_RESULT_ITEM_COUNT = "EXTRA_SEARCH_RESULT_ITEM_COUNT"
