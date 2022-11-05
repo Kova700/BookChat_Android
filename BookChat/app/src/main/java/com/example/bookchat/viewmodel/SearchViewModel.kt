@@ -13,6 +13,7 @@ import com.example.bookchat.data.Book
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.DataStoreManager
 import com.example.bookchat.utils.LoadState
 import com.example.bookchat.utils.SearchTapStatus
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,7 +56,6 @@ class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
             return@launch
         }
         if (keyword == previousKeyword) return@launch
-
         simpleSearchBooks(keyword)
         simpleSearchChatRoom(keyword)
     }
@@ -67,6 +67,7 @@ class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
 
     //책 6개만 호출
     private suspend fun simpleSearchBooks(keyword :String){
+        DataStoreManager.saveSearchHistory(_searchKeyWord.value)
         resultLoadState.value = LoadState.Loading
         runCatching { bookRepository.simpleSearchBooks(keyword) }
             .onSuccess { booksearchResult ->

@@ -3,7 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-
+            <variable
+                name="fragment"
+                type="com.example.bookchat.ui.fragment.SearchTapHistoryFragment" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_marginHorizontal="30dp"
@@ -26,6 +28,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/notosanskr_bold"
             android:text="전체삭제"
+            android:onClick="@{() -> fragment.clearHistory()}"
             android:textColor="#222222"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@+id/textView20"
@@ -33,14 +36,14 @@
             app:layout_constraintTop_toTopOf="@+id/textView20" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/history_listView"
+            android:id="@+id/history_Rcv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView20"
-            tools:listitem="@layout/item_search_tap_default" />
+            tools:listitem="@layout/item_search_history" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
