@@ -12,6 +12,7 @@ import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.databinding.DataBindingUtil
@@ -77,7 +78,7 @@ class SearchFragment : Fragment() {
             SearchTapStatus.History -> { replaceFragment(historyTapFragment, FRAGMENT_TAG_HISTORY) }
             SearchTapStatus.Searching -> { replaceFragment(searchingTapFragment, FRAGMENT_TAG_SEARCHING) }
             SearchTapStatus.Result -> {
-                closeKeyboard(binding.searchEditText.windowToken)
+                closeKeyboard(binding.searchEditText)
                 replaceFragment(resultTapFragment, FRAGMENT_TAG_RESULT)
             }
             SearchTapStatus.Detail -> { moveToDetailActivity() }
@@ -181,8 +182,9 @@ class SearchFragment : Fragment() {
         imm.showSoftInput(view,InputMethodManager.SHOW_IMPLICIT)
     }
 
-    private fun closeKeyboard(windowToken : IBinder) {
-        imm.hideSoftInputFromWindow(windowToken,InputMethodManager.HIDE_NOT_ALWAYS)
+    private fun closeKeyboard(editText: EditText) {
+        editText.clearFocus()
+        imm.hideSoftInputFromWindow(editText.windowToken,InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
     override fun onResume() {
