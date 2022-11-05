@@ -176,6 +176,10 @@ class SearchFragment : Fragment() {
         }
     }
 
+    fun clearSearchWindow(){
+        binding.searchEditText.setText("")
+    }
+
     private fun openKeyboard(view :View) {
         imm.showSoftInput(view,InputMethodManager.SHOW_IMPLICIT)
     }
