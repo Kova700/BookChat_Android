@@ -2,7 +2,10 @@ package com.example.bookchat.utils
 
 import android.content.Context
 import android.util.Log
-import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.bookchat.App
 import com.example.bookchat.data.IdToken
@@ -11,12 +14,10 @@ import com.example.bookchat.response.IdTokenDoseNotExistException
 import com.example.bookchat.response.TokenDoseNotExistException
 import com.example.bookchat.utils.Constants.TAG
 import com.google.gson.Gson
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import java.io.IOException
-
-//보관해야하는 값
-//1. 북챗 토큰 (암호화 추가해야함)
-//2. 검색 히스토리
 
 object DataStoreManager {
 
@@ -58,6 +59,35 @@ object DataStoreManager {
     suspend fun saveIdToken(idToken: IdToken) {
         val idTokenString = Gson().toJson(idToken)
         setDataStore(idTokenKey, idTokenString)
+    }
+
+    suspend fun getSearchHistory() :MutableList<String>? {
+        Log.d(TAG, "DataStoreManager: getSearchHistory() - called")
+        val historyString = readDataStore().firstOrNull()?.get(searchHistoryKey)
+        if (historyString.isNullOrBlank()) return null
+        val historyList = Gson().fromJson(historyString, Array<String>::class.java).toMutableList()
+        return historyList
+    }
+
+    suspend fun saveSearchHistory(searchKeyWord : String){
+        Log.d(TAG, "DataStoreManager: saveSearchHistory() - called")
+        val oldHistoryList = getSearchHistory()
+        val newHistoryList =  mutableListOf(searchKeyWord)
+        newHistoryList.addAll(oldHistoryList ?: listOf())
+        Log.d(TAG, "DataStoreManager: saveSearchHistory() - newHistoryList : $newHistoryList")
+        val historyString : String = Gson().toJson(newHistoryList)
+        setDataStore(searchHistoryKey,historyString)
+    }
+
+    suspend fun clearSearchHistory(){
+        Log.d(TAG, "DataStoreManager: clearSearchHistory() - called")
+        removeDataStore(searchHistoryKey)
+    }
+
+    suspend fun overWriteHistory(historyList : List<String>){
+        Log.d(TAG, "DataStoreManager: overWriteHistory() - historyList : $historyList")
+        val historyString : String = Gson().toJson(historyList)
+        setDataStore(searchHistoryKey,historyString)
     }
 
     suspend fun deleteBookchatToken() {
