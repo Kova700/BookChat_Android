@@ -63,5 +63,31 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView23" />
 
+        <ImageView
+            android:id="@+id/empty_result_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/empty_result"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/search_result_detail_Rcv" />
+
+        <TextView
+            android:id="@+id/empty_result_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/notosanskr_regular"
+            android:text="@string/message_search_book_result_empty"
+            android:textColor="#222222"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/empty_result_img"
+            app:layout_constraintEnd_toEndOf="@+id/empty_result_img"
+            app:layout_constraintHorizontal_bias="0.44"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/empty_result_img"
+            app:layout_constraintVertical_bias="0.57" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

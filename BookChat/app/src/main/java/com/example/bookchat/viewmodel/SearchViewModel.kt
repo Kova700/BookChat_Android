@@ -29,7 +29,8 @@ class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
     var bookSearchResultTotalItemCount = 0.toString()
     var previousKeyword = ""
 
-    var resultLoadState = MutableStateFlow<LoadState>(LoadState.Default)
+    val resultLoadState = MutableStateFlow<LoadState>(LoadState.Default)
+    val isSearchResultEmpty = MutableStateFlow<Boolean>(false)
 
     val editTextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -71,6 +72,7 @@ class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
             .onSuccess { booksearchResult ->
                 resultLoadState.value = LoadState.Result
                 simpleBooksearchResult =  booksearchResult.bookResponses
+                isSearchResultEmpty.value = simpleBooksearchResult.isEmpty()
                 bookSearchResultTotalItemCount = booksearchResult.meta.totalCount.toString()
                 previousKeyword = keyword
                 _searchTapStatus.value = SearchTapStatus.Result
