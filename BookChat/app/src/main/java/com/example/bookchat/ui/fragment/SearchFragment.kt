@@ -2,17 +2,16 @@ package com.example.bookchat.ui.fragment
 
 import android.animation.AnimatorInflater
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.databinding.DataBindingUtil
@@ -21,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentSearchBinding
+import com.example.bookchat.ui.activity.SearchTapResultDetailActivity
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.SearchTapStatus
 import com.example.bookchat.viewmodel.SearchViewModel
@@ -67,11 +67,11 @@ class SearchFragment : Fragment() {
     private fun collectSearchTapStatus() = viewLifecycleOwner.lifecycleScope.launch {
         searchViewModel._searchTapStatus.collect{ searchTapStatus->
             Log.d(TAG, "SearchFragment: _searchTapStatus.collect - searchTapStatus : $searchTapStatus")
-            handleFrgment(searchTapStatus)
+            handleSearchTapStatus(searchTapStatus)
         }
     }
 
-    private fun handleFrgment(searchTapStatus :SearchTapStatus) =
+    private fun handleSearchTapStatus(searchTapStatus :SearchTapStatus) =
         when(searchTapStatus){
             SearchTapStatus.Default -> { replaceFragment(defaultTapFragment, FRAGMENT_TAG_DEFAULT) }
             SearchTapStatus.History -> { replaceFragment(historyTapFragment, FRAGMENT_TAG_HISTORY) }
@@ -80,19 +80,29 @@ class SearchFragment : Fragment() {
                 closeKeyboard(binding.searchEditText.windowToken)
                 replaceFragment(resultTapFragment, FRAGMENT_TAG_RESULT)
             }
+            SearchTapStatus.Detail -> { moveToDetailActivity() }
             SearchTapStatus.Loading -> { }
         }
 
-    //스택관리 어떻게 할래 (교체버튼 누를떄 마다 지금 스택 쌓이는중)
+    private fun moveToDetailActivity(){
+        Log.d(TAG, "SearchFragment: moveToDetailActivity() - called")
+        //돌아왔을때 Status도 돌아와야함
+        //backStack으로 돌아왔을 때 책 데이터랑 , 검색창 모양, Status 유지되게 수정
+        val intent = Intent(requireContext(),SearchTapResultDetailActivity::class.java)
+        intent.putExtra(EXTRA_SEARCH_KEYWORD,searchViewModel._searchKeyWord.value)
+        intent.putExtra(EXTRA_SEARCH_RESULT_ITEM_COUNT,searchViewModel.bookSearchResultTotalItemCount)
+        startActivity(intent)
+    }
+
     private fun replaceFragment(newFragment :Fragment, tag :String){
-        val fragmentTransaction = childFragmentManager.beginTransaction()
-        with(fragmentTransaction){
+        val childFragmentTransaction = childFragmentManager.beginTransaction()
+        with(childFragmentTransaction){
             setReorderingAllowed(true)
             replace(R.id.searchPage_layout,newFragment,tag)
-            addToBackStack(tag)
             commit()
         }
     }
+
 
     /* 애니메이션 처리 전부 MotionLayout으로 마이그레이션 예정 */
     fun clickSearchWindow(){
@@ -182,6 +192,8 @@ class SearchFragment : Fragment() {
         const val FRAGMENT_TAG_RESULT = "Result"
 //        const val FRAGMENT_TAG_LOADING = "Loading"
         //로딩은 Frgment로 구성하는게 아니라 그냥 프로그레스 바로 구성
+        const val EXTRA_SEARCH_KEYWORD = "EXTRA_SEARCH_KEYWORD"
+        const val EXTRA_SEARCH_RESULT_ITEM_COUNT = "EXTRA_SEARCH_RESULT_ITEM_COUNT"
     }
 
 }

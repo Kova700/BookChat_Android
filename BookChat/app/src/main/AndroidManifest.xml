@@ -15,6 +15,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BookChat">
+        <activity android:name=".ui.activity.SearchTapResultDetailActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
         <activity
             android:name=".ui.activity.ImageCropActivity"
             android:screenOrientation="portrait"
