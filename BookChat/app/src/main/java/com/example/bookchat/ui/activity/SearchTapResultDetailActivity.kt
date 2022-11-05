@@ -9,15 +9,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.bookchat.R
 import com.example.bookchat.adapter.SearchResultBookDetailAdapter
-import com.example.bookchat.adapter.SearchResultBookSimpleAdapter
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ActivitySearchTapResultDetailBinding
 import com.example.bookchat.ui.fragment.SearchFragment
 import com.example.bookchat.utils.Constants
 import com.example.bookchat.viewmodel.SearchDetailViewModel
-import com.example.bookchat.viewmodel.SearchViewModel
 import com.example.bookchat.viewmodel.ViewModelFactory
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class SearchTapResultDetailActivity : AppCompatActivity() {

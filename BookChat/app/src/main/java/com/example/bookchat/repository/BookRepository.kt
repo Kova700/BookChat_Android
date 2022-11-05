@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 class BookRepository {
 
     suspend fun simpleSearchBooks(keyword :String) : BookSearchResult {
+        if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val response = App.instance.bookApiInterface.getBookFromTitle(
             query = keyword,
@@ -35,8 +36,7 @@ class BookRepository {
     }
 
     fun detailSearchBooks(keyword :String) : Flow<PagingData<Book>> {
-        Log.d(TAG, "BookRepository: bookSearch() - called")
-        if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
+        Log.d(TAG, "BookRepository: detailSearchBooks() - called")
 
         return Pager(
             config = PagingConfig( pageSize = 5, enablePlaceholders = false ),

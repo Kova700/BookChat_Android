@@ -8,14 +8,17 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
+import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.repository.BookRepository
+import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.LoadState
 import com.example.bookchat.utils.SearchTapStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
 
@@ -72,7 +75,7 @@ class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
                 previousKeyword = keyword
                 _searchTapStatus.value = SearchTapStatus.Result
             }
-            .onFailure {  }
+            .onFailure { failHandler(it) }
     }
 
     //채팅방 3개만 호출
@@ -87,6 +90,13 @@ class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
     fun clickBookDetailBtn() = viewModelScope.launch{
         Log.d(TAG, "SearchViewModel: clickDetailBtn() - called")
         _searchTapStatus.value = SearchTapStatus.Detail
+    }
+
+    private fun failHandler(exception: Throwable){
+        when(exception){
+            is NetworkIsNotConnectedException -> //임시 토스트 처리
+                Toast.makeText(App.instance.applicationContext, R.string.message_error_network, Toast.LENGTH_SHORT).show()
+        }
     }
 
 }
