@@ -6,9 +6,11 @@ import android.view.View
 import android.widget.*
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
+import com.example.bookchat.data.Book
 import com.example.bookchat.utils.NameCheckStatus
 import com.example.bookchat.utils.SearchTapStatus
 
@@ -105,6 +107,7 @@ object DataBindingAdapter {
         }
     }
 
+    /**검색창 : 검색어 삭제버튼 Visible 설정*/
     @JvmStatic
     @BindingAdapter("setSearchDeleteBtnVisible")
     fun setSearchDeleteBtnVisible(view: View, searchTapStatus : SearchTapStatus){
@@ -113,5 +116,21 @@ object DataBindingAdapter {
             return
         }
         view.visibility = View.VISIBLE
+    }
+
+    /**리사이클러뷰 어댑터 연결, 아이템 전달*/
+    @JvmStatic
+    @BindingAdapter("setItem")
+    fun setItem(recyclerView: RecyclerView, data :List<Any>){
+        if(data.isEmpty()) return
+
+        when(recyclerView.id){
+            R.id.search_result_book_simple_Rcv -> {
+                if(data.first() is Book) {
+                    val books = data.map { it as Book }
+                    (recyclerView.adapter as SearchResultBookSimpleAdapter).books = books
+                }
+            }
+        }
     }
 }
