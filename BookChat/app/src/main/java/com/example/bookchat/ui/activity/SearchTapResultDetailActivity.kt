@@ -74,9 +74,6 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
     }
 
     fun clickBackBtn(){
-        //뒤로기가 전에
-        //_searchTapStatus.value Result로 변경해줘야함 혹은 값 전달해줘야함함
-
         finish()
     }
 
