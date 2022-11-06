@@ -5,8 +5,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.bookchat.App
-import com.example.bookchat.data.Book
-import com.example.bookchat.data.BookSearchResult
+import com.example.bookchat.data.*
 import com.example.bookchat.paging.SearchResultBookDetailPagingSource
 import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.response.ResponseBodyEmptyException
@@ -44,6 +43,42 @@ class BookRepository {
         ).flow
     }
 
+    suspend fun registerWishBook(requestRegisterWishBook :RequestRegisterWishBook){
+        if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
+
+        val response = App.instance.bookApiInterface.registerWishBook(requestRegisterWishBook)
+        when(response.code()){
+            200 -> {
+
+            }
+            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
+        }
+    }
+
+    suspend fun registerReadingBook(requestRegisterReadingBook: RequestRegisterReadingBook){
+        if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
+
+        val response = App.instance.bookApiInterface.registerReadingBook(requestRegisterReadingBook)
+        when(response.code()){
+            200 -> {
+
+            }
+            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
+        }
+    }
+
+    suspend fun registerCompleteBook(requestRegisterCompleteBook: RequestRegisterCompleteBook){
+        if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
+
+        val response = App.instance.bookApiInterface.registerCompleteBook(requestRegisterCompleteBook)
+        when(response.code()){
+            200 -> {
+
+            }
+            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
+        }
+    }
+
     private fun isNetworkConnected() :Boolean{
         return App.instance.isNetworkConnected()
     }
@@ -53,6 +88,6 @@ class BookRepository {
     }
 
     companion object{
-        const val SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE = 6.toString()
+        private const val SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE = 6.toString()
     }
 }
