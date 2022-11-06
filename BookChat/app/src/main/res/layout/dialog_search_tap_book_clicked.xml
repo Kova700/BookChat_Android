@@ -4,8 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-            name="book"
-            type="com.example.bookchat.data.Book" />
+            name="viewmodel"
+            type="com.example.bookchat.viewmodel.SearchTapBookDialogViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:background="@drawable/view_round_white"
@@ -35,6 +35,7 @@
             android:textOff=""
             android:textOn=""
             android:scaleType="fitXY"
+            android:onClick="@{() -> viewmodel.requestRegisterWishBook()}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -63,7 +64,7 @@
 
                 <ImageView
                     android:id="@+id/bookImg"
-                    loadUrl="@{book.bookCoverImageUrl}"
+                    loadUrl="@{viewmodel.book.bookCoverImageUrl}"
                     android:layout_width="90dp"
                     android:layout_height="140dp"
                     android:scaleType="fitXY"
@@ -84,7 +85,7 @@
             android:gravity="center"
             android:marqueeRepeatLimit="marquee_forever"
             android:singleLine="true"
-            android:text="@{book.title}"
+            android:text="@{viewmodel.book.title}"
             android:textColor="#222222"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="@+id/constraintLayout5"
@@ -101,7 +102,7 @@
             android:singleLine="true"
             android:ellipsize="marquee"
             android:marqueeRepeatLimit="marquee_forever"
-            android:text="@{book.author[0]}"
+            android:text="@{viewmodel.book.authors[0]}"
             android:textColor="#373737"
             setSelected="@{Boolean.TRUE}"
             android:textSize="12sp"
