@@ -7,6 +7,7 @@
             type="com.example.bookchat.data.Book" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_marginTop="-8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
@@ -14,11 +15,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="10dp"
             app:cardCornerRadius="8dp"
-            app:cardElevation="4.5dp"
+            app:cardElevation="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
