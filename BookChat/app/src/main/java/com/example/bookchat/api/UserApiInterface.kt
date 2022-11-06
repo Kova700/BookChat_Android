@@ -16,10 +16,6 @@ interface UserApiInterface {
         @Query("nickname") nickname :String
     ) :Response<Unit>
 
-    @POST("/v1/api/auth/token")
-    suspend fun requestTokenRenewal(
-        @Body refreshToken :String
-    ): Response<Token>
 
     //회원가입
     @Multipart
