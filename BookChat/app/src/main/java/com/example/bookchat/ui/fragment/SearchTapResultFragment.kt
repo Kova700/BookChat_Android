@@ -1,6 +1,7 @@
 package com.example.bookchat.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,8 @@ import com.example.bookchat.adapter.MainChatRoomAdapter
 import com.example.bookchat.adapter.SearchResultBookSimpleAdapter
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.FragmentSearchTapResultBinding
+import com.example.bookchat.ui.dialog.SearchTapBookDialog
+import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.SearchViewModel
 import com.example.bookchat.viewmodel.ViewModelFactory
 
@@ -73,7 +76,8 @@ class SearchTapResultFragment : Fragment() {
     private fun initSearchResultBookAdapter(){
         val bookItemClickListener = object: SearchResultBookSimpleAdapter.OnItemClickListener{
             override fun onItemClick(book : Book) {
-                // 책 다이얼로그 출력
+                val dialog = SearchTapBookDialog(book)
+                dialog.show(childFragmentManager,"SearchTapBookDialog")
             }
         }
         searchResultBookSimpleAdapter = SearchResultBookSimpleAdapter()

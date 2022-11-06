@@ -14,6 +14,7 @@ import com.example.bookchat.R
 import com.example.bookchat.adapter.SearchResultBookDetailAdapter
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ActivitySearchTapResultDetailBinding
+import com.example.bookchat.ui.dialog.SearchTapBookDialog
 import com.example.bookchat.ui.fragment.SearchFragment
 import com.example.bookchat.utils.Constants
 import com.example.bookchat.viewmodel.SearchDetailViewModel
@@ -51,7 +52,8 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
     private fun initAdapter(){
         val bookItemClickListener = object: SearchResultBookDetailAdapter.OnItemClickListener{
             override fun onItemClick(book : Book) {
-                // 책 다이얼로그 출력
+                val dialog = SearchTapBookDialog(book)
+                dialog.show(this@SearchTapResultDetailActivity.supportFragmentManager,"SearchTapBookDialog")
             }
         }
         searchResultBookDetailAdapter = SearchResultBookDetailAdapter()
