@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minWidth="300dp"
-        android:minHeight="430dp">
+        android:minHeight="350dp">
 
         <ImageButton
             android:id="@+id/imageButton6"
@@ -42,10 +42,10 @@
             android:id="@+id/constraintLayout5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="-5dp"
-            app:layout_constraintBottom_toTopOf="@+id/textView26"
+            android:layout_marginTop="20dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageButton6">
 
             <androidx.cardview.widget.CardView
                 android:layout_width="wrap_content"
@@ -53,9 +53,9 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="10dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginBottom="7dp"
                 app:cardCornerRadius="8dp"
-                app:cardElevation="4.5dp"
+                app:cardElevation="5.5dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -64,8 +64,8 @@
                 <ImageView
                     android:id="@+id/bookImg"
                     loadUrl="@{book.bookCoverImageUrl}"
-                    android:layout_width="108dp"
-                    android:layout_height="168dp"
+                    android:layout_width="90dp"
+                    android:layout_height="140dp"
                     android:scaleType="fitXY"
                     android:src="@drawable/ex_book1" />
 
@@ -75,46 +75,60 @@
 
         <TextView
             android:id="@+id/textView26"
-            android:layout_width="wrap_content"
+            android:layout_width="240dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="-10dp"
+            android:gravity="center"
+            android:layout_marginTop="-7dp"
             android:fontFamily="@font/notosanskr_bold"
             android:text="@{book.title}"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
             android:textColor="#222222"
+            setSelected="@{Boolean.TRUE}"
             android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@+id/textView27"
             app:layout_constraintEnd_toEndOf="@+id/constraintLayout5"
-            app:layout_constraintStart_toStartOf="@+id/constraintLayout5" />
+            app:layout_constraintStart_toStartOf="@+id/constraintLayout5"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout5" />
 
         <TextView
             android:id="@+id/textView27"
-            android:layout_width="wrap_content"
+            android:layout_width="240dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
+            android:gravity="center"
+            android:layout_marginTop="-12dp"
             android:fontFamily="@font/notosanskr_regular"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
             android:text="@{book.author[0]}"
             android:textColor="#373737"
+            setSelected="@{Boolean.TRUE}"
             android:textSize="12sp"
-            app:layout_constraintBottom_toTopOf="@+id/button"
             app:layout_constraintEnd_toEndOf="@+id/constraintLayout5"
-            app:layout_constraintStart_toStartOf="@+id/constraintLayout5" />
+            app:layout_constraintStart_toStartOf="@+id/constraintLayout5"
+            app:layout_constraintTop_toBottomOf="@+id/textView26" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:elegantTextHeight="true"
+            android:minHeight="55dp"
             android:layout_marginStart="12dp"
+            android:layout_marginTop="15dp"
             android:layout_marginEnd="3dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="15dp"
             android:backgroundTint="#FFFFFF"
-            android:stateListAnimator="@null"
             android:fontFamily="@font/notosanskr_regular"
+            android:stateListAnimator="@null"
             android:text="독서완료"
             android:textColor="#5648FF"
-            app:cornerRadius="13dp"
+            app:cornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/button2"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView27"
             app:strokeColor="#5648FF"
             app:strokeWidth="1dp" />
 
@@ -122,18 +136,22 @@
             android:id="@+id/button2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:elegantTextHeight="true"
+            android:minHeight="55dp"
             android:layout_marginStart="3dp"
+            android:layout_marginTop="15dp"
             android:layout_marginEnd="12dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="15dp"
             android:backgroundTint="#5648FF"
-            android:stateListAnimator="@null"
             android:fontFamily="@font/notosanskr_regular"
+            android:stateListAnimator="@null"
             android:text="독서중"
             android:textColor="#FFFFFF"
-            app:cornerRadius="13dp"
+            app:cornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/button" />
+            app:layout_constraintStart_toEndOf="@+id/button"
+            app:layout_constraintTop_toBottomOf="@+id/textView27" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

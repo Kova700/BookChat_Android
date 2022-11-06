@@ -2,6 +2,7 @@ package com.example.bookchat.adapter
 
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.core.content.res.ResourcesCompat
@@ -11,11 +12,19 @@ import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
+import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.LoadState
 import com.example.bookchat.utils.NameCheckStatus
 import com.example.bookchat.utils.SearchTapStatus
 
 object DataBindingAdapter {
+
+    /**텍스트뷰 select 설정*/
+    @JvmStatic
+    @BindingAdapter("setSelected")
+    fun setSelected(view: View, boolean: Boolean){
+        view.isSelected = boolean
+    }
 
     /**이미지뷰 이미지 설정(URL)*/
     @JvmStatic
