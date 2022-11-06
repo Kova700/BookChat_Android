@@ -21,7 +21,7 @@ class SearchResultBookSimpleAdapter : RecyclerView.Adapter<SearchResultBookSimpl
             Log.d(Constants.TAG, "BookResultViewHolder: bind() - ${book.title} 바인드됨")
             binding.book = book
             binding.root.setOnClickListener {
-//                itemClickListener.onItemClick(book)
+                itemClickListener.onItemClick(book)
             }
         }
     }
