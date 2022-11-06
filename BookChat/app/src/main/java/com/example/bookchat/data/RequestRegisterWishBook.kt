@@ -3,17 +3,17 @@ package com.example.bookchat.data
 import com.example.bookchat.utils.ReadingStatus
 import com.google.gson.annotations.SerializedName
 
-data class RequestRegisterWishBook(
+class RequestRegisterWishBook(book: Book){
     @SerializedName("isbn")
-    val isbn :String,
+    private val isbn :String = book.isbn
     @SerializedName("title")
-    val title :String,
+    private val title :String = book.title
     @SerializedName("authors")
-    val authors :List<String>,
+    private val authors :List<String> = book.authors
     @SerializedName("publisher")
-    val publisher :String,
+    private val publisher :String = book.publisher
     @SerializedName("bookCoverImageUrl")
-    val bookCoverImageUrl :String,
+    private val bookCoverImageUrl :String = book.bookCoverImageUrl
     @SerializedName("readingStatus")
-    val readingStatus :ReadingStatus = ReadingStatus.WISH
-)
+    private val readingStatus :ReadingStatus = ReadingStatus.WISH
+}
