@@ -27,11 +27,11 @@ class SearchResultBookDetailPagingSource(
 
         when(response.code()){
             200 -> {
-                val bookSearchResultDto = response.body()
-                bookSearchResultDto?.let {
-                    val pagedBookList = bookSearchResultDto.bookResponses
+                val bookSearchResult = response.body()
+                bookSearchResult?.let {
+                    val pagedBookList = bookSearchResult.bookResponses
                     Log.d(TAG, "BookSearchResultPagingSource: load() - pagedBookList : $pagedBookList")
-                    val meta = bookSearchResultDto.meta
+                    val meta = bookSearchResult.meta
                     return getLoadResult(pagedBookList,page,meta)
                 }
                 return LoadResult.Error(ResponseBodyEmptyException(response.errorBody()?.string()))

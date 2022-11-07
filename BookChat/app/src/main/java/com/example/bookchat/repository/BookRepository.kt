@@ -25,8 +25,8 @@ class BookRepository {
 
         when(response.code()){
             200 -> {
-                val bookSearchResultDto = response.body()
-                bookSearchResultDto?.let { return bookSearchResultDto }
+                val bookSearchResult = response.body()
+                bookSearchResult?.let { return bookSearchResult }
                 throw ResponseBodyEmptyException(response.errorBody()?.string())
             }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
