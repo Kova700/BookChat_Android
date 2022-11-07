@@ -1,10 +1,9 @@
 package com.example.bookchat.api
 
-import com.example.bookchat.data.BookSearchResult
-import com.example.bookchat.data.RequestRegisterCompleteBook
-import com.example.bookchat.data.RequestRegisterReadingBook
-import com.example.bookchat.data.RequestRegisterWishBook
+import com.example.bookchat.data.*
 import com.example.bookchat.utils.BookSearchSortOption
+import com.example.bookchat.utils.ReadingStatus
+import com.google.gson.annotations.SerializedName
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -20,7 +19,7 @@ interface BookApiInterface {
         @Query("query") query:String,
         @Query("size") size:String,
         @Query("page") page:String,
-        @Query("sort") sort: BookSearchSortOption = BookSearchSortOption.LATEST,
+        @Query("sort") sort: BookSearchSortOption = BookSearchSortOption.ACCURACY,
     ): Response<BookSearchResult>
 
     @POST("/v1/api/bookshelf/books")
@@ -38,4 +37,11 @@ interface BookApiInterface {
         @Body requestRegisterCompleteBook: RequestRegisterCompleteBook
     ):Response<Unit>
 
+    @GET("/v1/api/bookshelf/books")
+    suspend fun getWishBooks(
+        @Query("size") size:String = "10",
+        @Query("page") page:String = "1",
+        @Query("sort") sort: String = "id,DESC",
+        @Query("readingStatus") readingStatus : ReadingStatus = ReadingStatus.WISH
+    ):Response<BookShelfResult>
 }

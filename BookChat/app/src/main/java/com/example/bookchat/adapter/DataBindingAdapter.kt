@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
+import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.LoadState
 import com.example.bookchat.utils.NameCheckStatus
@@ -128,17 +129,26 @@ object DataBindingAdapter {
         view.visibility = View.VISIBLE
     }
 
-    /**리사이클러뷰 어댑터 연결, 아이템 전달*/
+    /**리사이클러뷰 아이템 연결*/
     @JvmStatic
     @BindingAdapter("setItem")
     fun setItem(recyclerView: RecyclerView, data :List<Any>){
         if(data.isEmpty()) return
 
         when(recyclerView.id){
+
             R.id.search_result_book_simple_Rcv -> {
                 if(data.first() is Book) {
                     val books = data.map { it as Book }
                     (recyclerView.adapter as SearchResultBookSimpleAdapter).books = books
+                }
+            }
+
+            /*서재 전부 페이징으로 수정 예정*/
+            R.id.wishBookRcv -> {
+                if(data.first() is BookShelfItem) {
+                    val bookShelfItemList = data.map { it as BookShelfItem }
+                    (recyclerView.adapter as WishBookTabAdapter).books = bookShelfItemList
                 }
             }
         }

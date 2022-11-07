@@ -79,6 +79,23 @@ class BookRepository {
         }
     }
 
+    suspend fun requestGetWishList() :List<BookShelfItem>{
+        if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
+        val response = App.instance.bookApiInterface.getWishBooks()
+        when(response.code()){
+            200 -> {
+                val bookShelfResult = response.body()
+                bookShelfResult?.let {
+                    val bookShelfItemList = bookShelfResult.contents
+                    Log.d(TAG, "BookRepository: requestGetWishList() - bookShelfItemList :$bookShelfItemList")
+                    return bookShelfItemList
+                }
+                throw ResponseBodyEmptyException(response.errorBody()?.string())
+            }
+            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
+        }
+    }
+
     private fun isNetworkConnected() :Boolean{
         return App.instance.isNetworkConnected()
     }
