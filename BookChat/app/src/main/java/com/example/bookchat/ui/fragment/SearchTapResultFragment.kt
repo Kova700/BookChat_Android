@@ -77,6 +77,7 @@ class SearchTapResultFragment : Fragment() {
         val bookItemClickListener = object: SearchResultBookSimpleAdapter.OnItemClickListener{
             override fun onItemClick(book : Book) {
                 val dialog = SearchTapBookDialog(book)
+                Log.d(TAG, "SearchTapResultFragment: onItemClick() - book : $book")
                 dialog.show(childFragmentManager,"SearchTapBookDialog")
             }
         }

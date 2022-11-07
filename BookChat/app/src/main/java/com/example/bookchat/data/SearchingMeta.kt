@@ -2,7 +2,7 @@ package com.example.bookchat.data
 
 import com.google.gson.annotations.SerializedName
 
-data class Meta (
+data class SearchingMeta (
     @SerializedName("is_end")
     val isEnd :Boolean,
     @SerializedName("pageable_count")

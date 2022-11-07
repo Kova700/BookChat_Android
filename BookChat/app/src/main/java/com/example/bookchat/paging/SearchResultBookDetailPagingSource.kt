@@ -5,7 +5,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.bookchat.App
 import com.example.bookchat.data.Book
-import com.example.bookchat.data.Meta
+import com.example.bookchat.data.SearchingMeta
 import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.response.ResponseBodyEmptyException
 import com.example.bookchat.utils.Constants.TAG
@@ -31,7 +31,7 @@ class SearchResultBookDetailPagingSource(
                 bookSearchResult?.let {
                     val pagedBookList = bookSearchResult.bookResponses
                     Log.d(TAG, "BookSearchResultPagingSource: load() - pagedBookList : $pagedBookList")
-                    val meta = bookSearchResult.meta
+                    val meta = bookSearchResult.searchingMeta
                     return getLoadResult(pagedBookList,page,meta)
                 }
                 return LoadResult.Error(ResponseBodyEmptyException(response.errorBody()?.string()))
@@ -50,13 +50,13 @@ class SearchResultBookDetailPagingSource(
 
     private fun getLoadResult(
         data :List<Book>,
-        nowPage :Int, meta :Meta
+        nowPage :Int, searchingMeta :SearchingMeta
     ): LoadResult<Int, Book>{
         return try {
             LoadResult.Page(
                 data = data,
                 prevKey = if (nowPage == 1) null else nowPage - 1,
-                nextKey = if(meta.isEnd) null else nowPage + 1// 가져온만큼 다시 가져옴
+                nextKey = if(searchingMeta.isEnd) null else nowPage + 1// 가져온만큼 다시 가져옴
             )
         }catch (exception :Exception){
             LoadResult.Error(exception)

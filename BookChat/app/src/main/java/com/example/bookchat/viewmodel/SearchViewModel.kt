@@ -17,9 +17,7 @@ import com.example.bookchat.utils.DataStoreManager
 import com.example.bookchat.utils.LoadState
 import com.example.bookchat.utils.SearchTapStatus
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
 
@@ -74,7 +72,7 @@ class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
                 resultLoadState.value = LoadState.Result
                 simpleBooksearchResult =  booksearchResult.bookResponses
                 isSearchResultEmpty.value = simpleBooksearchResult.isEmpty()
-                bookSearchResultTotalItemCount = booksearchResult.meta.totalCount.toString()
+                bookSearchResultTotalItemCount = booksearchResult.searchingMeta.totalCount.toString()
                 previousKeyword = keyword
                 _searchTapStatus.value = SearchTapStatus.Result
             }

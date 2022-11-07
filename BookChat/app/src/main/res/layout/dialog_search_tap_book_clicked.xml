@@ -79,7 +79,7 @@
             setSelected="@{Boolean.TRUE}"
             android:layout_width="240dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="-9dp"
+            android:elegantTextHeight="true"
             android:ellipsize="marquee"
             android:fontFamily="@font/notosanskr_bold"
             android:gravity="center"
@@ -94,21 +94,39 @@
 
         <TextView
             android:id="@+id/textView27"
+            setSelected="@{Boolean.TRUE}"
             android:layout_width="240dp"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="-12dp"
-            android:fontFamily="@font/notosanskr_regular"
-            android:singleLine="true"
+            android:elegantTextHeight="true"
             android:ellipsize="marquee"
+            android:fontFamily="@font/notosanskr_regular"
+            android:gravity="center"
             android:marqueeRepeatLimit="marquee_forever"
+            android:singleLine="true"
             android:text="@{viewmodel.book.authors[0]}"
             android:textColor="#373737"
-            setSelected="@{Boolean.TRUE}"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="@+id/constraintLayout5"
             app:layout_constraintStart_toStartOf="@+id/constraintLayout5"
             app:layout_constraintTop_toBottomOf="@+id/textView26" />
+
+        <TextView
+            android:id="@+id/textView28"
+            setSelected="@{Boolean.TRUE}"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:elegantTextHeight="true"
+            android:ellipsize="marquee"
+            android:fontFamily="@font/notosanskr_regular"
+            android:gravity="center"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:singleLine="true"
+            android:text="@{viewmodel.book.datetime}"
+            android:textColor="#373737"
+            android:textSize="8sp"
+            app:layout_constraintEnd_toEndOf="@+id/constraintLayout5"
+            app:layout_constraintStart_toStartOf="@+id/constraintLayout5"
+            app:layout_constraintTop_toBottomOf="@+id/textView27" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button"
