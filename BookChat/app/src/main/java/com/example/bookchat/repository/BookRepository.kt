@@ -38,7 +38,7 @@ class BookRepository {
         Log.d(TAG, "BookRepository: detailSearchBooks() - called")
 
         return Pager(
-            config = PagingConfig( pageSize = 5, enablePlaceholders = false ),
+            config = PagingConfig( pageSize = 6, enablePlaceholders = false ),
             pagingSourceFactory = { SearchResultBookDetailPagingSource(keyword) }
         ).flow
     }
