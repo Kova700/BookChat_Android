@@ -140,7 +140,8 @@ object DataBindingAdapter {
             R.id.search_result_book_simple_Rcv -> {
                 if(data.first() is Book) {
                     val books = data.map { it as Book }
-                    (recyclerView.adapter as SearchResultBookSimpleAdapter).books = books
+                    val searchResultBookSimpleAdapter = recyclerView.adapter as SearchResultBookSimpleAdapter
+                    searchResultBookSimpleAdapter.books = books
                 }
             }
 
@@ -148,7 +149,9 @@ object DataBindingAdapter {
             R.id.wishBookRcv -> {
                 if(data.first() is BookShelfItem) {
                     val bookShelfItemList = data.map { it as BookShelfItem }
-                    (recyclerView.adapter as WishBookTabAdapter).books = bookShelfItemList
+                    val wishBookTabAdapter = recyclerView.adapter as WishBookTabAdapter
+                    wishBookTabAdapter.books = bookShelfItemList
+                    wishBookTabAdapter.notifyDataSetChanged()
                 }
             }
         }

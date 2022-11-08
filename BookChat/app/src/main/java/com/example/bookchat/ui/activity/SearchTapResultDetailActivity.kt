@@ -59,6 +59,7 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
         searchResultBookDetailAdapter = SearchResultBookDetailAdapter()
         searchResultBookDetailAdapter.setItemClickListener(bookItemClickListener)
         searchResultBookDetailAdapter.addLoadStateListener { combinedLoadStates ->
+            combinedLoadStates.source
             if (isLoadResultEmpty(combinedLoadStates.source)) {
                 binding.emptyResultImg.isVisible = true
                 binding.emptyResultText.isVisible = true
