@@ -9,6 +9,7 @@ import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ItemWishBookTabBinding
 import com.example.bookchat.utils.Constants
+import com.example.bookchat.utils.Constants.TAG
 
 class WishBookTabAdapter : RecyclerView.Adapter<WishBookTabAdapter.WishBookItemViewHolder>(){
     private lateinit var binding : ItemWishBookTabBinding
@@ -28,10 +29,12 @@ class WishBookTabAdapter : RecyclerView.Adapter<WishBookTabAdapter.WishBookItemV
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WishBookItemViewHolder {
         binding = DataBindingUtil
             .inflate(LayoutInflater.from(parent.context), R.layout.item_wish_book_tab,parent,false)
+        Log.d(TAG, "WishBookTabAdapter: onCreateViewHolder() - called")
         return WishBookItemViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: WishBookItemViewHolder, position: Int) {
+        Log.d(TAG, "WishBookTabAdapter: onBindViewHolder() - called")
         if(books.isNotEmpty()) holder.bind(books[position])
     }
 
