@@ -50,17 +50,30 @@ class SearchResultBookDetailPagingSource(
 
     private fun getLoadResult(
         data :List<Book>,
-        nowPage :Int, searchingMeta :SearchingMeta
+        nowPage :Int,
+        searchingMeta :SearchingMeta
     ): LoadResult<Int, Book>{
         return try {
             LoadResult.Page(
                 data = data,
                 prevKey = if (nowPage == 1) null else nowPage - 1,
-                nextKey = if(searchingMeta.isEnd) null else nowPage + 1// 가져온만큼 다시 가져옴
+                nextKey = getNextKey(nowPage,searchingMeta)
             )
         }catch (exception :Exception){
             LoadResult.Error(exception)
         }
+    }
+
+    private fun getNextKey(
+        nowPage :Int,
+        searchingMeta :SearchingMeta
+    ) :Int?{
+        if(searchingMeta.isEnd) return null
+
+        if (nowPage == STARTING_PAGE_INDEX){
+            return 4 * STARTING_PAGE_INDEX
+        }
+        return nowPage + 1
     }
 
     private fun createExceptionMessage(responseCode :Int, responseErrorBody :String?) :String {
