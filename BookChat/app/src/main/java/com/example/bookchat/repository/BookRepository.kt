@@ -85,6 +85,7 @@ class BookRepository {
         when(response.code()){
             200 -> {
                 val bookShelfResult = response.body()
+                Log.d(TAG, "BookRepository: requestGetWishList() - bookShelfResult : $bookShelfResult")
                 bookShelfResult?.let {
                     val bookShelfItemList = bookShelfResult.contents
                     Log.d(TAG, "BookRepository: requestGetWishList() - bookShelfItemList :$bookShelfItemList")
