@@ -15,7 +15,9 @@ import com.example.bookchat.utils.Constants.TAG
 import com.google.android.material.tabs.TabLayoutMediator
 
 class BookShelfFragment : Fragment() {
+
     lateinit var binding : FragmentBookShelfBinding
+    lateinit var pagerAdapter :PagerFragmentStateAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,13 +25,9 @@ class BookShelfFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_book_shelf,container,false)
-
-        val pagerAdapter = PagerFragmentStateAdapter(this)
-        pagerAdapter.addFragment(ReadingBookTabFragment())
-        pagerAdapter.addFragment(CompleteBookTabFragment())
-        pagerAdapter.addFragment(WishBookTabFragment())
-
+        pagerAdapter = PagerFragmentStateAdapter(this)
         binding.viewPager.adapter = pagerAdapter
+        initTapLayout()
 
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -40,14 +38,16 @@ class BookShelfFragment : Fragment() {
             }
         })
 
-        TabLayoutMediator(binding.tabLayout,binding.viewPager){ tab, position ->
-            when(position){
-                0 -> tab.text = "독서중"
-                1 -> tab.text = "독서완료"
-                2 -> tab.text = "독서예정"
-            }
-        }.attach()
-
         return binding.root
+    }
+
+    private fun initTapLayout(){
+        TabLayoutMediator(binding.tabLayout,binding.viewPager){ tab, position ->
+            tab.text = bookShelfTapNameList[position]
+        }.attach()
+    }
+
+    companion object {
+        private val bookShelfTapNameList = listOf("독서예정","독서중","독서완료")
     }
 }
