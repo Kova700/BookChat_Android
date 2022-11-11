@@ -4,7 +4,6 @@ import android.animation.AnimatorInflater
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.IBinder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +16,7 @@ import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
@@ -39,8 +39,6 @@ class SearchFragment : Fragment() {
     private val searchingTapFragment by lazy { SearchTapSearchingFragment() }
     private val resultTapFragment by lazy { SearchTapResultFragment() }
 
-    var isClickedSearchWindow = false //이거 뷰 디스트로이 됐다가 다시 나타나면 터시 안됨 수정필요함
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,9 +49,11 @@ class SearchFragment : Fragment() {
             ViewModelProvider(this, ViewModelFactory()).get(SearchViewModel::class.java)
         with(binding) {
             lifecycleOwner = this@SearchFragment
-            fragment = this@SearchFragment //viewModel로 옮길 수 있으면 다 옮기기
+            fragment = this@SearchFragment
             viewModel = searchViewModel
         }
+        initFragmentBackStackChangedListener()
+
 
         return binding.root
     }
@@ -67,6 +67,12 @@ class SearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
     }
 
+    private fun initFragmentBackStackChangedListener(){
+        childFragmentManager.addOnBackStackChangedListener {
+            getInflatedSearchTapFragment()?.let { handleBackStackFragment(it) }
+        }
+    }
+
     private fun collectSearchTapStatus() = viewLifecycleOwner.lifecycleScope.launch {
         searchViewModel._searchTapStatus.collect { searchTapStatus ->
             Log.d(TAG, "SearchFragment: _searchTapStatus.collect - searchTapStatus : $searchTapStatus")
@@ -77,22 +83,36 @@ class SearchFragment : Fragment() {
     private fun handleSearchTapStatus(searchTapStatus: SearchTapStatus) =
         when (searchTapStatus) {
             SearchTapStatus.Default -> {
-                replaceFragment(defaultTapFragment, FRAGMENT_TAG_DEFAULT)
+                closeSearchWindowAnimation()
+                replaceFragment(defaultTapFragment, FRAGMENT_TAG_DEFAULT,false)
             }
             SearchTapStatus.History -> {
-                replaceFragment(historyTapFragment, FRAGMENT_TAG_HISTORY)
+                openSearchWindowAnimation()
+                replaceFragment(historyTapFragment, FRAGMENT_TAG_HISTORY,true)
             }
             SearchTapStatus.Searching -> {
-                replaceFragment(searchingTapFragment, FRAGMENT_TAG_SEARCHING)
+                replaceFragment(searchingTapFragment, FRAGMENT_TAG_SEARCHING,true)
             }
             SearchTapStatus.Result -> {
                 closeKeyboard(binding.searchEditText)
-                replaceFragment(resultTapFragment, FRAGMENT_TAG_RESULT)
+                replaceFragment(resultTapFragment, FRAGMENT_TAG_RESULT,true)
             }
             SearchTapStatus.Detail -> {
                 moveToDetailActivity()
             }
         }
+
+    private fun handleBackStackFragment(inflatedFragment :Fragment){
+        when(inflatedFragment.tag){
+            FRAGMENT_TAG_DEFAULT -> {
+                searchViewModel._searchKeyWord.value = ""
+                searchViewModel._searchTapStatus.value = SearchTapStatus.Default
+            }
+            FRAGMENT_TAG_HISTORY -> { searchViewModel._searchTapStatus.value = SearchTapStatus.History }
+            FRAGMENT_TAG_SEARCHING -> { searchViewModel._searchTapStatus.value = SearchTapStatus.Searching }
+            FRAGMENT_TAG_RESULT -> {  searchViewModel._searchTapStatus.value = SearchTapStatus.Result }
+        }
+    }
 
     private fun moveToDetailActivity() {
         Log.d(TAG, "SearchFragment: moveToDetailActivity() - called")
@@ -105,21 +125,23 @@ class SearchFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun replaceFragment(newFragment: Fragment, tag: String) {
+    private fun replaceFragment(newFragment: Fragment, tag: String, backStackFlag :Boolean) {
+        childFragmentManager.popBackStack("1", FragmentManager.POP_BACK_STACK_INCLUSIVE)
         val childFragmentTransaction = childFragmentManager.beginTransaction()
         with(childFragmentTransaction) {
             setReorderingAllowed(true)
             replace(R.id.searchPage_layout, newFragment, tag)
+            if (backStackFlag){
+                addToBackStack("1")
+            }
             commit()
         }
+
     }
 
     /* 애니메이션 처리 전부 MotionLayout으로 마이그레이션 예정 */
-    fun clickSearchWindow() {
-        Log.d(TAG, "SearchFragment: clickedSearchWindow() - called")
-        if (isClickedSearchWindow) return
-        isClickedSearchWindow = true
-        searchViewModel._searchTapStatus.value = SearchTapStatus.History
+    private fun openSearchWindowAnimation() {
+        Log.d(TAG, "SearchFragment: openSearchWindowAnimation() - called")
 
         val windowAnimator = AnimatorInflater.loadAnimator(
             requireContext(),
@@ -129,12 +151,10 @@ class SearchFragment : Fragment() {
             setTarget(binding.searchWindow)
             binding.searchWindow.pivotX = 0.0f
             binding.searchWindow.pivotY = 0.0f
-            binding.backBtn.visibility = VISIBLE
             doOnStart {
                 binding.searchEditText.isEnabled = true
                 binding.searchEditText.requestFocus()
                 openKeyboard(binding.searchEditText)
-                binding.animationTouchEventView.visibility = INVISIBLE
             }
             start()
         }
@@ -161,9 +181,8 @@ class SearchFragment : Fragment() {
     }
 
     /* 애니메이션 처리 전부 MotionLayout으로 마이그레이션 예정 */
-    fun clickBackBtn() {
-        Log.d(TAG, "SearchFragment: clickBackBtn() - called")
-        if (!isClickedSearchWindow) return
+    private fun closeSearchWindowAnimation() {
+        Log.d(TAG, "SearchFragment: closeSearchWindowAnimation() - called")
 
         val windowAnimator = AnimatorInflater.loadAnimator(
             requireContext(),
@@ -174,10 +193,6 @@ class SearchFragment : Fragment() {
             binding.searchWindow.pivotX = 0.0f
             binding.searchWindow.pivotY = 0.0f
             doOnStart {
-                binding.backBtn.visibility = INVISIBLE
-                binding.searchEditText.setText("")
-                isClickedSearchWindow = false
-                searchViewModel._searchTapStatus.value = SearchTapStatus.Default
                 binding.searchEditText.isEnabled = false
             }
             start()
@@ -200,13 +215,8 @@ class SearchFragment : Fragment() {
             setTarget(binding.searchEditText)
             binding.searchEditText.pivotX = 0.0f
             binding.searchEditText.pivotY = 0.0f
-            doOnEnd { binding.animationTouchEventView.visibility = VISIBLE }
             start()
         }
-    }
-
-    fun clearSearchWindow() {
-        binding.searchEditText.setText("")
     }
 
     private fun openKeyboard(view: View) {
@@ -223,6 +233,10 @@ class SearchFragment : Fragment() {
             searchViewModel._searchTapStatus.value = SearchTapStatus.Result
         }
         super.onResume()
+    }
+
+    private fun getInflatedSearchTapFragment() :Fragment?{
+        return childFragmentManager.fragments.firstOrNull { it.isVisible }
     }
 
     companion object {

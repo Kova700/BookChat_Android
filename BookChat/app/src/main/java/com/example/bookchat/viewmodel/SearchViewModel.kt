@@ -40,11 +40,8 @@ class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
     }
 
     private fun renewSearchTapStatus(){
-        if (_searchKeyWord.value.isEmpty()) {
-            _searchTapStatus.value = SearchTapStatus.History
-            return
-        }
-        _searchTapStatus.value = SearchTapStatus.Searching
+        if (_searchKeyWord.value.isEmpty()) return
+        if (_searchTapStatus.value != SearchTapStatus.Searching) _searchTapStatus.value = SearchTapStatus.Searching
     }
 
     fun searchKeyword() = viewModelScope.launch {
@@ -53,7 +50,8 @@ class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
             Toast.makeText(App.instance.applicationContext,"검색어를 입력해주세요.",Toast.LENGTH_SHORT).show() //임시
             return@launch
         }
-        if (keyword == previousKeyword) return@launch
+        if ((keyword == previousKeyword) && (_searchTapStatus.value == SearchTapStatus.Result)) return@launch
+        DataStoreManager.saveSearchHistory(_searchKeyWord.value)
         simpleSearchBooks(keyword)
         simpleSearchChatRoom(keyword)
     }
@@ -65,7 +63,6 @@ class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
 
     //책 6개만 호출
     private suspend fun simpleSearchBooks(keyword :String){
-        DataStoreManager.saveSearchHistory(_searchKeyWord.value)
         resultLoadState.value = LoadState.Loading
         runCatching { bookRepository.simpleSearchBooks(keyword) }
             .onSuccess { booksearchResult ->
@@ -91,6 +88,20 @@ class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
     fun clickBookDetailBtn() = viewModelScope.launch{
         Log.d(TAG, "SearchViewModel: clickDetailBtn() - called")
         _searchTapStatus.value = SearchTapStatus.Detail
+    }
+
+    fun clickSearchWindow(){
+        Log.d(TAG, "SearchViewModel: clickSearchWindow() - called")
+        _searchTapStatus.value = SearchTapStatus.History
+    }
+
+    fun clickBackBtn(){
+        clearSearchWindow()
+        _searchTapStatus.value = SearchTapStatus.Default
+    }
+
+    fun clearSearchWindow() {
+        _searchKeyWord.value = ""
     }
 
     private fun failHandler(exception: Throwable){

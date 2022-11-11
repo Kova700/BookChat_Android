@@ -21,8 +21,9 @@
             android:layout_marginStart="22dp"
             android:layout_marginTop="27dp"
             android:background="#00ff0000"
+            setBackBtnViewVisibility="@{viewModel._searchTapStatus}"
             android:visibility="invisible"
-            android:onClick="@{() -> fragment.clickBackBtn()}"
+            android:onClick="@{() -> viewModel.clickBackBtn()}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_back_btn" />
@@ -33,7 +34,8 @@
             android:layout_height="0dp"
             android:background="#00000000"
             android:elevation="30dp"
-            android:onClick="@{() -> fragment.clickSearchWindow()}"
+            setAnimationTouchViewVisibility="@{viewModel._searchTapStatus}"
+            android:onClick="@{() -> viewModel.clickSearchWindow()}"
             app:layout_constraintBottom_toBottomOf="@+id/constraintLayout4"
             app:layout_constraintTop_toTopOf="@+id/constraintLayout4" />
 
@@ -121,9 +123,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="20dp"
                     android:background="#00ff0000"
-                    android:onClick="@{() -> fragment.clearSearchWindow()}"
+                    android:onClick="@{() -> viewModel.clearSearchWindow()}"
                     android:src="@drawable/ic_search_text_delete_btn"
-                    setSearchDeleteBtnVisible="@{viewModel._searchTapStatus}"
+                    setSearchDeleteBtnVisibility="@{viewModel._searchTapStatus}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
