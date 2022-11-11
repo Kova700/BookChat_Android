@@ -142,10 +142,13 @@ class MainActivity : AppCompatActivity() {
     //자식 FragmentBackStack 다 털고 BottomNaviFragmentBackStack 털어야 함
     override fun onBackPressed() {
         Log.d(TAG, "MainActivity: onBackPressed() - called")
-        if(supportFragmentManager.backStackEntryCount != 0){
-            supportFragmentManager.popBackStackImmediate()
-            return
+        getInflatedBottomNaviFragment(getInflatedFragmentList())?.let { bottomNaviFragment ->
+            if(bottomNaviFragment.childFragmentManager.backStackEntryCount != 0){
+                bottomNaviFragment.childFragmentManager.popBackStackImmediate()
+                return
+            }
         }
+
         backPressEvent()
         inflateFragmentInStack()
         updateBottomNaviIcon()
