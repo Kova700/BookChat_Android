@@ -126,13 +126,13 @@ class SearchFragment : Fragment() {
     }
 
     private fun replaceFragment(newFragment: Fragment, tag: String, backStackFlag :Boolean) {
-        childFragmentManager.popBackStack("1", FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        childFragmentManager.popBackStack(SEARCH_TAP_FRAGMENT_FLAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
         val childFragmentTransaction = childFragmentManager.beginTransaction()
         with(childFragmentTransaction) {
             setReorderingAllowed(true)
             replace(R.id.searchPage_layout, newFragment, tag)
             if (backStackFlag){
-                addToBackStack("1")
+                addToBackStack(SEARCH_TAP_FRAGMENT_FLAG)
             }
             commit()
         }
@@ -246,6 +246,7 @@ class SearchFragment : Fragment() {
         const val FRAGMENT_TAG_RESULT = "Result"
         const val EXTRA_SEARCH_KEYWORD = "EXTRA_SEARCH_KEYWORD"
         const val EXTRA_SEARCH_RESULT_ITEM_COUNT = "EXTRA_SEARCH_RESULT_ITEM_COUNT"
+        const val SEARCH_TAP_FRAGMENT_FLAG = "SEARCH_TAP_FRAGMENT_FLAG"
     }
 
 }
