@@ -56,6 +56,12 @@ class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
         simpleSearchChatRoom(keyword)
     }
 
+    fun clickHistory(keyword: String) = viewModelScope.launch {
+        _searchKeyWord.value = keyword
+        simpleSearchBooks(keyword)
+        simpleSearchChatRoom(keyword)
+    }
+
     val keyboardEnterListener = TextView.OnEditorActionListener{ _, _, _ ->
         searchKeyword()
         false
