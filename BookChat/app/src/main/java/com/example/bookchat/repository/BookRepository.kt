@@ -6,6 +6,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.bookchat.App
 import com.example.bookchat.data.*
+import com.example.bookchat.paging.ReadingBookTapPagingSource
 import com.example.bookchat.paging.SearchResultBookDetailPagingSource
 import com.example.bookchat.paging.WishBookTapPagingSource
 import com.example.bookchat.response.NetworkIsNotConnectedException
@@ -91,6 +92,14 @@ class BookRepository {
         ).flow
     }
 
+    fun requestGetReadingList() :Flow<PagingData<Pair<BookShelfItem, Long>>>{
+        Log.d(TAG, "BookRepository: requestGetReadingList() - called")
+        return Pager(
+            config = PagingConfig( pageSize = READING_TAP_BOOKS_ITEM_LOAD_SIZE, enablePlaceholders = false ),
+            pagingSourceFactory = { ReadingBookTapPagingSource() }
+        ).flow
+    }
+
     private fun isNetworkConnected() :Boolean{
         return App.instance.isNetworkConnected()
     }
@@ -102,5 +111,6 @@ class BookRepository {
     companion object{
         private const val SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE = 6
         private const val WISH_TAP_BOOKS_ITEM_LOAD_SIZE = 6
+        private const val READING_TAP_BOOKS_ITEM_LOAD_SIZE = 4
     }
 }

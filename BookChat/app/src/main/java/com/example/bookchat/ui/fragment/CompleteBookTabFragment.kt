@@ -31,9 +31,9 @@ class CompleteBookTabFragment : Fragment() {
     private fun initRecyclerView(){
         with(binding){
             completeBookAdapter = CompleteBookTabAdapter()
-            recyclerView.adapter = completeBookAdapter
-            recyclerView.setHasFixedSize(true)
-            recyclerView.layoutManager = LinearLayoutManager(requireContext())
+            completeRcv.adapter = completeBookAdapter
+            completeRcv.setHasFixedSize(true)
+            completeRcv.layoutManager = LinearLayoutManager(requireContext())
         }
     }
 

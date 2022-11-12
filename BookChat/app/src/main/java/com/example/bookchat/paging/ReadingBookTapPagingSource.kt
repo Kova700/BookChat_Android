@@ -12,7 +12,7 @@ import com.example.bookchat.response.ResponseBodyEmptyException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.ReadingStatus
 
-class WishBookTapPagingSource : PagingSource<Int, Pair<BookShelfItem, Long>>(){
+class ReadingBookTapPagingSource : PagingSource<Int, Pair<BookShelfItem, Long>>(){
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Pair<BookShelfItem, Long>> {
         if(!isNetworkConnected()) return LoadResult.Error(NetworkIsNotConnectedException())
@@ -22,13 +22,13 @@ class WishBookTapPagingSource : PagingSource<Int, Pair<BookShelfItem, Long>>(){
         val response = App.instance.bookApiInterface.getBookShelfBooks(
             size = params.loadSize.toString(),
             page = page.toString(),
-            readingStatus = ReadingStatus.WISH
+            readingStatus = ReadingStatus.READING
         )
 
         when(response.code()){
             200 -> {
                 val bookShelfResult = response.body()
-                Log.d(TAG, "WishBookTapPagingSource: load() - bookShelfResult : $bookShelfResult")
+                Log.d(TAG, "ReadingBookTapPagingSource: load() - bookShelfResult : $bookShelfResult")
                 bookShelfResult?.let { return getLoadResult(bookShelfResult,page) }
                 throw ResponseBodyEmptyException(response.errorBody()?.string())
             }
@@ -36,12 +36,12 @@ class WishBookTapPagingSource : PagingSource<Int, Pair<BookShelfItem, Long>>(){
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, Pair<BookShelfItem, Long>>): Int {
+    override fun getRefreshKey(state: PagingState<Int, Pair<BookShelfItem, Long>>): Int? {
         return 0
     }
 
     private fun getLoadResult(
-        bookShelfResult :BookShelfResult,
+        bookShelfResult : BookShelfResult,
         nowPage :Int
     ): LoadResult<Int, Pair<BookShelfItem, Long>>{
         return try {

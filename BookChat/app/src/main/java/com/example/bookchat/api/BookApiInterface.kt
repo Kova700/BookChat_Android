@@ -38,10 +38,11 @@ interface BookApiInterface {
     ):Response<Unit>
 
     @GET("/v1/api/bookshelf/books")
-    suspend fun getWishBooks(
+    suspend fun getBookShelfBooks(
         @Query("size") size:String,
         @Query("page") page:String,
-        @Query("sort") sort: String = "id,DESC",
-        @Query("readingStatus") readingStatus : ReadingStatus = ReadingStatus.WISH
+        @Query("readingStatus") readingStatus : ReadingStatus,
+        @Query("sort") sort: String = "id,DESC"
     ):Response<BookShelfResult>
+
 }
