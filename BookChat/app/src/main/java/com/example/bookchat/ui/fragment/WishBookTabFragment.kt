@@ -38,6 +38,8 @@ class WishBookTabFragment : Fragment() {
         }
         initAdapter()
         initRecyclerView()
+        initRefreshEvent()
+
         return binding.root
     }
 
@@ -56,6 +58,17 @@ class WishBookTabFragment : Fragment() {
             wishBookRcv.adapter = wishBookAdapter
             wishBookRcv.setHasFixedSize(true)
             wishBookRcv.layoutManager = GridLayoutManager(requireContext(),3) //중앙정렬 해야함 Or 개수 화면에 따라 늘어나게 설정
+            wishBookRcv.viewTreeObserver.addOnScrollChangedListener {
+                binding.swipeRefreshLayoutWish.isEnabled = (wishBookRcv.scrollY == 0)
+            }
+        }
+    }
+
+    private fun initRefreshEvent(){
+        binding.swipeRefreshLayoutWish.setOnRefreshListener {
+            wishBookTapViewModel.requestGetWishList()
+            wishBookAdapter.notifyDataSetChanged()
+            binding.swipeRefreshLayoutWish.isRefreshing = false
         }
     }
 

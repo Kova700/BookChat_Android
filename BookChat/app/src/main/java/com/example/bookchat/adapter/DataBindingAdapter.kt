@@ -8,6 +8,7 @@ import android.widget.*
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
@@ -169,6 +170,7 @@ object DataBindingAdapter {
 
             /*서재 전부 페이징으로 수정 예정*/
             R.id.wishBookRcv -> {
+                Log.d(TAG, "DataBindingAdapter: setItem() - called")
                 if(data.first() is BookShelfItem) {
                     val bookShelfItemList = data.map { it as BookShelfItem }
                     val wishBookTabAdapter = recyclerView.adapter as WishBookTabAdapter
@@ -200,4 +202,5 @@ object DataBindingAdapter {
             LoadState.Loading -> view.visibility = View.INVISIBLE
         }
     }
+
 }

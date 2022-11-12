@@ -15,10 +15,10 @@ class WishBookTapViewModel(private val bookRepository: BookRepository) :ViewMode
     val wishBookList = MutableStateFlow<List<BookShelfItem>>( listOf() )
 
     init {
-        viewModelScope.launch { requestGetWishList() }
+        requestGetWishList()
     }
 
-    private suspend fun requestGetWishList(){
+    fun requestGetWishList() = viewModelScope.launch{
         runCatching { bookRepository.requestGetWishList() }
             .onSuccess {
                 wishBookList.value = it
@@ -26,4 +26,5 @@ class WishBookTapViewModel(private val bookRepository: BookRepository) :ViewMode
             }
             .onFailure { Toast.makeText(App.instance.applicationContext,"Wish 조회 실패",Toast.LENGTH_SHORT).show() }
     }
+
 }
