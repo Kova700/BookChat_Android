@@ -159,23 +159,11 @@ object DataBindingAdapter {
         if(data.isNullOrEmpty()) return
 
         when(recyclerView.id){
-
             R.id.search_result_book_simple_Rcv -> {
                 if(data.first() is Book) {
                     val books = data.map { it as Book }
                     val searchResultBookSimpleAdapter = recyclerView.adapter as SearchResultBookSimpleAdapter
                     searchResultBookSimpleAdapter.books = books
-                }
-            }
-
-            /*서재 전부 페이징으로 수정 예정*/
-            R.id.wishBookRcv -> {
-                Log.d(TAG, "DataBindingAdapter: setItem() - called")
-                if(data.first() is BookShelfItem) {
-                    val bookShelfItemList = data.map { it as BookShelfItem }
-                    val wishBookTabAdapter = recyclerView.adapter as WishBookTabAdapter
-                    wishBookTabAdapter.books = bookShelfItemList
-                    wishBookTabAdapter.notifyDataSetChanged()
                 }
             }
         }

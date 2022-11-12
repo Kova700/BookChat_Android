@@ -1,25 +1,23 @@
 package com.example.bookchat.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
-import com.example.bookchat.adapter.ReadingBookTabAdapter
-import com.example.bookchat.adapter.SearchResultBookSimpleAdapter
 import com.example.bookchat.adapter.WishBookTabAdapter
-import com.example.bookchat.data.Book
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.FragmentWishBookTabBinding
-import com.example.bookchat.ui.dialog.SearchTapBookDialog
-import com.example.bookchat.viewmodel.SearchViewModel
+import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.ViewModelFactory
 import com.example.bookchat.viewmodel.WishBookTapViewModel
+import kotlinx.coroutines.launch
 
 class WishBookTabFragment : Fragment() {
     private lateinit var binding : FragmentWishBookTabBinding
@@ -39,8 +37,16 @@ class WishBookTabFragment : Fragment() {
         initAdapter()
         initRecyclerView()
         initRefreshEvent()
+        observePagingWishBookData()
 
         return binding.root
+    }
+
+    private fun observePagingWishBookData()= lifecycleScope.launch {
+        wishBookTapViewModel.wishBookResult.collect{ PagingBookShelfItem ->
+            Log.d(TAG, "WishBookTabFragment: observePagingWishBookData() - PagingBookShelfItem :$PagingBookShelfItem")
+            wishBookAdapter.submitData(PagingBookShelfItem)
+        }
     }
 
     private fun initAdapter(){
@@ -66,8 +72,7 @@ class WishBookTabFragment : Fragment() {
 
     private fun initRefreshEvent(){
         binding.swipeRefreshLayoutWish.setOnRefreshListener {
-            wishBookTapViewModel.requestGetWishList()
-            wishBookAdapter.notifyDataSetChanged()
+            wishBookAdapter.refresh()
             binding.swipeRefreshLayoutWish.isRefreshing = false
         }
     }
