@@ -168,6 +168,7 @@
             android:minHeight="55dp"
             android:stateListAnimator="@null"
             android:text="독서중"
+            android:onClick="@{() -> viewmodel.requestRegisterReadingBook()}"
             android:textColor="#FFFFFF"
             app:cornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"

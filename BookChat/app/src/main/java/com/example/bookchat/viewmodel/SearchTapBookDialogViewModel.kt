@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.data.Book
+import com.example.bookchat.data.RequestRegisterReadingBook
 import com.example.bookchat.data.RequestRegisterWishBook
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.Constants.TAG
@@ -24,6 +25,19 @@ class SearchTapBookDialogViewModel(private val bookRepository: BookRepository) :
             .onFailure {
                 Toast.makeText(App.instance.applicationContext,"Wish등록 실패",Toast.LENGTH_SHORT).show()
             }
+    }
+
+    fun requestRegisterReadingBook() = viewModelScope.launch {
+        Log.d(TAG, "SearchTapBookDialogViewModel: requestRegisterReadingBook() - called")
+        val requestRegisterReadingBook = RequestRegisterReadingBook(book)
+        runCatching { bookRepository.registerReadingBook(requestRegisterReadingBook) }
+            .onSuccess {
+                Toast.makeText(App.instance.applicationContext,"Reading등록 성공",Toast.LENGTH_SHORT).show()
+            }
+            .onFailure {
+                Toast.makeText(App.instance.applicationContext,"Reading등록 실패",Toast.LENGTH_SHORT).show()
+            }
+
     }
 
 }
