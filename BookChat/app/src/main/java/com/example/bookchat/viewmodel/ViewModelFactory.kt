@@ -49,6 +49,10 @@ class ViewModelFactory(val searchKeyword : String = "") : ViewModelProvider.Fact
                 return WishBookTapBookDialogViewModel(bookRepository) as T
             }
 
+            modelClass.isAssignableFrom(ReadingBookTapViewModel::class.java) -> {
+                return ReadingBookTapViewModel(bookRepository) as T
+            }
+
             else -> throw IllegalArgumentException("unknown model class : ${modelClass}")
         }
     }
