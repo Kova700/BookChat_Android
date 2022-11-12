@@ -155,8 +155,8 @@ object DataBindingAdapter {
     /**리사이클러뷰 아이템 연결*/
     @JvmStatic
     @BindingAdapter("setItem")
-    fun setItem(recyclerView: RecyclerView, data :List<Any>){
-        if(data.isEmpty()) return
+    fun setItem(recyclerView: RecyclerView, data :List<Any>?){
+        if(data.isNullOrEmpty()) return
 
         when(recyclerView.id){
 
