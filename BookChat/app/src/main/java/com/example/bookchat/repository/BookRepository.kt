@@ -7,6 +7,7 @@ import androidx.paging.PagingData
 import com.example.bookchat.App
 import com.example.bookchat.data.*
 import com.example.bookchat.paging.SearchResultBookDetailPagingSource
+import com.example.bookchat.paging.WishBookTapPagingSource
 import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.response.ResponseBodyEmptyException
 import com.example.bookchat.utils.Constants.TAG
@@ -14,12 +15,13 @@ import kotlinx.coroutines.flow.Flow
 
 class BookRepository {
 
+    /** 책 검색*/
     suspend fun simpleSearchBooks(keyword :String) : BookSearchResult {
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val response = App.instance.bookApiInterface.getBookFromTitle(
             query = keyword,
-            size = SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE,
+            size = SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE.toString(),
             page = 1.toString()
         )
 
@@ -38,11 +40,12 @@ class BookRepository {
         Log.d(TAG, "BookRepository: detailSearchBooks() - called")
 
         return Pager(
-            config = PagingConfig( pageSize = 6, enablePlaceholders = false ),
+            config = PagingConfig( pageSize = SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE, enablePlaceholders = false ),
             pagingSourceFactory = { SearchResultBookDetailPagingSource(keyword) }
         ).flow
     }
 
+    /** 책 서재 등록*/
     suspend fun registerWishBook(requestRegisterWishBook :RequestRegisterWishBook){
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
@@ -79,18 +82,13 @@ class BookRepository {
         }
     }
 
-    suspend fun requestGetWishList() :BookShelfResult{
-        if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-        val response = App.instance.bookApiInterface.getWishBooks()
-        when(response.code()){
-            200 -> {
-                val bookShelfResult = response.body()
-                Log.d(TAG, "BookRepository: requestGetWishList() - bookShelfResult : $bookShelfResult")
-                bookShelfResult?.let { return bookShelfResult }
-                throw ResponseBodyEmptyException(response.errorBody()?.string())
-            }
-            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
-        }
+    /** 책 서재 조회*/
+    fun requestGetWishList() :Flow<PagingData<Pair<BookShelfItem, Long>>>{
+        Log.d(TAG, "BookRepository: requestGetWishList() - called")
+        return Pager(
+            config = PagingConfig( pageSize = WISH_TAP_BOOKS_ITEM_LOAD_SIZE, enablePlaceholders = false ),
+            pagingSourceFactory = { WishBookTapPagingSource() }
+        ).flow
     }
 
     private fun isNetworkConnected() :Boolean{
@@ -102,6 +100,7 @@ class BookRepository {
     }
 
     companion object{
-        private const val SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE = 6.toString()
+        private const val SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE = 6
+        private const val WISH_TAP_BOOKS_ITEM_LOAD_SIZE = 6
     }
 }
