@@ -14,6 +14,8 @@ import com.example.bookchat.R
 import com.example.bookchat.adapter.WishBookTabAdapter
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.FragmentWishBookTabBinding
+import com.example.bookchat.ui.dialog.SearchTapBookDialog
+import com.example.bookchat.ui.dialog.WishTapBookDialog
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.ViewModelFactory
 import com.example.bookchat.viewmodel.WishBookTapViewModel
@@ -52,7 +54,8 @@ class WishBookTabFragment : Fragment() {
     private fun initAdapter(){
         val bookItemClickListener = object: WishBookTabAdapter.OnItemClickListener{
             override fun onItemClick(book : BookShelfItem) {
-                //다이얼로그 출력
+                val dialog = WishTapBookDialog(book)
+                dialog.show(this@WishBookTabFragment.childFragmentManager,"WishTapBookDialog")
             }
         }
         wishBookAdapter = WishBookTabAdapter()
