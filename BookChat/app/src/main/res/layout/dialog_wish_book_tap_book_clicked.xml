@@ -19,7 +19,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="12dp"
-            android:layout_marginTop="23dp"
+            android:layout_marginTop="17dp"
             android:layout_marginEnd="12dp"
             android:layout_marginBottom="23dp"
             android:background="@drawable/view_round_beige"
@@ -48,7 +48,7 @@
             android:id="@+id/constraintLayout5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="20dp"
             app:layout_constraintEnd_toEndOf="@+id/sub_background_wish"
             app:layout_constraintStart_toStartOf="@+id/sub_background_wish"
             app:layout_constraintTop_toTopOf="@+id/sub_background_wish">
