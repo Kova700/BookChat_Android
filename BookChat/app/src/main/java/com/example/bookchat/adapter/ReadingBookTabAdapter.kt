@@ -13,12 +13,16 @@ import com.example.bookchat.databinding.ItemReadingBookTabBinding
 class ReadingBookTabAdapter : PagingDataAdapter<BookShelfItem, ReadingBookTabAdapter.ReadingBookItemViewHolder>(BOOK_SHELF_ITEM_COMPARATOR){
     private lateinit var binding : ItemReadingBookTabBinding
     private lateinit var itemClickListener : OnItemClickListener
+    private lateinit var pageBtnClickListener :OnItemClickListener
 
     inner class ReadingBookItemViewHolder(val binding: ItemReadingBookTabBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(book : BookShelfItem){
             binding.bookShelfItem = book
             binding.root.setOnClickListener {
                 itemClickListener.onItemClick(book)
+            }
+            binding.pageBtn.setOnClickListener{
+                pageBtnClickListener.onItemClick(book)
             }
         }
     }
@@ -40,6 +44,10 @@ class ReadingBookTabAdapter : PagingDataAdapter<BookShelfItem, ReadingBookTabAda
 
     fun setItemClickListener(onItemClickListener: OnItemClickListener) {
         this.itemClickListener = onItemClickListener
+    }
+
+    fun setpageBtnClickListener(onItemClickListener: OnItemClickListener){
+        this.pageBtnClickListener = onItemClickListener
     }
 
 

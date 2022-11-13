@@ -4,36 +4,58 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
     </data>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        android:id="@+id/main_sliding_up_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        app:umanoDragView="@id/slide_layout"
+        app:umanoPanelHeight="50dp"
+        app:umanoShadowHeight="0dp"
+        app:umanoOverlay="true">
 
-        <FrameLayout
-            android:id="@+id/main_frame"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="match_parent">
 
-        </FrameLayout>
+            <FrameLayout
+                android:id="@+id/main_frame"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottomNavigationView"
+            </FrameLayout>
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottomNavigationView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemIconSize="32dp"
+                app:itemIconTint="@drawable/bottom_icon_color"
+                app:itemTextColor="@drawable/bottom_icon_color"
+                app:labelVisibilityMode="unlabeled"
+                app:itemBackground="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:menu="@menu/bottom_navigation_menu" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!--slide_layout-->
+        <LinearLayout
+            android:id="@+id/slide_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:itemIconSize="32dp"
-            app:itemIconTint="@drawable/bottom_icon_color"
-            app:itemTextColor="@drawable/bottom_icon_color"
-            app:labelVisibilityMode="unlabeled"
-            app:itemBackground="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:menu="@menu/bottom_navigation_menu" />
+            android:orientation="vertical">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <include layout="@layout/bottom_slide_page_input"/>
+        </LinearLayout>
+
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+
 
 </layout>

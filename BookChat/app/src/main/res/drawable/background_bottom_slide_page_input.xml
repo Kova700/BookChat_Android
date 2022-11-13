@@ -5,7 +5,6 @@
         android:color="#FFFFFF" />
     <padding
         android:left="45px"
-        android:top="15px"
         android:right="45px"
         android:bottom="15px" />
     <corners

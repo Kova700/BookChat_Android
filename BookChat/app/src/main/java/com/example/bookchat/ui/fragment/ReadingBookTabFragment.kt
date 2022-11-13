@@ -14,6 +14,7 @@ import com.example.bookchat.R
 import com.example.bookchat.adapter.ReadingBookTabAdapter
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.FragmentReadingBookTabBinding
+import com.example.bookchat.ui.activity.MainActivity
 import com.example.bookchat.ui.dialog.ReadingTapBookDialog
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.BookShelfViewModel
@@ -37,6 +38,7 @@ class ReadingBookTabFragment :Fragment() {
             lifecycleOwner = this@ReadingBookTabFragment
             viewmodel = bookShelfViewModel
         }
+        Log.d(TAG, "ReadingBookTabFragment: onCreateView() - (requireActivity() is MainActivity) : ${(requireActivity() is MainActivity)}")
         initAdapter()
         initRecyclerView()
         initRefreshEvent()
@@ -70,8 +72,15 @@ class ReadingBookTabFragment :Fragment() {
                 dialog.show(this@ReadingBookTabFragment.childFragmentManager,"ReadingTapBookDialog")
             }
         }
+        val pageBtnClickListener = object :ReadingBookTabAdapter.OnItemClickListener{
+            override fun onItemClick(book: BookShelfItem) {
+                //아래에서 slidingUp layout올라와서 페이지 변경 UI 노출
+                openPageInputSlide(book)
+            }
+        }
         readingBookAdapter = ReadingBookTabAdapter()
         readingBookAdapter.setItemClickListener(bookItemClickListener)
+        readingBookAdapter.setpageBtnClickListener(pageBtnClickListener)
     }
 
     private fun initRefreshEvent(){
@@ -79,6 +88,10 @@ class ReadingBookTabFragment :Fragment() {
             readingBookAdapter.refresh()
             binding.swipeRefreshLayoutReading.isRefreshing = false
         }
+    }
+
+    fun openPageInputSlide(book: BookShelfItem){
+        (requireActivity() as MainActivity).openPageInputSlide(book)
     }
 
 }
