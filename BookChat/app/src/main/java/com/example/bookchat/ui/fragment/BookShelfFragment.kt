@@ -7,17 +7,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.example.bookchat.R
 import com.example.bookchat.adapter.PagerFragmentStateAdapter
 import com.example.bookchat.databinding.FragmentBookShelfBinding
 import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.viewmodel.BookShelfViewModel
+import com.example.bookchat.viewmodel.ViewModelFactory
 import com.google.android.material.tabs.TabLayoutMediator
 
 class BookShelfFragment : Fragment() {
 
-    lateinit var binding : FragmentBookShelfBinding
-    lateinit var pagerAdapter :PagerFragmentStateAdapter
+    private lateinit var binding : FragmentBookShelfBinding
+    private lateinit var pagerAdapter :PagerFragmentStateAdapter
+    private lateinit var bookShelfViewModel: BookShelfViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -25,18 +29,10 @@ class BookShelfFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_book_shelf,container,false)
+        bookShelfViewModel = ViewModelProvider(this, ViewModelFactory()).get(BookShelfViewModel::class.java)
         pagerAdapter = PagerFragmentStateAdapter(this)
         binding.viewPager.adapter = pagerAdapter
         initTapLayout()
-
-        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                Log.d(TAG, "BookShelfFragment: onPageSelected() - Page ${position+1}")
-                Log.d(TAG, "BookShelfFragment: onCreateView() - parentFragmentManager : ${parentFragmentManager.fragments}")
-                Log.d(TAG, "BookShelfFragment: onCreateView() - childFragmentManager : ${childFragmentManager.fragments}")
-            }
-        })
 
         return binding.root
     }

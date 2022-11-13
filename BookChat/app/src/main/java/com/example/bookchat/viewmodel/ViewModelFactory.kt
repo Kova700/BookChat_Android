@@ -41,16 +41,16 @@ class ViewModelFactory(val searchKeyword : String = "") : ViewModelProvider.Fact
                 return SearchTapBookDialogViewModel(bookRepository) as T
             }
 
-            modelClass.isAssignableFrom(WishBookTapViewModel::class.java) -> {
-                return WishBookTapViewModel(bookRepository) as T
+            modelClass.isAssignableFrom(BookShelfViewModel::class.java) -> {
+                return BookShelfViewModel(bookRepository) as T
             }
 
-            modelClass.isAssignableFrom(WishBookTapBookDialogViewModel::class.java) -> {
-                return WishBookTapBookDialogViewModel(bookRepository) as T
+            modelClass.isAssignableFrom(WishBookTapDialogViewModel::class.java) -> {
+                return WishBookTapDialogViewModel(bookRepository) as T
             }
 
-            modelClass.isAssignableFrom(ReadingBookTapViewModel::class.java) -> {
-                return ReadingBookTapViewModel(bookRepository) as T
+            modelClass.isAssignableFrom(ReadingBookTapDialogViewModel::class.java) -> {
+                return ReadingBookTapDialogViewModel(bookRepository) as T
             }
 
             else -> throw IllegalArgumentException("unknown model class : ${modelClass}")

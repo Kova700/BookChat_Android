@@ -14,26 +14,28 @@ import com.example.bookchat.R
 import com.example.bookchat.adapter.ReadingBookTabAdapter
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.FragmentReadingBookTabBinding
-import com.example.bookchat.utils.Constants
+import com.example.bookchat.ui.dialog.ReadingTapBookDialog
 import com.example.bookchat.utils.Constants.TAG
-import com.example.bookchat.viewmodel.ReadingBookTapViewModel
+import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.ViewModelFactory
 import kotlinx.coroutines.launch
 
 class ReadingBookTabFragment :Fragment() {
     private lateinit var binding : FragmentReadingBookTabBinding
     private lateinit var readingBookAdapter :ReadingBookTabAdapter
-    private lateinit var readingBookTapViewModel: ReadingBookTapViewModel
+    private lateinit var bookShelfViewModel: BookShelfViewModel
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_reading_book_tab,container,false)
-        readingBookTapViewModel = ViewModelProvider(this, ViewModelFactory()).get(ReadingBookTapViewModel::class.java)
+        bookShelfViewModel = ViewModelProvider(requireParentFragment(), ViewModelFactory()).get(
+            BookShelfViewModel::class.java)
         with(binding){
             lifecycleOwner = this@ReadingBookTabFragment
-            viewmodel = readingBookTapViewModel
+            viewmodel = bookShelfViewModel
         }
         initAdapter()
         initRecyclerView()
@@ -44,7 +46,7 @@ class ReadingBookTabFragment :Fragment() {
     }
 
     private fun observePagingReadingBookData()= lifecycleScope.launch {
-        readingBookTapViewModel.readingBookResult.collect{ PagingBookShelfItem ->
+        bookShelfViewModel.readingBookResult.collect{ PagingBookShelfItem ->
             Log.d(TAG, "ReadingBookTabFragment: observePagingReadingBookData() - PagingBookShelfItem :$PagingBookShelfItem")
             readingBookAdapter.submitData(PagingBookShelfItem)
         }
@@ -64,7 +66,8 @@ class ReadingBookTabFragment :Fragment() {
     private fun initAdapter(){
         val bookItemClickListener = object: ReadingBookTabAdapter.OnItemClickListener{
             override fun onItemClick(book : BookShelfItem) {
-                //다이얼로그 출력
+                val dialog = ReadingTapBookDialog(book)
+                dialog.show(this@ReadingBookTabFragment.childFragmentManager,"ReadingTapBookDialog")
             }
         }
         readingBookAdapter = ReadingBookTabAdapter()

@@ -14,27 +14,27 @@ import com.example.bookchat.R
 import com.example.bookchat.adapter.WishBookTabAdapter
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.FragmentWishBookTabBinding
-import com.example.bookchat.ui.dialog.SearchTapBookDialog
 import com.example.bookchat.ui.dialog.WishTapBookDialog
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.ViewModelFactory
-import com.example.bookchat.viewmodel.WishBookTapViewModel
+import com.example.bookchat.viewmodel.BookShelfViewModel
 import kotlinx.coroutines.launch
 
 class WishBookTabFragment : Fragment() {
     private lateinit var binding : FragmentWishBookTabBinding
     private lateinit var wishBookAdapter : WishBookTabAdapter
-    private lateinit var wishBookTapViewModel: WishBookTapViewModel
+    private lateinit var bookShelfViewModel: BookShelfViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_wish_book_tab,container,false)
-        wishBookTapViewModel = ViewModelProvider(this, ViewModelFactory()).get(WishBookTapViewModel::class.java)
+        bookShelfViewModel = ViewModelProvider(requireParentFragment(), ViewModelFactory()).get(BookShelfViewModel::class.java)
+
         with(binding){
             lifecycleOwner = this@WishBookTabFragment
-            viewmodel = wishBookTapViewModel
+            viewmodel = bookShelfViewModel
         }
         initAdapter()
         initRecyclerView()
@@ -45,7 +45,7 @@ class WishBookTabFragment : Fragment() {
     }
 
     private fun observePagingWishBookData()= lifecycleScope.launch {
-        wishBookTapViewModel.wishBookResult.collect{ PagingBookShelfItem ->
+        bookShelfViewModel.wishBookResult.collect{ PagingBookShelfItem ->
             Log.d(TAG, "WishBookTabFragment: observePagingWishBookData() - PagingBookShelfItem :$PagingBookShelfItem")
             wishBookAdapter.submitData(PagingBookShelfItem)
         }

@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.viewmodel.WishBookTapViewModel" />
+            type="com.example.bookchat.viewmodel.BookShelfViewModel" />
     </data>
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout_wish"
@@ -40,7 +40,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="1dp"
                     android:fontFamily="@font/notosanskr_bold"
-                    android:text="@{String.valueOf(viewmodel.itemTotalCount)}"
+                    android:text="@{String.valueOf(viewmodel.wishBookTotalCount)}"
                     android:textColor="#222222"
                     app:layout_constraintBottom_toBottomOf="@+id/imageView6"
                     app:layout_constraintEnd_toStartOf="@+id/textView12"
