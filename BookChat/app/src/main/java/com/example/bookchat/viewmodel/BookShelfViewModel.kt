@@ -14,19 +14,36 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class ReadingBookTapViewModel(private val bookRepository: BookRepository) :ViewModel() {
+class BookShelfViewModel(private val bookRepository: BookRepository) :ViewModel() {
+
+    var wishBookResult = flowOf<PagingData<BookShelfItem>>(PagingData.empty())
+    var wishBookTotalCount = MutableStateFlow<Long>(0)
 
     var readingBookResult = flowOf<PagingData<BookShelfItem>>(PagingData.empty())
-    var itemTotalCount = MutableStateFlow<Long>(0)
+    var readingBookTotalCount = MutableStateFlow<Long>(0)
+
     init {
         requestGetWishList()
+        requestGetReadingList()
     }
 
-    fun requestGetWishList() = viewModelScope.launch{
+    private fun requestGetWishList() = viewModelScope.launch{
+        runCatching { bookRepository.requestGetWishList().cachedIn(viewModelScope) }
+            .onSuccess { bookShelfResult ->
+                wishBookResult = bookShelfResult.map { pagingData ->
+                    pagingData.map { pair -> wishBookTotalCount.value = pair.second; pair.first }
+                }
+                Toast.makeText(App.instance.applicationContext,"Wish 조회 성공", Toast.LENGTH_SHORT).show()
+            }
+            .onFailure { Toast.makeText(App.instance.applicationContext,"Wish 조회 실패",Toast.LENGTH_SHORT).show() }
+    }
+
+
+    private fun requestGetReadingList() = viewModelScope.launch{
         runCatching { bookRepository.requestGetReadingList().cachedIn(viewModelScope) }
             .onSuccess { bookShelfResult ->
                 readingBookResult = bookShelfResult.map { pagingData ->
-                    pagingData.map { pair -> itemTotalCount.value = pair.second; pair.first }
+                    pagingData.map { pair -> readingBookTotalCount.value = pair.second; pair.first }
                 }
                 Toast.makeText(App.instance.applicationContext,"Reading 조회 성공", Toast.LENGTH_SHORT).show()
             }
