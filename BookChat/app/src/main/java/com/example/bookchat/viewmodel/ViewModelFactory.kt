@@ -29,6 +29,10 @@ class ViewModelFactory(val searchKeyword : String = "") : ViewModelProvider.Fact
                 return SignUpViewModel(userRepository) as T
             }
 
+            modelClass.isAssignableFrom(MyPageViewModel::class.java) -> {
+                return MyPageViewModel(userRepository) as T
+            }
+
             modelClass.isAssignableFrom(SearchViewModel::class.java) -> {
                 return SearchViewModel(bookRepository) as T
             }
