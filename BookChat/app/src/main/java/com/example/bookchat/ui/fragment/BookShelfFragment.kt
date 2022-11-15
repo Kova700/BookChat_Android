@@ -19,7 +19,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class BookShelfFragment : Fragment() {
 
-    private lateinit var binding : FragmentBookShelfBinding
+    lateinit var binding : FragmentBookShelfBinding
     private lateinit var pagerAdapter :PagerFragmentStateAdapter
     private lateinit var bookShelfViewModel: BookShelfViewModel
 
