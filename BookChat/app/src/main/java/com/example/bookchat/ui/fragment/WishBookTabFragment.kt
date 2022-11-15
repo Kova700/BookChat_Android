@@ -16,8 +16,8 @@ import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.FragmentWishBookTabBinding
 import com.example.bookchat.ui.dialog.WishTapBookDialog
 import com.example.bookchat.utils.Constants.TAG
-import com.example.bookchat.viewmodel.ViewModelFactory
 import com.example.bookchat.viewmodel.BookShelfViewModel
+import com.example.bookchat.viewmodel.ViewModelFactory
 import kotlinx.coroutines.launch
 
 class WishBookTabFragment : Fragment() {
