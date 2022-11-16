@@ -50,17 +50,14 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
+            <com.example.bookchat.CustomRecyclerView
                 android:id="@+id/readingBook_Rcv"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:nestedScrollingEnabled="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/header_wish"
-                tools:listitem="@layout/item_reading_book_tab" />
-
+                app:layout_constraintTop_toBottomOf="@+id/header_wish"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
