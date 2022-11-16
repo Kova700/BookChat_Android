@@ -16,6 +16,8 @@ data class BookShelfItem(
     val authors: List<String>,
     @SerializedName("publisher")
     val publisher: String,
+    @SerializedName("publishAt")
+    val publishAt :String,
     @SerializedName("star")
     val star: StarRating,
     @SerializedName("singleLineAssessment")

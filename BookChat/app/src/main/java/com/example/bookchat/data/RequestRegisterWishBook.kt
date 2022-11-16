@@ -12,6 +12,8 @@ class RequestRegisterWishBook(book: Book){
     private val authors :List<String> = book.authors
     @SerializedName("publisher")
     private val publisher :String = book.publisher
+    @SerializedName("publishAt")
+    private val publishAt :String = book.datetime
     @SerializedName("bookCoverImageUrl")
     private val bookCoverImageUrl :String = book.bookCoverImageUrl
     @SerializedName("readingStatus")
