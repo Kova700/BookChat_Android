@@ -5,10 +5,7 @@ import com.example.bookchat.utils.BookSearchSortOption
 import com.example.bookchat.utils.ReadingStatus
 import com.google.gson.annotations.SerializedName
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface BookApiInterface {
     //API 테스트
@@ -16,33 +13,38 @@ interface BookApiInterface {
 
     @GET("/v1/api/books")
     suspend fun getBookFromTitle(
-        @Query("query") query:String,
-        @Query("size") size:String,
-        @Query("page") page:String,
+        @Query("query") query: String,
+        @Query("size") size: String,
+        @Query("page") page: String,
         @Query("sort") sort: BookSearchSortOption = BookSearchSortOption.ACCURACY,
     ): Response<BookSearchResult>
 
     @POST("/v1/api/bookshelf/books")
     suspend fun registerWishBook(
         @Body requestRegisterWishBook: RequestRegisterWishBook
-    ):Response<Unit>
+    ): Response<Unit>
 
     @POST("/v1/api/bookshelf/books")
     suspend fun registerReadingBook(
         @Body requestRegisterReadingBook: RequestRegisterReadingBook
-    ):Response<Unit>
+    ): Response<Unit>
 
     @POST("/v1/api/bookshelf/books")
     suspend fun registerCompleteBook(
         @Body requestRegisterCompleteBook: RequestRegisterCompleteBook
-    ):Response<Unit>
+    ): Response<Unit>
 
     @GET("/v1/api/bookshelf/books")
     suspend fun getBookShelfBooks(
-        @Query("size") size:String,
-        @Query("page") page:String,
-        @Query("readingStatus") readingStatus : ReadingStatus,
+        @Query("size") size: String,
+        @Query("page") page: String,
+        @Query("readingStatus") readingStatus: ReadingStatus,
         @Query("sort") sort: String = "id,DESC"
-    ):Response<BookShelfResult>
+    ): Response<BookShelfResult>
+
+    @DELETE("/v1/api/bookshelf/books/1")
+    suspend fun deleteBookShelfBook(
+        @Query("bookId") bookId: Long
+    ): Response<Unit>
 
 }

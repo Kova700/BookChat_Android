@@ -100,6 +100,20 @@ class BookRepository {
         ).flow
     }
 
+    /**서재 도서 삭제*/
+    suspend fun deleteBookShelfBook(bookId :Long){
+        Log.d(TAG, "BookRepository: deleteBookShelfBook() - called")
+        if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
+
+        val response = App.instance.bookApiInterface.deleteBookShelfBook(bookId)
+        when(response.code()){
+            200 -> {
+
+            }
+            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
+        }
+    }
+
     private fun isNetworkConnected() :Boolean{
         return App.instance.isNetworkConnected()
     }

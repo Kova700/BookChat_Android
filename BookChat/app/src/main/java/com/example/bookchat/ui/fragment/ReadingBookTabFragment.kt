@@ -93,8 +93,9 @@ class ReadingBookTabFragment :Fragment() {
         val deleteItemListener = object :ReadingBookTabAdapter.OnItemClickListener{
             override fun onItemClick(book: BookShelfItem) {
                 //아이템 삭제 API 호출
+                bookShelfViewModel.deleteBookShelfBook(book)
                 //UI 갱신
-                Toast.makeText(requireActivity(),"아이템 삭제!!",Toast.LENGTH_SHORT).show()
+                readingBookAdapter.notifyDataSetChanged()
             }
         }
 
