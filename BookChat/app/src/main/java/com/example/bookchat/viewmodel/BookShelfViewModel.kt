@@ -50,4 +50,14 @@ class BookShelfViewModel(private val bookRepository: BookRepository) :ViewModel(
             .onFailure { Toast.makeText(App.instance.applicationContext,"Reading 조회 실패", Toast.LENGTH_SHORT).show() }
     }
 
+    fun deleteBookShelfBook(book: BookShelfItem) = viewModelScope.launch {
+        runCatching { bookRepository.deleteBookShelfBook(book.bookId) }
+            .onSuccess {
+                Toast.makeText(App.instance.applicationContext,"Reading 삭제 성공", Toast.LENGTH_SHORT).show()
+            }
+            .onFailure {
+                Toast.makeText(App.instance.applicationContext,"Reading 삭제 실패", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 }
