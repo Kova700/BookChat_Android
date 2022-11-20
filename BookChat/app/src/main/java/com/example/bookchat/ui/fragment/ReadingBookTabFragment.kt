@@ -5,12 +5,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
+import com.example.bookchat.SwipeHelperCallback
 import com.example.bookchat.adapter.ReadingBookTabAdapter
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.FragmentReadingBookTabBinding
@@ -59,9 +63,17 @@ class ReadingBookTabFragment :Fragment() {
             readingBookRcv.adapter = readingBookAdapter
             readingBookRcv.setHasFixedSize(true)
             readingBookRcv.layoutManager = LinearLayoutManager(requireContext())
-            readingBookRcv.viewTreeObserver.addOnScrollChangedListener {
-                binding.swipeRefreshLayoutReading.isEnabled = (readingBookRcv.scrollY == 0)
-            }
+            setSwipeHelperCallback(readingBookRcv)
+        }
+    }
+
+    private fun setSwipeHelperCallback(recyclerView : RecyclerView){
+        val swipeHelperCallback = SwipeHelperCallback().apply { setClamp(200f) }
+        val itemTouchHelper = ItemTouchHelper(swipeHelperCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+        recyclerView.setOnTouchListener { _, _ ->
+            swipeHelperCallback.removePreviousClamp(recyclerView)
+            false
         }
     }
 
@@ -78,9 +90,18 @@ class ReadingBookTabFragment :Fragment() {
                 openPageInputSlide(book)
             }
         }
+        val deleteItemListener = object :ReadingBookTabAdapter.OnItemClickListener{
+            override fun onItemClick(book: BookShelfItem) {
+                //아이템 삭제 API 호출
+                //UI 갱신
+                Toast.makeText(requireActivity(),"아이템 삭제!!",Toast.LENGTH_SHORT).show()
+            }
+        }
+
         readingBookAdapter = ReadingBookTabAdapter()
         readingBookAdapter.setItemClickListener(bookItemClickListener)
-        readingBookAdapter.setpageBtnClickListener(pageBtnClickListener)
+        readingBookAdapter.setPageBtnClickListener(pageBtnClickListener)
+        readingBookAdapter.setdeleteClickListener(deleteItemListener)
     }
 
     private fun initRefreshEvent(){
