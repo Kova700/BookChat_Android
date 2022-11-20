@@ -2,19 +2,16 @@ package com.example.bookchat.ui.activity
 
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.example.bookchat.R
-import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ActivityMainBinding
 import com.example.bookchat.ui.fragment.*
 import com.example.bookchat.utils.Constants.TAG
 import com.google.android.material.navigation.NavigationBarView
-import com.sothree.slidinguppanel.SlidingUpPanelLayout
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,7 +34,6 @@ class MainActivity : AppCompatActivity() {
 
         setBottomNavigation()
         addFragment(homeFragment,FRAGMENT_TAG_HOME)
-        initSlidingUpFrame()
     }
 
     private fun setBottomNavigation(){
@@ -146,10 +142,6 @@ class MainActivity : AppCompatActivity() {
     //자식 FragmentBackStack 다 털고 BottomNaviFragmentBackStack 털어야 함
     override fun onBackPressed() {
         Log.d(TAG, "MainActivity: onBackPressed() - called")
-        if(binding.mainSlidingUpFrame.panelState != SlidingUpPanelLayout.PanelState.HIDDEN) {
-            binding.mainSlidingUpFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
-            return
-        }
 
         getInflatedBottomNaviFragment(getInflatedFragmentList())?.let { bottomNaviFragment ->
             if(bottomNaviFragment.childFragmentManager.backStackEntryCount != 0){
@@ -175,31 +167,6 @@ class MainActivity : AppCompatActivity() {
 
         toast.cancel()
         super.onBackPressed()
-    }
-
-    fun initSlidingUpFrame(){
-        binding.mainSlidingUpFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
-        binding.mainSlidingUpFrame.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener{
-            override fun onPanelSlide(panel: View?, slideOffset: Float) {}
-            override fun onPanelStateChanged(
-                panel: View?,
-                previousState: SlidingUpPanelLayout.PanelState?,
-                newState: SlidingUpPanelLayout.PanelState?
-            ) {
-                if (newState == SlidingUpPanelLayout.PanelState.COLLAPSED){
-                    binding.mainSlidingUpFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
-                }
-            }
-        })
-        binding.mainSlidingUpFrame.setFadeOnClickListener {
-            binding.mainSlidingUpFrame.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
-        }
-    }
-
-    fun openPageInputSlide(book: BookShelfItem){
-        Log.d(TAG, "MainActivity: openPageInputSlide() - called")
-        if(binding.mainSlidingUpFrame.panelState != SlidingUpPanelLayout.PanelState.HIDDEN) return
-        binding.mainSlidingUpFrame.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
     }
 
     companion object{
