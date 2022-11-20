@@ -19,6 +19,7 @@ import com.example.bookchat.adapter.ReadingBookTabAdapter
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.FragmentReadingBookTabBinding
 import com.example.bookchat.ui.activity.MainActivity
+import com.example.bookchat.ui.dialog.PageInputBottomSheetDialog
 import com.example.bookchat.ui.dialog.ReadingTapBookDialog
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.BookShelfViewModel
@@ -87,7 +88,8 @@ class ReadingBookTabFragment :Fragment() {
         val pageBtnClickListener = object :ReadingBookTabAdapter.OnItemClickListener{
             override fun onItemClick(book: BookShelfItem) {
                 //아래에서 slidingUp layout올라와서 페이지 변경 UI 노출
-                openPageInputSlide(book)
+                val pageInputBottomSheetDialog = PageInputBottomSheetDialog()
+                pageInputBottomSheetDialog.show(childFragmentManager,"PageInputBottomSheetDialog")
             }
         }
         val deleteItemListener = object :ReadingBookTabAdapter.OnItemClickListener{
@@ -110,10 +112,6 @@ class ReadingBookTabFragment :Fragment() {
             readingBookAdapter.refresh()
             binding.swipeRefreshLayoutReading.isRefreshing = false
         }
-    }
-
-    fun openPageInputSlide(book: BookShelfItem){
-        (requireActivity() as MainActivity).openPageInputSlide(book)
     }
 
 }
