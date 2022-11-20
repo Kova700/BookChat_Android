@@ -14,12 +14,16 @@ class ReadingBookTabAdapter : PagingDataAdapter<BookShelfItem, ReadingBookTabAda
     private lateinit var binding : ItemReadingBookTabBinding
     private lateinit var itemClickListener : OnItemClickListener
     private lateinit var pageBtnClickListener :OnItemClickListener
+    private lateinit var deleteClickListener :OnItemClickListener
 
     inner class ReadingBookItemViewHolder(val binding: ItemReadingBookTabBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(book : BookShelfItem){
             binding.bookShelfItem = book
-            binding.root.setOnClickListener {
+            binding.swipeView.setOnClickListener {
                 itemClickListener.onItemClick(book)
+            }
+            binding.swipeBackground.setOnClickListener {
+                deleteClickListener.onItemClick(book)
             }
             binding.pageBtn.setOnClickListener{
                 pageBtnClickListener.onItemClick(book)
@@ -46,10 +50,12 @@ class ReadingBookTabAdapter : PagingDataAdapter<BookShelfItem, ReadingBookTabAda
         this.itemClickListener = onItemClickListener
     }
 
-    fun setpageBtnClickListener(onItemClickListener: OnItemClickListener){
+    fun setPageBtnClickListener(onItemClickListener: OnItemClickListener){
         this.pageBtnClickListener = onItemClickListener
     }
 
-
+    fun setdeleteClickListener(onItemClickListener: OnItemClickListener){
+        this.deleteClickListener = onItemClickListener
+    }
 
 }
