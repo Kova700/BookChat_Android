@@ -42,9 +42,9 @@ interface BookApiInterface {
         @Query("sort") sort: String = "id,DESC"
     ): Response<BookShelfResult>
 
-    @DELETE("/v1/api/bookshelf/books/1")
+    @DELETE("/v1/api/bookshelf/books/{bookId}")
     suspend fun deleteBookShelfBook(
-        @Query("bookId") bookId: Long
+        @Path("bookId") bookId: Long
     ): Response<Unit>
 
 }
