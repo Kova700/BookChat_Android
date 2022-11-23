@@ -1,6 +1,5 @@
 package com.example.bookchat.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,11 +7,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemSearchHistoryBinding
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
 import kotlinx.coroutines.runBlocking
 
-//리스트 어댑터로 수정 예정
 class SearchHistoryAdapter(var searchHistoryList: MutableList<String>) :
     RecyclerView.Adapter<SearchHistoryAdapter.SearchHistoryViewHolder>() {
 
@@ -32,14 +29,16 @@ class SearchHistoryAdapter(var searchHistoryList: MutableList<String>) :
     }
 
     override fun onBindViewHolder(holder: SearchHistoryViewHolder, position: Int) {
-        holder.bind(searchHistoryList[position])
+        holder.bind(searchHistoryList[holder.itemId.toInt()])
+
         binding.searchHistoryTv.setOnClickListener {
-            itemClickListener.onClick(it, position)
+            itemClickListener.onClick(it, holder.itemId.toInt())
         }
+
         binding.deleteSearchHistoryBtn.setOnClickListener {
-            searchHistoryList.removeAt(position)
+            searchHistoryList.removeAt(holder.itemId.toInt())
             overWriteHistory(searchHistoryList)
-            this.notifyDataSetChanged()
+            this@SearchHistoryAdapter.notifyDataSetChanged()
         }
     }
 
@@ -47,6 +46,13 @@ class SearchHistoryAdapter(var searchHistoryList: MutableList<String>) :
         DataStoreManager.overWriteHistory(historyList)
     }
 
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return position
+    }
 
     override fun getItemCount(): Int {
         return searchHistoryList.size
