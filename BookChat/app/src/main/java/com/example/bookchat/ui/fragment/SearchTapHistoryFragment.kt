@@ -25,13 +25,11 @@ class SearchTapHistoryFragment : Fragment() {
     private lateinit var searchHistoryAdapter :SearchHistoryAdapter
     private lateinit var searchViewModel: SearchViewModel
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        //최근 검색어 받아와야함
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search_tap_history, container, false)
         searchViewModel = ViewModelProvider(requireParentFragment(), ViewModelFactory()).get(SearchViewModel::class.java)
         binding.fragment = this
@@ -43,8 +41,8 @@ class SearchTapHistoryFragment : Fragment() {
     private fun initAdapter() = lifecycleScope.launch {
         val historyList = DataStoreManager.getSearchHistory() ?: mutableListOf()
         searchHistoryAdapter = SearchHistoryAdapter(historyList)
-        searchHistoryAdapter.setItemClickListener(object :
-            SearchHistoryAdapter.OnItemClickListener {
+        searchHistoryAdapter.setHasStableIds(true)
+        searchHistoryAdapter.setItemClickListener(object : SearchHistoryAdapter.OnItemClickListener {
             override fun onClick(v: View, position: Int) {
                 val keyword = (v as TextView).text.toString()
                 searchViewModel.clickHistory(keyword)
