@@ -20,6 +20,14 @@ class SearchHistoryAdapter(var searchHistoryList: MutableList<String>) :
         RecyclerView.ViewHolder(binding.root){
         fun bind(historyKeyword : String){
             binding.historyKeyword = historyKeyword
+            this.binding.searchHistoryTv.setOnClickListener {
+                itemClickListener.onClick(it)
+            }
+            this.binding.deleteSearchHistoryBtn.setOnClickListener{
+                searchHistoryList.removeAt(this.absoluteAdapterPosition)
+                overWriteHistory(searchHistoryList)
+                this@SearchHistoryAdapter.notifyDataSetChanged()
+            }
         }
     }
 
@@ -29,29 +37,17 @@ class SearchHistoryAdapter(var searchHistoryList: MutableList<String>) :
     }
 
     override fun onBindViewHolder(holder: SearchHistoryViewHolder, position: Int) {
-        holder.bind(searchHistoryList[holder.itemId.toInt()])
-
-        binding.searchHistoryTv.setOnClickListener {
-            itemClickListener.onClick(it, holder.itemId.toInt())
-        }
-
-        binding.deleteSearchHistoryBtn.setOnClickListener {
-            searchHistoryList.removeAt(holder.itemId.toInt())
-            overWriteHistory(searchHistoryList)
-            this@SearchHistoryAdapter.notifyDataSetChanged()
-        }
+        holder.bind(searchHistoryList[position])
     }
 
     private fun overWriteHistory(historyList: List<String>) = runBlocking {
         DataStoreManager.overWriteHistory(historyList)
     }
 
+    //notifyDataSetChanged()시에 수정된 ItemView구분을 위해 사용 (수정된 ItemView만 갱신)
+    //ListAdapter와 DiffUtil사용하면 굳이 사용하지 않아도 됌
     override fun getItemId(position: Int): Long {
         return position.toLong()
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return position
     }
 
     override fun getItemCount(): Int {
@@ -59,7 +55,7 @@ class SearchHistoryAdapter(var searchHistoryList: MutableList<String>) :
     }
 
     interface OnItemClickListener {
-        fun onClick(v: View, position: Int)
+        fun onClick(v: View)
     }
 
     fun setItemClickListener(onItemClickListener: OnItemClickListener) {

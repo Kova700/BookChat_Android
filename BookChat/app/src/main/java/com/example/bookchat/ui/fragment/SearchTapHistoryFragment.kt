@@ -43,7 +43,7 @@ class SearchTapHistoryFragment : Fragment() {
         searchHistoryAdapter = SearchHistoryAdapter(historyList)
         searchHistoryAdapter.setHasStableIds(true)
         searchHistoryAdapter.setItemClickListener(object : SearchHistoryAdapter.OnItemClickListener {
-            override fun onClick(v: View, position: Int) {
+            override fun onClick(v: View) {
                 val keyword = (v as TextView).text.toString()
                 searchViewModel.clickHistory(keyword)
             }
