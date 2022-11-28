@@ -9,12 +9,14 @@ import com.example.bookchat.R
 import com.example.bookchat.adapter.WishBookTabAdapter.Companion.BOOK_SHELF_ITEM_COMPARATOR
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ItemReadingBookTabBinding
+import com.example.bookchat.utils.ReadingStatus
+import com.example.bookchat.viewmodel.BookShelfViewModel
 
-class ReadingBookTabAdapter : PagingDataAdapter<BookShelfItem, ReadingBookTabAdapter.ReadingBookItemViewHolder>(BOOK_SHELF_ITEM_COMPARATOR){
+class ReadingBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
+    : PagingDataAdapter<BookShelfItem, ReadingBookTabAdapter.ReadingBookItemViewHolder>(BOOK_SHELF_ITEM_COMPARATOR){
     private lateinit var binding : ItemReadingBookTabBinding
     private lateinit var itemClickListener : OnItemClickListener
     private lateinit var pageBtnClickListener :OnItemClickListener
-    private lateinit var deleteClickListener :OnItemClickListener
 
     inner class ReadingBookItemViewHolder(val binding: ItemReadingBookTabBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(book : BookShelfItem){
@@ -23,7 +25,8 @@ class ReadingBookTabAdapter : PagingDataAdapter<BookShelfItem, ReadingBookTabAda
                 itemClickListener.onItemClick(book)
             }
             binding.swipeBackground.setOnClickListener {
-                deleteClickListener.onItemClick(book)
+                bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.Remove(book), ReadingStatus.READING)
+                bookShelfViewModel.deleteBookShelfBook(book)
             }
             binding.pageBtn.setOnClickListener{
                 pageBtnClickListener.onItemClick(book)
@@ -52,10 +55,6 @@ class ReadingBookTabAdapter : PagingDataAdapter<BookShelfItem, ReadingBookTabAda
 
     fun setPageBtnClickListener(onItemClickListener: OnItemClickListener){
         this.pageBtnClickListener = onItemClickListener
-    }
-
-    fun setdeleteClickListener(onItemClickListener: OnItemClickListener){
-        this.deleteClickListener = onItemClickListener
     }
 
 }
