@@ -83,23 +83,6 @@ class BookRepository {
         }
     }
 
-    /** 책 서재 조회*/
-    fun requestGetWishList() :Flow<PagingData<Pair<BookShelfItem, Long>>>{
-        Log.d(TAG, "BookRepository: requestGetWishList() - called")
-        return Pager(
-            config = PagingConfig( pageSize = WISH_TAP_BOOKS_ITEM_LOAD_SIZE, enablePlaceholders = false ),
-            pagingSourceFactory = { WishBookTapPagingSource() }
-        ).flow
-    }
-
-    fun requestGetReadingList() :Flow<PagingData<Pair<BookShelfItem, Long>>>{
-        Log.d(TAG, "BookRepository: requestGetReadingList() - called")
-        return Pager(
-            config = PagingConfig( pageSize = READING_TAP_BOOKS_ITEM_LOAD_SIZE, enablePlaceholders = false ),
-            pagingSourceFactory = { ReadingBookTapPagingSource() }
-        ).flow
-    }
-
     /**서재 도서 삭제*/
     suspend fun deleteBookShelfBook(bookId :Long){
         Log.d(TAG, "BookRepository: deleteBookShelfBook() - called")
@@ -124,7 +107,7 @@ class BookRepository {
 
     companion object{
         private const val SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE = 6
-        private const val WISH_TAP_BOOKS_ITEM_LOAD_SIZE = 6
-        private const val READING_TAP_BOOKS_ITEM_LOAD_SIZE = 4
+        const val WISH_TAP_BOOKS_ITEM_LOAD_SIZE = 6
+        const val READING_TAP_BOOKS_ITEM_LOAD_SIZE = 4
     }
 }

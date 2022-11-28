@@ -1,15 +1,12 @@
 package com.example.bookchat.ui.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,19 +15,15 @@ import com.example.bookchat.SwipeHelperCallback
 import com.example.bookchat.adapter.ReadingBookTabAdapter
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.FragmentReadingBookTabBinding
-import com.example.bookchat.ui.activity.MainActivity
 import com.example.bookchat.ui.dialog.PageInputBottomSheetDialog
 import com.example.bookchat.ui.dialog.ReadingTapBookDialog
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.ViewModelFactory
-import kotlinx.coroutines.launch
 
 class ReadingBookTabFragment :Fragment() {
     private lateinit var binding : FragmentReadingBookTabBinding
     private lateinit var readingBookAdapter :ReadingBookTabAdapter
     private lateinit var bookShelfViewModel: BookShelfViewModel
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,7 +36,6 @@ class ReadingBookTabFragment :Fragment() {
             lifecycleOwner = this@ReadingBookTabFragment
             viewmodel = bookShelfViewModel
         }
-        Log.d(TAG, "ReadingBookTabFragment: onCreateView() - (requireActivity() is MainActivity) : ${(requireActivity() is MainActivity)}")
         initAdapter()
         initRecyclerView()
         initRefreshEvent()
@@ -52,10 +44,9 @@ class ReadingBookTabFragment :Fragment() {
         return binding.root
     }
 
-    private fun observePagingReadingBookData()= lifecycleScope.launch {
-        bookShelfViewModel.readingBookResult.collect{ PagingBookShelfItem ->
-            Log.d(TAG, "ReadingBookTabFragment: observePagingReadingBookData() - PagingBookShelfItem :$PagingBookShelfItem")
-            readingBookAdapter.submitData(PagingBookShelfItem)
+    private fun observePagingReadingBookData() {
+        bookShelfViewModel.readingBookCombined.observe(viewLifecycleOwner){ PagingBookShelfItem ->
+            readingBookAdapter.submitData(viewLifecycleOwner.lifecycle,PagingBookShelfItem)
         }
     }
 
@@ -92,19 +83,10 @@ class ReadingBookTabFragment :Fragment() {
                 pageInputBottomSheetDialog.show(childFragmentManager,"PageInputBottomSheetDialog")
             }
         }
-        val deleteItemListener = object :ReadingBookTabAdapter.OnItemClickListener{
-            override fun onItemClick(book: BookShelfItem) {
-                //아이템 삭제 API 호출
-                bookShelfViewModel.deleteBookShelfBook(book)
-                //UI 갱신
-                readingBookAdapter.notifyDataSetChanged()
-            }
-        }
 
-        readingBookAdapter = ReadingBookTabAdapter()
+        readingBookAdapter = ReadingBookTabAdapter(bookShelfViewModel)
         readingBookAdapter.setItemClickListener(bookItemClickListener)
         readingBookAdapter.setPageBtnClickListener(pageBtnClickListener)
-        readingBookAdapter.setdeleteClickListener(deleteItemListener)
     }
 
     private fun initRefreshEvent(){

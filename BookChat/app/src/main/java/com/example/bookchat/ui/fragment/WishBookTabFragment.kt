@@ -45,9 +45,8 @@ class WishBookTabFragment : Fragment() {
     }
 
     private fun observePagingWishBookData()= lifecycleScope.launch {
-        bookShelfViewModel.wishBookResult.collect{ PagingBookShelfItem ->
-            Log.d(TAG, "WishBookTabFragment: observePagingWishBookData() - PagingBookShelfItem :$PagingBookShelfItem")
-            wishBookAdapter.submitData(PagingBookShelfItem)
+        bookShelfViewModel.wishBookCombined.observe(viewLifecycleOwner){ PagingBookShelfItem ->
+            wishBookAdapter.submitData(viewLifecycleOwner.lifecycle,PagingBookShelfItem)
         }
     }
 
