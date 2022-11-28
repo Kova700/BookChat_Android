@@ -17,11 +17,12 @@ data class BookShelfItem(
     @SerializedName("publisher")
     val publisher: String,
     @SerializedName("publishAt")
-    val publishAt :String,
+    val publishAt: String,
     @SerializedName("star")
     val star: StarRating,
     @SerializedName("singleLineAssessment")
     val singleLineAssessment: String,
     @SerializedName("pages")
-    val pages: Int
+    val pages: Int,
+    var isSwiped: Boolean = false,
 )

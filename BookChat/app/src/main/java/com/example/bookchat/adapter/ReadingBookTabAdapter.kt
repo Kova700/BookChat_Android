@@ -1,6 +1,7 @@
 package com.example.bookchat.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.paging.PagingDataAdapter
@@ -20,18 +21,35 @@ class ReadingBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
 
     inner class ReadingBookItemViewHolder(val binding: ItemReadingBookTabBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(book : BookShelfItem){
-            binding.bookShelfItem = book
-            binding.swipeView.setOnClickListener {
-                itemClickListener.onItemClick(book)
-            }
-            binding.swipeBackground.setOnClickListener {
-                bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.Remove(book), ReadingStatus.READING)
-                bookShelfViewModel.deleteBookShelfBook(book)
-            }
-            binding.pageBtn.setOnClickListener{
-                pageBtnClickListener.onItemClick(book)
+            with(this.binding){
+                bookShelfItem = book
+                swipeView.setOnClickListener {
+                    itemClickListener.onItemClick(book)
+                }
+                swipeBackground.setOnClickListener {
+                    bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.Remove(book), ReadingStatus.READING)
+                    bookShelfViewModel.deleteBookShelfBook(book)
+                    swipeView.translationX = 0f
+                }
+                pageBtn.setOnClickListener{
+                    pageBtnClickListener.onItemClick(book)
+                }
+                setViewHolderState(swipeView,book.isSwiped)
             }
         }
+        fun setSwiped(isClamped: Boolean){
+            val currentItem = getItem(absoluteAdapterPosition)
+            currentItem?.let { currentItem.isSwiped = isClamped }
+        }
+
+        fun getSwiped(): Boolean{
+            return getItem(absoluteAdapterPosition)?.isSwiped ?: false
+        }
+    }
+
+    private fun setViewHolderState(view: View, isSwiped :Boolean){
+        if(!isSwiped) { view.translationX = 0f; return }
+        view.translationX = view.width.toFloat() * SWIPE_VIEW_PERCENT
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReadingBookTabAdapter.ReadingBookItemViewHolder {
@@ -55,6 +73,10 @@ class ReadingBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
 
     fun setPageBtnClickListener(onItemClickListener: OnItemClickListener){
         this.pageBtnClickListener = onItemClickListener
+    }
+
+    companion object {
+        private const val SWIPE_VIEW_PERCENT = 0.3F
     }
 
 }

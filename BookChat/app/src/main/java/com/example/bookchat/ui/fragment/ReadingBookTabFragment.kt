@@ -60,7 +60,7 @@ class ReadingBookTabFragment :Fragment() {
     }
 
     private fun setSwipeHelperCallback(recyclerView : RecyclerView){
-        val swipeHelperCallback = SwipeHelperCallback().apply { setClamp(200f) }
+        val swipeHelperCallback = SwipeHelperCallback()
         val itemTouchHelper = ItemTouchHelper(swipeHelperCallback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
         recyclerView.setOnTouchListener { _, _ ->
