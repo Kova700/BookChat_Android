@@ -6,13 +6,15 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.bookchat.App
 import com.example.bookchat.data.*
-import com.example.bookchat.paging.ReadingBookTapPagingSource
 import com.example.bookchat.paging.SearchResultBookDetailPagingSource
-import com.example.bookchat.paging.WishBookTapPagingSource
 import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.response.ResponseBodyEmptyException
 import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.ReadingStatus
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
+import okhttp3.MediaType
+import okhttp3.RequestBody
 
 class BookRepository {
 
@@ -38,7 +40,6 @@ class BookRepository {
     }
 
     fun detailSearchBooks(keyword :String) : Flow<PagingData<Book>> {
-        Log.d(TAG, "BookRepository: detailSearchBooks() - called")
 
         return Pager(
             config = PagingConfig( pageSize = SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE, enablePlaceholders = false ),
@@ -52,9 +53,7 @@ class BookRepository {
 
         val response = App.instance.bookApiInterface.registerWishBook(requestRegisterWishBook)
         when(response.code()){
-            200 -> {
-
-            }
+            200 -> { }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
         }
     }
@@ -64,9 +63,7 @@ class BookRepository {
 
         val response = App.instance.bookApiInterface.registerReadingBook(requestRegisterReadingBook)
         when(response.code()){
-            200 -> {
-
-            }
+            200 -> { }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
         }
     }
@@ -76,9 +73,7 @@ class BookRepository {
 
         val response = App.instance.bookApiInterface.registerCompleteBook(requestRegisterCompleteBook)
         when(response.code()){
-            200 -> {
-
-            }
+            200 -> { }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
         }
     }
@@ -90,12 +85,37 @@ class BookRepository {
 
         val response = App.instance.bookApiInterface.deleteBookShelfBook(bookId)
         when(response.code()){
-            200 -> {
-
-            }
+            200 -> { }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
         }
     }
+
+    /**서재 도서 상태변경*/
+    suspend fun changeBookShelfBookStatus(book :BookShelfItem, readingStatus : ReadingStatus){
+        Log.d(TAG, "BookRepository: changeBookShelfBookStatus() - called")
+        if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
+
+        val requestBody = getRequestBody(
+            content = hashMapOf( Pair(JSON_KEY_READINGSTATUS,readingStatus) ),
+            contentType = UserRepository.CONTENT_TYPE_JSON
+        )
+
+        val response = App.instance.bookApiInterface.changeBookShelfBookStatus(book.bookId,requestBody)
+        when(response.code()){
+            200 -> { }
+            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
+        }
+    }
+
+    private fun <T> getRequestBody(
+        content : T,
+        contentType : String
+    ) : RequestBody {
+        val jsonString = Gson().toJson(content)
+        val requestBody = RequestBody.create(MediaType.parse(contentType),jsonString)
+        return requestBody
+    }
+
 
     private fun isNetworkConnected() :Boolean{
         return App.instance.isNetworkConnected()
@@ -109,5 +129,6 @@ class BookRepository {
         private const val SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE = 6
         const val WISH_TAP_BOOKS_ITEM_LOAD_SIZE = 6
         const val READING_TAP_BOOKS_ITEM_LOAD_SIZE = 4
+        const val JSON_KEY_READINGSTATUS = "readingStatus"
     }
 }

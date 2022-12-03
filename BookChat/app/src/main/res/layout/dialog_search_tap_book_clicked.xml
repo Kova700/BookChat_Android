@@ -148,14 +148,14 @@
             android:textColor="#5648FF"
             app:cornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/button2"
+            app:layout_constraintEnd_toStartOf="@+id/change_status_to_reading_btn_wish_dialog"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView28"
             app:strokeColor="#5648FF"
             app:strokeWidth="1dp" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button2"
+            android:id="@+id/change_status_to_reading_btn_wish_dialog"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="3dp"

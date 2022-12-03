@@ -3,7 +3,7 @@ package com.example.bookchat.api
 import com.example.bookchat.data.*
 import com.example.bookchat.utils.BookSearchSortOption
 import com.example.bookchat.utils.ReadingStatus
-import com.google.gson.annotations.SerializedName
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -45,6 +45,12 @@ interface BookApiInterface {
     @DELETE("/v1/api/bookshelf/books/{bookId}")
     suspend fun deleteBookShelfBook(
         @Path("bookId") bookId: Long
+    ): Response<Unit>
+
+    @PATCH("/v1/api/bookshelf/books/{bookId}/status")
+    suspend fun changeBookShelfBookStatus(
+        @Path("bookId") bookId: Long,
+        @Body readingStatus: RequestBody
     ): Response<Unit>
 
 }

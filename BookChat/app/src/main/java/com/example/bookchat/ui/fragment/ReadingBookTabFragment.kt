@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,11 +21,12 @@ import com.example.bookchat.ui.dialog.PageInputBottomSheetDialog
 import com.example.bookchat.ui.dialog.ReadingTapBookDialog
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.ViewModelFactory
+import kotlinx.coroutines.launch
 
 class ReadingBookTabFragment :Fragment() {
-    private lateinit var binding : FragmentReadingBookTabBinding
-    private lateinit var readingBookAdapter :ReadingBookTabAdapter
-    private lateinit var bookShelfViewModel: BookShelfViewModel
+    lateinit var binding : FragmentReadingBookTabBinding
+    lateinit var readingBookAdapter :ReadingBookTabAdapter
+    lateinit var bookShelfViewModel: BookShelfViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,6 +43,7 @@ class ReadingBookTabFragment :Fragment() {
         initRecyclerView()
         initRefreshEvent()
         observePagingReadingBookData()
+        observeAdapterLoadState()
 
         return binding.root
     }
@@ -47,6 +51,18 @@ class ReadingBookTabFragment :Fragment() {
     private fun observePagingReadingBookData() {
         bookShelfViewModel.readingBookCombined.observe(viewLifecycleOwner){ PagingBookShelfItem ->
             readingBookAdapter.submitData(viewLifecycleOwner.lifecycle,PagingBookShelfItem)
+        }
+    }
+
+    private fun observeAdapterLoadState() = lifecycleScope.launch{
+        readingBookAdapter.loadStateFlow.collect{ combinedLoadStates ->
+            if(combinedLoadStates.refresh is LoadState.NotLoading) initializeModificationEvents()
+        }
+    }
+
+    private fun initializeModificationEvents(){
+        if(bookShelfViewModel.readingBookModificationEvents.value.isNotEmpty()){
+            bookShelfViewModel.readingBookModificationEvents.value = emptyList()
         }
     }
 
@@ -73,14 +89,14 @@ class ReadingBookTabFragment :Fragment() {
         val bookItemClickListener = object: ReadingBookTabAdapter.OnItemClickListener{
             override fun onItemClick(book : BookShelfItem) {
                 val dialog = ReadingTapBookDialog(book)
-                dialog.show(this@ReadingBookTabFragment.childFragmentManager,"ReadingTapBookDialog")
+                dialog.show(this@ReadingBookTabFragment.childFragmentManager,DIALOG_TAG_READING)
             }
         }
         val pageBtnClickListener = object :ReadingBookTabAdapter.OnItemClickListener{
             override fun onItemClick(book: BookShelfItem) {
                 //아래에서 slidingUp layout올라와서 페이지 변경 UI 노출
                 val pageInputBottomSheetDialog = PageInputBottomSheetDialog()
-                pageInputBottomSheetDialog.show(childFragmentManager,"PageInputBottomSheetDialog")
+                pageInputBottomSheetDialog.show(childFragmentManager,DIALOG_TAG_PAGE_INPUT)
             }
         }
 
@@ -96,4 +112,8 @@ class ReadingBookTabFragment :Fragment() {
         }
     }
 
+    companion object {
+        private const val DIALOG_TAG_READING = "ReadingTapBookDialog"
+        private const val DIALOG_TAG_PAGE_INPUT = "PageInputBottomSheetDialog"
+    }
 }
