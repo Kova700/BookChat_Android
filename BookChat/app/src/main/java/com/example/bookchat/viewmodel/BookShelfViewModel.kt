@@ -71,7 +71,7 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
         }.cachedIn(viewModelScope).asLiveData()
     }
 
-    fun deleteBookShelfBook(book: BookShelfItem) = viewModelScope.launch {
+    fun deleteBookShelfBookWithSwipe(book: BookShelfItem) = viewModelScope.launch {
         runCatching { bookRepository.deleteBookShelfBook(book.bookId) }
             .onSuccess {
                 Toast.makeText(App.instance.applicationContext, "도서가 삭제되었습니다.", Toast.LENGTH_SHORT)
@@ -89,6 +89,10 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
                 wishBookModificationEvents.value += pagingViewEvent
             }
             ReadingStatus.READING -> {
+                if (readingBookModificationEvents.value.contains(pagingViewEvent)){
+                    readingBookModificationEvents.value -= pagingViewEvent
+                    return
+                }
                 readingBookModificationEvents.value += pagingViewEvent
             }
             ReadingStatus.COMPLETE -> {}
@@ -103,6 +107,7 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
             is PagingViewEvent.Remove -> {
                 paging.filter { it.bookId != pagingViewEvent.bookShelfItem.bookId }
             }
+//            is PagingViewEvent.Edit -> {  }
         }
     }
 
