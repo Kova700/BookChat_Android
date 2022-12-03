@@ -1,9 +1,80 @@
 package com.example.bookchat.viewmodel
 
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.bookchat.App
 import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.data.RequestRegisterWishBook
 import com.example.bookchat.repository.BookRepository
+import com.example.bookchat.utils.ReadingStatus
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 
 class WishBookTapDialogViewModel(private val bookRepository: BookRepository) :ViewModel() {
+    private val _eventFlow = MutableSharedFlow<WishBookEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
     lateinit var book: BookShelfItem
+    private var isInited = false
+    var isToggleChecked = MutableStateFlow<Boolean>(true)
+
+    fun requestToggleApi() = viewModelScope.launch {
+        if (!isInited) { isInited = true; return@launch }
+
+        isToggleChecked.value = !(isToggleChecked.value)
+
+        if(isToggleChecked.value){
+            addWishBook()
+            return@launch
+        }
+        removeWishBook()
+    }
+
+    //알림 내용 스낵바로 수정 예정
+    private suspend fun removeWishBook()= viewModelScope.launch {
+        runCatching { bookRepository.deleteBookShelfBook(book.bookId) }
+            .onSuccess {
+                Toast.makeText(App.instance.applicationContext, "도서가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                startEvent(WishBookEvent.RemoveItem)
+            }
+            .onFailure {
+                Toast.makeText(App.instance.applicationContext, "WISH 삭제 실패", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private suspend fun addWishBook()= viewModelScope.launch {
+        val requestRegisterWishBook = RequestRegisterWishBook(book.getBook())
+        runCatching { bookRepository.registerWishBook(requestRegisterWishBook) }
+            .onSuccess {
+                Toast.makeText(App.instance.applicationContext,"독서예정에 등록되었습니다.",Toast.LENGTH_SHORT).show()
+                startEvent(WishBookEvent.AddItem)
+            }
+            .onFailure {
+                Toast.makeText(App.instance.applicationContext,"Wish 등록 실패",Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    fun changeToReadingBook() = viewModelScope.launch{
+        runCatching { bookRepository.changeBookShelfBookStatus(book, ReadingStatus.READING) }
+            .onSuccess {
+                Toast.makeText(App.instance.applicationContext,"독서중으로 변경되었습니다.",Toast.LENGTH_SHORT).show()
+                startEvent(WishBookEvent.MoveToReadingBook)
+            }
+            .onFailure {
+                Toast.makeText(App.instance.applicationContext,"독서중 변경 실패",Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun startEvent (event : WishBookEvent) = viewModelScope.launch {
+        _eventFlow.emit(event)
+    }
+
+    sealed class WishBookEvent {
+        object RemoveItem :WishBookEvent()
+        object AddItem :WishBookEvent()
+        object MoveToReadingBook :WishBookEvent()
+    }
 }

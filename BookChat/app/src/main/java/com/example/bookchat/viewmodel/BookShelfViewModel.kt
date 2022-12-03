@@ -17,25 +17,29 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel() {
-    private val readingBookModificationEvents = MutableStateFlow<List<PagingViewEvent>>(emptyList())
-    private val wishBookModificationEvents = MutableStateFlow<List<PagingViewEvent>>(emptyList())
+    private val _eventFlow = MutableSharedFlow<BookShelfEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
 
+    val wishBookModificationEvents = MutableStateFlow<List<PagingViewEvent>>(emptyList())
+    val readingBookModificationEvents = MutableStateFlow<List<PagingViewEvent>>(emptyList())
+
+    var wishBookTotalCountCache = 0L
     var wishBookTotalCount = MutableStateFlow<Long>(0)
-    private val wishBookResult by lazy {
-        Pager(
-            config = PagingConfig(
-                pageSize = WISH_TAP_BOOKS_ITEM_LOAD_SIZE,
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = { WishBookTapPagingSource() }
-        ).flow.map {
-            it.map {
-                wishBookTotalCount.value = it.second
-                it.first
-            }
-        }.cachedIn(viewModelScope)
-    }
+    var wishBookResult = Pager(
+        config = PagingConfig(
+            pageSize = WISH_TAP_BOOKS_ITEM_LOAD_SIZE,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = { WishBookTapPagingSource() }
+    ).flow.map { pagingData ->
+        pagingData.map { pair ->
+            wishBookTotalCountCache = pair.second
+            wishBookTotalCount.value = pair.second
+            pair.first
+        }
+    }.cachedIn(viewModelScope)
 
+    var readingBookTotalCountCache = 0L
     var readingBookTotalCount = MutableStateFlow<Long>(0)
     private val readingBookResult by lazy {
         Pager(
@@ -44,10 +48,11 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
                 enablePlaceholders = false
             ),
             pagingSourceFactory = { ReadingBookTapPagingSource() }
-        ).flow.map {
-            it.map {
-                readingBookTotalCount.value = it.second
-                it.first
+        ).flow.map { pagingData ->
+            pagingData.map { pair ->
+                readingBookTotalCountCache = pair.second
+                readingBookTotalCount.value = pair.second
+                pair.first
             }
         }.cachedIn(viewModelScope)
     }
@@ -55,47 +60,68 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
     val readingBookCombined by lazy {
         readingBookResult.combine(readingBookModificationEvents) { pagingData, modifications ->
             modifications.fold(pagingData) { acc, event -> applyEvents(acc, event) }
+                .also { renewTotalItemCount(MODIFICATION_EVENT_FLAG_READING) }
         }.cachedIn(viewModelScope).asLiveData()
     }
 
     val wishBookCombined by lazy {
         wishBookResult.combine(wishBookModificationEvents) { pagingData, modifications ->
             modifications.fold(pagingData) { acc, event -> applyEvents(acc, event) }
+                .also { renewTotalItemCount(MODIFICATION_EVENT_FLAG_WISH) }
         }.cachedIn(viewModelScope).asLiveData()
     }
 
     fun deleteBookShelfBook(book: BookShelfItem) = viewModelScope.launch {
         runCatching { bookRepository.deleteBookShelfBook(book.bookId) }
             .onSuccess {
-                Toast.makeText(App.instance.applicationContext, "Reading 삭제 성공", Toast.LENGTH_SHORT)
+                Toast.makeText(App.instance.applicationContext, "도서가 삭제되었습니다.", Toast.LENGTH_SHORT)
                     .show()
             }
             .onFailure {
-                Toast.makeText(App.instance.applicationContext, "Reading 삭제 실패", Toast.LENGTH_SHORT)
+                Toast.makeText(App.instance.applicationContext, "도서 삭제 실패", Toast.LENGTH_SHORT)
                     .show()
             }
     }
 
-    fun onPagingViewEvent(pagingViewEvent: PagingViewEvent, readingStatus :ReadingStatus) {
-        when(readingStatus){
-            ReadingStatus.WISH -> { wishBookModificationEvents.value += pagingViewEvent }
-            ReadingStatus.READING ->{ readingBookModificationEvents.value += pagingViewEvent }
-            ReadingStatus.COMPLETE -> { }
+    fun onPagingViewEvent(pagingViewEvent: PagingViewEvent, readingStatus: ReadingStatus) {
+        when (readingStatus) {
+            ReadingStatus.WISH -> {
+                wishBookModificationEvents.value += pagingViewEvent
+            }
+            ReadingStatus.READING -> {
+                readingBookModificationEvents.value += pagingViewEvent
+            }
+            ReadingStatus.COMPLETE -> {}
         }
     }
 
-    private fun applyEvents(
+    fun applyEvents(
         paging: PagingData<BookShelfItem>,
-        pagingViewEvent: PagingViewEvent
+        pagingViewEvent: PagingViewEvent,
     ): PagingData<BookShelfItem> {
         return when (pagingViewEvent) {
             is PagingViewEvent.Remove -> {
-                var itemCount = 0L
-                val newPagingData =
-                    paging.filter { it.bookId != pagingViewEvent.bookShelfItem.bookId }
-                newPagingData.map { readingBookTotalCount.value = ++itemCount;it }
+                paging.filter { it.bookId != pagingViewEvent.bookShelfItem.bookId }
             }
         }
+    }
+
+    private fun renewTotalItemCount(flag: String) {
+        when (flag) {
+            MODIFICATION_EVENT_FLAG_WISH -> {
+                wishBookTotalCount.value =
+                    wishBookTotalCountCache - wishBookModificationEvents.value.size
+            }
+            MODIFICATION_EVENT_FLAG_READING -> {
+                readingBookTotalCount.value =
+                    readingBookTotalCountCache - readingBookModificationEvents.value.size
+            }
+            else -> {}
+        }
+    }
+
+    fun startEvent(event: BookShelfEvent) = viewModelScope.launch {
+        _eventFlow.emit(event)
     }
 
     sealed class PagingViewEvent {
@@ -103,4 +129,12 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
 //        data class Edit(val bookShelfItem: BookShelfItem) : PagingViewEvent() //페이지 입력할 때 사용할 듯
     }
 
+    sealed class BookShelfEvent {
+        data class ChangeBookShelfTab(val tapIndex: Int) : BookShelfEvent()
+    }
+
+    companion object {
+        private const val MODIFICATION_EVENT_FLAG_WISH = "WISH"
+        private const val MODIFICATION_EVENT_FLAG_READING = "READING"
+    }
 }

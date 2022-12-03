@@ -25,4 +25,15 @@ data class BookShelfItem(
     @SerializedName("pages")
     val pages: Int,
     var isSwiped: Boolean = false,
-)
+){
+    fun getBook() :Book{
+        return Book(
+            isbn = this.isbn,
+            title = this.title,
+            datetime = this.publishAt,
+            authors = this.authors,
+            publisher = this.publisher,
+            bookCoverImageUrl = this.bookCoverImageUrl
+        )
+    }
+}

@@ -23,19 +23,21 @@
             android:layout_marginEnd="12dp"
             android:layout_marginBottom="-23dp"
             android:background="@drawable/view_round_beige"
-            app:layout_constraintBottom_toBottomOf="@+id/toggleButton"
+            app:layout_constraintBottom_toBottomOf="@+id/wish_heart_toggle_btn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ToggleButton
-            android:id="@+id/toggleButton"
+        <!--Wish 등록 / 삭제 API 호출-->
+        <com.example.bookchat.AntiDupClickToggleButton
+            android:id="@+id/wish_heart_toggle_btn"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
             android:background="@drawable/selector_wish_btn"
-            android:checked="true"
+            android:checked="@={viewmodel.isToggleChecked}"
+            android:onCheckedChanged="@{() -> viewmodel.requestToggleApi()}"
             android:scaleType="fitXY"
             android:textOff=""
             android:textOn=""
@@ -135,8 +137,9 @@
             app:layout_constraintStart_toStartOf="@+id/constraintLayout5"
             app:layout_constraintTop_toBottomOf="@+id/textView27" />
 
+        <!--상태 변경 API호출-->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button2"
+            android:id="@+id/change_status_to_reading_btn_wish_dialog"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
@@ -146,6 +149,7 @@
             android:backgroundTint="#5648FF"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"
+            android:onClick="@{() -> viewmodel.changeToReadingBook()}"
             android:minHeight="55dp"
             android:stateListAnimator="@null"
             android:text="독서중"
