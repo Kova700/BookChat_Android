@@ -2,6 +2,7 @@ package com.example.bookchat.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.bookchat.repository.AgonizeRepository
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.repository.UserRepository
 
@@ -9,6 +10,7 @@ import com.example.bookchat.repository.UserRepository
 class ViewModelFactory(val searchKeyword : String = "") : ViewModelProvider.Factory {
     private val userRepository by lazy { UserRepository() }
     private val bookRepository by lazy { BookRepository() }
+    private val agonizeRepository by lazy { AgonizeRepository() }
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
 
@@ -56,8 +58,13 @@ class ViewModelFactory(val searchKeyword : String = "") : ViewModelProvider.Fact
             modelClass.isAssignableFrom(ReadingBookTapDialogViewModel::class.java) -> {
                 return ReadingBookTapDialogViewModel(bookRepository) as T
             }
+
             modelClass.isAssignableFrom(CompleteBookTapDialogViewModel::class.java) -> {
                 return CompleteBookTapDialogViewModel(bookRepository) as T
+            }
+
+            modelClass.isAssignableFrom(AgonizeHistoryViewModel::class.java) -> {
+                return AgonizeHistoryViewModel(agonizeRepository) as T
             }
 
             else -> throw IllegalArgumentException("unknown model class : ${modelClass}")

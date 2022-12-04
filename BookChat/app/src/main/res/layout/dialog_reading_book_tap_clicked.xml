@@ -149,6 +149,7 @@
             android:minHeight="55dp"
             android:stateListAnimator="@null"
             android:text="고민기록"
+            android:onClick="@{() -> viewmodel.openAgonizeActivity()}"
             android:textColor="#5648FF"
             app:cornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
