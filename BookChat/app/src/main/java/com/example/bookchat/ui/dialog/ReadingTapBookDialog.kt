@@ -9,12 +9,14 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.DialogReadingBookTapClickedBinding
-import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel
+import com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel.ReadingBookEvent
 import com.example.bookchat.viewmodel.ViewModelFactory
+import kotlinx.coroutines.launch
 
 class ReadingTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
     private lateinit var binding : DialogReadingBookTapClickedBinding
@@ -34,11 +36,22 @@ class ReadingTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
         readingBookTapDialogViewModel.book = book
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
+        observeEventFlow()
+
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    private fun observeEventFlow() {
+        lifecycleScope.launch{
+            readingBookTapDialogViewModel.eventFlow.collect { event -> handleEvent(event) }
+        }
+    }
+
+    private fun handleEvent(event : ReadingBookEvent) = when(event){
+        is ReadingBookEvent.MoveToCompleteBook -> {
+
+            this.dismiss()
+        }
     }
 
     override fun onDestroyView() {

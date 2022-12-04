@@ -6,35 +6,103 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
+import com.example.bookchat.SwipeHelperCallback
+import com.example.bookchat.SwipeHelperCallback.SwipeViewType
 import com.example.bookchat.adapter.CompleteBookTabAdapter
+import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.FragmentCompleteBookTabBinding
+import com.example.bookchat.ui.dialog.CompleteTapBookDialog
+import com.example.bookchat.viewmodel.BookShelfViewModel
+import com.example.bookchat.viewmodel.ViewModelFactory
+import kotlinx.coroutines.launch
 
 class CompleteBookTabFragment : Fragment() {
     private lateinit var binding : FragmentCompleteBookTabBinding
     private lateinit var completeBookAdapter :CompleteBookTabAdapter
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    private lateinit var bookShelfViewModel: BookShelfViewModel
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_complete_book_tab,container,false)
+        bookShelfViewModel = ViewModelProvider(requireParentFragment(), ViewModelFactory()).get(
+            BookShelfViewModel::class.java)
         with(binding){
             lifecycleOwner = this@CompleteBookTabFragment
+            viewmodel = bookShelfViewModel
         }
+        initAdapter()
         initRecyclerView()
+        initRefreshEvent()
+        observePagingCompleteBookData()
+        observeAdapterLoadState()
+
+        //다이얼로그 별점 설정 정책 결정하고 설정해야함
 
         return binding.root
     }
 
+    private fun observePagingCompleteBookData(){
+        bookShelfViewModel.completeBookCombined.observe(viewLifecycleOwner){ PagingBookShelfItem ->
+            completeBookAdapter.submitData(viewLifecycleOwner.lifecycle, PagingBookShelfItem)
+        }
+    }
+
+    private fun observeAdapterLoadState() = lifecycleScope.launch{
+        completeBookAdapter.loadStateFlow.collect{ combinedLoadStates ->
+            if(combinedLoadStates.refresh is LoadState.NotLoading) initializeModificationEvents()
+        }
+    }
+    private fun initializeModificationEvents(){
+        if(bookShelfViewModel.completeBookModificationEvents.value.isNotEmpty()){
+            bookShelfViewModel.completeBookModificationEvents.value = emptyList()
+        }
+    }
+
+    private fun initAdapter(){
+        val bookItemClickListener = object: CompleteBookTabAdapter.OnItemClickListener {
+            override fun onItemClick(book : BookShelfItem) {
+                val dialog = CompleteTapBookDialog(book)
+                dialog.show(this@CompleteBookTabFragment.childFragmentManager, DIALOG_TAG_COMPLETE)
+            }
+        }
+
+        completeBookAdapter = CompleteBookTabAdapter(bookShelfViewModel)
+        completeBookAdapter.setItemClickListener(bookItemClickListener)
+    }
+
     private fun initRecyclerView(){
         with(binding){
-            completeBookAdapter = CompleteBookTabAdapter()
-            completeRcv.adapter = completeBookAdapter
-            completeRcv.setHasFixedSize(true)
-            completeRcv.layoutManager = LinearLayoutManager(requireContext())
+            completeBookRcv.adapter = completeBookAdapter
+            completeBookRcv.setHasFixedSize(true)
+            completeBookRcv.layoutManager = LinearLayoutManager(requireContext())
+            setSwipeHelperCallback(completeBookRcv)
         }
+    }
+
+    private fun setSwipeHelperCallback(recyclerView : RecyclerView){
+        val swipeHelperCallback = SwipeHelperCallback(SwipeViewType.Complete)
+        val itemTouchHelper = ItemTouchHelper(swipeHelperCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+        recyclerView.setOnTouchListener { _, _ ->
+            swipeHelperCallback.removePreviousClamp(recyclerView)
+            false
+        }
+    }
+
+    private fun initRefreshEvent(){
+        binding.swipeRefreshLayoutComplete.setOnRefreshListener {
+            completeBookAdapter.refresh()
+            binding.swipeRefreshLayoutComplete.isRefreshing = false
+        }
+    }
+
+    companion object{
+        private const val DIALOG_TAG_COMPLETE = "CompleteTapBookDialog"
     }
 
 }

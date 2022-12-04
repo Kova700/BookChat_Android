@@ -129,6 +129,7 @@ class BookRepository {
         private const val SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE = 6
         const val WISH_TAP_BOOKS_ITEM_LOAD_SIZE = 6
         const val READING_TAP_BOOKS_ITEM_LOAD_SIZE = 4
+        const val COMPLETE_TAP_BOOKS_ITEM_LOAD_SIZE = 4
         const val JSON_KEY_READINGSTATUS = "readingStatus"
     }
 }

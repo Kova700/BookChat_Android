@@ -14,6 +14,8 @@ import com.example.bookchat.data.Book
 import com.example.bookchat.utils.LoadState
 import com.example.bookchat.utils.NameCheckStatus
 import com.example.bookchat.utils.SearchTapStatus
+import com.example.bookchat.utils.StarRating
+import com.willy.ratingbar.ScaleRatingBar
 
 object DataBindingAdapter {
 
@@ -184,6 +186,19 @@ object DataBindingAdapter {
             LoadState.Default,
             LoadState.Result -> view.visibility = View.VISIBLE
             LoadState.Loading -> view.visibility = View.INVISIBLE
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter("setRatingBarStars")
+    fun setRatingBarStars(scaleRatingBar : ScaleRatingBar, starRating :StarRating?){
+        when(starRating){
+            StarRating.ZERO -> { scaleRatingBar.rating = 0F }; StarRating.HALF -> { scaleRatingBar.rating = 0.5F }
+            StarRating.ONE -> { scaleRatingBar.rating = 1F }; StarRating.ONE_HALF -> { scaleRatingBar.rating = 1.5F }
+            StarRating.TWO -> { scaleRatingBar.rating = 2F }; StarRating.TWO_HALF -> { scaleRatingBar.rating = 2.5F }
+            StarRating.THREE -> { scaleRatingBar.rating = 3F }; StarRating.THREE_HALF -> { scaleRatingBar.rating = 3.5F }
+            StarRating.FOUR -> { scaleRatingBar.rating = 4F }; StarRating.FOUR_HALF -> { scaleRatingBar.rating = 4.5F }
+            StarRating.FIVE -> { scaleRatingBar.rating = 5F }; null -> { scaleRatingBar.rating = 0F }
         }
     }
 
