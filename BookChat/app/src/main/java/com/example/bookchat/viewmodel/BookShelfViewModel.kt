@@ -26,6 +26,7 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
     val readingBookModificationEvents = MutableStateFlow<List<PagingViewEvent>>(emptyList())
     val completeBookModificationEvents = MutableStateFlow<List<PagingViewEvent>>(emptyList())
 
+    var isWishBookLoaded = false
     var wishBookTotalCountCache = 0L
     var wishBookTotalCount = MutableStateFlow<Long>(0)
     var wishBookResult = Pager(
@@ -36,12 +37,14 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
         pagingSourceFactory = { WishBookTapPagingSource() }
     ).flow.map { pagingData ->
         pagingData.map { pair ->
+            isWishBookLoaded = true
             wishBookTotalCountCache = pair.second
             wishBookTotalCount.value = pair.second
             pair.first
         }
     }.cachedIn(viewModelScope)
 
+    var isReadingBookLoaded = false
     var readingBookTotalCountCache = 0L
     var readingBookTotalCount = MutableStateFlow<Long>(0)
     private val readingBookResult by lazy {
@@ -53,6 +56,7 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
             pagingSourceFactory = { ReadingBookTapPagingSource() }
         ).flow.map { pagingData ->
             pagingData.map { pair ->
+                isReadingBookLoaded = true
                 readingBookTotalCountCache = pair.second
                 readingBookTotalCount.value = pair.second
                 pair.first
@@ -60,6 +64,7 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
         }.cachedIn(viewModelScope)
     }
 
+    var isCompleteBookLoaded = false
     var completeBookTotalCountCache = 0L
     var completeBookTotalCount = MutableStateFlow<Long>(0)
     private val completeBookResult by lazy {
@@ -71,6 +76,7 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
             pagingSourceFactory = { CompleteBookTapPagingSource() }
         ).flow.map { pagingData ->
             pagingData.map { pair ->
+                isCompleteBookLoaded = true
                 completeBookTotalCountCache = pair.second
                 completeBookTotalCount.value = pair.second
                 pair.first

@@ -15,6 +15,10 @@ import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.DialogReadingBookTapClickedBinding
 import com.example.bookchat.ui.activity.AgonizeHistoryActivity
+import com.example.bookchat.ui.fragment.BookShelfFragment
+import com.example.bookchat.ui.fragment.CompleteBookTabFragment
+import com.example.bookchat.utils.ReadingStatus
+import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel
 import com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel.ReadingBookEvent
 import com.example.bookchat.viewmodel.ViewModelFactory
@@ -23,6 +27,7 @@ import kotlinx.coroutines.launch
 class ReadingTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
     private lateinit var binding : DialogReadingBookTapClickedBinding
     private lateinit var readingBookTapDialogViewModel : ReadingBookTapDialogViewModel
+    private lateinit var bookShelfViewModel: BookShelfViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,6 +38,8 @@ class ReadingTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
             R.layout.dialog_reading_book_tap_clicked,container,false)
         readingBookTapDialogViewModel = ViewModelProvider(requireParentFragment(), ViewModelFactory()).get(
             ReadingBookTapDialogViewModel::class.java)
+        bookShelfViewModel = ViewModelProvider(getBookShelfFragment(), ViewModelFactory()).get(
+            BookShelfViewModel::class.java)
         binding.lifecycleOwner = this
         binding.viewmodel = readingBookTapDialogViewModel
         readingBookTapDialogViewModel.book = book
@@ -49,12 +56,30 @@ class ReadingTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
         }
     }
 
-    private fun handleEvent(event : ReadingBookEvent) = when(event){
-        is ReadingBookEvent.MoveToCompleteBook -> {
+    private fun getBookShelfFragment() : BookShelfFragment {
+        var fragment = requireParentFragment()
+        while (fragment !is BookShelfFragment){
+            fragment = fragment.requireParentFragment()
+        }
+        return fragment
+    }
 
+    private fun getCompleteBookTabFragment() : CompleteBookTabFragment {
+        return getBookShelfFragment().pagerAdapter.completeBookTabFragment
+    }
+
+    private fun handleEvent(event : ReadingBookEvent) = when(event){
+        is ReadingBookEvent.OpenAgonize -> { openAgonizeActivity() }
+
+        is ReadingBookEvent.MoveToCompleteBook -> {
+            val removeEvent = BookShelfViewModel.PagingViewEvent.Remove(book)
+            bookShelfViewModel.onPagingViewEvent(removeEvent, ReadingStatus.READING)
+            bookShelfViewModel.startEvent(BookShelfViewModel.BookShelfEvent.ChangeBookShelfTab(2))
+            if(bookShelfViewModel.isCompleteBookLoaded){
+                getCompleteBookTabFragment().completeBookAdapter.refresh()
+            }
             this.dismiss()
         }
-        is ReadingBookEvent.OpenAgonize -> { openAgonizeActivity() }
     }
 
     private fun openAgonizeActivity(){
