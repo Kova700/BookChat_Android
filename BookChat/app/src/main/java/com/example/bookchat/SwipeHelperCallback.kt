@@ -6,12 +6,13 @@ import android.view.View
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_SWIPE
 import androidx.recyclerview.widget.RecyclerView
+import com.example.bookchat.adapter.CompleteBookTabAdapter
 import com.example.bookchat.adapter.ReadingBookTabAdapter
 import com.example.bookchat.utils.Constants.TAG
 import kotlin.math.max
 import kotlin.math.min
 
-class SwipeHelperCallback : ItemTouchHelper.Callback() {
+class SwipeHelperCallback(private val swipeViewType :SwipeViewType) : ItemTouchHelper.Callback() {
 
     //# 수정 사항
     //Item 삭제 전 or 재활용 전 스와이프 상태 다시 원상복구
@@ -29,7 +30,7 @@ class SwipeHelperCallback : ItemTouchHelper.Callback() {
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder
     ): Int {
-        val swipeView = getSwipeView(viewHolder)
+        val swipeView = getSwipeView(viewHolder,swipeViewType)
         setClamp(swipeView.width.toFloat() * SWIPE_VIEW_PERCENT)
 
         val dragFlags = 0
@@ -56,7 +57,7 @@ class SwipeHelperCallback : ItemTouchHelper.Callback() {
     //상호작용이 종료되고 애니메이션이 종료 된 후에 호출
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         currentDx = 0f
-        getDefaultUIUtil().clearView(getSwipeView(viewHolder))
+        getDefaultUIUtil().clearView(getSwipeView(viewHolder,swipeViewType))
         previousPosition = viewHolder.absoluteAdapterPosition
     }
 
@@ -64,7 +65,7 @@ class SwipeHelperCallback : ItemTouchHelper.Callback() {
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
         viewHolder?.let {
             currentPosition = viewHolder.absoluteAdapterPosition
-            getDefaultUIUtil().onSelected(getSwipeView(it))
+            getDefaultUIUtil().onSelected(getSwipeView(it,swipeViewType))
         }
     }
 
@@ -81,8 +82,8 @@ class SwipeHelperCallback : ItemTouchHelper.Callback() {
         isCurrentlyActive: Boolean
     ) {
         if (actionState != ACTION_STATE_SWIPE) return
-        val swipeView = getSwipeView(viewHolder)
-        val isClamped = getSwiped((viewHolder as ReadingBookTabAdapter.ReadingBookItemViewHolder)) //현재 아이템이 스와이프 되어있는지 아닌지 판단
+        val swipeView = getSwipeView(viewHolder,swipeViewType)
+        val isClamped = getSwiped(viewHolder,swipeViewType) //현재 아이템이 스와이프 되어있는지 아닌지 판단
         val x = clampViewPositionHorizontal(swipeView, dX, isClamped, isCurrentlyActive)
         currentDx = x
         getDefaultUIUtil().onDraw(c, recyclerView, swipeView, x, dY, actionState, isCurrentlyActive)
@@ -121,18 +122,31 @@ class SwipeHelperCallback : ItemTouchHelper.Callback() {
 
     //스와이프 escape 임계 범위 설정
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
-        val isSwiped = getSwiped((viewHolder as ReadingBookTabAdapter.ReadingBookItemViewHolder))
+        val isSwiped = getSwiped(viewHolder,swipeViewType)
         // 현재 View가 고정되어있지 않고 사용자가 clamp 이상 swipe시 isClamped true로 변경 아닐시 false로 변경
-        setSwiped((viewHolder as ReadingBookTabAdapter.ReadingBookItemViewHolder), !isSwiped && (0 < currentDx) && (currentDx <= clamp))
+        setSwiped(viewHolder, !isSwiped && (0 < currentDx) && (currentDx <= clamp), swipeViewType)
         return 2f
     }
 
-    private fun setSwiped(viewHolder: ReadingBookTabAdapter.ReadingBookItemViewHolder, isSwiped: Boolean) {
-        viewHolder.setSwiped(isSwiped)
+    private fun setSwiped(
+        viewHolder: RecyclerView.ViewHolder,
+        isSwiped: Boolean,
+        swipeViewType :SwipeViewType
+    ) {
+        when(swipeViewType){
+            SwipeViewType.Reading -> { (viewHolder as ReadingBookTabAdapter.ReadingBookItemViewHolder).setSwiped(isSwiped) }
+            SwipeViewType.Complete -> { (viewHolder as CompleteBookTabAdapter.CompleteBookItemViewHolder).setSwiped(isSwiped) }
+        }
     }
 
-    private fun getSwiped(viewHolder: ReadingBookTabAdapter.ReadingBookItemViewHolder) :Boolean{
-        return viewHolder.getSwiped()
+    private fun getSwiped(
+        viewHolder: RecyclerView.ViewHolder,
+        swipeViewType :SwipeViewType
+    ) :Boolean{
+        return when(swipeViewType){
+            SwipeViewType.Reading -> { (viewHolder as ReadingBookTabAdapter.ReadingBookItemViewHolder).getSwiped() }
+            SwipeViewType.Complete -> { (viewHolder as CompleteBookTabAdapter.CompleteBookItemViewHolder).getSwiped() }
+        }
     }
 
     fun setClamp(clamp: Float) {
@@ -145,16 +159,32 @@ class SwipeHelperCallback : ItemTouchHelper.Callback() {
             return
         previousPosition?.let {
             val viewHolder = recyclerView.findViewHolderForAdapterPosition(it) ?: return
-            getSwipeView(viewHolder).translationX = 0f
-            setSwiped((viewHolder as ReadingBookTabAdapter.ReadingBookItemViewHolder), false)
+            getSwipeView(viewHolder,swipeViewType).translationX = 0f
+            setSwiped(viewHolder, false, swipeViewType)
             previousPosition = null
         }
     }
 
     //스와이프 될 뷰홀더 내부의 레이아웃 지정
-    private fun getSwipeView(viewHolder: RecyclerView.ViewHolder): View {
-        return (viewHolder as ReadingBookTabAdapter.ReadingBookItemViewHolder).itemView
-            .findViewById(R.id.swipe_view)
+    private fun getSwipeView(
+        viewHolder: RecyclerView.ViewHolder,
+        swipeViewType :SwipeViewType
+    ): View {
+        return when(swipeViewType) {
+            SwipeViewType.Reading -> {
+                (viewHolder as ReadingBookTabAdapter.ReadingBookItemViewHolder).itemView
+                    .findViewById(R.id.swipe_view)
+            }
+            SwipeViewType.Complete -> {
+                (viewHolder as CompleteBookTabAdapter.CompleteBookItemViewHolder).itemView
+                    .findViewById(R.id.swipe_view)
+            }
+        }
+    }
+
+    sealed class SwipeViewType{
+        object Reading :SwipeViewType()
+        object Complete :SwipeViewType()
     }
 
     companion object {

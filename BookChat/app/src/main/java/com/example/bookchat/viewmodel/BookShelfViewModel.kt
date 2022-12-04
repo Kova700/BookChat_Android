@@ -7,9 +7,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.example.bookchat.App
 import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.paging.CompleteBookTapPagingSource
 import com.example.bookchat.paging.ReadingBookTapPagingSource
 import com.example.bookchat.paging.WishBookTapPagingSource
 import com.example.bookchat.repository.BookRepository
+import com.example.bookchat.repository.BookRepository.Companion.COMPLETE_TAP_BOOKS_ITEM_LOAD_SIZE
 import com.example.bookchat.repository.BookRepository.Companion.READING_TAP_BOOKS_ITEM_LOAD_SIZE
 import com.example.bookchat.repository.BookRepository.Companion.WISH_TAP_BOOKS_ITEM_LOAD_SIZE
 import com.example.bookchat.utils.ReadingStatus
@@ -22,6 +24,7 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
 
     val wishBookModificationEvents = MutableStateFlow<List<PagingViewEvent>>(emptyList())
     val readingBookModificationEvents = MutableStateFlow<List<PagingViewEvent>>(emptyList())
+    val completeBookModificationEvents = MutableStateFlow<List<PagingViewEvent>>(emptyList())
 
     var wishBookTotalCountCache = 0L
     var wishBookTotalCount = MutableStateFlow<Long>(0)
@@ -57,6 +60,31 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
         }.cachedIn(viewModelScope)
     }
 
+    var completeBookTotalCountCache = 0L
+    var completeBookTotalCount = MutableStateFlow<Long>(0)
+    private val completeBookResult by lazy {
+        Pager(
+            config = PagingConfig(
+                pageSize = COMPLETE_TAP_BOOKS_ITEM_LOAD_SIZE,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { CompleteBookTapPagingSource() }
+        ).flow.map { pagingData ->
+            pagingData.map { pair ->
+                completeBookTotalCountCache = pair.second
+                completeBookTotalCount.value = pair.second
+                pair.first
+            }
+        }.cachedIn(viewModelScope)
+    }
+
+    val wishBookCombined by lazy {
+        wishBookResult.combine(wishBookModificationEvents) { pagingData, modifications ->
+            modifications.fold(pagingData) { acc, event -> applyEvents(acc, event) }
+                .also { renewTotalItemCount(MODIFICATION_EVENT_FLAG_WISH) }
+        }.cachedIn(viewModelScope).asLiveData()
+    }
+
     val readingBookCombined by lazy {
         readingBookResult.combine(readingBookModificationEvents) { pagingData, modifications ->
             modifications.fold(pagingData) { acc, event -> applyEvents(acc, event) }
@@ -64,10 +92,10 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
         }.cachedIn(viewModelScope).asLiveData()
     }
 
-    val wishBookCombined by lazy {
-        wishBookResult.combine(wishBookModificationEvents) { pagingData, modifications ->
+    val completeBookCombined by lazy {
+        completeBookResult.combine(completeBookModificationEvents) { pagingData, modifications ->
             modifications.fold(pagingData) { acc, event -> applyEvents(acc, event) }
-                .also { renewTotalItemCount(MODIFICATION_EVENT_FLAG_WISH) }
+                .also { renewTotalItemCount(MODIFICATION_EVENT_FLAG_COMPLETE) }
         }.cachedIn(viewModelScope).asLiveData()
     }
 
@@ -95,7 +123,13 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
                 }
                 readingBookModificationEvents.value += pagingViewEvent
             }
-            ReadingStatus.COMPLETE -> {}
+            ReadingStatus.COMPLETE -> {
+                if (completeBookModificationEvents.value.contains(pagingViewEvent)){
+                    completeBookModificationEvents.value -= pagingViewEvent
+                    return
+                }
+                completeBookModificationEvents.value += pagingViewEvent
+            }
         }
     }
 
@@ -121,7 +155,10 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
                 readingBookTotalCount.value =
                     readingBookTotalCountCache - readingBookModificationEvents.value.size
             }
-            else -> {}
+            MODIFICATION_EVENT_FLAG_COMPLETE -> {
+                completeBookTotalCount.value =
+                    completeBookTotalCountCache - completeBookModificationEvents.value.size
+            }
         }
     }
 
@@ -141,5 +178,6 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
     companion object {
         private const val MODIFICATION_EVENT_FLAG_WISH = "WISH"
         private const val MODIFICATION_EVENT_FLAG_READING = "READING"
+        private const val MODIFICATION_EVENT_FLAG_COMPLETE = "COMPLETE"
     }
 }

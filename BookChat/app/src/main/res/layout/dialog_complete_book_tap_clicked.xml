@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel" />
+            type="com.example.bookchat.viewmodel.CompleteBookTapDialogViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:background="@drawable/view_round_white"
@@ -172,8 +172,7 @@
             android:fontFamily="@font/notosanskr_regular"
             android:minHeight="55dp"
             android:stateListAnimator="@null"
-            android:text="독서완료"
-            android:onClick="@{() -> viewmodel.changeToCompleteBook()}"
+            android:text="독후감"
             setButtonColor="@{viewmodel.starRating == 0L}"
             android:textColor="#FFFFFF"
             app:cornerRadius="10dp"
@@ -182,7 +181,6 @@
             app:layout_constraintStart_toEndOf="@+id/button"
             app:layout_constraintTop_toBottomOf="@+id/sub_background_reading"
             app:layout_constraintVertical_bias="0.0" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

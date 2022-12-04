@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.SwipeHelperCallback
+import com.example.bookchat.SwipeHelperCallback.SwipeViewType
 import com.example.bookchat.adapter.ReadingBookTabAdapter
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.FragmentReadingBookTabBinding
@@ -76,7 +77,7 @@ class ReadingBookTabFragment :Fragment() {
     }
 
     private fun setSwipeHelperCallback(recyclerView : RecyclerView){
-        val swipeHelperCallback = SwipeHelperCallback()
+        val swipeHelperCallback = SwipeHelperCallback(SwipeViewType.Reading)
         val itemTouchHelper = ItemTouchHelper(swipeHelperCallback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
         recyclerView.setOnTouchListener { _, _ ->
