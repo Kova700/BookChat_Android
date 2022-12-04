@@ -3,6 +3,8 @@ package com.example.bookchat.ui.dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
+import com.example.bookchat.adapter.CompleteBookTabAdapter
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.DialogWishBookTapClickedBinding
 import com.example.bookchat.ui.fragment.BookShelfFragment
@@ -54,12 +57,16 @@ class WishTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
         return binding.root
     }
 
-    private fun getBookShelfFragment() :Fragment{
-        return requireParentFragment().requireParentFragment()
+    private fun getBookShelfFragment() : BookShelfFragment {
+        var fragment = requireParentFragment()
+        while (fragment !is BookShelfFragment){
+            fragment = fragment.requireParentFragment()
+        }
+        return fragment
     }
 
     private fun getReadingBookTabFragment() : ReadingBookTabFragment {
-        return (getBookShelfFragment() as BookShelfFragment).pagerAdapter.readingBookTabFragment
+        return getBookShelfFragment().pagerAdapter.readingBookTabFragment
     }
 
     private fun observeEventFlow() {
@@ -91,7 +98,9 @@ class WishTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
                 val removeEvent = BookShelfViewModel.PagingViewEvent.Remove(book)
                 bookShelfViewModel.onPagingViewEvent(removeEvent,ReadingStatus.WISH)
                 bookShelfViewModel.startEvent(BookShelfEvent.ChangeBookShelfTab(1))
-                getReadingBookTabFragment().readingBookAdapter.refresh()
+                if(bookShelfViewModel.isReadingBookLoaded){
+                    getReadingBookTabFragment().readingBookAdapter.refresh()
+                }
             }
             else -> { }
         }

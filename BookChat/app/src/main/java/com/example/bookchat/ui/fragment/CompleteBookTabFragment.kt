@@ -24,9 +24,9 @@ import com.example.bookchat.viewmodel.ViewModelFactory
 import kotlinx.coroutines.launch
 
 class CompleteBookTabFragment : Fragment() {
-    private lateinit var binding : FragmentCompleteBookTabBinding
-    private lateinit var completeBookAdapter :CompleteBookTabAdapter
-    private lateinit var bookShelfViewModel: BookShelfViewModel
+    lateinit var binding : FragmentCompleteBookTabBinding
+    lateinit var completeBookAdapter :CompleteBookTabAdapter
+    lateinit var bookShelfViewModel: BookShelfViewModel
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_complete_book_tab,container,false)
         bookShelfViewModel = ViewModelProvider(requireParentFragment(), ViewModelFactory()).get(
