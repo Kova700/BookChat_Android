@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.dialog
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -13,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.DialogReadingBookTapClickedBinding
+import com.example.bookchat.ui.activity.AgonizeHistoryActivity
 import com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel
 import com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel.ReadingBookEvent
 import com.example.bookchat.viewmodel.ViewModelFactory
@@ -52,10 +54,21 @@ class ReadingTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
 
             this.dismiss()
         }
+        is ReadingBookEvent.OpenAgonize -> { openAgonizeActivity() }
+    }
+
+    private fun openAgonizeActivity(){
+        val intent = Intent(requireContext(), AgonizeHistoryActivity::class.java)
+            .putExtra(EXTRA_AGONIZE_BOOK,book)
+        startActivity(intent)
     }
 
     override fun onDestroyView() {
         readingBookTapDialogViewModel.starRating.value = 0F
         super.onDestroyView()
+    }
+
+    companion object {
+        const val EXTRA_AGONIZE_BOOK = "EXTRA_AGONIZE_BOOK"
     }
 }

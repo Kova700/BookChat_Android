@@ -2,6 +2,7 @@ package com.example.bookchat.data
 
 import com.example.bookchat.utils.StarRating
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class BookShelfItem(
     @SerializedName("bookId")
@@ -25,7 +26,7 @@ data class BookShelfItem(
     @SerializedName("pages")
     val pages: Int,
     var isSwiped: Boolean = false,
-){
+) :Serializable{
     fun getBook() :Book{
         return Book(
             isbn = this.isbn,

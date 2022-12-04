@@ -35,11 +35,16 @@ class ReadingBookTapDialogViewModel(private val bookRepository: BookRepository) 
             }
     }
 
+    fun openAgonizeActivity(){
+        startEvent(ReadingBookEvent.OpenAgonize)
+    }
+
     private fun startEvent (event : ReadingBookEvent) = viewModelScope.launch {
         _eventFlow.emit(event)
     }
 
     sealed class ReadingBookEvent {
         object MoveToCompleteBook : ReadingBookEvent()
+        object OpenAgonize :ReadingBookEvent()
     }
 }
