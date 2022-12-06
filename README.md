@@ -1,16 +1,5 @@
-# BookChat 
+# BookChat - Android
 
-### Backend
-
-* TDD (도전)
-* OOP 준수(특정상황에서 타협O)
-* Google Coding Convention 
-* Clean한 Code, Architecture (도전)
-
-[__Issuelog(문제 해결 or 고민)__](https://github.com/geneaky/BookChat/wiki/backend-issue)
-
-***
-### Android
 도전 가득한 이번 프로젝트!!
 
 * Test 작성 (도전)
