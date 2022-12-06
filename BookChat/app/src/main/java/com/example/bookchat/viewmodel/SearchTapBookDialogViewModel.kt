@@ -6,10 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.data.Book
-import com.example.bookchat.data.RequestRegisterReadingBook
-import com.example.bookchat.data.RequestRegisterWishBook
+import com.example.bookchat.data.RequestRegisterBookShelfBook
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.ReadingStatus
 import kotlinx.coroutines.launch
 
 class SearchTapBookDialogViewModel(private val bookRepository: BookRepository) : ViewModel() {
@@ -17,8 +17,8 @@ class SearchTapBookDialogViewModel(private val bookRepository: BookRepository) :
 
     fun requestRegisterWishBook() = viewModelScope.launch {
         Log.d(TAG, "SearchTapBookDialogViewModel: requestRegisterWishBook() - called")
-        val requestRegisterWishBook = RequestRegisterWishBook(book)
-        runCatching { bookRepository.registerWishBook(requestRegisterWishBook) }
+        val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(book, ReadingStatus.WISH)
+        runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
             .onSuccess {
                 Toast.makeText(App.instance.applicationContext,"Wish등록 성공",Toast.LENGTH_SHORT).show()
             }
@@ -29,8 +29,8 @@ class SearchTapBookDialogViewModel(private val bookRepository: BookRepository) :
 
     fun requestRegisterReadingBook() = viewModelScope.launch {
         Log.d(TAG, "SearchTapBookDialogViewModel: requestRegisterReadingBook() - called")
-        val requestRegisterReadingBook = RequestRegisterReadingBook(book)
-        runCatching { bookRepository.registerReadingBook(requestRegisterReadingBook) }
+        val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(book,ReadingStatus.READING)
+        runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
             .onSuccess {
                 Toast.makeText(App.instance.applicationContext,"Reading등록 성공",Toast.LENGTH_SHORT).show()
             }

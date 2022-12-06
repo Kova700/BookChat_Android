@@ -5,7 +5,10 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.bookchat.App
-import com.example.bookchat.data.*
+import com.example.bookchat.data.Book
+import com.example.bookchat.data.BookSearchResult
+import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.data.RequestRegisterBookShelfBook
 import com.example.bookchat.paging.SearchResultBookDetailPagingSource
 import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.response.ResponseBodyEmptyException
@@ -22,7 +25,7 @@ class BookRepository {
     suspend fun simpleSearchBooks(keyword :String) : BookSearchResult {
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-        val response = App.instance.bookApiInterface.getBookFromTitle(
+        val response = App.instance.bookApiInterface.getBookSearchResult(
             query = keyword,
             size = SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE.toString(),
             page = 1.toString()
@@ -40,7 +43,6 @@ class BookRepository {
     }
 
     fun detailSearchBooks(keyword :String) : Flow<PagingData<Book>> {
-
         return Pager(
             config = PagingConfig( pageSize = SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE, enablePlaceholders = false ),
             pagingSourceFactory = { SearchResultBookDetailPagingSource(keyword) }
@@ -48,30 +50,9 @@ class BookRepository {
     }
 
     /** 책 서재 등록*/
-    suspend fun registerWishBook(requestRegisterWishBook :RequestRegisterWishBook){
+    suspend fun registerBookShelfBook(requestRegisterBookShelfBook: RequestRegisterBookShelfBook){
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
-        val response = App.instance.bookApiInterface.registerWishBook(requestRegisterWishBook)
-        when(response.code()){
-            200 -> { }
-            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
-        }
-    }
-
-    suspend fun registerReadingBook(requestRegisterReadingBook: RequestRegisterReadingBook){
-        if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
-        val response = App.instance.bookApiInterface.registerReadingBook(requestRegisterReadingBook)
-        when(response.code()){
-            200 -> { }
-            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
-        }
-    }
-
-    suspend fun registerCompleteBook(requestRegisterCompleteBook: RequestRegisterCompleteBook){
-        if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
-        val response = App.instance.bookApiInterface.registerCompleteBook(requestRegisterCompleteBook)
+        val response = App.instance.bookApiInterface.registerBookShelfBook(requestRegisterBookShelfBook)
         when(response.code()){
             200 -> { }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))

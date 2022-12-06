@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.data.BookShelfItem
-import com.example.bookchat.data.RequestRegisterWishBook
+import com.example.bookchat.data.RequestRegisterBookShelfBook
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.ReadingStatus
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,14 +27,14 @@ class WishBookTapDialogViewModel(private val bookRepository: BookRepository) :Vi
         isToggleChecked.value = !(isToggleChecked.value)
 
         if(isToggleChecked.value){
-            addWishBook()
+            requestAddWishBook()
             return@launch
         }
-        removeWishBook()
+        requestRemoveWishBook()
     }
 
     //알림 내용 스낵바로 수정 예정
-    private suspend fun removeWishBook()= viewModelScope.launch {
+    private suspend fun requestRemoveWishBook()= viewModelScope.launch {
         runCatching { bookRepository.deleteBookShelfBook(book.bookId) }
             .onSuccess {
                 Toast.makeText(App.instance.applicationContext, "도서가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
@@ -45,9 +45,9 @@ class WishBookTapDialogViewModel(private val bookRepository: BookRepository) :Vi
             }
     }
 
-    private suspend fun addWishBook()= viewModelScope.launch {
-        val requestRegisterWishBook = RequestRegisterWishBook(book.getBook())
-        runCatching { bookRepository.registerWishBook(requestRegisterWishBook) }
+    private suspend fun requestAddWishBook()= viewModelScope.launch {
+        val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(book.getBook(),ReadingStatus.WISH)
+        runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
             .onSuccess {
                 Toast.makeText(App.instance.applicationContext,"독서예정에 등록되었습니다.",Toast.LENGTH_SHORT).show()
                 startEvent(WishBookEvent.AddItem)

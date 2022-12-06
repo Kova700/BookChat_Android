@@ -12,7 +12,7 @@ interface BookApiInterface {
     //@POST("/3862dd02-166b-4975-9a3c-1666ebd4fcfa")
 
     @GET("/v1/api/books")
-    suspend fun getBookFromTitle(
+    suspend fun getBookSearchResult(
         @Query("query") query: String,
         @Query("size") size: String,
         @Query("page") page: String,
@@ -20,18 +20,8 @@ interface BookApiInterface {
     ): Response<BookSearchResult>
 
     @POST("/v1/api/bookshelf/books")
-    suspend fun registerWishBook(
-        @Body requestRegisterWishBook: RequestRegisterWishBook
-    ): Response<Unit>
-
-    @POST("/v1/api/bookshelf/books")
-    suspend fun registerReadingBook(
-        @Body requestRegisterReadingBook: RequestRegisterReadingBook
-    ): Response<Unit>
-
-    @POST("/v1/api/bookshelf/books")
-    suspend fun registerCompleteBook(
-        @Body requestRegisterCompleteBook: RequestRegisterCompleteBook
+    suspend fun registerBookShelfBook(
+        @Body requestRegisterBookShelfBook: RequestRegisterBookShelfBook
     ): Response<Unit>
 
     @GET("/v1/api/bookshelf/books")
