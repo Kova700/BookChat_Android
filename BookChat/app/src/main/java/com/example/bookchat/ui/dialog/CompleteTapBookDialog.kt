@@ -15,6 +15,7 @@ import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.DialogCompleteBookTapClickedBinding
 import com.example.bookchat.ui.activity.AgonizeHistoryActivity
+import com.example.bookchat.ui.activity.BookReportActivity
 import com.example.bookchat.viewmodel.CompleteBookTapDialogViewModel
 import com.example.bookchat.viewmodel.CompleteBookTapDialogViewModel.CompleteBookEvent
 import com.example.bookchat.viewmodel.ViewModelFactory
@@ -54,13 +55,23 @@ class CompleteTapBookDialog(private val book: BookShelfItem) : DialogFragment() 
 
     private fun handleEvent(event :CompleteBookEvent) = when(event){
         is CompleteBookEvent.OpenAgonize ->{ openAgonizeActivity() }
-        is CompleteBookEvent.OpenBookReport ->{  }
+        is CompleteBookEvent.OpenBookReport ->{ openBookReportActivity() }
     }
 
     private fun openAgonizeActivity(){
         val intent = Intent(requireContext(), AgonizeHistoryActivity::class.java)
             .putExtra(ReadingTapBookDialog.EXTRA_AGONIZE_BOOK,book)
         startActivity(intent)
+    }
+
+    private fun openBookReportActivity(){
+        val intent = Intent(requireContext(), BookReportActivity::class.java)
+            .putExtra(EXTRA_BOOKREPORT_BOOK,book)
+        startActivity(intent)
+    }
+
+    companion object{
+        const val EXTRA_BOOKREPORT_BOOK = "EXTRA_BOOKREPORT_BOOK"
     }
 
 }
