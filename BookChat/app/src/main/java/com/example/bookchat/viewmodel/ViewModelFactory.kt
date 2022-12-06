@@ -63,10 +63,13 @@ class ViewModelFactory(val searchKeyword : String = "") : ViewModelProvider.Fact
                 return CompleteBookTapDialogViewModel(bookRepository) as T
             }
 
+            modelClass.isAssignableFrom(BookReportViewModel::class.java) -> {
+                return BookReportViewModel(bookRepository) as T
+            }
+
             modelClass.isAssignableFrom(AgonizeHistoryViewModel::class.java) -> {
                 return AgonizeHistoryViewModel(agonizeRepository) as T
             }
-
             else -> throw IllegalArgumentException("unknown model class : ${modelClass}")
         }
     }
