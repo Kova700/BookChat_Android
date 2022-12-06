@@ -20,7 +20,7 @@ data class BookShelfItem(
     @SerializedName("publishAt")
     val publishAt: String,
     @SerializedName("star")
-    var star: StarRating,
+    var star: StarRating?,
     @SerializedName("singleLineAssessment")
     val singleLineAssessment: String,
     @SerializedName("pages")

@@ -1,9 +1,11 @@
 package com.example.bookchat.api
 
-import com.example.bookchat.data.*
+import com.example.bookchat.data.BookSearchResult
+import com.example.bookchat.data.BookShelfResult
+import com.example.bookchat.data.RequestChangeBookStatus
+import com.example.bookchat.data.RequestRegisterBookShelfBook
 import com.example.bookchat.utils.BookSearchSortOption
 import com.example.bookchat.utils.ReadingStatus
-import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -37,10 +39,10 @@ interface BookApiInterface {
         @Path("bookId") bookId: Long
     ): Response<Unit>
 
-    @PATCH("/v1/api/bookshelf/books/{bookId}/status")
+    @PUT("/v1/api/bookshelf/books/{bookId}")
     suspend fun changeBookShelfBookStatus(
         @Path("bookId") bookId: Long,
-        @Body readingStatus: RequestBody
+        @Body requestChangeBookStatus: RequestChangeBookStatus
     ): Response<Unit>
 
 }
