@@ -37,14 +37,16 @@ class ReadingBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
                     val handler = Handler(Looper.getMainLooper())
                     handler.postDelayed({
                         bookShelfViewModel.deleteBookShelfBookWithSwipe(book)
+                        bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.RemoveWaiting(book), ReadingStatus.READING)
+                        bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.Remove(book), ReadingStatus.READING)
                     }, SNACK_BAR_DURATION.toLong())
 
                     val snackCancelClickListener = View.OnClickListener {
-                        bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.Remove(book), ReadingStatus.READING)
+                        bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.RemoveWaiting(book), ReadingStatus.READING)
                         handler.removeCallbacksAndMessages(null)
                     }
 
-                    bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.Remove(book), ReadingStatus.READING)
+                    bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.RemoveWaiting(book), ReadingStatus.READING)
                     Snackbar.make(binding.root,"도서 삭제가 완료되었습니다.", Snackbar.LENGTH_INDEFINITE)
                         .setAction("실행취소",snackCancelClickListener)
                         .setDuration(SNACK_BAR_DURATION)

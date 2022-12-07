@@ -9,8 +9,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.adapter.WishBookTabAdapter.Companion.BOOK_SHELF_ITEM_COMPARATOR
+import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ItemCompleteBookTabBinding
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
@@ -36,14 +36,16 @@ class CompleteBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
                     val handler = Handler(Looper.getMainLooper())
                     handler.postDelayed({
                         bookShelfViewModel.deleteBookShelfBookWithSwipe(book)
+                        bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.RemoveWaiting(book), ReadingStatus.COMPLETE)
+                        bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.Remove(book), ReadingStatus.COMPLETE)
                     }, SNACK_BAR_DURATION.toLong())
 
                     val snackCancelClickListener = View.OnClickListener {
-                        bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.Remove(book), ReadingStatus.COMPLETE)
+                        bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.RemoveWaiting(book), ReadingStatus.COMPLETE)
                         handler.removeCallbacksAndMessages(null)
                     }
 
-                    bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.Remove(book), ReadingStatus.COMPLETE)
+                    bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.RemoveWaiting(book), ReadingStatus.COMPLETE)
                     Snackbar.make(binding.root,"도서 삭제가 완료되었습니다.", Snackbar.LENGTH_INDEFINITE)
                         .setAction("실행취소",snackCancelClickListener)
                         .setDuration(SNACK_BAR_DURATION)
