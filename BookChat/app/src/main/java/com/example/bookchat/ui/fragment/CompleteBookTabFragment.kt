@@ -58,9 +58,11 @@ class CompleteBookTabFragment : Fragment() {
         }
     }
     private fun initializeModificationEvents(){
-        if(bookShelfViewModel.completeBookModificationEvents.value.isNotEmpty()){
-            bookShelfViewModel.completeBookModificationEvents.value = emptyList()
-        }
+        bookShelfViewModel.completeBookModificationEvents.value =
+            bookShelfViewModel.completeBookModificationEvents.value.filter { pagingViewEvent ->
+                pagingViewEvent !is BookShelfViewModel.PagingViewEvent.Remove
+            }
+        bookShelfViewModel.renewTotalItemCount(BookShelfViewModel.MODIFICATION_EVENT_FLAG_COMPLETE)
     }
 
     private fun initAdapter(){

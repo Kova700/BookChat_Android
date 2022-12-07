@@ -62,9 +62,11 @@ class ReadingBookTabFragment :Fragment() {
     }
 
     private fun initializeModificationEvents(){
-        if(bookShelfViewModel.readingBookModificationEvents.value.isNotEmpty()){
-            bookShelfViewModel.readingBookModificationEvents.value = emptyList()
-        }
+        bookShelfViewModel.readingBookModificationEvents.value =
+            bookShelfViewModel.readingBookModificationEvents.value.filter { pagingViewEvent ->
+                pagingViewEvent !is BookShelfViewModel.PagingViewEvent.Remove
+            }
+        bookShelfViewModel.renewTotalItemCount(BookShelfViewModel.MODIFICATION_EVENT_FLAG_READING)
     }
 
     private fun initRecyclerView(){

@@ -147,11 +147,14 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
             is PagingViewEvent.Remove -> {
                 paging.filter { it.bookId != pagingViewEvent.bookShelfItem.bookId }
             }
+            is PagingViewEvent.RemoveWaiting -> {
+                paging.filter { it.bookId != pagingViewEvent.bookShelfItem.bookId }
+            }
 //            is PagingViewEvent.Edit -> {  }
         }
     }
 
-    private fun renewTotalItemCount(flag: String) {
+    fun renewTotalItemCount(flag: String) {
         when (flag) {
             MODIFICATION_EVENT_FLAG_WISH -> {
                 wishBookTotalCount.value =
@@ -174,6 +177,7 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
 
     sealed class PagingViewEvent {
         data class Remove(val bookShelfItem: BookShelfItem) : PagingViewEvent()
+        data class RemoveWaiting(val bookShelfItem: BookShelfItem) : PagingViewEvent()
 //        data class Edit(val bookShelfItem: BookShelfItem) : PagingViewEvent() //페이지 입력할 때 사용할 듯
     }
 
@@ -182,8 +186,8 @@ class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel
     }
 
     companion object {
-        private const val MODIFICATION_EVENT_FLAG_WISH = "WISH"
-        private const val MODIFICATION_EVENT_FLAG_READING = "READING"
-        private const val MODIFICATION_EVENT_FLAG_COMPLETE = "COMPLETE"
+        const val MODIFICATION_EVENT_FLAG_WISH = "WISH"
+        const val MODIFICATION_EVENT_FLAG_READING = "READING"
+        const val MODIFICATION_EVENT_FLAG_COMPLETE = "COMPLETE"
     }
 }
