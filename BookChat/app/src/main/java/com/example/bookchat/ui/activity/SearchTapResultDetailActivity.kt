@@ -2,9 +2,11 @@ package com.example.bookchat.ui.activity
 
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
@@ -19,20 +21,27 @@ import com.example.bookchat.ui.fragment.SearchFragment
 import com.example.bookchat.utils.Constants
 import com.example.bookchat.viewmodel.SearchDetailViewModel
 import com.example.bookchat.viewmodel.ViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SearchTapResultDetailActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var searchDetailViewModelFactory : SearchDetailViewModel.AssistedFactory
+
     private lateinit var binding : ActivitySearchTapResultDetailBinding
-    private lateinit var searchDetailViewModel : SearchDetailViewModel
+    private val searchDetailViewModel : SearchDetailViewModel by viewModels{
+        SearchDetailViewModel.provideFactory(searchDetailViewModelFactory, getSearchKeyWord())
+    }
     private lateinit var searchResultBookDetailAdapter : SearchResultBookDetailAdapter
     var searchResultTotalItemCount = 0.toString()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_search_tap_result_detail)
-        val searchKeyword = getSearchKeyWord() ?: ""
         searchResultTotalItemCount = getItemCount() ?: "0"
-        searchDetailViewModel = ViewModelProvider(this, ViewModelFactory(searchKeyword)).get(SearchDetailViewModel::class.java)
         binding.lifecycleOwner = this
         binding.activity = this
         binding.viewmodel = searchDetailViewModel
@@ -84,8 +93,8 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
                 && (searchResultBookDetailAdapter.itemCount < 1)
     }
 
-    private fun getSearchKeyWord(): String? {
-        return intent.getStringExtra(SearchFragment.EXTRA_SEARCH_KEYWORD)
+    private fun getSearchKeyWord(): String {
+        return intent.getStringExtra(SearchFragment.EXTRA_SEARCH_KEYWORD) ?: ""
     }
     private fun getItemCount() :String? {
         return intent.getStringExtra(SearchFragment.EXTRA_SEARCH_RESULT_ITEM_COUNT)
