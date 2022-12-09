@@ -12,7 +12,9 @@ import com.example.bookchat.response.ResponseBodyEmptyException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.ReadingStatus
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Singleton
 
+@Singleton
 class BookRepository {
 
     suspend fun simpleSearchBooks(keyword :String) : BookSearchResult {

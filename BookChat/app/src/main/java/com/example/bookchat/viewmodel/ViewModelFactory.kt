@@ -43,10 +43,6 @@ class ViewModelFactory(val searchKeyword : String = "") : ViewModelProvider.Fact
                 return SearchDetailViewModel(bookRepository,searchKeyword) as T
             }
 
-            modelClass.isAssignableFrom(SearchTapBookDialogViewModel::class.java) -> {
-                return SearchTapBookDialogViewModel(bookRepository) as T
-            }
-
             modelClass.isAssignableFrom(BookShelfViewModel::class.java) -> {
                 return BookShelfViewModel(bookRepository) as T
             }

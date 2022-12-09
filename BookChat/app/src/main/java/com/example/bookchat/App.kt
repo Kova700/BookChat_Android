@@ -8,7 +8,9 @@ import com.example.bookchat.api.UserApiInterface
 import com.example.bookchat.data.User
 import com.example.bookchat.utils.NetworkManager
 import com.kakao.sdk.common.KakaoSdk
+import dagger.hilt.android.HiltAndroidApp
 
+@HiltAndroidApp
 class App : Application() {
 
     companion object{
