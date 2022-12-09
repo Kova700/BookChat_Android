@@ -153,7 +153,7 @@
             android:textColor="#5648FF"
             app:cornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/change_status_to_reading_btn_wish_dialog"
+            app:layout_constraintEnd_toStartOf="@+id/change_status_to_reading_btn"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sub_background_reading"
             app:layout_constraintVertical_bias="0.0"
@@ -161,7 +161,7 @@
             app:strokeWidth="1dp" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/change_status_to_reading_btn_wish_dialog"
+            android:id="@+id/change_status_to_reading_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="3dp"

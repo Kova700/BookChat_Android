@@ -26,7 +26,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ToggleButton
+        <com.example.bookchat.AntiDupClickToggleButton
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginTop="20dp"
@@ -126,13 +126,13 @@
             android:text="@{viewmodel.book.datetime}"
             android:textColor="#373737"
             android:textSize="10sp"
-            app:layout_constraintBottom_toTopOf="@+id/button"
+            app:layout_constraintBottom_toTopOf="@+id/change_status_to_complete_btn"
             app:layout_constraintEnd_toEndOf="@+id/constraintLayout5"
             app:layout_constraintStart_toStartOf="@+id/constraintLayout5"
             app:layout_constraintTop_toBottomOf="@+id/textView27" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button"
+            android:id="@+id/change_status_to_complete_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
@@ -148,14 +148,14 @@
             android:textColor="#5648FF"
             app:cornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/change_status_to_reading_btn_wish_dialog"
+            app:layout_constraintEnd_toStartOf="@+id/change_status_to_reading_btn"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView28"
             app:strokeColor="#5648FF"
             app:strokeWidth="1dp" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/change_status_to_reading_btn_wish_dialog"
+            android:id="@+id/change_status_to_reading_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="3dp"
@@ -173,9 +173,26 @@
             app:cornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/button"
+            app:layout_constraintStart_toEndOf="@+id/change_status_to_complete_btn"
             app:layout_constraintTop_toBottomOf="@+id/textView28"
             app:layout_constraintVertical_bias="0.0" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/already_in_bookshelf_btn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:text="이미 서재에 등록된 도서"
+            app:cornerRadius="10dp"
+            android:visibility="invisible"
+            android:clickable="false"
+            android:fontFamily="@font/notosanskr_regular"
+            android:elegantTextHeight="true"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#D9D9D9"
+            app:layout_constraintBottom_toBottomOf="@+id/change_status_to_complete_btn"
+            app:layout_constraintEnd_toEndOf="@+id/change_status_to_reading_btn"
+            app:layout_constraintStart_toStartOf="@+id/change_status_to_complete_btn"
+            app:layout_constraintTop_toTopOf="@+id/change_status_to_complete_btn" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

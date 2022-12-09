@@ -1,9 +1,6 @@
 package com.example.bookchat.api
 
-import com.example.bookchat.data.BookSearchResult
-import com.example.bookchat.data.BookShelfResult
-import com.example.bookchat.data.RequestChangeBookStatus
-import com.example.bookchat.data.RequestRegisterBookShelfBook
+import com.example.bookchat.data.*
 import com.example.bookchat.utils.BookSearchSortOption
 import com.example.bookchat.utils.ReadingStatus
 import retrofit2.Response
@@ -45,4 +42,9 @@ interface BookApiInterface {
         @Body requestChangeBookStatus: RequestChangeBookStatus
     ): Response<Unit>
 
+    @GET("/v1/api/bookshelf/books/existence")
+    suspend fun checkAlreadyInBookShelf(
+        @Query("isbn") isbn :String,
+        @Query("publishAt") publishAt :String,
+    ): Response<RespondCheckInBookShelf>
 }

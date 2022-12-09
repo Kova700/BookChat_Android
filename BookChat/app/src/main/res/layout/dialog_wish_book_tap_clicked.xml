@@ -139,7 +139,7 @@
 
         <!--상태 변경 API호출-->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/change_status_to_reading_btn_wish_dialog"
+            android:id="@+id/change_status_to_reading_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
