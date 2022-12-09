@@ -78,6 +78,21 @@ class BookRepository {
         }
     }
 
+    suspend fun checkAlreadyInBookShelf(book :Book) :RespondCheckInBookShelf {
+        Log.d(TAG, "BookRepository: checkAlreadyInBookShelf() - called")
+        if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
+
+        val response = App.instance.bookApiInterface.checkAlreadyInBookShelf(book.isbn, book.datetime)
+        when(response.code()){
+            200 -> {
+                val respondCheckInBookShelf = response.body()
+                respondCheckInBookShelf?.let { return respondCheckInBookShelf }
+                throw ResponseBodyEmptyException(response.errorBody()?.string())
+            }
+            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
+        }
+    }
+
     private fun isNetworkConnected() :Boolean{
         return App.instance.isNetworkConnected()
     }
