@@ -2,22 +2,27 @@ package com.example.bookchat.viewmodel
 
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.data.RequestRegisterBookShelfBook
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.ReadingStatus
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-class WishBookTapDialogViewModel(private val bookRepository: BookRepository) :ViewModel() {
+class WishBookTapDialogViewModel @AssistedInject constructor(
+    private val bookRepository: BookRepository,
+    @Assisted val book : BookShelfItem
+) : ViewModel() {
     private val _eventFlow = MutableSharedFlow<WishBookEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    lateinit var book: BookShelfItem
     private var isInited = false
     var isToggleChecked = MutableStateFlow<Boolean>(true)
 
@@ -76,5 +81,21 @@ class WishBookTapDialogViewModel(private val bookRepository: BookRepository) :Vi
         object RemoveItem :WishBookEvent()
         object AddItem :WishBookEvent()
         object MoveToReadingBook :WishBookEvent()
+    }
+
+    @dagger.assisted.AssistedFactory
+    interface AssistedFactory {
+        fun create(book: BookShelfItem) :WishBookTapDialogViewModel
+    }
+
+    companion object {
+        fun provideFactory(
+            assistedFactory: AssistedFactory,
+            book: BookShelfItem
+        ) : ViewModelProvider.Factory = object : ViewModelProvider.Factory{
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return assistedFactory.create(book) as T
+            }
+        }
     }
 }

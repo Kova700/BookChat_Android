@@ -17,6 +17,7 @@ import androidx.core.animation.doOnStart
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
@@ -26,12 +27,14 @@ import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.SearchTapStatus
 import com.example.bookchat.viewmodel.SearchViewModel
 import com.example.bookchat.viewmodel.ViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class SearchFragment : Fragment() {
 
     private lateinit var binding: FragmentSearchBinding
-    private lateinit var searchViewModel: SearchViewModel
+    private val searchViewModel: SearchViewModel by viewModels()
     private val imm by lazy { requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
     private val defaultTapFragment by lazy { SearchTapDefaultFragment() }
@@ -45,8 +48,6 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false)
-        searchViewModel =
-            ViewModelProvider(this, ViewModelFactory()).get(SearchViewModel::class.java)
         with(binding) {
             lifecycleOwner = this@SearchFragment
             fragment = this@SearchFragment

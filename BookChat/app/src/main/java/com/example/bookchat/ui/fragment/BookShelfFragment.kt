@@ -6,22 +6,23 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.adapter.PagerFragmentStateAdapter
 import com.example.bookchat.databinding.FragmentBookShelfBinding
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.BookShelfViewModel.BookShelfEvent
-import com.example.bookchat.viewmodel.ViewModelFactory
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class BookShelfFragment : Fragment() {
 
     lateinit var binding : FragmentBookShelfBinding
     lateinit var pagerAdapter :PagerFragmentStateAdapter
-    lateinit var bookShelfViewModel: BookShelfViewModel
+    val bookShelfViewModel: BookShelfViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,7 +30,6 @@ class BookShelfFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_book_shelf,container,false)
-        bookShelfViewModel = ViewModelProvider(this, ViewModelFactory()).get(BookShelfViewModel::class.java)
         pagerAdapter = PagerFragmentStateAdapter(this)
         binding.viewPager.adapter = pagerAdapter
         initTapLayout()

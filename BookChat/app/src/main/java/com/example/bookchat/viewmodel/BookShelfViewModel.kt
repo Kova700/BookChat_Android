@@ -15,10 +15,15 @@ import com.example.bookchat.repository.BookRepository.Companion.COMPLETE_TAP_BOO
 import com.example.bookchat.repository.BookRepository.Companion.READING_TAP_BOOKS_ITEM_LOAD_SIZE
 import com.example.bookchat.repository.BookRepository.Companion.WISH_TAP_BOOKS_ITEM_LOAD_SIZE
 import com.example.bookchat.utils.ReadingStatus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class BookShelfViewModel(private val bookRepository: BookRepository) : ViewModel() {
+@HiltViewModel
+class BookShelfViewModel @Inject constructor(
+    private val bookRepository: BookRepository
+) : ViewModel() {
     private val _eventFlow = MutableSharedFlow<BookShelfEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 

@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -21,21 +21,20 @@ import com.example.bookchat.databinding.FragmentReadingBookTabBinding
 import com.example.bookchat.ui.dialog.PageInputBottomSheetDialog
 import com.example.bookchat.ui.dialog.ReadingTapBookDialog
 import com.example.bookchat.viewmodel.BookShelfViewModel
-import com.example.bookchat.viewmodel.ViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ReadingBookTabFragment :Fragment() {
     lateinit var binding : FragmentReadingBookTabBinding
     lateinit var readingBookAdapter :ReadingBookTabAdapter
-    lateinit var bookShelfViewModel: BookShelfViewModel
+    val bookShelfViewModel: BookShelfViewModel by viewModels({requireParentFragment()})
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_reading_book_tab,container,false)
-        bookShelfViewModel = ViewModelProvider(requireParentFragment(), ViewModelFactory()).get(
-            BookShelfViewModel::class.java)
         with(binding){
             lifecycleOwner = this@ReadingBookTabFragment
             viewmodel = bookShelfViewModel
