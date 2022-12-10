@@ -14,10 +14,8 @@ import com.example.bookchat.utils.ReadingStatus
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class SearchTapBookDialogViewModel @AssistedInject constructor(
     private val bookRepository: BookRepository,
@@ -27,7 +25,7 @@ class SearchTapBookDialogViewModel @AssistedInject constructor(
     val isAlreadyInBookShelf = MutableStateFlow(false)
 
     init {
-        checkAlreadyInBookShelf()
+        //checkAlreadyInBookShelf()
    }
 
     fun checkAlreadyInBookShelf() = viewModelScope.launch {

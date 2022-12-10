@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfItem
@@ -21,13 +21,21 @@ import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel
 import com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel.ReadingBookEvent
-import com.example.bookchat.viewmodel.ViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ReadingTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
+
+    @Inject
+    lateinit var readingBookTapDialogViewModelFactory :ReadingBookTapDialogViewModel.AssistedFactory
+
     private lateinit var binding : DialogReadingBookTapClickedBinding
-    private lateinit var readingBookTapDialogViewModel : ReadingBookTapDialogViewModel
-    private lateinit var bookShelfViewModel: BookShelfViewModel
+    private val readingBookTapDialogViewModel : ReadingBookTapDialogViewModel by viewModels{
+        ReadingBookTapDialogViewModel.provideFactory(readingBookTapDialogViewModelFactory, book)
+    }
+    private val bookShelfViewModel: BookShelfViewModel by viewModels({ getBookShelfFragment() })
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,13 +44,8 @@ class ReadingTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
     ): View? {
         binding = DataBindingUtil.inflate(inflater,
             R.layout.dialog_reading_book_tap_clicked,container,false)
-        readingBookTapDialogViewModel = ViewModelProvider(requireParentFragment(), ViewModelFactory()).get(
-            ReadingBookTapDialogViewModel::class.java)
-        bookShelfViewModel = ViewModelProvider(getBookShelfFragment(), ViewModelFactory()).get(
-            BookShelfViewModel::class.java)
         binding.lifecycleOwner = this
         binding.viewmodel = readingBookTapDialogViewModel
-        readingBookTapDialogViewModel.book = book
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         observeEventFlow()

@@ -2,6 +2,7 @@ package com.example.bookchat.ui.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -12,22 +13,28 @@ import com.example.bookchat.ui.dialog.CompleteTapBookDialog.Companion.EXTRA_BOOK
 import com.example.bookchat.viewmodel.BookReportViewModel
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportUIEvent
 import com.example.bookchat.viewmodel.ViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class BookReportActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var bookReportViewModelFactory: BookReportViewModel.AssistedFactory
+
     private lateinit var binding :ActivityBookReportBinding
-    private lateinit var bookReportViewModel: BookReportViewModel
+    private val bookReportViewModel: BookReportViewModel by viewModels {
+        BookReportViewModel.provideFactory(bookReportViewModelFactory, getBook())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this,R.layout.activity_book_report)
-        bookReportViewModel = ViewModelProvider(this, ViewModelFactory()).get(BookReportViewModel::class.java)
         binding.lifecycleOwner = this
         binding.viewmodel = bookReportViewModel
 
-        bookReportViewModel.book = getBook()
         observeBookReportEvent()
-
     }
 
     private fun observeBookReportEvent() = lifecycleScope.launch{

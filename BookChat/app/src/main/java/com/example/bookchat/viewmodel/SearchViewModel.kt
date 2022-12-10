@@ -16,10 +16,15 @@ import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
 import com.example.bookchat.utils.LoadState
 import com.example.bookchat.utils.SearchTapStatus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchViewModel(private var bookRepository :BookRepository) :ViewModel() {
+@HiltViewModel
+class SearchViewModel @Inject constructor(
+    private var bookRepository :BookRepository
+    ) :ViewModel() {
 
     val _searchTapStatus = MutableStateFlow<SearchTapStatus>(SearchTapStatus.Default)
     val _searchKeyWord = MutableStateFlow<String>("")

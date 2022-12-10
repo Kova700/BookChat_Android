@@ -1,13 +1,12 @@
 package com.example.bookchat.ui.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
@@ -16,25 +15,21 @@ import com.example.bookchat.adapter.WishBookTabAdapter
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.FragmentWishBookTabBinding
 import com.example.bookchat.ui.dialog.WishTapBookDialog
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.BookShelfViewModel
-import com.example.bookchat.viewmodel.ViewModelFactory
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class WishBookTabFragment : Fragment() {
     private lateinit var binding : FragmentWishBookTabBinding
     private lateinit var wishBookAdapter : WishBookTabAdapter
-    private lateinit var bookShelfViewModel: BookShelfViewModel
+    private val bookShelfViewModel: BookShelfViewModel by viewModels({requireParentFragment()})
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_wish_book_tab,container,false)
-        bookShelfViewModel = ViewModelProvider(requireParentFragment(), ViewModelFactory()).get(BookShelfViewModel::class.java)
 
         with(binding){
             lifecycleOwner = this@WishBookTabFragment
