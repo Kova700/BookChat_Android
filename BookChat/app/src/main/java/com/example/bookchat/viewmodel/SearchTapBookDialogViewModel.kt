@@ -38,6 +38,13 @@ class SearchTapBookDialogViewModel @AssistedInject constructor(
         isAlreadyInBookShelf.value?.let { requestRemoveWishBook(it) }
     }
 
+    fun clickCompleteBtn(){
+        //레이팅바 노출
+        //버튼 비활성화
+        //별점 채워지면 다시 버튼 활성화
+        //활성화 된 버튼 다시 누르면 독서완료 요청 API
+    }
+
     private fun checkAlreadyInBookShelf() = viewModelScope.launch {
         runCatching { bookRepository.checkAlreadyInBookShelf(book) }
             .onSuccess { respondCheckInBookShelf ->
