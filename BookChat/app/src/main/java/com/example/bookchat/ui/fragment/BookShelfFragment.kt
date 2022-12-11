@@ -31,12 +31,21 @@ class BookShelfFragment : Fragment() {
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_book_shelf,container,false)
         pagerAdapter = PagerFragmentStateAdapter(this)
+        binding.lifecycleOwner = this
         binding.viewPager.adapter = pagerAdapter
         initTapLayout()
         changeTab(1)
         observeEvent()
 
         return binding.root
+    }
+
+    private fun inflateFirstTap(){
+//        if(bookShelfViewModel.isBookShelfEmpty.value == false) {
+//            changeTab(1)
+//            return
+//        }
+        changeTab(0)
     }
 
     private fun observeEvent(){
