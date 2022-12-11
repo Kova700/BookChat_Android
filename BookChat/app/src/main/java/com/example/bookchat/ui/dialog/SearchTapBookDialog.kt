@@ -9,12 +9,10 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.DialogSearchTapBookClickedBinding
 import com.example.bookchat.viewmodel.SearchTapBookDialogViewModel
-import com.example.bookchat.viewmodel.ViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -35,7 +33,10 @@ class SearchTapBookDialog(private val book: Book) : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.dialog_search_tap_book_clicked, container, false)
-        binding.viewmodel = searchTapBookDialogViewModel
+        with(binding){
+            lifecycleOwner = this@SearchTapBookDialog
+            viewmodel = searchTapBookDialogViewModel
+        }
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return binding.root
     }
@@ -44,5 +45,4 @@ class SearchTapBookDialog(private val book: Book) : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
     }
 
-    //하트 눌렀다가 다시 누르면 어떻게 할 건가가
 }

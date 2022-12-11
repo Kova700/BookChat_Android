@@ -1,6 +1,5 @@
 package com.example.bookchat.viewmodel
 
-import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -8,8 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.RequestRegisterBookShelfBook
+import com.example.bookchat.data.RespondCheckInBookShelf
 import com.example.bookchat.repository.BookRepository
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.ReadingStatus
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -22,25 +21,37 @@ class SearchTapBookDialogViewModel @AssistedInject constructor(
     @Assisted val book :Book
 ) : ViewModel()
 {
-    val isAlreadyInBookShelf = MutableStateFlow(false)
+    val isAlreadyInBookShelf = MutableStateFlow<RespondCheckInBookShelf?>(null)
+    var isToggleChecked = MutableStateFlow<Boolean>(false)
 
     init {
-        //checkAlreadyInBookShelf()
+        checkAlreadyInBookShelf()
    }
 
-    fun checkAlreadyInBookShelf() = viewModelScope.launch {
-        Log.d(TAG, "SearchTapBookDialogViewModel: checkAlreadyInBookShelf() - called")
+    fun requestToggleApi() = viewModelScope.launch {
+        isToggleChecked.value = !(isToggleChecked.value)
+
+        if(isToggleChecked.value){
+            requestRegisterWishBook()
+            return@launch
+        }
+        isAlreadyInBookShelf.value?.let { requestRemoveWishBook(it) }
+    }
+
+    private fun checkAlreadyInBookShelf() = viewModelScope.launch {
         runCatching { bookRepository.checkAlreadyInBookShelf(book) }
-            .onSuccess {
-                Toast.makeText(App.instance.applicationContext,"서재에 존재여부 확인 성공",Toast.LENGTH_SHORT).show()
+            .onSuccess { respondCheckInBookShelf ->
+                respondCheckInBookShelf?.let {
+                    isAlreadyInBookShelf.value = respondCheckInBookShelf
+                    isToggleChecked.value = true
+                }
             }
             .onFailure {
                 Toast.makeText(App.instance.applicationContext,"서재에 존재여부 확인 실패",Toast.LENGTH_SHORT).show()
             }
     }
 
-    fun requestRegisterWishBook() = viewModelScope.launch {
-        Log.d(TAG, "SearchTapBookDialogViewModel: requestRegisterWishBook() - called")
+    private fun requestRegisterWishBook() = viewModelScope.launch {
         val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(book, ReadingStatus.WISH)
         runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
             .onSuccess {
@@ -51,8 +62,17 @@ class SearchTapBookDialogViewModel @AssistedInject constructor(
             }
     }
 
+    private suspend fun requestRemoveWishBook(respondCheckInBookShelf :RespondCheckInBookShelf)= viewModelScope.launch {
+        runCatching { bookRepository.deleteBookShelfBook(respondCheckInBookShelf.bookId) }
+            .onSuccess {
+                Toast.makeText(App.instance.applicationContext, "도서가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+            }
+            .onFailure {
+                Toast.makeText(App.instance.applicationContext, "WISH 삭제 실패", Toast.LENGTH_SHORT).show()
+            }
+    }
+
     fun requestRegisterReadingBook() = viewModelScope.launch {
-        Log.d(TAG, "SearchTapBookDialogViewModel: requestRegisterReadingBook() - called")
         val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(book,ReadingStatus.READING)
         runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
             .onSuccess {

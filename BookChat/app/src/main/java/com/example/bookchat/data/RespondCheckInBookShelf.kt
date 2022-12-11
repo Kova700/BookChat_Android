@@ -5,9 +5,9 @@ import com.google.gson.annotations.SerializedName
 
 data class RespondCheckInBookShelf(
     @SerializedName("bookShelfId")
-    private val bookShelfId :Long,
+    val bookShelfId :Long,
     @SerializedName("bookId")
-    private val bookId :Long,
+    val bookId :Long,
     @SerializedName("readingStatus")
-    private val readingStatus :ReadingStatus,
+    val readingStatus :ReadingStatus,
 )

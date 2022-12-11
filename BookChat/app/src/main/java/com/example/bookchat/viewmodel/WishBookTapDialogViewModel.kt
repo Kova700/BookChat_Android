@@ -23,14 +23,10 @@ class WishBookTapDialogViewModel @AssistedInject constructor(
     private val _eventFlow = MutableSharedFlow<WishBookEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    private var isInited = false
     var isToggleChecked = MutableStateFlow<Boolean>(true)
 
     fun requestToggleApi() = viewModelScope.launch {
-        if (!isInited) { isInited = true; return@launch }
-
         isToggleChecked.value = !(isToggleChecked.value)
-
         if(isToggleChecked.value){
             requestAddWishBook()
             return@launch
