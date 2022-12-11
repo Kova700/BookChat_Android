@@ -3,6 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
+        <import type="android.view.View"/>
+        <import type="com.example.bookchat.utils.ReadingStatus"/>
+
         <variable
             name="viewmodel"
             type="com.example.bookchat.viewmodel.SearchTapBookDialogViewModel" />
@@ -35,7 +38,9 @@
             android:textOff=""
             android:textOn=""
             android:scaleType="fitXY"
-            android:onClick="@{() -> viewmodel.requestRegisterWishBook()}"
+            android:checked="@{viewmodel.isAlreadyInBookShelf().readingStatus == ReadingStatus.WISH}"
+            android:onClick="@{() -> viewmodel.requestToggleApi()}"
+            android:clickable="@{viewmodel.isAlreadyInBookShelf() == null}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -145,6 +150,8 @@
             android:minHeight="55dp"
             android:stateListAnimator="@null"
             android:text="독서완료"
+            android:visibility="@{(viewmodel.isAlreadyInBookShelf() == null) ? View.VISIBLE : View.INVISIBLE}"
+            android:clickable="@{viewmodel.isAlreadyInBookShelf() == null}"
             android:textColor="#5648FF"
             app:cornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -168,7 +175,9 @@
             android:minHeight="55dp"
             android:stateListAnimator="@null"
             android:text="독서중"
+            android:visibility="@{(viewmodel.isAlreadyInBookShelf() == null) ? View.VISIBLE : View.INVISIBLE}"
             android:onClick="@{() -> viewmodel.requestRegisterReadingBook()}"
+            android:clickable="@{viewmodel.isAlreadyInBookShelf() == null}"
             android:textColor="#FFFFFF"
             app:cornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -183,7 +192,7 @@
             android:layout_height="0dp"
             android:text="이미 서재에 등록된 도서"
             app:cornerRadius="10dp"
-            android:visibility="invisible"
+            android:visibility="@{(viewmodel.isAlreadyInBookShelf() != null) ? View.VISIBLE : View.INVISIBLE}"
             android:clickable="false"
             android:fontFamily="@font/notosanskr_regular"
             android:elegantTextHeight="true"
