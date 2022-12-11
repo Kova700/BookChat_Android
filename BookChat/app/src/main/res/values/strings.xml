@@ -11,6 +11,6 @@
     <string name="message_forbidden">권한이 없는 접근이거나, 차단된 사용자입니다."\n 24시간 후에 다시 시도해 주세요.</string>
     <string name="message_kakao_login_fail">카카오 로그인에 문제가 발생하였습니다. 잠시 후 다시 시도해 주세요.</string>
     <string name="message_back_press">\'뒤로\' 버튼을 한 번 더 누르시면 종료됩니다.</string>
-    <string name="message_search_book_result_empty">해당 도서명이 존재하지 않습니다.</string>
+    <string name="message_search_book_result_empty">검색어가 존재하지 않습니다.</string>
     <string name="message_search_window_hint">검색어를 입력해주세요.</string>
 </resources>
