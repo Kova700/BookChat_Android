@@ -67,16 +67,6 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
         }
         searchResultBookDetailAdapter = SearchResultBookDetailAdapter()
         searchResultBookDetailAdapter.setItemClickListener(bookItemClickListener)
-        searchResultBookDetailAdapter.addLoadStateListener { combinedLoadStates ->
-            combinedLoadStates.source
-            if (isLoadResultEmpty(combinedLoadStates.source)) {
-                binding.emptyResultImg.isVisible = true
-                binding.emptyResultText.isVisible = true
-                return@addLoadStateListener
-            }
-            binding.emptyResultImg.isVisible = false
-            binding.emptyResultText.isVisible = false
-        }
     }
 
     private fun initSearchResultDetailRcv(){
@@ -85,12 +75,6 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
             searchResultDetailRcv.setHasFixedSize(true)
             searchResultDetailRcv.layoutManager = GridLayoutManager(this@SearchTapResultDetailActivity,3)
         }
-    }
-
-    private fun isLoadResultEmpty(loadStates : LoadStates) :Boolean{
-        return (loadStates.refresh is LoadState.NotLoading)
-                && (loadStates.append.endOfPaginationReached)
-                && (searchResultBookDetailAdapter.itemCount < 1)
     }
 
     private fun getSearchKeyWord(): String {
