@@ -8,9 +8,9 @@ import com.example.bookchat.repository.BookRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class BookReportViewModel @AssistedInject constructor(
     private val bookRepository: BookRepository,
@@ -18,6 +18,15 @@ class BookReportViewModel @AssistedInject constructor(
 ) : ViewModel() {
     private val _eventFlow = MutableSharedFlow<BookReportUIEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+    val bookReportStatus = MutableStateFlow(BookReportStatus.Default)
+
+    init {
+        //Room사용해서 로컬에 데이터 있으면 가져오고
+        //로컬에 데이터 없으면 호출해서 가져옴
+            //넘겨받은 값이 없으면 입력창 노출하고
+            //넘겨받은 값이 있으면 데이터 노출
+    }
 
     fun clickBackBtn(){
         startEvent(BookReportUIEvent.MoveToBack)
@@ -27,13 +36,20 @@ class BookReportViewModel @AssistedInject constructor(
         _eventFlow.emit(event)
     }
 
-    sealed class BookReportUIEvent{
-        object MoveToBack :BookReportUIEvent()
-    }
-
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
         fun create(book: BookShelfItem) :BookReportViewModel
+    }
+
+    sealed class BookReportStatus{
+        object Default :BookReportStatus() //기본
+        object ShowData :BookReportStatus() //데이터 노출
+        object EditData :BookReportStatus() //입력창 노출
+        object NoData :BookReportStatus() //입력창 노출
+    }
+
+    sealed class BookReportUIEvent{
+        object MoveToBack :BookReportUIEvent()
     }
 
     companion object {
