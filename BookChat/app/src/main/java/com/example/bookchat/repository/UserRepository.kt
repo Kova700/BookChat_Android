@@ -2,19 +2,21 @@ package com.example.bookchat.repository
 
 import UserSignUpRequest
 import android.util.Log
-import android.widget.Toast
 import com.example.bookchat.App
-import com.example.bookchat.R
 import com.example.bookchat.data.User
 import com.example.bookchat.data.UserSignUpDto
-import com.example.bookchat.response.*
+import com.example.bookchat.response.NeedToSignUpException
+import com.example.bookchat.response.NetworkIsNotConnectedException
+import com.example.bookchat.response.NickNameDuplicateException
+import com.example.bookchat.response.ResponseBodyEmptyException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
 import com.google.gson.Gson
 import okhttp3.MediaType
 import okhttp3.RequestBody
+import javax.inject.Inject
 
-class UserRepository{
+class UserRepository @Inject constructor(){
 
     suspend fun signIn() {
         Log.d(TAG, "UserRepository: login() - called")
