@@ -19,7 +19,7 @@ class SearchResultBookDetailPagingSource(
 
         val page = params.key ?: STARTING_PAGE_INDEX
 
-        val response = App.instance.bookApiInterface.getBookSearchResult(
+        val response = App.instance.bookChatApiClient.getBookSearchResult(
             query = keyword,
             size = params.loadSize.toString(), //처음엔 x3되어서 요첨됨
             page = page.toString(),

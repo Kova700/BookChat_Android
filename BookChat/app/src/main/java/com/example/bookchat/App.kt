@@ -2,10 +2,7 @@ package com.example.bookchat
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.bookchat.api.ApiClient
-import com.example.bookchat.api.BookApiInterface
-import com.example.bookchat.api.BookReportApiInterface
-import com.example.bookchat.api.UserApiInterface
+import com.example.bookchat.api.*
 import com.example.bookchat.data.User
 import com.example.bookchat.utils.NetworkManager
 import com.kakao.sdk.common.KakaoSdk
@@ -19,9 +16,7 @@ class App : Application() {
             private set
     }
     val networkManager by lazy { NetworkManager() }
-    val userApiInterface by lazy { ApiClient.getApiClient().create(UserApiInterface::class.java) }
-    val bookApiInterface by lazy { ApiClient.getApiClient().create(BookApiInterface::class.java) }
-    val bookReportApiInterface by lazy { ApiClient.getApiClient().create(BookReportApiInterface::class.java) }
+    val bookChatApiClient by lazy { RetrofitBuilder.getApiClient().create(BookChatApiInterface::class.java) }
 
     private var cachedUser : User? = null
 
