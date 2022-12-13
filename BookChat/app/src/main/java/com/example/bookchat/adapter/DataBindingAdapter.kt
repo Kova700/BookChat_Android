@@ -15,6 +15,7 @@ import com.example.bookchat.utils.LoadState
 import com.example.bookchat.utils.NameCheckStatus
 import com.example.bookchat.utils.SearchTapStatus
 import com.example.bookchat.utils.StarRating
+import com.example.bookchat.viewmodel.BookReportViewModel.BookReportStatus
 import com.willy.ratingbar.ScaleRatingBar
 
 object DataBindingAdapter {
@@ -202,4 +203,25 @@ object DataBindingAdapter {
         }
     }
 
+    @JvmStatic
+    @BindingAdapter("setLoadingVisibilityInBookReport")
+    fun setLoadingVisibilityInBookReport(view: View, status: BookReportStatus){
+        view.visibility = if(status == BookReportStatus.Loading) View.VISIBLE else View.INVISIBLE
+    }
+
+    @JvmStatic
+    @BindingAdapter("setInputLayoutVisibilityInBookReport")
+    fun setInputLayoutVisibilityInBookReport(view: View, status: BookReportStatus){
+        when(status) {
+            BookReportStatus.InputData,
+            BookReportStatus.ReviseData ->{ view.visibility = View.VISIBLE }
+            else -> { view.visibility = View.INVISIBLE }
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter("setShowDataLayoutVisibilityInBookReport")
+    fun setShowDataLayoutVisibilityInBookReport(view: View, status: BookReportStatus){
+        view.visibility = if(status == BookReportStatus.ShowData) View.VISIBLE else View.INVISIBLE
+    }
 }

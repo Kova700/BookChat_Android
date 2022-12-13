@@ -37,6 +37,7 @@
                 android:text="독후감"
                 android:textColor="#222222"
                 android:textSize="18sp"
+                setShowDataLayoutVisibilityInBookReport="@{viewmodel.bookReportStatus}"
                 app:layout_constraintBottom_toBottomOf="@+id/back_btn"
                 app:layout_constraintStart_toEndOf="@+id/back_btn"
                 app:layout_constraintTop_toTopOf="@+id/back_btn" />
@@ -46,8 +47,10 @@
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_marginEnd="30dp"
+                setShowDataLayoutVisibilityInBookReport="@{viewmodel.bookReportStatus}"
                 android:background="?android:selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_pencil_btn"
+                android:onClick="@{() -> viewmodel.clickReviseBtn()}"
                 app:layout_constraintBottom_toBottomOf="@+id/back_btn"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/back_btn" />
@@ -57,8 +60,10 @@
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_marginEnd="15dp"
+                setShowDataLayoutVisibilityInBookReport="@{viewmodel.bookReportStatus}"
                 android:background="?android:selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_wastebasket_btn"
+                android:onClick="@{() -> viewmodel.clickDeleteBtn()}"
                 app:layout_constraintBottom_toBottomOf="@+id/antiDupClickImageButton"
                 app:layout_constraintEnd_toStartOf="@+id/antiDupClickImageButton"
                 app:layout_constraintTop_toTopOf="@+id/antiDupClickImageButton" />
@@ -71,6 +76,8 @@
                 android:elegantTextHeight="true"
                 android:fontFamily="@font/notosanskr_medium"
                 android:text="등록"
+                android:onClick="@{() -> viewmodel.clickRegisterBtn()}"
+                setInputLayoutVisibilityInBookReport="@{viewmodel.bookReportStatus}"
                 android:stateListAnimator="@null"
                 android:textColor="#222222"
                 app:layout_constraintBottom_toBottomOf="@+id/antiDupClickImageButton"
@@ -167,8 +174,20 @@
                 app:srb_starPadding="2dp"
                 app:srb_stepSize="0.5" />
 
+            <ProgressBar
+                android:id="@+id/loading_bookReport"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="10dp"
+                setLoadingVisibilityInBookReport="@{viewmodel.bookReportStatus}"
+                app:layout_constraintBottom_toBottomOf="@+id/bookReportInput_layout"
+                app:layout_constraintEnd_toEndOf="@+id/bookReportInput_layout"
+                app:layout_constraintStart_toStartOf="@+id/bookReportInput_layout"
+                app:layout_constraintTop_toTopOf="@+id/bookReportInput_layout" />
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/bookReportInput_layout"
+                setInputLayoutVisibilityInBookReport="@{viewmodel.bookReportStatus}"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginHorizontal="30dp"
@@ -185,17 +204,19 @@
 
             <EditText
                 android:id="@+id/editText"
+                setInputLayoutVisibilityInBookReport="@{viewmodel.bookReportStatus}"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="40dp"
                 android:layout_marginEnd="20dp"
                 android:background="@null"
+                android:elegantTextHeight="true"
                 android:elevation="10dp"
                 android:fontFamily="@font/notosanskr_bold"
-                android:elegantTextHeight="true"
                 android:hint="제목"
                 android:singleLine="true"
+                android:text="@={viewmodel.reportTitle}"
                 android:textColorHint="#222222"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="@+id/bookReportInput_layout"
@@ -211,6 +232,7 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="7dp"
                 android:background="#D9D9D9"
+                setInputLayoutVisibilityInBookReport="@{viewmodel.bookReportStatus}"
                 app:layout_constraintBottom_toTopOf="@+id/editText2"
                 app:layout_constraintEnd_toEndOf="@+id/bookReportInput_layout"
                 app:layout_constraintStart_toStartOf="@+id/bookReportInput_layout"
@@ -218,6 +240,7 @@
 
             <EditText
                 android:id="@+id/editText2"
+                setInputLayoutVisibilityInBookReport="@{viewmodel.bookReportStatus}"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -229,12 +252,58 @@
                 android:gravity="top"
                 android:hint="내용"
                 android:minHeight="150dp"
+                android:text="@={viewmodel.reportContent}"
                 android:textColorHint="#373737"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/bookReportInput_layout"
                 app:layout_constraintStart_toStartOf="@+id/bookReportInput_layout"
                 app:layout_constraintTop_toBottomOf="@+id/view" />
+
+            <TextView
+                android:id="@+id/reportTitle_tv_showData"
+                setShowDataLayoutVisibilityInBookReport="@{viewmodel.bookReportStatus}"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_bold"
+                android:text="@{viewmodel.reportTitle}"
+                android:textColor="#222222"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/editText"
+                app:layout_constraintEnd_toEndOf="@+id/bookReportInput_layout"
+                app:layout_constraintStart_toStartOf="@+id/bookReportInput_layout" />
+
+            <TextView
+                android:id="@+id/reportContent_tv_showData"
+                setShowDataLayoutVisibilityInBookReport="@{viewmodel.bookReportStatus}"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="17dp"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_regular"
+                android:lineSpacingExtra="10dp"
+                android:minHeight="150dp"
+                android:text="@{viewmodel.reportContent}"
+                android:textColor="#222222"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/bookReportInput_layout"
+                app:layout_constraintStart_toStartOf="@+id/bookReportInput_layout"
+                app:layout_constraintTop_toBottomOf="@+id/reportTitle_tv_showData" />
+
+            <TextView
+                android:id="@+id/reportDate_tv_showData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/notosanskr_regular"
+                android:elegantTextHeight="true"
+                setShowDataLayoutVisibilityInBookReport="@{viewmodel.bookReportStatus}"
+                android:text="@{viewmodel.reportCreatedAt}"
+                android:textColor="#373737"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="@+id/reportContent_tv_showData"
+                app:layout_constraintTop_toBottomOf="@+id/reportContent_tv_showData" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
