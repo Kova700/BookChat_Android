@@ -12,10 +12,9 @@ import com.example.bookchat.response.ResponseBodyEmptyException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.ReadingStatus
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Singleton
+import javax.inject.Inject
 
-@Singleton
-class BookRepository {
+class BookRepository @Inject constructor(){
 
     suspend fun simpleSearchBooks(keyword :String) : BookSearchResult {
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
