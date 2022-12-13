@@ -19,7 +19,7 @@ class CompleteBookTapPagingSource : PagingSource<Int, Pair<BookShelfItem, Long>>
 
         val page = params.key ?: STARTING_PAGE_INDEX
 
-        val response = App.instance.bookApiInterface.getBookShelfBooks(
+        val response = App.instance.bookChatApiClient.getBookShelfBooks(
             size = params.loadSize.toString(),
             page = page.toString(),
             readingStatus = ReadingStatus.COMPLETE

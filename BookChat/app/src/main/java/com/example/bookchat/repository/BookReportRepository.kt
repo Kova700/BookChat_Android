@@ -16,7 +16,7 @@ class BookReportRepository @Inject constructor() {
         Log.d(TAG, "BookReportRepository: getBookReport() - called")
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-        val response = App.instance.bookReportApiInterface.getBookReport(book.bookId)
+        val response = App.instance.bookChatApiClient.getBookReport(book.bookId)
         Log.d(TAG, "BookReportRepository: getBookReport() - response : $response")
         Log.d(TAG, "BookReportRepository: getBookReport() - response.body() : ${response.body()}")
         when(response.code()){
@@ -39,7 +39,7 @@ class BookReportRepository @Inject constructor() {
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val bookReportRequest = BookReportRequest(bookReport.reportTitle, bookReport.reportContent)
-        val response = App.instance.bookReportApiInterface.registerBookReport(book.bookId, bookReportRequest)
+        val response = App.instance.bookChatApiClient.registerBookReport(book.bookId, bookReportRequest)
 
         when(response.code()){
             200 -> { }
@@ -51,7 +51,7 @@ class BookReportRepository @Inject constructor() {
         Log.d(TAG, "BookReportRepository: deleteBookReport() - called")
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-        val response = App.instance.bookReportApiInterface.deleteBookReport(book.bookId)
+        val response = App.instance.bookChatApiClient.deleteBookReport(book.bookId)
         when(response.code()){
             200 -> { }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
@@ -66,7 +66,7 @@ class BookReportRepository @Inject constructor() {
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val bookReportRequest = BookReportRequest(bookReport.reportTitle, bookReport.reportContent)
-        val response = App.instance.bookReportApiInterface.reviseBookReport(book.bookId, bookReportRequest)
+        val response = App.instance.bookChatApiClient.reviseBookReport(book.bookId, bookReportRequest)
 
         when(response.code()){
             200 -> { }

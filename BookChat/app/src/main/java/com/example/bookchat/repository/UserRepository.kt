@@ -28,7 +28,7 @@ class UserRepository @Inject constructor(){
             contentType = CONTENT_TYPE_JSON
         )
 
-        val response = App.instance.userApiInterface.signIn(idToken.token,requestBody)
+        val response = App.instance.bookChatApiClient.signIn(idToken.token,requestBody)
         Log.d(TAG, "UserRepository: signIn() - response : ${response}")
         when(response.code()){
             200 -> {
@@ -58,7 +58,7 @@ class UserRepository @Inject constructor(){
             contentType = CONTENT_TYPE_JSON
         )
 
-        val response = App.instance.userApiInterface.signUp(
+        val response = App.instance.bookChatApiClient.signUp(
             idToken = idToken.token,
             userProfileImage = userSignUpDto.userProfileImage,
             userSignUpRequest = requestBody
@@ -80,7 +80,7 @@ class UserRepository @Inject constructor(){
     //회원 탈퇴 후 재가입 가능 기간 정책 결정해야함
     suspend fun withdraw() {
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
-        val response = App.instance.userApiInterface.withdraw()
+        val response = App.instance.bookChatApiClient.withdraw()
         Log.d(TAG, "UserRepository: withdraw() - response.code : ${response.code()}")
         when(response.code()){
             200 -> signOut()
@@ -94,7 +94,7 @@ class UserRepository @Inject constructor(){
         cachedUser?.let { return cachedUser }
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-        val response = App.instance.userApiInterface.getUserProfile()
+        val response = App.instance.bookChatApiClient.getUserProfile()
         Log.d(TAG, "UserRepository: getUserProfile() - response : $response")
         when(response.code()){
             200 -> {
@@ -109,7 +109,7 @@ class UserRepository @Inject constructor(){
     suspend fun requestNameDuplicateCheck(nickName : String) {
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-        val response = App.instance.userApiInterface.requestNameDuplicateCheck(nickName)
+        val response = App.instance.bookChatApiClient.requestNameDuplicateCheck(nickName)
         Log.d(TAG, "UserRepository: requestNameDuplicateCheck() - response.code() : ${response.code()}")
         when(response.code()){
             200 -> { }

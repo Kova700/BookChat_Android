@@ -19,7 +19,7 @@ class BookRepository @Inject constructor(){
     suspend fun simpleSearchBooks(keyword :String) : BookSearchResult {
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-        val response = App.instance.bookApiInterface.getBookSearchResult(
+        val response = App.instance.bookChatApiClient.getBookSearchResult(
             query = keyword,
             size = SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE.toString(),
             page = 1.toString()
@@ -45,7 +45,7 @@ class BookRepository @Inject constructor(){
 
     suspend fun registerBookShelfBook(requestRegisterBookShelfBook: RequestRegisterBookShelfBook){
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-        val response = App.instance.bookApiInterface.registerBookShelfBook(requestRegisterBookShelfBook)
+        val response = App.instance.bookChatApiClient.registerBookShelfBook(requestRegisterBookShelfBook)
         when(response.code()){
             200 -> { }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
@@ -56,7 +56,7 @@ class BookRepository @Inject constructor(){
         Log.d(TAG, "BookRepository: deleteBookShelfBook() - called")
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-        val response = App.instance.bookApiInterface.deleteBookShelfBook(bookId)
+        val response = App.instance.bookChatApiClient.deleteBookShelfBook(bookId)
         when(response.code()){
             200 -> { }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
@@ -72,7 +72,7 @@ class BookRepository @Inject constructor(){
             star = book.star,
             pages = book.pages
         )
-        val response = App.instance.bookApiInterface.changeBookShelfBookStatus(book.bookId, requestBody)
+        val response = App.instance.bookChatApiClient.changeBookShelfBookStatus(book.bookId, requestBody)
         when(response.code()){
             200 -> { }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
@@ -83,7 +83,7 @@ class BookRepository @Inject constructor(){
         Log.d(TAG, "BookRepository: checkAlreadyInBookShelf() - called")
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-        val response = App.instance.bookApiInterface.checkAlreadyInBookShelf(book.isbn, book.datetime)
+        val response = App.instance.bookChatApiClient.checkAlreadyInBookShelf(book.isbn, book.datetime)
         when(response.code()){
             200, 404 -> {
                 val respondCheckInBookShelf = response.body()
