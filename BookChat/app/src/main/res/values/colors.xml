@@ -11,4 +11,5 @@
     <color name="bookchat_default_black">#FF222222</color>
     <color name="bookchat_blue">#FF5648FF</color>
     <color name="taste_unclicked">#FFF6F6F6</color>
+    <color name="ripple_color">#FFDDDAFD</color>
 </resources>

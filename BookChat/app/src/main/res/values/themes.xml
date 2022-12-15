@@ -16,6 +16,8 @@
         <item name="android:statusBarColor">#ffffff</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
+        <!-- Click Ripple Color(해당 Item명으로 해야지 덮어쓰기 적용됨)-->
+        <item name="colorControlHighlight">@color/ripple_color</item>
     </style>
 
     <style name="tab_text" parent="@android:style/TextAppearance.Widget.TabWidget">
