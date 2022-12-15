@@ -31,24 +31,29 @@ object DataBindingAdapter {
     @JvmStatic
     @BindingAdapter("loadUrl")
     fun loadUrl(imageView: ImageView, url: String?){
+        if(url == null || url.isEmpty()) return
+
         Glide.with(imageView.context)
             .load(url)
-            .placeholder(R.drawable.default_img)
-            .error(R.drawable.default_img)
+            .placeholder(R.drawable.loading_img)
+            .error(R.drawable.error_img)
             .into(imageView)
     }
 
     /**이미지뷰 이미지 설정(ByteArray)*/
     @JvmStatic
     @BindingAdapter("loadByteArray")
-    fun loadByteArray(imageView: ImageView, byteArray: ByteArray){
+    fun loadByteArray(imageView: ImageView, byteArray: ByteArray?){
+        if(byteArray == null || byteArray.isEmpty()) return
+
         val bitmap = BitmapFactory.decodeByteArray(byteArray,0,byteArray.size)
         Glide.with(imageView.context)
             .load(bitmap)
-            .placeholder(R.drawable.ic_default_profile_img1)
-            .error(R.drawable.ic_default_profile_img1)
+            .placeholder(R.drawable.loading_img)
+            .error(R.drawable.error_img)
             .into(imageView)
     }
+
     /** EditText 엔터이벤트 등록*/
     @JvmStatic
     @BindingAdapter("setEnterListener")

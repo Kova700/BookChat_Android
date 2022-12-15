@@ -73,7 +73,7 @@
                     android:layout_width="90dp"
                     android:layout_height="140dp"
                     android:scaleType="fitXY"
-                    android:src="@drawable/ex_book1" />
+                    android:src="@drawable/empty_img" />
 
             </androidx.cardview.widget.CardView>
 
