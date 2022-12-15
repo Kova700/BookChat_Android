@@ -28,8 +28,8 @@ class BookReportViewModel @AssistedInject constructor(
     val reportContent = MutableStateFlow<String?>(null)
     val reportCreatedAt = MutableStateFlow<String?>(null)
 
-    var cachedTitle = ""
-    var cachedContent = ""
+    var cachedTitle :String? = null
+    var cachedContent :String? = null
 
     init {
         //Room사용해서 로컬에 데이터 있으면 가져오고
@@ -127,11 +127,11 @@ class BookReportViewModel @AssistedInject constructor(
         }
     }
 
-    private fun isBookReportEmpty() :Boolean {
+    fun isBookReportEmpty() :Boolean {
         return reportTitle.value.isNullOrEmpty() || reportContent.value.isNullOrEmpty()
     }
 
-    private fun isNotChangedReport() :Boolean{
+    fun isNotChangedReport() :Boolean{
         return (cachedTitle == reportTitle.value) && (cachedContent == reportContent.value)
     }
 
@@ -146,14 +146,16 @@ class BookReportViewModel @AssistedInject constructor(
     }
 
     fun clickBackBtn(){
-        //작성 중이거나 , 작성중인 내용이 있다면 뒤로가기시에 다이얼로그로 경고 문구 띄워야함
-        initCachedData()
         startEvent(BookReportUIEvent.MoveToBack)
     }
 
+    fun isEditingStatus() :Boolean{
+        return (bookReportStatus.value == BookReportStatus.InputData) || (bookReportStatus.value == BookReportStatus.ReviseData)
+    }
+
     fun initCachedData(){
-        cachedTitle = ""
-        cachedContent = ""
+        cachedTitle = null
+        cachedContent = null
     }
 
     private fun startEvent (event : BookReportUIEvent) = viewModelScope.launch {
