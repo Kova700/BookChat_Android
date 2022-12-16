@@ -30,7 +30,7 @@ class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() 
     private val _nameCheckStatus = MutableStateFlow<NameCheckStatus>(NameCheckStatus.Default)
     val nameCheckStatus = _nameCheckStatus.asStateFlow()
 
-    val _userProfilByteArray = MutableStateFlow<ByteArray>(byteArrayOf())
+    val _userProfilByteArray = MutableStateFlow<ByteArray?>(null)
     val userProfilByteArray = _userProfilByteArray.asStateFlow()
 
     val editTextWatcher = object : TextWatcher {
@@ -96,14 +96,13 @@ class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() 
     }
 
     sealed class SignUpEvent {
-        data class MoveToSelectTaste(val signUpDto :UserSignUpDto, val userProfilByteArray :ByteArray) :SignUpEvent()
+        data class MoveToSelectTaste(val signUpDto :UserSignUpDto, val userProfilByteArray :ByteArray?) :SignUpEvent()
         object PermissionCheck :SignUpEvent()
         object MoveToBack :SignUpEvent()
         object UnknownError :SignUpEvent()
     }
 
     private fun failHandler(exception: Throwable) {
-        Log.d(TAG, "SignUpViewModel: failHandler() - called")
         when(exception){
             is NickNameDuplicateException -> { _nameCheckStatus.value = NameCheckStatus.IsDuplicate; isNotNameDuplicateFlag = false }
             else -> startEvent(SignUpEvent.UnknownError)
