@@ -5,25 +5,29 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.bookchat.App
 import com.example.bookchat.data.Book
+import com.example.bookchat.data.BookSearchResult
 import com.example.bookchat.data.SearchingMeta
 import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.response.ResponseBodyEmptyException
 import com.example.bookchat.utils.Constants.TAG
+import retrofit2.Response
 
-class SearchResultBookDetailPagingSource(
-    private val keyword :String
-) :PagingSource<Int, Book>(){
+class SearchResultBookDetailPagingSource(private val keyword :String) :PagingSource<Int, Book>(){
+    private lateinit var response : Response<BookSearchResult>
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Book> {
         if(!isNetworkConnected()) return LoadResult.Error(NetworkIsNotConnectedException())
-
         val page = params.key ?: STARTING_PAGE_INDEX
 
-        val response = App.instance.bookChatApiClient.getBookSearchResult(
-            query = keyword,
-            size = params.loadSize.toString(), //처음엔 x3되어서 요첨됨
-            page = page.toString(),
-        )
+        try {
+            response = App.instance.bookChatApiClient.getBookSearchResult(
+                query = keyword,
+                size = params.loadSize.toString(), //처음엔 x3되어서 요첨됨
+                page = page.toString(),
+            )
+        }catch (e :Exception){
+           return LoadResult.Error(e)
+        }
 
         when(response.code()){
             200 -> {

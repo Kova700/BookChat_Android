@@ -11,28 +11,33 @@ import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.response.ResponseBodyEmptyException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.ReadingStatus
+import retrofit2.Response
 
 class CompleteBookTapPagingSource : PagingSource<Int, Pair<BookShelfItem, Long>>(){
+    private lateinit var response : Response<BookShelfResult>
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Pair<BookShelfItem, Long>> {
         if(!isNetworkConnected()) return LoadResult.Error(NetworkIsNotConnectedException())
-
         val page = params.key ?: STARTING_PAGE_INDEX
 
-        val response = App.instance.bookChatApiClient.getBookShelfBooks(
-            size = params.loadSize.toString(),
-            page = page.toString(),
-            readingStatus = ReadingStatus.COMPLETE
-        )
+        try {
+            response = App.instance.bookChatApiClient.getBookShelfBooks(
+                size = params.loadSize.toString(),
+                page = page.toString(),
+                readingStatus = ReadingStatus.COMPLETE
+            )
+        }catch (e :Exception){
+            return LoadResult.Error(e)
+        }
 
         when(response.code()){
             200 -> {
                 val bookShelfResult = response.body()
                 Log.d(TAG, "CompleteBookTapPagingSource: load() - bookShelfResult : $bookShelfResult")
                 bookShelfResult?.let { return getLoadResult(bookShelfResult,page) }
-                throw ResponseBodyEmptyException(response.errorBody()?.string())
+                return LoadResult.Error(ResponseBodyEmptyException(response.errorBody()?.string()))
             }
-            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
+            else -> return LoadResult.Error(Exception(createExceptionMessage(response.code(),response.errorBody()?.string())))
         }
     }
 
