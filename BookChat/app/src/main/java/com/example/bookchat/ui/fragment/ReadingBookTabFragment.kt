@@ -73,17 +73,6 @@ class ReadingBookTabFragment :Fragment() {
             readingBookRcv.adapter = readingBookAdapter
             readingBookRcv.setHasFixedSize(true)
             readingBookRcv.layoutManager = LinearLayoutManager(requireContext())
-            setSwipeHelperCallback(readingBookRcv)
-        }
-    }
-
-    private fun setSwipeHelperCallback(recyclerView : RecyclerView){
-        val swipeHelperCallback = SwipeHelperCallback(SwipeViewType.Reading)
-        val itemTouchHelper = ItemTouchHelper(swipeHelperCallback)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
-        recyclerView.setOnTouchListener { _, _ ->
-            swipeHelperCallback.removePreviousClamp(recyclerView)
-            false
         }
     }
 

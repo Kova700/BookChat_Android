@@ -15,6 +15,10 @@ import com.example.bookchat.databinding.ItemReadingBookTabBinding
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class ReadingBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
     : PagingDataAdapter<BookShelfItem, ReadingBookTabAdapter.ReadingBookItemViewHolder>(BOOK_SHELF_ITEM_COMPARATOR){
@@ -26,9 +30,16 @@ class ReadingBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
         fun bind(book : BookShelfItem){
             with(this.binding){
                 bookShelfItem = book
+                setViewHolderState(swipeView,book.isSwiped)
 
                 swipeView.setOnClickListener {
                     itemClickListener.onItemClick(book)
+                }
+
+                swipeView.setOnLongClickListener {
+                    startSwipeAnimation(swipeView,book.isSwiped)
+                    book.isSwiped = !book.isSwiped
+                    true //true = clickEvent 종료 (ClickEvnet가 작동하지 않음)
                 }
 
                 swipeBackground.setOnClickListener {
@@ -58,9 +69,10 @@ class ReadingBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
                 pageBtn.setOnClickListener{
                     pageBtnClickListener.onItemClick(book)
                 }
-                setViewHolderState(swipeView,book.isSwiped)
+
             }
         }
+
         fun setSwiped(isClamped: Boolean){
             val currentItem = getItem(absoluteAdapterPosition)
             currentItem?.let { currentItem.isSwiped = isClamped }
@@ -70,6 +82,25 @@ class ReadingBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
             return getItem(absoluteAdapterPosition)?.isSwiped ?: false
         }
     }
+
+    private fun startSwipeAnimation(view: View, isSwiped :Boolean) =
+        CoroutineScope(Dispatchers.Main).launch {
+            val swipedX = view.width.toFloat() * SWIPE_VIEW_PERCENT
+            if(isSwiped) {
+                while (view.translationX > 0F){
+                    view.translationX -= swipedX /20
+                    delay(5L)
+                }
+                view.translationX = 0F
+                return@launch
+            }
+
+            while (view.translationX < swipedX){
+                view.translationX += swipedX /20
+                delay(5L)
+            }
+            view.translationX = swipedX
+        }
 
     private fun setViewHolderState(view: View, isSwiped :Boolean){
         if(!isSwiped) { view.translationX = 0f; return }

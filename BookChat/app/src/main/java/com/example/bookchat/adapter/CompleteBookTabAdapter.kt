@@ -15,6 +15,10 @@ import com.example.bookchat.databinding.ItemCompleteBookTabBinding
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class CompleteBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
     : PagingDataAdapter<BookShelfItem, CompleteBookTabAdapter.CompleteBookItemViewHolder>(BOOK_SHELF_ITEM_COMPARATOR){
@@ -25,9 +29,16 @@ class CompleteBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
         fun bind(book :BookShelfItem){
             with(this.binding){
                 bookShelfItem = book
+                setViewHolderState(swipeView,book.isSwiped)
 
                 swipeView.setOnClickListener {
                     itemClickListener.onItemClick(book)
+                }
+
+                swipeView.setOnLongClickListener {
+                    startSwipeAnimation(swipeView,book.isSwiped)
+                    book.isSwiped = !book.isSwiped
+                    true //true = clickEvent 종료 (ClickEvnet가 작동하지 않음)
                 }
 
                 swipeBackground.setOnClickListener {
@@ -53,7 +64,6 @@ class CompleteBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
 
                     swipeView.translationX = 0f
                 }
-
             }
         }
 
@@ -72,6 +82,25 @@ class CompleteBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
         if(!isSwiped) { view.translationX = 0f; return }
         view.translationX = view.width.toFloat() * SWIPE_VIEW_PERCENT
     }
+
+    private fun startSwipeAnimation(view: View, isSwiped :Boolean) =
+        CoroutineScope(Dispatchers.Main).launch {
+            val swipedX = view.width.toFloat() * SWIPE_VIEW_PERCENT
+            if(isSwiped) {
+                while (view.translationX > 0F){
+                    view.translationX -= swipedX /20
+                    delay(5L)
+                }
+                view.translationX = 0F
+                return@launch
+            }
+
+            while (view.translationX < swipedX){
+                view.translationX += swipedX /20
+                delay(5L)
+            }
+            view.translationX = swipedX
+        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CompleteBookItemViewHolder {
         binding = DataBindingUtil

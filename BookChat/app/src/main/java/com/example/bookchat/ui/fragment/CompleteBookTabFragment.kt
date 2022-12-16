@@ -72,7 +72,6 @@ class CompleteBookTabFragment : Fragment() {
                 dialog.show(this@CompleteBookTabFragment.childFragmentManager, DIALOG_TAG_COMPLETE)
             }
         }
-
         completeBookAdapter = CompleteBookTabAdapter(bookShelfViewModel)
         completeBookAdapter.setItemClickListener(bookItemClickListener)
     }
@@ -82,17 +81,6 @@ class CompleteBookTabFragment : Fragment() {
             completeBookRcv.adapter = completeBookAdapter
             completeBookRcv.setHasFixedSize(true)
             completeBookRcv.layoutManager = LinearLayoutManager(requireContext())
-            setSwipeHelperCallback(completeBookRcv)
-        }
-    }
-
-    private fun setSwipeHelperCallback(recyclerView : RecyclerView){
-        val swipeHelperCallback = SwipeHelperCallback(SwipeViewType.Complete)
-        val itemTouchHelper = ItemTouchHelper(swipeHelperCallback)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
-        recyclerView.setOnTouchListener { _, _ ->
-            swipeHelperCallback.removePreviousClamp(recyclerView)
-            false
         }
     }
 
