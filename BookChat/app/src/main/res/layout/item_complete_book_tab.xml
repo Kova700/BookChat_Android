@@ -73,7 +73,7 @@
                         android:layout_height="match_parent"
                         android:scaleType="fitXY"
                         loadUrl="@{bookShelfItem.bookCoverImageUrl}"
-                        android:src="@drawable/ex_book2" />
+                        android:src="@drawable/empty_img" />
                 </androidx.cardview.widget.CardView>
 
                 <TextView
