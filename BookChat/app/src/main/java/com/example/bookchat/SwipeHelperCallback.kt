@@ -154,6 +154,8 @@ class SwipeHelperCallback(private val swipeViewType :SwipeViewType) : ItemTouchH
     }
 
     // 다른 View가 swipe 되거나 터치되면 고정 해제
+    // (하지만 스와이프 된 Item이 안보이는 곳에서 새로운 Item 스와이프 시에
+    // 스와이프 아이템이 늘어나는 이슈는 해결하지 못했음)
     fun removePreviousClamp(recyclerView: RecyclerView) {
         if (currentPosition == previousPosition)
             return
