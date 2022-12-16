@@ -24,8 +24,7 @@ class CustomRecyclerView : RecyclerView {
     override fun onTouchEvent(event: MotionEvent?): Boolean {
          super.onTouchEvent(event)
         if(event?.action == MotionEvent.ACTION_UP) {
-//            parentViewPager?.isUserInputEnabled = true
-            parentViewPager?.isUserInputEnabled = false
+            parentViewPager?.isUserInputEnabled = true
         }
 
         return true
@@ -33,7 +32,6 @@ class CustomRecyclerView : RecyclerView {
 
     override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
         super.onScrollChanged(l, t, oldl, oldt)
-//        parentViewPager?.isUserInputEnabled = (this.scrollState != SCROLL_STATE_DRAGGING)
-        parentViewPager?.isUserInputEnabled = false
+        parentViewPager?.isUserInputEnabled = (this.scrollState != SCROLL_STATE_DRAGGING)
     }
 }
