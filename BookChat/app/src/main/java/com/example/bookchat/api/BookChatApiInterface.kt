@@ -1,6 +1,9 @@
 package com.example.bookchat.api
 
 import com.example.bookchat.data.*
+import com.example.bookchat.request.RequestChangeBookStatus
+import com.example.bookchat.request.RequestRegisterBookReport
+import com.example.bookchat.request.RequestRegisterBookShelfBook
 import com.example.bookchat.utils.BookSearchSortOption
 import com.example.bookchat.utils.ReadingStatus
 import okhttp3.MultipartBody
@@ -81,6 +84,11 @@ interface BookChatApiInterface {
         @Query("publishAt") publishAt :String,
     ): Response<RespondCheckInBookShelf>
 
+    @PUT("/v1/api/bookshelf/books/{bookId}")
+    suspend fun registerReadingPage(
+        @Path("bookId") bookId: Long
+    ): Response<Unit>
+
     /**------------독후감------------*/
 
     @GET("/v1/api/books/{bookId}/report")
@@ -91,7 +99,7 @@ interface BookChatApiInterface {
     @POST("/v1/api/books/{bookId}/report")
     suspend fun registerBookReport(
         @Path("bookId") bookId: Long,
-        @Body bookReportRequest : BookReportRequest
+        @Body requestRegisterBookReport : RequestRegisterBookReport
     ): Response<Unit>
 
     @DELETE("/v1/api/books/{bookId}/report")
@@ -102,7 +110,7 @@ interface BookChatApiInterface {
     @PUT("/v1/api/books/{bookId}/report")
     suspend fun reviseBookReport(
         @Path("bookId") bookId: Long,
-        @Body bookReportRequest : BookReportRequest
+        @Body requestRegisterBookReport : RequestRegisterBookReport
     ): Response<Unit>
 
 }

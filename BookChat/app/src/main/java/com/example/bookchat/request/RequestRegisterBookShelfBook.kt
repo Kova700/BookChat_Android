@@ -1,5 +1,6 @@
-package com.example.bookchat.data
+package com.example.bookchat.request
 
+import com.example.bookchat.data.Book
 import com.example.bookchat.utils.ReadingStatus
 import com.google.gson.annotations.SerializedName
 

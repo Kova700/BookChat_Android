@@ -1,4 +1,4 @@
-package com.example.bookchat.data
+package com.example.bookchat.request
 
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable

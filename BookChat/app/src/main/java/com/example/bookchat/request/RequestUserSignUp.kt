@@ -1,11 +1,11 @@
+package com.example.bookchat.request
+
 import com.example.bookchat.utils.OAuth2Provider
 import com.example.bookchat.utils.ReadingTaste
-import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import okhttp3.MultipartBody
 import java.io.Serializable
 
-data class UserSignUpRequest(
+data class RequestUserSignUp(
     @SerializedName("oauth2Provider")
     val oauth2Provider : OAuth2Provider,
     @SerializedName("nickname")

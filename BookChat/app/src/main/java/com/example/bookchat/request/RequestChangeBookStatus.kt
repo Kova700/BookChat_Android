@@ -1,4 +1,4 @@
-package com.example.bookchat.data
+package com.example.bookchat.request
 
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.utils.StarRating
