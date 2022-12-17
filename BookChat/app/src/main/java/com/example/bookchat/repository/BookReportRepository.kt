@@ -3,7 +3,7 @@ package com.example.bookchat.repository
 import android.util.Log
 import com.example.bookchat.App
 import com.example.bookchat.data.BookReport
-import com.example.bookchat.data.BookReportRequest
+import com.example.bookchat.request.RequestRegisterBookReport
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.response.ResponseBodyEmptyException
@@ -38,8 +38,8 @@ class BookReportRepository @Inject constructor() {
         Log.d(TAG, "BookReportRepository: registerBookReport() - called")
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-        val bookReportRequest = BookReportRequest(bookReport.reportTitle, bookReport.reportContent)
-        val response = App.instance.bookChatApiClient.registerBookReport(book.bookId, bookReportRequest)
+        val requestRegisterBookReport = RequestRegisterBookReport(bookReport.reportTitle, bookReport.reportContent)
+        val response = App.instance.bookChatApiClient.registerBookReport(book.bookId, requestRegisterBookReport)
 
         when(response.code()){
             200 -> { }
@@ -65,8 +65,8 @@ class BookReportRepository @Inject constructor() {
         Log.d(TAG, "BookReportRepository: reviseBookReport() - called")
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-        val bookReportRequest = BookReportRequest(bookReport.reportTitle, bookReport.reportContent)
-        val response = App.instance.bookChatApiClient.reviseBookReport(book.bookId, bookReportRequest)
+        val requestRegisterBookReport = RequestRegisterBookReport(bookReport.reportTitle, bookReport.reportContent)
+        val response = App.instance.bookChatApiClient.reviseBookReport(book.bookId, requestRegisterBookReport)
 
         when(response.code()){
             200 -> { }

@@ -1,10 +1,10 @@
 package com.example.bookchat.repository
 
-import UserSignUpRequest
 import android.util.Log
 import com.example.bookchat.App
 import com.example.bookchat.data.User
 import com.example.bookchat.data.UserSignUpDto
+import com.example.bookchat.request.RequestUserSignUp
 import com.example.bookchat.response.NeedToSignUpException
 import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.response.NickNameDuplicateException
@@ -46,7 +46,7 @@ class UserRepository @Inject constructor(){
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val idToken = DataStoreManager.getIdToken()
-        val userSignUpRequest = UserSignUpRequest(
+        val requestUserSignUp = RequestUserSignUp(
             oauth2Provider = idToken.oAuth2Provider,
             nickname = userSignUpDto.nickname,
             defaultProfileImageType = userSignUpDto.defaultProfileImageType,
@@ -54,7 +54,7 @@ class UserRepository @Inject constructor(){
         )
 
         val requestBody = getRequestBody(
-            content = userSignUpRequest,
+            content = requestUserSignUp,
             contentType = CONTENT_TYPE_JSON
         )
 

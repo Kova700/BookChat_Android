@@ -1,8 +1,8 @@
-package com.example.bookchat.data
+package com.example.bookchat.request
 
 import com.google.gson.annotations.SerializedName
 
-data class BookReportRequest(
+data class RequestRegisterBookReport(
     @SerializedName("title")
     val title :String,
     @SerializedName("content")

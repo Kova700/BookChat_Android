@@ -6,12 +6,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.data.Book
-import com.example.bookchat.data.RequestRegisterBookShelfBook
 import com.example.bookchat.data.RespondCheckInBookShelf
 import com.example.bookchat.repository.BookRepository
+import com.example.bookchat.request.RequestRegisterBookShelfBook
 import com.example.bookchat.utils.ReadingStatus
 import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
