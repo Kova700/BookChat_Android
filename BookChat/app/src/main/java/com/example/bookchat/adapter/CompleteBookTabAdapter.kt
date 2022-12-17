@@ -61,8 +61,6 @@ class CompleteBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
                         .setAction("실행취소",snackCancelClickListener)
                         .setDuration(SNACK_BAR_DURATION)
                         .show()
-
-                    swipeView.translationX = 0f
                 }
             }
         }
