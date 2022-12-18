@@ -9,12 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.SwipeHelperCallback
-import com.example.bookchat.SwipeHelperCallback.SwipeViewType
 import com.example.bookchat.adapter.ReadingBookTabAdapter
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.FragmentReadingBookTabBinding
@@ -85,8 +81,7 @@ class ReadingBookTabFragment :Fragment() {
         }
         val pageBtnClickListener = object :ReadingBookTabAdapter.OnItemClickListener{
             override fun onItemClick(book: BookShelfItem) {
-                //아래에서 slidingUp layout올라와서 페이지 변경 UI 노출
-                val pageInputBottomSheetDialog = PageInputBottomSheetDialog()
+                val pageInputBottomSheetDialog = PageInputBottomSheetDialog(book)
                 pageInputBottomSheetDialog.show(childFragmentManager,DIALOG_TAG_PAGE_INPUT)
             }
         }

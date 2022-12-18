@@ -128,6 +128,10 @@ class BookShelfViewModel @Inject constructor(
                 wishBookModificationEvents.value += pagingViewEvent
             }
             ReadingStatus.READING -> {
+                //지금 안에 들어가 있다면 지우는 방향으로 구현이 되어있음
+                //이렇게 구현해버리면 같은 책의 페이지를 두번째 수정할 때 한 아이템의 EditEvent가 여러개가 쌓임
+                // (뭐 딱히 상관은 없을듯 한데)
+                // 중복된 EditEvent는 나중에 삭제해주도록 하자
                 if (readingBookModificationEvents.value.contains(pagingViewEvent)){
                     readingBookModificationEvents.value -= pagingViewEvent
                     return
@@ -144,7 +148,7 @@ class BookShelfViewModel @Inject constructor(
         }
     }
 
-    fun applyEvents(
+    private fun applyEvents(
         paging: PagingData<BookShelfItem>,
         pagingViewEvent: PagingViewEvent,
     ): PagingData<BookShelfItem> {
@@ -155,7 +159,12 @@ class BookShelfViewModel @Inject constructor(
             is PagingViewEvent.RemoveWaiting -> {
                 paging.filter { it.bookId != pagingViewEvent.bookShelfItem.bookId }
             }
-//            is PagingViewEvent.Edit -> {  }
+            is PagingViewEvent.Edit -> {
+                paging.map { bookshelfItem ->
+                    if (pagingViewEvent.bookShelfItem.bookId != bookshelfItem.bookId) return@map bookshelfItem
+                    return@map bookshelfItem.copy(pages = pagingViewEvent.bookShelfItem.pages)
+                }
+            }
         }
     }
 
@@ -163,16 +172,22 @@ class BookShelfViewModel @Inject constructor(
         when (flag) {
             MODIFICATION_EVENT_FLAG_WISH -> {
                 wishBookTotalCount.value =
-                    wishBookTotalCountCache - wishBookModificationEvents.value.size
+                    wishBookTotalCountCache - getRemoveEventCount(wishBookModificationEvents)
             }
             MODIFICATION_EVENT_FLAG_READING -> {
                 readingBookTotalCount.value =
-                    readingBookTotalCountCache - readingBookModificationEvents.value.size
+                    readingBookTotalCountCache - getRemoveEventCount(readingBookModificationEvents)
             }
             MODIFICATION_EVENT_FLAG_COMPLETE -> {
                 completeBookTotalCount.value =
-                    completeBookTotalCountCache - completeBookModificationEvents.value.size
+                    completeBookTotalCountCache - getRemoveEventCount(completeBookModificationEvents)
             }
+        }
+    }
+
+    private fun getRemoveEventCount(eventFlow :MutableStateFlow<List<PagingViewEvent>>) :Int{
+        return eventFlow.value.count {
+            (it is PagingViewEvent.Remove) || (it is PagingViewEvent.RemoveWaiting)
         }
     }
 
@@ -183,7 +198,9 @@ class BookShelfViewModel @Inject constructor(
     sealed class PagingViewEvent {
         data class Remove(val bookShelfItem: BookShelfItem) : PagingViewEvent()
         data class RemoveWaiting(val bookShelfItem: BookShelfItem) : PagingViewEvent()
-//        data class Edit(val bookShelfItem: BookShelfItem) : PagingViewEvent() //페이지 입력할 때 사용할 듯
+        //이거 사용할 거면 Combined부분 다 손 좀 봐야함
+        data class Edit(val bookShelfItem: BookShelfItem) : PagingViewEvent() //페이지 입력할 때 사용할 듯
+        
     }
 
     sealed class BookShelfEvent {

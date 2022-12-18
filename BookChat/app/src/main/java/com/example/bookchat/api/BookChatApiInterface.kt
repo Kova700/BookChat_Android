@@ -19,30 +19,30 @@ interface BookChatApiInterface {
 
     @GET("/v1/api/users/profile/nickname")
     suspend fun requestNameDuplicateCheck(
-        @Query("nickname") nickname :String
-    ) : Response<Unit>
+        @Query("nickname") nickname: String
+    ): Response<Unit>
 
     @Multipart
     @POST("/v1/api/users/signup")
     suspend fun signUp(
-        @Header("OIDC") idToken :String,
+        @Header("OIDC") idToken: String,
         @Part userProfileImage: MultipartBody.Part? = null,
         @Part("userSignUpRequest") userSignUpRequest: RequestBody
-    ) : Response<Unit>
+    ): Response<Unit>
 
     @POST("/v1/api/users/signin")
     suspend fun signIn(
-        @Header("OIDC") idToken :String,
-        @Body oauth2Provider : RequestBody
-    ) : Response<Token>
+        @Header("OIDC") idToken: String,
+        @Body oauth2Provider: RequestBody
+    ): Response<Token>
 
     @DELETE("/v1/api/users")
     suspend fun withdraw(
-    ) : Response<Unit>
+    ): Response<Unit>
 
     @GET("/v1/api/users/profile")
     suspend fun getUserProfile(
-    ) : Response<User>
+    ): Response<User>
 
     /**------------도서------------*/
 
@@ -80,14 +80,9 @@ interface BookChatApiInterface {
 
     @GET("/v1/api/bookshelf/books/existence")
     suspend fun checkAlreadyInBookShelf(
-        @Query("isbn") isbn :String,
-        @Query("publishAt") publishAt :String,
+        @Query("isbn") isbn: String,
+        @Query("publishAt") publishAt: String,
     ): Response<RespondCheckInBookShelf>
-
-    @PUT("/v1/api/bookshelf/books/{bookId}")
-    suspend fun registerReadingPage(
-        @Path("bookId") bookId: Long
-    ): Response<Unit>
 
     /**------------독후감------------*/
 
@@ -99,7 +94,7 @@ interface BookChatApiInterface {
     @POST("/v1/api/books/{bookId}/report")
     suspend fun registerBookReport(
         @Path("bookId") bookId: Long,
-        @Body requestRegisterBookReport : RequestRegisterBookReport
+        @Body requestRegisterBookReport: RequestRegisterBookReport
     ): Response<Unit>
 
     @DELETE("/v1/api/books/{bookId}/report")
@@ -110,7 +105,7 @@ interface BookChatApiInterface {
     @PUT("/v1/api/books/{bookId}/report")
     suspend fun reviseBookReport(
         @Path("bookId") bookId: Long,
-        @Body requestRegisterBookReport : RequestRegisterBookReport
+        @Body requestRegisterBookReport: RequestRegisterBookReport
     ): Response<Unit>
 
 }
