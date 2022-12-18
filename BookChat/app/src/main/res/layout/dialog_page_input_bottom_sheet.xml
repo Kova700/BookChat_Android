@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
     <data>
-
+        <variable
+            name="viewmodel"
+            type="com.example.bookchat.viewmodel.PageInputDialogViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -54,10 +56,11 @@
                 android:background="@null"
                 android:elegantTextHeight="true"
                 android:focusable="false"
+                android:text="@={viewmodel.inputedPage}"
                 android:fontFamily="@font/notosanskr_regular"
                 android:gravity="center"
                 android:inputType="number"
-                android:maxLength="5"
+                android:maxLength="4"
                 android:textColor="#222222"
                 android:textCursorDrawable="@drawable/edittext_cursor"
                 android:textSize="22sp" />
@@ -87,6 +90,7 @@
             android:fontFamily="@font/notosanskr_regular"
             android:stateListAnimator="@null"
             android:text="1"
+            android:onClick="@{() -> viewmodel.inputNumber(1)}"
             android:background="#00000000"
             android:textColor="@color/bottom_slide_btn_color"
             android:textSize="22sp"
@@ -104,6 +108,7 @@
             android:fontFamily="@font/notosanskr_regular"
             android:stateListAnimator="@null"
             android:text="2"
+            android:onClick="@{() -> viewmodel.inputNumber(2)}"
             android:background="#00000000"
             android:textColor="@color/bottom_slide_btn_color"
             android:textSize="22sp"
@@ -121,6 +126,7 @@
             android:fontFamily="@font/notosanskr_regular"
             android:stateListAnimator="@null"
             android:text="3"
+            android:onClick="@{() -> viewmodel.inputNumber(3)}"
             android:background="#00000000"
             android:textColor="@color/bottom_slide_btn_color"
             android:textSize="22sp"
@@ -137,6 +143,7 @@
             android:fontFamily="@font/notosanskr_regular"
             android:stateListAnimator="@null"
             android:text="4"
+            android:onClick="@{() -> viewmodel.inputNumber(4)}"
             android:background="#00000000"
             android:textColor="@color/bottom_slide_btn_color"
             android:textSize="22sp"
@@ -153,6 +160,7 @@
             android:fontFamily="@font/notosanskr_regular"
             android:stateListAnimator="@null"
             android:text="5"
+            android:onClick="@{() -> viewmodel.inputNumber(5)}"
             android:background="#00000000"
             android:textColor="@color/bottom_slide_btn_color"
             android:textSize="22sp"
@@ -170,6 +178,7 @@
             android:textColor="@color/bottom_slide_btn_color"
             android:stateListAnimator="@null"
             android:text="6"
+            android:onClick="@{() -> viewmodel.inputNumber(6)}"
             android:background="#00000000"
             android:textSize="22sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -186,6 +195,7 @@
             android:textColor="@color/bottom_slide_btn_color"
             android:stateListAnimator="@null"
             android:text="7"
+            android:onClick="@{() -> viewmodel.inputNumber(7)}"
             android:background="#00000000"
             android:textSize="22sp"
             app:layout_constraintEnd_toStartOf="@+id/materialButton2"
@@ -201,6 +211,7 @@
             android:fontFamily="@font/notosanskr_regular"
             android:stateListAnimator="@null"
             android:text="8"
+            android:onClick="@{() -> viewmodel.inputNumber(8)}"
             android:background="#00000000"
             android:textColor="@color/bottom_slide_btn_color"
             android:textSize="22sp"
@@ -217,6 +228,7 @@
             android:fontFamily="@font/notosanskr_regular"
             android:stateListAnimator="@null"
             android:text="9"
+            android:onClick="@{() -> viewmodel.inputNumber(9)}"
             android:background="#00000000"
             android:textColor="@color/bottom_slide_btn_color"
             android:textSize="22sp"
@@ -225,7 +237,7 @@
             app:layout_constraintTop_toBottomOf="@+id/materialButton6" />
 
 
-        <com.google.android.material.button.MaterialButton
+        <com.example.bookchat.AntiDupClickButton
             android:id="@+id/materialButton10"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -234,6 +246,7 @@
             android:fontFamily="@font/notosanskr_regular"
             android:stateListAnimator="@null"
             android:text="확인"
+            android:onClick="@{() -> viewmodel.clickFinishBtn()}"
             android:background="#00000000"
             android:textColor="@color/bottom_slide_btn_color"
             android:textSize="18sp"
@@ -251,6 +264,7 @@
             android:fontFamily="@font/notosanskr_regular"
             android:stateListAnimator="@null"
             android:text="0"
+            android:onClick="@{() -> viewmodel.inputNumber(0)}"
             android:background="#00000000"
             android:textColor="@color/bottom_slide_btn_color"
             android:textSize="22sp"
@@ -264,12 +278,12 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:backgroundTint="#FFFFFF"
-            android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"
             android:src="@drawable/ic_bottom_slide_delete_btn"
             android:stateListAnimator="@null"
             android:background="#00000000"
             android:textSize="22sp"
+            android:onClick="@{() -> viewmodel.deleteNumber()}"
             app:layout_constraintBottom_toBottomOf="@+id/materialButton11"
             app:layout_constraintEnd_toEndOf="@+id/materialButton9"
             app:layout_constraintStart_toEndOf="@+id/materialButton2"
