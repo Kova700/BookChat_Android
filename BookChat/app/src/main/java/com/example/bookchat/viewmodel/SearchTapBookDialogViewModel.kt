@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.data.Book
-import com.example.bookchat.data.RespondCheckInBookShelf
+import com.example.bookchat.response.RespondCheckInBookShelf
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.request.RequestRegisterBookShelfBook
 import com.example.bookchat.utils.ReadingStatus
@@ -68,7 +68,7 @@ class SearchTapBookDialogViewModel @AssistedInject constructor(
             }
     }
 
-    private suspend fun requestRemoveWishBook(respondCheckInBookShelf :RespondCheckInBookShelf)= viewModelScope.launch {
+    private suspend fun requestRemoveWishBook(respondCheckInBookShelf : RespondCheckInBookShelf)= viewModelScope.launch {
         runCatching { bookRepository.deleteBookShelfBook(respondCheckInBookShelf.bookId) }
             .onSuccess {
                 Toast.makeText(App.instance.applicationContext, "도서가 삭제되었습니다.", Toast.LENGTH_SHORT).show()

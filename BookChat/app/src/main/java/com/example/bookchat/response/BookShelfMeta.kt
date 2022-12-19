@@ -1,4 +1,4 @@
-package com.example.bookchat.data
+package com.example.bookchat.response
 
 import com.google.gson.annotations.SerializedName
 

@@ -14,7 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.DialogReadingBookTapClickedBinding
-import com.example.bookchat.ui.activity.AgonizeHistoryActivity
+import com.example.bookchat.ui.activity.AgonyRecordActivity
 import com.example.bookchat.ui.fragment.BookShelfFragment
 import com.example.bookchat.ui.fragment.CompleteBookTabFragment
 import com.example.bookchat.utils.ReadingStatus
@@ -86,7 +86,7 @@ class ReadingTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
     }
 
     private fun openAgonizeActivity(){
-        val intent = Intent(requireContext(), AgonizeHistoryActivity::class.java)
+        val intent = Intent(requireContext(), AgonyRecordActivity::class.java)
             .putExtra(EXTRA_AGONIZE_BOOK,book)
         startActivity(intent)
     }

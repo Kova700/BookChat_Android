@@ -5,7 +5,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.bookchat.App
 import com.example.bookchat.data.BookShelfItem
-import com.example.bookchat.data.BookShelfMeta
+import com.example.bookchat.response.BookShelfMeta
 import com.example.bookchat.data.BookShelfResult
 import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.response.ResponseBodyEmptyException

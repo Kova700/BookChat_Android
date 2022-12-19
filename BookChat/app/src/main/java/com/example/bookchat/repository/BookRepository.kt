@@ -8,7 +8,7 @@ import com.example.bookchat.App
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.BookSearchResult
 import com.example.bookchat.data.BookShelfItem
-import com.example.bookchat.data.RespondCheckInBookShelf
+import com.example.bookchat.response.RespondCheckInBookShelf
 import com.example.bookchat.paging.SearchResultBookDetailPagingSource
 import com.example.bookchat.request.RequestChangeBookStatus
 import com.example.bookchat.request.RequestRegisterBookShelfBook
@@ -84,7 +84,7 @@ class BookRepository @Inject constructor(){
         }
     }
 
-    suspend fun checkAlreadyInBookShelf(book :Book) :RespondCheckInBookShelf? {
+    suspend fun checkAlreadyInBookShelf(book :Book) : RespondCheckInBookShelf? {
         Log.d(TAG, "BookRepository: checkAlreadyInBookShelf() - called")
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 

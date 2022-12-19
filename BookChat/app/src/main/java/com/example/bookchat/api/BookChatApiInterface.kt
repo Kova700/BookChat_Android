@@ -1,11 +1,13 @@
 package com.example.bookchat.api
 
 import com.example.bookchat.data.*
-import com.example.bookchat.request.RequestChangeBookStatus
-import com.example.bookchat.request.RequestRegisterBookReport
-import com.example.bookchat.request.RequestRegisterBookShelfBook
+import com.example.bookchat.request.*
+import com.example.bookchat.response.RespondCheckInBookShelf
+import com.example.bookchat.response.ResponseGetAgony
+import com.example.bookchat.response.ResponseGetAgonyRecord
 import com.example.bookchat.utils.BookSearchSortOption
 import com.example.bookchat.utils.ReadingStatus
+import com.example.bookchat.utils.SearchSortOption
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -64,7 +66,7 @@ interface BookChatApiInterface {
         @Query("size") size: String,
         @Query("page") page: String,
         @Query("readingStatus") readingStatus: ReadingStatus,
-        @Query("sort") sort: String = "id,DESC"
+        @Query("sort") sort: SearchSortOption = SearchSortOption.DESC //임시
     ): Response<BookShelfResult>
 
     @DELETE("/v1/api/bookshelf/books/{bookId}")
@@ -108,4 +110,58 @@ interface BookChatApiInterface {
         @Body requestRegisterBookReport: RequestRegisterBookReport
     ): Response<Unit>
 
+    /**------------고민 ------------*/
+
+    @POST("/v1/api/bookshelf/books/{bookId}/agonies")
+    suspend fun makeAgony(
+        @Path("bookId") bookId: Long,
+        @Body requestMakeAgony: RequestMakeAgony
+    ): Response<Unit>
+
+    @GET("/v1/api/agonies")
+    suspend fun getAgony(
+        @Query("size") size: String,
+        @Query("sort") sort: SearchSortOption = SearchSortOption.DESC, //임시
+        @Query("postCursorId") postCursorId: String?, //postCursorId Type 수정해야함
+    ): Response<ResponseGetAgony>
+
+    //동시 삭제가 가능하게 선택된 폴더 아이디들을 뒤에 쉼표로 연결해야함
+    // ex : /v1/api/agonies/1,2,3
+    @DELETE("/v1/api/agonies/{bookIdListString}")
+    suspend fun deleteAgony(
+        @Path("bookIdListString") bookIdListString: String,
+    ): Response<Unit>
+
+    @PUT("v1/api/agonies/{agonyId}")
+    suspend fun reviseAgony(
+        @Path("agonyId") agonyId: Long,
+        @Body requestReviseAgony: RequestReviseAgony
+    ): Response<Unit>
+
+    @POST("/v1/api/agonies/{agonyId}/records")
+    suspend fun makeAgonyRecord(
+        @Path("agonyId") agonyId: Long,
+        @Body requestMakeAgonyRecord: RequestMakeAgonyRecord
+    ): Response<Unit>
+
+    @GET("/v1/api/agonies/{agonyId}/records")
+    suspend fun getAgonyRecord(
+        @Path("agonyId") agonyId: Long,
+        @Query("size") size: String,
+        @Query("sort") sort: SearchSortOption = SearchSortOption.DESC, //임시
+        @Query("postCursorId") postCursorId: String?, //postCursorId Type 수정해야함
+    ): Response<ResponseGetAgonyRecord>
+
+    @DELETE("/v1/api/agonies/{agonyId}/records/{recordId}")
+    suspend fun deleteAgonyRecord(
+        @Path("agonyId") agonyId: Long,
+        @Path("recordId") recordId: Long
+    ): Response<Unit>
+
+    @PUT("/v1/api/agonies/{agonyId}/records/{recordId}")
+    suspend fun reviseAgonyRecord(
+        @Path("agonyId") agonyId: Long,
+        @Path("recordId") recordId: Long,
+        @Body requestReviseAgonyRecord: RequestReviseAgonyRecord
+    ): Response<Unit>
 }

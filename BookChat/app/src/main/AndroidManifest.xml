@@ -21,7 +21,7 @@
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".ui.activity.AgonizeHistoryActivity"
+            android:name=".ui.activity.AgonyRecordActivity"
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
