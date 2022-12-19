@@ -6,7 +6,7 @@ import androidx.paging.PagingState
 import com.example.bookchat.App
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.BookSearchResult
-import com.example.bookchat.data.SearchingMeta
+import com.example.bookchat.response.SearchingMeta
 import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.response.ResponseBodyEmptyException
 import com.example.bookchat.utils.Constants.TAG
@@ -55,7 +55,7 @@ class SearchResultBookDetailPagingSource(private val keyword :String) :PagingSou
     private fun getLoadResult(
         data :List<Book>,
         nowPage :Int,
-        searchingMeta :SearchingMeta
+        searchingMeta : SearchingMeta
     ): LoadResult<Int, Book>{
         return try {
             LoadResult.Page(
@@ -70,7 +70,7 @@ class SearchResultBookDetailPagingSource(private val keyword :String) :PagingSou
 
     private fun getNextKey(
         nowPage :Int,
-        searchingMeta :SearchingMeta
+        searchingMeta : SearchingMeta
     ) :Int?{
         if(searchingMeta.isEnd) return null
 
