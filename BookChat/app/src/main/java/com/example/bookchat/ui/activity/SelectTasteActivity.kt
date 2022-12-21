@@ -54,7 +54,7 @@ class SelectTasteActivity : AppCompatActivity() {
         val bitmapByteArray = intent?.getByteArrayExtra(EXTRA_USER_PROFILE_BYTE_ARRAY2)
         val imageMultipartBody = bitmapByteArray?.let { byteArrayToRequestBody(it) }
         val userProfileImageMultiPart = imageMultipartBody?.let {
-            MultipartBody.Part.createFormData(IMAGE_MULTIPART_NAME,IMAGE_FILE_NAME, it)
+            MultipartBody.Part.createFormData(IMAGE_MULTIPART_NAME,IMAGE_FILE_NAME + IMAGE_FILE_EXTENSION, it)
         }
         signUpUserDto.userProfileImage = userProfileImageMultiPart
     }
@@ -78,7 +78,8 @@ class SelectTasteActivity : AppCompatActivity() {
 
     companion object{
         const val CONTENT_TYPE_IMAGE_WEBP = "image/webp"
-        const val IMAGE_FILE_NAME = "profle_img"
+        const val IMAGE_FILE_NAME = "profile_img"
+        const val IMAGE_FILE_EXTENSION = ".webp"
         const val IMAGE_MULTIPART_NAME = "userProfileImage"
     }
 
