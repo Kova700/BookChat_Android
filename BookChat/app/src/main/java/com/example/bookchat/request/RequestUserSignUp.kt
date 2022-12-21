@@ -11,7 +11,7 @@ data class RequestUserSignUp(
     @SerializedName("nickname")
     var nickname: String,
     @SerializedName("defaultProfileImageType")
-    val defaultProfileImageType : Int?, //등록 이미지 없을 시 기본이미지 노출하게 (기본 이미지 번호)
+    val defaultProfileImageType : Int?,
     @SerializedName("readingTastes")
     var readingTastes : List<ReadingTaste>,
 ) : Serializable
