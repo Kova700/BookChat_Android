@@ -9,13 +9,12 @@ import com.example.bookchat.utils.BookSearchSortOption
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.utils.SearchSortOption
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.*
 
 interface BookChatApiInterface {
     //API 테스트
-    //@POST("/3862dd02-166b-4975-9a3c-1666ebd4fcfa")
+//    @POST("/2bc9634d-f24c-44ed-8215-d6e16121b8ae")
 
     /**------------유저------------*/
 
@@ -29,13 +28,13 @@ interface BookChatApiInterface {
     suspend fun signUp(
         @Header("OIDC") idToken: String,
         @Part userProfileImage: MultipartBody.Part? = null,
-        @Part("userSignUpRequest") userSignUpRequest: RequestBody
+        @Part("userSignUpRequest") requestUserSignUp: RequestUserSignUp
     ): Response<Unit>
 
     @POST("/v1/api/users/signin")
     suspend fun signIn(
         @Header("OIDC") idToken: String,
-        @Body oauth2Provider: RequestBody
+        @Body requestUserSignIn: RequestUserSignIn
     ): Response<Token>
 
     @DELETE("/v1/api/users")
