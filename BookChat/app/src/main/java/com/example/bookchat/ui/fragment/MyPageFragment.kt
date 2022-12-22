@@ -7,20 +7,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentMyPageBinding
 import com.example.bookchat.ui.activity.LoginActivity
 import com.example.bookchat.viewmodel.MyPageViewModel
 import com.example.bookchat.viewmodel.MyPageViewModel.MyPageEvent
-import com.example.bookchat.viewmodel.ViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MyPageFragment : Fragment()  {
 
     private lateinit var binding : FragmentMyPageBinding
-    private lateinit var myPageViewModel: MyPageViewModel
+    private val myPageViewModel: MyPageViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,7 +29,6 @@ class MyPageFragment : Fragment()  {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_my_page,container,false)
-        myPageViewModel = ViewModelProvider(this, ViewModelFactory()).get(MyPageViewModel::class.java)
         binding.lifecycleOwner = this
         binding.viewmodel = myPageViewModel
         return binding.root

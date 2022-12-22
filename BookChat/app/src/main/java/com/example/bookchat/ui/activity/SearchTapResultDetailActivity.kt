@@ -4,13 +4,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.LoadState
-import androidx.paging.LoadStates
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.bookchat.R
 import com.example.bookchat.adapter.SearchResultBookDetailAdapter
@@ -20,7 +15,6 @@ import com.example.bookchat.ui.dialog.SearchTapBookDialog
 import com.example.bookchat.ui.fragment.SearchFragment
 import com.example.bookchat.utils.Constants
 import com.example.bookchat.viewmodel.SearchDetailViewModel
-import com.example.bookchat.viewmodel.ViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject

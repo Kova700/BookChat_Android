@@ -9,13 +9,19 @@ import com.example.bookchat.response.ForbiddenException
 import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.ReadingTaste
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SelectTasteViewModel(private val userRepository : UserRepository) :ViewModel() {
+@HiltViewModel
+class SelectTasteViewModel @Inject constructor(
+    private val userRepository : UserRepository
+    ) :ViewModel() {
+
     private val _eventFlow = MutableSharedFlow<SelectTasteEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 

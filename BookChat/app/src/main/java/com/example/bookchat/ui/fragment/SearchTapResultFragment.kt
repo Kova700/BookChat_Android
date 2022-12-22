@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
@@ -18,13 +18,12 @@ import com.example.bookchat.databinding.FragmentSearchTapResultBinding
 import com.example.bookchat.ui.dialog.SearchTapBookDialog
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.SearchViewModel
-import com.example.bookchat.viewmodel.ViewModelFactory
 
 /*추후 확장이 필요하다 느끼면 ViewModel로 로직 이동*/
 class SearchTapResultFragment : Fragment() {
     private lateinit var binding :FragmentSearchTapResultBinding
     private lateinit var searchResultBookSimpleAdapter : SearchResultBookSimpleAdapter
-    private lateinit var searchViewModel: SearchViewModel
+    private val searchViewModel: SearchViewModel by viewModels({ requireParentFragment() })
 
     private lateinit var chatRoomAdapter: MainChatRoomAdapter // 임시
 
@@ -34,7 +33,6 @@ class SearchTapResultFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search_tap_result, container, false)
-        searchViewModel = ViewModelProvider(requireParentFragment(), ViewModelFactory()).get(SearchViewModel::class.java)
         binding.viewmodel = searchViewModel
         binding.lifecycleOwner = this
 
@@ -42,10 +40,6 @@ class SearchTapResultFragment : Fragment() {
         initRcv()
         requireParentFragment()
         return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
     }
 
     private fun initAdapter(){
