@@ -44,7 +44,6 @@ class UserRepository @Inject constructor(){
         val requestUserSignUp = RequestUserSignUp(
             oauth2Provider = idToken.oAuth2Provider,
             nickname = userSignUpDto.nickname,
-            defaultProfileImageType = userSignUpDto.defaultProfileImageType,
             readingTastes = userSignUpDto.readingTastes
         )
 

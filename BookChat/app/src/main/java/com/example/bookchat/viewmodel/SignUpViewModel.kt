@@ -31,7 +31,7 @@ class SignUpViewModel @Inject constructor(
 
     private var isNotNameShortFlag = false
     private var isNotNameDuplicateFlag = false
-    val _signUpDto = MutableStateFlow<UserSignUpDto>(UserSignUpDto( defaultProfileImageType = Random().nextInt(5) + 1) )
+    val _signUpDto = MutableStateFlow<UserSignUpDto>(UserSignUpDto())
 
     private val _nameCheckStatus = MutableStateFlow<NameCheckStatus>(NameCheckStatus.Default)
     val nameCheckStatus = _nameCheckStatus.asStateFlow()

@@ -8,7 +8,6 @@ import java.io.Serializable
 data class UserSignUpDto(
     val oauth2Provider : OAuth2Provider? = null,
     var nickname: String = "",
-    val defaultProfileImageType : Int? = null,
     var readingTastes : List<ReadingTaste> = arrayListOf(),
     var userProfileImage : MultipartBody.Part? = null
 ) : Serializable
