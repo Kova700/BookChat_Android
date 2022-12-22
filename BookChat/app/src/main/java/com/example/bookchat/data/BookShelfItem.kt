@@ -31,7 +31,7 @@ data class BookShelfItem(
         return Book(
             isbn = this.isbn,
             title = this.title,
-            datetime = this.publishAt,
+            publishAt = this.publishAt,
             authors = this.authors,
             publisher = this.publisher,
             bookCoverImageUrl = this.bookCoverImageUrl
