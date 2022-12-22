@@ -5,11 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.repository.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MyPageViewModel(private val userRepository: UserRepository) : ViewModel() {
+@HiltViewModel
+class MyPageViewModel @Inject constructor(
+    private val userRepository: UserRepository
+    ) : ViewModel() {
+
     private val _eventFlow = MutableSharedFlow<MyPageEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 

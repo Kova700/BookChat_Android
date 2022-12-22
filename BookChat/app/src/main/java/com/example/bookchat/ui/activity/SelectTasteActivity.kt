@@ -2,9 +2,9 @@ package com.example.bookchat.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.data.UserSignUpDto
@@ -13,23 +13,23 @@ import com.example.bookchat.ui.activity.SignUpActivity.Companion.EXTRA_SIGNUP_DT
 import com.example.bookchat.ui.activity.SignUpActivity.Companion.EXTRA_USER_PROFILE_BYTE_ARRAY2
 import com.example.bookchat.viewmodel.SelectTasteViewModel
 import com.example.bookchat.viewmodel.SelectTasteViewModel.SelectTasteEvent
-import com.example.bookchat.viewmodel.ViewModelFactory
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
+@AndroidEntryPoint
 class SelectTasteActivity : AppCompatActivity() {
 
     private lateinit var binding :ActivitySelectTasteBinding
-    private lateinit var selectTasteViewModel: SelectTasteViewModel
+    private val selectTasteViewModel: SelectTasteViewModel by viewModels()
     private lateinit var signUpUserDto :UserSignUpDto
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_select_taste)
-        selectTasteViewModel = ViewModelProvider(this,ViewModelFactory()).get(SelectTasteViewModel::class.java)
 
         with(binding){
             lifecycleOwner = this@SelectTasteActivity

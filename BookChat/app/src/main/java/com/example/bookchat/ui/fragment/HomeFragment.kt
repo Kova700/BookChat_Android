@@ -6,19 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
 import com.example.bookchat.adapter.MainChatRoomAdapter
 import com.example.bookchat.databinding.FragmentHomeBinding
 import com.example.bookchat.viewmodel.HomeViewModel
-import com.example.bookchat.viewmodel.ViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private lateinit var binding :FragmentHomeBinding
-    private lateinit var homeViewModel: HomeViewModel
+    private val homeViewModel: HomeViewModel by viewModels()
     private lateinit var chatRoomAdapter: MainChatRoomAdapter
 
     override fun onCreateView(
@@ -27,7 +27,6 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_home,container,false)
-        homeViewModel = ViewModelProvider(this, ViewModelFactory()).get(HomeViewModel::class.java)
         with(binding){
             lifecycleOwner = this@HomeFragment
             viewModel = homeViewModel

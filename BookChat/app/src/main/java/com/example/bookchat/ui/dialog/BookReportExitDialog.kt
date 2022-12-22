@@ -13,7 +13,9 @@ import androidx.fragment.app.viewModels
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogBookReportExitBinding
 import com.example.bookchat.viewmodel.BookReportViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class BookReportExitDialog : DialogFragment() {
 
     private lateinit var binding: DialogBookReportExitBinding

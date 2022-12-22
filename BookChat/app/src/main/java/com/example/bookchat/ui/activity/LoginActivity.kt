@@ -2,28 +2,26 @@ package com.example.bookchat.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityLoginBinding
 import com.example.bookchat.viewmodel.LoginViewModel
 import com.example.bookchat.viewmodel.LoginViewModel.LoginEvent
-import com.example.bookchat.viewmodel.ViewModelFactory
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding : ActivityLoginBinding
-    private lateinit var loginViewModel : LoginViewModel
+    private val loginViewModel : LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
-        loginViewModel = ViewModelProvider(this, ViewModelFactory()).get(LoginViewModel::class.java)
 
         with(binding){
             lifecycleOwner = this@LoginActivity

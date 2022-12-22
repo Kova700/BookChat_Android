@@ -7,18 +7,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentSearchBinding
@@ -26,7 +22,6 @@ import com.example.bookchat.ui.activity.SearchTapResultDetailActivity
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.SearchTapStatus
 import com.example.bookchat.viewmodel.SearchViewModel
-import com.example.bookchat.viewmodel.ViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

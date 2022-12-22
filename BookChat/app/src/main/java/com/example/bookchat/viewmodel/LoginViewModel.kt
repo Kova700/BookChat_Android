@@ -12,11 +12,17 @@ import com.example.bookchat.repository.UserRepository
 import com.example.bookchat.response.*
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor (
+    private val userRepository: UserRepository
+    ) : ViewModel() {
+
     private val _eventFlow = MutableSharedFlow<LoginEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 

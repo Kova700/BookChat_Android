@@ -11,6 +11,7 @@ import com.example.bookchat.repository.UserRepository
 import com.example.bookchat.response.NickNameDuplicateException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.NameCheckStatus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -18,8 +19,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.regex.Pattern
+import javax.inject.Inject
 
-class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() {
+@HiltViewModel
+class SignUpViewModel @Inject constructor(
+    private var userRepository : UserRepository
+    ) :ViewModel() {
+
     private val _eventFlow = MutableSharedFlow<SignUpEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
@@ -62,11 +68,12 @@ class SignUpViewModel(private var userRepository : UserRepository) :ViewModel() 
     })
 
     fun clickStartBtn() = viewModelScope.launch {
-        if (isNotNameShortFlag) {
-            isNotNameDuplicate(isNotNameDuplicateFlag)
-            return@launch
-        }
-        renewNameCheckStatus("")
+        startEvent(SignUpEvent.MoveToSelectTaste(_signUpDto.value,_userProfilByteArray.value))
+//        if (isNotNameShortFlag) {
+//            isNotNameDuplicate(isNotNameDuplicateFlag)
+//            return@launch
+//        }
+//        renewNameCheckStatus("")
     }
 
     private suspend fun isNotNameDuplicate(isNotNameDuplicateFlag :Boolean){
