@@ -69,11 +69,11 @@ class SignUpViewModel @Inject constructor(
 
     fun clickStartBtn() = viewModelScope.launch {
         startEvent(SignUpEvent.MoveToSelectTaste(_signUpDto.value,_userProfilByteArray.value))
-//        if (isNotNameShortFlag) {
-//            isNotNameDuplicate(isNotNameDuplicateFlag)
-//            return@launch
-//        }
-//        renewNameCheckStatus("")
+        if (isNotNameShortFlag) {
+            isNotNameDuplicate(isNotNameDuplicateFlag)
+            return@launch
+        }
+        renewNameCheckStatus("")
     }
 
     private suspend fun isNotNameDuplicate(isNotNameDuplicateFlag :Boolean){
