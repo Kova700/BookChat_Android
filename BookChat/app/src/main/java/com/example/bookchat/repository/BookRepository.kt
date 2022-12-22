@@ -49,6 +49,7 @@ class BookRepository @Inject constructor(){
     }
 
     suspend fun registerBookShelfBook(requestRegisterBookShelfBook: RequestRegisterBookShelfBook){
+        Log.d(TAG, "BookRepository: registerBookShelfBook() - called")
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
         val response = App.instance.bookChatApiClient.registerBookShelfBook(requestRegisterBookShelfBook)
         when(response.code()){
@@ -88,7 +89,7 @@ class BookRepository @Inject constructor(){
         Log.d(TAG, "BookRepository: checkAlreadyInBookShelf() - called")
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-        val response = App.instance.bookChatApiClient.checkAlreadyInBookShelf(book.isbn, book.datetime)
+        val response = App.instance.bookChatApiClient.checkAlreadyInBookShelf(book.isbn, book.publishAt)
         when(response.code()){
             200, 404 -> {
                 val respondCheckInBookShelf = response.body()

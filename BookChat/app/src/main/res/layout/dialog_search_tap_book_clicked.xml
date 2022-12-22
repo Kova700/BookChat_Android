@@ -128,7 +128,7 @@
             android:gravity="center"
             android:marqueeRepeatLimit="marquee_forever"
             android:singleLine="true"
-            android:text="@{viewmodel.book.datetime}"
+            android:text="@{viewmodel.book.publishAt}"
             android:textColor="#373737"
             android:textSize="10sp"
             app:layout_constraintBottom_toTopOf="@+id/change_status_to_complete_btn"
