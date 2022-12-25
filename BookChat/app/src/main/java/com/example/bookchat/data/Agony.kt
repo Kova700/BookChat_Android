@@ -10,4 +10,8 @@ data class Agony(
     val title :String,
     @SerializedName("hexColorCode")
     val hexColorCode : AgonyFolderHexColor
-)
+){
+    fun getAgonyDataItem() :AgonyItem{
+        return AgonyDataItem(this)
+    }
+}

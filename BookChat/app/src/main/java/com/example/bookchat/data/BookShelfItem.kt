@@ -4,6 +4,8 @@ import com.example.bookchat.utils.StarRating
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
+//isSwiped WrapperClass로 빼기
+//singleLineAssessment 삭제
 data class BookShelfItem(
     @SerializedName("bookId")
     val bookId: Long,
