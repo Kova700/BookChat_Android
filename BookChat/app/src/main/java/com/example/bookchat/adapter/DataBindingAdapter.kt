@@ -1,5 +1,6 @@
 package com.example.bookchat.adapter
 
+import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.view.View
@@ -11,10 +12,7 @@ import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
-import com.example.bookchat.utils.LoadState
-import com.example.bookchat.utils.NameCheckStatus
-import com.example.bookchat.utils.SearchTapStatus
-import com.example.bookchat.utils.StarRating
+import com.example.bookchat.utils.*
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportStatus
 import com.willy.ratingbar.ScaleRatingBar
 
@@ -228,5 +226,36 @@ object DataBindingAdapter {
     @BindingAdapter("setShowDataLayoutVisibilityInBookReport")
     fun setShowDataLayoutVisibilityInBookReport(view: View, status: BookReportStatus){
         view.visibility = if(status == BookReportStatus.ShowData) View.VISIBLE else View.INVISIBLE
+    }
+
+    /**고민 폴더 색상 설정*/
+    @JvmStatic
+    @BindingAdapter("setBackgorundTintWithHexColor")
+    fun setBackgorundTintWithHexColor(view :View, agonyFolderHexColor: AgonyFolderHexColor){
+        when(agonyFolderHexColor){
+            AgonyFolderHexColor.WHITE -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#999999"))
+            AgonyFolderHexColor.BLACK -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#595959"))
+            AgonyFolderHexColor.PURPLE -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#C972FF"))
+            AgonyFolderHexColor.MINT -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#00CEDB"))
+            AgonyFolderHexColor.GREEN -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#24D174"))
+            AgonyFolderHexColor.YELLOW -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FFE55C"))
+            AgonyFolderHexColor.ORANGE -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FF9D43"))
+        }
+    }
+    /**고민 폴더 text 색상 설정*/
+    @JvmStatic
+    @BindingAdapter("setTextColorWithFolderHexColor")
+    fun setTextColorWithFolderHexColor(textView: TextView, agonyFolderHexColor: AgonyFolderHexColor){
+        when(agonyFolderHexColor){
+            AgonyFolderHexColor.WHITE,
+            AgonyFolderHexColor.MINT -> textView.setTextColor(Color.parseColor("#222222"))
+
+            AgonyFolderHexColor.YELLOW,
+            AgonyFolderHexColor.ORANGE -> textView.setTextColor(Color.parseColor("#595959"))
+
+            AgonyFolderHexColor.BLACK,
+            AgonyFolderHexColor.GREEN,
+            AgonyFolderHexColor.PURPLE -> textView.setTextColor(Color.parseColor("#FFFFFF"))
+        }
     }
 }

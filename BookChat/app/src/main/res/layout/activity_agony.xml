@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="viewmodel"
+            type="com.example.bookchat.viewmodel.AgonyViewModel" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.activity.AgonyActivity">
+
+        <com.example.bookchat.AntiDupClickImageButton
+            android:id="@+id/back_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="27dp"
+            android:onClick="@{() -> viewmodel.clickBackBtn()}"
+            android:background="?android:selectableItemBackgroundBorderless"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_back_btn" />
+
+        <TextView
+            android:id="@+id/textView12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_bold"
+            android:text="고민기록"
+            android:textColor="#222222"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/back_btn"
+            app:layout_constraintStart_toEndOf="@+id/back_btn"
+            app:layout_constraintTop_toTopOf="@+id/back_btn" />
+
+        <com.example.bookchat.AntiDupClickImageButton
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="30dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_wastebasket_btn"
+            app:layout_constraintBottom_toBottomOf="@+id/back_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/back_btn" />
+
+        <!--그리드뷰 Item Spacing 설정해야함 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/agonyRcv"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+   </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

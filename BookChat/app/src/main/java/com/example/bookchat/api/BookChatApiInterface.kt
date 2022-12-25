@@ -11,6 +11,7 @@ import com.example.bookchat.utils.SearchSortOption
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
+import retrofit2.http.Header
 
 interface BookChatApiInterface {
     //API 테스트
@@ -121,7 +122,7 @@ interface BookChatApiInterface {
     suspend fun getAgony(
         @Query("size") size: String,
         @Query("sort") sort: SearchSortOption = SearchSortOption.DESC, //임시
-        @Query("postCursorId") postCursorId: String?, //postCursorId Type 수정해야함
+        @Query("postCursorId") postCursorId: Int?, //postCursorId Type 수정해야함
     ): Response<ResponseGetAgony>
 
     //동시 삭제가 가능하게 선택된 폴더 아이디들을 뒤에 쉼표로 연결해야함
