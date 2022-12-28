@@ -1,6 +1,7 @@
 package com.example.bookchat.ui.activity
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -11,6 +12,7 @@ import com.example.bookchat.adapter.AgonyAdapter
 import com.example.bookchat.data.Agony
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ActivityAgonyBinding
+import com.example.bookchat.ui.dialog.MakeAgonyBottomSheetDialog
 import com.example.bookchat.ui.dialog.ReadingTapBookDialog.Companion.EXTRA_AGONIZE_BOOK
 import com.example.bookchat.viewmodel.AgonyViewModel
 import com.example.bookchat.viewmodel.AgonyViewModel.AgonizeUIEvent
@@ -44,24 +46,22 @@ class AgonyActivity : AppCompatActivity() {
 
     }
 
-    private fun observePagingAgony() = lifecycleScope.launch{
-        agonyViewModel.agonyCombined.observe(this@AgonyActivity){ pagingData ->
-            agonyAdapter.submitData(this@AgonyActivity.lifecycle, pagingData)
-        }
-    }
-
-    private fun observeAgonizeEvent() = lifecycleScope.launch{
-        agonyViewModel.eventFlow.collect{ event -> handleEvent(event) }
-    }
-
     private fun initAdapter() {
-        val agonyClickListener = object : AgonyAdapter.OnItemClickListener{
+        val dataItemClickListener = object : AgonyAdapter.OnDataItemClickListener{
             override fun onItemClick(agony: Agony) {
                 //AgonyRecordActivity로 이동
             }
         }
+        val firstItemClickListener = object  : AgonyAdapter.OnFirstItemClickListener{
+            override fun onItemClick() {
+                //아래에서 바텀 슬라이드 올라와서 작성창 띄우기
+                MakeAgonyBottomSheetDialog().show(supportFragmentManager, DIALOG_TAG_MAKE_AGONY)
+            }
+
+        }
         agonyAdapter = AgonyAdapter(agonyViewModel)
-        agonyAdapter.setItemClickListener(agonyClickListener)
+        agonyAdapter.setDataItemClickListener(dataItemClickListener)
+        agonyAdapter.setFirstItemClickListner(firstItemClickListener)
     }
 
     private fun initRecyclerView(){
@@ -82,6 +82,16 @@ class AgonyActivity : AppCompatActivity() {
         }
     }
 
+    private fun observeAgonizeEvent() = lifecycleScope.launch{
+        agonyViewModel.eventFlow.collect{ event -> handleEvent(event) }
+    }
+
+    private fun observePagingAgony() = lifecycleScope.launch{
+        agonyViewModel.agonyCombined.observe(this@AgonyActivity){ pagingData ->
+            agonyAdapter.submitData(this@AgonyActivity.lifecycle, pagingData)
+        }
+    }
+
     private fun handleEvent(event :AgonizeUIEvent){
         when(event){
             is AgonizeUIEvent.MoveToBack -> { finish() }
@@ -90,6 +100,10 @@ class AgonyActivity : AppCompatActivity() {
 
     private fun getAgonizeBook() : BookShelfItem{
         return intent.getSerializableExtra(EXTRA_AGONIZE_BOOK) as BookShelfItem
+    }
+
+    companion object {
+        private const val DIALOG_TAG_MAKE_AGONY = "MakeAgonyBottomSheetDialog"
     }
 
 }

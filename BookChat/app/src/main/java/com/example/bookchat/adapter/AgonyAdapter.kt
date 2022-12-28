@@ -19,7 +19,8 @@ class AgonyAdapter(private val agonyViewModel : AgonyViewModel)
     private lateinit var bindingFirstItem : ItemAgonyFirstBinding
     private lateinit var bindingHeaderItem : ItemAgonyHeaderBinding
 
-    private lateinit var itemClickListener : OnItemClickListener
+    private lateinit var dataItemClickListener : OnDataItemClickListener
+    private lateinit var firstItemClickListner : OnFirstItemClickListener
 
     inner class AgonyHeaderItemViewHolder(val binding: ItemAgonyHeaderBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(){
@@ -31,7 +32,7 @@ class AgonyAdapter(private val agonyViewModel : AgonyViewModel)
         fun bind(){
             binding.viewmodel = agonyViewModel
             binding.root.setOnClickListener{
-                //아래에서 바텀 슬라이드 올라와서 작성창 띄우기
+                firstItemClickListner.onItemClick()
             }
         }
     }
@@ -42,7 +43,7 @@ class AgonyAdapter(private val agonyViewModel : AgonyViewModel)
             binding.viewmodel = agonyViewModel
             binding.agony = agonyItem.agony
             binding.root.setOnClickListener {
-                itemClickListener.onItemClick(agonyItem.agony)
+                dataItemClickListener.onItemClick(agonyItem.agony)
             }
         }
     }
@@ -102,12 +103,20 @@ class AgonyAdapter(private val agonyViewModel : AgonyViewModel)
         }
     }
 
-    interface OnItemClickListener {
+    interface OnDataItemClickListener {
         fun onItemClick(agony : Agony)
     }
 
-    fun setItemClickListener(onItemClickListener: OnItemClickListener) {
-        this.itemClickListener = onItemClickListener
+    interface OnFirstItemClickListener {
+        fun onItemClick()
+    }
+
+    fun setDataItemClickListener(onDataItemClickListener: OnDataItemClickListener) {
+        this.dataItemClickListener = onDataItemClickListener
+    }
+
+    fun setFirstItemClickListner(onFirstItemClickListener: OnFirstItemClickListener){
+        this.firstItemClickListner = onFirstItemClickListener
     }
 
     //AgonyEquatable 인터페이스 정의해서 헤더, firstItem, dataItem 구분가능하게 구현
