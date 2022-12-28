@@ -233,7 +233,7 @@ object DataBindingAdapter {
     @BindingAdapter("setBackgorundTintWithHexColor")
     fun setBackgorundTintWithHexColor(view :View, agonyFolderHexColor: AgonyFolderHexColor){
         when(agonyFolderHexColor){
-            AgonyFolderHexColor.WHITE -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#999999"))
+            AgonyFolderHexColor.WHITE -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#F6F6F6"))
             AgonyFolderHexColor.BLACK -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#595959"))
             AgonyFolderHexColor.PURPLE -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#C972FF"))
             AgonyFolderHexColor.MINT -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#00CEDB"))
@@ -244,18 +244,59 @@ object DataBindingAdapter {
     }
     /**고민 폴더 text 색상 설정*/
     @JvmStatic
-    @BindingAdapter("setTextColorWithFolderHexColor")
-    fun setTextColorWithFolderHexColor(textView: TextView, agonyFolderHexColor: AgonyFolderHexColor){
+    @BindingAdapter("setFolderTextColorWithFolderHexColor")
+    fun setFolderTextColorWithFolderHexColor(textView: TextView, agonyFolderHexColor: AgonyFolderHexColor){
         when(agonyFolderHexColor){
+            AgonyFolderHexColor.BLACK-> {
+                textView.setTextColor(Color.parseColor("#FFFFFF"))
+            }
+
             AgonyFolderHexColor.WHITE,
-            AgonyFolderHexColor.MINT -> textView.setTextColor(Color.parseColor("#222222"))
+            AgonyFolderHexColor.GREEN,
+            AgonyFolderHexColor.PURPLE,
+            AgonyFolderHexColor.MINT,
+            AgonyFolderHexColor.YELLOW,
+            AgonyFolderHexColor.ORANGE  -> {
+                textView.setTextColor(Color.parseColor("#222222"))
+            }
+        }
+    }
+
+    /**고민 생성 Dialog text 색상 설정*/
+    @JvmStatic
+    @BindingAdapter("setMakeAgonyTextColorWithFolderHexColor")
+    fun setMakeAgonyTextColorWithFolderHexColor(textView: TextView, agonyFolderHexColor: AgonyFolderHexColor){
+        when(agonyFolderHexColor){
+            AgonyFolderHexColor.WHITE-> {
+                textView.setTextColor(Color.parseColor("#595959"))
+                textView.setHintTextColor(Color.parseColor("#595959"))
+            }
 
             AgonyFolderHexColor.YELLOW,
-            AgonyFolderHexColor.ORANGE -> textView.setTextColor(Color.parseColor("#595959"))
+            AgonyFolderHexColor.ORANGE -> {
+                textView.setTextColor(Color.parseColor("#595959"))
+                textView.setHintTextColor(Color.parseColor("#595959"))
+            }
 
             AgonyFolderHexColor.BLACK,
             AgonyFolderHexColor.GREEN,
-            AgonyFolderHexColor.PURPLE -> textView.setTextColor(Color.parseColor("#FFFFFF"))
+            AgonyFolderHexColor.PURPLE,
+            AgonyFolderHexColor.MINT  -> {
+                textView.setTextColor(Color.parseColor("#FFFFFF"))
+                textView.setHintTextColor(Color.parseColor("#FFFFFF"))
+            }
         }
     }
+
+    /**고민 Color Circle Click 가능 여부 설정*/
+    @JvmStatic
+    @BindingAdapter("setCheckedWithAgonyFolderHexColor")
+    fun setCheckedWithAgonyFolderHexColor(toggleButton :ToggleButton, checkedFlag :Boolean){
+        if(checkedFlag) {
+            toggleButton.isClickable = false
+            return
+        }
+        toggleButton.isClickable = true
+    }
+
 }

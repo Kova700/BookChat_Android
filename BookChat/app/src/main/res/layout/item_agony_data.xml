@@ -47,7 +47,7 @@
             android:fontFamily="@font/notosanskr_bold"
             android:text="@{agony.title}"
             android:textSize="14sp"
-            setTextColorWithFolderHexColor = "@{agony.hexColorCode}"
+            setFolderTextColorWithFolderHexColor = "@{agony.hexColorCode}"
             app:layout_constraintBottom_toBottomOf="@+id/cardView4"
             app:layout_constraintEnd_toEndOf="@+id/cardView4"
             app:layout_constraintStart_toStartOf="@+id/cardView4"

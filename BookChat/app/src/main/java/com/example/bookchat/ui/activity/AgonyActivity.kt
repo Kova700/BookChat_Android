@@ -28,13 +28,15 @@ class AgonyActivity : AppCompatActivity() {
 
     private lateinit var binding :ActivityAgonyBinding
     private lateinit var agonyAdapter: AgonyAdapter
+    private lateinit var book : BookShelfItem
     private val agonyViewModel: AgonyViewModel by viewModels{
-        AgonyViewModel.provideFactory(agonyViewModelFactory, getAgonizeBook())
+        AgonyViewModel.provideFactory(agonyViewModelFactory, book)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this,R.layout.activity_agony)
+        book = getAgonizeBook()
         with(binding){
             lifecycleOwner = this@AgonyActivity
             viewmodel = agonyViewModel
@@ -55,7 +57,7 @@ class AgonyActivity : AppCompatActivity() {
         val firstItemClickListener = object  : AgonyAdapter.OnFirstItemClickListener{
             override fun onItemClick() {
                 //아래에서 바텀 슬라이드 올라와서 작성창 띄우기
-                MakeAgonyBottomSheetDialog().show(supportFragmentManager, DIALOG_TAG_MAKE_AGONY)
+                MakeAgonyBottomSheetDialog(book).show(supportFragmentManager, DIALOG_TAG_MAKE_AGONY)
             }
 
         }
