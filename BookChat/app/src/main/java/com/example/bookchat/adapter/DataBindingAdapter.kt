@@ -3,6 +3,7 @@ package com.example.bookchat.adapter
 import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.core.content.res.ResourcesCompat
@@ -13,6 +14,7 @@ import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.utils.*
+import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportStatus
 import com.willy.ratingbar.ScaleRatingBar
 
@@ -290,13 +292,9 @@ object DataBindingAdapter {
 
     /**고민 Color Circle Click 가능 여부 설정*/
     @JvmStatic
-    @BindingAdapter("setCheckedWithAgonyFolderHexColor")
-    fun setCheckedWithAgonyFolderHexColor(toggleButton :ToggleButton, checkedFlag :Boolean){
-        if(checkedFlag) {
-            toggleButton.isClickable = false
-            return
-        }
-        toggleButton.isClickable = true
+    @BindingAdapter("setClickableWithAgonyFolderHexColor")
+    fun setClickableWithAgonyFolderHexColor(toggleButton :ToggleButton, checkedFlag :Boolean){
+        toggleButton.isClickable = !checkedFlag
     }
 
 }
