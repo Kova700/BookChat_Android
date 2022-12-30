@@ -121,7 +121,7 @@ interface BookChatApiInterface {
     @GET("/v1/api/agonies")
     suspend fun getAgony(
         @Query("size") size: String,
-        @Query("sort") sort: SearchSortOption = SearchSortOption.DESC, //임시
+        @Query("sort") sort: SearchSortOption = SearchSortOption.ASC, //임시 DESC로 수정
         @Query("postCursorId") postCursorId: Int?, //postCursorId Type 수정해야함
     ): Response<ResponseGetAgony>
 
