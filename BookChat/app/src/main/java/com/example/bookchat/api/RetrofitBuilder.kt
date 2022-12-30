@@ -16,6 +16,7 @@ object RetrofitBuilder {
             .baseUrl(DOMAIN)
             .client(provideOkHttpClient(AppInterceptor())) //OkHttp 클라이언트 주입
             .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(EnumConverterFactory())
             .build()
     }
 
