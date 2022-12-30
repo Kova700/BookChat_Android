@@ -97,6 +97,10 @@ class AgonyActivity : AppCompatActivity() {
     private fun handleEvent(event :AgonizeUIEvent){
         when(event){
             is AgonizeUIEvent.MoveToBack -> { finish() }
+            is AgonizeUIEvent.RenewAgonyList -> {
+                //화면 갱신 이벤트
+                agonyAdapter.refresh()
+            }
         }
     }
 

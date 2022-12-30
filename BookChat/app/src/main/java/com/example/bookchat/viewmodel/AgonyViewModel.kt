@@ -60,7 +60,7 @@ class AgonyViewModel @AssistedInject constructor(
             is PagingViewEvent.InsertFirstItem -> {
                 paging.insertHeaderItem(item = AgonyFirstItem(book))
             }
-            is PagingViewEvent.Remove -> { paging } //임시
+            is PagingViewEvent.RemoveItem -> { paging } //임시
         }
     }
 
@@ -72,6 +72,10 @@ class AgonyViewModel @AssistedInject constructor(
         startEvent(AgonizeUIEvent.MoveToBack)
     }
 
+    fun renewAgonyList(){
+        startEvent(AgonizeUIEvent.RenewAgonyList)
+    }
+
     private fun startEvent (event : AgonizeUIEvent) = viewModelScope.launch {
         _eventFlow.emit(event)
     }
@@ -79,11 +83,12 @@ class AgonyViewModel @AssistedInject constructor(
     sealed class PagingViewEvent{
         object InsertHeaderItem : PagingViewEvent()
         object InsertFirstItem : PagingViewEvent()
-        object Remove : PagingViewEvent()
+        object RemoveItem : PagingViewEvent()
     }
 
     sealed class AgonizeUIEvent{
         object MoveToBack :AgonizeUIEvent()
+        object RenewAgonyList :AgonizeUIEvent()
     }
 
     @dagger.assisted.AssistedFactory
