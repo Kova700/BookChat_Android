@@ -3,9 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-        <variable
-            name="viewmodel"
-            type="com.example.bookchat.viewmodel.AgonyViewModel" />
+
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:background="@drawable/view_round_white"
