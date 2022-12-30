@@ -30,7 +30,6 @@ class AgonyAdapter(private val agonyViewModel : AgonyViewModel)
 
     inner class AgonyFirstItemViewHolder(val binding: ItemAgonyFirstBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(){
-            binding.viewmodel = agonyViewModel
             binding.root.setOnClickListener{
                 firstItemClickListner.onItemClick()
             }
