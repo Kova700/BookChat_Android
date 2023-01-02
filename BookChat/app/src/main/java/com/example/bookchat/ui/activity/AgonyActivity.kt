@@ -15,7 +15,7 @@ import com.example.bookchat.databinding.ActivityAgonyBinding
 import com.example.bookchat.ui.dialog.MakeAgonyBottomSheetDialog
 import com.example.bookchat.ui.dialog.ReadingTapBookDialog.Companion.EXTRA_AGONIZE_BOOK
 import com.example.bookchat.viewmodel.AgonyViewModel
-import com.example.bookchat.viewmodel.AgonyViewModel.AgonizeUIEvent
+import com.example.bookchat.viewmodel.AgonyViewModel.AgonyUiEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -45,13 +45,13 @@ class AgonyActivity : AppCompatActivity() {
         initRecyclerView()
         observeAgonizeEvent()
         observePagingAgony()
-
     }
 
     private fun initAdapter() {
         val dataItemClickListener = object : AgonyAdapter.OnDataItemClickListener{
             override fun onItemClick(agony: Agony) {
                 //AgonyRecordActivity로 이동
+                Toast.makeText(this@AgonyActivity,"${agony.title}의 AgonyRecordActivity로 이동",Toast.LENGTH_SHORT).show()
             }
         }
         val firstItemClickListener = object  : AgonyAdapter.OnFirstItemClickListener{
@@ -94,10 +94,10 @@ class AgonyActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleEvent(event :AgonizeUIEvent){
+    private fun handleEvent(event :AgonyUiEvent){
         when(event){
-            is AgonizeUIEvent.MoveToBack -> { finish() }
-            is AgonizeUIEvent.RenewAgonyList -> {
+            is AgonyUiEvent.MoveToBack -> { finish() }
+            is AgonyUiEvent.RenewAgonyList -> {
                 //화면 갱신 이벤트
                 agonyAdapter.refresh()
             }

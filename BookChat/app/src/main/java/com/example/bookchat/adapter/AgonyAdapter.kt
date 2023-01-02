@@ -12,6 +12,7 @@ import com.example.bookchat.databinding.ItemAgonyDataBinding
 import com.example.bookchat.databinding.ItemAgonyFirstBinding
 import com.example.bookchat.databinding.ItemAgonyHeaderBinding
 import com.example.bookchat.viewmodel.AgonyViewModel
+import com.example.bookchat.viewmodel.AgonyViewModel.PagingViewEvent
 
 class AgonyAdapter(private val agonyViewModel : AgonyViewModel)
     : PagingDataAdapter<AgonyItem, RecyclerView.ViewHolder>(AGONY_ITEM_COMPARATOR){
@@ -31,6 +32,7 @@ class AgonyAdapter(private val agonyViewModel : AgonyViewModel)
     inner class AgonyFirstItemViewHolder(val binding: ItemAgonyFirstBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(){
             binding.root.setOnClickListener{
+                if(agonyViewModel.activityStateFlow.value != AgonyViewModel.AgonyActivityState.Default) return@setOnClickListener
                 firstItemClickListner.onItemClick()
             }
         }
@@ -40,23 +42,29 @@ class AgonyAdapter(private val agonyViewModel : AgonyViewModel)
         fun bind(agonyItem : AgonyItem){
             if (agonyItem !is AgonyDataItem) return
             binding.viewmodel = agonyViewModel
-            binding.agony = agonyItem.agony
+            binding.agonyDataItem = agonyItem
             binding.root.setOnClickListener {
-                dataItemClickListener.onItemClick(agonyItem.agony)
+                when(agonyItem.status){
+                    AgonyDataItemStatus.Default -> {
+                        dataItemClickListener.onItemClick(agonyItem.agony)
+                        return@setOnClickListener
+                    }
+                    AgonyDataItemStatus.Editing -> {
+                        val event = PagingViewEvent.ChangeItemStatusToSelected(agonyItem.copy())
+                        agonyViewModel.onPagingViewEvent(event)
+                    }
+                    AgonyDataItemStatus.Selected -> {
+                        val event = PagingViewEvent.ChangeItemStatusToSelected(agonyItem.copy(status = AgonyDataItemStatus.Editing))
+                        agonyViewModel.onPagingViewEvent(event)
+                    }
+                }
+
             }
+
         }
     }
 
-    //ViewHolder 타입 구분하고 정의하고,
-    //헤더 ViewHolder면 spanSize = 1 로 설정 (책 표지 , 이름 ,작가 정보가 들어가야함)
-
-    //헤더 ViewHolder가 아니면 spanSize = 2로 설정해야함
-        //첫번째 아이템은 ViewHolder타입을 일반 데이터 ViewHolder와 구분해서 명시해야함
-        //첫번째 아아템은 항상 넣어두고 데이터를 호출하면 일반 데이터 ViewHolder를 추가하는 방식으로 구현
-
     override fun getItemViewType(position: Int): Int {
-        //넘어온 데이터를 열어봤을때 해당 아이템은 해당 ViewHolder와 연결되게
-        //내용물을 구분해야함
         return when(getItem(position)){
             is AgonyHeader -> R.layout.item_agony_header
             is AgonyFirstItem -> R.layout.item_agony_first
@@ -69,7 +77,6 @@ class AgonyAdapter(private val agonyViewModel : AgonyViewModel)
         parent: ViewGroup,
         viewType: Int
     ): RecyclerView.ViewHolder {
-        //viewType타입에 맞게 분기해서 ViewHolder 반환
         when(viewType){
             R.layout.item_agony_header -> {
                 bindingHeaderItem = DataBindingUtil
@@ -118,20 +125,19 @@ class AgonyAdapter(private val agonyViewModel : AgonyViewModel)
         this.firstItemClickListner = onFirstItemClickListener
     }
 
-    //AgonyEquatable 인터페이스 정의해서 헤더, firstItem, dataItem 구분가능하게 구현
     companion object {
         val AGONY_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<AgonyItem>() {
             override fun areItemsTheSame(oldItem: AgonyItem, newItem: AgonyItem) = when{
                 (oldItem is AgonyHeader && newItem is AgonyHeader) -> oldItem.bookShelfItem == newItem.bookShelfItem
                 (oldItem is AgonyFirstItem && newItem is AgonyFirstItem) -> oldItem == newItem
-                (oldItem is AgonyDataItem && newItem is AgonyDataItem) -> oldItem.agony.agonyId == newItem.agony.agonyId
+                (oldItem is AgonyDataItem && newItem is AgonyDataItem) -> oldItem.agony == newItem.agony
                 else -> false
             }
 
-            override fun areContentsTheSame(oldItem: AgonyItem, newItem: AgonyItem)= when{
+            override fun areContentsTheSame(oldItem: AgonyItem, newItem: AgonyItem) = when{
                 (oldItem is AgonyHeader && newItem is AgonyHeader) -> oldItem == newItem
                 (oldItem is AgonyFirstItem && newItem is AgonyFirstItem) -> oldItem == newItem
-                (oldItem is AgonyDataItem && newItem is AgonyDataItem) -> oldItem.agony == newItem.agony
+                (oldItem is AgonyDataItem && newItem is AgonyDataItem) -> oldItem == newItem
                 else -> false
             }
         }
