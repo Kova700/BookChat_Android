@@ -3,18 +3,19 @@ package com.example.bookchat.adapter
 import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
+import com.example.bookchat.data.AgonyDataItemStatus
 import com.example.bookchat.data.Book
 import com.example.bookchat.utils.*
-import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.viewmodel.AgonyViewModel.AgonyActivityState
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportStatus
 import com.willy.ratingbar.ScaleRatingBar
 
@@ -230,37 +231,89 @@ object DataBindingAdapter {
         view.visibility = if(status == BookReportStatus.ShowData) View.VISIBLE else View.INVISIBLE
     }
 
-    /**고민 폴더 색상 설정*/
+    /**고민 폴더 색상 설정(HexColor)*/
     @JvmStatic
-    @BindingAdapter("setBackgorundTintWithHexColor")
-    fun setBackgorundTintWithHexColor(view :View, agonyFolderHexColor: AgonyFolderHexColor){
+    @BindingAdapter("setBackgroundTintWithHexColor")
+    fun setBackgroundTintWithHexColor(
+        view :View,
+        agonyFolderHexColor: AgonyFolderHexColor
+    ) {
         when(agonyFolderHexColor){
-            AgonyFolderHexColor.WHITE -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#F6F6F6"))
-            AgonyFolderHexColor.BLACK -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#595959"))
-            AgonyFolderHexColor.PURPLE -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#C972FF"))
-            AgonyFolderHexColor.MINT -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#00CEDB"))
-            AgonyFolderHexColor.GREEN -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#24D174"))
-            AgonyFolderHexColor.YELLOW -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FFE55C"))
-            AgonyFolderHexColor.ORANGE -> view.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FF9D43"))
+            AgonyFolderHexColor.WHITE -> view.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(App.instance, R.color.agony_color_white))
+            AgonyFolderHexColor.BLACK -> view.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(App.instance, R.color.agony_color_black))
+            AgonyFolderHexColor.PURPLE -> view.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(App.instance, R.color.agony_color_purple))
+            AgonyFolderHexColor.MINT -> view.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(App.instance, R.color.agony_color_mint))
+            AgonyFolderHexColor.GREEN -> view.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(App.instance, R.color.agony_color_green))
+            AgonyFolderHexColor.YELLOW -> view.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(App.instance, R.color.agony_color_yellow))
+            AgonyFolderHexColor.ORANGE -> view.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(App.instance, R.color.agony_color_orange))
         }
     }
-    /**고민 폴더 text 색상 설정*/
+
+
+    /**고민 폴더 색상 설정(HexColor, ItemStatus)*/
     @JvmStatic
-    @BindingAdapter("setFolderTextColorWithFolderHexColor")
-    fun setFolderTextColorWithFolderHexColor(textView: TextView, agonyFolderHexColor: AgonyFolderHexColor){
-        when(agonyFolderHexColor){
-            AgonyFolderHexColor.BLACK-> {
-                textView.setTextColor(Color.parseColor("#FFFFFF"))
+    @BindingAdapter("setAgonyColorByHex", "setAgonyColorByStatus", requireAll = false)
+    fun setBackgroundTintWithHexColorAndItemStatus(
+        view :View,
+        agonyFolderHexColor: AgonyFolderHexColor,
+        itemStatus : AgonyDataItemStatus
+    ){
+        when(itemStatus){
+            AgonyDataItemStatus.Default -> {
+                setBackgroundTintWithHexColor(view, agonyFolderHexColor)
+            }
+            AgonyDataItemStatus.Editing -> {
+                view.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(App.instance, R.color.agony_color_white))
             }
 
-            AgonyFolderHexColor.WHITE,
-            AgonyFolderHexColor.GREEN,
-            AgonyFolderHexColor.PURPLE,
-            AgonyFolderHexColor.MINT,
-            AgonyFolderHexColor.YELLOW,
-            AgonyFolderHexColor.ORANGE  -> {
+            AgonyDataItemStatus.Selected -> {
+                view.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(App.instance, R.color.agony_color_selected))
+            }
+        }
+    }
+
+    /**고민 폴더 text 색상 설정(HexColor, ItemStatus)*/
+    @JvmStatic
+    @BindingAdapter("setAgonyTextColorByHex", "setAgonyTextColorByStatus", requireAll = false)
+    fun setFolderTextColorWithFolderHexColor(
+        textView: TextView,
+        agonyFolderHexColor: AgonyFolderHexColor,
+        itemStatus : AgonyDataItemStatus
+    ){
+        when(itemStatus){
+            AgonyDataItemStatus.Default -> {
+                when(agonyFolderHexColor){
+                    AgonyFolderHexColor.BLACK-> {
+                        textView.setTextColor(Color.parseColor("#FFFFFF"))
+                    }
+
+                    AgonyFolderHexColor.WHITE,
+                    AgonyFolderHexColor.GREEN,
+                    AgonyFolderHexColor.PURPLE,
+                    AgonyFolderHexColor.MINT,
+                    AgonyFolderHexColor.YELLOW,
+                    AgonyFolderHexColor.ORANGE  -> {
+                        textView.setTextColor(Color.parseColor("#222222"))
+                    }
+                }
+            }
+
+            AgonyDataItemStatus.Editing,
+            AgonyDataItemStatus.Selected-> {
                 textView.setTextColor(Color.parseColor("#222222"))
             }
+        }
+    }
+
+    /**고민 폴더 text 색상 설정(HexColor, ItemStatus)*/
+    @JvmStatic
+    @BindingAdapter("setVisibilityAgonyCheckedItemByStatus")
+    fun setVisibilityAgonyCheckedItemByStatus(view: View, itemStatus : AgonyDataItemStatus){
+        when(itemStatus){
+            AgonyDataItemStatus.Selected-> {
+                view.visibility = View.VISIBLE
+            }
+            else -> view.visibility = View.INVISIBLE
         }
     }
 
@@ -295,6 +348,27 @@ object DataBindingAdapter {
     @BindingAdapter("setClickableWithAgonyFolderHexColor")
     fun setClickableWithAgonyFolderHexColor(toggleButton :ToggleButton, checkedFlag :Boolean){
         toggleButton.isClickable = !checkedFlag
+    }
+
+    /** 고민탭 EditingState일 때 View Visibility 설정*/
+    @JvmStatic
+    @BindingAdapter("setVisibiltyInAgonyEditingState")
+    fun setVisibiltyInAgonyEditingState(view :View, agonyActivityState : AgonyActivityState){
+        if(agonyActivityState == AgonyActivityState.Editing) {
+            view.visibility = View.VISIBLE
+            return
+        }
+        view.visibility = View.GONE
+    }
+
+    @JvmStatic
+    @BindingAdapter("setVisibiltyInAgonyDefaultState")
+    fun setVisibiltyInAgonyDefaultState(view :View, agonyActivityState : AgonyActivityState){
+        if(agonyActivityState == AgonyActivityState.Default) {
+            view.visibility = View.VISIBLE
+            return
+        }
+        view.visibility = View.INVISIBLE
     }
 
 }

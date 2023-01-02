@@ -5,10 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
-import com.example.bookchat.data.AgonyFirstItem
-import com.example.bookchat.data.AgonyHeader
-import com.example.bookchat.data.AgonyItem
-import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.data.*
 import com.example.bookchat.paging.AgonyPagingSource
 import com.example.bookchat.repository.AgonyRepository
 import dagger.assisted.Assisted
@@ -21,14 +18,15 @@ class AgonyViewModel @AssistedInject constructor(
     @Assisted val book : BookShelfItem
     ) : ViewModel() {
 
-    private val _eventFlow = MutableSharedFlow<AgonizeUIEvent>()
+    private val _eventFlow = MutableSharedFlow<AgonyUiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+    val activityStateFlow = MutableStateFlow<AgonyActivityState>(AgonyActivityState.Default)
 
     val agonyModificationEvents = MutableStateFlow<List<PagingViewEvent>>(
         listOf(PagingViewEvent.InsertFirstItem, PagingViewEvent.InsertHeaderItem)
     )
 
-    //AgonyPagingSource에서 Agony를 받아와서 맨앞에 HEADER랑 FIRST를 넣어줘야함 그래야 Adapter에서 데이터 받을 수 있음
     val agonyPagingData = Pager(
         config = PagingConfig(
             pageSize = AGONY_LOAD_SIZE,
@@ -51,44 +49,129 @@ class AgonyViewModel @AssistedInject constructor(
 
     private fun applyEvents(
         paging: PagingData<AgonyItem>,
-        pagingVeiwEvent :PagingViewEvent
+        pagingViewEvent :PagingViewEvent
     ): PagingData<AgonyItem>{
-        return when(pagingVeiwEvent) {
+        return when(pagingViewEvent) {
             is PagingViewEvent.InsertHeaderItem -> {
                 paging.insertHeaderItem(item = AgonyHeader(book))
             }
             is PagingViewEvent.InsertFirstItem -> {
                 paging.insertHeaderItem(item = AgonyFirstItem(book))
             }
-            is PagingViewEvent.RemoveItem -> { paging } //임시
+
+            is PagingViewEvent.ChangeAllItemStatusToEditing -> {
+                paging.map { agonyItem ->
+                    if(agonyItem !is AgonyDataItem) return@map agonyItem
+                    return@map agonyItem.copy( status = AgonyDataItemStatus.Editing )
+                }
+            }
+
+            is PagingViewEvent.ChangeItemStatusToSelected -> {
+                paging.map { agonyItem ->
+                    if(agonyItem !is AgonyDataItem) return@map agonyItem
+                    if(pagingViewEvent.agonyItem != agonyItem) return@map agonyItem
+                    return@map agonyItem.copy(status = AgonyDataItemStatus.Selected)
+                }
+            }
+
+            is PagingViewEvent.RemoveItem -> {
+                paging.filter {
+                    if (it is AgonyDataItem) {
+                        it.agony.agonyId != (pagingViewEvent.agonyItem as AgonyDataItem).agony.agonyId
+                    }
+                    else true
+                }
+            }
+
         }
     }
 
     fun onPagingViewEvent(pagingViewEvent :PagingViewEvent){
+        if (agonyModificationEvents.value.contains(pagingViewEvent)){
+            agonyModificationEvents.value -= pagingViewEvent
+            return
+        }
         agonyModificationEvents.value += pagingViewEvent
     }
 
+    private fun getSelectedItemList() :List<AgonyDataItem>{
+        return agonyModificationEvents.value
+            .filterIsInstance<PagingViewEvent.ChangeItemStatusToSelected>()
+            .map { it.agonyItem as AgonyDataItem  }
+            .sortedBy { it.agony.agonyId }
+    }
+
+    private fun changeItemStatusSelectedToRemoved(){
+        agonyModificationEvents.value = agonyModificationEvents.value
+            .map { pagingEvent ->
+                if (pagingEvent !is PagingViewEvent.ChangeItemStatusToSelected) pagingEvent
+                else PagingViewEvent.RemoveItem(pagingEvent.agonyItem)
+            }
+    }
+
+    private fun deleteAgony() = viewModelScope.launch{
+        changeItemStatusSelectedToRemoved()
+        clickCancelBtn()
+        //API 400 넘어옴 이슈로 인해 일단 각주처리 (PostMan 확인 완료)
+//        runCatching { agonyRepository.deleteAgony(getSelectedItemList()) }
+//            .onSuccess { changeItemStatusSelectedToRemoved() }
+//            .onFailure { Toast.makeText(App.instance.applicationContext, "고민 삭제 실패", Toast.LENGTH_SHORT).show() }
+        //삭제API를 호출한다.
+            //성공시
+                //ChangeItemStatusToSelected상태인 애들 전부 Removed상태로 변경
+            //실패시
+                //ChangeItemStatusToSelected상태 유지
+    }
+
+    fun clickEditBtn(){
+        activityStateFlow.value = AgonyActivityState.Editing
+        onPagingViewEvent(PagingViewEvent.ChangeAllItemStatusToEditing)
+    }
+
+    fun clickDeleteBtn() {
+        deleteAgony()
+    }
+
+    fun clickCancelBtn(){
+        activityStateFlow.value = AgonyActivityState.Default
+        onPagingViewEvent(PagingViewEvent.ChangeAllItemStatusToEditing)
+        clearAllSelectedItem()
+    }
+
+    private fun clearAllSelectedItem(){
+        agonyModificationEvents.value = agonyModificationEvents.value
+            .filter { it !is PagingViewEvent.ChangeItemStatusToSelected }
+    }
+
+
     fun clickBackBtn(){
-        startEvent(AgonizeUIEvent.MoveToBack)
+        startEvent(AgonyUiEvent.MoveToBack)
     }
 
     fun renewAgonyList(){
-        startEvent(AgonizeUIEvent.RenewAgonyList)
+        startEvent(AgonyUiEvent.RenewAgonyList)
     }
 
-    private fun startEvent (event : AgonizeUIEvent) = viewModelScope.launch {
+    private fun startEvent (event : AgonyUiEvent) = viewModelScope.launch {
         _eventFlow.emit(event)
     }
 
     sealed class PagingViewEvent{
         object InsertHeaderItem : PagingViewEvent()
         object InsertFirstItem : PagingViewEvent()
-        object RemoveItem : PagingViewEvent()
+        object ChangeAllItemStatusToEditing : PagingViewEvent()
+        data class ChangeItemStatusToSelected(val agonyItem : AgonyItem) : PagingViewEvent()
+        data class RemoveItem(val agonyItem : AgonyItem) : PagingViewEvent()
     }
 
-    sealed class AgonizeUIEvent{
-        object MoveToBack :AgonizeUIEvent()
-        object RenewAgonyList :AgonizeUIEvent()
+    sealed class AgonyUiEvent{
+        object MoveToBack :AgonyUiEvent()
+        object RenewAgonyList :AgonyUiEvent()
+    }
+
+    sealed class AgonyActivityState{
+        object Default :AgonyActivityState()
+        object Editing :AgonyActivityState()
     }
 
     @dagger.assisted.AssistedFactory

@@ -2,6 +2,7 @@ package com.example.bookchat.repository
 
 import android.util.Log
 import com.example.bookchat.App
+import com.example.bookchat.data.AgonyDataItem
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.request.RequestMakeAgony
 import com.example.bookchat.response.NetworkIsNotConnectedException
@@ -19,6 +20,20 @@ class AgonyRepository @Inject constructor() {
 
         val response = App.instance.bookChatApiClient.makeAgony(book.bookId, requestMakeAgony)
 
+        when(response.code()){
+            200 -> { }
+            else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
+        }
+    }
+
+    suspend fun deleteAgony(
+        agonyDataList: List<AgonyDataItem>
+    ){
+        Log.d(TAG, "AgonyRepository: deleteAgony() - called")
+        if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
+
+        val deleteIdListString = agonyDataList.map { it.agony.agonyId }.joinToString(",")
+        val response = App.instance.bookChatApiClient.deleteAgony(deleteIdListString)
         when(response.code()){
             200 -> { }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))

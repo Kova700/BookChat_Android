@@ -12,4 +12,12 @@
     <color name="bookchat_blue">#FF5648FF</color>
     <color name="taste_unclicked">#FFF6F6F6</color>
     <color name="ripple_color">#FFDDDAFD</color>
+    <color name="agony_color_white">#FFF6F6F6</color>
+    <color name="agony_color_black">#FF595959</color>
+    <color name="agony_color_purple">#FFC972FF</color>
+    <color name="agony_color_mint">#FF00CEDB</color>
+    <color name="agony_color_green">#FF24D174</color>
+    <color name="agony_color_yellow">#FFFFE55C</color>
+    <color name="agony_color_orange">#FFFF9D43</color>
+    <color name="agony_color_selected">#FFACACAC</color>
 </resources>

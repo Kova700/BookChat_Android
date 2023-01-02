@@ -7,8 +7,8 @@
             name="viewmodel"
             type="com.example.bookchat.viewmodel.AgonyViewModel" />
         <variable
-            name="agony"
-            type="com.example.bookchat.data.Agony" />
+            name="agonyDataItem"
+            type="com.example.bookchat.data.AgonyDataItem" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:background="@drawable/view_round_white"
@@ -17,7 +17,8 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView4"
-            setBackgorundTintWithHexColor="@{agony.hexColorCode}"
+            setAgonyColorByHex="@{agonyDataItem.agony.hexColorCode}"
+            setAgonyColorByStatus="@{agonyDataItem.status}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -31,7 +32,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!--android:text="@{agony.title}"-->
         <!--최대 글자수 지정이 필요해 보임-->
         <TextView
             android:id="@+id/textView36"
@@ -45,13 +45,24 @@
             android:elevation="5dp"
             android:gravity="left"
             android:fontFamily="@font/notosanskr_bold"
-            android:text="@{agony.title}"
+            android:text="@{agonyDataItem.agony.title}"
             android:textSize="14sp"
-            setFolderTextColorWithFolderHexColor = "@{agony.hexColorCode}"
+            setAgonyTextColorByHex="@{agonyDataItem.agony.hexColorCode}"
+            setAgonyTextColorByStatus="@{agonyDataItem.status}"
             app:layout_constraintBottom_toBottomOf="@+id/cardView4"
             app:layout_constraintEnd_toEndOf="@+id/cardView4"
             app:layout_constraintStart_toStartOf="@+id/cardView4"
             app:layout_constraintTop_toTopOf="@+id/cardView4" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            setVisibilityAgonyCheckedItemByStatus="@{agonyDataItem.status}"
+            android:src="@drawable/item_check_icon"
+            app:layout_constraintBottom_toBottomOf="@+id/cardView4"
+            app:layout_constraintEnd_toEndOf="@+id/cardView4" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
