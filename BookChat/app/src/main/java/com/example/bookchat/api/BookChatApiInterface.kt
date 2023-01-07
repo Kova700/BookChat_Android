@@ -148,8 +148,8 @@ interface BookChatApiInterface {
     suspend fun getAgonyRecord(
         @Path("agonyId") agonyId: Long,
         @Query("size") size: String,
+        @Query("postCursorId") postCursorId: Int?, //postCursorId Type 수정해야함
         @Query("sort") sort: SearchSortOption = SearchSortOption.DESC, //임시
-        @Query("postCursorId") postCursorId: String?, //postCursorId Type 수정해야함
     ): Response<ResponseGetAgonyRecord>
 
     @DELETE("/v1/api/agonies/{agonyId}/records/{recordId}")

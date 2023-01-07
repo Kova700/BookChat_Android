@@ -1,7 +1,7 @@
 package com.example.bookchat.ui.activity
 
+import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -43,15 +43,16 @@ class AgonyActivity : AppCompatActivity() {
         }
         initAdapter()
         initRecyclerView()
-        observeAgonizeEvent()
+        observeAgonyUiEvent()
         observePagingAgony()
     }
 
     private fun initAdapter() {
         val dataItemClickListener = object : AgonyAdapter.OnDataItemClickListener{
             override fun onItemClick(agony: Agony) {
-                //AgonyRecordActivity로 이동
-                Toast.makeText(this@AgonyActivity,"${agony.title}의 AgonyRecordActivity로 이동",Toast.LENGTH_SHORT).show()
+                val intent = Intent(this@AgonyActivity, AgonyRecordActivity::class.java)
+                    .putExtra(EXTRA_AGONY, agony)
+                startActivity(intent)
             }
         }
         val firstItemClickListener = object  : AgonyAdapter.OnFirstItemClickListener{
@@ -84,7 +85,7 @@ class AgonyActivity : AppCompatActivity() {
         }
     }
 
-    private fun observeAgonizeEvent() = lifecycleScope.launch{
+    private fun observeAgonyUiEvent() = lifecycleScope.launch{
         agonyViewModel.eventFlow.collect{ event -> handleEvent(event) }
     }
 
@@ -110,6 +111,7 @@ class AgonyActivity : AppCompatActivity() {
 
     companion object {
         private const val DIALOG_TAG_MAKE_AGONY = "MakeAgonyBottomSheetDialog"
+        const val EXTRA_AGONY = "EXTRA_AGONY"
     }
 
 }

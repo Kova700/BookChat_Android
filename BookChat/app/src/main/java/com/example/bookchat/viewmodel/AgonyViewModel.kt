@@ -114,7 +114,10 @@ class AgonyViewModel @AssistedInject constructor(
         clickCancelBtn()
         //API 400 넘어옴 이슈로 인해 일단 각주처리 (PostMan 확인 완료)
 //        runCatching { agonyRepository.deleteAgony(getSelectedItemList()) }
-//            .onSuccess { changeItemStatusSelectedToRemoved() }
+//            .onSuccess {
+//                changeItemStatusSelectedToRemoved()
+//                clickCancelBtn()
+//            }
 //            .onFailure { Toast.makeText(App.instance.applicationContext, "고민 삭제 실패", Toast.LENGTH_SHORT).show() }
         //삭제API를 호출한다.
             //성공시
