@@ -17,13 +17,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BookChat">
         <activity
+            android:name=".ui.activity.AgonyRecordActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.activity.BookReportActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.AgonyActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.SearchTapResultDetailActivity"
             android:configChanges="uiMode"
