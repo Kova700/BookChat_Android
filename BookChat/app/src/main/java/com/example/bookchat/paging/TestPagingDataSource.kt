@@ -27,15 +27,17 @@ object TestPagingDataSource {
     }
 
     fun getTestAgonyPagingSource() : ResponseGetAgony {
-        val testPagedAgony = listOf(
-            Agony(1L,"테스트 제목1", AgonyFolderHexColor.WHITE),
-            Agony(2L,"테스트 제목2", AgonyFolderHexColor.BLACK),
-            Agony(3L,"테스트 제목3", AgonyFolderHexColor.PURPLE),
-            Agony(4L,"테스트 제목4", AgonyFolderHexColor.MINT),
-            Agony(5L,"테스트 제목5", AgonyFolderHexColor.GREEN),
-            Agony(6L,"테스트 제목6", AgonyFolderHexColor.YELLOW),
-            Agony(7L,"테스트 제목7", AgonyFolderHexColor.ORANGE),
+        val agonyFolderHexColorList = listOf(
+            AgonyFolderHexColor.WHITE, AgonyFolderHexColor.BLACK,
+            AgonyFolderHexColor.PURPLE, AgonyFolderHexColor.MINT,
+            AgonyFolderHexColor.GREEN, AgonyFolderHexColor.YELLOW,
+            AgonyFolderHexColor.ORANGE
         )
+        val agony = Agony(1L,"테스트 제목1", AgonyFolderHexColor.WHITE)
+        val testPagedAgony = mutableListOf<Agony>()
+        for (i in 0 until 30){
+            testPagedAgony.add(agony.copy(agonyId = i.toLong(), title = "테스트 제목$i", hexColorCode = agonyFolderHexColorList[i%agonyFolderHexColorList.size]))
+        }
         val testMeta = CursorMeta(1,6,true,false,true,true,1)
         return ResponseGetAgony(testPagedAgony,testMeta)
     }
