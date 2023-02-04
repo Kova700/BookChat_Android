@@ -1,6 +1,5 @@
 package com.example.bookchat.paging
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.bookchat.App
@@ -9,8 +8,6 @@ import com.example.bookchat.response.CursorMeta
 import com.example.bookchat.response.NetworkIsNotConnectedException
 import com.example.bookchat.response.ResponseBodyEmptyException
 import com.example.bookchat.response.ResponseGetAgony
-import com.example.bookchat.utils.Constants.TAG
-import com.example.bookchat.utils.SearchSortOption
 import retrofit2.Response
 
 class AgonyPagingSource : PagingSource<Int,Agony>(){
@@ -34,7 +31,6 @@ class AgonyPagingSource : PagingSource<Int,Agony>(){
                 val result = response.body()
                 result?.let {
                     val pagedAgony = result.agonyResponseList
-                    Log.d(TAG, "AgonyPagingSource: load() - pagedAgony :$pagedAgony")
                     val meta = result.cursorMeta
                     return getLoadResult(pagedAgony, page, meta)
                 }
