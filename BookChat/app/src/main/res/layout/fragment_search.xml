@@ -104,7 +104,7 @@
             android:background="#00ff0000"
             android:elevation="10dp"
             android:onClick="@{() -> viewModel.clearSearchWindow()}"
-            android:src="@drawable/ic_search_text_delete_btn"
+            android:src="@drawable/ic_text_delete_btn"
             app:layout_constraintBottom_toBottomOf="@+id/search_window"
             app:layout_constraintEnd_toEndOf="@+id/search_window"
             app:layout_constraintTop_toTopOf="@+id/search_window" />
