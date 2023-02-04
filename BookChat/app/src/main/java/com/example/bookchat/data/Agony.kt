@@ -12,7 +12,16 @@ data class Agony(
     @SerializedName("hexColorCode")
     val hexColorCode : AgonyFolderHexColor
 ): Serializable {
-    fun getAgonyDataItem() :AgonyItem{
-        return AgonyDataItem(this)
-    }
+    fun getAgonyDataItem() = AgonyDataItem(this)
+}
+
+data class AgonyDataItem(
+    val agony :Agony,
+    var status :AgonyDataItemStatus = AgonyDataItemStatus.Default
+)
+
+sealed class AgonyDataItemStatus{
+    object Default :AgonyDataItemStatus()
+    object Editing :AgonyDataItemStatus()
+    object Selected :AgonyDataItemStatus()
 }

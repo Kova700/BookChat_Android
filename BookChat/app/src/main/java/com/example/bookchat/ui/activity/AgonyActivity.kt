@@ -6,9 +6,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.bookchat.R
-import com.example.bookchat.adapter.AgonyAdapter
+import com.example.bookchat.adapter.Agony.AgonyDataItemAdapter
+import com.example.bookchat.adapter.Agony.AgonyFirstItemAdapter
+import com.example.bookchat.adapter.Agony.AgonyHeaderItemAdapter
 import com.example.bookchat.data.Agony
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ActivityAgonyBinding
@@ -27,7 +30,9 @@ class AgonyActivity : AppCompatActivity() {
     lateinit var agonyViewModelFactory : AgonyViewModel.AssistedFactory
 
     private lateinit var binding :ActivityAgonyBinding
-    private lateinit var agonyAdapter: AgonyAdapter
+    private lateinit var agonyDataItemAdapter: AgonyDataItemAdapter
+    private lateinit var agonyFirstItemAdapter : AgonyFirstItemAdapter
+    private lateinit var agonyHeaderItemAdapter : AgonyHeaderItemAdapter
     private lateinit var book : BookShelfItem
     private val agonyViewModel: AgonyViewModel by viewModels{
         AgonyViewModel.provideFactory(agonyViewModelFactory, book)
@@ -48,32 +53,36 @@ class AgonyActivity : AppCompatActivity() {
     }
 
     private fun initAdapter() {
-        val dataItemClickListener = object : AgonyAdapter.OnDataItemClickListener{
+        val dataItemClickListener = object : AgonyDataItemAdapter.OnDataItemClickListener{
             override fun onItemClick(agony: Agony) {
                 val intent = Intent(this@AgonyActivity, AgonyRecordActivity::class.java)
                     .putExtra(EXTRA_AGONY, agony)
                 startActivity(intent)
             }
         }
-        val firstItemClickListener = object  : AgonyAdapter.OnFirstItemClickListener{
+        val firstItemClickListener = object  : AgonyFirstItemAdapter.OnFirstItemClickListener {
             override fun onItemClick() {
                 //아래에서 바텀 슬라이드 올라와서 작성창 띄우기
                 MakeAgonyBottomSheetDialog(book).show(supportFragmentManager, DIALOG_TAG_MAKE_AGONY)
             }
 
         }
-        agonyAdapter = AgonyAdapter(agonyViewModel)
-        agonyAdapter.setDataItemClickListener(dataItemClickListener)
-        agonyAdapter.setFirstItemClickListner(firstItemClickListener)
+        agonyDataItemAdapter = AgonyDataItemAdapter(agonyViewModel)
+        agonyFirstItemAdapter = AgonyFirstItemAdapter(agonyViewModel)
+        agonyHeaderItemAdapter = AgonyHeaderItemAdapter(agonyViewModel)
+        agonyDataItemAdapter.setDataItemClickListener(dataItemClickListener)
+        agonyFirstItemAdapter.setFirstItemClickListner(firstItemClickListener)
     }
 
     private fun initRecyclerView(){
         with(binding){
-            agonyRcv.adapter = agonyAdapter
+            val concatAdapterConfig = ConcatAdapter.Config.Builder().apply { setIsolateViewTypes(false) }.build()
+            val concatAdapter = ConcatAdapter(concatAdapterConfig, agonyHeaderItemAdapter, agonyFirstItemAdapter, agonyDataItemAdapter)
+            agonyRcv.adapter = ConcatAdapter(agonyHeaderItemAdapter,agonyFirstItemAdapter,agonyDataItemAdapter)
             val gridLayoutManager = GridLayoutManager(this@AgonyActivity,2)
             gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup(){
                 override fun getSpanSize(position: Int): Int {
-                    return when(agonyAdapter.getItemViewType(position)){
+                    return when(concatAdapter.getItemViewType(position)){
                         R.layout.item_agony_header -> 2
                         R.layout.item_agony_first -> 1
                         R.layout.item_agony_data -> 1
@@ -91,7 +100,7 @@ class AgonyActivity : AppCompatActivity() {
 
     private fun observePagingAgony() = lifecycleScope.launch{
         agonyViewModel.agonyCombined.observe(this@AgonyActivity){ pagingData ->
-            agonyAdapter.submitData(this@AgonyActivity.lifecycle, pagingData)
+            agonyDataItemAdapter.submitData(this@AgonyActivity.lifecycle, pagingData)
         }
     }
 
@@ -99,8 +108,8 @@ class AgonyActivity : AppCompatActivity() {
         when(event){
             is AgonyUiEvent.MoveToBack -> { finish() }
             is AgonyUiEvent.RenewAgonyList -> {
-                //화면 갱신 이벤트
-                agonyAdapter.refresh()
+                //화면 갱신 이벤트 (아마 agonyModificationEvent도 비워줘야할 듯)
+                agonyDataItemAdapter.refresh()
             }
         }
     }
