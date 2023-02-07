@@ -110,8 +110,8 @@ class BookShelfViewModel @Inject constructor(
         }.cachedIn(viewModelScope).asLiveData()
     }
 
-    fun deleteBookShelfBookWithSwipe(book: BookShelfItem) = viewModelScope.launch {
-        runCatching { bookRepository.deleteBookShelfBook(book.bookId) }
+    fun deleteBookShelfBookWithSwipe(bookShelfItem: BookShelfItem) = viewModelScope.launch {
+        runCatching { bookRepository.deleteBookShelfBook(bookShelfItem.bookShelfId) }
             .onSuccess {
                 Toast.makeText(App.instance.applicationContext, "도서가 삭제되었습니다.", Toast.LENGTH_SHORT)
                     .show()
@@ -154,14 +154,14 @@ class BookShelfViewModel @Inject constructor(
     ): PagingData<BookShelfItem> {
         return when (pagingViewEvent) {
             is PagingViewEvent.Remove -> {
-                paging.filter { it.bookId != pagingViewEvent.bookShelfItem.bookId }
+                paging.filter { it.bookShelfId != pagingViewEvent.bookShelfItem.bookShelfId }
             }
             is PagingViewEvent.RemoveWaiting -> {
-                paging.filter { it.bookId != pagingViewEvent.bookShelfItem.bookId }
+                paging.filter { it.bookShelfId != pagingViewEvent.bookShelfItem.bookShelfId }
             }
             is PagingViewEvent.Edit -> {
                 paging.map { bookshelfItem ->
-                    if (pagingViewEvent.bookShelfItem.bookId != bookshelfItem.bookId) return@map bookshelfItem
+                    if (pagingViewEvent.bookShelfItem.bookShelfId != bookshelfItem.bookShelfId) return@map bookshelfItem
                     return@map bookshelfItem.copy(pages = pagingViewEvent.bookShelfItem.pages)
                 }
             }

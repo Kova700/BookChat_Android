@@ -5,10 +5,9 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 //isSwiped WrapperClass로 빼기
-//singleLineAssessment 삭제
 data class BookShelfItem(
-    @SerializedName("bookId")
-    val bookId: Long,
+    @SerializedName("bookShelfId")
+    val bookShelfId: Long,
     @SerializedName("title")
     val title: String,
     @SerializedName("isbn")
@@ -21,12 +20,10 @@ data class BookShelfItem(
     val publisher: String,
     @SerializedName("publishAt")
     val publishAt: String,
-    @SerializedName("star")
-    var star: StarRating?,
-    @SerializedName("singleLineAssessment")
-    val singleLineAssessment: String?,
     @SerializedName("pages")
     var pages: Int,
+    @SerializedName("star")
+    var star: StarRating?,
     var isSwiped: Boolean = false,
 ) :Serializable{
     fun getBook() :Book{
@@ -49,15 +46,5 @@ data class BookShelfItem(
             4.0F -> { StarRating.FOUR }; 4.5F -> { StarRating.FOUR_HALF }
             5.0F -> { StarRating.FIVE }; else -> { StarRating.ZERO }
         }
-    }
-
-    fun copy() :BookShelfItem{
-        return BookShelfItem(
-            this.bookId, this.title, this.isbn,
-            this.bookCoverImageUrl, this.authors.toList(),
-            this.publisher, this.publishAt,
-            this.star, this.singleLineAssessment,
-            this.pages, this.isSwiped
-        )
     }
 }

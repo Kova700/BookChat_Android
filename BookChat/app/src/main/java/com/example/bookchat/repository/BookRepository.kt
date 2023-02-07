@@ -78,7 +78,7 @@ class BookRepository @Inject constructor(){
             star = book.star,
             pages = book.pages
         )
-        val response = App.instance.bookChatApiClient.changeBookShelfBookStatus(book.bookId, requestBody)
+        val response = App.instance.bookChatApiClient.changeBookShelfBookStatus(book.bookShelfId, requestBody)
         when(response.code()){
             200 -> { }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))

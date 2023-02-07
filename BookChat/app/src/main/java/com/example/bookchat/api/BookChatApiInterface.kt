@@ -56,12 +56,12 @@ interface BookChatApiInterface {
         @Query("sort") sort: BookSearchSortOption = BookSearchSortOption.ACCURACY,
     ): Response<BookSearchResult>
 
-    @POST("/v1/api/bookshelf/books")
+    @POST("/v1/api/bookshelves")
     suspend fun registerBookShelfBook(
         @Body requestRegisterBookShelfBook: RequestRegisterBookShelfBook
     ): Response<Unit>
 
-    @GET("/v1/api/bookshelf/books")
+    @GET("/v1/api/bookshelves")
     suspend fun getBookShelfBooks(
         @Query("size") size: String,
         @Query("page") page: String,
@@ -69,18 +69,18 @@ interface BookChatApiInterface {
         @Query("sort") sort: SearchSortOption = SearchSortOption.DESC //임시
     ): Response<BookShelfResult>
 
-    @DELETE("/v1/api/bookshelf/books/{bookId}")
+    @DELETE("/v1/api/bookshelves/{bookId}")
     suspend fun deleteBookShelfBook(
         @Path("bookId") bookId: Long
     ): Response<Unit>
 
-    @PUT("/v1/api/bookshelf/books/{bookId}")
+    @PUT("/v1/api/bookshelves/{bookId}")
     suspend fun changeBookShelfBookStatus(
         @Path("bookId") bookId: Long,
         @Body requestChangeBookStatus: RequestChangeBookStatus
     ): Response<Unit>
 
-    @GET("/v1/api/bookshelf/books/existence")
+    @GET("/v1/api/bookshelves/book")
     suspend fun checkAlreadyInBookShelf(
         @Query("isbn") isbn: String,
         @Query("publishAt") publishAt: String,
@@ -112,54 +112,62 @@ interface BookChatApiInterface {
 
     /**------------고민 ------------*/
 
-    @POST("/v1/api/bookshelf/books/{bookId}/agonies")
+    @POST("/v1/api/bookshelves/{bookId}/agonies")
     suspend fun makeAgony(
         @Path("bookId") bookId: Long,
         @Body requestMakeAgony: RequestMakeAgony
     ): Response<Unit>
 
-    @GET("/v1/api/agonies")
+    @GET("/v1/api/bookshelves/{bookShelfId}/agonies")
     suspend fun getAgony(
+        @Path("bookShelfId") bookShelfId: Long,
         @Query("size") size: String,
-        @Query("sort") sort: SearchSortOption = SearchSortOption.ASC, //임시 DESC로 수정
+        @Query("sort") sort: SearchSortOption,
         @Query("postCursorId") postCursorId: Int?, //postCursorId Type 수정해야함
     ): Response<ResponseGetAgony>
 
     //동시 삭제가 가능하게 선택된 폴더 아이디들을 뒤에 쉼표로 연결해야함
     // ex : /v1/api/agonies/1,2,3
-    @DELETE("/v1/api/agonies/{bookIdListString}")
+    @DELETE("/v1/api/bookshelves/agonies/{bookIdListString}")
     suspend fun deleteAgony(
         @Path("bookIdListString") bookIdListString: String,
     ): Response<Unit>
 
-    @PUT("v1/api/agonies/{agonyId}")
+    @PUT("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}")
     suspend fun reviseAgony(
+        @Path("bookShelfId") bookShelfId: Long,
         @Path("agonyId") agonyId: Long,
         @Body requestReviseAgony: RequestReviseAgony
     ): Response<Unit>
 
-    @POST("/v1/api/agonies/{agonyId}/records")
+    /**------------고민 기록------------*/
+
+    @POST("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records")
     suspend fun makeAgonyRecord(
+        @Path("bookShelfId") bookShelfId: Long,
         @Path("agonyId") agonyId: Long,
         @Body requestMakeAgonyRecord: RequestMakeAgonyRecord
     ): Response<Unit>
 
-    @GET("/v1/api/agonies/{agonyId}/records")
+    @GET("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records")
     suspend fun getAgonyRecord(
+        @Path("bookShelfId") bookShelfId: Long,
         @Path("agonyId") agonyId: Long,
-        @Query("size") size: String,
         @Query("postCursorId") postCursorId: Int?, //postCursorId Type 수정해야함
+        @Query("size") size: String,
         @Query("sort") sort: SearchSortOption = SearchSortOption.DESC, //임시
     ): Response<ResponseGetAgonyRecord>
 
-    @DELETE("/v1/api/agonies/{agonyId}/records/{recordId}")
+    @DELETE("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
     suspend fun deleteAgonyRecord(
+        @Path("bookShelfId") bookShelfId: Long,
         @Path("agonyId") agonyId: Long,
         @Path("recordId") recordId: Long
     ): Response<Unit>
 
-    @PUT("/v1/api/agonies/{agonyId}/records/{recordId}")
+    @PUT("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
     suspend fun reviseAgonyRecord(
+        @Path("bookShelfId") bookShelfId: Long,
         @Path("agonyId") agonyId: Long,
         @Path("recordId") recordId: Long,
         @Body requestReviseAgonyRecord: RequestReviseAgonyRecord

@@ -36,7 +36,7 @@ class WishBookTapDialogViewModel @AssistedInject constructor(
 
     //알림 내용 스낵바로 수정 예정
     private suspend fun requestRemoveWishBook()= viewModelScope.launch {
-        runCatching { bookRepository.deleteBookShelfBook(book.bookId) }
+        runCatching { bookRepository.deleteBookShelfBook(book.bookShelfId) }
             .onSuccess {
                 Toast.makeText(App.instance.applicationContext, "도서가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
                 startEvent(WishBookEvent.RemoveItem)
