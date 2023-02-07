@@ -38,6 +38,7 @@ class AgonyRecordActivity : AppCompatActivity() {
     private lateinit var agonyRecordHeaderItemAdapter: AgonyRecordHeaderItemAdapter
     private lateinit var agonyDataItem :AgonyDataItem
     private lateinit var book :BookShelfItem
+    private lateinit var firstAgonyTitle :String
     private val agonyRecordViewModel :AgonyRecordViewModel by viewModels {
         AgonyRecordViewModel.provideFactory(agonyRecordViewModelFactory, agonyDataItem)
     }
@@ -47,6 +48,7 @@ class AgonyRecordActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_agony_record)
         agonyDataItem = getAgonyDataItem()
         book = getBook()
+        firstAgonyTitle = agonyDataItem.agony.title
         with(binding){
             viewmodel = agonyRecordViewModel
             lifecycleOwner = this@AgonyRecordActivity
@@ -76,6 +78,7 @@ class AgonyRecordActivity : AppCompatActivity() {
             if (result.resultCode == RESULT_OK){
                 val intent = result.data
                 val newTitle = intent?.getStringExtra(AgonyEditActivity.EXTRA_NEW_AGONY_TITLE) ?: throw Exception()
+                agonyDataItem = agonyDataItem.copy(agony = agonyDataItem.agony.copy(title = newTitle))
                 agonyRecordHeaderItemAdapter.agony = agonyRecordHeaderItemAdapter.agony.copy(title = newTitle)
                 agonyRecordHeaderItemAdapter.notifyDataSetChanged()
             }
@@ -120,7 +123,7 @@ class AgonyRecordActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        if (agonyDataItem.agony.title != agonyRecordHeaderItemAdapter.agony.title){
+        if (firstAgonyTitle != agonyRecordHeaderItemAdapter.agony.title){
             val intent = Intent(this@AgonyRecordActivity, AgonyActivity::class.java)
             intent.putExtra(AgonyEditActivity.EXTRA_NEW_AGONY_TITLE, agonyRecordHeaderItemAdapter.agony.title)
             setResult(RESULT_OK,intent)
