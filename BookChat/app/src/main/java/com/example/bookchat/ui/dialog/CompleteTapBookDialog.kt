@@ -12,7 +12,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
-import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.DialogCompleteBookTapClickedBinding
 import com.example.bookchat.ui.activity.AgonyActivity
 import com.example.bookchat.ui.activity.BookReportActivity
@@ -23,14 +23,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CompleteTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
+class CompleteTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : DialogFragment() {
 
     @Inject
     lateinit var completeBookTapDialogViewModelFactory : CompleteBookTapDialogViewModel.AssistedFactory
 
     private lateinit var binding : DialogCompleteBookTapClickedBinding
     private val completeBookTapDialogViewModel : CompleteBookTapDialogViewModel by viewModels {
-        CompleteBookTapDialogViewModel.provideFactory(completeBookTapDialogViewModelFactory, book)
+        CompleteBookTapDialogViewModel.provideFactory(completeBookTapDialogViewModelFactory, bookShelfDataItem)
     }
 
     override fun onCreateView(
@@ -45,9 +45,6 @@ class CompleteTapBookDialog(private val book: BookShelfItem) : DialogFragment() 
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         observeEventFlow()
-
-        //고민기록 연결
-        //독후감 만들고 연결
 
         return binding.root
     }
@@ -65,13 +62,13 @@ class CompleteTapBookDialog(private val book: BookShelfItem) : DialogFragment() 
 
     private fun openAgonizeActivity(){
         val intent = Intent(requireContext(), AgonyActivity::class.java)
-            .putExtra(ReadingTapBookDialog.EXTRA_AGONIZE_BOOK,book)
+            .putExtra(ReadingTapBookDialog.EXTRA_AGONIZE_BOOK,bookShelfDataItem.bookShelfItem)
         startActivity(intent)
     }
 
     private fun openBookReportActivity(){
         val intent = Intent(requireContext(), BookReportActivity::class.java)
-            .putExtra(EXTRA_BOOKREPORT_BOOK,book)
+            .putExtra(EXTRA_BOOKREPORT_BOOK,bookShelfDataItem.bookShelfItem)
         startActivity(intent)
     }
 

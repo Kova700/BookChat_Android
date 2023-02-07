@@ -4,7 +4,6 @@ import com.example.bookchat.utils.StarRating
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-//isSwiped WrapperClass로 빼기
 data class BookShelfItem(
     @SerializedName("bookShelfId")
     val bookShelfId: Long,
@@ -24,7 +23,6 @@ data class BookShelfItem(
     var pages: Int,
     @SerializedName("star")
     var star: StarRating?,
-    var isSwiped: Boolean = false,
 ) :Serializable{
     fun getBook() :Book{
         return Book(
@@ -37,6 +35,8 @@ data class BookShelfItem(
         )
     }
 
+    fun getBookShelfDataItem() = BookShelfDataItem(this)
+
     fun setStarRating(value :Float){
         this.star = when(value){
             0F -> { StarRating.ZERO }; 0.5F -> { StarRating.HALF}
@@ -48,3 +48,8 @@ data class BookShelfItem(
         }
     }
 }
+
+data class BookShelfDataItem(
+    val bookShelfItem :BookShelfItem,
+    var isSwiped: Boolean = false
+) :Serializable

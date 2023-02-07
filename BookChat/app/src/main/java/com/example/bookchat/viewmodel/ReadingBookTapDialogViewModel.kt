@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
-import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.ReadingStatus
 import dagger.assisted.Assisted
@@ -14,11 +14,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class ReadingBookTapDialogViewModel @AssistedInject constructor(
     private val bookRepository: BookRepository,
-    @Assisted val book : BookShelfItem
+    @Assisted val bookShelfDataItem: BookShelfDataItem
 ) : ViewModel() {
     private val _eventFlow = MutableSharedFlow<ReadingBookEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -26,15 +25,13 @@ class ReadingBookTapDialogViewModel @AssistedInject constructor(
     var starRating = MutableStateFlow<Float>(0.0F)
 
     fun changeToCompleteBook() = viewModelScope.launch{
-        book.setStarRating(starRating.value)
-        runCatching { bookRepository.changeBookShelfBookStatus(book, ReadingStatus.COMPLETE) }
+        bookShelfDataItem.bookShelfItem.setStarRating(starRating.value)
+        runCatching { bookRepository.changeBookShelfBookStatus(bookShelfDataItem.bookShelfItem, ReadingStatus.COMPLETE) }
             .onSuccess {
-                Toast.makeText(App.instance.applicationContext,"독서완료로 변경되었습니다.", Toast.LENGTH_SHORT).show()
+                makeToast("독서완료로 변경되었습니다.")
                 startEvent(ReadingBookEvent.MoveToCompleteBook)
             }
-            .onFailure {
-                Toast.makeText(App.instance.applicationContext,"독서완료로 변경 실패", Toast.LENGTH_SHORT).show()
-            }
+            .onFailure { makeToast("독서완료로 변경을 실패했습니다.") }
     }
 
     fun openAgonizeActivity(){
@@ -45,6 +42,10 @@ class ReadingBookTapDialogViewModel @AssistedInject constructor(
         _eventFlow.emit(event)
     }
 
+    private fun makeToast(text :String){
+        Toast.makeText(App.instance.applicationContext, text, Toast.LENGTH_SHORT).show()
+    }
+
     sealed class ReadingBookEvent {
         object MoveToCompleteBook : ReadingBookEvent()
         object OpenAgonize :ReadingBookEvent()
@@ -52,16 +53,16 @@ class ReadingBookTapDialogViewModel @AssistedInject constructor(
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(book: BookShelfItem) :ReadingBookTapDialogViewModel
+        fun create(bookShelfDataItem: BookShelfDataItem) :ReadingBookTapDialogViewModel
     }
 
     companion object {
         fun provideFactory(
             assistedFactory: AssistedFactory,
-            book: BookShelfItem
+            bookShelfDataItem: BookShelfDataItem
         ) : ViewModelProvider.Factory = object : ViewModelProvider.Factory{
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(book) as T
+                return assistedFactory.create(bookShelfDataItem) as T
             }
         }
     }

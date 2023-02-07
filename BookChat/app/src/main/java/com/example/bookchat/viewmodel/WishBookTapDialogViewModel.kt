@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
-import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.request.RequestRegisterBookShelfBook
 import com.example.bookchat.utils.ReadingStatus
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 class WishBookTapDialogViewModel @AssistedInject constructor(
     private val bookRepository: BookRepository,
-    @Assisted val book : BookShelfItem
+    @Assisted val bookShelfDataItem : BookShelfDataItem
 ) : ViewModel() {
     private val _eventFlow = MutableSharedFlow<WishBookEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -36,61 +36,55 @@ class WishBookTapDialogViewModel @AssistedInject constructor(
 
     //알림 내용 스낵바로 수정 예정
     private suspend fun requestRemoveWishBook()= viewModelScope.launch {
-        runCatching { bookRepository.deleteBookShelfBook(book.bookShelfId) }
+        runCatching { bookRepository.deleteBookShelfBook(bookShelfDataItem.bookShelfItem.bookShelfId) }
             .onSuccess {
-                Toast.makeText(App.instance.applicationContext, "도서가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                makeToast("독서예정에서 삭제되었습니다.")
                 startEvent(WishBookEvent.RemoveItem)
             }
-            .onFailure {
-                Toast.makeText(App.instance.applicationContext, "WISH 삭제 실패", Toast.LENGTH_SHORT).show()
-            }
+            .onFailure { makeToast("독서예정 삭제를 실패했습니다.") }
     }
 
     private suspend fun requestAddWishBook()= viewModelScope.launch {
-        val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(book.getBook(),ReadingStatus.WISH)
+        val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(bookShelfDataItem.bookShelfItem.getBook(),ReadingStatus.WISH)
         runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
-            .onSuccess {
-                Toast.makeText(App.instance.applicationContext,"독서예정에 등록되었습니다.",Toast.LENGTH_SHORT).show()
-                startEvent(WishBookEvent.AddItem)
-            }
-            .onFailure {
-                Toast.makeText(App.instance.applicationContext,"Wish 등록 실패",Toast.LENGTH_SHORT).show()
-            }
+            .onSuccess { makeToast("독서예정에 등록되었습니다.") }
+            .onFailure { makeToast("독서예정 등록을 실패했습니다.") }
     }
 
     fun changeToReadingBook() = viewModelScope.launch{
-        runCatching { bookRepository.changeBookShelfBookStatus(book, ReadingStatus.READING) }
+        runCatching { bookRepository.changeBookShelfBookStatus(bookShelfDataItem.bookShelfItem, ReadingStatus.READING) }
             .onSuccess {
-                Toast.makeText(App.instance.applicationContext,"독서중으로 변경되었습니다.",Toast.LENGTH_SHORT).show()
+                makeToast("독서중으로 변경되었습니다.")
                 startEvent(WishBookEvent.MoveToReadingBook)
             }
-            .onFailure {
-                Toast.makeText(App.instance.applicationContext,"독서중 변경 실패",Toast.LENGTH_SHORT).show()
-            }
+            .onFailure { makeToast("독서중으로 변경을 실패했습니다.") }
     }
 
     private fun startEvent (event : WishBookEvent) = viewModelScope.launch {
         _eventFlow.emit(event)
     }
 
+    private fun makeToast(text :String){
+        Toast.makeText(App.instance.applicationContext, text, Toast.LENGTH_SHORT).show()
+    }
+
     sealed class WishBookEvent {
         object RemoveItem :WishBookEvent()
-        object AddItem :WishBookEvent()
         object MoveToReadingBook :WishBookEvent()
     }
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(book: BookShelfItem) :WishBookTapDialogViewModel
+        fun create(bookShelfDataItem: BookShelfDataItem) :WishBookTapDialogViewModel
     }
 
     companion object {
         fun provideFactory(
             assistedFactory: AssistedFactory,
-            book: BookShelfItem
+            bookShelfDataItem: BookShelfDataItem
         ) : ViewModelProvider.Factory = object : ViewModelProvider.Factory{
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(book) as T
+                return assistedFactory.create(bookShelfDataItem) as T
             }
         }
     }

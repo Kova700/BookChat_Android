@@ -12,11 +12,12 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
 import com.example.bookchat.adapter.ReadingBookTabAdapter
-import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.FragmentReadingBookTabBinding
 import com.example.bookchat.ui.dialog.PageInputBottomSheetDialog
 import com.example.bookchat.ui.dialog.ReadingTapBookDialog
 import com.example.bookchat.viewmodel.BookShelfViewModel
+import com.example.bookchat.viewmodel.BookShelfViewModel.PagingViewEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -58,9 +59,7 @@ class ReadingBookTabFragment :Fragment() {
 
     private fun initializeModificationEvents(){
         bookShelfViewModel.readingBookModificationEvents.value =
-            bookShelfViewModel.readingBookModificationEvents.value.filter { pagingViewEvent ->
-                pagingViewEvent !is BookShelfViewModel.PagingViewEvent.Remove
-            }
+            bookShelfViewModel.readingBookModificationEvents.value.filterIsInstance<PagingViewEvent.RemoveWaiting>()
         bookShelfViewModel.renewTotalItemCount(BookShelfViewModel.MODIFICATION_EVENT_FLAG_READING)
     }
 
@@ -74,14 +73,14 @@ class ReadingBookTabFragment :Fragment() {
 
     private fun initAdapter(){
         val bookItemClickListener = object: ReadingBookTabAdapter.OnItemClickListener{
-            override fun onItemClick(book : BookShelfItem) {
-                val dialog = ReadingTapBookDialog(book)
-                dialog.show(this@ReadingBookTabFragment.childFragmentManager,DIALOG_TAG_READING)
+            override fun onItemClick(bookShelfDataItem : BookShelfDataItem) {
+                val dialog = ReadingTapBookDialog(bookShelfDataItem)
+                dialog.show(childFragmentManager,DIALOG_TAG_READING)
             }
         }
         val pageBtnClickListener = object :ReadingBookTabAdapter.OnItemClickListener{
-            override fun onItemClick(book: BookShelfItem) {
-                val pageInputBottomSheetDialog = PageInputBottomSheetDialog(book)
+            override fun onItemClick(bookShelfDataItem : BookShelfDataItem) {
+                val pageInputBottomSheetDialog = PageInputBottomSheetDialog(bookShelfDataItem)
                 pageInputBottomSheetDialog.show(childFragmentManager,DIALOG_TAG_PAGE_INPUT)
             }
         }

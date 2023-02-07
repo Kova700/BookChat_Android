@@ -11,13 +11,14 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
-import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.DialogWishBookTapClickedBinding
 import com.example.bookchat.ui.fragment.BookShelfFragment
 import com.example.bookchat.ui.fragment.ReadingBookTabFragment
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.BookShelfViewModel.BookShelfEvent
+import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.READING_TAB_INDEX
 import com.example.bookchat.viewmodel.WishBookTapDialogViewModel
 import com.example.bookchat.viewmodel.WishBookTapDialogViewModel.WishBookEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,14 +26,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class WishTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
+class WishTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : DialogFragment() {
 
     @Inject
     lateinit var wishBookTapDialogViewModelFactory :WishBookTapDialogViewModel.AssistedFactory
 
     private lateinit var binding :DialogWishBookTapClickedBinding
     private val wishBookTapDialogViewModel: WishBookTapDialogViewModel by viewModels{
-        WishBookTapDialogViewModel.provideFactory(wishBookTapDialogViewModelFactory, book)
+        WishBookTapDialogViewModel.provideFactory(wishBookTapDialogViewModelFactory, bookShelfDataItem)
     }
     private val bookShelfViewModel: BookShelfViewModel by viewModels({ getBookShelfFragment() })
     private var returnEvent :WishBookEvent? = null
@@ -76,9 +77,6 @@ class WishTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
         is WishBookEvent.RemoveItem -> {
             returnEvent = WishBookEvent.RemoveItem
         }
-        is WishBookEvent.AddItem -> {
-            returnEvent = WishBookEvent.AddItem
-        }
         is WishBookEvent.MoveToReadingBook -> {
             returnEvent = WishBookEvent.MoveToReadingBook
             this.dismiss()
@@ -88,13 +86,14 @@ class WishTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
     override fun onDetach() {
         when(returnEvent){
             WishBookEvent.RemoveItem ->{
-                val removeEvent = BookShelfViewModel.PagingViewEvent.Remove(book)
-                bookShelfViewModel.onPagingViewEvent(removeEvent,ReadingStatus.WISH)
+                val itemRemoveEvent = BookShelfViewModel.PagingViewEvent.Remove(bookShelfDataItem)
+                bookShelfViewModel.addPagingViewEvent(itemRemoveEvent,ReadingStatus.WISH)
             }
             WishBookEvent.MoveToReadingBook -> {
-                val removeEvent = BookShelfViewModel.PagingViewEvent.Remove(book)
-                bookShelfViewModel.onPagingViewEvent(removeEvent,ReadingStatus.WISH)
-                bookShelfViewModel.startEvent(BookShelfEvent.ChangeBookShelfTab(1))
+                val itemRemoveEvent = BookShelfViewModel.PagingViewEvent.Remove(bookShelfDataItem)
+                bookShelfViewModel.addPagingViewEvent(itemRemoveEvent,ReadingStatus.WISH)
+                val bookShelfUiEvent = BookShelfEvent.ChangeBookShelfTab(READING_TAB_INDEX)
+                bookShelfViewModel.startBookShelfUiEvent(bookShelfUiEvent)
                 if(bookShelfViewModel.isReadingBookLoaded){
                     getReadingBookTabFragment().readingBookAdapter.refresh()
                 }

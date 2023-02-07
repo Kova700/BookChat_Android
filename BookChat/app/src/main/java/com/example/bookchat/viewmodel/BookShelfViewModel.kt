@@ -6,7 +6,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.example.bookchat.App
-import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.paging.CompleteBookTapPagingSource
 import com.example.bookchat.paging.ReadingBookTapPagingSource
 import com.example.bookchat.paging.WishBookTapPagingSource
@@ -34,20 +34,21 @@ class BookShelfViewModel @Inject constructor(
     var isWishBookLoaded = false
     var wishBookTotalCountCache = 0L
     var wishBookTotalCount = MutableStateFlow<Long>(0)
-    var wishBookResult = Pager(
+    private var wishBookResult = Pager(
         config = PagingConfig(
             pageSize = WISH_TAP_BOOKS_ITEM_LOAD_SIZE,
             enablePlaceholders = false
         ),
         pagingSourceFactory = { WishBookTapPagingSource() }
-    ).flow.map { pagingData ->
-        pagingData.map { pair ->
+    ).flow
+        .map { pagingData ->
             isWishBookLoaded = true
-            wishBookTotalCountCache = pair.second
-            wishBookTotalCount.value = pair.second
-            pair.first
-        }
-    }.cachedIn(viewModelScope)
+            pagingData.map { pair ->
+                wishBookTotalCountCache = pair.second
+                wishBookTotalCount.value = pair.second
+                pair.first.getBookShelfDataItem()
+            }
+        }.cachedIn(viewModelScope)
 
     var isReadingBookLoaded = false
     var readingBookTotalCountCache = 0L
@@ -59,14 +60,15 @@ class BookShelfViewModel @Inject constructor(
                 enablePlaceholders = false
             ),
             pagingSourceFactory = { ReadingBookTapPagingSource() }
-        ).flow.map { pagingData ->
-            pagingData.map { pair ->
+        ).flow
+            .map { pagingData ->
                 isReadingBookLoaded = true
-                readingBookTotalCountCache = pair.second
-                readingBookTotalCount.value = pair.second
-                pair.first
-            }
-        }.cachedIn(viewModelScope)
+                pagingData.map { pair ->
+                    readingBookTotalCountCache = pair.second
+                    readingBookTotalCount.value = pair.second
+                    pair.first.getBookShelfDataItem()
+                }
+            }.cachedIn(viewModelScope)
     }
 
     var isCompleteBookLoaded = false
@@ -79,14 +81,15 @@ class BookShelfViewModel @Inject constructor(
                 enablePlaceholders = false
             ),
             pagingSourceFactory = { CompleteBookTapPagingSource() }
-        ).flow.map { pagingData ->
-            pagingData.map { pair ->
+        ).flow
+            .map { pagingData ->
                 isCompleteBookLoaded = true
-                completeBookTotalCountCache = pair.second
-                completeBookTotalCount.value = pair.second
-                pair.first
-            }
-        }.cachedIn(viewModelScope)
+                pagingData.map { pair ->
+                    completeBookTotalCountCache = pair.second
+                    completeBookTotalCount.value = pair.second
+                    pair.first.getBookShelfDataItem()
+                }
+            }.cachedIn(viewModelScope)
     }
 
     val wishBookCombined by lazy {
@@ -110,59 +113,50 @@ class BookShelfViewModel @Inject constructor(
         }.cachedIn(viewModelScope).asLiveData()
     }
 
-    fun deleteBookShelfBookWithSwipe(bookShelfItem: BookShelfItem) = viewModelScope.launch {
-        runCatching { bookRepository.deleteBookShelfBook(bookShelfItem.bookShelfId) }
-            .onSuccess {
-                Toast.makeText(App.instance.applicationContext, "도서가 삭제되었습니다.", Toast.LENGTH_SHORT)
-                    .show()
-            }
+    fun deleteBookShelfBookWithSwipe(
+        bookShelfDataItem: BookShelfDataItem,
+        removeEvent :PagingViewEvent.Remove,
+        readingStatus :ReadingStatus
+    ) = viewModelScope.launch {
+        runCatching { bookRepository.deleteBookShelfBook(bookShelfDataItem.bookShelfItem.bookShelfId) }
+            .onSuccess { makeToast("도서가 삭제되었습니다.") }
             .onFailure {
-                Toast.makeText(App.instance.applicationContext, "도서 삭제 실패", Toast.LENGTH_SHORT)
-                    .show()
+                makeToast("도서 삭제에 실패했습니다.")
+                removePagingViewEvent(removeEvent, readingStatus)
             }
     }
 
-    fun onPagingViewEvent(pagingViewEvent: PagingViewEvent, readingStatus: ReadingStatus) {
+    fun addPagingViewEvent(pagingViewEvent: PagingViewEvent, readingStatus: ReadingStatus) {
         when (readingStatus) {
-            ReadingStatus.WISH -> {
-                wishBookModificationEvents.value += pagingViewEvent
-            }
-            ReadingStatus.READING -> {
-                //지금 안에 들어가 있다면 지우는 방향으로 구현이 되어있음
-                //이렇게 구현해버리면 같은 책의 페이지를 두번째 수정할 때 한 아이템의 EditEvent가 여러개가 쌓임
-                // (뭐 딱히 상관은 없을듯 한데)
-                // 중복된 EditEvent는 나중에 삭제해주도록 하자
-                if (readingBookModificationEvents.value.contains(pagingViewEvent)){
-                    readingBookModificationEvents.value -= pagingViewEvent
-                    return
-                }
-                readingBookModificationEvents.value += pagingViewEvent
-            }
-            ReadingStatus.COMPLETE -> {
-                if (completeBookModificationEvents.value.contains(pagingViewEvent)){
-                    completeBookModificationEvents.value -= pagingViewEvent
-                    return
-                }
-                completeBookModificationEvents.value += pagingViewEvent
-            }
+            ReadingStatus.WISH -> wishBookModificationEvents.value += pagingViewEvent
+            ReadingStatus.READING -> readingBookModificationEvents.value += pagingViewEvent
+            ReadingStatus.COMPLETE -> completeBookModificationEvents.value += pagingViewEvent
+        }
+    }
+
+    fun removePagingViewEvent(pagingViewEvent: PagingViewEvent, readingStatus: ReadingStatus) {
+        when (readingStatus) {
+            ReadingStatus.WISH -> wishBookModificationEvents.value -= pagingViewEvent
+            ReadingStatus.READING -> readingBookModificationEvents.value -= pagingViewEvent
+            ReadingStatus.COMPLETE -> completeBookModificationEvents.value -= pagingViewEvent
         }
     }
 
     private fun applyEvents(
-        paging: PagingData<BookShelfItem>,
+        paging: PagingData<BookShelfDataItem>,
         pagingViewEvent: PagingViewEvent,
-    ): PagingData<BookShelfItem> {
+    ): PagingData<BookShelfDataItem> {
         return when (pagingViewEvent) {
             is PagingViewEvent.Remove -> {
-                paging.filter { it.bookShelfId != pagingViewEvent.bookShelfItem.bookShelfId }
+                paging.filter { it.bookShelfItem.bookShelfId != pagingViewEvent.bookShelfDataItem.bookShelfItem.bookShelfId }
             }
             is PagingViewEvent.RemoveWaiting -> {
-                paging.filter { it.bookShelfId != pagingViewEvent.bookShelfItem.bookShelfId }
+                paging.filter { it.bookShelfItem.bookShelfId != pagingViewEvent.bookShelfDataItem.bookShelfItem.bookShelfId }
             }
             is PagingViewEvent.Edit -> {
-                paging.map { bookshelfItem ->
-                    if (pagingViewEvent.bookShelfItem.bookShelfId != bookshelfItem.bookShelfId) return@map bookshelfItem
-                    return@map bookshelfItem.copy(pages = pagingViewEvent.bookShelfItem.pages)
+                paging.map {
+                    if (pagingViewEvent.bookShelfDataItem.bookShelfItem.bookShelfId != it.bookShelfItem.bookShelfId) it
+                    else pagingViewEvent.bookShelfDataItem
                 }
             }
         }
@@ -185,22 +179,24 @@ class BookShelfViewModel @Inject constructor(
         }
     }
 
-    private fun getRemoveEventCount(eventFlow :MutableStateFlow<List<PagingViewEvent>>) :Int{
+    private fun getRemoveEventCount(eventFlow: MutableStateFlow<List<PagingViewEvent>>): Int {
         return eventFlow.value.count {
             (it is PagingViewEvent.Remove) || (it is PagingViewEvent.RemoveWaiting)
         }
     }
 
-    fun startEvent(event: BookShelfEvent) = viewModelScope.launch {
+    fun startBookShelfUiEvent(event: BookShelfEvent) = viewModelScope.launch {
         _eventFlow.emit(event)
     }
 
+    private fun makeToast(text :String){
+        Toast.makeText(App.instance.applicationContext, text, Toast.LENGTH_SHORT).show()
+    }
+
     sealed class PagingViewEvent {
-        data class Remove(val bookShelfItem: BookShelfItem) : PagingViewEvent()
-        data class RemoveWaiting(val bookShelfItem: BookShelfItem) : PagingViewEvent()
-        //이거 사용할 거면 Combined부분 다 손 좀 봐야함
-        data class Edit(val bookShelfItem: BookShelfItem) : PagingViewEvent() //페이지 입력할 때 사용할 듯
-        
+        data class Remove(val bookShelfDataItem: BookShelfDataItem) : PagingViewEvent()
+        data class RemoveWaiting(val bookShelfDataItem: BookShelfDataItem) : PagingViewEvent()
+        data class Edit(val bookShelfDataItem: BookShelfDataItem) : PagingViewEvent()
     }
 
     sealed class BookShelfEvent {
@@ -211,5 +207,8 @@ class BookShelfViewModel @Inject constructor(
         const val MODIFICATION_EVENT_FLAG_WISH = "WISH"
         const val MODIFICATION_EVENT_FLAG_READING = "READING"
         const val MODIFICATION_EVENT_FLAG_COMPLETE = "COMPLETE"
+        const val WISH_TAB_INDEX = 0
+        const val READING_TAB_INDEX = 1
+        const val COMPLETE_TAB_INDEX = 2
     }
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
+import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.ReadingStatus
@@ -17,25 +18,25 @@ import kotlinx.coroutines.launch
 
 class PageInputDialogViewModel @AssistedInject constructor(
     private val bookRepository: BookRepository,
-    @Assisted val book: BookShelfItem
+    @Assisted val bookShelfDataItem: BookShelfDataItem
 ) : ViewModel() {
 
     private val _eventFlow = MutableSharedFlow<PageInputDialogEvnet>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    val inputedPage = MutableStateFlow<String>(book.pages.toString()) //그전에 얘로 숫자 핸들링
-    val pageInputedBook = MutableStateFlow<BookShelfItem>(book.copy()) //마지막에 API 성공시에 값 바꾸기
-
-    //페이지가 변경된 실시간 갱신되는 BookShelfItem가 필요함
+    val inputedPage = MutableStateFlow<String>(bookShelfDataItem.bookShelfItem.pages.toString()) //입력 숫자 핸들링
 
     fun clickFinishBtn() {
-        if(book.pages.toString() == inputedPage.value) {
+        if(bookShelfDataItem.bookShelfItem.pages.toString() == inputedPage.value) {
             startEvent(PageInputDialogEvnet.CloseDialog)
             return
         }
 
-        pageInputedBook.value.pages = inputedPage.value.toInt()
-        registerReadingPage()
+        registerReadingPage(bookShelfDataItem.copy(
+            bookShelfItem = bookShelfDataItem.bookShelfItem.copy(
+                pages = inputedPage.value.toInt()
+            )
+        ))
     }
 
     fun inputNumber(num: Int) {
@@ -54,38 +55,37 @@ class PageInputDialogViewModel @AssistedInject constructor(
         inputedPage.value = inputedPage.value.substring(0, inputedPage.value.lastIndex)
     }
 
-    private fun registerReadingPage() = viewModelScope.launch {
-        runCatching { bookRepository.changeBookShelfBookStatus(pageInputedBook.value, ReadingStatus.READING)}
-            .onSuccess {
-                Toast.makeText(App.instance.applicationContext, "페이지 등록 성공", Toast.LENGTH_SHORT).show()
-                startEvent(PageInputDialogEvnet.SuccessApi(pageInputedBook.value))
-            }
-            .onFailure {
-                Toast.makeText(App.instance.applicationContext, "페이지 등록 실패", Toast.LENGTH_SHORT).show()
-            }
+    private fun registerReadingPage(newBookShelfDataItem :BookShelfDataItem) = viewModelScope.launch {
+        runCatching { bookRepository.changeBookShelfBookStatus(newBookShelfDataItem.bookShelfItem, ReadingStatus.READING)}
+            .onSuccess { startEvent(PageInputDialogEvnet.SuccessApi(newBookShelfDataItem)) }
+            .onFailure { makeToast("페이지 등록을 실패했습니다.") }
     }
 
     fun startEvent(event: PageInputDialogEvnet) = viewModelScope.launch {
         _eventFlow.emit(event)
     }
 
+    private fun makeToast(text :String){
+        Toast.makeText(App.instance.applicationContext, text, Toast.LENGTH_SHORT).show()
+    }
+
     sealed class PageInputDialogEvnet {
         object CloseDialog : PageInputDialogEvnet()
-        data class SuccessApi(val book: BookShelfItem) : PageInputDialogEvnet()
+        data class SuccessApi(val bookShelfDataItem: BookShelfDataItem) : PageInputDialogEvnet()
     }
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(book: BookShelfItem): PageInputDialogViewModel
+        fun create(bookShelfDataItem: BookShelfDataItem): PageInputDialogViewModel
     }
 
     companion object {
         fun provideFactory(
             assistedFactory: AssistedFactory,
-            book: BookShelfItem
+            bookShelfDataItem: BookShelfDataItem
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(book) as T
+                return assistedFactory.create(bookShelfDataItem) as T
             }
         }
     }

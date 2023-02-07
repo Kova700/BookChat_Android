@@ -10,7 +10,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.adapter.WishBookTabAdapter.Companion.BOOK_SHELF_ITEM_COMPARATOR
-import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.ItemCompleteBookTabBinding
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
@@ -21,43 +21,45 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class CompleteBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
-    : PagingDataAdapter<BookShelfItem, CompleteBookTabAdapter.CompleteBookItemViewHolder>(BOOK_SHELF_ITEM_COMPARATOR){
+    : PagingDataAdapter<BookShelfDataItem, CompleteBookTabAdapter.CompleteBookItemViewHolder>(BOOK_SHELF_ITEM_COMPARATOR){
     private lateinit var binding : ItemCompleteBookTabBinding
     private lateinit var itemClickListener : OnItemClickListener
 
     inner class CompleteBookItemViewHolder(val binding: ItemCompleteBookTabBinding) : RecyclerView.ViewHolder(binding.root){
-        fun bind(book :BookShelfItem){
+        fun bind(bookShelfDataItem :BookShelfDataItem){
             with(this.binding){
-                bookShelfItem = book
-                setViewHolderState(swipeView,book.isSwiped)
+                bookShelfItem = bookShelfDataItem.bookShelfItem
+                setViewHolderState(swipeView, bookShelfDataItem.isSwiped)
 
                 swipeView.setOnClickListener {
-                    itemClickListener.onItemClick(book)
+                    itemClickListener.onItemClick(bookShelfDataItem)
                 }
 
                 swipeView.setOnLongClickListener {
-                    startSwipeAnimation(swipeView,book.isSwiped)
-                    book.isSwiped = !book.isSwiped
+                    startSwipeAnimation(swipeView, bookShelfDataItem.isSwiped)
+                    bookShelfDataItem.isSwiped = !bookShelfDataItem.isSwiped
                     true //true = clickEvent 종료 (ClickEvnet가 작동하지 않음)
                 }
 
                 swipeBackground.setOnClickListener {
                     setSwiped(false)
+                    val removeWaitingEvent = BookShelfViewModel.PagingViewEvent.RemoveWaiting(bookShelfDataItem)
+                    bookShelfViewModel.addPagingViewEvent(removeWaitingEvent, ReadingStatus.COMPLETE)
 
                     val handler = Handler(Looper.getMainLooper())
                     handler.postDelayed({
-                        bookShelfViewModel.deleteBookShelfBookWithSwipe(book)
-                        bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.RemoveWaiting(book), ReadingStatus.COMPLETE)
-                        bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.Remove(book), ReadingStatus.COMPLETE)
+                        val removeEvent = BookShelfViewModel.PagingViewEvent.Remove(bookShelfDataItem)
+                        bookShelfViewModel.deleteBookShelfBookWithSwipe(bookShelfDataItem, removeEvent, ReadingStatus.COMPLETE)
+                        bookShelfViewModel.removePagingViewEvent(removeWaitingEvent, ReadingStatus.COMPLETE)
+                        bookShelfViewModel.addPagingViewEvent(removeEvent, ReadingStatus.COMPLETE)
                     }, SNACK_BAR_DURATION.toLong())
 
                     val snackCancelClickListener = View.OnClickListener {
-                        bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.RemoveWaiting(book), ReadingStatus.COMPLETE)
+                        bookShelfViewModel.removePagingViewEvent(removeWaitingEvent, ReadingStatus.COMPLETE)
                         handler.removeCallbacksAndMessages(null)
                     }
 
-                    bookShelfViewModel.onPagingViewEvent(BookShelfViewModel.PagingViewEvent.RemoveWaiting(book), ReadingStatus.COMPLETE)
-                    Snackbar.make(binding.root,"도서 삭제가 완료되었습니다.", Snackbar.LENGTH_INDEFINITE)
+                    Snackbar.make(binding.root,"3초 뒤 도서가 삭제됩니다.", Snackbar.LENGTH_INDEFINITE)
                         .setAction("실행취소",snackCancelClickListener)
                         .setDuration(SNACK_BAR_DURATION)
                         .show()
@@ -65,9 +67,9 @@ class CompleteBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
             }
         }
 
-        fun setSwiped(isClamped: Boolean){
+        fun setSwiped(flag: Boolean){
             val currentItem = getItem(absoluteAdapterPosition)
-            currentItem?.let { currentItem.isSwiped = isClamped }
+            currentItem?.let { currentItem.isSwiped = flag }
         }
 
         fun getSwiped(): Boolean{
@@ -113,7 +115,7 @@ class CompleteBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
     }
 
     interface OnItemClickListener {
-        fun onItemClick(book :BookShelfItem)
+        fun onItemClick(bookShelfDataItem :BookShelfDataItem)
     }
 
     fun setItemClickListener(onItemClickListener: OnItemClickListener) {
@@ -122,7 +124,7 @@ class CompleteBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
 
     companion object {
         private const val SWIPE_VIEW_PERCENT = 0.3F
-        private const val SNACK_BAR_DURATION = 5000
+        private const val SNACK_BAR_DURATION = 3000
     }
 
 }

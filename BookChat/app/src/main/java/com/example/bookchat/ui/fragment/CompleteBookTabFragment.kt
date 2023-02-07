@@ -9,17 +9,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.SwipeHelperCallback
-import com.example.bookchat.SwipeHelperCallback.SwipeViewType
 import com.example.bookchat.adapter.CompleteBookTabAdapter
-import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.FragmentCompleteBookTabBinding
 import com.example.bookchat.ui.dialog.CompleteTapBookDialog
 import com.example.bookchat.viewmodel.BookShelfViewModel
+import com.example.bookchat.viewmodel.BookShelfViewModel.PagingViewEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -41,14 +38,12 @@ class CompleteBookTabFragment : Fragment() {
         observePagingCompleteBookData()
         observeAdapterLoadState()
 
-        //다이얼로그 별점 설정 정책 결정하고 설정해야함
-
         return binding.root
     }
 
     private fun observePagingCompleteBookData(){
-        bookShelfViewModel.completeBookCombined.observe(viewLifecycleOwner){ PagingBookShelfItem ->
-            completeBookAdapter.submitData(viewLifecycleOwner.lifecycle, PagingBookShelfItem)
+        bookShelfViewModel.completeBookCombined.observe(viewLifecycleOwner){ pagingData ->
+            completeBookAdapter.submitData(viewLifecycleOwner.lifecycle, pagingData)
         }
     }
 
@@ -59,16 +54,14 @@ class CompleteBookTabFragment : Fragment() {
     }
     private fun initializeModificationEvents(){
         bookShelfViewModel.completeBookModificationEvents.value =
-            bookShelfViewModel.completeBookModificationEvents.value.filter { pagingViewEvent ->
-                pagingViewEvent !is BookShelfViewModel.PagingViewEvent.Remove
-            }
+            bookShelfViewModel.completeBookModificationEvents.value.filterIsInstance<PagingViewEvent.RemoveWaiting>()
         bookShelfViewModel.renewTotalItemCount(BookShelfViewModel.MODIFICATION_EVENT_FLAG_COMPLETE)
     }
 
     private fun initAdapter(){
         val bookItemClickListener = object: CompleteBookTabAdapter.OnItemClickListener {
-            override fun onItemClick(book : BookShelfItem) {
-                val dialog = CompleteTapBookDialog(book)
+            override fun onItemClick(bookShelfDataItem : BookShelfDataItem) {
+                val dialog = CompleteTapBookDialog(bookShelfDataItem)
                 dialog.show(this@CompleteBookTabFragment.childFragmentManager, DIALOG_TAG_COMPLETE)
             }
         }

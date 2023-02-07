@@ -7,18 +7,19 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
+import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ItemWishBookTabBinding
 
-class WishBookTabAdapter : PagingDataAdapter<BookShelfItem,WishBookTabAdapter.WishBookItemViewHolder>(BOOK_SHELF_ITEM_COMPARATOR){
+class WishBookTabAdapter : PagingDataAdapter<BookShelfDataItem,WishBookTabAdapter.WishBookItemViewHolder>(BOOK_SHELF_ITEM_COMPARATOR){
     private lateinit var binding : ItemWishBookTabBinding
     private lateinit var itemClickListener : OnItemClickListener
 
     inner class WishBookItemViewHolder(val binding: ItemWishBookTabBinding) : RecyclerView.ViewHolder(binding.root){
-        fun bind(book : BookShelfItem){
-            binding.bookShelfItem = book
+        fun bind(bookShelfDataItem : BookShelfDataItem){
+            binding.bookShelfItem = bookShelfDataItem.bookShelfItem
             binding.root.setOnClickListener {
-                itemClickListener.onItemClick(book)
+                itemClickListener.onItemClick(bookShelfDataItem)
             }
         }
     }
@@ -35,7 +36,7 @@ class WishBookTabAdapter : PagingDataAdapter<BookShelfItem,WishBookTabAdapter.Wi
     }
 
     interface OnItemClickListener {
-        fun onItemClick(book :BookShelfItem)
+        fun onItemClick(bookShelfDataItem :BookShelfDataItem)
     }
 
     fun setItemClickListener(onItemClickListener: OnItemClickListener) {
@@ -43,12 +44,12 @@ class WishBookTabAdapter : PagingDataAdapter<BookShelfItem,WishBookTabAdapter.Wi
     }
 
     companion object {
-        val BOOK_SHELF_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<BookShelfItem>() {
-            override fun areItemsTheSame(oldItem: BookShelfItem, newItem: BookShelfItem) =
-                oldItem.isbn == newItem.isbn
+        val BOOK_SHELF_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<BookShelfDataItem>() {
+            override fun areItemsTheSame(oldItem: BookShelfDataItem, newItem: BookShelfDataItem) =
+                oldItem.bookShelfItem.isbn == newItem.bookShelfItem.isbn
 
-            override fun areContentsTheSame(oldItem: BookShelfItem, newItem: BookShelfItem) =
-                oldItem == newItem
+            override fun areContentsTheSame(oldItem: BookShelfDataItem, newItem: BookShelfDataItem) =
+                oldItem.bookShelfItem == newItem.bookShelfItem
         }
     }
 

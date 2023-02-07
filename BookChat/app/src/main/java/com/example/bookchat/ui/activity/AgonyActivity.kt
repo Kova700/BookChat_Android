@@ -2,7 +2,6 @@ package com.example.bookchat.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -14,16 +13,14 @@ import com.example.bookchat.R
 import com.example.bookchat.adapter.Agony.AgonyDataItemAdapter
 import com.example.bookchat.adapter.Agony.AgonyFirstItemAdapter
 import com.example.bookchat.adapter.Agony.AgonyHeaderItemAdapter
-import com.example.bookchat.data.Agony
 import com.example.bookchat.data.AgonyDataItem
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ActivityAgonyBinding
 import com.example.bookchat.ui.dialog.MakeAgonyBottomSheetDialog
 import com.example.bookchat.ui.dialog.ReadingTapBookDialog.Companion.EXTRA_AGONIZE_BOOK
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.AgonyViewModel
-import com.example.bookchat.viewmodel.AgonyViewModel.PagingViewEvent
 import com.example.bookchat.viewmodel.AgonyViewModel.AgonyUiEvent
+import com.example.bookchat.viewmodel.AgonyViewModel.PagingViewEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject

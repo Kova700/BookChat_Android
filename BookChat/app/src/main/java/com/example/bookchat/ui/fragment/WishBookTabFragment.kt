@@ -12,7 +12,7 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.bookchat.R
 import com.example.bookchat.adapter.WishBookTabAdapter
-import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.FragmentWishBookTabBinding
 import com.example.bookchat.ui.dialog.WishTapBookDialog
 import com.example.bookchat.viewmodel.BookShelfViewModel
@@ -52,22 +52,18 @@ class WishBookTabFragment : Fragment() {
 
     private fun observeAdapterLoadState() = lifecycleScope.launch{
         wishBookAdapter.loadStateFlow.collect{ combinedLoadStates ->
-            if(combinedLoadStates.refresh is LoadState.NotLoading) {
-                initializeModificationEvents()
-            }
+            if(combinedLoadStates.refresh is LoadState.NotLoading) initializeModificationEvents()
         }
     }
 
     private fun initializeModificationEvents(){
-        if(bookShelfViewModel.wishBookModificationEvents.value.isNotEmpty()){
-            bookShelfViewModel.wishBookModificationEvents.value = emptyList()
-        }
+        bookShelfViewModel.wishBookModificationEvents.value = emptyList()
     }
 
     private fun initAdapter(){
         val bookItemClickListener = object: WishBookTabAdapter.OnItemClickListener{
-            override fun onItemClick(book : BookShelfItem) {
-                val dialog = WishTapBookDialog(book)
+            override fun onItemClick(bookShelfDataItem : BookShelfDataItem) {
+                val dialog = WishTapBookDialog(bookShelfDataItem)
                 dialog.show(this@WishBookTabFragment.childFragmentManager,DIALOG_TAG_WISH)
             }
         }

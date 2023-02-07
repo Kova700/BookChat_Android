@@ -3,18 +3,17 @@ package com.example.bookchat.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.repository.BookRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class CompleteBookTapDialogViewModel @AssistedInject constructor(
     private val bookRepository: BookRepository,
-    @Assisted val book : BookShelfItem
+    @Assisted val bookShelfDataItem: BookShelfDataItem
 ) : ViewModel() {
     private val _eventFlow = MutableSharedFlow<CompleteBookEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -38,16 +37,16 @@ class CompleteBookTapDialogViewModel @AssistedInject constructor(
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(book: BookShelfItem) :CompleteBookTapDialogViewModel
+        fun create(bookShelfDataItem: BookShelfDataItem) :CompleteBookTapDialogViewModel
     }
 
     companion object {
         fun provideFactory(
             assistedFactory: AssistedFactory,
-            book: BookShelfItem
+            bookShelfDataItem: BookShelfDataItem
         ) : ViewModelProvider.Factory = object : ViewModelProvider.Factory{
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(book) as T
+                return assistedFactory.create(bookShelfDataItem) as T
             }
         }
     }

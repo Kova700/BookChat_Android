@@ -12,13 +12,14 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
-import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.DialogReadingBookTapClickedBinding
 import com.example.bookchat.ui.activity.AgonyActivity
 import com.example.bookchat.ui.fragment.BookShelfFragment
 import com.example.bookchat.ui.fragment.CompleteBookTabFragment
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
+import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.COMPLETE_TAB_INDEX
 import com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel
 import com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel.ReadingBookEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,14 +27,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ReadingTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
+class ReadingTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : DialogFragment() {
 
     @Inject
     lateinit var readingBookTapDialogViewModelFactory :ReadingBookTapDialogViewModel.AssistedFactory
 
     private lateinit var binding : DialogReadingBookTapClickedBinding
     private val readingBookTapDialogViewModel : ReadingBookTapDialogViewModel by viewModels{
-        ReadingBookTapDialogViewModel.provideFactory(readingBookTapDialogViewModelFactory, book)
+        ReadingBookTapDialogViewModel.provideFactory(readingBookTapDialogViewModelFactory, bookShelfDataItem)
     }
     private val bookShelfViewModel: BookShelfViewModel by viewModels({ getBookShelfFragment() })
 
@@ -75,9 +76,10 @@ class ReadingTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
         is ReadingBookEvent.OpenAgonize -> { openAgonizeActivity() }
 
         is ReadingBookEvent.MoveToCompleteBook -> {
-            val removeEvent = BookShelfViewModel.PagingViewEvent.Remove(book)
-            bookShelfViewModel.onPagingViewEvent(removeEvent, ReadingStatus.READING)
-            bookShelfViewModel.startEvent(BookShelfViewModel.BookShelfEvent.ChangeBookShelfTab(2))
+            val itemRemoveEvent = BookShelfViewModel.PagingViewEvent.Remove(bookShelfDataItem)
+            bookShelfViewModel.addPagingViewEvent(itemRemoveEvent, ReadingStatus.READING)
+            val bookShelfUiEvent = BookShelfViewModel.BookShelfEvent.ChangeBookShelfTab(COMPLETE_TAB_INDEX)
+            bookShelfViewModel.startBookShelfUiEvent(bookShelfUiEvent)
             if(bookShelfViewModel.isCompleteBookLoaded){
                 getCompleteBookTabFragment().completeBookAdapter.refresh()
             }
@@ -87,7 +89,7 @@ class ReadingTapBookDialog(private val book: BookShelfItem) : DialogFragment() {
 
     private fun openAgonizeActivity(){
         val intent = Intent(requireContext(), AgonyActivity::class.java)
-            .putExtra(EXTRA_AGONIZE_BOOK,book)
+            .putExtra(EXTRA_AGONIZE_BOOK,bookShelfDataItem.bookShelfItem)
         startActivity(intent)
     }
 
