@@ -1,14 +1,15 @@
 package com.example.bookchat.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.example.bookchat.data.*
-import com.example.bookchat.paging.AgonyPagingSource
 import com.example.bookchat.paging.AgonyRecordPagingSource
 import com.example.bookchat.repository.AgonyRecordRepository
+import com.example.bookchat.utils.Constants.TAG
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.*
@@ -16,7 +17,7 @@ import kotlinx.coroutines.launch
 
 class AgonyRecordViewModel @AssistedInject constructor(
     private val agonyRecordRepository: AgonyRecordRepository,
-    @Assisted val agony: Agony
+    @Assisted val agonyDataItem: AgonyDataItem
 ) :ViewModel() {
 
     private val _eventFlow = MutableSharedFlow<AgonyRecordUiEvent>()
@@ -27,18 +28,12 @@ class AgonyRecordViewModel @AssistedInject constructor(
             pageSize = AGONY_RECORD_LOAD_SIZE,
             enablePlaceholders = false
         ),
-        pagingSourceFactory = { AgonyRecordPagingSource(agony) }
+        pagingSourceFactory = { AgonyRecordPagingSource(agonyDataItem.agony) }
     ).flow
-        .map { pagingData ->
-            pagingData.map { agonyRecord ->
-                agonyRecord.getAgonyRecordDataItem()
-            }
-        }
+        .map { pagingData -> pagingData.map { agonyRecord -> agonyRecord.getAgonyRecordDataItem() } }
         .cachedIn(viewModelScope)
 
-    val agonyRecordModificationEvents = MutableStateFlow<List<PagingViewEvent>>(
-        listOf(PagingViewEvent.InsertFirstItem, PagingViewEvent.InsertHeaderItem)
-    )
+    val agonyRecordModificationEvents = MutableStateFlow<List<PagingViewEvent>>(emptyList())
 
     val agonyRecordCombined by lazy {
         agonyRecordPagingData.combine(agonyRecordModificationEvents) { pagingData, modifications ->
@@ -47,27 +42,22 @@ class AgonyRecordViewModel @AssistedInject constructor(
     }
 
     private fun applyEvents(
-        paging: PagingData<AgonyRecordItem>,
+        paging: PagingData<AgonyRecordDataItem>,
         pagingViewEvent : PagingViewEvent
-    ): PagingData<AgonyRecordItem> {
+    ): PagingData<AgonyRecordDataItem> {
         return when(pagingViewEvent){
-            is PagingViewEvent.InsertHeaderItem -> {
-                paging.insertHeaderItem(item = AgonyRecordHeader(agony))
-            }
-            is PagingViewEvent.InsertFirstItem -> {
-                paging.insertHeaderItem(item = AgonyRecordFirstItem(agony))
-            }
             is PagingViewEvent.ChangeItemStatusToEdit -> { paging } //임시
             is PagingViewEvent.RemoveItem -> { paging } //임시
         }
     }
 
     sealed class PagingViewEvent{
-        object InsertHeaderItem : PagingViewEvent()
-        object InsertFirstItem : PagingViewEvent()
-        //추후 FirstItem도 statusToEdit가 적용이 가능하게 해야함
-        data class ChangeItemStatusToEdit(val agonyRecordItem : AgonyRecordItem) : PagingViewEvent()
-        data class RemoveItem(val agonyRecordItem : AgonyRecordItem) : PagingViewEvent()
+        data class ChangeItemStatusToEdit(val agonyRecordItem : AgonyRecordDataItem) : PagingViewEvent()
+        data class RemoveItem(val agonyRecordItem : AgonyRecordDataItem) : PagingViewEvent()
+    }
+
+    fun clickXbtn(){
+        Log.d(TAG, "AgonyRecordViewModel: clickXbtn() - called")
     }
 
     fun clickBackBtn(){
@@ -85,16 +75,16 @@ class AgonyRecordViewModel @AssistedInject constructor(
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(agony: Agony) :AgonyRecordViewModel
+        fun create(agonyDataItem: AgonyDataItem) :AgonyRecordViewModel
     }
 
     companion object {
         fun provideFactory(
             assistedFactory: AssistedFactory,
-            agony: Agony
+            agonyDataItem: AgonyDataItem
         ) : ViewModelProvider.Factory = object : ViewModelProvider.Factory{
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(agony) as T
+                return assistedFactory.create(agonyDataItem) as T
             }
         }
 

@@ -12,8 +12,18 @@ data class AgonyRecord(
     @SerializedName("createdAt")
     val createdAt :String
 ){
-    fun getAgonyRecordDataItem() :AgonyRecordItem{
+    fun getAgonyRecordDataItem() :AgonyRecordDataItem{
         return AgonyRecordDataItem(this)
     }
+}
+
+data class AgonyRecordDataItem(
+    val agonyRecord : AgonyRecord,
+    var status :AgonyRecordDataItemStatus = AgonyRecordDataItemStatus.Default
+)
+
+sealed class AgonyRecordDataItemStatus{
+    object Default :AgonyRecordDataItemStatus()
+    object Editing :AgonyRecordDataItemStatus()
 }
 

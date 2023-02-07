@@ -1,6 +1,5 @@
 package com.example.bookchat.paging
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.bookchat.App
@@ -8,9 +7,7 @@ import com.example.bookchat.data.Agony
 import com.example.bookchat.data.AgonyRecord
 import com.example.bookchat.response.CursorMeta
 import com.example.bookchat.response.NetworkIsNotConnectedException
-import com.example.bookchat.response.ResponseBodyEmptyException
 import com.example.bookchat.response.ResponseGetAgonyRecord
-import com.example.bookchat.utils.Constants
 import retrofit2.Response
 
 class AgonyRecordPagingSource(private val agony: Agony) : PagingSource<Int, AgonyRecord>() {
@@ -20,9 +17,8 @@ class AgonyRecordPagingSource(private val agony: Agony) : PagingSource<Int, Agon
         if(!isNetworkConnected()) return LoadResult.Error(NetworkIsNotConnectedException())
         val page = params.key ?: STARTING_PAGE_INDEX
 
-        val testPagedAgonyRecord = listOf(AgonyRecord(1L,"테스트 제목","테스트 내용", "2023-01-07"))
-        val testMeta = CursorMeta(1,1,true,false,true,true,1)
-        return getLoadResult(testPagedAgonyRecord, page, testMeta)
+        val testData = TestPagingDataSource.getTestAgonyRecordPagingSource()
+        return getLoadResult(testData.agonyRecordResponseList, page, testData.cursorMeta)
 
 //        try {
 //            response = App.instance.bookChatApiClient.getAgonyRecord(
@@ -38,8 +34,7 @@ class AgonyRecordPagingSource(private val agony: Agony) : PagingSource<Int, Agon
 //            200 -> {
 //                val result = response.body()
 //                result?.let {
-//                    val pagedAgonyRecord = listOf(AgonyRecord(1L,"테스트 제목","테스트 내용", "2023-01-07"))
-////                    val pagedAgonyRecord = result.agonyRecordResponseList
+//                    val pagedAgonyRecord = result.agonyRecordResponseList
 //                    Log.d(Constants.TAG, "AgonyPagingSource: load() - pagedAgony :$pagedAgonyRecord")
 //                    val meta = result.cursorMeta
 //                    return getLoadResult(pagedAgonyRecord, page, meta)

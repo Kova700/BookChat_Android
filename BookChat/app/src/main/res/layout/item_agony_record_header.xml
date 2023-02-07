@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable
-            name="viewmodel"
-            type="com.example.bookchat.viewmodel.AgonyRecordViewModel" />
+            name="agony"
+            type="com.example.bookchat.data.Agony" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -15,22 +15,26 @@
             android:id="@+id/textView37"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
+            android:layout_marginStart="30dp"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_bold"
-            android:text="@{viewmodel.agony.title}"
+            android:text="@{agony.title}"
             android:textColor="#222222"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.example.bookchat.AntiDupClickImageButton
-            android:id="@+id/antiDupClickImageButton4"
+            android:id="@+id/agonyTitleEidtBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="30dp"
             android:background="?android:selectableItemBackgroundBorderless"
             android:src="@drawable/ic_pencil_btn"
             app:layout_constraintBottom_toBottomOf="@+id/textView37"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/textView37"
             app:layout_constraintTop_toTopOf="parent" />
 
