@@ -5,15 +5,15 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.bookchat.App
 import com.example.bookchat.data.Book
-import com.example.bookchat.data.BookSearchResult
-import com.example.bookchat.data.response.SearchingMeta
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseBodyEmptyException
+import com.example.bookchat.data.response.ResponseGetBookSearch
+import com.example.bookchat.data.response.SearchingMeta
 import com.example.bookchat.utils.Constants.TAG
 import retrofit2.Response
 
 class SearchResultBookDetailPagingSource(private val keyword :String) :PagingSource<Int, Book>(){
-    private lateinit var response : Response<BookSearchResult>
+    private lateinit var response : Response<ResponseGetBookSearch>
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Book> {
         if(!isNetworkConnected()) return LoadResult.Error(NetworkIsNotConnectedException())

@@ -1,10 +1,10 @@
-package com.example.bookchat.data
+package com.example.bookchat.data.response
 
-import com.example.bookchat.data.response.SearchingMeta
+import com.example.bookchat.data.Book
 import com.google.gson.annotations.SerializedName
 
 
-data class BookSearchResult(
+data class ResponseGetBookSearch(
     @SerializedName("bookResponses")
     val bookResponses :List<Book>,
     @SerializedName("meta")

@@ -6,14 +6,14 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.bookchat.App
 import com.example.bookchat.data.Book
-import com.example.bookchat.data.BookSearchResult
 import com.example.bookchat.data.BookShelfItem
-import com.example.bookchat.data.response.RespondCheckInBookShelf
-import com.example.bookchat.paging.SearchResultBookDetailPagingSource
 import com.example.bookchat.data.request.RequestChangeBookStatus
 import com.example.bookchat.data.request.RequestRegisterBookShelfBook
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.response.RespondCheckInBookShelf
 import com.example.bookchat.data.response.ResponseBodyEmptyException
+import com.example.bookchat.data.response.ResponseGetBookSearch
+import com.example.bookchat.paging.SearchResultBookDetailPagingSource
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.ReadingStatus
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 class BookRepository @Inject constructor(){
 
-    suspend fun simpleSearchBooks(keyword :String) : BookSearchResult {
+    suspend fun simpleSearchBooks(keyword :String) : ResponseGetBookSearch {
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val response = App.instance.bookChatApiClient.getBookSearchResult(
