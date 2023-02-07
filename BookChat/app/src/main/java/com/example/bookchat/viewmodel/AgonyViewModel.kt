@@ -5,9 +5,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
-import com.example.bookchat.data.*
+import com.example.bookchat.data.AgonyDataItem
+import com.example.bookchat.data.AgonyDataItemStatus
+import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.paging.AgonyPagingSource
 import com.example.bookchat.repository.AgonyRepository
+import com.example.bookchat.utils.SearchSortOption
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.*
@@ -29,7 +32,7 @@ class AgonyViewModel @AssistedInject constructor(
             pageSize = AGONY_LOAD_SIZE,
             enablePlaceholders = false
         ),
-        pagingSourceFactory = { AgonyPagingSource() }
+        pagingSourceFactory = { AgonyPagingSource(book, SearchSortOption.DESC) }
     ).flow
         .map { pagingData -> pagingData.map { agony -> agony.getAgonyDataItem() } }
         .cachedIn(viewModelScope)
@@ -58,6 +61,13 @@ class AgonyViewModel @AssistedInject constructor(
 
             is PagingViewEvent.RemoveItem -> {
                 paging.filter { agonyItem -> pagingViewEvent.agonyItem.agony.agonyId != agonyItem.agony.agonyId }
+            }
+
+            is PagingViewEvent.ChangeItemTitle ->{
+                paging.map { agonyItem ->
+                    if (pagingViewEvent.agonyItem != agonyItem) return@map agonyItem
+                    return@map agonyItem.copy( agony =  agonyItem.agony.copy(title = pagingViewEvent.newTitle))
+                }
             }
         }
     }
@@ -138,6 +148,7 @@ class AgonyViewModel @AssistedInject constructor(
         object ChangeAllItemStatusToEditing : PagingViewEvent()
         data class ChangeItemStatusToSelected(val agonyItem: AgonyDataItem) : PagingViewEvent()
         data class RemoveItem(val agonyItem: AgonyDataItem) : PagingViewEvent()
+        data class ChangeItemTitle(val agonyItem: AgonyDataItem, val newTitle :String) : PagingViewEvent()
     }
 
     sealed class AgonyUiEvent {

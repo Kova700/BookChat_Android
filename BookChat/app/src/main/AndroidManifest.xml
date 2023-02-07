@@ -17,6 +17,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BookChat">
         <activity
+            android:name=".ui.activity.AgonyEditActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name=".ui.activity.AgonyRecordActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

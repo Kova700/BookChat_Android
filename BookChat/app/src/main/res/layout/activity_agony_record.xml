@@ -35,37 +35,13 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/folder_icon" />
 
-        <!--최대 길이 설정 필요함-->
-        <TextView
-            android:id="@+id/textView37"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_bold"
-            android:text="@{viewmodel.agony.title}"
-            android:textColor="#222222"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="@+id/back_btn"
-            app:layout_constraintTop_toBottomOf="@+id/back_btn" />
-
-        <com.example.bookchat.AntiDupClickImageButton
-            android:id="@+id/antiDupClickImageButton4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_pencil_btn"
-            app:layout_constraintBottom_toBottomOf="@+id/textView37"
-            app:layout_constraintStart_toEndOf="@+id/textView37"
-            app:layout_constraintTop_toTopOf="@+id/textView37" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/agonyRecordRcv"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="15dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/antiDupClickImageButton4" />
+            app:layout_constraintTop_toBottomOf="@+id/back_btn" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

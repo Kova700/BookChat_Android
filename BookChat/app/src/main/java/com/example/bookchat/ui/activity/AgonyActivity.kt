@@ -2,6 +2,8 @@ package com.example.bookchat.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -13,11 +15,14 @@ import com.example.bookchat.adapter.Agony.AgonyDataItemAdapter
 import com.example.bookchat.adapter.Agony.AgonyFirstItemAdapter
 import com.example.bookchat.adapter.Agony.AgonyHeaderItemAdapter
 import com.example.bookchat.data.Agony
+import com.example.bookchat.data.AgonyDataItem
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ActivityAgonyBinding
 import com.example.bookchat.ui.dialog.MakeAgonyBottomSheetDialog
 import com.example.bookchat.ui.dialog.ReadingTapBookDialog.Companion.EXTRA_AGONIZE_BOOK
+import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.AgonyViewModel
+import com.example.bookchat.viewmodel.AgonyViewModel.PagingViewEvent
 import com.example.bookchat.viewmodel.AgonyViewModel.AgonyUiEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -37,6 +42,7 @@ class AgonyActivity : AppCompatActivity() {
     private val agonyViewModel: AgonyViewModel by viewModels{
         AgonyViewModel.provideFactory(agonyViewModelFactory, book)
     }
+    private lateinit var clickedDataItem :AgonyDataItem
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,18 +60,18 @@ class AgonyActivity : AppCompatActivity() {
 
     private fun initAdapter() {
         val dataItemClickListener = object : AgonyDataItemAdapter.OnDataItemClickListener{
-            override fun onItemClick(agony: Agony) {
+            override fun onItemClick(agonyDataItem: AgonyDataItem) {
                 val intent = Intent(this@AgonyActivity, AgonyRecordActivity::class.java)
-                    .putExtra(EXTRA_AGONY, agony)
-                startActivity(intent)
+                    .putExtra(EXTRA_BOOK, book)
+                    .putExtra(EXTRA_AGONY, agonyDataItem)
+                clickedDataItem = agonyDataItem
+                agonyRecordActivityResultLauncher.launch(intent)
             }
         }
         val firstItemClickListener = object  : AgonyFirstItemAdapter.OnFirstItemClickListener {
             override fun onItemClick() {
-                //아래에서 바텀 슬라이드 올라와서 작성창 띄우기
                 MakeAgonyBottomSheetDialog(book).show(supportFragmentManager, DIALOG_TAG_MAKE_AGONY)
             }
-
         }
         agonyDataItemAdapter = AgonyDataItemAdapter(agonyViewModel)
         agonyFirstItemAdapter = AgonyFirstItemAdapter(agonyViewModel)
@@ -74,11 +80,20 @@ class AgonyActivity : AppCompatActivity() {
         agonyFirstItemAdapter.setFirstItemClickListner(firstItemClickListener)
     }
 
+    private val agonyRecordActivityResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK){
+                val newTitle = result.data?.getStringExtra(AgonyEditActivity.EXTRA_NEW_AGONY_TITLE)
+                    ?: throw Exception("newTitle is not exist")
+                agonyViewModel.onPagingViewEvent(PagingViewEvent.ChangeItemTitle(clickedDataItem, newTitle))
+            }
+        }
+
     private fun initRecyclerView(){
         with(binding){
             val concatAdapterConfig = ConcatAdapter.Config.Builder().apply { setIsolateViewTypes(false) }.build()
             val concatAdapter = ConcatAdapter(concatAdapterConfig, agonyHeaderItemAdapter, agonyFirstItemAdapter, agonyDataItemAdapter)
-            agonyRcv.adapter = ConcatAdapter(agonyHeaderItemAdapter,agonyFirstItemAdapter,agonyDataItemAdapter)
+            agonyRcv.adapter = concatAdapter
             val gridLayoutManager = GridLayoutManager(this@AgonyActivity,2)
             gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup(){
                 override fun getSpanSize(position: Int): Int {
@@ -107,10 +122,7 @@ class AgonyActivity : AppCompatActivity() {
     private fun handleEvent(event :AgonyUiEvent){
         when(event){
             is AgonyUiEvent.MoveToBack -> { finish() }
-            is AgonyUiEvent.RenewAgonyList -> {
-                //화면 갱신 이벤트 (아마 agonyModificationEvent도 비워줘야할 듯)
-                agonyDataItemAdapter.refresh()
-            }
+            is AgonyUiEvent.RenewAgonyList -> { agonyDataItemAdapter.refresh() }
         }
     }
 
@@ -121,6 +133,7 @@ class AgonyActivity : AppCompatActivity() {
     companion object {
         private const val DIALOG_TAG_MAKE_AGONY = "MakeAgonyBottomSheetDialog"
         const val EXTRA_AGONY = "EXTRA_AGONY"
+        const val EXTRA_BOOK = "EXTRA_BOOK"
     }
 
 }
