@@ -18,9 +18,9 @@ data class Agony(
 data class AgonyDataItem(
     val agony :Agony,
     var status :AgonyDataItemStatus = AgonyDataItemStatus.Default
-)
+): Serializable
 
-sealed class AgonyDataItemStatus{
+sealed class AgonyDataItemStatus : Serializable{
     object Default :AgonyDataItemStatus()
     object Editing :AgonyDataItemStatus()
     object Selected :AgonyDataItemStatus()

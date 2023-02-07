@@ -27,7 +27,7 @@ class AgonyDataItemAdapter(private val agonyViewModel: AgonyViewModel) :
             binding.root.setOnClickListener {
                 when (agonyDataItem.status) {
                     AgonyDataItemStatus.Default -> {
-                        dataItemClickListener.onItemClick(agonyDataItem.agony)
+                        dataItemClickListener.onItemClick(agonyDataItem)
                         return@setOnClickListener
                     }
                     AgonyDataItemStatus.Editing -> {
@@ -66,7 +66,7 @@ class AgonyDataItemAdapter(private val agonyViewModel: AgonyViewModel) :
     }
 
     interface OnDataItemClickListener {
-        fun onItemClick(agony: Agony)
+        fun onItemClick(agonyDataItem: AgonyDataItem)
     }
 
     fun setDataItemClickListener(onDataItemClickListener: OnDataItemClickListener) {
@@ -76,7 +76,7 @@ class AgonyDataItemAdapter(private val agonyViewModel: AgonyViewModel) :
     companion object {
         val AGONY_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<AgonyDataItem>() {
             override fun areItemsTheSame(oldItem: AgonyDataItem, newItem: AgonyDataItem) =
-                oldItem.agony == newItem.agony
+                oldItem.agony.agonyId == newItem.agony.agonyId
 
             override fun areContentsTheSame(oldItem: AgonyDataItem, newItem: AgonyDataItem) =
                 oldItem == newItem
