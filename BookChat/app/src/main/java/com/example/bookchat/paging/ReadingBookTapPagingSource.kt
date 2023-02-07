@@ -5,7 +5,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.bookchat.App
 import com.example.bookchat.data.BookShelfItem
-import com.example.bookchat.data.BookShelfResult
+import com.example.bookchat.data.response.ResponseGetBookShelfBooks
 import com.example.bookchat.data.response.BookShelfMeta
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseBodyEmptyException
@@ -14,7 +14,7 @@ import com.example.bookchat.utils.ReadingStatus
 import retrofit2.Response
 
 class ReadingBookTapPagingSource : PagingSource<Int, Pair<BookShelfItem, Long>>(){
-    private lateinit var response : Response<BookShelfResult>
+    private lateinit var response : Response<ResponseGetBookShelfBooks>
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Pair<BookShelfItem, Long>> {
         if(!isNetworkConnected()) return LoadResult.Error(NetworkIsNotConnectedException())
@@ -32,9 +32,9 @@ class ReadingBookTapPagingSource : PagingSource<Int, Pair<BookShelfItem, Long>>(
 
         when(response.code()){
             200 -> {
-                val bookShelfResult = response.body()
-                Log.d(TAG, "ReadingBookTapPagingSource: load() - bookShelfResult : $bookShelfResult")
-                bookShelfResult?.let { return getLoadResult(bookShelfResult,page) }
+                val responseGetBookShelfBooks = response.body()
+                Log.d(TAG, "ReadingBookTapPagingSource: load() - bookShelfResult : $responseGetBookShelfBooks")
+                responseGetBookShelfBooks?.let { return getLoadResult(responseGetBookShelfBooks, page) }
                 return LoadResult.Error(ResponseBodyEmptyException(response.errorBody()?.string()))
             }
             else -> return LoadResult.Error(Exception(createExceptionMessage(response.code(),response.errorBody()?.string())))
@@ -46,14 +46,14 @@ class ReadingBookTapPagingSource : PagingSource<Int, Pair<BookShelfItem, Long>>(
     }
 
     private fun getLoadResult(
-        bookShelfResult : BookShelfResult,
+        response : ResponseGetBookShelfBooks,
         nowPage :Int
     ): LoadResult<Int, Pair<BookShelfItem, Long>>{
         return try {
             LoadResult.Page(
-                data = bookShelfResult.contents.map { Pair(it,bookShelfResult.pageMeta.totalElements) },
+                data = response.contents.map { Pair(it,response.pageMeta.totalElements) },
                 prevKey = if (nowPage == STARTING_PAGE_INDEX) null else nowPage - 1,
-                nextKey = getNextKey(nowPage,bookShelfResult.pageMeta)
+                nextKey = getNextKey(nowPage,response.pageMeta)
             )
         }catch (exception :Exception){
             LoadResult.Error(exception)

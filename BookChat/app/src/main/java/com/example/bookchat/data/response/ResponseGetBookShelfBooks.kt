@@ -1,9 +1,9 @@
-package com.example.bookchat.data
+package com.example.bookchat.data.response
 
-import com.example.bookchat.data.response.BookShelfMeta
+import com.example.bookchat.data.BookShelfItem
 import com.google.gson.annotations.SerializedName
 
-data class BookShelfResult(
+data class ResponseGetBookShelfBooks(
     @SerializedName("contents")
     val contents :List<BookShelfItem>,
     @SerializedName("pageMeta")

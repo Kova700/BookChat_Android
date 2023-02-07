@@ -3,7 +3,7 @@ package com.example.bookchat.paging
 import com.example.bookchat.data.Agony
 import com.example.bookchat.data.AgonyRecord
 import com.example.bookchat.data.BookShelfItem
-import com.example.bookchat.data.BookShelfResult
+import com.example.bookchat.data.response.ResponseGetBookShelfBooks
 import com.example.bookchat.data.response.BookShelfMeta
 import com.example.bookchat.data.response.CursorMeta
 import com.example.bookchat.data.response.ResponseGetAgony
@@ -12,7 +12,7 @@ import com.example.bookchat.utils.AgonyFolderHexColor
 
 object TestPagingDataSource {
 
-    fun getTestReadingBookPagingSource() :BookShelfResult{
+    fun getTestReadingBookPagingSource() : ResponseGetBookShelfBooks {
         val testReadingBookList = mutableListOf<BookShelfItem>()
         val bookShelfItem = BookShelfItem(1,"test","12345",
             "https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Ft1.daumcdn.net%2Flbook%2Fimage%2F1590611%3Ftimestamp%3D20221209172054%22,%22isbn%22:%221158883595",
@@ -22,7 +22,7 @@ object TestPagingDataSource {
             testReadingBookList.add(bookShelfItem.copy(bookShelfId = i.toLong(), title = "test$i", pages = 150+i))
         }
         val testPagedMeta = BookShelfMeta(testReadingBookList.size.toLong(),1,1,0,0,true,true,false)
-        return BookShelfResult(testReadingBookList,testPagedMeta)
+        return ResponseGetBookShelfBooks(testReadingBookList,testPagedMeta)
     }
 
     fun getTestAgonyPagingSource() : ResponseGetAgony {

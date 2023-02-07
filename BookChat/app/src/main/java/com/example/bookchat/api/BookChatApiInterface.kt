@@ -2,10 +2,7 @@ package com.example.bookchat.api
 
 import com.example.bookchat.data.*
 import com.example.bookchat.data.request.*
-import com.example.bookchat.data.response.RespondCheckInBookShelf
-import com.example.bookchat.data.response.ResponseGetAgony
-import com.example.bookchat.data.response.ResponseGetAgonyRecord
-import com.example.bookchat.data.response.ResponseGetBookSearch
+import com.example.bookchat.data.response.*
 import com.example.bookchat.utils.BookSearchSortOption
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.utils.SearchSortOption
@@ -68,7 +65,7 @@ interface BookChatApiInterface {
         @Query("page") page: String,
         @Query("readingStatus") readingStatus: ReadingStatus,
         @Query("sort") sort: SearchSortOption = SearchSortOption.DESC //임시
-    ): Response<BookShelfResult>
+    ): Response<ResponseGetBookShelfBooks>
 
     @DELETE("/v1/api/bookshelves/{bookId}")
     suspend fun deleteBookShelfBook(
