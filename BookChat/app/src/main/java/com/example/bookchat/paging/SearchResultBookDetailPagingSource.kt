@@ -6,9 +6,9 @@ import androidx.paging.PagingState
 import com.example.bookchat.App
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.BookSearchResult
-import com.example.bookchat.response.SearchingMeta
-import com.example.bookchat.response.NetworkIsNotConnectedException
-import com.example.bookchat.response.ResponseBodyEmptyException
+import com.example.bookchat.data.response.SearchingMeta
+import com.example.bookchat.data.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.response.ResponseBodyEmptyException
 import com.example.bookchat.utils.Constants.TAG
 import retrofit2.Response
 

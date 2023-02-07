@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.repository.UserRepository
-import com.example.bookchat.response.ForbiddenException
-import com.example.bookchat.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.response.ForbiddenException
+import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.ReadingTaste
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -11,7 +11,7 @@ import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.repository.BookRepository
-import com.example.bookchat.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
 import com.example.bookchat.utils.LoadState

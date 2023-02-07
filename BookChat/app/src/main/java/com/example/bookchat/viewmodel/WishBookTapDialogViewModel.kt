@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.repository.BookRepository
-import com.example.bookchat.request.RequestRegisterBookShelfBook
+import com.example.bookchat.data.request.RequestRegisterBookShelfBook
 import com.example.bookchat.utils.ReadingStatus
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

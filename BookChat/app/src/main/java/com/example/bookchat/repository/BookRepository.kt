@@ -8,12 +8,12 @@ import com.example.bookchat.App
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.BookSearchResult
 import com.example.bookchat.data.BookShelfItem
-import com.example.bookchat.response.RespondCheckInBookShelf
+import com.example.bookchat.data.response.RespondCheckInBookShelf
 import com.example.bookchat.paging.SearchResultBookDetailPagingSource
-import com.example.bookchat.request.RequestChangeBookStatus
-import com.example.bookchat.request.RequestRegisterBookShelfBook
-import com.example.bookchat.response.NetworkIsNotConnectedException
-import com.example.bookchat.response.ResponseBodyEmptyException
+import com.example.bookchat.data.request.RequestChangeBookStatus
+import com.example.bookchat.data.request.RequestRegisterBookShelfBook
+import com.example.bookchat.data.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.response.ResponseBodyEmptyException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.ReadingStatus
 import kotlinx.coroutines.flow.Flow

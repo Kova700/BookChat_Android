@@ -4,9 +4,9 @@ import android.util.Log
 import com.example.bookchat.BuildConfig.TOKEN_RENEWAL_URL
 import com.example.bookchat.data.Token
 import com.example.bookchat.repository.UserRepository.Companion.CONTENT_TYPE_JSON
-import com.example.bookchat.response.BadRequestException
-import com.example.bookchat.response.ForbiddenException
-import com.example.bookchat.response.TokenRenewalFailException
+import com.example.bookchat.data.response.BadRequestException
+import com.example.bookchat.data.response.ForbiddenException
+import com.example.bookchat.data.response.TokenRenewalFailException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
 import com.google.gson.Gson

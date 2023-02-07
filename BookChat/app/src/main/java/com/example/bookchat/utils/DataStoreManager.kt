@@ -10,8 +10,8 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.example.bookchat.App
 import com.example.bookchat.data.IdToken
 import com.example.bookchat.data.Token
-import com.example.bookchat.response.IdTokenDoseNotExistException
-import com.example.bookchat.response.TokenDoseNotExistException
+import com.example.bookchat.data.response.IdTokenDoseNotExistException
+import com.example.bookchat.data.response.TokenDoseNotExistException
 import com.example.bookchat.utils.Constants.TAG
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow

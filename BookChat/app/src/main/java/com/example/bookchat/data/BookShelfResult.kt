@@ -1,6 +1,6 @@
 package com.example.bookchat.data
 
-import com.example.bookchat.response.BookShelfMeta
+import com.example.bookchat.data.response.BookShelfMeta
 import com.google.gson.annotations.SerializedName
 
 data class BookShelfResult(

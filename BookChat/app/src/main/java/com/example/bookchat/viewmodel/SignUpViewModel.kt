@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.repository.UserRepository
-import com.example.bookchat.response.NickNameDuplicateException
+import com.example.bookchat.data.response.NickNameDuplicateException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.NameCheckStatus
 import dagger.hilt.android.lifecycle.HiltViewModel

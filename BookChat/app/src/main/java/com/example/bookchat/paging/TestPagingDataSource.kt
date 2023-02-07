@@ -4,10 +4,10 @@ import com.example.bookchat.data.Agony
 import com.example.bookchat.data.AgonyRecord
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.data.BookShelfResult
-import com.example.bookchat.response.BookShelfMeta
-import com.example.bookchat.response.CursorMeta
-import com.example.bookchat.response.ResponseGetAgony
-import com.example.bookchat.response.ResponseGetAgonyRecord
+import com.example.bookchat.data.response.BookShelfMeta
+import com.example.bookchat.data.response.CursorMeta
+import com.example.bookchat.data.response.ResponseGetAgony
+import com.example.bookchat.data.response.ResponseGetAgonyRecord
 import com.example.bookchat.utils.AgonyFolderHexColor
 
 object TestPagingDataSource {

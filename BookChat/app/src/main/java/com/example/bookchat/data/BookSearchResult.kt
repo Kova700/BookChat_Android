@@ -1,6 +1,6 @@
 package com.example.bookchat.data
 
-import com.example.bookchat.response.SearchingMeta
+import com.example.bookchat.data.response.SearchingMeta
 import com.google.gson.annotations.SerializedName
 
 

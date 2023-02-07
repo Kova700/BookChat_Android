@@ -3,7 +3,7 @@ package com.example.bookchat.kakao
 import android.content.Context
 import android.util.Log
 import com.example.bookchat.data.IdToken
-import com.example.bookchat.response.KakaoLoginFailException
+import com.example.bookchat.data.response.KakaoLoginFailException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
 import com.example.bookchat.utils.OAuth2Provider

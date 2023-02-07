@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.repository.AgonyRepository
-import com.example.bookchat.request.RequestMakeAgony
+import com.example.bookchat.data.request.RequestMakeAgony
 import com.example.bookchat.utils.AgonyFolderHexColor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -49,7 +49,7 @@ class MakeAgonyDialogViewModel @AssistedInject constructor(
         registeAgony(RequestMakeAgony(agonyTitle.value!!, selectedColor.value))
     }
 
-    private fun registeAgony(requestMakeAgony :RequestMakeAgony) = viewModelScope.launch{
+    private fun registeAgony(requestMakeAgony : RequestMakeAgony) = viewModelScope.launch{
         runCatching { agonyRepository.makeAgony(book, requestMakeAgony) }
             .onSuccess {
                 Toast.makeText(App.instance.applicationContext,"고민 등록 성공",Toast.LENGTH_SHORT).show()

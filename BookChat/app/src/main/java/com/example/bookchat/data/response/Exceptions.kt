@@ -1,4 +1,4 @@
-package com.example.bookchat.response
+package com.example.bookchat.data.response
 
 import java.io.IOException
 

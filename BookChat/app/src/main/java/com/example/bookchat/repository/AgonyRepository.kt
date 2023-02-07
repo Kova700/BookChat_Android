@@ -5,9 +5,9 @@ import com.example.bookchat.App
 import com.example.bookchat.data.Agony
 import com.example.bookchat.data.AgonyDataItem
 import com.example.bookchat.data.BookShelfItem
-import com.example.bookchat.request.RequestMakeAgony
-import com.example.bookchat.request.RequestReviseAgony
-import com.example.bookchat.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.request.RequestMakeAgony
+import com.example.bookchat.data.request.RequestReviseAgony
+import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.utils.Constants.TAG
 import javax.inject.Inject
 

@@ -1,10 +1,11 @@
 package com.example.bookchat.api
 
 import com.example.bookchat.data.*
+import com.example.bookchat.data.request.*
 import com.example.bookchat.request.*
-import com.example.bookchat.response.RespondCheckInBookShelf
-import com.example.bookchat.response.ResponseGetAgony
-import com.example.bookchat.response.ResponseGetAgonyRecord
+import com.example.bookchat.data.response.RespondCheckInBookShelf
+import com.example.bookchat.data.response.ResponseGetAgony
+import com.example.bookchat.data.response.ResponseGetAgonyRecord
 import com.example.bookchat.utils.BookSearchSortOption
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.utils.SearchSortOption

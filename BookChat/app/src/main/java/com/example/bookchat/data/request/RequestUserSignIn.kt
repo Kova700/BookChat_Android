@@ -1,4 +1,4 @@
-package com.example.bookchat.request
+package com.example.bookchat.data.request
 
 import com.example.bookchat.utils.OAuth2Provider
 import com.google.gson.annotations.SerializedName

@@ -3,10 +3,10 @@ package com.example.bookchat.repository
 import android.util.Log
 import com.example.bookchat.App
 import com.example.bookchat.data.BookReport
-import com.example.bookchat.request.RequestRegisterBookReport
+import com.example.bookchat.data.request.RequestRegisterBookReport
 import com.example.bookchat.data.BookShelfItem
-import com.example.bookchat.response.NetworkIsNotConnectedException
-import com.example.bookchat.response.ResponseBodyEmptyException
+import com.example.bookchat.data.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.response.ResponseBodyEmptyException
 import com.example.bookchat.utils.Constants.TAG
 import javax.inject.Inject
 
