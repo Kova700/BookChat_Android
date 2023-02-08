@@ -45,13 +45,14 @@ class AgonyRepository @Inject constructor() {
     }
 
     suspend fun deleteAgony(
+        bookShelfId: Long,
         agonyDataList: List<AgonyDataItem>
     ){
         Log.d(TAG, "AgonyRepository: deleteAgony() - called")
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val deleteIdListString = agonyDataList.map { it.agony.agonyId }.joinToString(",")
-        val response = App.instance.bookChatApiClient.deleteAgony(deleteIdListString)
+        val response = App.instance.bookChatApiClient.deleteAgony(bookShelfId, deleteIdListString)
         when(response.code()){
             200 -> { }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))

@@ -1,10 +1,12 @@
 package com.example.bookchat.viewmodel
 
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
+import com.example.bookchat.App
 import com.example.bookchat.data.AgonyDataItem
 import com.example.bookchat.data.AgonyDataItemStatus
 import com.example.bookchat.data.BookShelfItem
@@ -96,20 +98,12 @@ class AgonyViewModel @AssistedInject constructor(
     }
 
     private fun deleteAgony() = viewModelScope.launch {
-        changeItemStatusSelectedToRemoved()
-        clickCancelBtn()
-        //API 400 넘어옴 이슈로 인해 일단 각주처리 (PostMan 확인 완료)
-//        runCatching { agonyRepository.deleteAgony(getSelectedItemList()) }
-//            .onSuccess {
-//                changeItemStatusSelectedToRemoved()
-//                clickCancelBtn()
-//            }
-//            .onFailure { Toast.makeText(App.instance.applicationContext, "고민 삭제 실패", Toast.LENGTH_SHORT).show() }
-        //삭제API를 호출한다.
-        //성공시
-        //ChangeItemStatusToSelected상태인 애들 전부 Removed상태로 변경
-        //실패시
-        //ChangeItemStatusToSelected상태 유지
+        runCatching { agonyRepository.deleteAgony(book.bookShelfId, getSelectedItemList()) }
+            .onSuccess {
+                changeItemStatusSelectedToRemoved()
+                clickCancelBtn()
+            }
+            .onFailure { makeToast("고민삭제를 실패했습니다.") }
     }
 
     fun clickEditBtn() {
@@ -142,6 +136,10 @@ class AgonyViewModel @AssistedInject constructor(
 
     private fun startEvent(event: AgonyUiEvent) = viewModelScope.launch {
         _eventFlow.emit(event)
+    }
+
+    private fun makeToast(text :String){
+        Toast.makeText(App.instance.applicationContext, text, Toast.LENGTH_SHORT).show()
     }
 
     sealed class PagingViewEvent {
