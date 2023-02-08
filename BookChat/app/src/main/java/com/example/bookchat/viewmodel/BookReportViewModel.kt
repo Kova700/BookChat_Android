@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.data.BookReport
 import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.data.response.BookReportDoseNotExistException
 import com.example.bookchat.repository.BookReportRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -48,10 +49,7 @@ class BookReportViewModel @AssistedInject constructor(
                 cacheReport(bookReport)
                 bookReportStatus.value = BookReportStatus.ShowData
             }
-            .onFailure {
-                //수정이 필요함 실패가 아닌 404일 때만 InputData로 바뀌게
-                bookReportStatus.value = BookReportStatus.InputData
-            }
+            .onFailure { failHandler(it) }
     }
 
     private fun bindReport(bookReport :BookReport){
@@ -68,44 +66,42 @@ class BookReportViewModel @AssistedInject constructor(
     private fun registerBookReport(bookReport :BookReport) = viewModelScope.launch {
         runCatching { bookReportRepository.registerBookReport(book, bookReport) }
             .onSuccess {
-                Toast.makeText(App.instance.applicationContext,"독후감이 등록되었습니다.",Toast.LENGTH_SHORT).show()
                 cacheReport(bookReport)
                 bookReportStatus.value = BookReportStatus.ShowData
             }
             .onFailure {
                 bookReportStatus.value = BookReportStatus.InputData
-                Toast.makeText(App.instance.applicationContext,"독후감 등록 실패",Toast.LENGTH_SHORT).show()
+                makeToast("독후감 등록이 실패했습니다.")
             }
     }
 
     private fun deleteBookReport() = viewModelScope.launch {
         runCatching { bookReportRepository.deleteBookReport(book) }
             .onSuccess {
-                Toast.makeText(App.instance.applicationContext,"독후감이 삭제되었습니다.",Toast.LENGTH_SHORT).show()
+                makeToast("독후감이 삭제되었습니다.")
                 startEvent(BookReportUIEvent.MoveToBack)
             }
             .onFailure {
                 bookReportStatus.value = BookReportStatus.ShowData
-                Toast.makeText(App.instance.applicationContext,"독후감 삭제 실패",Toast.LENGTH_SHORT).show()
+                makeToast("독후감 삭제를 실패했습니다.")
             }
     }
 
     private fun reviseBookReport(bookReport :BookReport) = viewModelScope.launch {
         runCatching { bookReportRepository.reviseBookReport(book, bookReport) }
             .onSuccess {
-                Toast.makeText(App.instance.applicationContext,"독후감이 수정되었습니다.",Toast.LENGTH_SHORT).show()
                 cacheReport(bookReport)
                 bookReportStatus.value = BookReportStatus.ShowData
             }
             .onFailure {
                 bookReportStatus.value = BookReportStatus.ReviseData
-                Toast.makeText(App.instance.applicationContext,"독후감 수정 실패",Toast.LENGTH_SHORT).show()
+                makeToast("독후감 수정을 실패했습니다.")
             }
     }
 
     fun clickRegisterBtn(){
         if (isBookReportEmpty()) {
-            Toast.makeText(App.instance.applicationContext,"제목, 내용을 입력해주세요.",Toast.LENGTH_SHORT).show()
+            makeToast("제목, 내용을 입력해주세요.")
             return
         }
 
@@ -116,7 +112,7 @@ class BookReportViewModel @AssistedInject constructor(
             }
             BookReportStatus.ReviseData -> {
                 if (isNotChangedReport()) {
-                    Toast.makeText(App.instance.applicationContext,"수정된 내용이 없습니다.",Toast.LENGTH_SHORT).show()
+                    makeToast("수정된 내용이 없습니다.")
                     bookReportStatus.value = BookReportStatus.ShowData
                     return
                 }
@@ -162,6 +158,17 @@ class BookReportViewModel @AssistedInject constructor(
         _eventFlow.emit(event)
     }
 
+    private fun makeToast(text :String){
+        Toast.makeText(App.instance.applicationContext,text,Toast.LENGTH_SHORT).show()
+    }
+
+    private fun failHandler(exception: Throwable) {
+        when (exception) {
+            is BookReportDoseNotExistException -> bookReportStatus.value = BookReportStatus.InputData
+            else -> startEvent(BookReportUIEvent.UnknownError)
+        }
+    }
+
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
         fun create(book: BookShelfItem) :BookReportViewModel
@@ -176,6 +183,7 @@ class BookReportViewModel @AssistedInject constructor(
 
     sealed class BookReportUIEvent{
         object MoveToBack :BookReportUIEvent()
+        object UnknownError :BookReportUIEvent()
     }
 
     companion object {

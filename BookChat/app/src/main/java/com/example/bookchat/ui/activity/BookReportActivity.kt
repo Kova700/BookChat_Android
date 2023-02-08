@@ -13,6 +13,7 @@ import com.example.bookchat.ui.dialog.BookReportExitDialog
 import com.example.bookchat.ui.dialog.CompleteTapBookDialog.Companion.EXTRA_BOOKREPORT_BOOK
 import com.example.bookchat.viewmodel.BookReportViewModel
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportUIEvent
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -45,6 +46,7 @@ class BookReportActivity : AppCompatActivity() {
     private fun handleEvent(event : BookReportUIEvent){
         when(event){
             is BookReportUIEvent.MoveToBack -> { onBackPressedDispatcher.onBackPressed() }
+            is BookReportUIEvent.UnknownError -> { showSnackbar(R.string.message_error_else) }
         }
     }
 
@@ -69,6 +71,10 @@ class BookReportActivity : AppCompatActivity() {
             val dialog = BookReportExitDialog()
             dialog.show(this@BookReportActivity.supportFragmentManager, DIALOG_TAG_BOOK_REPORT_EXIT)
         }
+    }
+
+    private fun showSnackbar(textId :Int){
+        Snackbar.make(binding.bookReportLayout, textId, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun onDestroy() {

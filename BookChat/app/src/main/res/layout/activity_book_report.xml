@@ -8,6 +8,7 @@
             type="com.example.bookchat.viewmodel.BookReportViewModel" />
     </data>
     <ScrollView
+        android:id="@+id/bookReport_Layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

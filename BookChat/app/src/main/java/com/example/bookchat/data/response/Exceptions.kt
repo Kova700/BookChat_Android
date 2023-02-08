@@ -12,3 +12,4 @@ class TokenDoseNotExistException : IOException("Saved BookChatToken does not exi
 class NickNameDuplicateException(errorBody :String?) : IOException(errorBody)
 class KakaoLoginFailException(errorBody :String?) : IOException(errorBody)
 class TokenRenewalFailException : IOException("TokenRenewal request is fail")
+class BookReportDoseNotExistException : IOException("BookReport does not exist")

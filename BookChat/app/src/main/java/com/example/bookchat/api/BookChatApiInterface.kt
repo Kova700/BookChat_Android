@@ -86,25 +86,25 @@ interface BookChatApiInterface {
 
     /**------------독후감------------*/
 
-    @GET("/v1/api/books/{bookId}/report")
+    @GET("/v1/api/bookshelves/{bookShelfId}/report")
     suspend fun getBookReport(
-        @Path("bookId") bookId: Long,
+        @Path("bookShelfId") bookShelfId: Long,
     ): Response<BookReport>
 
-    @POST("/v1/api/books/{bookId}/report")
+    @POST("/v1/api/bookshelves/{bookShelfId}/report")
     suspend fun registerBookReport(
-        @Path("bookId") bookId: Long,
+        @Path("bookShelfId") bookShelfId: Long,
         @Body requestRegisterBookReport: RequestRegisterBookReport
     ): Response<Unit>
 
-    @DELETE("/v1/api/books/{bookId}/report")
+    @DELETE("/v1/api/bookshelves/{bookShelfId}/report")
     suspend fun deleteBookReport(
-        @Path("bookId") bookId: Long,
+        @Path("bookShelfId") bookShelfId: Long,
     ): Response<Unit>
 
-    @PUT("/v1/api/books/{bookId}/report")
+    @PUT("/v1/api/bookshelves/{bookShelfId}/report")
     suspend fun reviseBookReport(
-        @Path("bookId") bookId: Long,
+        @Path("bookShelfId") bookShelfId: Long,
         @Body requestRegisterBookReport: RequestRegisterBookReport
     ): Response<Unit>
 
