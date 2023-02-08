@@ -43,6 +43,7 @@ class BookReportViewModel @AssistedInject constructor(
     //서버에서 가져옴
     //추후 UseCase 구분해서 로컬부터 우선적으로 가져오게 구현
     private fun getBookReport() = viewModelScope.launch{
+        bookReportStatus.value = BookReportStatus.Loading
         runCatching { bookReportRepository.getBookReport(book) }
             .onSuccess { bookReport ->
                 bindReport(bookReport)
@@ -64,6 +65,7 @@ class BookReportViewModel @AssistedInject constructor(
     }
 
     private fun registerBookReport(bookReport :BookReport) = viewModelScope.launch {
+        bookReportStatus.value = BookReportStatus.Loading
         runCatching { bookReportRepository.registerBookReport(book, bookReport) }
             .onSuccess {
                 cacheReport(bookReport)
@@ -75,7 +77,8 @@ class BookReportViewModel @AssistedInject constructor(
             }
     }
 
-    private fun deleteBookReport() = viewModelScope.launch {
+    fun deleteBookReport() = viewModelScope.launch {
+        bookReportStatus.value = BookReportStatus.Loading
         runCatching { bookReportRepository.deleteBookReport(book) }
             .onSuccess {
                 makeToast("독후감이 삭제되었습니다.")
@@ -88,6 +91,7 @@ class BookReportViewModel @AssistedInject constructor(
     }
 
     private fun reviseBookReport(bookReport :BookReport) = viewModelScope.launch {
+        bookReportStatus.value = BookReportStatus.Loading
         runCatching { bookReportRepository.reviseBookReport(book, bookReport) }
             .onSuccess {
                 cacheReport(bookReport)
@@ -107,7 +111,6 @@ class BookReportViewModel @AssistedInject constructor(
 
         when(bookReportStatus.value){
             BookReportStatus.InputData -> {
-                bookReportStatus.value = BookReportStatus.Loading
                 registerBookReport(BookReport(reportTitle.value!!, reportContent.value!!))
             }
             BookReportStatus.ReviseData -> {
@@ -116,7 +119,6 @@ class BookReportViewModel @AssistedInject constructor(
                     bookReportStatus.value = BookReportStatus.ShowData
                     return
                 }
-                bookReportStatus.value = BookReportStatus.Loading
                 reviseBookReport(BookReport(reportTitle.value!!, reportContent.value!!))
             }
             else -> { }
@@ -136,9 +138,7 @@ class BookReportViewModel @AssistedInject constructor(
     }
 
     fun clickDeleteBtn(){
-        //삭제시 다이얼로그로 경고 문구 띄워야함
-        bookReportStatus.value = BookReportStatus.Loading
-        deleteBookReport()
+        startEvent(BookReportUIEvent.ShowDeleteWarningDialog)
     }
 
     fun clickBackBtn(){
@@ -184,6 +184,7 @@ class BookReportViewModel @AssistedInject constructor(
     sealed class BookReportUIEvent{
         object MoveToBack :BookReportUIEvent()
         object UnknownError :BookReportUIEvent()
+        object ShowDeleteWarningDialog :BookReportUIEvent()
     }
 
     companion object {

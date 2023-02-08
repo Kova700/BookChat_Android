@@ -9,7 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ActivityBookReportBinding
-import com.example.bookchat.ui.dialog.BookReportExitDialog
+import com.example.bookchat.ui.dialog.BookReportWarningDialog
 import com.example.bookchat.ui.dialog.CompleteTapBookDialog.Companion.EXTRA_BOOKREPORT_BOOK
 import com.example.bookchat.viewmodel.BookReportViewModel
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportUIEvent
@@ -47,6 +47,7 @@ class BookReportActivity : AppCompatActivity() {
         when(event){
             is BookReportUIEvent.MoveToBack -> { onBackPressedDispatcher.onBackPressed() }
             is BookReportUIEvent.UnknownError -> { showSnackbar(R.string.message_error_else) }
+            is BookReportUIEvent.ShowDeleteWarningDialog -> { showWarningDialog() }
         }
     }
 
@@ -67,10 +68,13 @@ class BookReportActivity : AppCompatActivity() {
                 finish()
                 return@addCallback
             }
-
-            val dialog = BookReportExitDialog()
-            dialog.show(this@BookReportActivity.supportFragmentManager, DIALOG_TAG_BOOK_REPORT_EXIT)
+            showWarningDialog()
         }
+    }
+
+    private fun showWarningDialog(){
+        val dialog = BookReportWarningDialog()
+        dialog.show(this@BookReportActivity.supportFragmentManager, DIALOG_TAG_WARNING_BOOK_REPORT)
     }
 
     private fun showSnackbar(textId :Int){
@@ -83,7 +87,7 @@ class BookReportActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val DIALOG_TAG_BOOK_REPORT_EXIT = "BookReportExitDialog"
+        private const val DIALOG_TAG_WARNING_BOOK_REPORT = "BookReportWarningDialog"
     }
 
 }

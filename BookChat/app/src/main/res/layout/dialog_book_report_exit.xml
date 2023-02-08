@@ -5,7 +5,7 @@
     <data>
         <variable
             name="dialog"
-            type="com.example.bookchat.ui.dialog.BookReportExitDialog" />
+            type="com.example.bookchat.ui.dialog.BookReportWarningDialog" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:background="@drawable/view_round_white_not_padding"
@@ -14,14 +14,13 @@
         android:minWidth="300dp">
 
         <TextView
-            android:id="@+id/textView35"
+            android:id="@+id/warningTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_bold"
             android:gravity="center"
-            android:text="독후감 작성을 취소하시겠습니까?\n작성중인 내용이 삭제됩니다."
             android:textColor="#000000"
             android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -38,7 +37,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView35" />
+            app:layout_constraintTop_toBottomOf="@+id/warningTextView" />
 
         <TextView
             android:id="@+id/cancelBtn_bookReportExit"
