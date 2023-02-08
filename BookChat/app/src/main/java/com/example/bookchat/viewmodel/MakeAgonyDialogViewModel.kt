@@ -42,22 +42,17 @@ class MakeAgonyDialogViewModel @AssistedInject constructor(
     }
 
     fun clickRegisterBtn(){
-        if (agonyTitle.value.isNullOrEmpty()){
-            Toast.makeText(App.instance.applicationContext,"주제를 입력해 주세요.",Toast.LENGTH_SHORT).show()
+        if (agonyTitle.value.isNullOrBlank()){
+            makeToast("주제를 입력해 주세요.")
             return
         }
-        registeAgony(RequestMakeAgony(agonyTitle.value!!, selectedColor.value))
+        registeAgony(RequestMakeAgony(agonyTitle.value!!.trim(), selectedColor.value))
     }
 
     private fun registeAgony(requestMakeAgony : RequestMakeAgony) = viewModelScope.launch{
         runCatching { agonyRepository.makeAgony(book, requestMakeAgony) }
-            .onSuccess {
-                Toast.makeText(App.instance.applicationContext,"고민 등록 성공",Toast.LENGTH_SHORT).show()
-                startEvent(MakeAgonyUiEvent.RenewAgonyList)
-            }
-            .onFailure {
-                Toast.makeText(App.instance.applicationContext,"고민 등록 실패",Toast.LENGTH_SHORT).show()
-            }
+            .onSuccess { startEvent(MakeAgonyUiEvent.RenewAgonyList) }
+            .onFailure { makeToast("고민 등록을 실패했습니다.") }
     }
 
     private fun startEvent (event : MakeAgonyUiEvent) = viewModelScope.launch {
@@ -71,6 +66,10 @@ class MakeAgonyDialogViewModel @AssistedInject constructor(
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
         fun create(book: BookShelfItem) :MakeAgonyDialogViewModel
+    }
+
+    private fun makeToast(text :String){
+        Toast.makeText(App.instance.applicationContext, text, Toast.LENGTH_SHORT).show()
     }
 
     companion object {
