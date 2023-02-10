@@ -150,6 +150,7 @@
             android:minHeight="55dp"
             android:stateListAnimator="@null"
             android:text="독서완료"
+            android:onClick="@{() -> viewmodel.clickCompleteBtn()}"
             android:visibility="@{(viewmodel.isAlreadyInBookShelf() == null) ? View.VISIBLE : View.INVISIBLE}"
             android:clickable="@{viewmodel.isAlreadyInBookShelf() == null}"
             android:textColor="#5648FF"

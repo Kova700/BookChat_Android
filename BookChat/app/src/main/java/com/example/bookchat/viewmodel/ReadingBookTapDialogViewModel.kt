@@ -8,6 +8,7 @@ import com.example.bookchat.App
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.ReadingStatus
+import com.example.bookchat.utils.toStarRating
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,8 +26,8 @@ class ReadingBookTapDialogViewModel @AssistedInject constructor(
     var starRating = MutableStateFlow<Float>(0.0F)
 
     fun changeToCompleteBook() = viewModelScope.launch{
-        bookShelfDataItem.bookShelfItem.setStarRating(starRating.value)
-        runCatching { bookRepository.changeBookShelfBookStatus(bookShelfDataItem.bookShelfItem, ReadingStatus.COMPLETE) }
+        val newItem = bookShelfDataItem.bookShelfItem.copy(star = starRating.value.toStarRating())
+        runCatching { bookRepository.changeBookShelfBookStatus(newItem, ReadingStatus.COMPLETE) }
             .onSuccess {
                 makeToast("독서완료로 변경되었습니다.")
                 startEvent(ReadingBookEvent.MoveToCompleteBook)

@@ -9,11 +9,15 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.DialogSearchTapBookClickedBinding
+import com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel
 import com.example.bookchat.viewmodel.SearchTapBookDialogViewModel
+import com.example.bookchat.viewmodel.SearchTapBookDialogViewModel.SearchTapDialogEvent
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -21,6 +25,8 @@ class SearchTapBookDialog(private val book: Book) : DialogFragment() {
 
     @Inject
     lateinit var searchTapBookDialogViewModelFactory: SearchTapBookDialogViewModel.AssistedFactory
+    @Inject
+    lateinit var completeBookSetStarsDialogFactory : CompleteBookSetStarsDialog.AssistedFactory
 
     private lateinit var binding :DialogSearchTapBookClickedBinding
     private val searchTapBookDialogViewModel :SearchTapBookDialogViewModel by viewModels {
@@ -38,11 +44,28 @@ class SearchTapBookDialog(private val book: Book) : DialogFragment() {
             viewmodel = searchTapBookDialogViewModel
         }
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        observeEvent()
+
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    private fun observeEvent(){
+        lifecycleScope.launch {
+            searchTapBookDialogViewModel.eventFlow.collect { event -> handleEvent(event) }
+        }
+    }
+
+    private fun openSetStarsDialog(){
+        val dialog = completeBookSetStarsDialogFactory.create(book)
+        dialog.show(childFragmentManager, DIALOG_TAG_STAR_SET)
+    }
+
+    private fun handleEvent(event: SearchTapDialogEvent) = when(event){
+            is SearchTapDialogEvent.OpenSetStarsDalog -> openSetStarsDialog()
+    }
+
+    companion object{
+        const val DIALOG_TAG_STAR_SET = "DIALOG_TAG_STAR_SET"
     }
 
 }

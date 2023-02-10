@@ -9,10 +9,16 @@ import com.example.bookchat.data.Book
 import com.example.bookchat.data.response.RespondCheckInBookShelf
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.data.request.RequestRegisterBookShelfBook
+import com.example.bookchat.ui.dialog.ReadingTapBookDialog
+import com.example.bookchat.ui.fragment.ReadingBookTabFragment
 import com.example.bookchat.utils.ReadingStatus
+import com.example.bookchat.utils.StarRating
+import com.example.bookchat.utils.toStarRating
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class SearchTapBookDialogViewModel @AssistedInject constructor(
@@ -22,6 +28,9 @@ class SearchTapBookDialogViewModel @AssistedInject constructor(
 {
     val isAlreadyInBookShelf = MutableStateFlow<RespondCheckInBookShelf?>(null)
     var isToggleChecked = MutableStateFlow<Boolean>(false)
+
+    private val _eventFlow = MutableSharedFlow<SearchTapDialogEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
 
     init {
         checkAlreadyInBookShelf()
@@ -37,13 +46,8 @@ class SearchTapBookDialogViewModel @AssistedInject constructor(
         isAlreadyInBookShelf.value?.let { requestRemoveWishBook(it) }
     }
 
-    fun clickCompleteBtn(){
-        //레이팅바 노출
-        //버튼 비활성화
-        //별점 채워지면 다시 버튼 활성화
-        //활성화 된 버튼 다시 누르면 독서완료 요청 API
-    }
-
+    //서재 등록 API를 호출하고, 등록되었으면
+    //바로 현재 UI를 등록된 도서입니다로 수정하기
     private fun checkAlreadyInBookShelf() = viewModelScope.launch {
         runCatching { bookRepository.checkAlreadyInBookShelf(book) }
             .onSuccess { respondCheckInBookShelf ->
@@ -60,33 +64,37 @@ class SearchTapBookDialogViewModel @AssistedInject constructor(
     private fun requestRegisterWishBook() = viewModelScope.launch {
         val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(book, ReadingStatus.WISH)
         runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
-            .onSuccess {
-                Toast.makeText(App.instance.applicationContext,"Wish등록 성공",Toast.LENGTH_SHORT).show()
-            }
-            .onFailure {
-                Toast.makeText(App.instance.applicationContext,"Wish등록 실패",Toast.LENGTH_SHORT).show()
-            }
+            .onSuccess { makeToast("[서재] - [독서예정]에 도서가 등록되었습니다.") }
+            .onFailure { makeToast("독서예정 등록에 실패했습니다.") }
+    }
+
+    fun requestRegisterReadingBook() = viewModelScope.launch {
+        val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(book, ReadingStatus.READING)
+        runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
+            .onSuccess { makeToast("[서재] - [독서중]에 도서가 등록되었습니다.") }
+            .onFailure { makeToast("독서중 등록에 실패했습니다.") }
     }
 
     private suspend fun requestRemoveWishBook(respondCheckInBookShelf : RespondCheckInBookShelf)= viewModelScope.launch {
         runCatching { bookRepository.deleteBookShelfBook(respondCheckInBookShelf.bookId) }
-            .onSuccess {
-                Toast.makeText(App.instance.applicationContext, "도서가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
-            }
-            .onFailure {
-                Toast.makeText(App.instance.applicationContext, "WISH 삭제 실패", Toast.LENGTH_SHORT).show()
-            }
+            .onSuccess { makeToast("도서가 삭제되었습니다.") }
+            .onFailure { makeToast("도서 삭제를 실패했습니다.") }
     }
 
-    fun requestRegisterReadingBook() = viewModelScope.launch {
-        val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(book,ReadingStatus.READING)
-        runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
-            .onSuccess {
-                Toast.makeText(App.instance.applicationContext,"Reading등록 성공",Toast.LENGTH_SHORT).show()
-            }
-            .onFailure {
-                Toast.makeText(App.instance.applicationContext,"Reading등록 실패",Toast.LENGTH_SHORT).show()
-            }
+    fun clickCompleteBtn(){
+        startUiEvent(SearchTapDialogEvent.OpenSetStarsDalog)
+    }
+
+    private fun makeToast(text :String){
+        Toast.makeText(App.instance.applicationContext, text, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun startUiEvent(event: SearchTapDialogEvent) = viewModelScope.launch {
+        _eventFlow.emit(event)
+    }
+
+    sealed class SearchTapDialogEvent {
+        object OpenSetStarsDalog :SearchTapDialogEvent()
     }
 
     @dagger.assisted.AssistedFactory
