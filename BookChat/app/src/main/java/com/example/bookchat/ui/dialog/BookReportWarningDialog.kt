@@ -10,14 +10,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.example.bookchat.R
-import com.example.bookchat.databinding.DialogBookReportExitBinding
+import com.example.bookchat.databinding.DialogBookReportWarningBinding
 import com.example.bookchat.viewmodel.BookReportViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class BookReportWarningDialog : DialogFragment() {
 
-    private lateinit var binding: DialogBookReportExitBinding
+    private lateinit var binding: DialogBookReportWarningBinding
     private val bookReportViewModel: BookReportViewModel by viewModels({ requireActivity() })
 
     override fun onCreateView(
@@ -25,7 +25,7 @@ class BookReportWarningDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.dialog_book_report_exit, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.dialog_book_report_warning, container, false)
         binding.dialog = this
         binding.lifecycleOwner = this
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
