@@ -25,10 +25,9 @@ class MakeAgonyDialogViewModel @AssistedInject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     val selectedColor = MutableStateFlow<AgonyFolderHexColor>(AgonyFolderHexColor.WHITE)
-    val agonyTitle = MutableStateFlow<String?>(null)
-    
-    //글자 최대 길이 설정 + 글자 깨짐 + 간격 설정남음
+    val agonyTitle = MutableStateFlow<String>("")
 
+    //글자 최대 길이 설정 + 글자 깨짐 + 간격 설정남음
     fun clickColorCircle(color :AgonyFolderHexColor){
         when(color){
             AgonyFolderHexColor.WHITE -> { selectedColor.value = AgonyFolderHexColor.WHITE }
@@ -42,15 +41,18 @@ class MakeAgonyDialogViewModel @AssistedInject constructor(
     }
 
     fun clickRegisterBtn(){
-        if (agonyTitle.value.isNullOrBlank()){
+        if (agonyTitle.value.trim().isBlank()){
             makeToast("주제를 입력해 주세요.")
             return
         }
-        registeAgony(RequestMakeAgony(agonyTitle.value!!.trim(), selectedColor.value))
+        registeAgony(agonyTitle.value.trim(), selectedColor.value)
     }
 
-    private fun registeAgony(requestMakeAgony : RequestMakeAgony) = viewModelScope.launch{
-        runCatching { agonyRepository.makeAgony(book, requestMakeAgony) }
+    private fun registeAgony(
+        title :String,
+        hexColorCode :AgonyFolderHexColor
+    ) = viewModelScope.launch{
+        runCatching { agonyRepository.makeAgony(book.bookShelfId, title, hexColorCode) }
             .onSuccess { startEvent(MakeAgonyUiEvent.RenewAgonyList) }
             .onFailure { makeToast("고민 등록을 실패했습니다.") }
     }

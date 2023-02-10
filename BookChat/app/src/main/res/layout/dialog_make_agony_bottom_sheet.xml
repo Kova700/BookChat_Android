@@ -62,6 +62,7 @@
             android:gravity="left"
             setMakeAgonyTextColorWithFolderHexColor="@{viewmodel.selectedColor}"
             android:hint="주제를 입력해 주세요."
+            android:maxLength="20"
             android:text="@={viewmodel.agonyTitle}"
             android:textSize="14sp"
             android:background="@null"

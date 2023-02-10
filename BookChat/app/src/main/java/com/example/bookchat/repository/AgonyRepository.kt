@@ -8,19 +8,22 @@ import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.data.request.RequestMakeAgony
 import com.example.bookchat.data.request.RequestReviseAgony
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
+import com.example.bookchat.utils.AgonyFolderHexColor
 import com.example.bookchat.utils.Constants.TAG
 import javax.inject.Inject
 
 class AgonyRepository @Inject constructor() {
 
     suspend fun makeAgony(
-        book :BookShelfItem,
-        requestMakeAgony: RequestMakeAgony
+        bookShelfId: Long,
+        title :String,
+        hexColorCode : AgonyFolderHexColor
     ){
         Log.d(TAG, "AgonyRepository: makeAgony() - called")
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-        val response = App.instance.bookChatApiClient.makeAgony(book.bookShelfId, requestMakeAgony)
+        val requestMakeAgony = RequestMakeAgony(title, hexColorCode)
+        val response = App.instance.bookChatApiClient.makeAgony(bookShelfId, requestMakeAgony)
         when(response.code()){
             200 -> { }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
