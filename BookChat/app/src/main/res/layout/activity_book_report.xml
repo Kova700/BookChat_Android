@@ -160,7 +160,7 @@
 
             <com.willy.ratingbar.ScaleRatingBar
                 android:id="@+id/scaleRatingBar"
-                setRatingBarStars="@{viewmodel.book.star}"
+                android:rating="@{viewmodel.book.star.value}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"

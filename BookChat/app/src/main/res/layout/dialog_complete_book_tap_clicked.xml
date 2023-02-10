@@ -40,7 +40,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textView28"
             app:srb_drawableEmpty="@drawable/ic_star_not_fill"
             app:srb_drawableFilled="@drawable/ic_star_fill"
-            setRatingBarStars="@{viewmodel.bookShelfDataItem.bookShelfItem.star}"
+            app:rating="@{viewmodel.bookShelfDataItem.bookShelfItem.star.value}"
             app:srb_starPadding="2dp"
             app:srb_stepSize="0.5" />
 

@@ -198,19 +198,6 @@ object DataBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("setRatingBarStars")
-    fun setRatingBarStars(scaleRatingBar : ScaleRatingBar, starRating :StarRating?){
-        when(starRating){
-            StarRating.ZERO -> { scaleRatingBar.rating = 0F }; StarRating.HALF -> { scaleRatingBar.rating = 0.5F }
-            StarRating.ONE -> { scaleRatingBar.rating = 1F }; StarRating.ONE_HALF -> { scaleRatingBar.rating = 1.5F }
-            StarRating.TWO -> { scaleRatingBar.rating = 2F }; StarRating.TWO_HALF -> { scaleRatingBar.rating = 2.5F }
-            StarRating.THREE -> { scaleRatingBar.rating = 3F }; StarRating.THREE_HALF -> { scaleRatingBar.rating = 3.5F }
-            StarRating.FOUR -> { scaleRatingBar.rating = 4F }; StarRating.FOUR_HALF -> { scaleRatingBar.rating = 4.5F }
-            StarRating.FIVE -> { scaleRatingBar.rating = 5F }; null -> { scaleRatingBar.rating = 0F }
-        }
-    }
-
-    @JvmStatic
     @BindingAdapter("setLoadingVisibilityInBookReport")
     fun setLoadingVisibilityInBookReport(view: View, status: BookReportStatus){
         view.visibility = if(status == BookReportStatus.Loading) View.VISIBLE else View.INVISIBLE

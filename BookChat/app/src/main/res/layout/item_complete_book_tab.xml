@@ -120,7 +120,7 @@
                     android:numStars="5"
                     app:srb_isIndicator="true"
                     app:srb_starPadding="2dp"
-                    setRatingBarStars="@{bookShelfItem.star}"
+                    app:rating="@{bookShelfItem.star.value}"
                     app:srb_stepSize="0.5"
                     android:isIndicator="false"
                     app:srb_drawableEmpty="@drawable/ic_star_not_fill"
