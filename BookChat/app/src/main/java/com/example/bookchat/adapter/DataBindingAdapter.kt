@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.AgonyDataItemStatus
+import com.example.bookchat.data.AgonyRecordFirstItemStatus
 import com.example.bookchat.data.Book
 import com.example.bookchat.utils.*
 import com.example.bookchat.viewmodel.AgonyViewModel.AgonyActivityState
@@ -361,6 +362,7 @@ object DataBindingAdapter {
         view.visibility = View.GONE
     }
 
+    /** 고민탭 DefaultState일 때 View Visibility 설정*/
     @JvmStatic
     @BindingAdapter("setVisibiltyInAgonyDefaultState")
     fun setVisibiltyInAgonyDefaultState(view :View, agonyActivityState : AgonyActivityState){
@@ -370,5 +372,46 @@ object DataBindingAdapter {
         }
         view.visibility = View.INVISIBLE
     }
+    
+    /**고민 기록 FirstItem Default State일 때 View Visibility 설정*/
+    @JvmStatic
+    @BindingAdapter("setVisibiltyFirstItemInDefaultState")
+    fun setVisibiltyInFirstItemView(
+        view :View,
+        nowFirstItemStatus : AgonyRecordFirstItemStatus
+    ){
+        if(nowFirstItemStatus == AgonyRecordFirstItemStatus.Default){
+            view.visibility = View.VISIBLE
+            return
+        }
+        view.visibility = View.INVISIBLE
+    }
 
+    /**고민 기록 FirstItem Editing State일 때 View Visibility 설정*/
+    @JvmStatic
+    @BindingAdapter("setVisibiltyFirstItemInEditingState")
+    fun setVisibiltyInEditingItemView(
+        view :View,
+        nowFirstItemStatus : AgonyRecordFirstItemStatus
+    ){
+        if(nowFirstItemStatus == AgonyRecordFirstItemStatus.Editing){
+            view.visibility = View.VISIBLE
+            return
+        }
+        view.visibility = View.INVISIBLE
+    }
+
+    /**고민 기록 FirstItem Loading State일 때 View Visibility 설정*/
+    @JvmStatic
+    @BindingAdapter("setVisibiltyFirstItemInLoadingState")
+    fun setVisibiltyInLoadingItemView(
+        view :View,
+        nowFirstItemStatus : AgonyRecordFirstItemStatus
+    ){
+        if(nowFirstItemStatus == AgonyRecordFirstItemStatus.Loading){
+            view.visibility = View.VISIBLE
+            return
+        }
+        view.visibility = View.INVISIBLE
+    }
 }

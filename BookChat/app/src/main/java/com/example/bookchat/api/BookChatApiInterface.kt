@@ -121,11 +121,9 @@ interface BookChatApiInterface {
         @Path("bookShelfId") bookShelfId: Long,
         @Query("size") size: String,
         @Query("sort") sort: SearchSortOption,
-        @Query("postCursorId") postCursorId: Int?, //postCursorId Type 수정해야함
+        @Query("postCursorId") postCursorId: Int?,
     ): Response<ResponseGetAgony>
 
-    //동시 삭제가 가능하게 선택된 폴더 아이디들을 뒤에 쉼표로 연결해야함
-    // ex : /v1/api/agonies/1,2,3
     @DELETE("/v1/api/bookshelves/{bookShelfId}/agonies/{bookIdListString}")
     suspend fun deleteAgony(
         @Path("bookShelfId") bookShelfId: Long,
@@ -152,9 +150,9 @@ interface BookChatApiInterface {
     suspend fun getAgonyRecord(
         @Path("bookShelfId") bookShelfId: Long,
         @Path("agonyId") agonyId: Long,
-        @Query("postCursorId") postCursorId: Int?, //postCursorId Type 수정해야함
+        @Query("postCursorId") postCursorId: Int?,
         @Query("size") size: String,
-        @Query("sort") sort: SearchSortOption = SearchSortOption.DESC, //임시
+        @Query("sort") sort: SearchSortOption
     ): Response<ResponseGetAgonyRecord>
 
     @DELETE("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}")

@@ -2,7 +2,7 @@ package com.example.bookchat.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -19,7 +19,7 @@ import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ActivityAgonyRecordBinding
 import com.example.bookchat.ui.activity.AgonyActivity.Companion.EXTRA_AGONY
 import com.example.bookchat.ui.activity.AgonyActivity.Companion.EXTRA_BOOK
-import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.ui.dialog.AgonyRecordWarningDialog
 import com.example.bookchat.viewmodel.AgonyRecordViewModel
 import com.example.bookchat.viewmodel.AgonyRecordViewModel.AgonyRecordUiEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,7 +40,7 @@ class AgonyRecordActivity : AppCompatActivity() {
     private lateinit var book :BookShelfItem
     private lateinit var firstAgonyTitle :String
     private val agonyRecordViewModel :AgonyRecordViewModel by viewModels {
-        AgonyRecordViewModel.provideFactory(agonyRecordViewModelFactory, agonyDataItem)
+        AgonyRecordViewModel.provideFactory(agonyRecordViewModelFactory, agonyDataItem, book)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +58,7 @@ class AgonyRecordActivity : AppCompatActivity() {
         initRecyclerView()
         observeAgonyRecordUiEvent()
         observePagingAgonyRecord()
+        setBackPressedDispatcher()
     }
 
     private fun initAdapter(){
@@ -80,7 +81,7 @@ class AgonyRecordActivity : AppCompatActivity() {
                 val newTitle = intent?.getStringExtra(AgonyEditActivity.EXTRA_NEW_AGONY_TITLE) ?: throw Exception()
                 agonyDataItem = agonyDataItem.copy(agony = agonyDataItem.agony.copy(title = newTitle))
                 agonyRecordHeaderItemAdapter.agony = agonyRecordHeaderItemAdapter.agony.copy(title = newTitle)
-                agonyRecordHeaderItemAdapter.notifyDataSetChanged()
+                agonyRecordHeaderItemAdapter.notifyItemChanged(0)
             }
         }
 
@@ -101,7 +102,18 @@ class AgonyRecordActivity : AppCompatActivity() {
                 //화면 갱신 이벤트
                 //(고민 기록 생셩시 생성된 서버 데이터 받아와야지)
             }
+            is AgonyRecordUiEvent.ShowWarningDialog -> { showWarningDialog() }
+            is AgonyRecordUiEvent.RenewFirstItemAdapter -> { renewFirstItemAdapter() }
+            is AgonyRecordUiEvent.RefreshDataItemAdapter -> { agonyRecordDataItemAdapter.refresh() }
         }
+    }
+
+    private fun renewFirstItemAdapter() =
+        agonyRecordFirstItemAdapter.notifyItemChanged(0)
+
+    private fun showWarningDialog(){
+        val warningDialog = AgonyRecordWarningDialog()
+        warningDialog.show(this.supportFragmentManager, DIALOG_TAG_WARNING_EDIT_CANCEL)
     }
 
     private fun observeAgonyRecordUiEvent() = lifecycleScope.launch{
@@ -111,6 +123,17 @@ class AgonyRecordActivity : AppCompatActivity() {
     private fun observePagingAgonyRecord() = lifecycleScope.launch{
         agonyRecordViewModel.agonyRecordCombined.observe(this@AgonyRecordActivity){ pagingData ->
             agonyRecordDataItemAdapter.submitData(this@AgonyRecordActivity.lifecycle, pagingData)
+        }
+    }
+
+    private fun setBackPressedDispatcher(){
+        onBackPressedDispatcher.addCallback{
+            if (agonyRecordViewModel.isFirstItemEditing()){
+                showWarningDialog()
+                return@addCallback
+            }
+            // DataItem이 수정중이라면 경고 문구 띄우기 로직 추가해야함
+            finish()
         }
     }
 
@@ -129,5 +152,9 @@ class AgonyRecordActivity : AppCompatActivity() {
             setResult(RESULT_OK,intent)
         }
         super.onResume()
+    }
+
+    companion object{
+        private const val DIALOG_TAG_WARNING_EDIT_CANCEL = "DIALOG_TAG_WARNING_EDIT_CANCEL"
     }
 }

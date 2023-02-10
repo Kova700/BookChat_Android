@@ -7,14 +7,23 @@
             name="viewmodel"
             type="com.example.bookchat.viewmodel.AgonyRecordViewModel" />
     </data>
-    <!--눌리면 입력창으로 바뀌고 고민기록 작성 UI 나와야함-->
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            setVisibiltyFirstItemInLoadingState ="@{viewmodel.firstItemState}"
+            app:layout_constraintBottom_toBottomOf="@+id/cardView4"
+            app:layout_constraintEnd_toEndOf="@+id/cardView4"
+            app:layout_constraintStart_toStartOf="@+id/cardView4"
+            app:layout_constraintTop_toTopOf="@+id/cardView4" />
+
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView4"
+            setVisibiltyFirstItemInDefaultState ="@{viewmodel.firstItemState}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
@@ -22,8 +31,6 @@
             android:layout_marginEnd="30dp"
             android:layout_marginBottom="10dp"
             android:foreground="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
             android:minHeight="190dp"
             android:backgroundTint="#F6F6F6"
             app:cardCornerRadius="15dp"
@@ -41,9 +48,9 @@
                 android:src="@drawable/ic_plus_btn_gray" />
         </androidx.cardview.widget.CardView>
 
-<!--        <include layout="@layout/item_agony_record_edit"-->
-<!--            android:visibility="invisible"-->
-<!--            app:viewmodel="@{viewmodel}"/>-->
+        <include
+            layout="@layout/item_agony_record_edit"
+            app:viewmodel="@{viewmodel}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

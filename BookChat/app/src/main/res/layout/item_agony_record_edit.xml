@@ -9,6 +9,7 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        setVisibiltyFirstItemInEditingState ="@{viewmodel.firstItemState}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -22,6 +23,8 @@
             android:elevation="2dp"
             android:fontFamily="@font/notosanskr_regular"
             android:hint="제목"
+            android:maxLength="20"
+            android:text="@={viewmodel.firstItemTitle}"
             android:gravity="top"
             android:background="@null"
             android:textColor="#222222"
@@ -35,7 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="15dp"
-            android:onClick="@{() -> viewmodel.clickXbtn()}"
+            android:onClick="@{() -> viewmodel.clickFirstItemXBtn()}"
             android:background="?android:attr/selectableItemBackground"
             android:elevation="10dp"
             android:src="@drawable/x_icon_round_small"
@@ -56,7 +59,9 @@
             android:elevation="2dp"
             android:fontFamily="@font/notosanskr_regular"
             android:gravity="top"
+            android:maxLength="100"
             android:hint="내용"
+            android:text="@={viewmodel.firstItemContent}"
             android:textColor="#373737"
             android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@+id/textView38"
@@ -74,11 +79,12 @@
             android:elegantTextHeight="true"
             android:elevation="2dp"
             android:fontFamily="@font/notosanskr_regular"
-            android:text="수정 완료"
+            android:onClick="@{() -> viewmodel.clickFirstItemSubmitBtn()}"
+            android:text="작성 완료"
+            android:textColor="#5648FF"
             android:clickable="true"
             android:focusable="true"
             android:background="?android:attr/selectableItemBackground"
-            android:textColor="#222222"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@+id/cardView4"
             app:layout_constraintEnd_toEndOf="@+id/cardView4" />

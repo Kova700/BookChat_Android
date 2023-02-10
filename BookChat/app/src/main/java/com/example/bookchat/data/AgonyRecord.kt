@@ -19,11 +19,18 @@ data class AgonyRecord(
 
 data class AgonyRecordDataItem(
     val agonyRecord : AgonyRecord,
+    var isSwiped: Boolean = false,
     var status :AgonyRecordDataItemStatus = AgonyRecordDataItemStatus.Default
 )
 
 sealed class AgonyRecordDataItemStatus{
     object Default :AgonyRecordDataItemStatus()
+    object Loading :AgonyRecordDataItemStatus()
     object Editing :AgonyRecordDataItemStatus()
 }
 
+sealed class AgonyRecordFirstItemStatus{
+    object Default : AgonyRecordFirstItemStatus()
+    object Loading : AgonyRecordFirstItemStatus()
+    object Editing : AgonyRecordFirstItemStatus()
+}
