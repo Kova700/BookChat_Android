@@ -18,7 +18,9 @@ data class Agony(
 data class AgonyDataItem(
     val agony :Agony,
     var status :AgonyDataItemStatus = AgonyDataItemStatus.Default
-): Serializable
+): Serializable{
+    fun getId() = agony.agonyId
+}
 
 sealed class AgonyDataItemStatus : Serializable{
     object Default :AgonyDataItemStatus()

@@ -62,7 +62,7 @@ class AgonyViewModel @AssistedInject constructor(
             }
 
             is PagingViewEvent.RemoveItem -> {
-                paging.filter { agonyItem -> pagingViewEvent.agonyItem.agony.agonyId != agonyItem.agony.agonyId }
+                paging.filter { agonyItem -> pagingViewEvent.agonyItem.getId() != agonyItem.getId() }
             }
 
             is PagingViewEvent.ChangeItemTitle ->{
