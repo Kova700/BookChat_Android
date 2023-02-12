@@ -148,14 +148,14 @@ class BookShelfViewModel @Inject constructor(
     ): PagingData<BookShelfDataItem> {
         return when (pagingViewEvent) {
             is PagingViewEvent.Remove -> {
-                paging.filter { it.bookShelfItem.bookShelfId != pagingViewEvent.bookShelfDataItem.bookShelfItem.bookShelfId }
+                paging.filter { it.getId() != pagingViewEvent.bookShelfDataItem.getId() }
             }
             is PagingViewEvent.RemoveWaiting -> {
-                paging.filter { it.bookShelfItem.bookShelfId != pagingViewEvent.bookShelfDataItem.bookShelfItem.bookShelfId }
+                paging.filter { it.getId() != pagingViewEvent.bookShelfDataItem.getId() }
             }
             is PagingViewEvent.Edit -> {
                 paging.map {
-                    if (pagingViewEvent.bookShelfDataItem.bookShelfItem.bookShelfId != it.bookShelfItem.bookShelfId) it
+                    if (pagingViewEvent.bookShelfDataItem.getId() != it.getId()) it
                     else pagingViewEvent.bookShelfDataItem
                 }
             }

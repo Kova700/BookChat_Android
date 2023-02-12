@@ -41,4 +41,6 @@ data class BookShelfItem(
 data class BookShelfDataItem(
     val bookShelfItem :BookShelfItem,
     var isSwiped: Boolean = false
-) :Serializable
+) :Serializable{
+    fun getId() = bookShelfItem.bookShelfId
+}

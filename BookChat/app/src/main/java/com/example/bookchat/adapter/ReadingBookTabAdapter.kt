@@ -14,6 +14,7 @@ import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.ItemReadingBookTabBinding
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
+import com.example.bookchat.viewmodel.BookShelfViewModel.PagingViewEvent
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,18 +43,18 @@ class ReadingBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
 
                 swipeView.setOnLongClickListener {
                     startSwipeAnimation(swipeView, bookShelfDataItem.isSwiped)
-                    bookShelfDataItem.isSwiped = !bookShelfDataItem.isSwiped
-                    true //true = clickEvent 종료 (ClickEvnet가 작동하지 않음)
+                    setSwiped(true)
+                    true
                 }
 
                 swipeBackground.setOnClickListener {
                     setSwiped(false)
-                    val removeWaitingEvent = BookShelfViewModel.PagingViewEvent.RemoveWaiting(bookShelfDataItem)
+                    val removeWaitingEvent = PagingViewEvent.RemoveWaiting(bookShelfDataItem)
                     bookShelfViewModel.addPagingViewEvent(removeWaitingEvent ,ReadingStatus.READING)
 
                     val handler = Handler(Looper.getMainLooper())
                     handler.postDelayed({
-                        val removeEvent = BookShelfViewModel.PagingViewEvent.Remove(bookShelfDataItem)
+                        val removeEvent = PagingViewEvent.Remove(bookShelfDataItem)
                         bookShelfViewModel.deleteBookShelfBookWithSwipe(bookShelfDataItem, removeEvent, ReadingStatus.READING)
                         bookShelfViewModel.removePagingViewEvent(removeWaitingEvent, ReadingStatus.READING)
                         bookShelfViewModel.addPagingViewEvent(removeEvent, ReadingStatus.READING)
@@ -73,13 +74,9 @@ class ReadingBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
             }
         }
 
-        fun setSwiped(flag: Boolean){
+        private fun setSwiped(flag: Boolean){
             val currentItem = getItem(absoluteAdapterPosition)
             currentItem?.let { currentItem.isSwiped = flag }
-        }
-
-        fun getSwiped(): Boolean{
-            return getItem(absoluteAdapterPosition)?.isSwiped ?: false
         }
     }
 
@@ -135,5 +132,4 @@ class ReadingBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
         private const val SWIPE_VIEW_PERCENT = 0.3F
         private const val SNACK_BAR_DURATION = 3000
     }
-
 }
