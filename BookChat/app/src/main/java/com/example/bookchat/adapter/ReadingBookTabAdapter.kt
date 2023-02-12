@@ -43,7 +43,7 @@ class ReadingBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
 
                 swipeView.setOnLongClickListener {
                     startSwipeAnimation(swipeView, bookShelfDataItem.isSwiped)
-                    setSwiped(true)
+                    bookShelfDataItem.isSwiped = !bookShelfDataItem.isSwiped
                     true
                 }
 
