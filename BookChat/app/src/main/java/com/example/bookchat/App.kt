@@ -2,6 +2,7 @@ package com.example.bookchat
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.bookchat.BuildConfig.KAKAO_APP_KEY
 import com.example.bookchat.api.*
 import com.example.bookchat.data.User
 import com.example.bookchat.utils.NetworkManager
@@ -24,7 +25,7 @@ class App : Application() {
         instance = this
         KakaoSdk.init(
             context = this,
-            appKey = BuildConfig.KAKAO_APP_KEY
+            appKey = KAKAO_APP_KEY
         )
     }
 
