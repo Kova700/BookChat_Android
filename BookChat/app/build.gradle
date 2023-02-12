@@ -49,8 +49,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     // Kakao Login
     implementation "com.kakao.sdk:v2-user:2.11.0"
-    //ChromeCustomTab //삭제 예정
-    implementation "androidx.browser:browser:1.4.0"
+    // Google Login
+    implementation 'com.google.android.gms:play-services-auth:20.4.1'
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     // Gson converter
@@ -60,7 +60,6 @@ dependencies {
     kapt 'com.github.bumptech.glide:compiler:4.13.0'
     // EncryptedSharedPreferences
     implementation "androidx.security:security-crypto:1.0.0"
-
     // ViewModel
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
     // LiveData
