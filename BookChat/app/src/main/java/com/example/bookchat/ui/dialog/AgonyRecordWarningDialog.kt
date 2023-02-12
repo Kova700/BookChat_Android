@@ -13,7 +13,7 @@ import com.example.bookchat.R
 import com.example.bookchat.data.AgonyRecordFirstItemStatus
 import com.example.bookchat.databinding.DialogAgonyRecordWarningBinding
 import com.example.bookchat.viewmodel.AgonyRecordViewModel
-import com.example.bookchat.viewmodel.AgonyRecordViewModel.AgonyRecordUiEvent
+import com.example.bookchat.viewmodel.AgonyRecordViewModel.AgonyRecordUiState
 
 class AgonyRecordWarningDialog : DialogFragment() {
 
@@ -41,6 +41,8 @@ class AgonyRecordWarningDialog : DialogFragment() {
         with(agonyRecordViewModel){
             renewFirstItemUi(AgonyRecordFirstItemStatus.Default)
             clearFirstItemData()
+            resetAllEditingItemToDefault()
+            setUiState(AgonyRecordUiState.Default)
         }
         this.dismiss()
     }

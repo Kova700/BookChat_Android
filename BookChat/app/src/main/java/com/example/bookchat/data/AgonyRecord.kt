@@ -10,26 +10,28 @@ data class AgonyRecord(
     @SerializedName("agonyRecordContent")
     val agonyRecordContent: String,
     @SerializedName("createdAt")
-    val createdAt :String
-){
-    fun getAgonyRecordDataItem() :AgonyRecordDataItem{
+    val createdAt: String
+) {
+    fun getAgonyRecordDataItem(): AgonyRecordDataItem {
         return AgonyRecordDataItem(this)
     }
 }
 
 data class AgonyRecordDataItem(
-    val agonyRecord : AgonyRecord,
+    val agonyRecord: AgonyRecord,
     var isSwiped: Boolean = false,
-    var status :AgonyRecordDataItemStatus = AgonyRecordDataItemStatus.Default
-)
-
-sealed class AgonyRecordDataItemStatus{
-    object Default :AgonyRecordDataItemStatus()
-    object Loading :AgonyRecordDataItemStatus()
-    object Editing :AgonyRecordDataItemStatus()
+    var status: AgonyRecordDataItemStatus = AgonyRecordDataItemStatus.Default
+){
+    fun getId() = agonyRecord.agonyRecordId
 }
 
-sealed class AgonyRecordFirstItemStatus{
+sealed class AgonyRecordDataItemStatus {
+    object Default : AgonyRecordDataItemStatus()
+    object Loading : AgonyRecordDataItemStatus()
+    object Editing : AgonyRecordDataItemStatus()
+}
+
+sealed class AgonyRecordFirstItemStatus {
     object Default : AgonyRecordFirstItemStatus()
     object Loading : AgonyRecordFirstItemStatus()
     object Editing : AgonyRecordFirstItemStatus()

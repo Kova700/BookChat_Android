@@ -9,8 +9,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
+import com.example.bookchat.SwipeHelperCallback
 import com.example.bookchat.adapter.AgonyRecord.AgonyRecordDataItemAdapter
 import com.example.bookchat.adapter.AgonyRecord.AgonyRecordFirstItemAdapter
 import com.example.bookchat.adapter.AgonyRecord.AgonyRecordHeaderItemAdapter
@@ -21,6 +24,7 @@ import com.example.bookchat.ui.activity.AgonyActivity.Companion.EXTRA_AGONY
 import com.example.bookchat.ui.activity.AgonyActivity.Companion.EXTRA_BOOK
 import com.example.bookchat.ui.dialog.AgonyRecordWarningDialog
 import com.example.bookchat.viewmodel.AgonyRecordViewModel
+import com.example.bookchat.viewmodel.AgonyRecordViewModel.AgonyRecordUiState
 import com.example.bookchat.viewmodel.AgonyRecordViewModel.AgonyRecordUiEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -71,7 +75,6 @@ class AgonyRecordActivity : AppCompatActivity() {
                 .putExtra(EXTRA_BOOK, book)
             agonyEditActivityResultLauncher.launch(intent)
         }
-        //onClickListener 설정 해야함
     }
 
     private val agonyEditActivityResultLauncher =
@@ -92,16 +95,19 @@ class AgonyRecordActivity : AppCompatActivity() {
             agonyRecordRcv.adapter = concatAdapter
             agonyRecordRcv.setHasFixedSize(true)
             agonyRecordRcv.layoutManager = LinearLayoutManager(this@AgonyRecordActivity)
+            setSwipeHelperCallback(agonyRecordRcv)
         }
+    }
+
+    private fun setSwipeHelperCallback(recyclerView : RecyclerView){
+        val swipeHelperCallback = SwipeHelperCallback()
+        val itemTouchHelper = ItemTouchHelper(swipeHelperCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 
     private fun handleEvent(event : AgonyRecordUiEvent){
         when(event){
             is AgonyRecordUiEvent.MoveToBack -> { finish() }
-            is AgonyRecordUiEvent.RenewAgonyList -> {
-                //화면 갱신 이벤트
-                //(고민 기록 생셩시 생성된 서버 데이터 받아와야지)
-            }
             is AgonyRecordUiEvent.ShowWarningDialog -> { showWarningDialog() }
             is AgonyRecordUiEvent.RenewFirstItemAdapter -> { renewFirstItemAdapter() }
             is AgonyRecordUiEvent.RefreshDataItemAdapter -> { agonyRecordDataItemAdapter.refresh() }
@@ -128,11 +134,10 @@ class AgonyRecordActivity : AppCompatActivity() {
 
     private fun setBackPressedDispatcher(){
         onBackPressedDispatcher.addCallback{
-            if (agonyRecordViewModel.isFirstItemEditing()){
+            if (agonyRecordViewModel.agonyRecordUiState.value == AgonyRecordUiState.Editing){
                 showWarningDialog()
                 return@addCallback
             }
-            // DataItem이 수정중이라면 경고 문구 띄우기 로직 추가해야함
             finish()
         }
     }

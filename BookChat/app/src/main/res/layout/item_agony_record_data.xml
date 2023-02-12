@@ -4,18 +4,38 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-            name="viewmodel"
-            type="com.example.bookchat.viewmodel.AgonyRecordViewModel" />
-        <variable
             name="agonyRecordDataItem"
             type="com.example.bookchat.data.AgonyRecordDataItem" />
     </data>
-    <!--밀어서 제거 UI 나와야함-->
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <ProgressBar
+            setVisibiltyDataItemInLoadingState="@{agonyRecordDataItem.status}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/swipe_background"
+            app:agonyRecordDataItem ="@{agonyRecordDataItem}"
+            layout="@layout/item_agony_record_swipe_background" />
+
+        <include
+            android:id="@+id/edit_layout"
+            app:agonyRecordDataItem ="@{agonyRecordDataItem}"
+            app:newTitle ="@{agonyRecordDataItem.agonyRecord.agonyRecordTitle}"
+            app:newContent ="@{agonyRecordDataItem.agonyRecord.agonyRecordContent}"
+            layout="@layout/item_agony_record_edit_data"/>
+
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/swipe_view"
+            setVisibiltyDataItemInDefaultState ="@{agonyRecordDataItem.status}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -32,9 +52,6 @@
                 android:layout_marginEnd="30dp"
                 android:layout_marginBottom="10dp"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:onClick="@{() -> viewmodel.clickXbtn()}"
                 android:minHeight="190dp"
                 app:cardCornerRadius="15dp"
                 app:cardElevation="3dp"
@@ -43,7 +60,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!--TextView 전부 최대 길이 설정 해야함 -->
             <TextView
                 android:id="@+id/agony_record_title"
                 android:layout_width="wrap_content"
@@ -52,6 +68,7 @@
                 android:layout_marginTop="15dp"
                 android:elegantTextHeight="true"
                 android:elevation="10dp"
+                android:maxLength="100"
                 android:fontFamily="@font/notosanskr_regular"
                 android:text="@{agonyRecordDataItem.agonyRecord.agonyRecordTitle}"
                 android:textColor="#222222"
@@ -93,10 +110,6 @@
                 app:layout_constraintBottom_toBottomOf="@+id/cardView4"
                 app:layout_constraintStart_toStartOf="@+id/cardView4" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-<!--        <include layout="@layout/item_agony_record_edit"-->
-<!--            android:visibility="invisible"-->
-<!--            app:viewmodel="@{viewmodel}"/>-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

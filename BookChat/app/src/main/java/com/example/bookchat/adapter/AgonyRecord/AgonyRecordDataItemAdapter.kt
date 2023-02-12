@@ -1,15 +1,22 @@
 package com.example.bookchat.adapter.AgonyRecord
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.data.*
+import com.example.bookchat.SwipeHelperCallback.Companion.SWIPE_VIEW_PERCENT
+import com.example.bookchat.data.AgonyRecordDataItem
+import com.example.bookchat.data.AgonyRecordDataItemStatus
+import com.example.bookchat.data.AgonyRecordFirstItemStatus
 import com.example.bookchat.databinding.ItemAgonyRecordDataBinding
 import com.example.bookchat.viewmodel.AgonyRecordViewModel
+import com.example.bookchat.viewmodel.AgonyRecordViewModel.AgonyRecordUiEvent
+import com.example.bookchat.viewmodel.AgonyRecordViewModel.AgonyRecordUiState
+import com.example.bookchat.viewmodel.AgonyRecordViewModel.PagingViewEvent
 
 class AgonyRecordDataItemAdapter(private val agonyRecordViewModel: AgonyRecordViewModel) :
     PagingDataAdapter<AgonyRecordDataItem, AgonyRecordDataItemAdapter.AgonyRecordDataItemViewHolder>(AGONY_RECORD_ITEM_COMPARATOR) {
@@ -17,18 +24,88 @@ class AgonyRecordDataItemAdapter(private val agonyRecordViewModel: AgonyRecordVi
 
     inner class AgonyRecordDataItemViewHolder(val binding: ItemAgonyRecordDataBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(agonyRecordItem :AgonyRecordDataItem) {
-            binding.viewmodel = agonyRecordViewModel
-            binding.agonyRecordDataItem = agonyRecordItem
-            //setOnClickListener
-                //현재 Item의 상태에 따라 분기
-                //Editing -> Default 상태로 변경
-                //Default -> Editing 상태로 변경
-            //눌리면 고민기록 수정 UI 나와야함(기존 데이터 가지고) + (수정 API 호출)
-            //수정 완료 버튼에 연결된 함수에 파라미터 넣어서 수정 or 등록 분기 처리
 
-            //밀어서 삭제 구현해야함
+        fun bind(agonyRecordItem :AgonyRecordDataItem) {
+            with(binding){
+                agonyRecordDataItem = agonyRecordItem
+                setViewHolderState(swipeView, agonyRecordItem)
+
+                swipeView.setOnClickListener {
+                    when(agonyRecordViewModel.agonyRecordUiState.value){
+                        AgonyRecordUiState.Default -> {
+                            if(!agonyRecordItem.isSwiped){
+                                val itemStatusChangeEvent = PagingViewEvent.ItemStatusChange(agonyRecordItem.copy(status = AgonyRecordDataItemStatus.Editing))
+                                agonyRecordViewModel.addPagingViewEvent(itemStatusChangeEvent)
+                                agonyRecordViewModel.setUiState(AgonyRecordUiState.Editing)
+                            }
+                        }
+                        AgonyRecordUiState.Editing -> {
+                            if (agonyRecordViewModel.isFirstItemStatusEditing()){
+                                if (agonyRecordViewModel.doesFirstItemHaveData()){
+                                    agonyRecordViewModel.startEvent(AgonyRecordUiEvent.ShowWarningDialog)
+                                    return@setOnClickListener
+                                }
+                                agonyRecordViewModel.renewFirstItemUi(AgonyRecordFirstItemStatus.Default)
+                                agonyRecordViewModel.clearFirstItemData()
+                                val itemStatusChangeEvent = PagingViewEvent.ItemStatusChange(agonyRecordItem.copy(status = AgonyRecordDataItemStatus.Editing))
+                                agonyRecordViewModel.addPagingViewEvent(itemStatusChangeEvent)
+                                agonyRecordViewModel.setUiState(AgonyRecordUiState.Editing)
+                                return@setOnClickListener
+                            }
+                            agonyRecordViewModel.startEvent(AgonyRecordUiEvent.ShowWarningDialog)
+                        }
+                    }
+                }
+
+                with(swipeBackground){
+                    background.setOnClickListener {
+                        if (!agonyRecordItem.isSwiped) return@setOnClickListener
+                        agonyRecordViewModel.deleteAgonyRecord(agonyRecordItem)
+                    }
+                }
+
+                with(editLayout){
+                    editCancelBtn.setOnClickListener{
+                        agonyRecordViewModel.resetAllEditingItemToDefault()
+                        agonyRecordViewModel.setUiState(AgonyRecordUiState.Default)
+                    }
+
+                    submitBtn.setOnClickListener{
+                        if ((newTitle?.isBlank() == true) || (newContent?.isBlank() == true)){
+                            agonyRecordViewModel.makeToast("제목, 내용을 입력해주세요.")
+                            return@setOnClickListener
+                        }
+
+                        val loadingEvent = PagingViewEvent.ItemStatusChange(agonyRecordItem.copy(status = AgonyRecordDataItemStatus.Loading))
+                        agonyRecordViewModel.addPagingViewEvent(loadingEvent)
+
+                        if((newTitle!!.trim() == agonyRecordItem.agonyRecord.agonyRecordTitle) &&
+                                newContent!!.trim() == agonyRecordItem.agonyRecord.agonyRecordContent){
+                            agonyRecordViewModel.removePagingViewEvent(loadingEvent)
+                            agonyRecordViewModel.resetAllEditingItemToDefault()
+                            agonyRecordViewModel.setUiState(AgonyRecordUiState.Default)
+                            return@setOnClickListener
+                        }
+                        agonyRecordViewModel.reviseAgonyRecord(agonyRecordItem, newTitle!!, newContent!!)
+                    }
+                }
+            }
         }
+
+        fun setSwiped(flag :Boolean){
+            val currentItem = getItem(bindingAdapterPosition)
+            currentItem?.let { currentItem.isSwiped = flag }
+        }
+
+        fun getSwiped(): Boolean{
+            val currentItem = getItem(bindingAdapterPosition)
+            return currentItem?.isSwiped ?: false
+        }
+    }
+
+    private fun setViewHolderState(view: View, agonyRecordItem :AgonyRecordDataItem){
+        if(!agonyRecordItem.isSwiped) { view.translationX = 0f; return }
+        view.translationX = view.width.toFloat() * SWIPE_VIEW_PERCENT
     }
 
     override fun getItemViewType(position: Int): Int = R.layout.item_agony_record_data

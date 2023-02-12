@@ -15,5 +15,5 @@
     <string name="message_search_window_hint">검색어를 입력해주세요.</string>
     <string name="message_warning_cancel_write_book_report">독후감 작성을 취소하시겠습니까?\n작성중인 내용이 삭제됩니다.</string>
     <string name="message_warning_delete_book_report">독후감을 삭제하시겠습니까?\n삭제된 독후감은 복구할 수 없습니다.</string>
-    <string name="message_warning_edit_cancel_agony_record">고민기록 수정을 취소하시겠습니까?\n작성중인 내용이 삭제됩니다.</string>
+    <string name="message_warning_edit_cancel_agony_record">고민기록 작성을 취소하시겠습니까?\n작성중인 내용이 삭제됩니다.</string>
 </resources>

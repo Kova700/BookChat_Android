@@ -13,12 +13,12 @@ import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.AgonyDataItemStatus
+import com.example.bookchat.data.AgonyRecordDataItemStatus
 import com.example.bookchat.data.AgonyRecordFirstItemStatus
 import com.example.bookchat.data.Book
 import com.example.bookchat.utils.*
 import com.example.bookchat.viewmodel.AgonyViewModel.AgonyActivityState
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportStatus
-import com.willy.ratingbar.ScaleRatingBar
 
 object DataBindingAdapter {
 
@@ -396,6 +396,48 @@ object DataBindingAdapter {
         nowFirstItemStatus : AgonyRecordFirstItemStatus
     ){
         if(nowFirstItemStatus == AgonyRecordFirstItemStatus.Loading){
+            view.visibility = View.VISIBLE
+            return
+        }
+        view.visibility = View.INVISIBLE
+    }
+
+    /**고민 기록 DataItem Default State일 때 View Visibility 설정*/
+    @JvmStatic
+    @BindingAdapter("setVisibiltyDataItemInDefaultState")
+    fun setVisibiltyDataItemInDefaultState(
+        view :View,
+        nowFirstItemStatus : AgonyRecordDataItemStatus
+    ){
+        if(nowFirstItemStatus == AgonyRecordDataItemStatus.Default){
+            view.visibility = View.VISIBLE
+            return
+        }
+        view.visibility = View.INVISIBLE
+    }
+
+    /**고민 기록 DataItem Editing State일 때 View Visibility 설정*/
+    @JvmStatic
+    @BindingAdapter("setVisibiltyDataItemInEditingState")
+    fun setVisibiltyDataItemInEditingState(
+        view :View,
+        nowFirstItemStatus : AgonyRecordDataItemStatus
+    ){
+        if(nowFirstItemStatus == AgonyRecordDataItemStatus.Editing){
+            view.visibility = View.VISIBLE
+            return
+        }
+        view.visibility = View.INVISIBLE
+    }
+
+    /**고민 기록 DataItem Loading State일 때 View Visibility 설정*/
+    @JvmStatic
+    @BindingAdapter("setVisibiltyDataItemInLoadingState")
+    fun setVisibiltyDataItemInLoadingState(
+        view :View,
+        nowFirstItemStatus : AgonyRecordDataItemStatus
+    ){
+        if(nowFirstItemStatus == AgonyRecordDataItemStatus.Loading){
             view.visibility = View.VISIBLE
             return
         }
