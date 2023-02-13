@@ -38,7 +38,7 @@ class CompleteBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
                 swipeView.setOnLongClickListener {
                     startSwipeAnimation(swipeView, bookShelfDataItem.isSwiped)
                     bookShelfDataItem.isSwiped = !bookShelfDataItem.isSwiped
-                    true //true = clickEvent 종료 (ClickEvnet가 작동하지 않음)
+                    true
                 }
 
                 swipeBackground.setOnClickListener {
@@ -59,8 +59,8 @@ class CompleteBookTabAdapter(private val bookShelfViewModel: BookShelfViewModel)
                         handler.removeCallbacksAndMessages(null)
                     }
 
-                    Snackbar.make(binding.root,"3초 뒤 도서가 삭제됩니다.", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("실행취소",snackCancelClickListener)
+                    Snackbar.make(binding.root, R.string.bookshelf_delete_snack_bar, Snackbar.LENGTH_INDEFINITE)
+                        .setAction(R.string.bookshelf_delete_snack_bar_cancel, snackCancelClickListener)
                         .setDuration(SNACK_BAR_DURATION)
                         .show()
                 }

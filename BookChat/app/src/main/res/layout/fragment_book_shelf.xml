@@ -20,7 +20,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
                 android:fontFamily="@font/notosanskr_bold"
-                android:text="서재"
+                android:text="@string/bookshelf"
                 android:textColor="#222222"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"

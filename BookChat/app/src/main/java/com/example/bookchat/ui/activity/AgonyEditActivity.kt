@@ -68,7 +68,7 @@ class AgonyEditActivity : AppCompatActivity() {
             return
         }
         if(agonyTitle.value.isBlank()){
-            makeToast("제목을 입력해주세요.")
+            makeToast(R.string.agony_title_empty)
             return
         }
         reviseAgony(agonyTitle.value.trim())
@@ -77,10 +77,10 @@ class AgonyEditActivity : AppCompatActivity() {
     private fun reviseAgony(newTitle :String) = lifecycleScope.launch{
         runCatching { agonyRepository.reviseAgony(bookShelfId = book.bookShelfId, agony = oldAgony, newTitle = newTitle) }
             .onSuccess {
-                makeToast("제목이 수정되었습니다.")
+                makeToast(R.string.agony_title_edit_success)
                 moveToPreviousActivity(newTitle)
             }
-            .onFailure { makeToast("수정을 실패했습니다.") }
+            .onFailure { makeToast(R.string.agony_title_edit_fail) }
     }
 
     private fun moveToPreviousActivity(newTitle :String){
@@ -97,8 +97,9 @@ class AgonyEditActivity : AppCompatActivity() {
     fun clickDeleteTextBtn() {
         agonyTitle.value = ""
     }
-    private fun makeToast(text :String){
-        Toast.makeText(App.instance.applicationContext,text, Toast.LENGTH_SHORT).show()
+
+    private fun makeToast(stringId :Int){
+        Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
     }
 
     companion object{

@@ -64,9 +64,9 @@ class SelectTasteActivity : AppCompatActivity() {
     }
 
     private fun handleEvent(event: SelectTasteEvent) = when(event) {
-        is SelectTasteEvent.Forbidden -> { Snackbar.make(binding.selectTasteLayout,R.string.message_forbidden, Snackbar.LENGTH_SHORT).show() }
-        is SelectTasteEvent.NetworkError -> { Snackbar.make(binding.selectTasteLayout,R.string.message_error_network, Snackbar.LENGTH_SHORT).show() }
-        is SelectTasteEvent.UnknownError -> { Snackbar.make(binding.selectTasteLayout,R.string.message_error_else, Snackbar.LENGTH_SHORT).show() }
+        is SelectTasteEvent.Forbidden -> { Snackbar.make(binding.selectTasteLayout,R.string.login_forbidden_user, Snackbar.LENGTH_SHORT).show() }
+        is SelectTasteEvent.NetworkError -> { Snackbar.make(binding.selectTasteLayout,R.string.error_network, Snackbar.LENGTH_SHORT).show() }
+        is SelectTasteEvent.UnknownError -> { Snackbar.make(binding.selectTasteLayout,R.string.error_else, Snackbar.LENGTH_SHORT).show() }
         is SelectTasteEvent.MoveToBack -> { finish() }
         is SelectTasteEvent.MoveToMain -> {
             val intent = Intent(this, MainActivity::class.java)

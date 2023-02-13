@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/notosanskr_bold"
-            android:text="관련 도서명"
+            android:text="@string/related_book_name"
             android:textColor="#222222"
             android:textSize="12sp"
             app:layout_constraintStart_toStartOf="parent"

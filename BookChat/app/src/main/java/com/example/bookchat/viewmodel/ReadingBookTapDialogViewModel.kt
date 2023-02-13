@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
+import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.ReadingStatus
@@ -29,10 +30,10 @@ class ReadingBookTapDialogViewModel @AssistedInject constructor(
         val newItem = bookShelfDataItem.bookShelfItem.copy(star = starRating.value.toStarRating())
         runCatching { bookRepository.changeBookShelfBookStatus(newItem, ReadingStatus.COMPLETE) }
             .onSuccess {
-                makeToast("독서완료로 변경되었습니다.")
+                makeToast(R.string.bookshelf_change_to_complete_success)
                 startEvent(ReadingBookEvent.MoveToCompleteBook)
             }
-            .onFailure { makeToast("독서완료로 변경을 실패했습니다.") }
+            .onFailure { makeToast(R.string.bookshelf_change_to_complete_fail) }
     }
 
     fun openAgonizeActivity(){
@@ -43,8 +44,8 @@ class ReadingBookTapDialogViewModel @AssistedInject constructor(
         _eventFlow.emit(event)
     }
 
-    private fun makeToast(text :String){
-        Toast.makeText(App.instance.applicationContext, text, Toast.LENGTH_SHORT).show()
+    private fun makeToast(stringId :Int){
+        Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
     }
 
     sealed class ReadingBookEvent {

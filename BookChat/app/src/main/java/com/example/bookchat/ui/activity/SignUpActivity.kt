@@ -94,12 +94,12 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         map[DENIED]?.let{
-            Snackbar.make(binding.signUpLayout,R.string.message_permission_denied, Snackbar.LENGTH_LONG).show()
+            Snackbar.make(binding.signUpLayout,R.string.permission_denied, Snackbar.LENGTH_LONG).show()
             return
         }
 
         map[EXPLAINED]?.let {
-            Toast.makeText(this,R.string.message_permission_explained,Toast.LENGTH_LONG).show()
+            Toast.makeText(this,R.string.permission_explained,Toast.LENGTH_LONG).show()
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             val uri = Uri.fromParts(SCHEME_PACKAGE, this.packageName, null)
             intent.data = uri
@@ -132,7 +132,7 @@ class SignUpActivity : AppCompatActivity() {
         }
 
     private fun handleEvent(event: SignUpEvent) = when(event) {
-        is SignUpEvent.UnknownError -> { Snackbar.make(binding.signUpLayout,R.string.message_error_else,Snackbar.LENGTH_SHORT).show() }
+        is SignUpEvent.UnknownError -> { Snackbar.make(binding.signUpLayout,R.string.error_else,Snackbar.LENGTH_SHORT).show() }
         is SignUpEvent.PermissionCheck -> launchPermissions()
         is SignUpEvent.MoveToBack -> finish()
         is SignUpEvent.MoveToSelectTaste -> {

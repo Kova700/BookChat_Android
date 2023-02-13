@@ -6,6 +6,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.example.bookchat.App
+import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.paging.CompleteBookTapPagingSource
 import com.example.bookchat.paging.ReadingBookTapPagingSource
@@ -119,9 +120,9 @@ class BookShelfViewModel @Inject constructor(
         readingStatus :ReadingStatus
     ) = viewModelScope.launch {
         runCatching { bookRepository.deleteBookShelfBook(bookShelfDataItem.bookShelfItem.bookShelfId) }
-            .onSuccess { makeToast("도서가 삭제되었습니다.") }
+            .onSuccess { makeToast(R.string.bookshelf_delete_success) }
             .onFailure {
-                makeToast("도서 삭제에 실패했습니다.")
+                makeToast(R.string.bookshelf_delete_fail)
                 removePagingViewEvent(removeEvent, readingStatus)
             }
     }
@@ -189,8 +190,8 @@ class BookShelfViewModel @Inject constructor(
         _eventFlow.emit(event)
     }
 
-    private fun makeToast(text :String){
-        Toast.makeText(App.instance.applicationContext, text, Toast.LENGTH_SHORT).show()
+    private fun makeToast(stringId :Int){
+        Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
     }
 
     sealed class PagingViewEvent {

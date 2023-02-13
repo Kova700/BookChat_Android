@@ -52,7 +52,7 @@ class SearchViewModel @Inject constructor(
     fun searchKeyword() = viewModelScope.launch {
         val keyword = _searchKeyWord.value
         if (keyword.isEmpty()) {
-            Toast.makeText(App.instance.applicationContext,"검색어를 입력해주세요.",Toast.LENGTH_SHORT).show() //임시
+            makeToast(R.string.search_book_keyword_empty)
             return@launch
         }
         if ((keyword == previousKeyword) && (_searchTapStatus.value == SearchTapStatus.Result)) return@launch
@@ -115,10 +115,15 @@ class SearchViewModel @Inject constructor(
         _searchKeyWord.value = ""
     }
 
+    private fun makeToast(stringId :Int){
+        Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
+
+    }
+
     private fun failHandler(exception: Throwable){
         when(exception){
             is NetworkIsNotConnectedException -> //임시 토스트 처리
-                Toast.makeText(App.instance.applicationContext, R.string.message_error_network, Toast.LENGTH_SHORT).show()
+                makeToast(R.string.error_network)
         }
     }
 

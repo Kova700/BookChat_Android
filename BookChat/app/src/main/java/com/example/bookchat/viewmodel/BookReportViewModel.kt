@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
+import com.example.bookchat.R
 import com.example.bookchat.data.BookReport
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.data.response.BookReportDoseNotExistException
@@ -73,7 +74,7 @@ class BookReportViewModel @AssistedInject constructor(
             }
             .onFailure {
                 bookReportStatus.value = BookReportStatus.InputData
-                makeToast("독후감 등록이 실패했습니다.")
+                makeToast(R.string.book_report_make_fail)
             }
     }
 
@@ -81,12 +82,12 @@ class BookReportViewModel @AssistedInject constructor(
         bookReportStatus.value = BookReportStatus.Loading
         runCatching { bookReportRepository.deleteBookReport(book) }
             .onSuccess {
-                makeToast("독후감이 삭제되었습니다.")
+                makeToast(R.string.book_report_delete_success)
                 startEvent(BookReportUIEvent.MoveToBack)
             }
             .onFailure {
                 bookReportStatus.value = BookReportStatus.ShowData
-                makeToast("독후감 삭제를 실패했습니다.")
+                makeToast(R.string.book_report_delete_fail)
             }
     }
 
@@ -99,13 +100,13 @@ class BookReportViewModel @AssistedInject constructor(
             }
             .onFailure {
                 bookReportStatus.value = BookReportStatus.ReviseData
-                makeToast("독후감 수정을 실패했습니다.")
+                makeToast(R.string.book_report_revise_fail)
             }
     }
 
     fun clickRegisterBtn(){
         if (isBookReportEmpty()) {
-            makeToast("제목, 내용을 입력해주세요.")
+            makeToast(R.string.title_content_empty)
             return
         }
 
@@ -115,7 +116,6 @@ class BookReportViewModel @AssistedInject constructor(
             }
             BookReportStatus.ReviseData -> {
                 if (isNotChangedReport()) {
-                    makeToast("수정된 내용이 없습니다.")
                     bookReportStatus.value = BookReportStatus.ShowData
                     return
                 }
@@ -130,7 +130,8 @@ class BookReportViewModel @AssistedInject constructor(
     }
 
     fun isNotChangedReport() :Boolean{
-        return (cachedTitle == reportTitle.value) && (cachedContent == reportContent.value)
+        return (cachedTitle == reportTitle.value?.trim()) &&
+                (cachedContent == reportContent.value?.trim())
     }
 
     fun clickReviseBtn(){
@@ -146,7 +147,8 @@ class BookReportViewModel @AssistedInject constructor(
     }
 
     fun isEditingStatus() :Boolean{
-        return (bookReportStatus.value == BookReportStatus.InputData) || (bookReportStatus.value == BookReportStatus.ReviseData)
+        return (bookReportStatus.value == BookReportStatus.InputData) ||
+                (bookReportStatus.value == BookReportStatus.ReviseData)
     }
 
     fun initCachedData(){
@@ -158,8 +160,8 @@ class BookReportViewModel @AssistedInject constructor(
         _eventFlow.emit(event)
     }
 
-    private fun makeToast(text :String){
-        Toast.makeText(App.instance.applicationContext,text,Toast.LENGTH_SHORT).show()
+    private fun makeToast(stirngId :Int){
+        Toast.makeText(App.instance.applicationContext, stirngId, Toast.LENGTH_SHORT).show()
     }
 
     private fun failHandler(exception: Throwable) {

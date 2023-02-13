@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity() {
     private fun backPressEvent() {
         if (!bottomNaviFragmentStack.isEmpty()) return
 
-        val toast = Toast.makeText(this, R.string.message_back_press, Toast.LENGTH_SHORT)
+        val toast = Toast.makeText(this, R.string.back_press_warning, Toast.LENGTH_SHORT)
         if (System.currentTimeMillis() > backPressedTime + 2000){
             backPressedTime = System.currentTimeMillis()
             toast.show()

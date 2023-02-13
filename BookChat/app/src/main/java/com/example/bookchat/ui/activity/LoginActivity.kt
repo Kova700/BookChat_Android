@@ -45,10 +45,10 @@ class LoginActivity : AppCompatActivity() {
     private fun handleEvent(event: LoginEvent) = when(event) {
         is LoginEvent.MoveToMain -> { startActivity(Intent(this, MainActivity::class.java)); finish() }
         is LoginEvent.MoveToSignUp -> { startActivity(Intent(this, SignUpActivity::class.java)); }
-        is LoginEvent.Forbidden -> { showSnackbar(R.string.message_forbidden) }
-        is LoginEvent.NetworkError -> { showSnackbar(R.string.message_error_network) }
-        is LoginEvent.KakaoLoginFail -> { showSnackbar(R.string.message_kakao_login_fail) }
-        is LoginEvent.UnknownError -> { showSnackbar(R.string.message_error_else)}
+        is LoginEvent.Forbidden -> { showSnackbar(R.string.login_forbidden_user) }
+        is LoginEvent.NetworkError -> { showSnackbar(R.string.error_network) }
+        is LoginEvent.KakaoLoginFail -> { showSnackbar(R.string.error_kakao_login) }
+        is LoginEvent.UnknownError -> { showSnackbar(R.string.error_else)}
     }
 
 }

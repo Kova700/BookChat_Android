@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
+import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfDataItem
-import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.ReadingStatus
 import dagger.assisted.Assisted
@@ -58,15 +58,15 @@ class PageInputDialogViewModel @AssistedInject constructor(
     private fun registerReadingPage(newBookShelfDataItem :BookShelfDataItem) = viewModelScope.launch {
         runCatching { bookRepository.changeBookShelfBookStatus(newBookShelfDataItem.bookShelfItem, ReadingStatus.READING)}
             .onSuccess { startEvent(PageInputDialogEvnet.SuccessApi(newBookShelfDataItem)) }
-            .onFailure { makeToast("페이지 등록을 실패했습니다.") }
+            .onFailure { makeToast(R.string.bookshelf_page_input_fail) }
     }
 
     fun startEvent(event: PageInputDialogEvnet) = viewModelScope.launch {
         _eventFlow.emit(event)
     }
 
-    private fun makeToast(text :String){
-        Toast.makeText(App.instance.applicationContext, text, Toast.LENGTH_SHORT).show()
+    private fun makeToast(stringId :Int){
+        Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
     }
 
     sealed class PageInputDialogEvnet {

@@ -7,6 +7,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.example.bookchat.App
+import com.example.bookchat.R
 import com.example.bookchat.data.AgonyDataItem
 import com.example.bookchat.data.AgonyDataItemStatus
 import com.example.bookchat.data.BookShelfItem
@@ -103,7 +104,7 @@ class AgonyViewModel @AssistedInject constructor(
                 changeItemStatusSelectedToRemoved()
                 clickCancelBtn()
             }
-            .onFailure { makeToast("고민삭제를 실패했습니다.") }
+            .onFailure { makeToast(R.string.agony_delete_fail) }
     }
 
     fun clickEditBtn() {
@@ -138,8 +139,8 @@ class AgonyViewModel @AssistedInject constructor(
         _eventFlow.emit(event)
     }
 
-    private fun makeToast(text :String){
-        Toast.makeText(App.instance.applicationContext, text, Toast.LENGTH_SHORT).show()
+    private fun makeToast(stringId :Int){
+        Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
     }
 
     sealed class PagingViewEvent {

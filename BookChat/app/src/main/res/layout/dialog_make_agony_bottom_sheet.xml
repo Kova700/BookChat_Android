@@ -61,7 +61,7 @@
             android:elegantTextHeight="true"
             android:gravity="left"
             setMakeAgonyTextColorWithFolderHexColor="@{viewmodel.selectedColor}"
-            android:hint="주제를 입력해 주세요."
+            android:hint="@string/agony_make_input_hint"
             android:maxLength="20"
             android:text="@={viewmodel.agonyTitle}"
             android:textSize="14sp"
@@ -71,8 +71,6 @@
             app:layout_constraintStart_toStartOf="@+id/cardView5"
             app:layout_constraintTop_toTopOf="@+id/cardView5" />
 
-        <!--색갈 oval 모양 아이템 만들어야함-->
-        <!--클릭된 색은 stroke도 넣어줘야함-->
         <LinearLayout
             android:id="@+id/color_select_layout"
             android:layout_width="0dp"

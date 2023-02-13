@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
+import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.data.request.RequestRegisterBookShelfBook
@@ -34,38 +35,37 @@ class WishBookTapDialogViewModel @AssistedInject constructor(
         requestRemoveWishBook()
     }
 
-    //알림 내용 스낵바로 수정 예정
     private suspend fun requestRemoveWishBook()= viewModelScope.launch {
         runCatching { bookRepository.deleteBookShelfBook(bookShelfDataItem.bookShelfItem.bookShelfId) }
             .onSuccess {
-                makeToast("독서예정에서 삭제되었습니다.")
+                makeToast(R.string.bookshelf_delete_wish_book)
                 startEvent(WishBookEvent.RemoveItem)
             }
-            .onFailure { makeToast("독서예정 삭제를 실패했습니다.") }
+            .onFailure { makeToast(R.string.bookshelf_delete_fail) }
     }
 
     private suspend fun requestAddWishBook()= viewModelScope.launch {
         val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(bookShelfDataItem.bookShelfItem.getBook(),ReadingStatus.WISH)
         runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
-            .onSuccess { makeToast("독서예정에 등록되었습니다.") }
-            .onFailure { makeToast("독서예정 등록을 실패했습니다.") }
+            .onSuccess { makeToast(R.string.wish_bookshelf_register_success) }
+            .onFailure { makeToast(R.string.wish_bookshelf_register_fail) }
     }
 
     fun changeToReadingBook() = viewModelScope.launch{
         runCatching { bookRepository.changeBookShelfBookStatus(bookShelfDataItem.bookShelfItem, ReadingStatus.READING) }
             .onSuccess {
-                makeToast("독서중으로 변경되었습니다.")
+                makeToast(R.string.bookshelf_change_to_reading_success)
                 startEvent(WishBookEvent.MoveToReadingBook)
             }
-            .onFailure { makeToast("독서중으로 변경을 실패했습니다.") }
+            .onFailure { makeToast(R.string.bookshelf_change_to_reading_fail) }
     }
 
     private fun startEvent (event : WishBookEvent) = viewModelScope.launch {
         _eventFlow.emit(event)
     }
 
-    private fun makeToast(text :String){
-        Toast.makeText(App.instance.applicationContext, text, Toast.LENGTH_SHORT).show()
+    private fun makeToast(stringId :Int){
+        Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
     }
 
     sealed class WishBookEvent {

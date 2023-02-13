@@ -7,6 +7,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.example.bookchat.App
+import com.example.bookchat.R
 import com.example.bookchat.data.*
 import com.example.bookchat.paging.AgonyRecordPagingSource
 import com.example.bookchat.repository.AgonyRecordRepository
@@ -95,7 +96,7 @@ class AgonyRecordViewModel @AssistedInject constructor(
                 setUiState(AgonyRecordUiState.Default)
             }
             .onFailure {
-                makeToast("고민기록 등록을 실패했습니다.")
+                makeToast(R.string.agony_record_make_fail)
                 renewFirstItemUi(AgonyRecordFirstItemStatus.Editing)
             }
     }
@@ -113,11 +114,11 @@ class AgonyRecordViewModel @AssistedInject constructor(
                 removePagingViewEvent(PagingViewEvent.ItemStatusChange(agonyRecordItem.copy(status = AgonyRecordDataItemStatus.Loading)))
                 addPagingViewEvent(PagingViewEvent.Edit(agonyRecordItem.copy(agonyRecord = agonyRecordItem.agonyRecord.copy(agonyRecordTitle = newTitle, agonyRecordContent = newContent))))
                 setUiState(AgonyRecordUiState.Default)
-                makeToast("고민기록이 수정되었습니다.")
+                makeToast(R.string.agony_record_revise_success)
             }
             .onFailure {
                 removePagingViewEvent(PagingViewEvent.ItemStatusChange(agonyRecordItem.copy(status = AgonyRecordDataItemStatus.Loading)))
-                makeToast("고민기록이 수정을 실패했습니다.")
+                makeToast(R.string.agony_record_revise_fail)
             }
     }
 
@@ -127,9 +128,9 @@ class AgonyRecordViewModel @AssistedInject constructor(
         }
             .onSuccess {
                 addPagingViewEvent(PagingViewEvent.Remove(agonyRecordItem))
-                makeToast("고민기록이 삭제되었습니다.")
+                makeToast(R.string.agony_record_revise_success)
             }
-            .onFailure { makeToast("고민기록 삭제를 실패했습니다.") }
+            .onFailure { makeToast(R.string.agony_record_revise_fail) }
     }
 
     fun clickFirstItemXBtn() {
@@ -143,7 +144,7 @@ class AgonyRecordViewModel @AssistedInject constructor(
 
     fun clickFirstItemSubmitBtn() {
         if (isBlankFirstItemValue()) {
-            makeToast("제목, 내용을 입력해주세요.")
+            makeToast(R.string.title_content_empty)
             return
         }
         renewFirstItemUi(AgonyRecordFirstItemStatus.Loading)
@@ -151,7 +152,7 @@ class AgonyRecordViewModel @AssistedInject constructor(
     }
 
     fun clickFolderBtn() {
-        makeToast("폴더 버튼 클릭 : 아래에서 SlidingWindow 올라 옴")
+        //폴더 버튼 클릭 : 아래에서 SlidingWindow 올라 옴
     }
 
     fun clickBackBtn() {
@@ -193,8 +194,8 @@ class AgonyRecordViewModel @AssistedInject constructor(
         agonyRecordUiState.value = state
     }
 
-    fun makeToast(text: String) {
-        Toast.makeText(App.instance.applicationContext, text, Toast.LENGTH_SHORT).show()
+    fun makeToast(stringId: Int) {
+        Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
     }
 
     fun startEvent(event: AgonyRecordUiEvent) = viewModelScope.launch {

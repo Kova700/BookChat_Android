@@ -36,10 +36,10 @@ class BookReportWarningDialog : DialogFragment() {
 
     private fun setWarningText(){
         if (bookReportViewModel.isEditingStatus()){
-            binding.warningTextView.setText(R.string.message_warning_cancel_write_book_report)
+            binding.warningTextView.setText(R.string.book_report_writing_cancel_warning)
             return
         }
-        binding.warningTextView.setText(R.string.message_warning_delete_book_report)
+        binding.warningTextView.setText(R.string.book_report_delete_warning)
     }
 
     fun clickCancelBtn(){

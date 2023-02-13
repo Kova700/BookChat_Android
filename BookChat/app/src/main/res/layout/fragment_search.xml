@@ -81,7 +81,7 @@
             android:elevation="10dp"
             android:enabled="false"
             android:fontFamily="@font/notosanskr_regular"
-            android:hint="@string/message_search_window_hint"
+            android:hint="@string/search_window_hint"
             android:inputType="text"
             android:text="@={viewModel._searchKeyWord}"
             android:textColor="#222222"

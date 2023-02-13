@@ -46,7 +46,7 @@ class BookReportActivity : AppCompatActivity() {
     private fun handleEvent(event : BookReportUIEvent){
         when(event){
             is BookReportUIEvent.MoveToBack -> { onBackPressedDispatcher.onBackPressed() }
-            is BookReportUIEvent.UnknownError -> { showSnackbar(R.string.message_error_else) }
+            is BookReportUIEvent.UnknownError -> { showSnackbar(R.string.error_else) }
             is BookReportUIEvent.ShowDeleteWarningDialog -> { showWarningDialog() }
         }
     }
