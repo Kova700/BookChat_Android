@@ -7,5 +7,5 @@ data class CursorMeta(
     val hasNext :Boolean,
     val last :Boolean,
     val first :Boolean,
-    val nextCursorId :Int //Int 인지 확인
+    val nextCursorId :Int
 )

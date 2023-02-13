@@ -64,7 +64,7 @@ interface BookChatApiInterface {
         @Query("size") size: String,
         @Query("page") page: String,
         @Query("readingStatus") readingStatus: ReadingStatus,
-        @Query("sort") sort: SearchSortOption = SearchSortOption.DESC //임시
+        @Query("sort") sort: SearchSortOption = SearchSortOption.UPDATED_AT_DESC
     ): Response<ResponseGetBookShelfBooks>
 
     @DELETE("/v1/api/bookshelves/{bookId}")

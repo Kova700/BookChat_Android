@@ -35,7 +35,7 @@ class AgonyViewModel @AssistedInject constructor(
             pageSize = AGONY_LOAD_SIZE,
             enablePlaceholders = false
         ),
-        pagingSourceFactory = { AgonyPagingSource(book, SearchSortOption.DESC) }
+        pagingSourceFactory = { AgonyPagingSource(book, SearchSortOption.ID_DESC) }
     ).flow
         .map { pagingData -> pagingData.map { agony -> agony.getAgonyDataItem() } }
         .cachedIn(viewModelScope)

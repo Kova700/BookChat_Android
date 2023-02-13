@@ -74,10 +74,13 @@ class AgonyRecordPagingSource(
         if (cursorMeta.last) return null
 
         return when (sortOption) {
-            SearchSortOption.DESC -> {
+            SearchSortOption.ID_DESC,
+            SearchSortOption.UPDATED_AT_DESC -> {
                 if (cursorMeta.first) cursorMeta.nextCursorId - 2 else cursorMeta.nextCursorId
             }
-            SearchSortOption.ASC -> {
+
+            SearchSortOption.ID_ASC,
+            SearchSortOption.UPDATED_AT_ASC -> {
                 if (cursorMeta.first) cursorMeta.nextCursorId + 2 else cursorMeta.nextCursorId
             }
         }
@@ -87,13 +90,16 @@ class AgonyRecordPagingSource(
         if (cursorMeta.first) null else cursorMeta.nextCursorId
 
     override fun getRefreshKey(state: PagingState<Int, AgonyRecord>): Int? {
-        return if (sortOption == SearchSortOption.DESC) null else 0
+        return getFirstIndex(sortOption)
     }
 
     private fun getFirstIndex(sortOption: SearchSortOption): Int? {
         return when (sortOption) {
-            SearchSortOption.DESC -> null
-            SearchSortOption.ASC -> 0
+            SearchSortOption.ID_DESC,
+            SearchSortOption.UPDATED_AT_DESC -> null
+
+            SearchSortOption.ID_ASC,
+            SearchSortOption.UPDATED_AT_ASC  -> 0
         }
     }
 
