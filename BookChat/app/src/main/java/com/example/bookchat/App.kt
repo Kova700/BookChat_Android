@@ -11,16 +11,13 @@ import dagger.hilt.android.HiltAndroidApp
 @HiltAndroidApp
 class App : Application() {
 
-    companion object{
-        lateinit var instance : App
-            private set
+    private val networkManager by lazy { NetworkManager() }
+    val bookChatApiClient: BookChatApiInterface by lazy {
+        RetrofitBuilder.getApiClient().create(BookChatApiInterface::class.java)
     }
-    val networkManager by lazy { NetworkManager() }
-    val bookChatApiClient by lazy { RetrofitBuilder.getApiClient().create(BookChatApiInterface::class.java) }
 
-    private var cachedUser : User? = null
+    private var cachedUser: User? = null
 
-    //액티비티 , 리시버 , 서비스가 생성되기 전에 어플리케이션이 시작 중일 때 실행됨
     override fun onCreate() {
         super.onCreate()
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -31,19 +28,24 @@ class App : Application() {
         )
     }
 
-    fun isNetworkConnected() :Boolean{
+    fun isNetworkConnected(): Boolean {
         return instance.networkManager.checkNetworkState()
     }
 
-    fun cacheUser(user :User){
+    fun cacheUser(user: User) {
         cachedUser = user
     }
 
-    fun getCachedUser() :User?{
+    fun getCachedUser(): User? {
         return cachedUser
     }
 
     fun deleteCachedUser() {
         cachedUser = null
+    }
+
+    companion object {
+        lateinit var instance: App
+            private set
     }
 }
