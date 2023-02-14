@@ -72,7 +72,7 @@ class AgonyRecordDataItemAdapter(private val agonyRecordViewModel: AgonyRecordVi
 
                     submitBtn.setOnClickListener{
                         if ((newTitle?.isBlank() == true) || (newContent?.isBlank() == true)){
-                            agonyRecordViewModel.makeToast("제목, 내용을 입력해주세요.")
+                            agonyRecordViewModel.makeToast(R.string.title_content_empty)
                             return@setOnClickListener
                         }
 
