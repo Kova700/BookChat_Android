@@ -3,16 +3,17 @@ package com.example.bookchat.data
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-//DTO
 data class Book(
     @SerializedName("isbn")
     val isbn: String,
     @SerializedName("title")
     var title: String,
-    @SerializedName("author")
-    val author: ArrayList<String> = ArrayList<String>(), //작가가 공동저자일 수도 있으니 배열로 선언
+    @SerializedName("authors")
+    val authors: List<String>,
     @SerializedName("publisher")
     val publisher: String,
+    @SerializedName("publishAt")
+    var publishAt :String,
     @SerializedName("bookCoverImageUrl")
     val bookCoverImageUrl: String
 ) : Serializable

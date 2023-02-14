@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="viewmodel"
+            type="com.example.bookchat.viewmodel.WishBookTapDialogViewModel" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:background="@drawable/view_round_white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minWidth="300dp"
+        android:minHeight="350dp">
+
+        <ImageView
+            android:id="@+id/sub_background_wish"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="17dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="-23dp"
+            android:background="@drawable/view_round_beige"
+            app:layout_constraintBottom_toBottomOf="@+id/wish_heart_toggle_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.example.bookchat.AntiDupClickToggleButton
+            android:id="@+id/wish_heart_toggle_btn"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/selector_wish_btn"
+            android:checked="@{viewmodel.isToggleChecked}"
+            android:onClick="@{() -> viewmodel.requestToggleApi()}"
+            android:scaleType="fitXY"
+            android:textOff=""
+            android:textOn=""
+            app:layout_constraintBottom_toBottomOf="@+id/sub_background_wish"
+            app:layout_constraintEnd_toEndOf="@+id/constraintLayout5"
+            app:layout_constraintStart_toStartOf="@+id/constraintLayout5"
+            app:layout_constraintTop_toBottomOf="@+id/textView28" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:layout_constraintEnd_toEndOf="@+id/sub_background_wish"
+            app:layout_constraintStart_toStartOf="@+id/sub_background_wish"
+            app:layout_constraintTop_toTopOf="@+id/sub_background_wish">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/bookImg"
+                    loadUrl="@{viewmodel.bookShelfDataItem.bookShelfItem.bookCoverImageUrl}"
+                    android:layout_width="90dp"
+                    android:layout_height="140dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/empty_img"/>
+
+            </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/textView26"
+            setSelected="@{Boolean.TRUE}"
+            android:layout_width="210dp"
+            android:layout_height="wrap_content"
+            android:elegantTextHeight="true"
+            android:ellipsize="marquee"
+            android:fontFamily="@font/notosanskr_bold"
+            android:gravity="center"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:singleLine="true"
+            android:text="@{viewmodel.bookShelfDataItem.bookShelfItem.title}"
+            android:textColor="#222222"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@+id/constraintLayout5"
+            app:layout_constraintStart_toStartOf="@+id/constraintLayout5"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout5" />
+
+        <TextView
+            android:id="@+id/textView27"
+            setSelected="@{Boolean.TRUE}"
+            android:layout_width="210dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:elegantTextHeight="true"
+            android:ellipsize="marquee"
+            android:fontFamily="@font/notosanskr_regular"
+            android:gravity="center"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:singleLine="true"
+            android:text="@{viewmodel.bookShelfDataItem.bookShelfItem.authors[0]}"
+            android:textColor="#373737"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@+id/constraintLayout5"
+            app:layout_constraintStart_toStartOf="@+id/constraintLayout5"
+            app:layout_constraintTop_toBottomOf="@+id/textView26" />
+
+        <TextView
+            android:id="@+id/textView28"
+            setSelected="@{Boolean.TRUE}"
+            android:layout_width="210dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:elegantTextHeight="true"
+            android:ellipsize="marquee"
+            android:fontFamily="@font/notosanskr_regular"
+            android:gravity="center"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:singleLine="true"
+            android:text="@{viewmodel.bookShelfDataItem.bookShelfItem.publishAt}"
+            android:textColor="#373737"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toEndOf="@+id/constraintLayout5"
+            app:layout_constraintStart_toStartOf="@+id/constraintLayout5"
+            app:layout_constraintTop_toBottomOf="@+id/textView27" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/change_status_to_reading_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="15dp"
+            android:backgroundTint="#5648FF"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:onClick="@{() -> viewmodel.changeToReadingBook()}"
+            android:minHeight="55dp"
+            android:stateListAnimator="@null"
+            android:text="@string/reading_book"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sub_background_wish" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

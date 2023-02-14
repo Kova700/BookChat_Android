@@ -1,12 +1,18 @@
 package com.example.bookchat.adapter
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.example.bookchat.ui.fragment.CompleteBookTabFragment
+import com.example.bookchat.ui.fragment.ReadingBookTabFragment
+import com.example.bookchat.ui.fragment.WishBookTabFragment
 
-class PagerFragmentStateAdapter(fragmentActivity: FragmentActivity): FragmentStateAdapter(fragmentActivity) {
+class PagerFragmentStateAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+    val wishBookTabFragment by lazy { WishBookTabFragment() }
+    val readingBookTabFragment by lazy { ReadingBookTabFragment() }
+    val completeBookTabFragment by lazy { CompleteBookTabFragment() }
 
-    var fragments : ArrayList<Fragment> = ArrayList()
+    private var fragments: List<Fragment> =
+        listOf(wishBookTabFragment,readingBookTabFragment, completeBookTabFragment)
 
     override fun getItemCount(): Int {
         return fragments.size
@@ -14,16 +20,6 @@ class PagerFragmentStateAdapter(fragmentActivity: FragmentActivity): FragmentSta
 
     override fun createFragment(position: Int): Fragment {
         return fragments[position]
-    }
-
-    fun addFragment(fragment: Fragment) {
-        fragments.add(fragment)
-        notifyItemInserted(fragments.size-1)
-    }
-
-    fun removeFragment() {
-        fragments.removeLast()
-        notifyItemRemoved(fragments.size)
     }
 
 }

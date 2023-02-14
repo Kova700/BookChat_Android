@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="activity"
+            type="com.example.bookchat.ui.activity.AgonyEditActivity" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.activity.AgonyEditActivity">
+
+        <com.example.bookchat.AntiDupClickImageButton
+            android:id="@+id/antiDupClickImageButton6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="20dp"
+            android:onClick="@{() -> activity.clickXBtn()}"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:src="@drawable/x_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView40"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_bold"
+            android:text="@string/agony_title"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="@+id/antiDupClickImageButton6"
+            app:layout_constraintEnd_toStartOf="@+id/textView39"
+            app:layout_constraintStart_toEndOf="@+id/antiDupClickImageButton6"
+            app:layout_constraintTop_toTopOf="@+id/antiDupClickImageButton6" />
+
+        <TextView
+            android:id="@+id/textView39"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="30dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:elegantTextHeight="true"
+            android:focusable="true"
+            android:fontFamily="@font/notosanskr_medium"
+            android:text="@string/confirm"
+            android:onClick="@{() -> activity.clickConfirmBtn()}"
+            android:textColor="#222222"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/antiDupClickImageButton6"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/antiDupClickImageButton6" />
+
+        <EditText
+            android:id="@+id/agonyTitleEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="35dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="10dp"
+            android:background="@null"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_bold"
+            android:maxLength="20"
+            android:singleLine="true"
+            android:text="@={activity.agonyTitle}"
+            android:textColor="#222222"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@+id/imageButton5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/antiDupClickImageButton6" />
+
+        <ImageButton
+            android:id="@+id/imageButton5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:onClick="@{() -> activity.clickDeleteTextBtn()}"
+            android:src="@drawable/ic_text_delete_btn"
+            app:layout_constraintBottom_toTopOf="@+id/underlineView"
+            app:layout_constraintEnd_toStartOf="@+id/textView41"
+            app:layout_constraintTop_toTopOf="@+id/agonyTitleEditText" />
+
+        <!--현재 입력된 Text개수 카운팅-->
+        <TextView
+            android:id="@+id/textView41"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:text="@{String.valueOf(activity.agonyTitle.length()) + '/' + String.valueOf(20)}"
+            android:textColor="#303030"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toTopOf="@+id/underlineView"
+            app:layout_constraintEnd_toEndOf="@+id/underlineView"
+            app:layout_constraintTop_toTopOf="@+id/agonyTitleEditText" />
+
+        <View
+            android:id="@+id/underlineView"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="30dp"
+            android:background="#373737"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/agonyTitleEditText" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

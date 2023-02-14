@@ -1,0 +1,105 @@
+package com.example.bookchat.ui.dialog
+
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.example.bookchat.R
+import com.example.bookchat.data.BookShelfDataItem
+import com.example.bookchat.databinding.DialogWishBookTapClickedBinding
+import com.example.bookchat.ui.fragment.BookShelfFragment
+import com.example.bookchat.ui.fragment.ReadingBookTabFragment
+import com.example.bookchat.utils.ReadingStatus
+import com.example.bookchat.viewmodel.BookShelfViewModel
+import com.example.bookchat.viewmodel.BookShelfViewModel.BookShelfEvent
+import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.READING_TAB_INDEX
+import com.example.bookchat.viewmodel.WishBookTapDialogViewModel
+import com.example.bookchat.viewmodel.WishBookTapDialogViewModel.WishBookEvent
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@AndroidEntryPoint
+class WishTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : DialogFragment() {
+
+    @Inject
+    lateinit var wishBookTapDialogViewModelFactory :WishBookTapDialogViewModel.AssistedFactory
+
+    private lateinit var binding :DialogWishBookTapClickedBinding
+    private val wishBookTapDialogViewModel: WishBookTapDialogViewModel by viewModels{
+        WishBookTapDialogViewModel.provideFactory(wishBookTapDialogViewModelFactory, bookShelfDataItem)
+    }
+    private val bookShelfViewModel: BookShelfViewModel by viewModels({ getBookShelfFragment() })
+    private var returnEvent :WishBookEvent? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = DataBindingUtil.inflate(inflater, R.layout.dialog_wish_book_tap_clicked, container, false)
+        binding.lifecycleOwner = this
+        binding.viewmodel = wishBookTapDialogViewModel
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        observeEventFlow()
+
+        //버튼 중복클릭 방지 (+네트워크가 연결되어있지 않을때는 클릭이 안되게) 수정이 필요해보임
+        //혹은 API응답이 오기 전까지 클릭이 안되거나
+
+        return binding.root
+    }
+
+    private fun getBookShelfFragment() : BookShelfFragment {
+        var fragment = requireParentFragment()
+        while (fragment !is BookShelfFragment){
+            fragment = fragment.requireParentFragment()
+        }
+        return fragment
+    }
+
+    private fun getReadingBookTabFragment() : ReadingBookTabFragment {
+        return getBookShelfFragment().pagerAdapter.readingBookTabFragment
+    }
+
+    private fun observeEventFlow() {
+        lifecycleScope.launch {
+            wishBookTapDialogViewModel.eventFlow.collect { event -> handleEvent(event) }
+        }
+    }
+
+    private fun handleEvent(event: WishBookEvent) = when(event){
+        is WishBookEvent.RemoveItem -> {
+            returnEvent = WishBookEvent.RemoveItem
+        }
+        is WishBookEvent.MoveToReadingBook -> {
+            returnEvent = WishBookEvent.MoveToReadingBook
+            this.dismiss()
+        }
+    }
+
+    override fun onDetach() {
+        when(returnEvent){
+            WishBookEvent.RemoveItem ->{
+                val itemRemoveEvent = BookShelfViewModel.PagingViewEvent.Remove(bookShelfDataItem)
+                bookShelfViewModel.addPagingViewEvent(itemRemoveEvent,ReadingStatus.WISH)
+            }
+            WishBookEvent.MoveToReadingBook -> {
+                val itemRemoveEvent = BookShelfViewModel.PagingViewEvent.Remove(bookShelfDataItem)
+                bookShelfViewModel.addPagingViewEvent(itemRemoveEvent,ReadingStatus.WISH)
+                val bookShelfUiEvent = BookShelfEvent.ChangeBookShelfTab(READING_TAB_INDEX)
+                bookShelfViewModel.startBookShelfUiEvent(bookShelfUiEvent)
+                if(bookShelfViewModel.isReadingBookLoaded){
+                    getReadingBookTabFragment().readingBookAdapter.refresh()
+                }
+            }
+            else -> { }
+        }
+        super.onDetach()
+    }
+}

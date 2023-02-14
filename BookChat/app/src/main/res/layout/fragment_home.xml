@@ -8,191 +8,161 @@
             type="com.example.bookchat.viewmodel.HomeViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ScrollView
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="wrap_content">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="34dp"
+                android:src="@drawable/ic_bookchat_main_logo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="28dp"
+                android:layout_marginTop="40dp"
+                android:fontFamily="@font/notosanskr_regular"
+                android:elegantTextHeight="true"
+                android:text="@string/main_hello"
+                android:textColor="#222222"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+
+            <TextView
+                android:id="@+id/nickName_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="28dp"
+                android:layout_marginTop="-7dp"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_bold"
+                android:text="@{viewModel.user.userNickname + '님'}"
+                android:textColor="#222222"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="30dp"
+                android:src="@drawable/ic_main_smiley"
+                app:layout_constraintBottom_toBottomOf="@+id/nickName_tv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/textView5" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="28dp"
+                android:layout_marginTop="30dp"
+                android:fontFamily="@font/notosanskr_bold"
+                android:text="@string/today_book"
+                android:textColor="#222222"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/nickName_tv" />
+
+            <HorizontalScrollView
+                android:id="@+id/horizontalScrollView"
+                tools:layout_editor_absoluteX="1dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="170dp"
+                android:scrollbars="none"
+                app:layout_constraintTop_toBottomOf="@+id/textView6">
 
-                <ImageView
-                    android:id="@+id/imageView3"
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginTop="34dp"
-                    android:src="@drawable/ic_bookchat_main_logo"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/imageView4"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:layout_marginEnd="30dp"
-                    android:background="?android:selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_search_btn"
-                    android:onClick="@{() -> viewModel.requestWithdraw()}"
-                    app:layout_constraintBottom_toBottomOf="@+id/imageView3"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/imageView3" />
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="93dp"
+                        android:layout_height="142dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="28dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="5dp">
 
-                <TextView
-                    android:id="@+id/textView5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="28dp"
-                    android:layout_marginTop="40dp"
-                    android:fontFamily="@font/notosanskr_regular"
-                    android:text="안녕하세요"
-                    android:textColor="#222222"
-                    android:textSize="20sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/ex_book1" />
+                    </androidx.cardview.widget.CardView>
 
-                <TextView
-                    android:id="@+id/nickName_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="28dp"
-                    android:layout_marginTop="-30dp"
-                    android:fontFamily="@font/notosanskr_bold"
-                    android:text="@{viewModel.user.userNickname}"
-                    android:textColor="#222222"
-                    android:textSize="20sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView5" />
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="93dp"
+                        android:layout_height="142dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="28dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="5dp">
 
-                <TextView
-                    android:id="@+id/nickName_tv2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="-30dp"
-                    android:fontFamily="@font/notosanskr_bold"
-                    android:text="님"
-                    android:textColor="#222222"
-                    android:textSize="20sp"
-                    app:layout_constraintStart_toEndOf="@+id/nickName_tv"
-                    app:layout_constraintTop_toBottomOf="@+id/textView5" />
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/ex_book2" />
+                    </androidx.cardview.widget.CardView>
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
-                    android:layout_marginEnd="30dp"
-                    android:src="@drawable/ic_main_smiley"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView4" />
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="93dp"
+                        android:layout_height="142dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="28dp"
+                        android:layout_marginRight="20dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="5dp">
 
-                <TextView
-                    android:id="@+id/textView6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="28dp"
-                    android:layout_marginTop="30dp"
-                    android:fontFamily="@font/notosanskr_bold"
-                    android:text="오늘의 북"
-                    android:textColor="#222222"
-                    android:textSize="16sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/nickName_tv" />
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/ex_book3" />
+                    </androidx.cardview.widget.CardView>
 
-                <HorizontalScrollView
-                    android:id="@+id/horizontalScrollView"
-                    tools:layout_editor_absoluteX="1dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="170dp"
-                    android:scrollbars="none"
-                    app:layout_constraintTop_toBottomOf="@+id/textView6">
+                </LinearLayout>
+            </HorizontalScrollView>
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal">
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/notosanskr_bold"
+                android:text="@string/today_chat"
+                android:textColor="#222222"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
 
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="93dp"
-                            android:layout_height="142dp"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="28dp"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="5dp">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/todayChatRoomListView"
+                tools:listitem="@layout/item_main_chatroom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:overScrollMode="never"
+                app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:scaleType="fitXY"
-                                android:src="@drawable/ex_book1" />
-                        </androidx.cardview.widget.CardView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="93dp"
-                            android:layout_height="142dp"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="28dp"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="5dp">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:scaleType="fitXY"
-                                android:src="@drawable/ex_book2" />
-                        </androidx.cardview.widget.CardView>
-
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="93dp"
-                            android:layout_height="142dp"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="28dp"
-                            android:layout_marginRight="20dp"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="5dp">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:scaleType="fitXY"
-                                android:src="@drawable/ex_book3" />
-                        </androidx.cardview.widget.CardView>
-
-                    </LinearLayout>
-                </HorizontalScrollView>
-
-                <TextView
-                    android:id="@+id/textView7"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginTop="10dp"
-                    android:fontFamily="@font/notosanskr_bold"
-                    android:text="오늘의 챗"
-                    android:textColor="#222222"
-                    android:textSize="16sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/todayChatRoomListView"
-                    tools:listitem="@layout/item_main_chatroom"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:overScrollMode="never"
-                    app:layout_constraintTop_toBottomOf="@+id/textView7" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </ScrollView>
+    </ScrollView>
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

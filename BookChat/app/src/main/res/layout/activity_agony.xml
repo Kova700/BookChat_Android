@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="com.example.bookchat.viewmodel.AgonyViewModel.AgonyActivityState"/>
+        <variable
+            name="viewmodel"
+            type="com.example.bookchat.viewmodel.AgonyViewModel" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.activity.AgonyActivity">
+
+        <com.example.bookchat.AntiDupClickImageButton
+            android:id="@+id/back_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="27dp"
+            android:onClick="@{() -> viewmodel.clickBackBtn()}"
+            android:background="?android:selectableItemBackgroundBorderless"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_back_btn" />
+
+        <TextView
+            android:id="@+id/textView12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_bold"
+            android:text="@string/agony_record"
+            android:textColor="#222222"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/back_btn"
+            app:layout_constraintStart_toEndOf="@+id/back_btn"
+            app:layout_constraintTop_toTopOf="@+id/back_btn" />
+
+        <com.example.bookchat.AntiDupClickImageButton
+            android:id="@+id/antiDupClickImageButton3"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="30dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:onClick="@{() -> viewmodel.clickEditBtn()}"
+            setVisibiltyInAgonyDefaultState="@{viewmodel.activityStateFlow}"
+            android:src="@drawable/ic_wastebasket_btn"
+            app:layout_constraintBottom_toBottomOf="@+id/back_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/back_btn" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_medium"
+            android:text="@string/cancel"
+            android:textSize="14sp"
+            android:clickable="true"
+            android:focusable="true"
+            android:onClick="@{() -> viewmodel.clickCancelBtn()}"
+            android:background="?android:selectableItemBackgroundBorderless"
+            setVisibiltyInAgonyEditingState="@{viewmodel.activityStateFlow}"
+            android:visibility="invisible"
+            android:textColor="#222222"
+            app:layout_constraintBottom_toBottomOf="@+id/antiDupClickImageButton3"
+            app:layout_constraintEnd_toEndOf="@+id/antiDupClickImageButton3"
+            app:layout_constraintStart_toStartOf="@+id/antiDupClickImageButton3"
+            app:layout_constraintTop_toTopOf="@+id/antiDupClickImageButton3" />
+
+        <!--그리드뷰 Item Spacing 설정해야함 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/agonyRcv"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintBottom_toTopOf="@+id/agony_delete_btn"
+            app:layout_constraintTop_toBottomOf="@+id/textView12"
+            app:layout_constraintVertical_bias="0.0"
+            tools:layout_editor_absoluteX="0dp" />
+
+        <com.example.bookchat.AntiDupClickButton
+            android:id="@+id/agony_delete_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="60dp"
+            android:text="@string/agony_record_delete_btn_text"
+            app:cornerRadius="0dp"
+            android:onClick="@{() -> viewmodel.clickDeleteBtn()}"
+            setVisibiltyInAgonyEditingState="@{viewmodel.activityStateFlow}"
+            android:fontFamily="@font/notosanskr_regular"
+            android:textSize="14sp"
+            android:backgroundTint="#5648FF"
+            android:elegantTextHeight="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

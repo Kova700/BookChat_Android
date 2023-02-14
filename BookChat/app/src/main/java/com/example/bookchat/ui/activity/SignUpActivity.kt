@@ -3,46 +3,45 @@ package com.example.bookchat.ui.activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Bundle
-import android.os.Handler
-import android.os.IBinder
-import android.os.Looper
+import android.os.*
 import android.provider.Settings
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySignUpBinding
 import com.example.bookchat.ui.activity.ImageCropActivity.Companion.EXTRA_USER_PROFILE_BYTE_ARRAY1
 import com.example.bookchat.viewmodel.SignUpViewModel
 import com.example.bookchat.viewmodel.SignUpViewModel.SignUpEvent
-import com.example.bookchat.viewmodel.ViewModelFactory
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class SignUpActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivitySignUpBinding
-    private lateinit var signUpViewModel : SignUpViewModel
-    private lateinit var imm :InputMethodManager
+    private val signUpViewModel : SignUpViewModel by viewModels()
+    private val imm by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up)
-        signUpViewModel = ViewModelProvider(this, ViewModelFactory()).get(SignUpViewModel::class.java)
         with(binding){
             lifecycleOwner = this@SignUpActivity
             viewModel = signUpViewModel
         }
         setFocus()
+        observeEvent()
+    }
 
-        lifecycleScope.launch {
-            signUpViewModel.eventFlow.collect { event -> handleEvent(event) }
-        }
+    private fun observeEvent() = lifecycleScope.launch {
+        signUpViewModel.eventFlow.collect { event -> handleEvent(event) }
     }
 
     private fun setFocus(){
@@ -51,20 +50,27 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun openKeyboard(view :View) {
-        imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         Handler(Looper.getMainLooper()).postDelayed({
             imm.showSoftInput(view,InputMethodManager.SHOW_IMPLICIT)
         },DELAY_TIME)
     }
+
     private fun closeKeyboard(windowToken :IBinder) {
         imm.hideSoftInputFromWindow(windowToken,InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
-    private fun launchPermissions() {
-        val permissions = arrayOf(
+    private fun getPermissions() :Array<String>{
+        if (sdkVersionIsMoreTIRAMISU()) {
+            return arrayOf(android.Manifest.permission.READ_MEDIA_IMAGES)
+        }
+        return arrayOf(
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
+    }
+
+    private fun launchPermissions() {
+        val permissions = getPermissions()
         closeKeyboard(binding.nickNameEt.windowToken)
         requestPermissions.launch(permissions)
     }
@@ -88,12 +94,12 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         map[DENIED]?.let{
-            Snackbar.make(binding.signUpLayout,R.string.message_permission_denied, Snackbar.LENGTH_LONG).show()
+            Snackbar.make(binding.signUpLayout,R.string.permission_denied, Snackbar.LENGTH_LONG).show()
             return
         }
 
         map[EXPLAINED]?.let {
-            Snackbar.make(binding.signUpLayout,R.string.message_permission_explained, Snackbar.LENGTH_LONG).show()
+            Toast.makeText(this,R.string.permission_explained,Toast.LENGTH_LONG).show()
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             val uri = Uri.fromParts(SCHEME_PACKAGE, this.packageName, null)
             intent.data = uri
@@ -126,7 +132,7 @@ class SignUpActivity : AppCompatActivity() {
         }
 
     private fun handleEvent(event: SignUpEvent) = when(event) {
-        is SignUpEvent.UnknownError -> { Snackbar.make(binding.signUpLayout,R.string.message_error_else,Snackbar.LENGTH_SHORT).show() }
+        is SignUpEvent.UnknownError -> { Snackbar.make(binding.signUpLayout,R.string.error_else,Snackbar.LENGTH_SHORT).show() }
         is SignUpEvent.PermissionCheck -> launchPermissions()
         is SignUpEvent.MoveToBack -> finish()
         is SignUpEvent.MoveToSelectTaste -> {
@@ -135,6 +141,10 @@ class SignUpActivity : AppCompatActivity() {
             intent.putExtra(EXTRA_USER_PROFILE_BYTE_ARRAY2,event.userProfilByteArray)
             startActivity(intent)
         }
+    }
+
+    private fun sdkVersionIsMoreTIRAMISU() :Boolean{
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
     }
 
     companion object{

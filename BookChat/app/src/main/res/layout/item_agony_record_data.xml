@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="agonyRecordDataItem"
+            type="com.example.bookchat.data.AgonyRecordDataItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ProgressBar
+            setVisibiltyDataItemInLoadingState="@{agonyRecordDataItem.status}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/swipe_background"
+            app:agonyRecordDataItem ="@{agonyRecordDataItem}"
+            layout="@layout/item_agony_record_swipe_background" />
+
+        <include
+            android:id="@+id/edit_layout"
+            app:agonyRecordDataItem ="@{agonyRecordDataItem}"
+            app:newTitle ="@{agonyRecordDataItem.agonyRecord.agonyRecordTitle}"
+            app:newContent ="@{agonyRecordDataItem.agonyRecord.agonyRecordContent}"
+            layout="@layout/item_agony_record_edit_data"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/swipe_view"
+            setVisibiltyDataItemInDefaultState ="@{agonyRecordDataItem.status}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="30dp"
+                android:layout_marginBottom="10dp"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:minHeight="190dp"
+                app:cardCornerRadius="15dp"
+                app:cardElevation="3dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/agony_record_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="15dp"
+                android:elegantTextHeight="true"
+                android:elevation="10dp"
+                android:maxLength="100"
+                android:fontFamily="@font/notosanskr_regular"
+                android:text="@{agonyRecordDataItem.agonyRecord.agonyRecordTitle}"
+                android:textColor="#222222"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="@+id/cardView4"
+                app:layout_constraintTop_toTopOf="@+id/cardView4" />
+
+            <TextView
+                android:id="@+id/agony_record_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="10dp"
+                android:elegantTextHeight="true"
+                android:elevation="10dp"
+                android:fontFamily="@font/notosanskr_regular"
+                android:text="@{agonyRecordDataItem.agonyRecord.agonyRecordContent}"
+                android:textColor="#373737"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@+id/agony_record_createdAt"
+                app:layout_constraintEnd_toEndOf="@+id/cardView4"
+                app:layout_constraintStart_toStartOf="@+id/cardView4"
+                app:layout_constraintTop_toBottomOf="@+id/agony_record_title" />
+
+            <TextView
+                android:id="@+id/agony_record_createdAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginBottom="10dp"
+                android:elegantTextHeight="true"
+                android:elevation="10dp"
+                android:fontFamily="@font/notosanskr_regular"
+                android:text="@{agonyRecordDataItem.agonyRecord.createdAt}"
+                android:textColor="#373737"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@+id/cardView4"
+                app:layout_constraintStart_toStartOf="@+id/cardView4" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

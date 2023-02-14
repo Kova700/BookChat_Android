@@ -2,25 +2,29 @@ package com.example.bookchat.viewmodel
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.App
-import com.example.bookchat.R
+import com.example.bookchat.data.response.ForbiddenException
+import com.example.bookchat.data.response.KakaoLoginFailException
+import com.example.bookchat.data.response.NeedToSignUpException
+import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.kakao.KakaoSDK
 import com.example.bookchat.repository.UserRepository
-import com.example.bookchat.response.*
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor (
+    private val userRepository: UserRepository
+    ) : ViewModel() {
+
     private val _eventFlow = MutableSharedFlow<LoginEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
-
-    private var recursiveChecker = false //임시 (구조 개선 필요)
 
     init {
         viewModelScope.launch {
@@ -33,13 +37,6 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
         Log.d(TAG, "LoginViewModel: requestUserInfo() - called")
         runCatching { userRepository.getUserProfile() }
             .onSuccess { startEvent(LoginEvent.MoveToMain) }
-            .onFailure { failHandler(it) }
-    }
-
-    private fun requestTokenRenewal() = viewModelScope.launch {
-        Log.d(TAG, "LoginViewModel: requestTokenRenewal() - called")
-        runCatching { userRepository.requestTokenRenewal() }
-            .onSuccess { if (recursiveChecker == false) requestUserInfo(); recursiveChecker = true }
             .onFailure { failHandler(it) }
     }
 
@@ -76,7 +73,6 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
     private fun failHandler(exception: Throwable) {
         Log.d(TAG, "LoginViewModel: failHandler() - exception : $exception")
         when (exception) {
-            is TokenExpiredException -> requestTokenRenewal()
             is NeedToSignUpException -> startEvent(LoginEvent.MoveToSignUp)
             is ForbiddenException -> startEvent(LoginEvent.Forbidden)
             is NetworkIsNotConnectedException -> startEvent(LoginEvent.NetworkError)

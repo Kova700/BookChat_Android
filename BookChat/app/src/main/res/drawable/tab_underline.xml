@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--리플 색 안변하거나 적용이 안되는 이슈 있어서 수정 예저-->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#A0A0A0">
+    <item android:gravity="bottom">
+        <shape android:shape="rectangle">
+            <solid android:color="#D9D9D9" />
+            <size android:height="2dp" />
+        </shape>
+    </item>
+</ripple>
