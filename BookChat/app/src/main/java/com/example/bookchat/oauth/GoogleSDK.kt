@@ -40,6 +40,17 @@ object GoogleSDK {
         DataStoreManager.saveIdToken(IdToken("Bearer ${token}", OAuth2Provider.GOOGLE) )
     }
 
-    //로그아웃
-    //탈퇴
+    private fun signOut(context :Context) {
+        val mGoogleSignInClient = GoogleSignIn.getClient(context, googleSignInOptions)
+        mGoogleSignInClient.signOut().addOnCompleteListener { task ->
+
+        }
+    }
+
+    private fun withdrawAccess(context :Context) {
+        val mGoogleSignInClient = GoogleSignIn.getClient(context, googleSignInOptions)
+        mGoogleSignInClient.revokeAccess().addOnCompleteListener { task ->
+
+        }
+    }
 }
