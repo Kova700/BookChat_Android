@@ -1,4 +1,4 @@
-package com.example.bookchat.kakao
+package com.example.bookchat.oauth
 
 import android.content.Context
 import android.util.Log
@@ -46,7 +46,6 @@ object KakaoSDK {
     }
 
     private suspend fun saveIdToken(token :OAuthToken){
-        Log.d(TAG, "KakaoSDK: saveIdToken() - idToken : ${token.idToken}")
         DataStoreManager.saveIdToken(IdToken("Bearer ${token.idToken}", OAuth2Provider.KAKAO) )
     }
 

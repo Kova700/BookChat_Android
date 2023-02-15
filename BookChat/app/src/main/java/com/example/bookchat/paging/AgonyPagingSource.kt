@@ -10,6 +10,10 @@ import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseBodyEmptyException
 import com.example.bookchat.data.response.ResponseGetAgony
 import com.example.bookchat.utils.SearchSortOption
+import com.example.bookchat.utils.SearchSortOption.ID_ASC
+import com.example.bookchat.utils.SearchSortOption.ID_DESC
+import com.example.bookchat.utils.SearchSortOption.UPDATED_AT_ASC
+import com.example.bookchat.utils.SearchSortOption.UPDATED_AT_DESC
 import retrofit2.Response
 
 class AgonyPagingSource(
@@ -56,7 +60,7 @@ class AgonyPagingSource(
     }
 
     override fun getRefreshKey(state: PagingState<Int, Agony>): Int? {
-        return if (sortOption == SearchSortOption.DESC) null else 0
+        return getFirstIndex(sortOption)
     }
 
     private fun getLoadResult(
@@ -85,10 +89,13 @@ class AgonyPagingSource(
         if (cursorMeta.last) return null
 
         return when (sortOption) {
-            SearchSortOption.DESC -> {
+            ID_DESC,
+            UPDATED_AT_DESC -> {
                 if (cursorMeta.first) cursorMeta.nextCursorId - 2 else cursorMeta.nextCursorId
             }
-            SearchSortOption.ASC -> {
+
+            ID_ASC,
+            UPDATED_AT_ASC -> {
                 if (cursorMeta.first) cursorMeta.nextCursorId + 2 else cursorMeta.nextCursorId
             }
         }
@@ -96,8 +103,11 @@ class AgonyPagingSource(
 
     private fun getFirstIndex(sortOption: SearchSortOption): Int? {
         return when (sortOption) {
-            SearchSortOption.DESC -> null
-            SearchSortOption.ASC -> 0
+            ID_DESC,
+            UPDATED_AT_DESC -> null
+
+            ID_ASC,
+            UPDATED_AT_ASC  -> 0
         }
     }
 

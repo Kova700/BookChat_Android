@@ -8,6 +8,7 @@ import android.os.Looper
 import com.example.bookchat.R
 
 class SplashActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
@@ -19,7 +20,7 @@ class SplashActivity : AppCompatActivity() {
         },SPLASH_DURATION)
 
     }
-    
+
     companion object{
         const val SPLASH_DURATION = 2000L
     }

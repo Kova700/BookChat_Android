@@ -46,7 +46,7 @@ class AgonyRecordViewModel @AssistedInject constructor(
             AgonyRecordPagingSource(
                 agonyDataItem.agony,
                 book,
-                SearchSortOption.DESC
+                SearchSortOption.ID_DESC
             )
         }
     ).flow

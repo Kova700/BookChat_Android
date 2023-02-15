@@ -1,6 +1,6 @@
 package com.example.bookchat.api
 
-import com.example.bookchat.utils.Constants.DOMAIN
+import com.example.bookchat.BuildConfig.DOMAIN
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

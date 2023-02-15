@@ -4,8 +4,10 @@ import com.example.bookchat.data.*
 import com.example.bookchat.data.request.*
 import com.example.bookchat.data.response.*
 import com.example.bookchat.utils.BookSearchSortOption
+import com.example.bookchat.utils.BookSearchSortOption.ACCURACY
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.utils.SearchSortOption
+import com.example.bookchat.utils.SearchSortOption.UPDATED_AT_DESC
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
@@ -51,7 +53,7 @@ interface BookChatApiInterface {
         @Query("query") query: String,
         @Query("size") size: String,
         @Query("page") page: String,
-        @Query("sort") sort: BookSearchSortOption = BookSearchSortOption.ACCURACY,
+        @Query("sort") sort: BookSearchSortOption = ACCURACY
     ): Response<ResponseGetBookSearch>
 
     @POST("/v1/api/bookshelves")
@@ -64,7 +66,7 @@ interface BookChatApiInterface {
         @Query("size") size: String,
         @Query("page") page: String,
         @Query("readingStatus") readingStatus: ReadingStatus,
-        @Query("sort") sort: SearchSortOption = SearchSortOption.DESC //임시
+        @Query("sort") sort: SearchSortOption = UPDATED_AT_DESC
     ): Response<ResponseGetBookShelfBooks>
 
     @DELETE("/v1/api/bookshelves/{bookId}")
