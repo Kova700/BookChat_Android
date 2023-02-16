@@ -9,10 +9,11 @@ import com.example.bookchat.oauth.GoogleSDK
 import com.example.bookchat.oauth.KakaoSDK
 import com.example.bookchat.repository.UserRepository
 import com.example.bookchat.utils.Constants.TAG
-import com.example.bookchat.utils.DataStoreManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,12 +25,7 @@ class LoginViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<LoginEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    init {
-        viewModelScope.launch {
-            runCatching { DataStoreManager.getBookchatToken() }
-                .onSuccess { requestUserInfo() }
-        }
-    }
+    private val uiStateFlow = MutableStateFlow<LoginUiState>(LoginUiState.Default)
 
     private fun requestUserInfo() = viewModelScope.launch {
         Log.d(TAG, "LoginViewModel: requestUserInfo() - called")
@@ -43,19 +39,15 @@ class LoginViewModel @Inject constructor(
         runCatching { KakaoSDK.kakaoLogin(context) }
             .onSuccess { bookchatLogin() }
             .onFailure { failHandler(it) }
-    }
-
-    fun startGoogleLogin(context: Context) = viewModelScope.launch {
-        Log.d(TAG, "LoginViewModel: requestGoogleLogin() - called")
-        runCatching { GoogleSDK.googleLogin(context) }
-            .onSuccess { bookchatLogin() }
-            .onFailure { failHandler(it) }
+            .also { setUiStateToDefault() }
     }
 
     fun bookchatLogin() = viewModelScope.launch {
+        Log.d(TAG, "LoginViewModel: bookchatLogin() - called")
         runCatching { userRepository.signIn() }
             .onSuccess { requestUserInfo() }
             .onFailure { failHandler(it) }
+            .also { setUiStateToDefault() }
     }
 
     private fun startEvent(event: LoginEvent) = viewModelScope.launch {
@@ -70,6 +62,22 @@ class LoginViewModel @Inject constructor(
         object KakaoLoginFail : LoginEvent()
         object NeedToGoogleLogin : LoginEvent()
         object UnknownError : LoginEvent()
+    }
+
+    sealed class LoginUiState {
+        object Loading :LoginUiState()
+        object Default :LoginUiState()
+    }
+
+    fun isUiStateDefault() =
+        uiStateFlow.value == LoginUiState.Default
+
+    fun setUiStateToLoading() {
+        uiStateFlow.value = LoginUiState.Loading
+    }
+
+    fun setUiStateToDefault() {
+        uiStateFlow.value = LoginUiState.Default
     }
 
     private fun failHandler(exception: Throwable) {
