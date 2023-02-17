@@ -80,7 +80,7 @@ class SignUpViewModel @Inject constructor(
             startEvent(SignUpEvent.MoveToSelectTaste(_signUpDto.value,_userProfilByteArray.value))
             return
         }
-        requestNameDuplicateCheck(_signUpDto.value.nickname)
+        requestNameDuplicateCheck(_signUpDto.value.nickname.trim())
     }
 
     private suspend fun requestNameDuplicateCheck(nickName :String) {

@@ -4,8 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-            name="viewModel"
-            type="com.example.bookchat.viewmodel.HomeViewModel" />
+            name="user"
+            type="com.example.bookchat.data.User" />
     </data>
 
     <ScrollView
@@ -48,7 +48,7 @@
                 android:layout_marginTop="-7dp"
                 android:elegantTextHeight="true"
                 android:fontFamily="@font/notosanskr_bold"
-                android:text="@{viewModel.user.userNickname + '님'}"
+                android:text="@{user.userNickname + '님'}"
                 android:textColor="#222222"
                 android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="parent"

@@ -10,9 +10,6 @@
         <variable
             name="activity"
             type="com.example.bookchat.ui.activity.LoginActivity" />
-        <variable
-            name="viewModel"
-            type="com.example.bookchat.viewmodel.LoginViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -48,7 +45,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.813" />
 
-        <Button
+        <com.example.bookchat.AntiDupClickButton
             android:id="@+id/googleLogin_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -72,7 +69,7 @@
             app:strokeColor="#F5F5F5"
             app:strokeWidth="1.5dp" />
 
-        <Button
+        <com.example.bookchat.AntiDupClickButton
             android:id="@+id/kakaoLogin_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

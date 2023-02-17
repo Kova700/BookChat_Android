@@ -13,11 +13,10 @@ import com.example.bookchat.data.response.TokenDoseNotExistException
 import com.example.bookchat.databinding.ActivityLoginBinding
 import com.example.bookchat.oauth.GoogleSDK
 import com.example.bookchat.utils.DataStoreManager
-import com.example.bookchat.utils.OAuth2Provider
+import com.example.bookchat.utils.OAuth2Provider.GOOGLE
 import com.example.bookchat.viewmodel.LoginViewModel
 import com.example.bookchat.viewmodel.LoginViewModel.LoginEvent
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -35,7 +34,6 @@ class LoginActivity : AppCompatActivity() {
         with(binding){
             lifecycleOwner = this@LoginActivity
             activity = this@LoginActivity
-            viewModel = loginViewModel
         }
 
         observeUiEvent()
@@ -46,31 +44,40 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun clickKakaoLoginBtn(){
-        loginViewModel.startKakaoLogin(this)
+        if (loginViewModel.isUiStateDefault()){
+            loginViewModel.setUiStateToLoading()
+            loginViewModel.startKakaoLogin(this)
+        }
     }
 
     fun clickGoogleLoginBtn(){
-        loginViewModel.startGoogleLogin(this)
+        if (loginViewModel.isUiStateDefault()){
+            startGoogleLoginActivity()
+        }
     }
 
     private fun startGoogleLoginActivity(){
+        loginViewModel.setUiStateToLoading()
         val signInIntent = GoogleSDK.getSignInIntent(this)
         googleLoginActivityResultLauncher.launch(signInIntent)
     }
 
     private val googleLoginActivityResultLauncher =
         this.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            loginViewModel.setUiStateToDefault()
+
             if(result.resultCode == RESULT_OK){
                 runCatching {
                     val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-                    saveIdToken(task.result.idToken)
+                    saveGoogleIdToken(task.result.idToken)
+                    loginViewModel.bookchatLogin()
                 }
             }
         }
 
-    private fun saveIdToken(idToken :String?) = lifecycleScope.launch(){
+    private fun saveGoogleIdToken(idToken :String?) {
         idToken ?: throw TokenDoseNotExistException()
-        DataStoreManager.saveIdToken(IdToken("Bearer $idToken", OAuth2Provider.GOOGLE))
+        DataStoreManager.saveIdToken(IdToken("Bearer $idToken", GOOGLE))
     }
 
     private fun showSnackBar(textId :Int){
@@ -86,5 +93,4 @@ class LoginActivity : AppCompatActivity() {
         is LoginEvent.UnknownError -> { showSnackBar(R.string.error_else)}
         is LoginEvent.NeedToGoogleLogin -> { startGoogleLoginActivity() }
     }
-
 }

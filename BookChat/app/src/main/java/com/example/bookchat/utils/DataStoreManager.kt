@@ -20,14 +20,13 @@ import kotlinx.coroutines.flow.firstOrNull
 import java.io.IOException
 
 object DataStoreManager {
+    private var cachedIdToken : IdToken? = null
 
     private const val DATASTORE_KEY = "DATASTORE_KEY"
-    private const val ID_TOKEN_KEY = "ID_TOKEN_KEY"
     private const val BOOKCHAT_TOKEN_KEY = "BOOKCHAT_TOKEN_KEY"
     private const val SEARCH_HISTORY_KEY = "SEARCH_HISTORY_KEY"
 
     private val Context.dataStore by preferencesDataStore(DATASTORE_KEY)
-    private val idTokenKey = stringPreferencesKey(ID_TOKEN_KEY)
     private val bookChatTokenKey = stringPreferencesKey(BOOKCHAT_TOKEN_KEY)
     private val searchHistoryKey = stringPreferencesKey(SEARCH_HISTORY_KEY)
 
@@ -47,22 +46,15 @@ object DataStoreManager {
         setDataStore(bookChatTokenKey, tokenString)
     }
 
-    //ID토큰 (추후 암호화 추가)
-    suspend fun getIdToken(): IdToken {
-        val idTokenString = readDataStore().firstOrNull()?.get(idTokenKey)
-        if (idTokenString.isNullOrBlank()) throw IdTokenDoseNotExistException()
-        val idToken = Gson().fromJson(idTokenString, IdToken::class.java)
-        Log.d(TAG, "DataStoreManager: getIdToken() - idToken : $idToken")
-        return idToken
+    fun getIdToken(): IdToken {
+        return this.cachedIdToken ?: throw IdTokenDoseNotExistException()
     }
 
-    suspend fun saveIdToken(idToken: IdToken) {
-        val idTokenString = Gson().toJson(idToken)
-        setDataStore(idTokenKey, idTokenString)
+    fun saveIdToken(idToken: IdToken) {
+        this.cachedIdToken = idToken
     }
 
     suspend fun getSearchHistory() :MutableList<String>? {
-        Log.d(TAG, "DataStoreManager: getSearchHistory() - called")
         val historyString = readDataStore().firstOrNull()?.get(searchHistoryKey)
         if (historyString.isNullOrBlank()) return null
         val historyList = Gson().fromJson(historyString, Array<String>::class.java).toMutableList()
@@ -70,32 +62,24 @@ object DataStoreManager {
     }
 
     suspend fun saveSearchHistory(searchKeyWord : String){
-        Log.d(TAG, "DataStoreManager: saveSearchHistory() - called")
         val oldHistoryList = getSearchHistory()
         val newHistoryList =  mutableListOf(searchKeyWord)
         newHistoryList.addAll(oldHistoryList ?: listOf())
-        Log.d(TAG, "DataStoreManager: saveSearchHistory() - newHistoryList : $newHistoryList")
         val historyString : String = Gson().toJson(newHistoryList)
         setDataStore(searchHistoryKey,historyString)
     }
 
     suspend fun clearSearchHistory(){
-        Log.d(TAG, "DataStoreManager: clearSearchHistory() - called")
         removeDataStore(searchHistoryKey)
     }
 
     suspend fun overWriteHistory(historyList : List<String>){
-        Log.d(TAG, "DataStoreManager: overWriteHistory() - historyList : $historyList")
         val historyString : String = Gson().toJson(historyList)
         setDataStore(searchHistoryKey,historyString)
     }
 
     suspend fun deleteBookchatToken() {
         removeDataStore(bookChatTokenKey)
-    }
-
-    suspend fun deleteIdToken() {
-        removeDataStore(idTokenKey)
     }
 
     suspend fun <T : Any> removeDataStore(

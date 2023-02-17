@@ -4,49 +4,49 @@ import android.content.Context
 import android.util.Log
 import com.example.bookchat.data.IdToken
 import com.example.bookchat.data.response.KakaoLoginFailException
+import com.example.bookchat.data.response.KakaoLoginUserCancelException
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
-import com.example.bookchat.utils.OAuth2Provider
+import com.example.bookchat.utils.OAuth2Provider.KAKAO
 import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.model.AuthError
+import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.user.UserApiClient
-import kotlinx.coroutines.*
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 object KakaoSDK {
     private val userApiClient by lazy { UserApiClient.instance }
 
     suspend fun kakaoLogin(context :Context) {
-        val kakaoLoginResult = getKakaoLoginResult(context)
-        kakaoLoginResult.onFailure { throw KakaoLoginFailException(it.message) }
-        kakaoLoginResult.onSuccess { kakaoLoginResult.map { saveIdToken(it) } }
-    }
-
-    private suspend fun getKakaoLoginResult(context :Context) : Result<OAuthToken>{
         val isKakaoTalkLoginAvailable = userApiClient.isKakaoTalkLoginAvailable(context)
-        if (isKakaoTalkLoginAvailable)  return kakaoLoginWithKakaoTalk(context)
-        return kakaoLoginWithKakaoAccount(context)
+        if (isKakaoTalkLoginAvailable) { kakaoLoginWithKakaoTalk(context); return}
+        kakaoLoginWithKakaoAccount(context)
     }
 
-    private suspend fun kakaoLoginWithKakaoTalk(context :Context) : Result<OAuthToken>{
-        val kakaoTalkLoginResult = suspendCancellableCoroutine<Result<OAuthToken>> { continuation ->
+    private suspend fun kakaoLoginWithKakaoTalk(context :Context){
+        suspendCancellableCoroutine<Result<OAuthToken>> { continuation ->
             userApiClient.loginWithKakaoTalk(context) { token, error ->
                 continuation.resume(getTokenResult(token, error))
             }
-        }
-        return kakaoTalkLoginResult
+        }.handelKakaoLoginResult(context)
     }
 
-    private suspend fun kakaoLoginWithKakaoAccount(context :Context) : Result<OAuthToken>{
-        val kakaoAccountLoginResult = suspendCancellableCoroutine<Result<OAuthToken>> { continuation ->
+    private suspend fun kakaoLoginWithKakaoAccount(context :Context){
+        suspendCancellableCoroutine<Result<OAuthToken>> { continuation ->
             userApiClient.loginWithKakaoAccount(context){ token, error ->
                 continuation.resume(getTokenResult(token, error))
             }
-        }
-        return kakaoAccountLoginResult
+        }.handelKakaoLoginResult(context)
     }
 
-    private suspend fun saveIdToken(token :OAuthToken){
-        DataStoreManager.saveIdToken(IdToken("Bearer ${token.idToken}", OAuth2Provider.KAKAO) )
+    private suspend fun Result<OAuthToken>.handelKakaoLoginResult(context :Context){
+        this.onSuccess { saveIdToken(it) }
+            .onFailure { kakaoLoginFailHandler(it, context) }
+    }
+
+    private fun saveIdToken(token :OAuthToken){
+        DataStoreManager.saveIdToken(IdToken("Bearer ${token.idToken}", KAKAO) )
     }
 
     private fun getTokenResult(token : OAuthToken?, error :Throwable?) :Result<OAuthToken>{
@@ -70,6 +70,14 @@ object KakaoSDK {
         userApiClient.unlink { error ->
             error?.let { Log.d(TAG, "KakaoSDK: unlink() - 연결 끊기 실패. SDK에서 토큰 삭제됨 error : ${error}") }
                 ?: run { Log.d(TAG, "KakaoSDK: unlink() - 연결 끊기 성공. SDK에서 토큰 삭제됨") }
+        }
+    }
+
+    private suspend fun kakaoLoginFailHandler(throwable: Throwable, context :Context) {
+        when(throwable){
+            is AuthError -> { kakaoLoginWithKakaoAccount(context) }
+            is ClientError -> { throw KakaoLoginUserCancelException(throwable.message) }
+            else -> { throw KakaoLoginFailException(throwable.message) }
         }
     }
 

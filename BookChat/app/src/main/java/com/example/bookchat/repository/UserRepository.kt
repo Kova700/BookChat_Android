@@ -2,7 +2,6 @@ package com.example.bookchat.repository
 
 import android.util.Log
 import com.example.bookchat.App
-import com.example.bookchat.data.User
 import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.data.request.RequestUserSignIn
 import com.example.bookchat.data.request.RequestUserSignUp
@@ -24,7 +23,6 @@ class UserRepository @Inject constructor(){
         val requestUserSignIn = RequestUserSignIn(idToken.oAuth2Provider)
 
         val response = App.instance.bookChatApiClient.signIn(idToken.token, requestUserSignIn)
-
         when(response.code()){
             200 -> {
                 val token = response.body()
@@ -62,8 +60,6 @@ class UserRepository @Inject constructor(){
     suspend fun signOut(){
         Log.d(TAG, "UserRepository: signOut() - called")
         DataStoreManager.deleteBookchatToken()
-        DataStoreManager.deleteIdToken()
-        App.instance.deleteCachedUser()
     }
 
     //회원 탈퇴 후 재가입 가능 기간 정책 결정해야함
@@ -77,17 +73,15 @@ class UserRepository @Inject constructor(){
         }
     }
 
-    suspend fun getUserProfile() :User{
+    suspend fun getUserProfile(){
         Log.d(TAG, "UserRepository: getUserProfile() - called")
-        val cachedUser = App.instance.getCachedUser()
-        cachedUser?.let { return cachedUser }
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val response = App.instance.bookChatApiClient.getUserProfile()
         when(response.code()){
             200 -> {
                 val user = response.body()
-                user?.let { App.instance.cacheUser(user); return user }
+                user?.let { App.instance.cacheUser(user); return }
                 throw ResponseBodyEmptyException(response.errorBody()?.string())
             }
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
