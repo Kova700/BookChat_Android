@@ -1,35 +1,221 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
             name="viewmodel"
             type="com.example.bookchat.viewmodel.MyPageViewModel" />
+        <variable
+            name="buildConfig"
+            type="com.example.bookchat.BuildConfig" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <Button
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_top"
+            app:layout_constraintGuide_begin="30dp"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="50dp"
-            android:text="탈퇴(임시)"
-            android:onClick="@{() -> viewmodel.requestWithdraw()}"
-            app:layout_constraintBottom_toTopOf="@+id/textView30"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintGuide_begin="30dp"
+            android:orientation="vertical" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintGuide_end="30dp"
+            android:orientation="vertical" />
 
         <TextView
-            android:id="@+id/textView30"
+            android:id="@+id/mypage_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="MYPAGE"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_bold"
+            android:text="나의 정보"
+            android:textColor="#222222"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="@id/guideline_start"
+            app:layout_constraintTop_toTopOf="@id/guideline_top" />
+
+        <!--이미지 수정해야함-->
+        <!--유저에 이미지를 우선불러오고, 없으면, default이미지 번호로
+        이미지 띄워야함-->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView6"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="35dp"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/mypage_title">
+
+            <ImageView
+                android:id="@+id/userProfile_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="fitCenter"
+                android:src="@drawable/default_profile_img1" />
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/nickname_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="15dp"
+            android:elegantTextHeight="true"
+            android:ellipsize="end"
+            android:fontFamily="@font/notosanskr_bold"
+            android:maxLength="20"
+            android:maxLines="1"
+            android:text="북챗123"
+            android:textColor="#373737"
+            android:textSize="20sp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toStartOf="@+id/antiDupClickImageButton7"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/cardView6" />
+
+        <com.example.bookchat.AntiDupClickImageButton
+            android:id="@+id/antiDupClickImageButton7"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="10dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:src="@drawable/caret_left_btn"
+            app:layout_constraintBottom_toBottomOf="@+id/nickname_tv"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintStart_toEndOf="@+id/nickname_tv"
+            app:layout_constraintTop_toTopOf="@+id/nickname_tv" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/wish_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/mypage_heart_btn"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingHorizontal="1dp"
+            android:paddingVertical="0dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:textColor="#373737"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:text="관심목록"
+            app:layout_constraintBottom_toBottomOf="@+id/notice_btn"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
+            app:layout_constraintTop_toTopOf="@+id/notice_btn"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/notice_btn"
+            android:layout_marginTop="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/mypage_notice"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingHorizontal="1dp"
+            android:paddingVertical="0dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:textColor="#373737"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:text="공지사항"
+            app:layout_constraintEnd_toEndOf="@+id/cardView6"
+            app:layout_constraintStart_toStartOf="@+id/cardView6"
+            app:layout_constraintTop_toBottomOf="@+id/nickname_tv"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/invite_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:drawableTop="@drawable/mypage_invite"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingHorizontal="1dp"
+            android:paddingVertical="0dp"
+            android:text="친구초대"
+            android:textColor="#373737"
+            app:layout_constraintBottom_toBottomOf="@+id/notice_btn"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintTop_toTopOf="@+id/notice_btn" />
+
+        <TextView
+            android:id="@+id/user_setting_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:foreground="?android:selectableItemBackground"
+            android:text="계정 설정"
+            android:textColor="#373737"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/notice_btn" />
+
+        <TextView
+            android:id="@+id/app_settting_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:foreground="?android:selectableItemBackground"
+            android:text="앱 설정"
+            android:textColor="#373737"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/user_setting_btn" />
+
+        <TextView
+            android:id="@+id/app_version_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:foreground="?android:selectableItemBackground"
+            android:text="앱 버전"
+            android:textColor="#373737"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/app_settting_btn" />
+
+        <TextView
+            android:id="@+id/app_version_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:fontFamily="@font/notosanskr_regular"
+            android:text="@{buildConfig.VERSION_NAME}"
+            android:textColor="#373737"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/app_version_btn"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintTop_toTopOf="@+id/app_version_btn" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
