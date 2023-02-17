@@ -89,6 +89,8 @@
             android:minHeight="60dp"
             android:text="@string/agony_record_delete_btn_text"
             app:cornerRadius="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             android:onClick="@{() -> viewmodel.clickDeleteBtn()}"
             setVisibiltyInAgonyEditingState="@{viewmodel.activityStateFlow}"
             android:fontFamily="@font/notosanskr_regular"
