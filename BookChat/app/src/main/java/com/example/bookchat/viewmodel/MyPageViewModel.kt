@@ -30,11 +30,16 @@ class MyPageViewModel @Inject constructor(
             }
     }
 
+    fun clickUserEditBtn(){
+        startEvent(MyPageEvent.MoveToUserEditPage)
+    }
+
     private fun startEvent (event : MyPageEvent) = viewModelScope.launch {
         _eventFlow.emit(event)
     }
 
     sealed class MyPageEvent{
         object MoveToLoginPage :MyPageEvent()
+        object MoveToUserEditPage :MyPageEvent()
     }
 }

@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentMyPageBinding
 import com.example.bookchat.ui.activity.LoginActivity
+import com.example.bookchat.ui.activity.UserEditActivity
 import com.example.bookchat.viewmodel.MyPageViewModel
 import com.example.bookchat.viewmodel.MyPageViewModel.MyPageEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,9 +53,15 @@ class MyPageFragment : Fragment()  {
         startActivity(intent)
     }
 
+    private fun moveToUserEditActivity(){
+        val intent = Intent(requireContext(), UserEditActivity::class.java)
+        startActivity(intent)
+    }
+
     private fun handleEvent(event : MyPageEvent){
         when(event){
-            MyPageEvent.MoveToLoginPage -> moveToLoginActivity()
+            is MyPageEvent.MoveToLoginPage -> moveToLoginActivity()
+            is MyPageEvent.MoveToUserEditPage -> moveToUserEditActivity()
         }
     }
 
