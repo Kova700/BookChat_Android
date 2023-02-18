@@ -18,7 +18,8 @@
         android:theme="@style/Theme.BookChat">
         <activity
             android:name=".ui.activity.UserEditActivity"
-            android:exported="false"/>
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.activity.AgonyEditActivity"
             android:exported="false"
