@@ -3,6 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
+        <variable
+            name="user"
+            type="com.example.bookchat.data.User" />
+        <variable
+            name="activity"
+            type="com.example.bookchat.ui.activity.UserEditActivity" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -34,6 +40,7 @@
             android:id="@+id/back_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="@{()-> activity.clickBackBtn()}"
             android:background="?android:selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="@+id/mypage_title"
             app:layout_constraintStart_toStartOf="@id/guideline_start"
@@ -73,6 +80,8 @@
                     android:id="@+id/userProfile_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    loadUserProfile="@{user}"
+                    loadByteArray="@{activity.userImage}"
                     android:scaleType="fitCenter"
                     android:src="@drawable/default_profile_img1" />
             </androidx.cardview.widget.CardView>
@@ -85,6 +94,7 @@
                 android:layout_marginEnd="3dp"
                 android:layout_marginBottom="3dp"
                 android:background="@drawable/getpicture_btn_back"
+                android:onClick="@{()-> activity.startUserProfileEdit()}"
                 android:baselineAlignBottom="true"
                 android:elevation="3dp"
                 app:srcCompat="@drawable/ic_getpicture_btn" />
@@ -114,6 +124,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:background="@null"
+                android:text="@{user.userNickname}"
                 android:hint="@string/sign_up_input_hint"
                 android:textColorHint="#CFCFCF"
                 android:textSize="13sp"/>
