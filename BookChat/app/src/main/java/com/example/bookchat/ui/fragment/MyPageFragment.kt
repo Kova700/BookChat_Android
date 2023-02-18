@@ -2,6 +2,7 @@ package com.example.bookchat.ui.fragment
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,10 +10,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentMyPageBinding
 import com.example.bookchat.ui.activity.LoginActivity
 import com.example.bookchat.ui.activity.UserEditActivity
+import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.DataStoreManager
 import com.example.bookchat.viewmodel.MyPageViewModel
 import com.example.bookchat.viewmodel.MyPageViewModel.MyPageEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,8 +34,12 @@ class MyPageFragment : Fragment()  {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_my_page,container,false)
-        binding.lifecycleOwner = this
-        binding.viewmodel = myPageViewModel
+        with(binding){
+            lifecycleOwner = this@MyPageFragment
+            user = App.instance.getCachedUser()
+            viewmodel = myPageViewModel
+        }
+
         return binding.root
     }
 
