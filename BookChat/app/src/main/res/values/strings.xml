@@ -135,7 +135,10 @@
     <string name="duplicate_check">중복확인</string>
     <!--notice-->
     <!--app setting-->
+    <string name="push_notification">푸시알림</string>
     <!--user setting-->
+    <string name="sign_out">로그아웃</string>
+    <string name="withdraw">회원탈퇴</string>
 
     <!--util-->
     <string name="confirm">확인</string>
