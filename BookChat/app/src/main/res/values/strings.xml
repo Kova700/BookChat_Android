@@ -126,6 +126,9 @@
     <string name="account_setting">계정 설정</string>
     <string name="app_setting">앱 설정</string>
     <string name="app_version">앱 버전</string>
+    <string name="my_page_profile_edit_success">프로필이 수정되었습니다.</string>
+    <string name="my_page_profile_edit_fail">프로필 수정을 실패했습니다.</string>
+    <string name="my_page_profile_need_name_dup_check">닉네임 중복확인이 필요합니다.</string>
 
     <!--user edit-->
     <string name="uesr_edit_title">프로필 수정</string>

@@ -4,8 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-            name="user"
-            type="com.example.bookchat.data.User" />
+            name="viewmodel"
+            type="com.example.bookchat.viewmodel.UserEditViewModel" />
         <variable
             name="activity"
             type="com.example.bookchat.ui.activity.UserEditActivity" />
@@ -40,7 +40,7 @@
             android:id="@+id/back_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{()-> activity.clickBackBtn()}"
+            android:onClick="@{()-> viewmodel.clickBackBtn()}"
             android:background="?android:selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="@+id/mypage_title"
             app:layout_constraintStart_toStartOf="@id/guideline_start"
@@ -80,8 +80,8 @@
                     android:id="@+id/userProfile_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    loadUserProfile="@{user}"
-                    loadByteArray="@{activity.userImage}"
+                    loadUserProfile="@{viewmodel.cachedUser}"
+                    loadByteArray="@{viewmodel.newProfileImage}"
                     android:scaleType="fitCenter"
                     android:src="@drawable/default_profile_img1" />
             </androidx.cardview.widget.CardView>
@@ -102,7 +102,7 @@
 
         <LinearLayout
             android:id="@+id/nickName_layout"
-            setLayoutFromCheckResult="@{}"
+            setLayoutFromCheckResult="@{viewmodel.nameCheckStatus}"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginStart="30dp"
@@ -124,11 +124,23 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:background="@null"
-                android:text="@{user.userNickname}"
+                android:text="@={viewmodel.newNickname}"
+                app:addTextChangedListener="@{viewmodel.editTextWatcher}"
+                app:filters="@{viewmodel.specialCharFilter}"
                 android:hint="@string/sign_up_input_hint"
                 android:textColorHint="#CFCFCF"
                 android:textSize="13sp"/>
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/checkResult_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:textSize="10sp"
+            setTextViewFromCheckResult="@{viewmodel.nameCheckStatus}"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/nickName_layout" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/materialButton13"
@@ -144,6 +156,7 @@
             android:textColor="#FFFFFF"
             android:textSize="12sp"
             app:cornerRadius="6dp"
+            android:onClick="@{() -> viewmodel.clickDupCheckBtn()}"
             app:layout_constraintBottom_toBottomOf="@+id/nickName_layout"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintTop_toTopOf="@+id/nickName_layout" />
