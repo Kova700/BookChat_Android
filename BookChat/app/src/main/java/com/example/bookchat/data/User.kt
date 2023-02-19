@@ -1,5 +1,6 @@
 package com.example.bookchat.data
 
+import com.example.bookchat.utils.UserDefaultProfileImageType
 import com.google.gson.annotations.SerializedName
 
 data class User(
@@ -8,7 +9,7 @@ data class User(
     @SerializedName("userEmail")
     val userEmail: String,
     @SerializedName("userProfileImageUri")
-    val userProfileImageUri: String,
+    val userProfileImageUri: String?,
     @SerializedName("defaultProfileImageType")
-    val defaultProfileImageType: Int
+    val defaultProfileImageType: UserDefaultProfileImageType
 )

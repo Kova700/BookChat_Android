@@ -17,10 +17,29 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BookChat">
         <activity
+            android:name=".ui.activity.WishActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.AppSettingActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.AccountSettingActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.NoticeActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.UserEditActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.activity.AgonyEditActivity"
             android:exported="false"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.AgonyRecordActivity"
             android:exported="false"
@@ -35,7 +54,6 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.SearchTapResultDetailActivity"
-            android:configChanges="uiMode"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

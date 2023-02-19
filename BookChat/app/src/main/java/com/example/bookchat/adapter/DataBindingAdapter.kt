@@ -12,10 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.data.AgonyDataItemStatus
-import com.example.bookchat.data.AgonyRecordDataItemStatus
-import com.example.bookchat.data.AgonyRecordFirstItemStatus
-import com.example.bookchat.data.Book
+import com.example.bookchat.data.*
 import com.example.bookchat.utils.*
 import com.example.bookchat.viewmodel.AgonyViewModel.AgonyActivityState
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportStatus
@@ -56,13 +53,37 @@ object DataBindingAdapter {
             .into(imageView)
     }
 
+    /**유저 프로필 이미지 출력*/
+    @JvmStatic
+    @BindingAdapter("loadUserProfile")
+    fun loadUserProfile(imageView: ImageView, user : User?){
+        if (user == null) return
+
+        if (user.userProfileImageUri?.trim().isNullOrBlank()){
+            Glide.with(imageView.context)
+                .load(getUserDefaultProfileImage(user))
+                .placeholder(R.drawable.loading_img)
+                .error(R.drawable.error_img)
+                .into(imageView)
+            return
+        }
+        loadUrl(imageView, user.userProfileImageUri)
+    }
+
+    private fun getUserDefaultProfileImage(user :User) = when (user.defaultProfileImageType) {
+        UserDefaultProfileImageType.ONE -> R.drawable.default_profile_img1
+        UserDefaultProfileImageType.TWO -> R.drawable.default_profile_img2
+        UserDefaultProfileImageType.THREE -> R.drawable.default_profile_img3
+        UserDefaultProfileImageType.FOUR -> R.drawable.default_profile_img4
+        UserDefaultProfileImageType.FIVE -> R.drawable.default_profile_img5
+    }
+
     /** EditText 엔터이벤트 등록*/
     @JvmStatic
     @BindingAdapter("setEnterListener")
     fun setEnterListener(editText : EditText, listener : TextView.OnEditorActionListener){
         editText.setOnEditorActionListener(listener)
     }
-
 
     /**독서취향 : 제출 버튼 색상 설정*/
     @JvmStatic
@@ -359,7 +380,7 @@ object DataBindingAdapter {
         }
         view.visibility = View.INVISIBLE
     }
-    
+
     /**고민 기록 FirstItem Default State일 때 View Visibility 설정*/
     @JvmStatic
     @BindingAdapter("setVisibiltyFirstItemInDefaultState")

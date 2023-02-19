@@ -49,7 +49,6 @@
     <string name="today_book">오늘의 북</string>
     <string name="today_chat">오늘의 챗</string>
 
-
     <!--bookshelf-->
     <string name="bookshelf">서재</string>
     <string name="complete_book">독서완료</string>
@@ -116,6 +115,31 @@
     <string name="agony_record_delete_success">고민기록이 삭제되었습니다.</string>
     <string name="agony_record_delete_fail">고민기록 삭제를 실패했습니다.</string>
 
+    <!--chat-->
+    <string name="chat_room">채팅방</string>
+
+    <!--my page-->
+    <string name="my_page_title">나의 정보</string>
+    <string name="heart_list">관심목록</string>
+    <string name="notice">공지사항</string>
+    <string name="invite">친구초대</string>
+    <string name="account_setting">계정 설정</string>
+    <string name="app_setting">앱 설정</string>
+    <string name="app_version">앱 버전</string>
+    <string name="my_page_profile_edit_success">프로필이 수정되었습니다.</string>
+    <string name="my_page_profile_edit_fail">프로필 수정을 실패했습니다.</string>
+    <string name="my_page_profile_need_name_dup_check">닉네임 중복확인이 필요합니다.</string>
+
+    <!--user edit-->
+    <string name="uesr_edit_title">프로필 수정</string>
+    <string name="duplicate_check">중복확인</string>
+    <!--notice-->
+    <!--app setting-->
+    <string name="push_notification">푸시알림</string>
+    <!--user setting-->
+    <string name="sign_out">로그아웃</string>
+    <string name="withdraw">회원탈퇴</string>
+
     <!--util-->
     <string name="confirm">확인</string>
     <string name="cancel">취소</string>
@@ -127,8 +151,5 @@
     <string name="all_delete">전체삭제</string>
     <string name="back_press_warning">\'뒤로\' 버튼을 한 번 더 누르시면 \n종료됩니다.</string>
     <string name="title_content_empty">제목, 내용을 입력해주세요.</string>
-
-    <!--chat-->
-    <string name="chat_room">채팅방</string>
 
 </resources>

@@ -40,6 +40,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
+            <!--MaxLength 설정하고 layout_constrainedWidth도 설정-->
+            <!--다른 곳 UI 위치 맞추고, elgantHeight도 설정-->
             <TextView
                 android:id="@+id/nickName_tv"
                 android:layout_width="wrap_content"
