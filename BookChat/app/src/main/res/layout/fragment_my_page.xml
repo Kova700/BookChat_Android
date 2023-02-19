@@ -49,9 +49,6 @@
             app:layout_constraintStart_toStartOf="@id/guideline_start"
             app:layout_constraintTop_toTopOf="@id/guideline_top" />
 
-        <!--이미지 수정해야함-->
-        <!--유저에 이미지를 우선불러오고, 없으면, default이미지 번호로
-        이미지 띄워야함-->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView6"
             android:layout_width="100dp"
