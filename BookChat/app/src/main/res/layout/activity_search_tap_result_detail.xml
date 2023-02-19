@@ -39,19 +39,6 @@
             app:layout_constraintStart_toEndOf="@+id/back_btn"
             app:layout_constraintTop_toTopOf="@+id/back_btn" />
 
-        <TextView
-            android:id="@+id/textView22"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:fontFamily="@font/notosanskr_medium"
-            android:text="@{activity.searchResultTotalItemCount}"
-            android:textColor="#5648FF"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="@+id/textView23"
-            app:layout_constraintStart_toEndOf="@+id/textView23"
-            app:layout_constraintTop_toTopOf="@+id/textView23" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/search_result_detail_Rcv"
             android:layout_width="match_parent"

@@ -29,8 +29,7 @@ class SearchViewModel @Inject constructor(
     val _searchTapStatus = MutableStateFlow<SearchTapStatus>(SearchTapStatus.Default)
     val _searchKeyWord = MutableStateFlow<String>("")
 
-    var simpleBooksearchResult : List<Book> = listOf()
-    var bookSearchResultTotalItemCount = 0.toString()
+    var simpleBooksearchResult = MutableStateFlow<List<Book>>(listOf())
     var previousKeyword = ""
 
     val resultLoadState = MutableStateFlow<LoadState>(LoadState.Default)
@@ -78,9 +77,8 @@ class SearchViewModel @Inject constructor(
         runCatching { bookRepository.simpleSearchBooks(keyword) }
             .onSuccess { booksearchResult ->
                 resultLoadState.value = LoadState.Result
-                simpleBooksearchResult =  booksearchResult.bookResponses
-                isSearchResultEmpty.value = simpleBooksearchResult.isEmpty()
-                bookSearchResultTotalItemCount = booksearchResult.searchingMeta.totalCount.toString()
+                simpleBooksearchResult.value =  booksearchResult.bookResponses
+                isSearchResultEmpty.value = simpleBooksearchResult.value.isEmpty()
                 previousKeyword = keyword
                 _searchTapStatus.value = SearchTapStatus.Result
             }
@@ -122,7 +120,7 @@ class SearchViewModel @Inject constructor(
 
     private fun failHandler(exception: Throwable){
         when(exception){
-            is NetworkIsNotConnectedException -> //임시 토스트 처리
+            is NetworkIsNotConnectedException ->
                 makeToast(R.string.error_network)
         }
     }

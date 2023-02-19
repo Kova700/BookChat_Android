@@ -30,12 +30,10 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
         SearchDetailViewModel.provideFactory(searchDetailViewModelFactory, getSearchKeyWord())
     }
     private lateinit var searchResultBookDetailAdapter : SearchResultBookDetailAdapter
-    var searchResultTotalItemCount = 0.toString()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_search_tap_result_detail)
-        searchResultTotalItemCount = getItemCount() ?: "0"
         binding.lifecycleOwner = this
         binding.activity = this
         binding.viewmodel = searchDetailViewModel
@@ -73,9 +71,6 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
 
     private fun getSearchKeyWord(): String {
         return intent.getStringExtra(SearchFragment.EXTRA_SEARCH_KEYWORD) ?: ""
-    }
-    private fun getItemCount() :String? {
-        return intent.getStringExtra(SearchFragment.EXTRA_SEARCH_RESULT_ITEM_COUNT)
     }
 
     fun clickBackBtn(){
