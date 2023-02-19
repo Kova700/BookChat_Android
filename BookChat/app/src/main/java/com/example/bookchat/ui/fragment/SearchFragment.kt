@@ -49,18 +49,8 @@ class SearchFragment : Fragment() {
             viewModel = searchViewModel
         }
         initFragmentBackStackChangedListener()
-
-
-        return binding.root
-    }
-
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
-    ) {
-
         collectSearchTapStatus()
-        super.onViewCreated(view, savedInstanceState)
+        return binding.root
     }
 
     private fun initFragmentBackStackChangedListener(){
@@ -111,13 +101,8 @@ class SearchFragment : Fragment() {
     }
 
     private fun moveToDetailActivity() {
-        Log.d(TAG, "SearchFragment: moveToDetailActivity() - called")
         val intent = Intent(requireContext(), SearchTapResultDetailActivity::class.java)
         intent.putExtra(EXTRA_SEARCH_KEYWORD, searchViewModel._searchKeyWord.value)
-        intent.putExtra(
-            EXTRA_SEARCH_RESULT_ITEM_COUNT,
-            searchViewModel.bookSearchResultTotalItemCount
-        )
         startActivity(intent)
     }
 
@@ -241,7 +226,6 @@ class SearchFragment : Fragment() {
         const val FRAGMENT_TAG_SEARCHING = "Searching"
         const val FRAGMENT_TAG_RESULT = "Result"
         const val EXTRA_SEARCH_KEYWORD = "EXTRA_SEARCH_KEYWORD"
-        const val EXTRA_SEARCH_RESULT_ITEM_COUNT = "EXTRA_SEARCH_RESULT_ITEM_COUNT"
         const val SEARCH_TAP_FRAGMENT_FLAG = "SEARCH_TAP_FRAGMENT_FLAG"
     }
 

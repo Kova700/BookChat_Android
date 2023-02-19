@@ -39,19 +39,6 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/textView22"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:elegantTextHeight="true"
-                    android:fontFamily="@font/notosanskr_medium"
-                    android:text="@{viewmodel.bookSearchResultTotalItemCount}"
-                    android:textColor="#5648FF"
-                    android:textSize="16sp"
-                    app:layout_constraintStart_toEndOf="@+id/textView21"
-                    app:layout_constraintTop_toTopOf="parent" />
-
                 <ImageButton
                     android:id="@+id/imageButton4"
                     android:layout_width="wrap_content"
@@ -60,9 +47,9 @@
                     android:background="?android:selectableItemBackgroundBorderless"
                     android:onClick="@{() -> viewmodel.clickBookDetailBtn()}"
                     android:src="@drawable/ic_open_page_input_btn"
-                    app:layout_constraintBottom_toBottomOf="@+id/textView22"
+                    app:layout_constraintBottom_toBottomOf="@+id/textView21"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/textView22" />
+                    app:layout_constraintTop_toTopOf="@+id/textView21" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -123,28 +110,15 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/textView25"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:elegantTextHeight="true"
-                    android:fontFamily="@font/notosanskr_medium"
-                    android:text="0"
-                    android:textColor="#5648FF"
-                    android:textSize="16sp"
-                    app:layout_constraintStart_toEndOf="@+id/textView24"
-                    app:layout_constraintTop_toTopOf="parent" />
-
                 <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
                     android:background="?android:selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_open_page_input_btn"
-                    app:layout_constraintBottom_toBottomOf="@+id/textView25"
+                    app:layout_constraintBottom_toBottomOf="@+id/textView24"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/textView25" />
+                    app:layout_constraintTop_toTopOf="@+id/textView24" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

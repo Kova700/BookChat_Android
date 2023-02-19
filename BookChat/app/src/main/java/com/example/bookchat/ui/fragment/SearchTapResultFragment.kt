@@ -19,7 +19,6 @@ import com.example.bookchat.ui.dialog.SearchTapBookDialog
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.SearchViewModel
 
-/*추후 확장이 필요하다 느끼면 ViewModel로 로직 이동*/
 class SearchTapResultFragment : Fragment() {
     private lateinit var binding :FragmentSearchTapResultBinding
     private lateinit var searchResultBookSimpleAdapter : SearchResultBookSimpleAdapter
@@ -56,7 +55,7 @@ class SearchTapResultFragment : Fragment() {
         with(binding){
             searchResultBookSimpleRcv.adapter = searchResultBookSimpleAdapter
             searchResultBookSimpleRcv.setHasFixedSize(true)
-            searchResultBookSimpleRcv.layoutManager = GridLayoutManager(requireContext(),3) //중앙정렬 해야함 Or 개수 화면에 따라 늘어나게 설정
+            searchResultBookSimpleRcv.layoutManager = GridLayoutManager(requireContext(),3)
         }
     }
     private fun initSearchResultChatRoomRcv(){
@@ -71,8 +70,7 @@ class SearchTapResultFragment : Fragment() {
         val bookItemClickListener = object: SearchResultBookSimpleAdapter.OnItemClickListener{
             override fun onItemClick(book : Book) {
                 val dialog = SearchTapBookDialog(book)
-                Log.d(TAG, "SearchTapResultFragment: onItemClick() - book : $book")
-                dialog.show(childFragmentManager,"SearchTapBookDialog")
+                dialog.show(childFragmentManager, DIALOG_TAG_SEARCH_BOOK)
             }
         }
         searchResultBookSimpleAdapter = SearchResultBookSimpleAdapter()
@@ -81,5 +79,9 @@ class SearchTapResultFragment : Fragment() {
 
     private fun initSearchResultChatRoomAdapter(){
         chatRoomAdapter = MainChatRoomAdapter() //임시
+    }
+
+    companion object{
+        private const val DIALOG_TAG_SEARCH_BOOK = "SearchTapBookDialog"
     }
 }
