@@ -292,17 +292,17 @@ object DataBindingAdapter {
         when(itemStatus){
             AgonyDataItemStatus.Default -> {
                 when(agonyFolderHexColor){
-                    AgonyFolderHexColor.BLACK-> {
-                        textView.setTextColor(Color.parseColor("#FFFFFF"))
+                    AgonyFolderHexColor.WHITE,
+                    AgonyFolderHexColor.YELLOW,
+                    AgonyFolderHexColor.ORANGE -> {
+                        textView.setTextColor(Color.parseColor("#595959"))
                     }
 
-                    AgonyFolderHexColor.WHITE,
+                    AgonyFolderHexColor.BLACK,
                     AgonyFolderHexColor.GREEN,
                     AgonyFolderHexColor.PURPLE,
-                    AgonyFolderHexColor.MINT,
-                    AgonyFolderHexColor.YELLOW,
-                    AgonyFolderHexColor.ORANGE  -> {
-                        textView.setTextColor(Color.parseColor("#222222"))
+                    AgonyFolderHexColor.MINT  -> {
+                        textView.setTextColor(Color.parseColor("#FFFFFF"))
                     }
                 }
             }
@@ -331,11 +331,7 @@ object DataBindingAdapter {
     @BindingAdapter("setMakeAgonyTextColorWithFolderHexColor")
     fun setMakeAgonyTextColorWithFolderHexColor(textView: TextView, agonyFolderHexColor: AgonyFolderHexColor){
         when(agonyFolderHexColor){
-            AgonyFolderHexColor.WHITE-> {
-                textView.setTextColor(Color.parseColor("#595959"))
-                textView.setHintTextColor(Color.parseColor("#595959"))
-            }
-
+            AgonyFolderHexColor.WHITE,
             AgonyFolderHexColor.YELLOW,
             AgonyFolderHexColor.ORANGE -> {
                 textView.setTextColor(Color.parseColor("#595959"))
