@@ -23,7 +23,7 @@ class MyPageViewModel @Inject constructor(
         runCatching { userRepository.withdraw() }
             .onSuccess {
                 Toast.makeText(App.instance.applicationContext,"회원이 탈퇴되었습니다(임시)", Toast.LENGTH_SHORT).show()
-                startEvent(MyPageEvent.MoveToLoginPage) //로그인 액티비티로 이동 (임시)
+                startEvent(MyPageEvent.MoveToLoginPage)
             }
             .onFailure {
                 Toast.makeText(App.instance.applicationContext,"회원이 탈퇴 실패 (임시)", Toast.LENGTH_SHORT).show()
@@ -33,6 +33,18 @@ class MyPageViewModel @Inject constructor(
     fun clickUserEditBtn(){
         startEvent(MyPageEvent.MoveToUserEditPage)
     }
+    fun clickWishBtn(){
+        startEvent(MyPageEvent.MoveToWish)
+    }
+    fun clickNoticeBtn(){
+        startEvent(MyPageEvent.MoveToNotice)
+    }
+    fun clickAccountSetBtn(){
+        startEvent(MyPageEvent.MoveToAccountSetting)
+    }
+    fun clickAppSetBtn(){
+        startEvent(MyPageEvent.MoveToAppSetting)
+    }
 
     private fun startEvent (event : MyPageEvent) = viewModelScope.launch {
         _eventFlow.emit(event)
@@ -41,5 +53,9 @@ class MyPageViewModel @Inject constructor(
     sealed class MyPageEvent{
         object MoveToLoginPage :MyPageEvent()
         object MoveToUserEditPage :MyPageEvent()
+        object MoveToWish :MyPageEvent()
+        object MoveToNotice :MyPageEvent()
+        object MoveToAccountSetting :MyPageEvent()
+        object MoveToAppSetting :MyPageEvent()
     }
 }

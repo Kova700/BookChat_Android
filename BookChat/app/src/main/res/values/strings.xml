@@ -133,6 +133,9 @@
     <!--user edit-->
     <string name="uesr_edit_title">프로필 수정</string>
     <string name="duplicate_check">중복확인</string>
+    <!--notice-->
+    <!--app setting-->
+    <!--user setting-->
 
     <!--util-->
     <string name="confirm">확인</string>

@@ -13,8 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentMyPageBinding
-import com.example.bookchat.ui.activity.LoginActivity
-import com.example.bookchat.ui.activity.UserEditActivity
+import com.example.bookchat.ui.activity.*
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
 import com.example.bookchat.viewmodel.MyPageViewModel
@@ -65,11 +64,31 @@ class MyPageFragment : Fragment()  {
         val intent = Intent(requireContext(), UserEditActivity::class.java)
         startActivity(intent)
     }
+    private fun moveToWishActivity(){
+        val intent = Intent(requireContext(), WishActivity::class.java)
+        startActivity(intent)
+    }
+    private fun moveToNoticeActivity(){
+        val intent = Intent(requireContext(), NoticeActivity::class.java)
+        startActivity(intent)
+    }
+    private fun moveToAccountSettingActivity(){
+        val intent = Intent(requireContext(), AccountSettingActivity::class.java)
+        startActivity(intent)
+    }
+    private fun moveToAppSettingActivity(){
+        val intent = Intent(requireContext(), AppSettingActivity::class.java)
+        startActivity(intent)
+    }
 
     private fun handleEvent(event : MyPageEvent){
         when(event){
             is MyPageEvent.MoveToLoginPage -> moveToLoginActivity()
             is MyPageEvent.MoveToUserEditPage -> moveToUserEditActivity()
+            is MyPageEvent.MoveToWish -> moveToWishActivity()
+            is MyPageEvent.MoveToNotice -> moveToNoticeActivity()
+            is MyPageEvent.MoveToAccountSetting -> moveToAccountSettingActivity()
+            is MyPageEvent.MoveToAppSetting -> moveToAppSettingActivity()
         }
     }
 
