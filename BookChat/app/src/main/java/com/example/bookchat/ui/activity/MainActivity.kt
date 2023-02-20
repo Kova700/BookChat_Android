@@ -163,26 +163,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun setBackPressedDispatcher() {
         onBackPressedDispatcher.addCallback {
-            val inflatedBtmNaviFgmt = getInflatedBottomNaviFragment(getInflatedFragmentList())
-            if (inflatedBtmNaviFgmt != null){
-                if(inflatedBtmNaviFgmt.hasChildBackStack()){
-                    inflatedBtmNaviFgmt.childFragmentManager.popBackStackImmediate()
-                    return@addCallback
-                }
+            val nowInflatedBtmNaviFgmt = getInflatedBottomNaviFragment(getInflatedFragmentList())
+            if (nowInflatedBtmNaviFgmt.hasChildBackStack()){
+                nowInflatedBtmNaviFgmt.popChildBackStack()
+                return@addCallback
             }
-
             backPressToastEvent()
             inflateFragmentInStack()
             updateBottomNaviIcon()
-            finish()
         }
     }
 
-    private fun Fragment.hasChildBackStack() =
-        this.childFragmentManager.backStackEntryCount != 0
+    private fun Fragment?.popChildBackStack(){
+        this?.childFragmentManager?.popBackStackImmediate()
+    }
+
+    private fun Fragment?.hasChildBackStack() =
+        this?.childFragmentManager?.backStackEntryCount != 0
 
     private fun backPressToastEvent() {
-        if (!bottomNaviFragmentStack.isEmpty()) return
+        if (bottomNaviFragmentStack.isNotEmpty()) return
 
         val toast = Toast.makeText(this, R.string.back_press_warning, Toast.LENGTH_SHORT)
         if (System.currentTimeMillis() > backPressedTime + 2000) {
@@ -191,6 +191,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         toast.cancel()
+        finish()
     }
 
     companion object {
