@@ -1,4 +1,4 @@
-package com.example.bookchat.adapter.AgonyRecord
+package com.example.bookchat.adapter.agony_record
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

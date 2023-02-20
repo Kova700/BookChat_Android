@@ -14,9 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.SwipeHelperCallback
-import com.example.bookchat.adapter.AgonyRecord.AgonyRecordDataItemAdapter
-import com.example.bookchat.adapter.AgonyRecord.AgonyRecordFirstItemAdapter
-import com.example.bookchat.adapter.AgonyRecord.AgonyRecordHeaderItemAdapter
+import com.example.bookchat.adapter.agony_record.AgonyRecordDataItemAdapter
+import com.example.bookchat.adapter.agony_record.AgonyRecordFirstItemAdapter
+import com.example.bookchat.adapter.agony_record.AgonyRecordHeaderItemAdapter
 import com.example.bookchat.data.AgonyDataItem
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ActivityAgonyRecordBinding

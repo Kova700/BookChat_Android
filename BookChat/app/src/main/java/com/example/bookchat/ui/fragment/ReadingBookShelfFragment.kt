@@ -13,8 +13,8 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
-import com.example.bookchat.adapter.ReadingBookShelf.ReadingBookShelfDataAdapter
-import com.example.bookchat.adapter.ReadingBookShelf.ReadingBookShelfHeaderAdapter
+import com.example.bookchat.adapter.reading_bookshelf.ReadingBookShelfDataAdapter
+import com.example.bookchat.adapter.reading_bookshelf.ReadingBookShelfHeaderAdapter
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.FragmentReadingBookshelfBinding
 import com.example.bookchat.ui.dialog.PageInputBottomSheetDialog

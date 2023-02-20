@@ -1,15 +1,12 @@
-package com.example.bookchat.adapter.ReadingBookShelf
+package com.example.bookchat.adapter.reading_bookshelf
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemReadingBookshelfHeaderBinding
 import com.example.bookchat.viewmodel.BookShelfViewModel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 class ReadingBookShelfHeaderAdapter(private val bookShelfViewModel: BookShelfViewModel) :
     RecyclerView.Adapter<ReadingBookShelfHeaderAdapter.ReadingBookShelfHeaderViewHolder>()

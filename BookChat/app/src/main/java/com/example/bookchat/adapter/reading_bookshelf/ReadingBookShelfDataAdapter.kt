@@ -1,4 +1,4 @@
-package com.example.bookchat.adapter.ReadingBookShelf
+package com.example.bookchat.adapter.reading_bookshelf
 
 import android.os.Handler
 import android.os.Looper
