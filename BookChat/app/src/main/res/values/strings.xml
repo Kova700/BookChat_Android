@@ -51,6 +51,7 @@
 
     <!--bookshelf-->
     <string name="bookshelf">서재</string>
+    <string name="wish_book">독서예정</string>
     <string name="complete_book">독서완료</string>
     <string name="reading_book">독서중</string>
     <string name="already_in_bookshelf">이미 서재에 등록된 도서</string>
