@@ -46,7 +46,7 @@ class WishBookTabAdapter : PagingDataAdapter<BookShelfDataItem,WishBookTabAdapte
     companion object {
         val BOOK_SHELF_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<BookShelfDataItem>() {
             override fun areItemsTheSame(oldItem: BookShelfDataItem, newItem: BookShelfDataItem) =
-                oldItem.bookShelfItem.isbn == newItem.bookShelfItem.isbn
+                oldItem.bookShelfItem.bookShelfId == newItem.bookShelfItem.bookShelfId
 
             override fun areContentsTheSame(oldItem: BookShelfDataItem, newItem: BookShelfDataItem) =
                 oldItem.bookShelfItem == newItem.bookShelfItem

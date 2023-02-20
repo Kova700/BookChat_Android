@@ -16,7 +16,7 @@ import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.DialogReadingBookTapClickedBinding
 import com.example.bookchat.ui.activity.AgonyActivity
 import com.example.bookchat.ui.fragment.BookShelfFragment
-import com.example.bookchat.ui.fragment.CompleteBookTabFragment
+import com.example.bookchat.ui.fragment.CompleteBookShelfFragment
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.COMPLETE_TAB_INDEX
@@ -45,10 +45,11 @@ class ReadingTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : D
     ): View? {
         binding = DataBindingUtil.inflate(inflater,
             R.layout.dialog_reading_book_tap_clicked,container,false)
-        binding.lifecycleOwner = this
-        binding.viewmodel = readingBookTapDialogViewModel
+        with(binding){
+            lifecycleOwner = this@ReadingTapBookDialog
+            viewmodel = readingBookTapDialogViewModel
+        }
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
         observeEventFlow()
 
         return binding.root
@@ -68,8 +69,8 @@ class ReadingTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : D
         return fragment
     }
 
-    private fun getCompleteBookTabFragment() : CompleteBookTabFragment {
-        return getBookShelfFragment().pagerAdapter.completeBookTabFragment
+    private fun getCompleteBookTabFragment() : CompleteBookShelfFragment {
+        return getBookShelfFragment().pagerAdapter.completeBookShelfFragment
     }
 
     private fun handleEvent(event : ReadingBookEvent) = when(event){
@@ -81,7 +82,7 @@ class ReadingTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : D
             val bookShelfUiEvent = BookShelfViewModel.BookShelfEvent.ChangeBookShelfTab(COMPLETE_TAB_INDEX)
             bookShelfViewModel.startBookShelfUiEvent(bookShelfUiEvent)
             if(bookShelfViewModel.isCompleteBookLoaded){
-                getCompleteBookTabFragment().completeBookAdapter.refresh()
+                getCompleteBookTabFragment().completeBookShelfDataAdapter.refresh()
             }
             this.dismiss()
         }
