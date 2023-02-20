@@ -117,13 +117,17 @@ class BookShelfViewModel @Inject constructor(
     fun deleteBookShelfBookWithSwipe(
         bookShelfDataItem: BookShelfDataItem,
         removeEvent :PagingViewEvent.Remove,
+        removeWaitingEvent :PagingViewEvent.RemoveWaiting,
         readingStatus :ReadingStatus
     ) = viewModelScope.launch {
         runCatching { bookRepository.deleteBookShelfBook(bookShelfDataItem.bookShelfItem.bookShelfId) }
-            .onSuccess { makeToast(R.string.bookshelf_delete_success) }
+            .onSuccess { makeToast(R.string.bookshelf_delete_success)
+                addPagingViewEvent(removeEvent, readingStatus)
+                removePagingViewEvent(removeWaitingEvent, readingStatus)
+            }
             .onFailure {
                 makeToast(R.string.bookshelf_delete_fail)
-                removePagingViewEvent(removeEvent, readingStatus)
+                removePagingViewEvent(removeWaitingEvent, readingStatus)
             }
     }
 

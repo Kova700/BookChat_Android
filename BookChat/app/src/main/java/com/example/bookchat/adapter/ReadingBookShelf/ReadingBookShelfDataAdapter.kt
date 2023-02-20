@@ -55,9 +55,8 @@ class ReadingBookShelfDataAdapter(private val bookShelfViewModel: BookShelfViewM
                     val handler = Handler(Looper.getMainLooper())
                     handler.postDelayed({
                         val removeEvent = PagingViewEvent.Remove(bookShelfDataItem)
-                        bookShelfViewModel.deleteBookShelfBookWithSwipe(bookShelfDataItem, removeEvent, ReadingStatus.READING)
-                        bookShelfViewModel.removePagingViewEvent(removeWaitingEvent, ReadingStatus.READING)
-                        bookShelfViewModel.addPagingViewEvent(removeEvent, ReadingStatus.READING)
+                        bookShelfViewModel.deleteBookShelfBookWithSwipe(bookShelfDataItem,
+                            removeEvent, removeWaitingEvent, ReadingStatus.READING)
                     }, SNACK_BAR_DURATION.toLong())
 
                     val snackCancelClickListener = View.OnClickListener {
