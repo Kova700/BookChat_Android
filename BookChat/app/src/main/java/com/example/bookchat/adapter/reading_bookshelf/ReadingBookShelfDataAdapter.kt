@@ -9,7 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.adapter.WishBookTabAdapter.Companion.BOOK_SHELF_ITEM_COMPARATOR
+import com.example.bookchat.adapter.wish_bookshelf.WishBookShelfDataAdapter.Companion.BOOK_SHELF_ITEM_COMPARATOR
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.ItemReadingBookshelfDataBinding
 import com.example.bookchat.utils.ReadingStatus

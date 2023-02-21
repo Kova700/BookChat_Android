@@ -4,15 +4,15 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.bookchat.ui.fragment.CompleteBookShelfFragment
 import com.example.bookchat.ui.fragment.ReadingBookShelfFragment
-import com.example.bookchat.ui.fragment.WishBookTabFragment
+import com.example.bookchat.ui.fragment.WishBookBookShelfFragment
 
 class PagerFragmentStateAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-    val wishBookTabFragment by lazy { WishBookTabFragment() }
+    val wishBookBookShelfFragment by lazy { WishBookBookShelfFragment() }
     val readingBookShelfFragment by lazy { ReadingBookShelfFragment() }
     val completeBookShelfFragment by lazy { CompleteBookShelfFragment() }
 
     private var fragments: List<Fragment> =
-        listOf(wishBookTabFragment,readingBookShelfFragment, completeBookShelfFragment)
+        listOf(wishBookBookShelfFragment,readingBookShelfFragment, completeBookShelfFragment)
 
     override fun getItemCount(): Int {
         return fragments.size
