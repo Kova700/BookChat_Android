@@ -79,6 +79,8 @@ dependencies {
     //Hilt
     implementation "com.google.dagger:hilt-android:2.44"
     kapt "com.google.dagger:hilt-compiler:2.44"
+    //Flex box
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
 }
 
 kapt {

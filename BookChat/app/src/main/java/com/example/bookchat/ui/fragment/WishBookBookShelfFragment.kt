@@ -10,7 +10,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.GridLayoutManager
 import com.example.bookchat.R
 import com.example.bookchat.adapter.wish_bookshelf.WishBookShelfDataAdapter
 import com.example.bookchat.adapter.wish_bookshelf.WishBookShelfHeaderAdapter
@@ -18,11 +17,7 @@ import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.FragmentWishBookshelfBinding
 import com.example.bookchat.ui.dialog.WishTapBookDialog
 import com.example.bookchat.viewmodel.BookShelfViewModel
-import com.google.android.flexbox.AlignItems
-import com.google.android.flexbox.FlexDirection
-import com.google.android.flexbox.FlexWrap
-import com.google.android.flexbox.FlexboxLayoutManager
-import com.google.android.flexbox.JustifyContent
+import com.google.android.flexbox.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -97,18 +92,12 @@ class WishBookBookShelfFragment : Fragment() {
                 wishBookShelfDataAdapter
             )
             wishBookRcv.adapter = concatAdapter
-
-            val gridLayoutManager = GridLayoutManager(requireContext(),3)
-            gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup(){
-                override fun getSpanSize(position: Int): Int {
-                    return when(concatAdapter.getItemViewType(position)){
-                        R.layout.item_wish_bookshelf_header -> 3
-                        R.layout.item_wish_bookshelf_data -> 1
-                        else -> throw Exception("Unknown ViewType")
-                    }
-                }
+            val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
+                justifyContent = JustifyContent.CENTER
+                flexDirection = FlexDirection.ROW
+                flexWrap = FlexWrap.WRAP
             }
-            wishBookRcv.layoutManager = gridLayoutManager
+            wishBookRcv.layoutManager = flexboxLayoutManager
         }
     }
 
@@ -121,6 +110,7 @@ class WishBookBookShelfFragment : Fragment() {
 
     companion object {
         private const val DIALOG_TAG_WISH = "WishTapBookDialog"
+        private const val WISH_GRID_SPAN_SIZE = 3
     }
 
 }
