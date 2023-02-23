@@ -55,7 +55,12 @@ class WishBookBookShelfFragment : Fragment() {
 
     private fun observeAdapterLoadState() = lifecycleScope.launch{
         wishBookShelfDataAdapter.loadStateFlow.collect{ combinedLoadStates ->
-            if(combinedLoadStates.refresh is LoadState.NotLoading) initializeModificationEvents()
+            if(combinedLoadStates.refresh is LoadState.NotLoading) {
+                if(wishBookShelfDataAdapter.itemCount == 0){
+                    bookShelfViewModel.wishBookTotalCountCache = 0
+                }
+                initializeModificationEvents()
+            }
         }
     }
 
