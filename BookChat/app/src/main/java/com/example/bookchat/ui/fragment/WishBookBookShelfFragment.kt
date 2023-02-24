@@ -17,7 +17,10 @@ import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.FragmentWishBookshelfBinding
 import com.example.bookchat.ui.dialog.WishTapBookDialog
 import com.example.bookchat.viewmodel.BookShelfViewModel
-import com.google.android.flexbox.*
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.flexbox.JustifyContent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -25,7 +28,7 @@ import kotlinx.coroutines.launch
 class WishBookBookShelfFragment : Fragment() {
     private lateinit var binding : FragmentWishBookshelfBinding
     private lateinit var wishBookShelfHeaderAdapter :WishBookShelfHeaderAdapter
-    private lateinit var wishBookShelfDataAdapter : WishBookShelfDataAdapter
+    lateinit var wishBookShelfDataAdapter : WishBookShelfDataAdapter
     private val bookShelfViewModel: BookShelfViewModel by viewModels({requireParentFragment()})
 
     override fun onCreateView(
@@ -57,8 +60,14 @@ class WishBookBookShelfFragment : Fragment() {
         wishBookShelfDataAdapter.loadStateFlow.collect{ combinedLoadStates ->
             if(combinedLoadStates.refresh is LoadState.NotLoading) {
                 if(wishBookShelfDataAdapter.itemCount == 0){
+                    binding.bookshelfEmptyLayout.visibilty = View.VISIBLE
+                    binding.swipeRefreshLayoutWish.visibility = View.GONE
                     bookShelfViewModel.wishBookTotalCountCache = 0
+                    initializeModificationEvents()
+                    return@collect
                 }
+                binding.bookshelfEmptyLayout.visibilty = View.GONE
+                binding.swipeRefreshLayoutWish.visibility = View.VISIBLE
                 initializeModificationEvents()
             }
         }
@@ -117,5 +126,4 @@ class WishBookBookShelfFragment : Fragment() {
         private const val DIALOG_TAG_WISH = "WishTapBookDialog"
         private const val WISH_GRID_SPAN_SIZE = 3
     }
-
 }

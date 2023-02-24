@@ -11,6 +11,7 @@ import com.example.bookchat.data.response.RespondCheckInBookShelf
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.data.request.RequestRegisterBookShelfBook
 import com.example.bookchat.utils.ReadingStatus
+import com.example.bookchat.utils.RefreshManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -56,14 +57,20 @@ class SearchTapBookDialogViewModel @AssistedInject constructor(
     private fun requestRegisterWishBook() = viewModelScope.launch {
         val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(book, ReadingStatus.WISH)
         runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
-            .onSuccess { makeToast(R.string.wish_bookshelf_register_success) }
+            .onSuccess {
+                makeToast(R.string.wish_bookshelf_register_success)
+                RefreshManager.hasWishBookShelfNewData = true
+            }
             .onFailure { makeToast(R.string.wish_bookshelf_register_fail) }
     }
 
     fun requestRegisterReadingBook() = viewModelScope.launch {
         val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(book, ReadingStatus.READING)
         runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
-            .onSuccess { makeToast(R.string.reading_bookshelf_register_success) }
+            .onSuccess {
+                makeToast(R.string.reading_bookshelf_register_success)
+                RefreshManager.hasReadingBookShelfNewData = true
+            }
             .onFailure { makeToast(R.string.reading_bookshelf_register_fail) }
     }
 

@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentTransaction
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityMainBinding
 import com.example.bookchat.ui.fragment.*
+import com.example.bookchat.utils.RefreshManager
 import com.google.android.material.navigation.NavigationBarView
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -62,13 +63,32 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigationView.setOnItemSelectedListener(bottomNaviItemSelectedListener)
     }
 
-
     private fun addOrReplaceFragment(newFragment: Fragment, tag: String) {
         if (newFragment.isAdded) {
             replaceFragment(newFragment)
+            if (newFragment is BookShelfFragment) refreshBookShelf()
             return
         }
         addFragment(newFragment, tag)
+    }
+
+    private fun refreshBookShelf(){
+        with(bookShelfFragment.pagerAdapter){
+            when{
+                RefreshManager.hasWishBookShelfNewData->{
+                    wishBookBookShelfFragment.wishBookShelfDataAdapter.refresh()
+                    RefreshManager.hasWishBookShelfNewData = false
+                }
+                RefreshManager.hasReadingBookShelfNewData -> {
+                    readingBookShelfFragment.readingBookShelfDataAdapter.refresh()
+                    RefreshManager.hasReadingBookShelfNewData = false
+                }
+                RefreshManager.hasCompleteBookShelfNewData -> {
+                    completeBookShelfFragment.completeBookShelfDataAdapter.refresh()
+                    RefreshManager.hasCompleteBookShelfNewData = false
+                }
+            }
+        }
     }
 
     private fun addFragment(newFragment: Fragment, tag: String) {
