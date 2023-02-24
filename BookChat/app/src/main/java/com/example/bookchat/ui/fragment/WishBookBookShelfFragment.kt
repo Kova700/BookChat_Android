@@ -16,6 +16,8 @@ import com.example.bookchat.adapter.wish_bookshelf.WishBookShelfHeaderAdapter
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.FragmentWishBookshelfBinding
 import com.example.bookchat.ui.dialog.WishTapBookDialog
+import com.example.bookchat.utils.RefreshManager
+import com.example.bookchat.utils.RefreshManager.popRefreshWishFlag
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
@@ -66,6 +68,7 @@ class WishBookBookShelfFragment : Fragment() {
                     initializeModificationEvents()
                     return@collect
                 }
+                bookShelfViewModel.isWishBookLoaded = true
                 binding.bookshelfEmptyLayout.visibilty = View.GONE
                 binding.swipeRefreshLayoutWish.visibility = View.VISIBLE
                 initializeModificationEvents()
@@ -75,6 +78,7 @@ class WishBookBookShelfFragment : Fragment() {
 
     private fun initializeModificationEvents(){
         bookShelfViewModel.wishBookModificationEvents.value = emptyList()
+        popRefreshWishFlag()
     }
 
     private fun initAdapter(){
@@ -122,8 +126,15 @@ class WishBookBookShelfFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if(RefreshManager.hasWishBookShelfNewData()){
+            wishBookShelfDataAdapter.refresh()
+            popRefreshWishFlag()
+        }
+    }
+
     companion object {
         private const val DIALOG_TAG_WISH = "WishTapBookDialog"
-        private const val WISH_GRID_SPAN_SIZE = 3
     }
 }

@@ -12,6 +12,7 @@ import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.data.request.RequestRegisterBookShelfBook
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.utils.RefreshManager
+import com.example.bookchat.utils.RefreshManager.BookShelfRefreshFlag
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -59,7 +60,7 @@ class SearchTapBookDialogViewModel @AssistedInject constructor(
         runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
             .onSuccess {
                 makeToast(R.string.wish_bookshelf_register_success)
-                RefreshManager.hasWishBookShelfNewData = true
+                RefreshManager.addBookShelfRefreshFlag(BookShelfRefreshFlag.Wish)
             }
             .onFailure { makeToast(R.string.wish_bookshelf_register_fail) }
     }
@@ -69,7 +70,7 @@ class SearchTapBookDialogViewModel @AssistedInject constructor(
         runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
             .onSuccess {
                 makeToast(R.string.reading_bookshelf_register_success)
-                RefreshManager.hasReadingBookShelfNewData = true
+                RefreshManager.addBookShelfRefreshFlag(BookShelfRefreshFlag.Reading)
             }
             .onFailure { makeToast(R.string.reading_bookshelf_register_fail) }
     }

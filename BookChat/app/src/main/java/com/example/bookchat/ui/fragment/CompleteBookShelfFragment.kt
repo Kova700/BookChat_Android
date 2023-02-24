@@ -17,6 +17,8 @@ import com.example.bookchat.adapter.complete_bookshelf.CompleteBookShelfHeaderAd
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.FragmentCompleteBookshelfBinding
 import com.example.bookchat.ui.dialog.CompleteTapBookDialog
+import com.example.bookchat.utils.RefreshManager
+import com.example.bookchat.utils.RefreshManager.popRefreshCompleteFlag
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.BookShelfViewModel.PagingViewEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -64,6 +66,7 @@ class CompleteBookShelfFragment : Fragment() {
                         return@collect
                     }
                 }
+                bookShelfViewModel.isCompleteBookLoaded = true
                 binding.bookshelfEmptyLayout.visibilty = View.GONE
                 binding.swipeRefreshLayoutComplete.visibility = View.VISIBLE
                 initializeModificationEvents()
@@ -74,6 +77,7 @@ class CompleteBookShelfFragment : Fragment() {
         bookShelfViewModel.completeBookModificationEvents.value =
             bookShelfViewModel.completeBookModificationEvents.value.filterIsInstance<PagingViewEvent.RemoveWaiting>()
         bookShelfViewModel.renewTotalItemCount(BookShelfViewModel.MODIFICATION_EVENT_FLAG_COMPLETE)
+        popRefreshCompleteFlag()
     }
 
     private fun initAdapter(){
@@ -114,6 +118,13 @@ class CompleteBookShelfFragment : Fragment() {
         binding.swipeRefreshLayoutComplete.setOnRefreshListener {
             completeBookShelfDataAdapter.refresh()
             binding.swipeRefreshLayoutComplete.isRefreshing = false
+        }
+    }
+    override fun onResume() {
+        super.onResume()
+        if(RefreshManager.hasCompleteBookShelfNewData()){
+            completeBookShelfDataAdapter.refresh()
+            popRefreshCompleteFlag()
         }
     }
 

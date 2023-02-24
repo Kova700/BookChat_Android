@@ -18,6 +18,8 @@ import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.FragmentReadingBookshelfBinding
 import com.example.bookchat.ui.dialog.PageInputBottomSheetDialog
 import com.example.bookchat.ui.dialog.ReadingTapBookDialog
+import com.example.bookchat.utils.RefreshManager
+import com.example.bookchat.utils.RefreshManager.popRefreshReadingFlag
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.BookShelfViewModel.PagingViewEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -69,6 +71,7 @@ class ReadingBookShelfFragment : Fragment() {
                         return@collect
                     }
                 }
+                bookShelfViewModel.isReadingBookLoaded = true
                 binding.bookshelfEmptyLayout.visibilty = View.GONE
                 binding.swipeRefreshLayoutReading.visibility = View.VISIBLE
                 initializeModificationEvents()
@@ -80,6 +83,7 @@ class ReadingBookShelfFragment : Fragment() {
         bookShelfViewModel.readingBookModificationEvents.value =
             bookShelfViewModel.readingBookModificationEvents.value.filterIsInstance<PagingViewEvent.RemoveWaiting>()
         bookShelfViewModel.renewTotalItemCount(BookShelfViewModel.MODIFICATION_EVENT_FLAG_READING)
+        popRefreshReadingFlag()
     }
 
     private fun initRecyclerView() {
@@ -127,6 +131,13 @@ class ReadingBookShelfFragment : Fragment() {
         binding.swipeRefreshLayoutReading.setOnRefreshListener {
             readingBookShelfDataAdapter.refresh()
             binding.swipeRefreshLayoutReading.isRefreshing = false
+        }
+    }
+    override fun onResume() {
+        super.onResume()
+        if(RefreshManager.hasReadingBookShelfNewData()){
+            readingBookShelfDataAdapter.refresh()
+            popRefreshReadingFlag()
         }
     }
 

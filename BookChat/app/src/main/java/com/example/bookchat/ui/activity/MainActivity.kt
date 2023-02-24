@@ -11,6 +11,9 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityMainBinding
 import com.example.bookchat.ui.fragment.*
 import com.example.bookchat.utils.RefreshManager
+import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.COMPLETE_TAB_INDEX
+import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.READING_TAB_INDEX
+import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.WISH_TAB_INDEX
 import com.google.android.material.navigation.NavigationBarView
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -74,18 +77,25 @@ class MainActivity : AppCompatActivity() {
 
     private fun refreshBookShelf(){
         with(bookShelfFragment.pagerAdapter){
-            when{
-                RefreshManager.hasWishBookShelfNewData->{
-                    wishBookBookShelfFragment.wishBookShelfDataAdapter.refresh()
-                    RefreshManager.hasWishBookShelfNewData = false
+            val bookshelfRefreshFlag = RefreshManager.bookShelfRefreshList.removeFirstOrNull() ?: return
+            when(bookshelfRefreshFlag){
+                RefreshManager.BookShelfRefreshFlag.Wish -> {
+                    bookShelfFragment.changeTab(WISH_TAB_INDEX)
+                    if(bookShelfFragment.bookShelfViewModel.isWishBookLoaded){
+                        wishBookBookShelfFragment.wishBookShelfDataAdapter.refresh()
+                    }
                 }
-                RefreshManager.hasReadingBookShelfNewData -> {
-                    readingBookShelfFragment.readingBookShelfDataAdapter.refresh()
-                    RefreshManager.hasReadingBookShelfNewData = false
+                RefreshManager.BookShelfRefreshFlag.Reading -> {
+                    bookShelfFragment.changeTab(READING_TAB_INDEX)
+                    if(bookShelfFragment.bookShelfViewModel.isReadingBookLoaded){
+                        readingBookShelfFragment.readingBookShelfDataAdapter.refresh()
+                    }
                 }
-                RefreshManager.hasCompleteBookShelfNewData -> {
-                    completeBookShelfFragment.completeBookShelfDataAdapter.refresh()
-                    RefreshManager.hasCompleteBookShelfNewData = false
+                RefreshManager.BookShelfRefreshFlag.Complete -> {
+                    bookShelfFragment.changeTab(COMPLETE_TAB_INDEX)
+                    if(bookShelfFragment.bookShelfViewModel.isCompleteBookLoaded){
+                        completeBookShelfFragment.completeBookShelfDataAdapter.refresh()
+                    }
                 }
             }
         }

@@ -58,7 +58,7 @@ class BookShelfFragment : Fragment() {
         }.attach()
     }
 
-    private fun changeTab(tabIndex: Int) {
+    fun changeTab(tabIndex: Int) {
         binding.viewPager.currentItem = tabIndex
     }
 
