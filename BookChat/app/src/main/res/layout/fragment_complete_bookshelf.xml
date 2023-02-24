@@ -11,6 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <include
+            android:id="@+id/bookshelf_empty_layout"
+            android:elevation="5dp"
+            app:viewmodel ="@{viewmodel}"
+            layout="@layout/layout_bookshelf_empty" />
+
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeRefreshLayout_complete"
             android:layout_width="match_parent"

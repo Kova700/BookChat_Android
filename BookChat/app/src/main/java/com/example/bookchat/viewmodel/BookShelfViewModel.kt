@@ -185,6 +185,10 @@ class BookShelfViewModel @Inject constructor(
         }
     }
 
+    fun getRemoveWaitingCount(eventFlow: MutableStateFlow<List<PagingViewEvent>>) :Int{
+        return eventFlow.value.count{ it is  PagingViewEvent.RemoveWaiting }
+    }
+
     private fun getRemoveEventCount(eventFlow: MutableStateFlow<List<PagingViewEvent>>): Int {
         return eventFlow.value.count {
             (it is PagingViewEvent.Remove) || (it is PagingViewEvent.RemoveWaiting)

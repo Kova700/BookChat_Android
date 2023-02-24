@@ -59,8 +59,18 @@ class ReadingBookShelfFragment : Fragment() {
         readingBookShelfDataAdapter.loadStateFlow.collect { combinedLoadStates ->
             if (combinedLoadStates.refresh is LoadState.NotLoading) {
                 if(readingBookShelfDataAdapter.itemCount == 0){
-                    bookShelfViewModel.readingBookTotalCountCache = 0
+                    with(bookShelfViewModel){
+                        readingBookTotalCountCache = 0 + getRemoveWaitingCount(readingBookModificationEvents).toLong()
+                        initializeModificationEvents()
+                        if(readingBookModificationEvents.value.isEmpty()){
+                            binding.bookshelfEmptyLayout.visibilty = View.VISIBLE
+                            binding.swipeRefreshLayoutReading.visibility = View.GONE
+                        }
+                        return@collect
+                    }
                 }
+                binding.bookshelfEmptyLayout.visibilty = View.GONE
+                binding.swipeRefreshLayoutReading.visibility = View.VISIBLE
                 initializeModificationEvents()
             }
         }
