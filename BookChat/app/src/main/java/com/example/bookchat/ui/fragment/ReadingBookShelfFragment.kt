@@ -1,7 +1,6 @@
 package com.example.bookchat.ui.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +18,6 @@ import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.FragmentReadingBookshelfBinding
 import com.example.bookchat.ui.dialog.PageInputBottomSheetDialog
 import com.example.bookchat.ui.dialog.ReadingTapBookDialog
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.BookShelfViewModel.PagingViewEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,14 +51,18 @@ class ReadingBookShelfFragment : Fragment() {
 
     private fun observePagingReadingBookData() {
         bookShelfViewModel.readingBookCombined.observe(viewLifecycleOwner) { PagingBookShelfItem ->
-            Log.d(TAG, "ReadingBookTabFragment: readingBookShelfDataAdapter.submitData() - called")
             readingBookShelfDataAdapter.submitData(viewLifecycleOwner.lifecycle, PagingBookShelfItem)
         }
     }
 
     private fun observeAdapterLoadState() = lifecycleScope.launch {
         readingBookShelfDataAdapter.loadStateFlow.collect { combinedLoadStates ->
-            if (combinedLoadStates.refresh is LoadState.NotLoading) initializeModificationEvents()
+            if (combinedLoadStates.refresh is LoadState.NotLoading) {
+                if(readingBookShelfDataAdapter.itemCount == 0){
+                    bookShelfViewModel.readingBookTotalCountCache = 0
+                }
+                initializeModificationEvents()
+            }
         }
     }
 

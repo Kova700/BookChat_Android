@@ -52,7 +52,12 @@ class CompleteBookShelfFragment : Fragment() {
 
     private fun observeAdapterLoadState() = lifecycleScope.launch{
         completeBookShelfDataAdapter.loadStateFlow.collect{ combinedLoadStates ->
-            if(combinedLoadStates.refresh is LoadState.NotLoading) initializeModificationEvents()
+            if(combinedLoadStates.refresh is LoadState.NotLoading) {
+                if(completeBookShelfDataAdapter.itemCount == 0){
+                    bookShelfViewModel.completeBookTotalCountCache = 0
+                }
+                initializeModificationEvents()
+            }
         }
     }
     private fun initializeModificationEvents(){

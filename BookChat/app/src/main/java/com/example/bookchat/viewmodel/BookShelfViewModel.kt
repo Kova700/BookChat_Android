@@ -20,6 +20,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.max
 
 @HiltViewModel
 class BookShelfViewModel @Inject constructor(
@@ -171,15 +172,15 @@ class BookShelfViewModel @Inject constructor(
         when (flag) {
             MODIFICATION_EVENT_FLAG_WISH -> {
                 wishBookTotalCount.value =
-                    wishBookTotalCountCache - getRemoveEventCount(wishBookModificationEvents)
+                    max(wishBookTotalCountCache - getRemoveEventCount(wishBookModificationEvents),0)
             }
             MODIFICATION_EVENT_FLAG_READING -> {
                 readingBookTotalCount.value =
-                    readingBookTotalCountCache - getRemoveEventCount(readingBookModificationEvents)
+                    max(readingBookTotalCountCache - getRemoveEventCount(readingBookModificationEvents),0)
             }
             MODIFICATION_EVENT_FLAG_COMPLETE -> {
                 completeBookTotalCount.value =
-                    completeBookTotalCountCache - getRemoveEventCount(completeBookModificationEvents)
+                    max(completeBookTotalCountCache - getRemoveEventCount(completeBookModificationEvents),0)
             }
         }
     }
