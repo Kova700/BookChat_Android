@@ -12,8 +12,8 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
-import com.example.bookchat.adapter.complete_bookshelf.CompleteBookShelfDataAdapter
-import com.example.bookchat.adapter.complete_bookshelf.CompleteBookShelfHeaderAdapter
+import com.example.bookchat.adapter.completebookshelf.CompleteBookShelfDataAdapter
+import com.example.bookchat.adapter.completebookshelf.CompleteBookShelfHeaderAdapter
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.FragmentCompleteBookshelfBinding
 import com.example.bookchat.ui.dialog.CompleteTapBookDialog

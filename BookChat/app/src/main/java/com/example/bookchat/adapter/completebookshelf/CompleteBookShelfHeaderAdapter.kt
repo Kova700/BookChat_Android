@@ -1,4 +1,4 @@
-package com.example.bookchat.adapter.complete_bookshelf
+package com.example.bookchat.adapter.completebookshelf
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
