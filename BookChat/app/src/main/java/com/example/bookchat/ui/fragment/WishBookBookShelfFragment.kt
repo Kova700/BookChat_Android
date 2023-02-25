@@ -11,8 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.ConcatAdapter
 import com.example.bookchat.R
-import com.example.bookchat.adapter.wish_bookshelf.WishBookShelfDataAdapter
-import com.example.bookchat.adapter.wish_bookshelf.WishBookShelfHeaderAdapter
+import com.example.bookchat.adapter.wishbookshelf.WishBookShelfDataAdapter
+import com.example.bookchat.adapter.wishbookshelf.WishBookShelfHeaderAdapter
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.FragmentWishBookshelfBinding
 import com.example.bookchat.ui.dialog.WishTapBookDialog

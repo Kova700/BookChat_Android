@@ -1,4 +1,4 @@
-package com.example.bookchat.adapter.wish_bookshelf
+package com.example.bookchat.adapter.wishbookshelf
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

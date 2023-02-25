@@ -1,4 +1,4 @@
-package com.example.bookchat.adapter.complete_bookshelf
+package com.example.bookchat.adapter.readingbookshelf
 
 import android.os.Handler
 import android.os.Looper
@@ -9,9 +9,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.adapter.wish_bookshelf.WishBookShelfDataAdapter.Companion.BOOK_SHELF_ITEM_COMPARATOR
+import com.example.bookchat.adapter.wishbookshelf.WishBookShelfDataAdapter.Companion.BOOK_SHELF_ITEM_COMPARATOR
 import com.example.bookchat.data.BookShelfDataItem
-import com.example.bookchat.databinding.ItemCompleteBookshelfDataBinding
+import com.example.bookchat.databinding.ItemReadingBookshelfDataBinding
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.BookShelfViewModel.PagingViewEvent
@@ -21,19 +21,24 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class CompleteBookShelfDataAdapter(private val bookShelfViewModel: BookShelfViewModel)
-    : PagingDataAdapter<BookShelfDataItem, CompleteBookShelfDataAdapter.CompleteBookItemViewHolder>(BOOK_SHELF_ITEM_COMPARATOR){
-    private lateinit var binding : ItemCompleteBookshelfDataBinding
+class ReadingBookShelfDataAdapter(private val bookShelfViewModel: BookShelfViewModel)
+    : PagingDataAdapter<BookShelfDataItem, ReadingBookShelfDataAdapter.ReadingBookShelfDataViewHolder>(BOOK_SHELF_ITEM_COMPARATOR){
+    private lateinit var bindingDataItem : ItemReadingBookshelfDataBinding
     private lateinit var itemClickListener : OnItemClickListener
+    private lateinit var pageBtnClickListener : OnItemClickListener
 
-    inner class CompleteBookItemViewHolder(val binding: ItemCompleteBookshelfDataBinding) : RecyclerView.ViewHolder(binding.root){
-        fun bind(bookShelfDataItem :BookShelfDataItem){
-            with(this.binding){
+    inner class ReadingBookShelfDataViewHolder(val binding: ItemReadingBookshelfDataBinding) : RecyclerView.ViewHolder(binding.root){
+        fun bind(bookShelfDataItem : BookShelfDataItem){
+            with(binding){
                 bookShelfItem = bookShelfDataItem.bookShelfItem
-                setViewHolderState(swipeView, bookShelfDataItem.isSwiped)
+                setViewHolderState(swipeView,bookShelfDataItem.isSwiped)
 
                 swipeView.setOnClickListener {
                     itemClickListener.onItemClick(bookShelfDataItem)
+                }
+
+                pageBtn.setOnClickListener{
+                    pageBtnClickListener.onItemClick(bookShelfDataItem)
                 }
 
                 swipeView.setOnLongClickListener {
@@ -45,17 +50,17 @@ class CompleteBookShelfDataAdapter(private val bookShelfViewModel: BookShelfView
                 swipeBackground.setOnClickListener {
                     setSwiped(false)
                     val removeWaitingEvent = PagingViewEvent.RemoveWaiting(bookShelfDataItem)
-                    bookShelfViewModel.addPagingViewEvent(removeWaitingEvent, ReadingStatus.COMPLETE)
+                    bookShelfViewModel.addPagingViewEvent(removeWaitingEvent ,ReadingStatus.READING)
 
                     val handler = Handler(Looper.getMainLooper())
                     handler.postDelayed({
                         val removeEvent = PagingViewEvent.Remove(bookShelfDataItem)
                         bookShelfViewModel.deleteBookShelfBookWithSwipe(bookShelfDataItem,
-                            removeEvent, removeWaitingEvent, ReadingStatus.COMPLETE)
+                            removeEvent, removeWaitingEvent, ReadingStatus.READING)
                     }, SNACK_BAR_DURATION.toLong())
 
                     val snackCancelClickListener = View.OnClickListener {
-                        bookShelfViewModel.removePagingViewEvent(removeWaitingEvent, ReadingStatus.COMPLETE)
+                        bookShelfViewModel.removePagingViewEvent(removeWaitingEvent, ReadingStatus.READING)
                         handler.removeCallbacksAndMessages(null)
                     }
 
@@ -64,6 +69,7 @@ class CompleteBookShelfDataAdapter(private val bookShelfViewModel: BookShelfView
                         .setDuration(SNACK_BAR_DURATION)
                         .show()
                 }
+
             }
         }
 
@@ -71,11 +77,6 @@ class CompleteBookShelfDataAdapter(private val bookShelfViewModel: BookShelfView
             val currentItem = getItem(bindingAdapterPosition)
             currentItem?.let { currentItem.isSwiped = flag }
         }
-    }
-
-    private fun setViewHolderState(view: View, isSwiped :Boolean){
-        if(!isSwiped) { view.translationX = 0f; return }
-        view.translationX = view.width.toFloat() * SWIPE_VIEW_PERCENT
     }
 
     private fun startSwipeAnimation(view: View, isSwiped :Boolean) =
@@ -97,31 +98,39 @@ class CompleteBookShelfDataAdapter(private val bookShelfViewModel: BookShelfView
             view.translationX = swipedX
         }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CompleteBookItemViewHolder {
-        binding = DataBindingUtil
-            .inflate(LayoutInflater.from(parent.context),
-                R.layout.item_complete_bookshelf_data,parent,false)
-        return CompleteBookItemViewHolder(binding)
+    private fun setViewHolderState(view: View, isSwiped :Boolean){
+        if(!isSwiped) { view.translationX = 0f; return }
+        view.translationX = view.width.toFloat() * SWIPE_VIEW_PERCENT
     }
 
-    override fun onBindViewHolder(holder: CompleteBookItemViewHolder, position: Int) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReadingBookShelfDataViewHolder {
+        bindingDataItem = DataBindingUtil
+            .inflate(LayoutInflater.from(parent.context),
+                R.layout.item_reading_bookshelf_data,parent,false)
+        return ReadingBookShelfDataViewHolder(bindingDataItem)
+    }
+
+    override fun onBindViewHolder(holder: ReadingBookShelfDataViewHolder, position: Int) {
         val currentItem = getItem(position)
         currentItem?.let { holder.bind(currentItem) }
     }
 
     interface OnItemClickListener {
-        fun onItemClick(bookShelfDataItem :BookShelfDataItem)
+        fun onItemClick(bookShelfDataItem : BookShelfDataItem)
     }
 
     fun setItemClickListener(onItemClickListener: OnItemClickListener) {
         this.itemClickListener = onItemClickListener
     }
 
-    override fun getItemViewType(position: Int): Int = R.layout.item_complete_bookshelf_data
+    fun setPageBtnClickListener(onItemClickListener: OnItemClickListener){
+        this.pageBtnClickListener = onItemClickListener
+    }
+
+    override fun getItemViewType(position: Int): Int  = R.layout.item_reading_bookshelf_data
 
     companion object {
         private const val SWIPE_VIEW_PERCENT = 0.3F
         private const val SNACK_BAR_DURATION = 3000
     }
-
 }
