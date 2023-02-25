@@ -51,6 +51,7 @@
 
     <!--bookshelf-->
     <string name="bookshelf">서재</string>
+    <string name="wish_book">독서예정</string>
     <string name="complete_book">독서완료</string>
     <string name="reading_book">독서중</string>
     <string name="already_in_bookshelf">이미 서재에 등록된 도서</string>
@@ -64,6 +65,8 @@
     <string name="bookshelf_change_to_complete_fail">독서완료로 변경을 실패했습니다.</string>
     <string name="bookshelf_change_to_reading_success">독서중으로 변경되었습니다.</string>
     <string name="bookshelf_change_to_reading_fail">독서중으로 변경을 실패했습니다.</string>
+    <string name="bookshelf_request_add_book">서재에 도서를 추가해주세요.</string>
+    <string name="bookshelf_add_book">도서 추가하기</string>
 
     <!--search-->
     <string name="book">도서</string>

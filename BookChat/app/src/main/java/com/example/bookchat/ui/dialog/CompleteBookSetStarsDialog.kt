@@ -17,6 +17,8 @@ import com.example.bookchat.data.request.RequestRegisterBookShelfBook
 import com.example.bookchat.databinding.DialogCompleteBookSetStarsBinding
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.ReadingStatus
+import com.example.bookchat.utils.RefreshManager
+import com.example.bookchat.utils.RefreshManager.BookShelfRefreshFlag
 import com.example.bookchat.utils.toStarRating
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -64,6 +66,7 @@ class CompleteBookSetStarsDialog @AssistedInject constructor(
         runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
             .onSuccess {
                 makeToast(R.string.complete_bookshelf_register_success)
+                RefreshManager.addBookShelfRefreshFlag(BookShelfRefreshFlag.Complete)
                 this@CompleteBookSetStarsDialog.dismiss()
             }
             .onFailure { makeToast(R.string.complete_bookshelf_register_fail) }

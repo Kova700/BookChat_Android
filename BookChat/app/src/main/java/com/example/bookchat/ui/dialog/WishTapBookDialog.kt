@@ -14,7 +14,7 @@ import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.DialogWishBookTapClickedBinding
 import com.example.bookchat.ui.fragment.BookShelfFragment
-import com.example.bookchat.ui.fragment.ReadingBookTabFragment
+import com.example.bookchat.ui.fragment.ReadingBookShelfFragment
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.BookShelfViewModel.BookShelfEvent
@@ -63,8 +63,8 @@ class WishTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : Dial
         return fragment
     }
 
-    private fun getReadingBookTabFragment() : ReadingBookTabFragment {
-        return getBookShelfFragment().pagerAdapter.readingBookTabFragment
+    private fun getReadingBookTabFragment() : ReadingBookShelfFragment {
+        return getBookShelfFragment().pagerAdapter.readingBookShelfFragment
     }
 
     private fun observeEventFlow() {
@@ -95,7 +95,7 @@ class WishTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : Dial
                 val bookShelfUiEvent = BookShelfEvent.ChangeBookShelfTab(READING_TAB_INDEX)
                 bookShelfViewModel.startBookShelfUiEvent(bookShelfUiEvent)
                 if(bookShelfViewModel.isReadingBookLoaded){
-                    getReadingBookTabFragment().readingBookAdapter.refresh()
+                    getReadingBookTabFragment().readingBookShelfDataAdapter.refresh()
                 }
             }
             else -> { }

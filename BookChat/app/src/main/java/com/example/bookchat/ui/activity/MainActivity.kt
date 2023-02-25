@@ -10,6 +10,10 @@ import androidx.fragment.app.FragmentTransaction
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityMainBinding
 import com.example.bookchat.ui.fragment.*
+import com.example.bookchat.utils.RefreshManager
+import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.COMPLETE_TAB_INDEX
+import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.READING_TAB_INDEX
+import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.WISH_TAB_INDEX
 import com.google.android.material.navigation.NavigationBarView
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -62,13 +66,39 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigationView.setOnItemSelectedListener(bottomNaviItemSelectedListener)
     }
 
-
     private fun addOrReplaceFragment(newFragment: Fragment, tag: String) {
         if (newFragment.isAdded) {
             replaceFragment(newFragment)
+            if (newFragment is BookShelfFragment) refreshBookShelf()
             return
         }
         addFragment(newFragment, tag)
+    }
+
+    private fun refreshBookShelf(){
+        with(bookShelfFragment.pagerAdapter){
+            val bookshelfRefreshFlag = RefreshManager.bookShelfRefreshList.removeFirstOrNull() ?: return
+            when(bookshelfRefreshFlag){
+                RefreshManager.BookShelfRefreshFlag.Wish -> {
+                    bookShelfFragment.changeTab(WISH_TAB_INDEX)
+                    if(bookShelfFragment.bookShelfViewModel.isWishBookLoaded){
+                        wishBookBookShelfFragment.wishBookShelfDataAdapter.refresh()
+                    }
+                }
+                RefreshManager.BookShelfRefreshFlag.Reading -> {
+                    bookShelfFragment.changeTab(READING_TAB_INDEX)
+                    if(bookShelfFragment.bookShelfViewModel.isReadingBookLoaded){
+                        readingBookShelfFragment.readingBookShelfDataAdapter.refresh()
+                    }
+                }
+                RefreshManager.BookShelfRefreshFlag.Complete -> {
+                    bookShelfFragment.changeTab(COMPLETE_TAB_INDEX)
+                    if(bookShelfFragment.bookShelfViewModel.isCompleteBookLoaded){
+                        completeBookShelfFragment.completeBookShelfDataAdapter.refresh()
+                    }
+                }
+            }
+        }
     }
 
     private fun addFragment(newFragment: Fragment, tag: String) {
@@ -163,26 +193,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun setBackPressedDispatcher() {
         onBackPressedDispatcher.addCallback {
-            val inflatedBtmNaviFgmt = getInflatedBottomNaviFragment(getInflatedFragmentList())
-            if (inflatedBtmNaviFgmt != null){
-                if(inflatedBtmNaviFgmt.hasChildBackStack()){
-                    inflatedBtmNaviFgmt.childFragmentManager.popBackStackImmediate()
-                    return@addCallback
-                }
+            val nowInflatedBtmNaviFgmt = getInflatedBottomNaviFragment(getInflatedFragmentList())
+            if (nowInflatedBtmNaviFgmt.hasChildBackStack()){
+                nowInflatedBtmNaviFgmt.popChildBackStack()
+                return@addCallback
             }
-
             backPressToastEvent()
             inflateFragmentInStack()
             updateBottomNaviIcon()
-            finish()
         }
     }
 
-    private fun Fragment.hasChildBackStack() =
-        this.childFragmentManager.backStackEntryCount != 0
+    private fun Fragment?.popChildBackStack(){
+        this?.childFragmentManager?.popBackStackImmediate()
+    }
+
+    private fun Fragment?.hasChildBackStack() =
+        this?.childFragmentManager?.backStackEntryCount != 0
 
     private fun backPressToastEvent() {
-        if (!bottomNaviFragmentStack.isEmpty()) return
+        if (bottomNaviFragmentStack.isNotEmpty()) return
 
         val toast = Toast.makeText(this, R.string.back_press_warning, Toast.LENGTH_SHORT)
         if (System.currentTimeMillis() > backPressedTime + 2000) {
@@ -191,6 +221,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         toast.cancel()
+        finish()
     }
 
     companion object {

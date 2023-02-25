@@ -12,14 +12,12 @@ import com.example.bookchat.paging.CompleteBookTapPagingSource
 import com.example.bookchat.paging.ReadingBookTapPagingSource
 import com.example.bookchat.paging.WishBookTapPagingSource
 import com.example.bookchat.repository.BookRepository
-import com.example.bookchat.repository.BookRepository.Companion.COMPLETE_TAP_BOOKS_ITEM_LOAD_SIZE
-import com.example.bookchat.repository.BookRepository.Companion.READING_TAP_BOOKS_ITEM_LOAD_SIZE
-import com.example.bookchat.repository.BookRepository.Companion.WISH_TAP_BOOKS_ITEM_LOAD_SIZE
 import com.example.bookchat.utils.ReadingStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.max
 
 @HiltViewModel
 class BookShelfViewModel @Inject constructor(
@@ -117,13 +115,17 @@ class BookShelfViewModel @Inject constructor(
     fun deleteBookShelfBookWithSwipe(
         bookShelfDataItem: BookShelfDataItem,
         removeEvent :PagingViewEvent.Remove,
+        removeWaitingEvent :PagingViewEvent.RemoveWaiting,
         readingStatus :ReadingStatus
     ) = viewModelScope.launch {
         runCatching { bookRepository.deleteBookShelfBook(bookShelfDataItem.bookShelfItem.bookShelfId) }
-            .onSuccess { makeToast(R.string.bookshelf_delete_success) }
+            .onSuccess { makeToast(R.string.bookshelf_delete_success)
+                addPagingViewEvent(removeEvent, readingStatus)
+                removePagingViewEvent(removeWaitingEvent, readingStatus)
+            }
             .onFailure {
                 makeToast(R.string.bookshelf_delete_fail)
-                removePagingViewEvent(removeEvent, readingStatus)
+                removePagingViewEvent(removeWaitingEvent, readingStatus)
             }
     }
 
@@ -167,17 +169,21 @@ class BookShelfViewModel @Inject constructor(
         when (flag) {
             MODIFICATION_EVENT_FLAG_WISH -> {
                 wishBookTotalCount.value =
-                    wishBookTotalCountCache - getRemoveEventCount(wishBookModificationEvents)
+                    max(wishBookTotalCountCache - getRemoveEventCount(wishBookModificationEvents),0)
             }
             MODIFICATION_EVENT_FLAG_READING -> {
                 readingBookTotalCount.value =
-                    readingBookTotalCountCache - getRemoveEventCount(readingBookModificationEvents)
+                    max(readingBookTotalCountCache - getRemoveEventCount(readingBookModificationEvents),0)
             }
             MODIFICATION_EVENT_FLAG_COMPLETE -> {
                 completeBookTotalCount.value =
-                    completeBookTotalCountCache - getRemoveEventCount(completeBookModificationEvents)
+                    max(completeBookTotalCountCache - getRemoveEventCount(completeBookModificationEvents),0)
             }
         }
+    }
+
+    fun getRemoveWaitingCount(eventFlow: MutableStateFlow<List<PagingViewEvent>>) :Int{
+        return eventFlow.value.count{ it is  PagingViewEvent.RemoveWaiting }
     }
 
     private fun getRemoveEventCount(eventFlow: MutableStateFlow<List<PagingViewEvent>>): Int {
@@ -205,6 +211,9 @@ class BookShelfViewModel @Inject constructor(
     }
 
     companion object {
+        private const val WISH_TAP_BOOKS_ITEM_LOAD_SIZE = 10
+        private const val READING_TAP_BOOKS_ITEM_LOAD_SIZE = 4
+        private const val COMPLETE_TAP_BOOKS_ITEM_LOAD_SIZE = 4
         const val MODIFICATION_EVENT_FLAG_WISH = "WISH"
         const val MODIFICATION_EVENT_FLAG_READING = "READING"
         const val MODIFICATION_EVENT_FLAG_COMPLETE = "COMPLETE"

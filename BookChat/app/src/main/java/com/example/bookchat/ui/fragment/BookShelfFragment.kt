@@ -20,8 +20,8 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class BookShelfFragment : Fragment() {
 
-    lateinit var binding : FragmentBookShelfBinding
-    lateinit var pagerAdapter :PagerFragmentStateAdapter
+    lateinit var binding: FragmentBookShelfBinding
+    lateinit var pagerAdapter: PagerFragmentStateAdapter
     val bookShelfViewModel: BookShelfViewModel by viewModels()
 
     override fun onCreateView(
@@ -29,47 +29,47 @@ class BookShelfFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_book_shelf,container,false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_book_shelf, container, false)
         pagerAdapter = PagerFragmentStateAdapter(this)
-        binding.lifecycleOwner = this
-        binding.viewPager.adapter = pagerAdapter
+        with(binding){
+            lifecycleOwner = this@BookShelfFragment
+            viewPager.adapter = pagerAdapter
+        }
         initTapLayout()
-        changeTab(1)
+        inflateFirstTab(1)
         observeEvent()
 
         return binding.root
     }
 
-    private fun inflateFirstTap(){
-//        if(bookShelfViewModel.isBookShelfEmpty.value == false) {
-//            changeTab(1)
-//            return
-//        }
-        changeTab(0)
+    private fun inflateFirstTab(tabIndex: Int) {
+        binding.viewPager.setCurrentItem(tabIndex, false)
     }
 
-    private fun observeEvent(){
+    private fun observeEvent() {
         lifecycleScope.launch {
             bookShelfViewModel.eventFlow.collect { event -> handleEvent(event) }
         }
     }
 
-    private fun initTapLayout(){
-        TabLayoutMediator(binding.tabLayout,binding.viewPager){ tab, position ->
-            tab.text = bookShelfTapNameList[position]
+    private fun initTapLayout() {
+        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+            tab.text = resources.getString(bookShelfTapNameList[position])
         }.attach()
     }
 
-    //자식 Fragment로부터 서재 탭 이동이 가능한 메소드
-    fun changeTab(tapIndex :Int){
-        binding.viewPager.currentItem = tapIndex
+    fun changeTab(tabIndex: Int) {
+        binding.viewPager.currentItem = tabIndex
     }
 
-    private fun handleEvent(event: BookShelfEvent) = when(event){
-        is BookShelfEvent.ChangeBookShelfTab -> { changeTab(event.tapIndex) }
+    private fun handleEvent(event: BookShelfEvent) = when (event) {
+        is BookShelfEvent.ChangeBookShelfTab -> {
+            changeTab(event.tapIndex)
+        }
     }
 
     companion object {
-        private val bookShelfTapNameList = listOf("독서예정","독서중","독서완료")
+        private val bookShelfTapNameList =
+            listOf(R.string.wish_book, R.string.reading_book, R.string.complete_book)
     }
 }

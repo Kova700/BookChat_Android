@@ -10,9 +10,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.bookchat.R
-import com.example.bookchat.adapter.Agony.AgonyDataItemAdapter
-import com.example.bookchat.adapter.Agony.AgonyFirstItemAdapter
-import com.example.bookchat.adapter.Agony.AgonyHeaderItemAdapter
+import com.example.bookchat.adapter.agony.AgonyDataItemAdapter
+import com.example.bookchat.adapter.agony.AgonyFirstItemAdapter
+import com.example.bookchat.adapter.agony.AgonyHeaderItemAdapter
 import com.example.bookchat.data.AgonyDataItem
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ActivityAgonyBinding

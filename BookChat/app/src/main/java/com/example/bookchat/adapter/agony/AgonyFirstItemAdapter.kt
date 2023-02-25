@@ -1,4 +1,4 @@
-package com.example.bookchat.adapter.Agony
+package com.example.bookchat.adapter.agony
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
