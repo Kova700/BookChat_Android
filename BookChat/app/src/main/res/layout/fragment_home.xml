@@ -156,7 +156,7 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/todayChatRoomListView"
-                tools:listitem="@layout/item_main_chatroom"
+                tools:listitem="@layout/item_chat_room_list_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:overScrollMode="never"

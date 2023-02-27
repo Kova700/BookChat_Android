@@ -119,7 +119,9 @@
     <string name="agony_record_delete_fail">고민기록 삭제를 실패했습니다.</string>
 
     <!--chat-->
+    <string name="chat">채팅</string>
     <string name="chat_room">채팅방</string>
+    <string name="my_chat_room">나의 채팅방</string>
 
     <!--my page-->
     <string name="my_page_title">나의 정보</string>

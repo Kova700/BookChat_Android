@@ -6,10 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.adapter.MainChatRoomAdapter
 import com.example.bookchat.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,7 +15,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private lateinit var binding :FragmentHomeBinding
-    private lateinit var chatRoomAdapter: MainChatRoomAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,18 +26,7 @@ class HomeFragment : Fragment() {
             lifecycleOwner = this@HomeFragment
             user = App.instance.getCachedUser()
         }
-        initChatRoomRcv()
 
         return binding.root
     }
-
-    private fun initChatRoomRcv(){
-        with(binding){
-            chatRoomAdapter = MainChatRoomAdapter()
-            todayChatRoomListView.adapter = chatRoomAdapter
-            todayChatRoomListView.setHasFixedSize(true)
-            todayChatRoomListView.layoutManager = LinearLayoutManager(requireContext())
-        }
-    }
-
 }

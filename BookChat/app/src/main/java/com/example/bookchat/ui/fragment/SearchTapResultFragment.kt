@@ -1,7 +1,6 @@
 package com.example.bookchat.ui.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,12 +10,11 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
-import com.example.bookchat.adapter.MainChatRoomAdapter
+import com.example.bookchat.adapter.chatroomlist.ChatRoomListDataAdapter
 import com.example.bookchat.adapter.SearchResultBookSimpleAdapter
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.FragmentSearchTapResultBinding
 import com.example.bookchat.ui.dialog.SearchTapBookDialog
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.SearchViewModel
 
 class SearchTapResultFragment : Fragment() {
@@ -24,7 +22,7 @@ class SearchTapResultFragment : Fragment() {
     private lateinit var searchResultBookSimpleAdapter : SearchResultBookSimpleAdapter
     private val searchViewModel: SearchViewModel by viewModels({ requireParentFragment() })
 
-    private lateinit var chatRoomAdapter: MainChatRoomAdapter // 임시
+//    private lateinit var chatRoomAdapter: ChatRoomListDataAdapter // 임시
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,12 +41,12 @@ class SearchTapResultFragment : Fragment() {
 
     private fun initAdapter(){
         initSearchResultBookAdapter()
-        initSearchResultChatRoomAdapter()
+//        initSearchResultChatRoomAdapter()
     }
 
     private fun initRcv(){
         initSearchResultBookRcv()
-        initSearchResultChatRoomRcv()
+//        initSearchResultChatRoomRcv()
     }
 
     private fun initSearchResultBookRcv(){
@@ -58,13 +56,13 @@ class SearchTapResultFragment : Fragment() {
             searchResultBookSimpleRcv.layoutManager = GridLayoutManager(requireContext(),3)
         }
     }
-    private fun initSearchResultChatRoomRcv(){
-        with(binding){
-            searchResultChatRoomSimpleRcv.adapter = chatRoomAdapter
-            searchResultChatRoomSimpleRcv.setHasFixedSize(true)
-            searchResultChatRoomSimpleRcv.layoutManager = LinearLayoutManager(requireContext())
-        }
-    }
+//    private fun initSearchResultChatRoomRcv(){
+//        with(binding){
+//            searchResultChatRoomSimpleRcv.adapter = chatRoomAdapter
+//            searchResultChatRoomSimpleRcv.setHasFixedSize(true)
+//            searchResultChatRoomSimpleRcv.layoutManager = LinearLayoutManager(requireContext())
+//        }
+//    }
 
     private fun initSearchResultBookAdapter(){
         val bookItemClickListener = object: SearchResultBookSimpleAdapter.OnItemClickListener{
@@ -77,9 +75,9 @@ class SearchTapResultFragment : Fragment() {
         searchResultBookSimpleAdapter.setItemClickListener(bookItemClickListener)
     }
 
-    private fun initSearchResultChatRoomAdapter(){
-        chatRoomAdapter = MainChatRoomAdapter() //임시
-    }
+//    private fun initSearchResultChatRoomAdapter(){
+//        chatRoomAdapter = ChatRoomListDataAdapter() //임시
+//    }
 
     companion object{
         private const val DIALOG_TAG_SEARCH_BOOK = "SearchTapBookDialog"

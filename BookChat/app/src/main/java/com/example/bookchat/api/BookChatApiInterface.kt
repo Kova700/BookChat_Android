@@ -171,4 +171,12 @@ interface BookChatApiInterface {
         @Path("recordId") recordId: Long,
         @Body requestReviseAgonyRecord: RequestReviseAgonyRecord
     ): Response<Unit>
+
+    /**------------채팅방 목록------------*/
+
+    @GET("/v1/api/chatrooms")
+    suspend fun getChatRoomList(
+        @Query("postCursorId") postCursorId: Int,
+        @Query("size") size: String,
+    ): Response<ResponseGetChatRoomList>
 }
