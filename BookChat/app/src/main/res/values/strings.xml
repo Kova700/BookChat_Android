@@ -151,6 +151,7 @@
     <string name="title">제목</string>
     <string name="content">내용</string>
     <string name="add">추가하기</string>
+    <string name="people_count_text">명</string>
     <string name="make_confirm">작성 완료</string>
     <string name="revise_confirm">수정 완료</string>
     <string name="all_delete">전체삭제</string>

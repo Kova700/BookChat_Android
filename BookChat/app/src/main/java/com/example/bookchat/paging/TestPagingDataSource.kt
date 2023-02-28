@@ -11,10 +11,18 @@ object TestPagingDataSource {
 
     fun getChatRoomListPagingSource() : ResponseGetChatRoomList {
         val testChatRoomDataList = mutableListOf<ChatRoomListItem>()
-        val chatRoomListItem = ChatRoomListItem(1L,"채팅방 제목","roomSid",3L,2,"https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Ft1.daumcdn.net%2Flbook%2Fimage%2F1590611%3Ftimestamp%3D20221209172054%22,%22isbn%22:%221158883595",
-        3L,"2000-10-02","블라블라")
-        for (i in 0 until 20){
-            testChatRoomDataList.add(chatRoomListItem.copy(roomId = i.toLong()))
+        val item = ChatRoomListItem(1L,"채팅방 제목","roomSid",3L,2,"https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Ft1.daumcdn.net%2Fcfile%2Ftistory%2F996333405A8280FC23",
+        3L,"2023-02-13T16:03:23.8916109","블라블라")
+        val item2 = item.copy(roomId = 2L,lastActiveTime = "2023-02-28T02:55:06")
+        val item3 = item.copy(roomId = 3L,lastActiveTime = "2023-02-27T02:55:06")
+        val item4 = item.copy(roomId = 4L,lastActiveTime = "2022-12-03T02:55:06")
+        val item5 = item.copy(roomId = 5L,lastActiveTime = "2023-03-01T03:29:01")
+        val item6 = item.copy(roomId = 5L,lastActiveTime = "2023-03-01T13:29:01")
+        val item7 = item.copy(roomId = 5L,lastActiveTime = "2023-03-01T00:29:01")
+        val item8 = item.copy(roomId = 5L,lastActiveTime = "2023-03-01T23:29:01")
+        testChatRoomDataList.addAll(listOf(item2,item3,item4,item5,item6,item7,item8))
+        for (i in 9 until 20){
+            testChatRoomDataList.add(item.copy(roomId = i.toLong()))
         }
         val testMeta = CursorMeta(1,6,true,false,true,true,1)
         return ResponseGetChatRoomList(testChatRoomDataList, testMeta)

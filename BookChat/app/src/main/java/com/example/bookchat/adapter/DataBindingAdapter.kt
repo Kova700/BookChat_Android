@@ -14,8 +14,10 @@ import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.*
 import com.example.bookchat.utils.*
+import com.example.bookchat.utils.DateManager.getFormattingText
 import com.example.bookchat.viewmodel.AgonyViewModel.AgonyActivityState
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportStatus
+import java.util.*
 
 object DataBindingAdapter {
 
@@ -459,5 +461,11 @@ object DataBindingAdapter {
             return
         }
         view.visibility = View.INVISIBLE
+    }
+
+    @JvmStatic
+    @BindingAdapter("getFormattingTimeText")
+    fun getFormattingTimeText(view: TextView, inputedDateAndTimeString: String) {
+        view.text = getFormattingText(inputedDateAndTimeString)
     }
 }
