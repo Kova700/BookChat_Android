@@ -122,6 +122,9 @@
     <string name="chat">채팅</string>
     <string name="chat_room">채팅방</string>
     <string name="my_chat_room">나의 채팅방</string>
+    <string name="make_chat_room">채팅방 만들기</string>
+    <string name="make_chat_room_title_hint">채팅방 제목을 작성해 주세요.</string>
+    <string name="make_chat_room_tag_hint">#해시태그로 채팅방을 소개해 주세요.</string>
 
     <!--my page-->
     <string name="my_page_title">나의 정보</string>
@@ -148,6 +151,7 @@
     <!--util-->
     <string name="confirm">확인</string>
     <string name="cancel">취소</string>
+    <string name="finish">완료</string>
     <string name="title">제목</string>
     <string name="content">내용</string>
     <string name="add">추가하기</string>

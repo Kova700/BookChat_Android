@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,9 +15,10 @@ import com.example.bookchat.R
 import com.example.bookchat.adapter.chatroomlist.ChatRoomListDataAdapter
 import com.example.bookchat.adapter.chatroomlist.ChatRoomListHeaderAdapter
 import com.example.bookchat.databinding.FragmentChatRoomListBinding
+import com.example.bookchat.ui.activity.MakeChatRoomActivity
 import com.example.bookchat.viewmodel.ChatRoomListViewModel
+import com.example.bookchat.viewmodel.ChatRoomListViewModel.ChatRoomListUiEvent
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 /*상단 고정, 채팅방 알림 끄기도 구현해야함*/
@@ -40,8 +42,13 @@ class ChatRoomListFragment : Fragment() {
         initAdapter()
         initRecyclerView()
         observePagingData()
+        observeUiEvent()
 
         return binding.root
+    }
+
+    private fun observeUiEvent() = lifecycleScope.launch{
+        chatRoomListViewModel.eventFlow.collect{ event -> handleEvent(event) }
     }
 
     private fun observePagingData() = lifecycleScope.launch{
@@ -53,7 +60,7 @@ class ChatRoomListFragment : Fragment() {
     private fun initAdapter() {
         chatRoomListHeaderAdapter = ChatRoomListHeaderAdapter()
         chatRoomListDataAdapter = ChatRoomListDataAdapter()
-        //클릭리스너 설정해줘야함
+        //클릭, 롱클릭 리스너 설정해줘야함
     }
 
     private fun initRecyclerView() {
@@ -69,6 +76,14 @@ class ChatRoomListFragment : Fragment() {
             chatRcv.setHasFixedSize(true)
             chatRcv.layoutManager = LinearLayoutManager(requireContext())
         }
+    }
+
+    private fun handleEvent(event : ChatRoomListUiEvent) = when(event){
+        ChatRoomListUiEvent.MoveToMakeChatRoomPage -> {
+            val intent = Intent(requireContext(), MakeChatRoomActivity::class.java)
+            startActivity(intent)
+        }
+        ChatRoomListUiEvent.MoveToSearchChatRoomPage -> {}
     }
 
 }

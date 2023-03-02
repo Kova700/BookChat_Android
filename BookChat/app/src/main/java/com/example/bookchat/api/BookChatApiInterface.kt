@@ -179,4 +179,10 @@ interface BookChatApiInterface {
         @Query("postCursorId") postCursorId: Int,
         @Query("size") size: String,
     ): Response<ResponseGetChatRoomList>
+
+    @POST("/v1/api/chatrooms")
+    suspend fun makeChatRoom(
+        @Part chatRoomImage: MultipartBody.Part? = null,
+        @Part("createChatRoomRequest") requestMakeChatRoom: RequestMakeChatRoom
+    ): Response<Unit>
 }
