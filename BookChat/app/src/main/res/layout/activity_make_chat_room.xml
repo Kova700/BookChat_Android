@@ -9,6 +9,7 @@
             type="com.example.bookchat.viewmodel.MakeChatRoomViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/make_chat_room_screen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.activity.MakeChatRoomActivity">
@@ -70,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="60dp"
             app:cardCornerRadius="10dp"
             app:cardElevation="0dp"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
@@ -79,6 +80,7 @@
 
             <!--이거 이미지 랜덤으로 나오게 설정해야함-->
             <!--크기 고정적 혹은 동적 설정 결정-->
+            <!--사진 사이즈 고정값 수정해야함 200x200 부족해보임-->
             <ImageView
                 android:layout_width="100dp"
                 android:layout_height="150dp"
@@ -101,15 +103,14 @@
             app:srcCompat="@drawable/ic_getpicture_btn" />
 
         <EditText
-            android:id="@+id/agonyTitleEditText"
+            android:id="@+id/chat_room_title_et"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
             android:layout_marginTop="30dp"
             android:layout_marginEnd="10dp"
             android:background="@null"
             android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_bold"
+            android:fontFamily="@font/roboto_bold"
             android:hint="@string/make_chat_room_title_hint"
             android:text="@={viewmodel.chatRoomTitle}"
             android:maxLength="20"
@@ -130,12 +131,12 @@
             android:visibility="@{viewmodel.chatRoomTitle.length() == 0 ? View.GONE : View.VISIBLE}"
             android:src="@drawable/ic_text_delete_btn"
             app:layout_constraintBottom_toTopOf="@+id/underlineView"
-            app:layout_constraintEnd_toStartOf="@+id/textView41"
-            app:layout_constraintTop_toTopOf="@+id/agonyTitleEditText" />
+            app:layout_constraintEnd_toStartOf="@+id/text_count_tv"
+            app:layout_constraintTop_toTopOf="@+id/chat_room_title_et" />
 
         <!--현재 입력된 Text개수 카운팅-->
         <TextView
-            android:id="@+id/textView41"
+            android:id="@+id/text_count_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:elegantTextHeight="true"
@@ -145,7 +146,7 @@
             android:textSize="10sp"
             app:layout_constraintBottom_toTopOf="@+id/underlineView"
             app:layout_constraintEnd_toEndOf="@+id/underlineView"
-            app:layout_constraintTop_toTopOf="@+id/agonyTitleEditText" />
+            app:layout_constraintTop_toTopOf="@+id/chat_room_title_et" />
 
         <View
             android:id="@+id/underlineView"
@@ -155,15 +156,77 @@
             android:background="#373737"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@+id/agonyTitleEditText" />
+            app:layout_constraintTop_toBottomOf="@+id/chat_room_title_et" />
 
-        <EditText
-            android:layout_width="0dp"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/hash_tag_background"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="@string/make_chat_room_tag_hint"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="40dp"
+            app:cardElevation="0dp"
+            android:backgroundTint="#F5F5F5"
+            app:cardCornerRadius="5dp"
+            app:layout_constrainedWidth = "true"
+            app:layout_constraintEnd_toStartOf="@+id/text_count_tv2"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@+id/underlineView" />
+            app:layout_constraintTop_toBottomOf="@+id/underlineView">
+
+            <EditText
+                android:id="@+id/hash_tag_et"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_regular"
+                android:hint="@string/make_chat_room_tag_hint"
+                android:background="@null"
+                android:maxLength="50"
+                android:minWidth="200dp"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="5dp"
+                android:text="@={viewmodel.chatRoomTag}"
+                android:textColor="#373737"
+                android:textColorHint="#B1B3B8"
+                android:textSize="12sp" />
+        </androidx.cardview.widget.CardView>
+
+        <!--현재 입력된 Text개수 카운팅-->
+        <TextView
+            android:id="@+id/text_count_tv2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:text="@{String.valueOf(viewmodel.chatRoomTag.length()) + '/' + String.valueOf(50)}"
+            android:textColor="#303030"
+            android:textSize="10sp"
+            app:layout_constraintStart_toEndOf="@+id/hash_tag_background"
+            app:layout_constraintEnd_toEndOf="@+id/underlineView"
+            app:layout_constraintBottom_toBottomOf="@+id/hash_tag_background"
+            app:layout_constraintTop_toTopOf="@+id/hash_tag_background" />
+
+        <com.example.bookchat.AntiDupClickButton
+            android:id="@+id/antiDupClickButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="#FFFFFF"
+            android:elegantTextHeight="true"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minWidth="75dp"
+            android:minHeight="40dp"
+            android:text="@string/make_chat_room_book_select"
+            android:textColor="#5648FF"
+            android:textSize="12sp"
+            app:cornerRadius="30dp"
+            android:stateListAnimator="@null"
+            android:fontFamily="@font/notosanskr_regular"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/hash_tag_background"
+            app:strokeColor="#5648FF"
+            app:strokeWidth="1dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

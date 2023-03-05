@@ -19,6 +19,7 @@ class MakeChatRoomViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     val chatRoomTitle = MutableStateFlow<String>("")
+    val chatRoomTag = MutableStateFlow<String>("")
 
     fun clickDeleteTextBtn() {
         chatRoomTitle.value = ""
