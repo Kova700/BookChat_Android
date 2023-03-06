@@ -78,13 +78,12 @@
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
             app:layout_constraintTop_toBottomOf="@+id/textView30">
 
-            <!--이거 이미지 랜덤으로 나오게 설정해야함-->
-            <!--크기 고정적 혹은 동적 설정 결정-->
             <!--사진 사이즈 고정값 수정해야함 200x200 부족해보임-->
             <ImageView
                 android:layout_width="100dp"
                 android:layout_height="150dp"
                 android:scaleType="fitCenter"
+                setRandomChatRoomImg="@{true}"
                 android:src="@drawable/default_chat_room_img1" />
         </androidx.cardview.widget.CardView>
 

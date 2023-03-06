@@ -468,4 +468,18 @@ object DataBindingAdapter {
     fun getFormattingTimeText(view: TextView, inputedDateAndTimeString: String) {
         view.text = getFormattingText(inputedDateAndTimeString)
     }
+
+    @JvmStatic
+    @BindingAdapter("setRandomChatRoomImg")
+    fun setRandomChatRoomImg(view :ImageView, bool :Boolean){
+        when(Random().nextInt(7) + 1){
+            1 -> view.setImageResource(R.drawable.default_chat_room_img1)
+            2 -> view.setImageResource(R.drawable.default_chat_room_img2)
+            3 -> view.setImageResource(R.drawable.default_chat_room_img3)
+            4 -> view.setImageResource(R.drawable.default_chat_room_img4)
+            5 -> view.setImageResource(R.drawable.default_chat_room_img5)
+            6 -> view.setImageResource(R.drawable.default_chat_room_img6)
+            7 -> view.setImageResource(R.drawable.default_chat_room_img7)
+        }
+    }
 }
