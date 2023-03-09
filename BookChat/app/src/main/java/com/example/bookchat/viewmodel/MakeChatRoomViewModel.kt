@@ -2,6 +2,8 @@ package com.example.bookchat.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bookchat.data.Book
+import com.example.bookchat.data.getEmptyBook
 import com.example.bookchat.repository.ChatRoomListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,6 +22,7 @@ class MakeChatRoomViewModel @Inject constructor(
 
     val chatRoomTitle = MutableStateFlow<String>("")
     val chatRoomTag = MutableStateFlow<String>("")
+    val selectedBook = MutableStateFlow<Book>(getEmptyBook())
 
     fun clickDeleteTextBtn() {
         chatRoomTitle.value = ""
@@ -35,5 +38,6 @@ class MakeChatRoomViewModel @Inject constructor(
 
     sealed class MakeChatRoomUiEvent{
         object MoveToBack :MakeChatRoomUiEvent()
+        object MoveSelectBook :MakeChatRoomUiEvent()
     }
 }

@@ -28,10 +28,14 @@ class MakeChatRoomActivity : AppCompatActivity() {
         observeUiEvent()
     }
 
+    private fun moveToSelectBook(){
+
+    }
     private fun observeUiEvent() = lifecycleScope.launch{
         makeChatRoomViewModel.eventFlow.collect{ event -> handleEvent(event) }
     }
     private fun handleEvent(event : MakeChatRoomUiEvent) = when(event){
         MakeChatRoomUiEvent.MoveToBack -> finish()
+        MakeChatRoomUiEvent.MoveSelectBook -> moveToSelectBook()
     }
 }
