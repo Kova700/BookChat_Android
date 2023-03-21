@@ -12,12 +12,14 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.ConcatAdapter
 import com.example.bookchat.R
 import com.example.bookchat.adapter.wishbookshelf.WishBookShelfDataAdapter
+import com.example.bookchat.adapter.wishbookshelf.WishBookShelfDummyDataAdapter
 import com.example.bookchat.adapter.wishbookshelf.WishBookShelfHeaderAdapter
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.FragmentWishBookshelfBinding
 import com.example.bookchat.ui.dialog.WishTapBookDialog
 import com.example.bookchat.utils.RefreshManager
 import com.example.bookchat.utils.RefreshManager.popRefreshWishFlag
+import com.example.bookchat.utils.ScreenSizeManager
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
@@ -28,18 +30,20 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class WishBookBookShelfFragment : Fragment() {
-    private lateinit var binding : FragmentWishBookshelfBinding
-    private lateinit var wishBookShelfHeaderAdapter :WishBookShelfHeaderAdapter
-    lateinit var wishBookShelfDataAdapter : WishBookShelfDataAdapter
-    private val bookShelfViewModel: BookShelfViewModel by viewModels({requireParentFragment()})
+    private lateinit var binding: FragmentWishBookshelfBinding
+    private lateinit var wishBookShelfHeaderAdapter: WishBookShelfHeaderAdapter
+    private lateinit var wishBookShelfDummyDataAdapter: WishBookShelfDummyDataAdapter
+    lateinit var wishBookShelfDataAdapter: WishBookShelfDataAdapter
+    private val bookShelfViewModel: BookShelfViewModel by viewModels({ requireParentFragment() })
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_wish_bookshelf,container,false)
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_wish_bookshelf, container, false)
 
-        with(binding){
+        with(binding) {
             lifecycleOwner = this@WishBookBookShelfFragment
             viewmodel = bookShelfViewModel
         }
@@ -53,15 +57,15 @@ class WishBookBookShelfFragment : Fragment() {
     }
 
     private fun observePagingWishBookData() {
-        bookShelfViewModel.wishBookCombined.observe(viewLifecycleOwner){ PagingBookShelfItem ->
-            wishBookShelfDataAdapter.submitData(viewLifecycleOwner.lifecycle,PagingBookShelfItem)
+        bookShelfViewModel.wishBookCombined.observe(viewLifecycleOwner) { PagingBookShelfItem ->
+            wishBookShelfDataAdapter.submitData(viewLifecycleOwner.lifecycle, PagingBookShelfItem)
         }
     }
 
-    private fun observeAdapterLoadState() = lifecycleScope.launch{
-        wishBookShelfDataAdapter.loadStateFlow.collect{ combinedLoadStates ->
-            if(combinedLoadStates.refresh is LoadState.NotLoading) {
-                if(wishBookShelfDataAdapter.itemCount == 0){
+    private fun observeAdapterLoadState() = lifecycleScope.launch {
+        wishBookShelfDataAdapter.loadStateFlow.collect { combinedLoadStates ->
+            if (combinedLoadStates.refresh is LoadState.NotLoading) {
+                if (wishBookShelfDataAdapter.itemCount == 0) {
                     binding.bookshelfEmptyLayout.visibilty = View.VISIBLE
                     binding.swipeRefreshLayoutWish.visibility = View.GONE
                     bookShelfViewModel.wishBookTotalCountCache = 0
@@ -76,38 +80,42 @@ class WishBookBookShelfFragment : Fragment() {
         }
     }
 
-    private fun initializeModificationEvents(){
+    private fun initializeModificationEvents() {
         bookShelfViewModel.wishBookModificationEvents.value = emptyList()
         popRefreshWishFlag()
     }
 
-    private fun initAdapter(){
-        val bookItemClickListener = object: WishBookShelfDataAdapter.OnItemClickListener{
-            override fun onItemClick(bookShelfDataItem : BookShelfDataItem) {
+    private fun initAdapter() {
+        val bookItemClickListener = object : WishBookShelfDataAdapter.OnItemClickListener {
+            override fun onItemClick(bookShelfDataItem: BookShelfDataItem) {
                 val dialog = WishTapBookDialog(bookShelfDataItem)
-                dialog.show(this@WishBookBookShelfFragment.childFragmentManager,DIALOG_TAG_WISH)
+                dialog.show(this@WishBookBookShelfFragment.childFragmentManager, DIALOG_TAG_WISH)
             }
         }
         wishBookShelfHeaderAdapter = WishBookShelfHeaderAdapter(bookShelfViewModel)
+        wishBookShelfDummyDataAdapter = WishBookShelfDummyDataAdapter()
         wishBookShelfDataAdapter = WishBookShelfDataAdapter()
         wishBookShelfDataAdapter.setItemClickListener(bookItemClickListener)
         observeWishBookCount()
     }
 
-    private fun observeWishBookCount() = lifecycleScope.launch{
-        bookShelfViewModel.wishBookTotalCount.collect{
+    private fun observeWishBookCount() = lifecycleScope.launch {
+        bookShelfViewModel.wishBookTotalCount.collect { wishBookCount ->
             wishBookShelfHeaderAdapter.notifyItemChanged(0)
+            wishBookShelfDummyDataAdapter.dummyItemCount = ScreenSizeManager.getFlexBoxBookSpanItemCount(wishBookCount)
+            wishBookShelfDummyDataAdapter.notifyDataSetChanged()
         }
     }
 
-    private fun initRecyclerView(){
-        with(binding){
+    private fun initRecyclerView() {
+        with(binding) {
             val concatAdapterConfig =
                 ConcatAdapter.Config.Builder().apply { setIsolateViewTypes(false) }.build()
             val concatAdapter = ConcatAdapter(
                 concatAdapterConfig,
                 wishBookShelfHeaderAdapter,
-                wishBookShelfDataAdapter
+                wishBookShelfDataAdapter,
+                wishBookShelfDummyDataAdapter
             )
             wishBookRcv.adapter = concatAdapter
             val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
@@ -119,7 +127,7 @@ class WishBookBookShelfFragment : Fragment() {
         }
     }
 
-    private fun initRefreshEvent(){
+    private fun initRefreshEvent() {
         binding.swipeRefreshLayoutWish.setOnRefreshListener {
             wishBookShelfDataAdapter.refresh()
             binding.swipeRefreshLayoutWish.isRefreshing = false
@@ -128,7 +136,7 @@ class WishBookBookShelfFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if(RefreshManager.hasWishBookShelfNewData()){
+        if (RefreshManager.hasWishBookShelfNewData()) {
             wishBookShelfDataAdapter.refresh()
             popRefreshWishFlag()
         }
