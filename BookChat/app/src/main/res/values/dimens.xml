@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="book_img_width_default">88dp</dimen>
+    <dimen name="book_img_height_default">130dp</dimen>
+    <dimen name="flex_box_book_item_margin_horizontal">7.5dp</dimen>
+    <dimen name="flex_box_book_item_margin_vertical">10dp</dimen>
+    <dimen name="flex_box_margin_horizontal">25dp</dimen>
+</resources>

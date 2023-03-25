@@ -19,7 +19,7 @@ import com.example.bookchat.databinding.FragmentWishBookshelfBinding
 import com.example.bookchat.ui.dialog.WishTapBookDialog
 import com.example.bookchat.utils.RefreshManager
 import com.example.bookchat.utils.RefreshManager.popRefreshWishFlag
-import com.example.bookchat.utils.ScreenSizeManager
+import com.example.bookchat.utils.FlexBoxBookItemSizeManager
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
@@ -102,7 +102,7 @@ class WishBookBookShelfFragment : Fragment() {
     private fun observeWishBookCount() = lifecycleScope.launch {
         bookShelfViewModel.wishBookTotalCount.collect { wishBookCount ->
             wishBookShelfHeaderAdapter.notifyItemChanged(0)
-            wishBookShelfDummyDataAdapter.dummyItemCount = ScreenSizeManager.getFlexBoxBookSpanItemCount(wishBookCount)
+            wishBookShelfDummyDataAdapter.dummyItemCount = FlexBoxBookItemSizeManager.getFlexBoxDummyItemCount(wishBookCount)
             wishBookShelfDummyDataAdapter.notifyDataSetChanged()
         }
     }
