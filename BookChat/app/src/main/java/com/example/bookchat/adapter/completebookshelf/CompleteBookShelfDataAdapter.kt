@@ -12,6 +12,7 @@ import com.example.bookchat.R
 import com.example.bookchat.adapter.wishbookshelf.WishBookShelfDataAdapter.Companion.BOOK_SHELF_ITEM_COMPARATOR
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.ItemCompleteBookshelfDataBinding
+import com.example.bookchat.utils.FlexBoxBookItemSizeManager
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.BookShelfViewModel.PagingViewEvent
@@ -101,6 +102,8 @@ class CompleteBookShelfDataAdapter(private val bookShelfViewModel: BookShelfView
         binding = DataBindingUtil
             .inflate(LayoutInflater.from(parent.context),
                 R.layout.item_complete_bookshelf_data,parent,false)
+        binding.bookImg.layoutParams.width = FlexBoxBookItemSizeManager.flexBoxItemBookImgWidthPx
+        binding.bookImg.layoutParams.height = FlexBoxBookItemSizeManager.flexBoxItemBookImgHeightPx
         return CompleteBookItemViewHolder(binding)
     }
 

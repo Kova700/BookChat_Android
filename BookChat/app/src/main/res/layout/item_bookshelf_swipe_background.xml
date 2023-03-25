@@ -8,13 +8,10 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView7"
         android:layout_width="match_parent"
-        android:layout_height="182dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="10dp"
+        android:layout_height="match_parent"
+        android:minHeight="182dp"
         android:backgroundTint="#D9D9D9"
-        app:cardCornerRadius="16dp"
+        app:cardCornerRadius="@dimen/swipe_item_corner_radius"
         app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,9 +24,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:src="@drawable/ic_garbage_can_white"
+        app:layout_constraintHorizontal_bias="0.15"
         app:layout_constraintBottom_toBottomOf="@+id/cardView7"
         app:layout_constraintEnd_toEndOf="@+id/cardView7"
-        app:layout_constraintHorizontal_bias="0.15"
         app:layout_constraintStart_toStartOf="@+id/cardView7"
         app:layout_constraintTop_toTopOf="@+id/cardView7" />
 

@@ -12,6 +12,7 @@ import com.example.bookchat.R
 import com.example.bookchat.adapter.wishbookshelf.WishBookShelfDataAdapter.Companion.BOOK_SHELF_ITEM_COMPARATOR
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.ItemReadingBookshelfDataBinding
+import com.example.bookchat.utils.FlexBoxBookItemSizeManager
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.BookShelfViewModel.PagingViewEvent
@@ -23,7 +24,7 @@ import kotlinx.coroutines.launch
 
 class ReadingBookShelfDataAdapter(private val bookShelfViewModel: BookShelfViewModel)
     : PagingDataAdapter<BookShelfDataItem, ReadingBookShelfDataAdapter.ReadingBookShelfDataViewHolder>(BOOK_SHELF_ITEM_COMPARATOR){
-    private lateinit var bindingDataItem : ItemReadingBookshelfDataBinding
+    private lateinit var binding : ItemReadingBookshelfDataBinding
     private lateinit var itemClickListener : OnItemClickListener
     private lateinit var pageBtnClickListener : OnItemClickListener
 
@@ -104,10 +105,12 @@ class ReadingBookShelfDataAdapter(private val bookShelfViewModel: BookShelfViewM
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReadingBookShelfDataViewHolder {
-        bindingDataItem = DataBindingUtil
+        binding = DataBindingUtil
             .inflate(LayoutInflater.from(parent.context),
                 R.layout.item_reading_bookshelf_data,parent,false)
-        return ReadingBookShelfDataViewHolder(bindingDataItem)
+        binding.bookImg.layoutParams.width = FlexBoxBookItemSizeManager.flexBoxItemBookImgWidthPx
+        binding.bookImg.layoutParams.height = FlexBoxBookItemSizeManager.flexBoxItemBookImgHeightPx
+        return ReadingBookShelfDataViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ReadingBookShelfDataViewHolder, position: Int) {

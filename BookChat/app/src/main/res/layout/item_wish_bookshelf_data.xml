@@ -18,8 +18,8 @@
             android:layout_gravity="center_vertical"
             android:layout_marginHorizontal="@dimen/flex_box_book_item_margin_horizontal"
             android:layout_marginVertical="@dimen/flex_box_book_item_margin_vertical"
-            app:cardCornerRadius="7dp"
-            app:cardElevation="5dp"
+            app:cardCornerRadius="@dimen/book_img_corner_radius"
+            app:cardElevation="@dimen/book_img_elevation"
             android:foreground="?android:attr/selectableItemBackground"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -28,8 +28,8 @@
 
             <ImageView
                 android:id="@+id/bookImg"
-                android:layout_width="@dimen/flex_box_book_img_width_default"
-                android:layout_height="@dimen/flex_box_book_img_height_default"
+                android:layout_width="@dimen/book_img_width_default"
+                android:layout_height="@dimen/book_img_height_default"
                 android:scaleType="fitXY"
                 loadUrl="@{bookShelfItem.bookCoverImageUrl}"
                 android:src="@drawable/empty_img"/>
