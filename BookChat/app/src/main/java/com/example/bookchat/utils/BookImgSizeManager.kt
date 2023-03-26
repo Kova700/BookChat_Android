@@ -4,7 +4,7 @@ import android.util.DisplayMetrics
 import com.example.bookchat.App
 import com.example.bookchat.R
 
-object FlexBoxBookItemSizeManager {
+object BookImgSizeManager {
     private val contextResources = App.instance.applicationContext.resources
     private val displayMetrics: DisplayMetrics = contextResources.displayMetrics
     private val deviceWidthPx: Int = displayMetrics.widthPixels
@@ -15,7 +15,6 @@ object FlexBoxBookItemSizeManager {
         contextResources.getDimensionPixelSize(R.dimen.flex_box_book_item_margin_vertical) * 2
     private val FLEX_BOX_MARGIN_HORIZONTAL_PX =
         contextResources.getDimensionPixelSize(R.dimen.flex_box_margin_horizontal) * 2
-
     private val FLEX_BOX_WIDTH_PX = deviceWidthPx - FLEX_BOX_MARGIN_HORIZONTAL_PX
 
     private val DEFAULT_BOOK_IMG_WIDTH_PX =
@@ -31,13 +30,13 @@ object FlexBoxBookItemSizeManager {
     private val flexBoxBookSpanSize: Int =
         FLEX_BOX_WIDTH_PX / DEFAULT_BOOK_ITEM_WIDTH_PX
 
-    val flexBoxItemBookImgWidthPx =
+    val bookImgWidthPx =
         (FLEX_BOX_WIDTH_PX / flexBoxBookSpanSize) - BOOK_ITEM_MARGIN_HORIZONTAL_PX
 
-    private val scaleRate :Float=
-        (flexBoxItemBookImgWidthPx.toFloat() / DEFAULT_BOOK_IMG_WIDTH_PX)
+    private val scaleRate: Float =
+        (bookImgWidthPx.toFloat() / DEFAULT_BOOK_IMG_WIDTH_PX)
 
-    val flexBoxItemBookImgHeightPx =
+    val bookImgHeightPx =
         (DEFAULT_BOOK_IMG_HEIGHT_PX * scaleRate).toInt()
 
     fun getFlexBoxDummyItemCount(totalItemCount: Long) =

@@ -1,13 +1,12 @@
 package com.example.bookchat.adapter.wishbookshelf
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemWishBookshelfDummyDataBinding
-import com.example.bookchat.utils.FlexBoxBookItemSizeManager
+import com.example.bookchat.utils.BookImgSizeManager
 
 class WishBookShelfDummyDataAdapter :
     RecyclerView.Adapter<WishBookShelfDummyDataAdapter.WishBookShelfDummyDataViewHolder>() {
@@ -22,9 +21,15 @@ class WishBookShelfDummyDataAdapter :
     ): WishBookShelfDummyDataViewHolder {
         binding = DataBindingUtil
             .inflate(LayoutInflater.from(parent.context), R.layout.item_wish_bookshelf_dummy_data,parent,false)
-        binding.flexBoxDummyBookLayout.layoutParams.width = FlexBoxBookItemSizeManager.flexBoxItemBookImgWidthPx
-        binding.flexBoxDummyBookLayout.layoutParams.height = FlexBoxBookItemSizeManager.flexBoxItemBookImgHeightPx
+        setDummyItemSize()
         return WishBookShelfDummyDataViewHolder(binding)
+    }
+
+    private fun setDummyItemSize(){
+        with(binding){
+            flexBoxDummyBookLayout.layoutParams.width = BookImgSizeManager.bookImgWidthPx
+            flexBoxDummyBookLayout.layoutParams.height = BookImgSizeManager.bookImgHeightPx
+        }
     }
 
     override fun onBindViewHolder(holder: WishBookShelfDummyDataViewHolder, position: Int) {}
