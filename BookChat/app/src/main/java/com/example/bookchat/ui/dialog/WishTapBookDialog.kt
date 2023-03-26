@@ -51,8 +51,6 @@ class WishTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : Dial
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         observeEventFlow()
 
-        //버튼 중복클릭 방지 (+네트워크가 연결되어있지 않을때는 클릭이 안되게) 수정이 필요해보임
-        //혹은 API응답이 오기 전까지 클릭이 안되거나
         return binding.root
     }
 
@@ -93,6 +91,9 @@ class WishTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : Dial
     private fun handleEvent(event: WishBookEvent) = when(event){
         is WishBookEvent.RemoveItem -> {
             returnEvent = WishBookEvent.RemoveItem
+        }
+        is WishBookEvent.AddItem -> {
+            returnEvent = null
         }
         is WishBookEvent.MoveToReadingBook -> {
             returnEvent = WishBookEvent.MoveToReadingBook
