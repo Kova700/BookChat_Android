@@ -11,18 +11,17 @@
             type="com.example.bookchat.viewmodel.SearchTapBookDialogViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/dialog_layout"
+        android:paddingHorizontal="25dp"
+        android:paddingVertical="30dp"
         android:background="@drawable/view_round_white"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minWidth="300dp"
-        android:minHeight="350dp">
+        android:layout_height="wrap_content">
 
         <ImageButton
             android:id="@+id/imageButton6"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
             android:background="?android:selectableItemBackgroundBorderless"
             android:scaleType="fitXY"
             android:src="@drawable/ic_chat_navi_btn"
@@ -32,8 +31,6 @@
         <com.example.bookchat.AntiDupClickToggleButton
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="20dp"
             android:background="@drawable/selector_wish_btn"
             android:textOff=""
             android:textOn=""
@@ -44,46 +41,33 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout5"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="35dp"
+            app:cardCornerRadius="@dimen/book_img_corner_radius"
+            app:cardElevation="@dimen/book_img_elevation"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageButton6">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="10dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="5dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+            <ImageView
+                android:id="@+id/bookImg"
+                loadUrl="@{viewmodel.book.bookCoverImageUrl}"
+                android:layout_width="@dimen/book_img_width_default"
+                android:layout_height="@dimen/book_img_height_default"
+                android:scaleType="fitXY"
+                android:src="@drawable/empty_img"/>
 
-                <ImageView
-                    android:id="@+id/bookImg"
-                    loadUrl="@{viewmodel.book.bookCoverImageUrl}"
-                    android:layout_width="90dp"
-                    android:layout_height="140dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/empty_img"/>
-
-            </androidx.cardview.widget.CardView>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/textView26"
             setSelected="@{Boolean.TRUE}"
-            android:layout_width="240dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="17dp"
             android:elegantTextHeight="true"
             android:ellipsize="marquee"
             android:fontFamily="@font/notosanskr_bold"
@@ -93,14 +77,14 @@
             android:text="@{viewmodel.book.title}"
             android:textColor="#222222"
             android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@+id/constraintLayout5"
-            app:layout_constraintStart_toStartOf="@+id/constraintLayout5"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout5" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cardView2" />
 
         <TextView
             android:id="@+id/textView27"
             setSelected="@{Boolean.TRUE}"
-            android:layout_width="240dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
             android:elegantTextHeight="true"
@@ -112,14 +96,14 @@
             android:text="@{viewmodel.book.authors[0]}"
             android:textColor="#373737"
             android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="@+id/constraintLayout5"
-            app:layout_constraintStart_toStartOf="@+id/constraintLayout5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView26" />
 
         <TextView
             android:id="@+id/textView28"
             setSelected="@{Boolean.TRUE}"
-            android:layout_width="240dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
             android:elegantTextHeight="true"
@@ -132,24 +116,24 @@
             android:textColor="#373737"
             android:textSize="10sp"
             app:layout_constraintBottom_toTopOf="@+id/change_status_to_complete_btn"
-            app:layout_constraintEnd_toEndOf="@+id/constraintLayout5"
-            app:layout_constraintStart_toStartOf="@+id/constraintLayout5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView27" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/change_status_to_complete_btn"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="23dp"
-            android:layout_marginEnd="3dp"
-            android:layout_marginBottom="15dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="4dp"
             android:backgroundTint="#FFFFFF"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"
             android:minHeight="55dp"
             android:stateListAnimator="@null"
             android:text="@string/complete_book"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             android:onClick="@{() -> viewmodel.clickCompleteBtn()}"
             android:visibility="@{(viewmodel.isAlreadyInBookShelf() == null) ? View.VISIBLE : View.INVISIBLE}"
             android:clickable="@{viewmodel.isAlreadyInBookShelf() == null}"
@@ -165,17 +149,17 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/change_status_to_reading_btn"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="3dp"
-            android:layout_marginTop="23dp"
-            android:layout_marginEnd="12dp"
-            android:layout_marginBottom="15dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="30dp"
             android:backgroundTint="#5648FF"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"
             android:minHeight="55dp"
             android:stateListAnimator="@null"
             android:text="@string/reading_book"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             android:visibility="@{(viewmodel.isAlreadyInBookShelf() == null) ? View.VISIBLE : View.INVISIBLE}"
             android:onClick="@{() -> viewmodel.requestRegisterReadingBook()}"
             android:clickable="@{viewmodel.isAlreadyInBookShelf() == null}"
@@ -196,9 +180,12 @@
             android:visibility="@{(viewmodel.isAlreadyInBookShelf() != null) ? View.VISIBLE : View.INVISIBLE}"
             android:clickable="false"
             android:fontFamily="@font/notosanskr_regular"
+            android:stateListAnimator="@null"
             android:elegantTextHeight="true"
             android:textColor="#FFFFFF"
             android:backgroundTint="#D9D9D9"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             app:layout_constraintBottom_toBottomOf="@+id/change_status_to_complete_btn"
             app:layout_constraintEnd_toEndOf="@+id/change_status_to_reading_btn"
             app:layout_constraintStart_toStartOf="@+id/change_status_to_complete_btn"

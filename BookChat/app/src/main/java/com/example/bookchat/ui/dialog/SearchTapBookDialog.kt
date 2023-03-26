@@ -13,6 +13,8 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.DialogSearchTapBookClickedBinding
+import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.DialogSizeManager
 import com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel
 import com.example.bookchat.viewmodel.SearchTapBookDialogViewModel
 import com.example.bookchat.viewmodel.SearchTapBookDialogViewModel.SearchTapDialogEvent
@@ -47,6 +49,22 @@ class SearchTapBookDialog(private val book: Book) : DialogFragment() {
         observeEvent()
 
         return binding.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setDialogSize()
+        setBookImgSize()
+    }
+
+    private fun setDialogSize(){
+        binding.dialogLayout.layoutParams.width = DialogSizeManager.dialogWidthPx
+    }
+    private fun setBookImgSize(){
+        with(binding){
+            bookImg.layoutParams.width = BookImgSizeManager.bookImgWidthPx
+            bookImg.layoutParams.height = BookImgSizeManager.bookImgHeightPx
+        }
     }
 
     private fun observeEvent(){
