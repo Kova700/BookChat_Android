@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
+import com.example.bookchat.adapter.booksearch.SearchResultBookSimpleAdapter
 import com.example.bookchat.data.*
 import com.example.bookchat.utils.*
 import com.example.bookchat.utils.DateManager.getFormattingText

@@ -1,4 +1,4 @@
-package com.example.bookchat.adapter
+package com.example.bookchat.adapter.booksearch
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,7 +13,7 @@ import com.example.bookchat.utils.Constants
 class SearchResultBookSimpleAdapter : RecyclerView.Adapter<SearchResultBookSimpleAdapter.BookResultViewHolder>(){
 
     private lateinit var binding :ItemBookSearchResultBinding
-    private lateinit var itemClickListener :OnItemClickListener
+    private lateinit var itemClickListener : OnItemClickListener
     var books :List<Book> = listOf()
 
     inner class BookResultViewHolder(val binding: ItemBookSearchResultBinding) : RecyclerView.ViewHolder(binding.root) {

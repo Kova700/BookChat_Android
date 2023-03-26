@@ -8,10 +8,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
-import com.example.bookchat.adapter.chatroomlist.ChatRoomListDataAdapter
-import com.example.bookchat.adapter.SearchResultBookSimpleAdapter
+import com.example.bookchat.adapter.booksearch.SearchResultBookSimpleAdapter
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.FragmentSearchTapResultBinding
 import com.example.bookchat.ui.dialog.SearchTapBookDialog
