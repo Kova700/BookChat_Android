@@ -1,4 +1,4 @@
-package com.example.bookchat.adapter.wishbookshelf
+package com.example.bookchat.adapter.booksearch
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,21 +8,18 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemFlexBoxDummyBinding
 import com.example.bookchat.utils.BookImgSizeManager
 
-class WishBookShelfDummyDataAdapter :
-    RecyclerView.Adapter<WishBookShelfDummyDataAdapter.WishBookShelfDummyDataViewHolder>() {
-    private lateinit var binding :ItemFlexBoxDummyBinding
+class SearchResultBookDetailDummyAdapter :
+    RecyclerView.Adapter<SearchResultBookDetailDummyAdapter.BookResultDummyViewHolder>() {
+    private lateinit var binding : ItemFlexBoxDummyBinding
     var dummyItemCount = 0
 
-    inner class WishBookShelfDummyDataViewHolder(val binding: ItemFlexBoxDummyBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class BookResultDummyViewHolder(val binding: ItemFlexBoxDummyBinding) : RecyclerView.ViewHolder(binding.root)
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): WishBookShelfDummyDataViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookResultDummyViewHolder {
         binding = DataBindingUtil
             .inflate(LayoutInflater.from(parent.context), R.layout.item_flex_box_dummy,parent,false)
         setDummyItemSize()
-        return WishBookShelfDummyDataViewHolder(binding)
+        return BookResultDummyViewHolder(binding)
     }
 
     private fun setDummyItemSize(){
@@ -32,7 +29,7 @@ class WishBookShelfDummyDataAdapter :
         }
     }
 
-    override fun onBindViewHolder(holder: WishBookShelfDummyDataViewHolder, position: Int) {}
+    override fun onBindViewHolder(holder: BookResultDummyViewHolder, position: Int) {}
     override fun getItemCount(): Int = dummyItemCount
     override fun getItemViewType(position: Int): Int = R.layout.item_flex_box_dummy
 }

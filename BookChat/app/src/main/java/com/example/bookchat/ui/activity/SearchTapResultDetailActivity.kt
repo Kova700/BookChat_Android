@@ -1,21 +1,26 @@
 package com.example.bookchat.ui.activity
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ConcatAdapter
 import com.example.bookchat.R
-import com.example.bookchat.adapter.SearchResultBookDetailAdapter
+import com.example.bookchat.adapter.booksearch.SearchResultBookDetailDataAdapter
+import com.example.bookchat.adapter.booksearch.SearchResultBookDetailDummyAdapter
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ActivitySearchTapResultDetailBinding
 import com.example.bookchat.ui.dialog.SearchTapBookDialog
 import com.example.bookchat.ui.fragment.SearchFragment
-import com.example.bookchat.utils.Constants
+import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.viewmodel.SearchDetailViewModel
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.flexbox.JustifyContent
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,49 +28,79 @@ import javax.inject.Inject
 class SearchTapResultDetailActivity : AppCompatActivity() {
 
     @Inject
-    lateinit var searchDetailViewModelFactory : SearchDetailViewModel.AssistedFactory
+    lateinit var searchDetailViewModelFactory: SearchDetailViewModel.AssistedFactory
 
-    private lateinit var binding : ActivitySearchTapResultDetailBinding
-    private val searchDetailViewModel : SearchDetailViewModel by viewModels{
+    private lateinit var binding: ActivitySearchTapResultDetailBinding
+    private lateinit var searchResultBookDetailDataAdapter: SearchResultBookDetailDataAdapter
+    private lateinit var searchResultBookDetailDummyAdapter: SearchResultBookDetailDummyAdapter
+    private val searchDetailViewModel: SearchDetailViewModel by viewModels {
         SearchDetailViewModel.provideFactory(searchDetailViewModelFactory, getSearchKeyWord())
     }
-    private lateinit var searchResultBookDetailAdapter : SearchResultBookDetailAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_search_tap_result_detail)
-        binding.lifecycleOwner = this
-        binding.activity = this
-        binding.viewmodel = searchDetailViewModel
+        with(binding) {
+            lifecycleOwner = this@SearchTapResultDetailActivity
+            activity = this@SearchTapResultDetailActivity
+            viewmodel = searchDetailViewModel
+        }
 
         initAdapter()
-        initSearchResultDetailRcv()
+        initRecyclerView()
         observePagingBookData()
+        observeAdapterLoadState()
+    }
+
+    private fun observeAdapterLoadState() = lifecycleScope.launch {
+        searchResultBookDetailDataAdapter.loadStateFlow.collectLatest { loadState ->
+            if (loadState.append.endOfPaginationReached) {
+                searchResultBookDetailDummyAdapter.dummyItemCount =
+                    BookImgSizeManager.getFlexBoxDummyItemCount(searchResultBookDetailDataAdapter.itemCount.toLong())
+                searchResultBookDetailDummyAdapter.notifyDataSetChanged()
+            }
+        }
     }
 
     private fun observePagingBookData() = lifecycleScope.launch {
-        searchDetailViewModel.pagingBookData.collect{ pagingBookData ->
-            Log.d(Constants.TAG, "SearchTapResultFragment: observePagingBookData() - pagingBookData : $pagingBookData")
-            searchResultBookDetailAdapter.submitData(pagingBookData)
+        searchDetailViewModel.pagingBookData.collect { pagingBookData ->
+            searchResultBookDetailDataAdapter.submitData(pagingBookData)
         }
     }
 
-    private fun initAdapter(){
-        val bookItemClickListener = object: SearchResultBookDetailAdapter.OnItemClickListener{
-            override fun onItemClick(book : Book) {
+    private fun initAdapter() {
+        val bookItemClickListener = object : SearchResultBookDetailDataAdapter.OnItemClickListener {
+            override fun onItemClick(book: Book) {
                 val dialog = SearchTapBookDialog(book)
-                dialog.show(this@SearchTapResultDetailActivity.supportFragmentManager,"SearchTapBookDialog")
+                dialog.show(
+                    this@SearchTapResultDetailActivity.supportFragmentManager,
+                    DIALOG_TAG_SEARCH
+                )
             }
         }
-        searchResultBookDetailAdapter = SearchResultBookDetailAdapter()
-        searchResultBookDetailAdapter.setItemClickListener(bookItemClickListener)
+        searchResultBookDetailDataAdapter = SearchResultBookDetailDataAdapter()
+        searchResultBookDetailDummyAdapter = SearchResultBookDetailDummyAdapter()
+        searchResultBookDetailDataAdapter.setItemClickListener(bookItemClickListener)
     }
 
-    private fun initSearchResultDetailRcv(){
-        with(binding){
-            searchResultDetailRcv.adapter = searchResultBookDetailAdapter
+    private fun initRecyclerView() {
+        with(binding) {
+            val concatAdapterConfig =
+                ConcatAdapter.Config.Builder().apply { setIsolateViewTypes(false) }.build()
+            val concatAdapter = ConcatAdapter(
+                concatAdapterConfig,
+                searchResultBookDetailDataAdapter,
+                searchResultBookDetailDummyAdapter
+            )
+            searchResultDetailRcv.adapter = concatAdapter
             searchResultDetailRcv.setHasFixedSize(true)
-            searchResultDetailRcv.layoutManager = GridLayoutManager(this@SearchTapResultDetailActivity,3)
+            val flexboxLayoutManager =
+                FlexboxLayoutManager(this@SearchTapResultDetailActivity).apply {
+                    justifyContent = JustifyContent.CENTER
+                    flexDirection = FlexDirection.ROW
+                    flexWrap = FlexWrap.WRAP
+                }
+            searchResultDetailRcv.layoutManager = flexboxLayoutManager
         }
     }
 
@@ -73,8 +108,12 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
         return intent.getStringExtra(SearchFragment.EXTRA_SEARCH_KEYWORD) ?: ""
     }
 
-    fun clickBackBtn(){
+    fun clickBackBtn() {
         finish()
+    }
+
+    companion object {
+        private const val DIALOG_TAG_SEARCH = "SearchTapBookDialog"
     }
 
 }

@@ -43,7 +43,7 @@
             android:id="@+id/search_result_detail_Rcv"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginHorizontal="30dp"
+            android:layout_marginHorizontal="@dimen/flex_box_margin_horizontal"
             android:overScrollMode="never"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
