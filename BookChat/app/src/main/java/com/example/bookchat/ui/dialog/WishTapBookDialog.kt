@@ -15,6 +15,8 @@ import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.DialogWishBookTapClickedBinding
 import com.example.bookchat.ui.fragment.BookShelfFragment
 import com.example.bookchat.ui.fragment.ReadingBookShelfFragment
+import com.example.bookchat.utils.DialogSizeManager
+import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.BookShelfViewModel.BookShelfEvent
@@ -51,8 +53,23 @@ class WishTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : Dial
 
         //버튼 중복클릭 방지 (+네트워크가 연결되어있지 않을때는 클릭이 안되게) 수정이 필요해보임
         //혹은 API응답이 오기 전까지 클릭이 안되거나
-
         return binding.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setDialogSize()
+        setBookImgSize()
+    }
+
+    private fun setDialogSize(){
+        binding.wishDialogLayout.layoutParams.width = DialogSizeManager.dialogWidthPx
+    }
+    private fun setBookImgSize(){
+        with(binding){
+            bookImg.layoutParams.width = BookImgSizeManager.bookImgWidthPx
+            bookImg.layoutParams.height = BookImgSizeManager.bookImgHeightPx
+        }
     }
 
     private fun getBookShelfFragment() : BookShelfFragment {

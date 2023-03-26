@@ -14,4 +14,10 @@
     <dimen name="swipe_item_corner_radius">16dp</dimen>
     <dimen name="bookshelf_swipe_item_margin_horizontal">30dp</dimen>
     <dimen name="bookshelf_swipe_item_margin_vertical">10dp</dimen>
+    <!--bookshelf_dialog-->
+    <dimen name="bookshelf_dialog_empty_area_horizontal">30dp</dimen>
+    <dimen name="bookshelf_dialog_white_padding_horizontal">25dp</dimen>
+    <dimen name="bookshelf_dialog_white_padding_top">25dp</dimen>
+    <dimen name="bookshelf_dialog_white_padding_bottom">30dp</dimen>
+    <dimen name="bookshelf_dialog_beige_area_top_margin">30dp</dimen>
 </resources>
