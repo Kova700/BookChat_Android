@@ -57,6 +57,8 @@ class SearchResultBookDetailDataAdapter()
         this.itemClickListener = onItemClickListener
     }
 
+    override fun getItemViewType(position: Int): Int = R.layout.item_book_search_result
+
     companion object {
         private val BOOK_COMPARATOR = object : DiffUtil.ItemCallback<Book>() {
             override fun areItemsTheSame(oldItem: Book, newItem: Book) =
