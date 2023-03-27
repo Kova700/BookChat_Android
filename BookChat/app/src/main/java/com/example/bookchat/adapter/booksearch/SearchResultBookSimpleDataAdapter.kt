@@ -8,15 +8,18 @@ import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ItemBookSearchResultBinding
 import com.example.bookchat.utils.BookImgSizeManager
+import java.util.Collections.min
 
-class SearchResultBookSimpleDataAdapter : RecyclerView.Adapter<SearchResultBookSimpleDataAdapter.BookResultViewHolder>(){
+class SearchResultBookSimpleDataAdapter :
+    RecyclerView.Adapter<SearchResultBookSimpleDataAdapter.BookResultViewHolder>() {
 
-    private lateinit var binding :ItemBookSearchResultBinding
-    private lateinit var itemClickListener : OnItemClickListener
-    var books :List<Book> = listOf()
+    private lateinit var binding: ItemBookSearchResultBinding
+    private lateinit var itemClickListener: OnItemClickListener
+    var books: List<Book> = listOf()
 
-    inner class BookResultViewHolder(val binding: ItemBookSearchResultBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(book : Book){
+    inner class BookResultViewHolder(val binding: ItemBookSearchResultBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(book: Book) {
             binding.book = book
             binding.root.setOnClickListener {
                 itemClickListener.onItemClick(book)
@@ -35,28 +38,28 @@ class SearchResultBookSimpleDataAdapter : RecyclerView.Adapter<SearchResultBookS
         return BookResultViewHolder(binding)
     }
 
-    private fun setBookImgSize(){
-        with(binding){
+    private fun setBookImgSize() {
+        with(binding) {
             bookImg.layoutParams.width = BookImgSizeManager.bookImgWidthPx
             bookImg.layoutParams.height = BookImgSizeManager.bookImgHeightPx
         }
     }
 
     override fun onBindViewHolder(holder: BookResultViewHolder, position: Int) {
-        if(books.isNotEmpty()) holder.bind(books[position])
+        if (books.isNotEmpty()) holder.bind(books[position])
     }
 
     override fun getItemCount(): Int {
-        return books.size
+        return minOf(books.size, BookImgSizeManager.flexBoxBookSpanSize * 2)
     }
 
+    override fun getItemViewType(position: Int): Int = R.layout.item_book_search_result
+
     interface OnItemClickListener {
-        fun onItemClick(book :Book)
+        fun onItemClick(book: Book)
     }
 
     fun setItemClickListener(onItemClickListener: OnItemClickListener) {
         this.itemClickListener = onItemClickListener
     }
-
-
 }

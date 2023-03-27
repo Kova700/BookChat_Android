@@ -27,7 +27,7 @@ object BookImgSizeManager {
     private val DEFAULT_BOOK_ITEM_HEIGHT_PX =
         DEFAULT_BOOK_IMG_HEIGHT_PX + BOOK_ITEM_MARGIN_VERTICAL_PX
 
-    private val flexBoxBookSpanSize: Int =
+    val flexBoxBookSpanSize: Int =
         FLEX_BOX_WIDTH_PX / DEFAULT_BOOK_ITEM_WIDTH_PX
 
     val bookImgWidthPx =

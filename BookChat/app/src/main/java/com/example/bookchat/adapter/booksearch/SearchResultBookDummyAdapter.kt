@@ -8,8 +8,8 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemFlexBoxDummyBinding
 import com.example.bookchat.utils.BookImgSizeManager
 
-class SearchResultBookDetailDummyAdapter :
-    RecyclerView.Adapter<SearchResultBookDetailDummyAdapter.BookResultDummyViewHolder>() {
+class SearchResultBookDummyAdapter :
+    RecyclerView.Adapter<SearchResultBookDummyAdapter.BookResultDummyViewHolder>() {
     private lateinit var binding : ItemFlexBoxDummyBinding
     var dummyItemCount = 0
 

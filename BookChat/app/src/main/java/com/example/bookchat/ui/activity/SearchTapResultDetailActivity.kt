@@ -8,7 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import com.example.bookchat.R
 import com.example.bookchat.adapter.booksearch.SearchResultBookDetailDataAdapter
-import com.example.bookchat.adapter.booksearch.SearchResultBookDetailDummyAdapter
+import com.example.bookchat.adapter.booksearch.SearchResultBookDummyAdapter
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ActivitySearchTapResultDetailBinding
 import com.example.bookchat.ui.dialog.SearchTapBookDialog
@@ -32,7 +32,7 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySearchTapResultDetailBinding
     private lateinit var searchResultBookDetailDataAdapter: SearchResultBookDetailDataAdapter
-    private lateinit var searchResultBookDetailDummyAdapter: SearchResultBookDetailDummyAdapter
+    private lateinit var searchResultBookDummyAdapter: SearchResultBookDummyAdapter
     private val searchDetailViewModel: SearchDetailViewModel by viewModels {
         SearchDetailViewModel.provideFactory(searchDetailViewModelFactory, getSearchKeyWord())
     }
@@ -55,9 +55,9 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
     private fun observeAdapterLoadState() = lifecycleScope.launch {
         searchResultBookDetailDataAdapter.loadStateFlow.collectLatest { loadState ->
             if (loadState.append.endOfPaginationReached) {
-                searchResultBookDetailDummyAdapter.dummyItemCount =
+                searchResultBookDummyAdapter.dummyItemCount =
                     BookImgSizeManager.getFlexBoxDummyItemCount(searchResultBookDetailDataAdapter.itemCount.toLong())
-                searchResultBookDetailDummyAdapter.notifyDataSetChanged()
+                searchResultBookDummyAdapter.notifyDataSetChanged()
             }
         }
     }
@@ -79,7 +79,7 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
             }
         }
         searchResultBookDetailDataAdapter = SearchResultBookDetailDataAdapter()
-        searchResultBookDetailDummyAdapter = SearchResultBookDetailDummyAdapter()
+        searchResultBookDummyAdapter = SearchResultBookDummyAdapter()
         searchResultBookDetailDataAdapter.setItemClickListener(bookItemClickListener)
     }
 
@@ -90,7 +90,7 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
             val concatAdapter = ConcatAdapter(
                 concatAdapterConfig,
                 searchResultBookDetailDataAdapter,
-                searchResultBookDetailDummyAdapter
+                searchResultBookDummyAdapter
             )
             searchResultDetailRcv.adapter = concatAdapter
             searchResultDetailRcv.setHasFixedSize(true)

@@ -8,11 +8,9 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.adapter.booksearch.SearchResultBookSimpleAdapter
 import com.example.bookchat.data.*
 import com.example.bookchat.utils.*
 import com.example.bookchat.utils.DateManager.getFormattingText
@@ -180,23 +178,6 @@ object DataBindingAdapter {
             return
         }
         view.visibility = View.INVISIBLE
-    }
-
-    /**리사이클러뷰 아이템 연결*/
-    @JvmStatic
-    @BindingAdapter("setItem")
-    fun setItem(recyclerView: RecyclerView, data :List<Any>?){
-        if(data.isNullOrEmpty()) return
-
-        when(recyclerView.id){
-            R.id.search_result_book_simple_Rcv -> {
-                if(data.first() is Book) {
-                    val books = data.map { it as Book }
-                    val searchResultBookSimpleAdapter = recyclerView.adapter as SearchResultBookSimpleAdapter
-                    searchResultBookSimpleAdapter.books = books
-                }
-            }
-        }
     }
 
     /**ProgressBar Viisbilty 설정*/

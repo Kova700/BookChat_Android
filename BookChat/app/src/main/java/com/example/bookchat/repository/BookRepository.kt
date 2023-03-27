@@ -1,6 +1,5 @@
 package com.example.bookchat.repository
 
-import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -14,7 +13,7 @@ import com.example.bookchat.data.response.RespondCheckInBookShelf
 import com.example.bookchat.data.response.ResponseBodyEmptyException
 import com.example.bookchat.data.response.ResponseGetBookSearch
 import com.example.bookchat.paging.SearchResultBookDetailPagingSource
-import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.ReadingStatus
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -23,10 +22,11 @@ class BookRepository @Inject constructor(){
 
     suspend fun simpleSearchBooks(keyword :String) : ResponseGetBookSearch {
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
+        val loadSize = SEARCH_BOOKS_ITEM_LOAD_SIZE * 2
 
         val response = App.instance.bookChatApiClient.getBookSearchResult(
             query = keyword,
-            size = SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE.toString(),
+            size = loadSize.toString(),
             page = 1.toString()
         )
 
@@ -43,13 +43,12 @@ class BookRepository @Inject constructor(){
 
     fun detailSearchBooks(keyword :String) : Flow<PagingData<Book>> {
         return Pager(
-            config = PagingConfig( pageSize = SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE, enablePlaceholders = false ),
+            config = PagingConfig( pageSize = SEARCH_BOOKS_ITEM_LOAD_SIZE, enablePlaceholders = false ),
             pagingSourceFactory = { SearchResultBookDetailPagingSource(keyword) }
         ).flow
     }
 
     suspend fun registerBookShelfBook(requestRegisterBookShelfBook: RequestRegisterBookShelfBook){
-        Log.d(TAG, "BookRepository: registerBookShelfBook() - called")
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
         val response = App.instance.bookChatApiClient.registerBookShelfBook(requestRegisterBookShelfBook)
         when(response.code()){
@@ -59,7 +58,6 @@ class BookRepository @Inject constructor(){
     }
 
     suspend fun deleteBookShelfBook(bookId :Long){
-        Log.d(TAG, "BookRepository: deleteBookShelfBook() - called")
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val response = App.instance.bookChatApiClient.deleteBookShelfBook(bookId)
@@ -70,7 +68,6 @@ class BookRepository @Inject constructor(){
     }
 
     suspend fun changeBookShelfBookStatus(book :BookShelfItem, readingStatus : ReadingStatus){
-        Log.d(TAG, "BookRepository: changeBookShelfBookStatus() - called")
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val requestBody = RequestChangeBookStatus(
@@ -86,7 +83,6 @@ class BookRepository @Inject constructor(){
     }
 
     suspend fun checkAlreadyInBookShelf(book :Book) : RespondCheckInBookShelf? {
-        Log.d(TAG, "BookRepository: checkAlreadyInBookShelf() - called")
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val response = App.instance.bookChatApiClient.checkAlreadyInBookShelf(book.isbn, book.publishAt)
@@ -108,6 +104,6 @@ class BookRepository @Inject constructor(){
     }
 
     companion object{
-        private const val SIMPLE_SEARCH_BOOKS_ITEM_LOAD_SIZE = 6
+        private val SEARCH_BOOKS_ITEM_LOAD_SIZE = BookImgSizeManager.flexBoxBookSpanSize * 2
     }
 }
