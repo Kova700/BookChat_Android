@@ -13,14 +13,14 @@ class AntiDupClickToggleButton :androidx.appcompat.widget.AppCompatToggleButton 
     override fun callOnClick(): Boolean {
         if(isClicked) return false
         delayCallback()
-        this.isChecked = false
+        this.isChecked = !this.isChecked
         return super.callOnClick()
     }
 
     override fun performClick(): Boolean {
         if(isClicked) return false
         delayCallback()
-        this.isChecked = false
+        this.isChecked = !this.isChecked
         return super.performClick()
     }
 
