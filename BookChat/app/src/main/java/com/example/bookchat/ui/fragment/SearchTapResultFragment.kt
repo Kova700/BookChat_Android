@@ -14,6 +14,10 @@ import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.FragmentSearchTapResultBinding
 import com.example.bookchat.ui.dialog.SearchTapBookDialog
 import com.example.bookchat.viewmodel.SearchViewModel
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.flexbox.JustifyContent
 
 class SearchTapResultFragment : Fragment() {
     private lateinit var binding :FragmentSearchTapResultBinding
@@ -51,7 +55,13 @@ class SearchTapResultFragment : Fragment() {
         with(binding){
             searchResultBookSimpleRcv.adapter = searchResultBookSimpleAdapter
             searchResultBookSimpleRcv.setHasFixedSize(true)
-            searchResultBookSimpleRcv.layoutManager = GridLayoutManager(requireContext(),3)
+            val flexboxLayoutManager =
+                FlexboxLayoutManager(requireContext()).apply {
+                    justifyContent = JustifyContent.CENTER
+                    flexDirection = FlexDirection.ROW
+                    flexWrap = FlexWrap.WRAP
+                }
+            searchResultBookSimpleRcv.layoutManager = flexboxLayoutManager
         }
     }
 //    private fun initSearchResultChatRoomRcv(){
