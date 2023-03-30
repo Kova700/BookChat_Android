@@ -86,6 +86,8 @@
     <string name="wish_bookshelf_register_fail">독서예정 등록을 실패했습니다.</string>
     <string name="chat_room_result_empty">채팅방이 없어요!</string>
     <string name="chat_room_add_slogan">새로운 채팅방을 추가하고\n북챗을 나눠보세요.</string>
+    <string name="book_result_empty">해당 도서가 없어요!</string>
+    <string name="book_result_empty_sub">검색어를 다시 확인해 주세요.</string>
 
     <!--book report-->
     <string name="book_report">독후감</string>

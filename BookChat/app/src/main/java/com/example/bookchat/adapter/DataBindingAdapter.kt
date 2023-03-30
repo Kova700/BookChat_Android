@@ -180,28 +180,6 @@ object DataBindingAdapter {
         view.visibility = View.INVISIBLE
     }
 
-    /**ProgressBar Viisbilty 설정*/
-    @JvmStatic
-    @BindingAdapter("setProgressBarVisibility")
-    fun setProgressBarVisibility(view: View, loadState: LoadState){
-        when(loadState){
-            LoadState.Default,
-            LoadState.Result -> view.visibility = View.INVISIBLE
-            LoadState.Loading -> view.visibility = View.VISIBLE
-        }
-    }
-
-    /**RecyclerView Viisbilty 설정*/
-    @JvmStatic
-    @BindingAdapter("setRcvVisibility")
-    fun setRcvVisibility(view: View, loadState: LoadState){
-        when(loadState){
-            LoadState.Default,
-            LoadState.Result -> view.visibility = View.VISIBLE
-            LoadState.Loading -> view.visibility = View.INVISIBLE
-        }
-    }
-
     @JvmStatic
     @BindingAdapter("setLoadingVisibilityInBookReport")
     fun setLoadingVisibilityInBookReport(view: View, status: BookReportStatus){

@@ -2,7 +2,6 @@ package com.example.bookchat.viewmodel
 
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
@@ -10,10 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
-import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseGetBookSearch
-import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.DataStoreManager
 import com.example.bookchat.utils.LoadState
 import com.example.bookchat.utils.SearchTapStatus
@@ -33,8 +31,17 @@ class SearchViewModel @Inject constructor(
     var simpleBooksearchResult = MutableStateFlow<List<Book>>(listOf())
     var previousKeyword = ""
 
-    val resultLoadState = MutableStateFlow<LoadState>(LoadState.Loading)
-    val isSearchResultEmpty = MutableStateFlow<Boolean>(false)
+    val bookResultState = MutableStateFlow<SearchState>(SearchState.Loading)
+    val chatResultState = MutableStateFlow<SearchState>(SearchState.EmptyResult)
+
+    fun isStateLoading(searchState: SearchState) =
+        searchState == SearchState.Loading
+    fun isOnlyBookEmptyResult(bookSearchState: SearchState, chatSearchState: SearchState) =
+        (bookSearchState == SearchState.EmptyResult) && (chatSearchState != SearchState.EmptyResult)
+    fun isOnlyChatEmptyResult(bookSearchState: SearchState, chatSearchState: SearchState) =
+        (bookSearchState != SearchState.EmptyResult) && (chatSearchState == SearchState.EmptyResult)
+    fun isBothEmptyResult(bookSearchState: SearchState, chatSearchState: SearchState) =
+        (bookSearchState == SearchState.EmptyResult) && (chatSearchState == SearchState.EmptyResult)
 
     val editTextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -74,16 +81,19 @@ class SearchViewModel @Inject constructor(
     }
 
     private suspend fun simpleSearchBooks(keyword: String) {
-        resultLoadState.value = LoadState.Loading
+        bookResultState.value = SearchState.Loading
         runCatching { bookRepository.simpleSearchBooks(keyword) }
-            .onSuccess { respond -> searchBooksSuccessCallBack(respond,keyword) }
+            .onSuccess { respond -> searchBooksSuccessCallBack(respond, keyword) }
             .onFailure { failHandler(it) }
     }
 
     private fun searchBooksSuccessCallBack(respond: ResponseGetBookSearch, keyword: String) {
-        resultLoadState.value = LoadState.Result
         simpleBooksearchResult.value = respond.bookResponses
-        isSearchResultEmpty.value = simpleBooksearchResult.value.isEmpty()
+        if (simpleBooksearchResult.value.isEmpty()){
+            bookResultState.value = SearchState.EmptyResult
+        }else{
+            bookResultState.value = SearchState.HaveResult
+        }
         previousKeyword = keyword
         _searchTapStatus.value = SearchTapStatus.Result
     }
@@ -114,6 +124,12 @@ class SearchViewModel @Inject constructor(
         _searchKeyWord.value = ""
     }
 
+    sealed class SearchState {
+        object Loading : SearchState()
+        object HaveResult : SearchState()
+        object EmptyResult : SearchState()
+    }
+
     private fun makeToast(stringId: Int) {
         Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
     }
@@ -124,5 +140,4 @@ class SearchViewModel @Inject constructor(
                 makeToast(R.string.error_network)
         }
     }
-
 }
