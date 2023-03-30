@@ -16,7 +16,6 @@ import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.DialogCompleteBookTapClickedBinding
 import com.example.bookchat.ui.activity.AgonyActivity
 import com.example.bookchat.ui.activity.BookReportActivity
-import com.example.bookchat.utils.DialogSizeManager
 import com.example.bookchat.viewmodel.CompleteBookTapDialogViewModel
 import com.example.bookchat.viewmodel.CompleteBookTapDialogViewModel.CompleteBookEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,15 +47,6 @@ class CompleteTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : 
         observeEventFlow()
 
         return binding.root
-    }
-
-    override fun onStart() {
-        super.onStart()
-        setDialogSize()
-    }
-
-    private fun setDialogSize(){
-        binding.completeDialogLayout.layoutParams.width = DialogSizeManager.dialogWidthPx
     }
 
     private fun observeEventFlow() {

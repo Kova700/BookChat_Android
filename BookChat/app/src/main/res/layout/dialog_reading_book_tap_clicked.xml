@@ -12,6 +12,7 @@
         android:paddingHorizontal="@dimen/bookshelf_dialog_white_padding_horizontal"
         android:paddingTop="@dimen/bookshelf_dialog_white_padding_top"
         android:paddingBottom="@dimen/bookshelf_dialog_white_padding_bottom"
+        setDialogSize="@{true}"
         android:background="@drawable/view_round_white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

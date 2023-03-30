@@ -438,6 +438,12 @@ object DataBindingAdapter {
     }
 
     @JvmStatic
+    @BindingAdapter("setDialogSize")
+    fun setDialogSize(view :View, bool :Boolean){
+        view.layoutParams.width = DialogSizeManager.dialogWidthPx
+    }
+
+    @JvmStatic
     @BindingAdapter("setRandomChatRoomImg")
     fun setRandomChatRoomImg(view :ImageView, bool :Boolean){
         when(Random().nextInt(7) + 1){

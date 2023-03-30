@@ -17,7 +17,6 @@ import com.example.bookchat.databinding.DialogReadingBookTapClickedBinding
 import com.example.bookchat.ui.activity.AgonyActivity
 import com.example.bookchat.ui.fragment.BookShelfFragment
 import com.example.bookchat.ui.fragment.CompleteBookShelfFragment
-import com.example.bookchat.utils.DialogSizeManager
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.COMPLETE_TAB_INDEX
@@ -54,15 +53,6 @@ class ReadingTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : D
         observeEventFlow()
 
         return binding.root
-    }
-
-    override fun onStart() {
-        super.onStart()
-        setDialogSize()
-    }
-
-    private fun setDialogSize(){
-        binding.readingDialogLayout.layoutParams.width = DialogSizeManager.dialogWidthPx
     }
 
     private fun observeEventFlow() {
