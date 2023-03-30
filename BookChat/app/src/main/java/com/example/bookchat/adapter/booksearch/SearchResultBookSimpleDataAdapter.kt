@@ -34,15 +34,7 @@ class SearchResultBookSimpleDataAdapter :
             parent,
             false
         )
-        setBookImgSize()
         return BookResultViewHolder(binding)
-    }
-
-    private fun setBookImgSize() {
-        with(binding) {
-            bookImg.layoutParams.width = BookImgSizeManager.bookImgWidthPx
-            bookImg.layoutParams.height = BookImgSizeManager.bookImgHeightPx
-        }
     }
 
     override fun onBindViewHolder(holder: BookResultViewHolder, position: Int) {

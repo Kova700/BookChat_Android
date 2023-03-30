@@ -6,7 +6,8 @@
         android:layout_marginHorizontal="@dimen/flex_box_book_item_margin_horizontal"
         android:layout_marginVertical="@dimen/flex_box_book_item_margin_vertical"
         android:layout_width="@dimen/book_img_width_default"
-        android:layout_height="@dimen/book_img_height_default">
+        android:layout_height="@dimen/book_img_height_default"
+        setBookImgSize="@{true}">
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

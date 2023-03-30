@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ItemBookSearchResultBinding
-import com.example.bookchat.utils.BookImgSizeManager
 
 class SearchResultBookDetailDataAdapter()
     : PagingDataAdapter<Book, SearchResultBookDetailDataAdapter.BookResultViewHolder>(BOOK_COMPARATOR) {
@@ -33,15 +32,7 @@ class SearchResultBookDetailDataAdapter()
             parent,
             false
         )
-        setBookImgSize()
         return BookResultViewHolder(binding)
-    }
-
-    private fun setBookImgSize(){
-        with(binding){
-            bookImg.layoutParams.width = BookImgSizeManager.bookImgWidthPx
-            bookImg.layoutParams.height = BookImgSizeManager.bookImgHeightPx
-        }
     }
 
     override fun onBindViewHolder(holder: BookResultViewHolder, position: Int) {

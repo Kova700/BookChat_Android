@@ -16,7 +16,6 @@ import com.example.bookchat.databinding.DialogWishBookTapClickedBinding
 import com.example.bookchat.ui.fragment.BookShelfFragment
 import com.example.bookchat.ui.fragment.ReadingBookShelfFragment
 import com.example.bookchat.utils.DialogSizeManager
-import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.BookShelfViewModel.BookShelfEvent
@@ -57,17 +56,10 @@ class WishTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : Dial
     override fun onStart() {
         super.onStart()
         setDialogSize()
-        setBookImgSize()
     }
 
     private fun setDialogSize(){
         binding.wishDialogLayout.layoutParams.width = DialogSizeManager.dialogWidthPx
-    }
-    private fun setBookImgSize(){
-        with(binding){
-            bookImg.layoutParams.width = BookImgSizeManager.bookImgWidthPx
-            bookImg.layoutParams.height = BookImgSizeManager.bookImgHeightPx
-        }
     }
 
     private fun getBookShelfFragment() : BookShelfFragment {

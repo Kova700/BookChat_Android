@@ -428,6 +428,14 @@ object DataBindingAdapter {
     fun getFormattingTimeText(view: TextView, inputedDateAndTimeString: String) {
         view.text = getFormattingText(inputedDateAndTimeString)
     }
+    @JvmStatic
+    @BindingAdapter("setBookImgSize")
+    fun setBookImgSize(view :View, bool :Boolean){
+        with(view){
+            layoutParams.width = BookImgSizeManager.bookImgWidthPx
+            layoutParams.height = BookImgSizeManager.bookImgHeightPx
+        }
+    }
 
     @JvmStatic
     @BindingAdapter("setRandomChatRoomImg")
@@ -446,7 +454,9 @@ object DataBindingAdapter {
     @BindingAdapter("setMakeChatRoomImgSize")
     fun setMakeChatRoomImgSize(view :ImageView, bool :Boolean){
         val sizeManager = MakeChatRoomImgSizeManager()
-        view.layoutParams.width = sizeManager.chatRoomImgWidthPx
-        view.layoutParams.height = sizeManager.chatRoomImgHeightPx
+        with(view){
+            layoutParams.width = sizeManager.chatRoomImgWidthPx
+            layoutParams.height = sizeManager.chatRoomImgHeightPx
+        }
     }
 }

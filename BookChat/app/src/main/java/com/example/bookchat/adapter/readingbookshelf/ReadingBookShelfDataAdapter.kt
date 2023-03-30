@@ -12,7 +12,6 @@ import com.example.bookchat.R
 import com.example.bookchat.adapter.wishbookshelf.WishBookShelfDataAdapter.Companion.BOOK_SHELF_ITEM_COMPARATOR
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.ItemReadingBookshelfDataBinding
-import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
 import com.example.bookchat.viewmodel.BookShelfViewModel.PagingViewEvent
@@ -108,14 +107,7 @@ class ReadingBookShelfDataAdapter(private val bookShelfViewModel: BookShelfViewM
         binding = DataBindingUtil
             .inflate(LayoutInflater.from(parent.context),
                 R.layout.item_reading_bookshelf_data,parent,false)
-        setBookImgSize()
         return ReadingBookShelfDataViewHolder(binding)
-    }
-    private fun setBookImgSize(){
-        with(binding){
-            bookImg.layoutParams.width = BookImgSizeManager.bookImgWidthPx
-            bookImg.layoutParams.height = BookImgSizeManager.bookImgHeightPx
-        }
     }
 
     override fun onBindViewHolder(holder: ReadingBookShelfDataViewHolder, position: Int) {

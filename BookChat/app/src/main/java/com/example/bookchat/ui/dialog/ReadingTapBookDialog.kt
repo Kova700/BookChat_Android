@@ -17,7 +17,6 @@ import com.example.bookchat.databinding.DialogReadingBookTapClickedBinding
 import com.example.bookchat.ui.activity.AgonyActivity
 import com.example.bookchat.ui.fragment.BookShelfFragment
 import com.example.bookchat.ui.fragment.CompleteBookShelfFragment
-import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.viewmodel.BookShelfViewModel
@@ -60,17 +59,10 @@ class ReadingTapBookDialog(private val bookShelfDataItem: BookShelfDataItem) : D
     override fun onStart() {
         super.onStart()
         setDialogSize()
-        setBookImgSize()
     }
 
     private fun setDialogSize(){
         binding.readingDialogLayout.layoutParams.width = DialogSizeManager.dialogWidthPx
-    }
-    private fun setBookImgSize(){
-        with(binding){
-            bookImg.layoutParams.width = BookImgSizeManager.bookImgWidthPx
-            bookImg.layoutParams.height = BookImgSizeManager.bookImgHeightPx
-        }
     }
 
     private fun observeEventFlow() {

@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.ItemWishBookshelfDataBinding
-import com.example.bookchat.utils.BookImgSizeManager
 
 class WishBookShelfDataAdapter : PagingDataAdapter<BookShelfDataItem, WishBookShelfDataAdapter.WishBookItemViewHolder>(
     BOOK_SHELF_ITEM_COMPARATOR
@@ -29,14 +28,7 @@ class WishBookShelfDataAdapter : PagingDataAdapter<BookShelfDataItem, WishBookSh
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WishBookItemViewHolder {
         binding = DataBindingUtil
             .inflate(LayoutInflater.from(parent.context), R.layout.item_wish_bookshelf_data,parent,false)
-        setBookImgSize()
         return WishBookItemViewHolder(binding)
-    }
-    private fun setBookImgSize(){
-        with(binding){
-            bookImg.layoutParams.width = BookImgSizeManager.bookImgWidthPx
-            bookImg.layoutParams.height = BookImgSizeManager.bookImgHeightPx
-        }
     }
 
     override fun onBindViewHolder(holder: WishBookItemViewHolder, position: Int) {

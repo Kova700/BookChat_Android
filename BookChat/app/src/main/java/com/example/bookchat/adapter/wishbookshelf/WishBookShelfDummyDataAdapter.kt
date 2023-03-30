@@ -6,7 +6,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemFlexBoxDummyBinding
-import com.example.bookchat.utils.BookImgSizeManager
 
 class WishBookShelfDummyDataAdapter :
     RecyclerView.Adapter<WishBookShelfDummyDataAdapter.WishBookShelfDummyDataViewHolder>() {
@@ -21,15 +20,7 @@ class WishBookShelfDummyDataAdapter :
     ): WishBookShelfDummyDataViewHolder {
         binding = DataBindingUtil
             .inflate(LayoutInflater.from(parent.context), R.layout.item_flex_box_dummy,parent,false)
-        setDummyItemSize()
         return WishBookShelfDummyDataViewHolder(binding)
-    }
-
-    private fun setDummyItemSize(){
-        with(binding){
-            flexBoxDummyBookLayout.layoutParams.width = BookImgSizeManager.bookImgWidthPx
-            flexBoxDummyBookLayout.layoutParams.height = BookImgSizeManager.bookImgHeightPx
-        }
     }
 
     override fun onBindViewHolder(holder: WishBookShelfDummyDataViewHolder, position: Int) {}
