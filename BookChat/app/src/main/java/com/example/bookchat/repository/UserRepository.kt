@@ -1,6 +1,5 @@
 package com.example.bookchat.repository
 
-import android.util.Log
 import com.example.bookchat.App
 import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.data.request.RequestUserSignIn
@@ -9,14 +8,12 @@ import com.example.bookchat.data.response.NeedToSignUpException
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.NickNameDuplicateException
 import com.example.bookchat.data.response.ResponseBodyEmptyException
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(){
 
     suspend fun signIn() {
-        Log.d(TAG, "UserRepository: login() - called")
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val idToken = DataStoreManager.getIdToken()
@@ -26,7 +23,7 @@ class UserRepository @Inject constructor(){
         when(response.code()){
             200 -> {
                 val token = response.body()
-                token?.let { DataStoreManager.saveBookchatToken(token); return }
+                token?.let { DataStoreManager.saveBookChatToken(token); return }
                 throw ResponseBodyEmptyException(response.errorBody()?.string())
             }
             404 ->  throw NeedToSignUpException(response.errorBody()?.string())
@@ -35,7 +32,6 @@ class UserRepository @Inject constructor(){
     }
 
     suspend fun signUp(userSignUpDto : UserSignUpDto) {
-        Log.d(TAG, "UserRepository: signUp() - called")
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val idToken = DataStoreManager.getIdToken()
@@ -58,13 +54,11 @@ class UserRepository @Inject constructor(){
     }
 
     suspend fun signOut(){
-        Log.d(TAG, "UserRepository: signOut() - called")
-        DataStoreManager.deleteBookchatToken()
+        DataStoreManager.deleteBookChatToken()
     }
 
     //회원 탈퇴 후 재가입 가능 기간 정책 결정해야함
     suspend fun withdraw() {
-        Log.d(TAG, "UserRepository: withdraw() - called")
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
         val response = App.instance.bookChatApiClient.withdraw()
         when(response.code()){
@@ -74,7 +68,6 @@ class UserRepository @Inject constructor(){
     }
 
     suspend fun getUserProfile(){
-        Log.d(TAG, "UserRepository: getUserProfile() - called")
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val response = App.instance.bookChatApiClient.getUserProfile()
@@ -89,7 +82,6 @@ class UserRepository @Inject constructor(){
     }
 
     suspend fun requestNameDuplicateCheck(nickName : String) {
-        Log.d(TAG, "UserRepository: requestNameDuplicateCheck() - called")
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val response = App.instance.bookChatApiClient.requestNameDuplicateCheck(nickName)
@@ -107,11 +99,5 @@ class UserRepository @Inject constructor(){
     private fun isNetworkConnected() :Boolean{
         return App.instance.isNetworkConnected()
     }
-
-    //AppIntercepter부분 수정 가능해보임
-    companion object {
-        const val CONTENT_TYPE_JSON = "application/json; charset=utf-8"
-    }
-
 }
 
