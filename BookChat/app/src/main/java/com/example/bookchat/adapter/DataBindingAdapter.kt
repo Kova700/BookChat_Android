@@ -442,4 +442,11 @@ object DataBindingAdapter {
             7 -> view.setImageResource(R.drawable.default_chat_room_img7)
         }
     }
+    @JvmStatic
+    @BindingAdapter("setMakeChatRoomImgSize")
+    fun setMakeChatRoomImgSize(view :ImageView, bool :Boolean){
+        val sizeManager = MakeChatRoomImgSizeManager()
+        view.layoutParams.width = sizeManager.chatRoomImgWidthPx
+        view.layoutParams.height = sizeManager.chatRoomImgHeightPx
+    }
 }

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--target_screen_size-->
+    <dimen name="target_screen_width">360dp</dimen>
     <!--book_img-->
     <dimen name="book_img_corner_radius">7dp</dimen>
     <dimen name="book_img_elevation">5dp</dimen>
@@ -20,4 +22,7 @@
     <dimen name="bookshelf_dialog_white_padding_top">25dp</dimen>
     <dimen name="bookshelf_dialog_white_padding_bottom">30dp</dimen>
     <dimen name="bookshelf_dialog_beige_area_top_margin">30dp</dimen>
+    <!--make_chat_room-->
+    <dimen name="make_chat_room_img_width_default">100dp</dimen>
+    <dimen name="make_chat_room_img_height_default">150dp</dimen>
 </resources>
