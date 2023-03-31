@@ -20,8 +20,8 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentSearchBinding
 import com.example.bookchat.ui.activity.SearchTapResultDetailActivity
 import com.example.bookchat.utils.Constants.TAG
-import com.example.bookchat.utils.SearchTapStatus
 import com.example.bookchat.viewmodel.SearchViewModel
+import com.example.bookchat.viewmodel.SearchViewModel.SearchTapStatus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -48,7 +48,7 @@ class SearchFragment : Fragment() {
             viewModel = searchViewModel
         }
         initFragmentBackStackChangedListener()
-        collectSearchTapStatus()
+        observeSearchTapStatus()
         return binding.root
     }
 
@@ -58,9 +58,8 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun collectSearchTapStatus() = viewLifecycleOwner.lifecycleScope.launch {
-        searchViewModel._searchTapStatus.collect { searchTapStatus ->
-            Log.d(TAG, "SearchFragment: _searchTapStatus.collect - searchTapStatus : $searchTapStatus")
+    private fun observeSearchTapStatus() = viewLifecycleOwner.lifecycleScope.launch {
+        searchViewModel.searchTapStatus.collect { searchTapStatus ->
             handleSearchTapStatus(searchTapStatus)
         }
     }
@@ -90,18 +89,18 @@ class SearchFragment : Fragment() {
     private fun handleBackStackFragment(inflatedFragment :Fragment){
         when(inflatedFragment.tag){
             FRAGMENT_TAG_DEFAULT -> {
-                searchViewModel._searchKeyWord.value = ""
-                searchViewModel._searchTapStatus.value = SearchTapStatus.Default
+                searchViewModel.searchKeyWord.value = ""
+                searchViewModel.searchTapStatus.value = SearchTapStatus.Default
             }
-            FRAGMENT_TAG_HISTORY -> { searchViewModel._searchTapStatus.value = SearchTapStatus.History }
-            FRAGMENT_TAG_SEARCHING -> { searchViewModel._searchTapStatus.value = SearchTapStatus.Searching }
-            FRAGMENT_TAG_RESULT -> {  searchViewModel._searchTapStatus.value = SearchTapStatus.Result }
+            FRAGMENT_TAG_HISTORY -> { searchViewModel.searchTapStatus.value = SearchTapStatus.History }
+            FRAGMENT_TAG_SEARCHING -> { searchViewModel.searchTapStatus.value = SearchTapStatus.Searching }
+            FRAGMENT_TAG_RESULT -> {  searchViewModel.searchTapStatus.value = SearchTapStatus.Result }
         }
     }
 
     private fun moveToDetailActivity() {
         val intent = Intent(requireContext(), SearchTapResultDetailActivity::class.java)
-        intent.putExtra(EXTRA_SEARCH_KEYWORD, searchViewModel._searchKeyWord.value)
+        intent.putExtra(EXTRA_SEARCH_KEYWORD, searchViewModel.searchKeyWord.value)
         startActivity(intent)
     }
 
@@ -209,8 +208,8 @@ class SearchFragment : Fragment() {
     }
 
     override fun onResume() {
-        if (searchViewModel._searchTapStatus.value == SearchTapStatus.Detail) {
-            searchViewModel._searchTapStatus.value = SearchTapStatus.Result
+        if (searchViewModel.searchTapStatus.value == SearchTapStatus.Detail) {
+            searchViewModel.searchTapStatus.value = SearchTapStatus.Result
         }
         super.onResume()
     }

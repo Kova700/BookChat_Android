@@ -147,39 +147,6 @@ object DataBindingAdapter {
         }
     }
 
-    /**검색창 : 검색어 삭제버튼 Visible 설정*/
-    @JvmStatic
-    @BindingAdapter("setSearchDeleteBtnVisibility")
-    fun setSearchDeleteBtnVisibility(view: View, searchTapStatus : SearchTapStatus){
-        if (searchTapStatus !is SearchTapStatus.Searching) {
-            view.visibility = View.INVISIBLE
-            return
-        }
-        view.visibility = View.VISIBLE
-    }
-
-    /**검색창 애니메이션 터치뷰 : 검색창 애니메이션 터치뷰 Visible 설정*/
-    @JvmStatic
-    @BindingAdapter("setAnimationTouchViewVisibility")
-    fun setAnimationTouchViewVisibility(view: View, searchTapStatus : SearchTapStatus){
-        if (searchTapStatus !is SearchTapStatus.Default) {
-            view.visibility = View.INVISIBLE
-            return
-        }
-        view.visibility = View.VISIBLE
-    }
-
-    /**검색창 뒤로가기 버튼 : 검색창 뒤로가기 버튼 Visible 설정*/
-    @JvmStatic
-    @BindingAdapter("setBackBtnViewVisibility")
-    fun setBackBtnViewVisibility(view: View, searchTapStatus : SearchTapStatus){
-        if (searchTapStatus !is SearchTapStatus.Default) {
-            view.visibility = View.VISIBLE
-            return
-        }
-        view.visibility = View.INVISIBLE
-    }
-
     @JvmStatic
     @BindingAdapter("setLoadingVisibilityInBookReport")
     fun setLoadingVisibilityInBookReport(view: View, status: BookReportStatus){

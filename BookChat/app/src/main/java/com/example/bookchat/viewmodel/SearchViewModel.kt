@@ -13,8 +13,6 @@ import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseGetBookSearch
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.DataStoreManager
-import com.example.bookchat.utils.LoadState
-import com.example.bookchat.utils.SearchTapStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -25,23 +23,14 @@ class SearchViewModel @Inject constructor(
     private var bookRepository: BookRepository
 ) : ViewModel() {
 
-    val _searchTapStatus = MutableStateFlow<SearchTapStatus>(SearchTapStatus.Default)
-    val _searchKeyWord = MutableStateFlow<String>("")
+    val searchTapStatus = MutableStateFlow<SearchTapStatus>(SearchTapStatus.Default)
+    val searchKeyWord = MutableStateFlow<String>("")
 
     var simpleBooksearchResult = MutableStateFlow<List<Book>>(listOf())
     var previousKeyword = ""
 
     val bookResultState = MutableStateFlow<SearchState>(SearchState.Loading)
     val chatResultState = MutableStateFlow<SearchState>(SearchState.EmptyResult)
-
-    fun isStateLoading(searchState: SearchState) =
-        searchState == SearchState.Loading
-    fun isOnlyBookEmptyResult(bookSearchState: SearchState, chatSearchState: SearchState) =
-        (bookSearchState == SearchState.EmptyResult) && (chatSearchState != SearchState.EmptyResult)
-    fun isOnlyChatEmptyResult(bookSearchState: SearchState, chatSearchState: SearchState) =
-        (bookSearchState != SearchState.EmptyResult) && (chatSearchState == SearchState.EmptyResult)
-    fun isBothEmptyResult(bookSearchState: SearchState, chatSearchState: SearchState) =
-        (bookSearchState == SearchState.EmptyResult) && (chatSearchState == SearchState.EmptyResult)
 
     val editTextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -52,25 +41,25 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun renewSearchTapStatus() {
-        if (_searchKeyWord.value.isEmpty()) return
-        if (_searchTapStatus.value != SearchTapStatus.Searching) _searchTapStatus.value =
+        if (searchKeyWord.value.isEmpty()) return
+        if (searchTapStatus.value != SearchTapStatus.Searching) searchTapStatus.value =
             SearchTapStatus.Searching
     }
 
     fun searchKeyword() = viewModelScope.launch {
-        val keyword = _searchKeyWord.value
+        val keyword = searchKeyWord.value
         if (keyword.isEmpty()) {
             makeToast(R.string.search_book_keyword_empty)
             return@launch
         }
-        if ((keyword == previousKeyword) && (_searchTapStatus.value == SearchTapStatus.Result)) return@launch
-        DataStoreManager.saveSearchHistory(_searchKeyWord.value)
+        if ((keyword == previousKeyword) && (searchTapStatus.value == SearchTapStatus.Result)) return@launch
+        DataStoreManager.saveSearchHistory(searchKeyWord.value)
         simpleSearchBooks(keyword)
         simpleSearchChatRoom(keyword)
     }
 
     fun clickHistory(keyword: String) = viewModelScope.launch {
-        _searchKeyWord.value = keyword
+        searchKeyWord.value = keyword
         simpleSearchBooks(keyword)
         simpleSearchChatRoom(keyword)
     }
@@ -95,7 +84,6 @@ class SearchViewModel @Inject constructor(
             bookResultState.value = SearchState.HaveResult
         }
         previousKeyword = keyword
-        _searchTapStatus.value = SearchTapStatus.Result
     }
 
     //채팅방 3개만 호출
@@ -108,26 +96,48 @@ class SearchViewModel @Inject constructor(
     }
 
     fun clickBookDetailBtn() = viewModelScope.launch {
-        _searchTapStatus.value = SearchTapStatus.Detail
+        searchTapStatus.value = SearchTapStatus.Detail
     }
 
     fun clickSearchWindow() {
-        _searchTapStatus.value = SearchTapStatus.History
+        searchTapStatus.value = SearchTapStatus.History
     }
 
     fun clickBackBtn() {
         clearSearchWindow()
-        _searchTapStatus.value = SearchTapStatus.Default
+        searchTapStatus.value = SearchTapStatus.Default
     }
 
     fun clearSearchWindow() {
-        _searchKeyWord.value = ""
+        searchKeyWord.value = ""
     }
+
+    fun isStateLoading(searchState: SearchState) =
+        searchState == SearchState.Loading
+    fun isOnlyBookEmptyResult(bookSearchState: SearchState, chatSearchState: SearchState) =
+        (bookSearchState == SearchState.EmptyResult) && (chatSearchState != SearchState.EmptyResult)
+    fun isOnlyChatEmptyResult(bookSearchState: SearchState, chatSearchState: SearchState) =
+        (bookSearchState != SearchState.EmptyResult) && (chatSearchState == SearchState.EmptyResult)
+    fun isBothEmptyResult(bookSearchState: SearchState, chatSearchState: SearchState) =
+        (bookSearchState == SearchState.EmptyResult) && (chatSearchState == SearchState.EmptyResult)
 
     sealed class SearchState {
         object Loading : SearchState()
         object HaveResult : SearchState()
         object EmptyResult : SearchState()
+    }
+
+    fun isSearchTapDefault(searchTapStatus :SearchTapStatus) =
+        searchTapStatus == SearchTapStatus.Default
+    fun isSearchTapSearching(searchTapStatus :SearchTapStatus) =
+        searchTapStatus == SearchTapStatus.Searching
+
+    sealed class SearchTapStatus {
+        object Default : SearchTapStatus()
+        object History : SearchTapStatus()
+        object Searching : SearchTapStatus()
+        object Result : SearchTapStatus()
+        object Detail : SearchTapStatus()
     }
 
     private fun makeToast(stringId: Int) {

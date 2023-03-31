@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
+        <import type="android.view.View"/>
         <variable
             name="viewModel"
             type="com.example.bookchat.viewmodel.SearchViewModel" />
@@ -14,21 +15,20 @@
 
         <ImageButton
             android:id="@+id/back_btn"
-            setBackBtnViewVisibility="@{viewModel._searchTapStatus}"
+            android:visibility="@{viewModel.isSearchTapDefault(viewModel.searchTapStatus) ? View.INVISIBLE : View.VISIBLE}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:layout_marginTop="27dp"
             android:background="?android:selectableItemBackgroundBorderless"
             android:onClick="@{() -> viewModel.clickBackBtn()}"
-            android:visibility="visible"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_back_btn" />
 
         <View
             android:id="@+id/animation_touchEvent_view"
-            setAnimationTouchViewVisibility="@{viewModel._searchTapStatus}"
+            android:visibility="@{viewModel.isSearchTapDefault(viewModel.searchTapStatus) ? View.VISIBLE : View.INVISIBLE}"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:background="#00000000"
@@ -76,7 +76,7 @@
             android:fontFamily="@font/notosanskr_regular"
             android:hint="@string/search_window_hint"
             android:inputType="text"
-            android:text="@={viewModel._searchKeyWord}"
+            android:text="@={viewModel.searchKeyWord}"
             android:textColor="#222222"
             android:textColorHint="#B1B3B8"
             android:textCursorDrawable="@drawable/edittext_cursor"
@@ -89,7 +89,7 @@
 
         <ImageButton
             android:id="@+id/search_delete_btn"
-            setSearchDeleteBtnVisibility="@{viewModel._searchTapStatus}"
+            android:visibility="@{viewModel.isSearchTapSearching(viewModel.searchTapStatus) ? View.VISIBLE : View.INVISIBLE}"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginEnd="27dp"
