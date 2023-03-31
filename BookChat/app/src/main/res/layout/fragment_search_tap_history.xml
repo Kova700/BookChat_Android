@@ -8,7 +8,7 @@
                 type="com.example.bookchat.ui.fragment.SearchTapHistoryFragment" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_marginHorizontal="30dp"
+        android:paddingHorizontal="30dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

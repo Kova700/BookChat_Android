@@ -45,7 +45,6 @@ class SearchFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false)
         with(binding) {
             lifecycleOwner = this@SearchFragment
-            fragment = this@SearchFragment
             viewModel = searchViewModel
         }
         initFragmentBackStackChangedListener()
