@@ -56,6 +56,7 @@
                         android:layout_width="@dimen/book_img_width_default"
                         android:layout_height="@dimen/book_img_height_default"
                         android:scaleType="fitXY"
+                        setBookImgSize="@{true}"
                         loadUrl="@{bookShelfItem.bookCoverImageUrl}"
                         android:src="@drawable/empty_img"/>
                 </androidx.cardview.widget.CardView>

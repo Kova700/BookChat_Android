@@ -72,6 +72,7 @@
             <ImageView
                 android:id="@+id/bookImg"
                 loadUrl="@{viewmodel.book.bookCoverImageUrl}"
+                setBookImgSize="@{true}"
                 android:layout_width="@dimen/book_img_width_default"
                 android:layout_height="@dimen/book_img_height_default"
                 android:scaleType="fitXY"
