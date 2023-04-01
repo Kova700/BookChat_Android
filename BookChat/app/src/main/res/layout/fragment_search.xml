@@ -99,7 +99,7 @@
             android:elevation="10dp"
             android:onClick="@{() -> viewModel.clearSearchWindow()}"
             android:src="@drawable/ic_text_delete_btn"
-            android:visibility="@{viewModel.isSearchTapSearching(viewModel.searchTapStatus) ? View.VISIBLE : View.INVISIBLE}"
+            android:visibility="@{viewModel.isSearchTapDefaultOrHistory(viewModel.searchTapStatus) ? View.INVISIBLE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@+id/search_window"
             app:layout_constraintEnd_toEndOf="@+id/search_window"
             app:layout_constraintTop_toTopOf="@+id/search_window" />

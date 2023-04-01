@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import com.example.bookchat.R
 import com.example.bookchat.adapter.booksearch.SearchResultBookDummyAdapter
@@ -20,6 +21,8 @@ import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class SearchTapResultFragment : Fragment() {
     private lateinit var binding: FragmentSearchTapResultBinding
@@ -41,6 +44,7 @@ class SearchTapResultFragment : Fragment() {
 
         initAdapter()
         initRcv()
+        observeSimpleBookSearchResult()
         return binding.root
     }
 
@@ -73,20 +77,14 @@ class SearchTapResultFragment : Fragment() {
                 }
             searchResultBookSimpleRcv.layoutManager = flexboxLayoutManager
         }
-        submitBookDataToAdapter()
-        setDummyBookCount()
     }
-//    private fun initSearchResultChatRoomRcv(){
-//        with(binding){
-//            searchResultChatRoomSimpleRcv.adapter = chatRoomAdapter
-//            searchResultChatRoomSimpleRcv.setHasFixedSize(true)
-//            searchResultChatRoomSimpleRcv.layoutManager = LinearLayoutManager(requireContext())
-//        }
-//    }
 
-    private fun submitBookDataToAdapter(){
-        searchResultBookSimpleDataAdapter.books = searchViewModel.simpleBooksearchResult.value
-        searchResultBookSimpleDataAdapter.notifyDataSetChanged()
+    private fun observeSimpleBookSearchResult() = lifecycleScope.launch(){
+        searchViewModel.simpleBookSearchResult.collectLatest{ books ->
+            searchResultBookSimpleDataAdapter.books = books
+            searchResultBookSimpleDataAdapter.notifyDataSetChanged()
+            setDummyBookCount()
+        }
     }
 
     private fun setDummyBookCount(){
@@ -106,6 +104,14 @@ class SearchTapResultFragment : Fragment() {
         searchResultBookDummyAdapter = SearchResultBookDummyAdapter()
         searchResultBookSimpleDataAdapter.setItemClickListener(bookItemClickListener)
     }
+
+    //    private fun initSearchResultChatRoomRcv(){
+//        with(binding){
+//            searchResultChatRoomSimpleRcv.adapter = chatRoomAdapter
+//            searchResultChatRoomSimpleRcv.setHasFixedSize(true)
+//            searchResultChatRoomSimpleRcv.layoutManager = LinearLayoutManager(requireContext())
+//        }
+//    }
 
 //    private fun initSearchResultChatRoomAdapter(){
 //        chatRoomAdapter = ChatRoomListDataAdapter() //임시

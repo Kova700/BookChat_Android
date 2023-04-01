@@ -4,7 +4,6 @@ import android.animation.AnimatorInflater
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +18,6 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentSearchBinding
 import com.example.bookchat.ui.activity.SearchTapResultDetailActivity
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.SearchViewModel
 import com.example.bookchat.viewmodel.SearchViewModel.SearchTapStatus
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,7 +56,7 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun observeSearchTapStatus() = viewLifecycleOwner.lifecycleScope.launch {
+    private fun observeSearchTapStatus() = lifecycleScope.launch {
         searchViewModel.searchTapStatus.collect { searchTapStatus ->
             handleSearchTapStatus(searchTapStatus)
         }
@@ -100,7 +98,7 @@ class SearchFragment : Fragment() {
 
     private fun moveToDetailActivity() {
         val intent = Intent(requireContext(), SearchTapResultDetailActivity::class.java)
-        intent.putExtra(EXTRA_SEARCH_KEYWORD, searchViewModel.searchKeyWord.value)
+        intent.putExtra(EXTRA_SEARCH_KEYWORD, searchViewModel.searchKeyWord.value.trim())
         startActivity(intent)
     }
 
@@ -120,7 +118,6 @@ class SearchFragment : Fragment() {
 
     /* 애니메이션 처리 전부 MotionLayout으로 마이그레이션 예정 */
     private fun openSearchWindowAnimation() {
-        Log.d(TAG, "SearchFragment: openSearchWindowAnimation() - called")
 
         val windowAnimator = AnimatorInflater.loadAnimator(
             requireContext(),
@@ -161,7 +158,6 @@ class SearchFragment : Fragment() {
 
     /* 애니메이션 처리 전부 MotionLayout으로 마이그레이션 예정 */
     private fun closeSearchWindowAnimation() {
-        Log.d(TAG, "SearchFragment: closeSearchWindowAnimation() - called")
 
         val windowAnimator = AnimatorInflater.loadAnimator(
             requireContext(),
@@ -226,5 +222,4 @@ class SearchFragment : Fragment() {
         const val EXTRA_SEARCH_KEYWORD = "EXTRA_SEARCH_KEYWORD"
         const val SEARCH_TAP_FRAGMENT_FLAG = "SEARCH_TAP_FRAGMENT_FLAG"
     }
-
 }

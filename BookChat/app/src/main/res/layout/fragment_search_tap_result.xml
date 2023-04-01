@@ -44,13 +44,6 @@
                 android:layout_height="wrap_content"/>
 
             <androidx.constraintlayout.widget.Group
-                android:id="@+id/invisible_group_in_both_empty"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="@{viewmodel.isBothEmptyResult(viewmodel.bookResultState, viewmodel.chatResultState) ? View.INVISIBLE : View.VISIBLE}"
-                app:constraint_referenced_ids="bookHeaderLayout, search_result_book_simple_Rcv, chatRoomHeaderLayout, search_result_chatRoom_simple_Rcv"/>
-
-            <androidx.constraintlayout.widget.Group
                 android:id="@+id/visible_group_in_both_empty"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -80,6 +73,7 @@
                 android:id="@+id/bookHeaderLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:visibility="@{viewmodel.isBothEmptyResult(viewmodel.bookResultState, viewmodel.chatResultState) ? View.INVISIBLE : View.VISIBLE}"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start"
                 app:layout_constraintTop_toTopOf="parent">
@@ -116,6 +110,7 @@
                 android:layout_marginTop="17dp"
                 android:overScrollMode="never"
                 android:minHeight="200dp"
+                android:visibility="@{viewmodel.isStateHaveResult(viewmodel.bookResultState) ? View.VISIBLE : View.INVISIBLE}"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end_book_rcv"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start_book_rcv"
                 app:layout_constraintTop_toBottomOf="@+id/bookHeaderLayout" />
@@ -166,6 +161,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
+                android:visibility="@{viewmodel.isBothEmptyResult(viewmodel.bookResultState, viewmodel.chatResultState) ? View.INVISIBLE : View.VISIBLE}"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start"
                 app:layout_constraintTop_toBottomOf="@+id/search_result_book_simple_Rcv" >
@@ -202,6 +198,7 @@
                 android:layout_marginHorizontal="24dp"
                 android:minHeight="200dp"
                 android:overScrollMode="never"
+                android:visibility="@{viewmodel.isStateHaveResult(viewmodel.chatResultState) ? View.VISIBLE : View.INVISIBLE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/chatRoomHeaderLayout" />
