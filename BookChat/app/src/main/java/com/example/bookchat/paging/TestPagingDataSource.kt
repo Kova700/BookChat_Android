@@ -3,15 +3,15 @@ package com.example.bookchat.paging
 import com.example.bookchat.data.Agony
 import com.example.bookchat.data.AgonyRecord
 import com.example.bookchat.data.BookShelfItem
-import com.example.bookchat.data.ChatRoomListItem
+import com.example.bookchat.data.UserChatRoomListItem
 import com.example.bookchat.data.response.*
 import com.example.bookchat.utils.AgonyFolderHexColor
 
 object TestPagingDataSource {
 
-    fun getChatRoomListPagingSource() : ResponseGetChatRoomList {
-        val testChatRoomDataList = mutableListOf<ChatRoomListItem>()
-        val item = ChatRoomListItem(1L,"채팅방 제목","roomSid",3L,2,"https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Ft1.daumcdn.net%2Fcfile%2Ftistory%2F996333405A8280FC23",
+    fun getChatRoomListPagingSource() : ResponseGetUserChatRoomList {
+        val testChatRoomDataList = mutableListOf<UserChatRoomListItem>()
+        val item = UserChatRoomListItem(1L,"채팅방 제목","roomSid",3L,2,"https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Ft1.daumcdn.net%2Fcfile%2Ftistory%2F996333405A8280FC23",
         3L,"2023-02-13T16:03:23.8916109","블라블라")
         val item2 = item.copy(roomId = 2L,lastActiveTime = "2023-02-28T02:55:06")
         val item3 = item.copy(roomId = 3L,lastActiveTime = "2023-02-27T02:55:06")
@@ -25,7 +25,7 @@ object TestPagingDataSource {
             testChatRoomDataList.add(item.copy(roomId = i.toLong()))
         }
         val testMeta = CursorMeta(1,6,true,false,true,true,1)
-        return ResponseGetChatRoomList(testChatRoomDataList, testMeta)
+        return ResponseGetUserChatRoomList(testChatRoomDataList, testMeta)
     }
 
 

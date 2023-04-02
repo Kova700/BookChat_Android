@@ -1,11 +1,11 @@
 package com.example.bookchat.data.response
 
-import com.example.bookchat.data.ChatRoomListItem
+import com.example.bookchat.data.UserChatRoomListItem
 import com.google.gson.annotations.SerializedName
 
-data class ResponseGetChatRoomList(
+data class ResponseGetUserChatRoomList(
     @SerializedName("userChatRoomResponseList")
-    val chatRoomList :List<ChatRoomListItem>,
+    val chatRoomList :List<UserChatRoomListItem>,
     @SerializedName("cursorMeta")
     val cursorMeta : CursorMeta
 )

@@ -12,8 +12,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
-import com.example.bookchat.adapter.chatroomlist.ChatRoomListDataAdapter
-import com.example.bookchat.adapter.chatroomlist.ChatRoomListHeaderAdapter
+import com.example.bookchat.adapter.userchatroomlist.UserChatRoomListDataAdapter
+import com.example.bookchat.adapter.userchatroomlist.UserChatRoomListHeaderAdapter
 import com.example.bookchat.databinding.FragmentChatRoomListBinding
 import com.example.bookchat.ui.activity.MakeChatRoomActivity
 import com.example.bookchat.viewmodel.ChatRoomListViewModel
@@ -28,8 +28,8 @@ import kotlinx.coroutines.launch
 class ChatRoomListFragment : Fragment() {
 
     private lateinit var binding: FragmentChatRoomListBinding
-    private lateinit var chatRoomListHeaderAdapter: ChatRoomListHeaderAdapter
-    private lateinit var chatRoomListDataAdapter: ChatRoomListDataAdapter
+    private lateinit var userChatRoomListHeaderAdapter: UserChatRoomListHeaderAdapter
+    private lateinit var userChatRoomListDataAdapter: UserChatRoomListDataAdapter
     private val chatRoomListViewModel: ChatRoomListViewModel by viewModels()
 
     override fun onCreateView(
@@ -53,13 +53,13 @@ class ChatRoomListFragment : Fragment() {
 
     private fun observePagingData() = lifecycleScope.launch{
         chatRoomListViewModel.chatRoomPagingData.collect{ pagingData ->
-            chatRoomListDataAdapter.submitData(pagingData)
+            userChatRoomListDataAdapter.submitData(pagingData)
         }
     }
 
     private fun initAdapter() {
-        chatRoomListHeaderAdapter = ChatRoomListHeaderAdapter()
-        chatRoomListDataAdapter = ChatRoomListDataAdapter()
+        userChatRoomListHeaderAdapter = UserChatRoomListHeaderAdapter()
+        userChatRoomListDataAdapter = UserChatRoomListDataAdapter()
         //클릭, 롱클릭 리스너 설정해줘야함
     }
 
@@ -69,8 +69,8 @@ class ChatRoomListFragment : Fragment() {
                 ConcatAdapter.Config.Builder().apply { setIsolateViewTypes(false) }.build()
             val concatAdapter = ConcatAdapter(
                 concatAdapterConfig,
-                chatRoomListHeaderAdapter,
-                chatRoomListDataAdapter
+                userChatRoomListHeaderAdapter,
+                userChatRoomListDataAdapter
             )
             chatRcv.adapter = concatAdapter
             chatRcv.setHasFixedSize(true)

@@ -1,25 +1,25 @@
-package com.example.bookchat.adapter.booksearch
+package com.example.bookchat.adapter.search.booksearch
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ItemBookSearchResultBinding
-import com.example.bookchat.utils.BookImgSizeManager
-import java.util.Collections.min
 
-class SearchResultBookSimpleDataAdapter :
-    RecyclerView.Adapter<SearchResultBookSimpleDataAdapter.BookResultViewHolder>() {
+class SearchResultBookDetailDataAdapter
+    : PagingDataAdapter<Book, SearchResultBookDetailDataAdapter.BookResultViewHolder>(
+    BOOK_COMPARATOR
+) {
 
-    private lateinit var binding: ItemBookSearchResultBinding
+    private lateinit var binding : ItemBookSearchResultBinding
     private lateinit var itemClickListener: OnItemClickListener
-    var books: List<Book> = listOf()
 
-    inner class BookResultViewHolder(val binding: ItemBookSearchResultBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        fun bind(book: Book) {
+    inner class BookResultViewHolder(val binding: ItemBookSearchResultBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(book : Book){
             binding.book = book
             binding.root.setOnClickListener {
                 itemClickListener.onItemClick(book)
@@ -38,20 +38,28 @@ class SearchResultBookSimpleDataAdapter :
     }
 
     override fun onBindViewHolder(holder: BookResultViewHolder, position: Int) {
-        if (books.isNotEmpty()) holder.bind(books[position])
+        val currentItem = getItem(position)
+        currentItem?.let { holder.bind(currentItem) }
     }
-
-    override fun getItemCount(): Int {
-        return minOf(books.size, BookImgSizeManager.flexBoxBookSpanSize * 2)
-    }
-
-    override fun getItemViewType(position: Int): Int = R.layout.item_book_search_result
 
     interface OnItemClickListener {
-        fun onItemClick(book: Book)
+        fun onItemClick(book :Book)
     }
 
     fun setItemClickListener(onItemClickListener: OnItemClickListener) {
         this.itemClickListener = onItemClickListener
     }
+
+    override fun getItemViewType(position: Int): Int = R.layout.item_book_search_result
+
+    companion object {
+        private val BOOK_COMPARATOR = object : DiffUtil.ItemCallback<Book>() {
+            override fun areItemsTheSame(oldItem: Book, newItem: Book) =
+                oldItem.isbn == newItem.isbn
+
+            override fun areContentsTheSame(oldItem: Book, newItem: Book) =
+                oldItem == newItem
+        }
+    }
+
 }

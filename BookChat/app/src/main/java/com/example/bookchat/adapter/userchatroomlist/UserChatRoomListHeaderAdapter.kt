@@ -1,4 +1,4 @@
-package com.example.bookchat.adapter.chatroomlist
+package com.example.bookchat.adapter.userchatroomlist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemChatRoomListHeaderBinding
 
-class ChatRoomListHeaderAdapter : RecyclerView.Adapter<ChatRoomListHeaderAdapter.ChatHeaderViewHolder>() {
+class UserChatRoomListHeaderAdapter : RecyclerView.Adapter<UserChatRoomListHeaderAdapter.ChatHeaderViewHolder>() {
 
     private lateinit var bindingHeaderItem: ItemChatRoomListHeaderBinding
 

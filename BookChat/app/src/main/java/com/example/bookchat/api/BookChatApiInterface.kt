@@ -178,7 +178,7 @@ interface BookChatApiInterface {
     suspend fun getUserChatRoomList(
         @Query("postCursorId") postCursorId: Int,
         @Query("size") size: String,
-    ): Response<ResponseGetChatRoomList>
+    ): Response<ResponseGetUserChatRoomList>
 
     @Multipart
     @POST("/v1/api/chatrooms")
@@ -186,4 +186,15 @@ interface BookChatApiInterface {
         @Part("createChatRoomRequest") requestMakeChatRoom: RequestMakeChatRoom,
         @Part chatRoomImage: MultipartBody.Part? = null
     ): Response<Unit>
+
+    @GET("/v1/api/chatrooms")
+    suspend fun searchChatRoom(
+        @Query("postCursorId") postCursorId: Int,
+        @Query("size") size: String,
+        @Query("roomName") roomName: String? = null,
+        @Query("title") title: String? = null,
+        @Query("isbn") isbn: String? = null,
+        @Query("tags") tags: String? = null,
+    ): Response<ResponseGetSearchChatRoomList>
+
 }

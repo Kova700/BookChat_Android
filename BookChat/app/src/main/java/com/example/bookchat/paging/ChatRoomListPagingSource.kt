@@ -3,17 +3,17 @@ package com.example.bookchat.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.bookchat.App
-import com.example.bookchat.data.ChatRoomListItem
+import com.example.bookchat.data.UserChatRoomListItem
 import com.example.bookchat.data.response.CursorMeta
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseBodyEmptyException
-import com.example.bookchat.data.response.ResponseGetChatRoomList
+import com.example.bookchat.data.response.ResponseGetUserChatRoomList
 import retrofit2.Response
 
-class ChatRoomListPagingSource : PagingSource<Int, ChatRoomListItem>() {
-    private lateinit var response: Response<ResponseGetChatRoomList>
+class ChatRoomListPagingSource : PagingSource<Int, UserChatRoomListItem>() {
+    private lateinit var response: Response<ResponseGetUserChatRoomList>
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ChatRoomListItem> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UserChatRoomListItem> {
         if (!isNetworkConnected()) return LoadResult.Error(NetworkIsNotConnectedException())
 
         val page = params.key ?: 0
@@ -49,9 +49,9 @@ class ChatRoomListPagingSource : PagingSource<Int, ChatRoomListItem>() {
     }
 
     private fun getLoadResult(
-        data: List<ChatRoomListItem>,
+        data: List<UserChatRoomListItem>,
         cursorMeta: CursorMeta,
-    ): LoadResult<Int, ChatRoomListItem> {
+    ): LoadResult<Int, UserChatRoomListItem> {
         return LoadResult.Page(
             data = data,
             prevKey = getPrevKey(cursorMeta),
@@ -67,7 +67,7 @@ class ChatRoomListPagingSource : PagingSource<Int, ChatRoomListItem>() {
         return if (cursorMeta.first) cursorMeta.nextCursorId + 2 else cursorMeta.nextCursorId
     }
 
-    override fun getRefreshKey(state: PagingState<Int, ChatRoomListItem>): Int = 0
+    override fun getRefreshKey(state: PagingState<Int, UserChatRoomListItem>): Int = 0
 
     private fun isNetworkConnected(): Boolean {
         return App.instance.isNetworkConnected()

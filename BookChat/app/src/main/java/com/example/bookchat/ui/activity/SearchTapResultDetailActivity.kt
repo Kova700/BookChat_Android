@@ -7,8 +7,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import com.example.bookchat.R
-import com.example.bookchat.adapter.booksearch.SearchResultBookDetailDataAdapter
-import com.example.bookchat.adapter.booksearch.SearchResultBookDummyAdapter
+import com.example.bookchat.adapter.search.booksearch.SearchResultBookDetailDataAdapter
+import com.example.bookchat.adapter.search.booksearch.SearchResultBookDummyAdapter
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ActivitySearchTapResultDetailBinding
 import com.example.bookchat.ui.dialog.SearchTapBookDialog

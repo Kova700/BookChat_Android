@@ -10,21 +10,24 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
+import com.example.bookchat.data.SearchChatRoomListItem
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseGetBookSearch
+import com.example.bookchat.data.response.ResponseGetSearchChatRoomList
 import com.example.bookchat.repository.BookRepository
+import com.example.bookchat.repository.ChatRoomRepository
+import com.example.bookchat.utils.ChatSearchFilter
 import com.example.bookchat.utils.DataStoreManager
 import com.example.bookchat.utils.SearchPurpose
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class SearchViewModel @AssistedInject constructor(
     private val bookRepository: BookRepository,
+    private val chatRoomRepository: ChatRoomRepository,
     @Assisted val searchPurpose: SearchPurpose
 ) : ViewModel() {
 
@@ -32,10 +35,12 @@ class SearchViewModel @AssistedInject constructor(
     val searchKeyWord = MutableStateFlow<String>("")
 
     var simpleBookSearchResult = MutableStateFlow<List<Book>>(listOf())
+    var simpleChatRoomSearchResult = MutableStateFlow<List<SearchChatRoomListItem>>(listOf())
     var previousSearchKeyword = ""
 
     val bookResultState = MutableStateFlow<SearchState>(SearchState.Loading)
-    val chatResultState = MutableStateFlow<SearchState>(SearchState.EmptyResult)
+    val chatResultState = MutableStateFlow<SearchState>(SearchState.Loading)
+    val chatSearchFilter = MutableStateFlow<ChatSearchFilter>(ChatSearchFilter.BOOKTITLE)
 
     val editTextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -98,13 +103,25 @@ class SearchViewModel @AssistedInject constructor(
         bookResultState.value = SearchState.HaveResult
     }
 
-    //채팅방 3개만 호출
     private suspend fun simpleSearchChatRoom(keyword: String) {
+        chatResultState.value = SearchState.Loading
+        searchTapStatus.value = SearchTapStatus.Result
+        runCatching { chatRoomRepository.simpleSearchChatRooms(keyword, chatSearchFilter.value) }
+            .onSuccess { searchChatRoomsSuccessCallBack(it, keyword) }
+            .onFailure { failHandler(it) }
     }
 
-    //상세페이지 이동시 호출
-    private suspend fun detailSearchChatRoom(keyword: String) {
-//        runCatching { bookRepository.searchChatRoom(keyword) }
+    private fun searchChatRoomsSuccessCallBack(
+        respond: ResponseGetSearchChatRoomList,
+        keyword: String
+    ) {
+        simpleChatRoomSearchResult.value = respond.chatRoomList
+        previousSearchKeyword = keyword
+        if (simpleChatRoomSearchResult.value.isEmpty()) {
+            chatResultState.value = SearchState.EmptyResult
+            return
+        }
+        chatResultState.value = SearchState.HaveResult
     }
 
     fun clickBookDetailBtn() = viewModelScope.launch {
@@ -174,14 +191,14 @@ class SearchViewModel @AssistedInject constructor(
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(searchPurpose: SearchPurpose) : SearchViewModel
+        fun create(searchPurpose: SearchPurpose): SearchViewModel
     }
 
     companion object {
         fun provideFactory(
             assistedFactory: AssistedFactory,
             searchPurpose: SearchPurpose
-        ) : ViewModelProvider.Factory = object : ViewModelProvider.Factory{
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return assistedFactory.create(searchPurpose) as T
             }

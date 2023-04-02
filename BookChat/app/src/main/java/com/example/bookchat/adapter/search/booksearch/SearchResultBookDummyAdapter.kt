@@ -1,4 +1,4 @@
-package com.example.bookchat.adapter.booksearch
+package com.example.bookchat.adapter.search.booksearch
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

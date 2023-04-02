@@ -1,9 +1,8 @@
 package com.example.bookchat.data
 
 import com.google.gson.annotations.SerializedName
-import java.io.Serializable
 
-data class ChatRoomListItem(
+data class SearchChatRoomListItem(
     @SerializedName("roomId")
     val roomId: Long,
     @SerializedName("roomName")
@@ -16,10 +15,10 @@ data class ChatRoomListItem(
     val defaultRoomImageType: Int,
     @SerializedName("roomImageUri")
     val roomImageUri: String,
+    @SerializedName("tags")
+    val tags: String,
     @SerializedName("lastChatId")
-    val lastChatId :Long,
+    val lastChatId: String,
     @SerializedName("lastActiveTime")
-    val lastActiveTime :String,
-    @SerializedName("lastChatContent")
-    val lastChatContent :String
+    val lastActiveTime: String,
 )
