@@ -18,37 +18,34 @@ class ChatRoomListPagingSource : PagingSource<Int, ChatRoomListItem>() {
 
         val page = params.key ?: 0
 
-        val testData = TestPagingDataSource.getChatRoomListPagingSource()
-        return getLoadResult(testData.chatRoomList, testData.cursorMeta)
+        try {
+            response = App.instance.bookChatApiClient.getUserChatRoomList(
+                postCursorId = page,
+                size = params.loadSize.toString()
+            )
+        } catch (e: Exception) {
+            return LoadResult.Error(e)
+        }
 
-//        try {
-//            response = App.instance.bookChatApiClient.getChatRoomList(
-//                postCursorId = page,
-//                size = params.loadSize.toString()
-//            )
-//        } catch (e: Exception) {
-//            return LoadResult.Error(e)
-//        }
-//
-//        when (response.code()) {
-//            200 -> {
-//                val result = response.body()
-//                result?.let {
-//                    val pagedChatRoom = result.chatRoomList
-//                    val meta = result.cursorMeta
-//                    return getLoadResult(pagedChatRoom, meta)
-//                }
-//                return LoadResult.Error(ResponseBodyEmptyException(response.errorBody()?.string()))
-//            }
-//            else -> return LoadResult.Error(
-//                Exception(
-//                    createExceptionMessage(
-//                        response.code(),
-//                        response.errorBody()?.string()
-//                    )
-//                )
-//            )
-//        }
+        when (response.code()) {
+            200 -> {
+                val result = response.body()
+                result?.let {
+                    val pagedChatRoom = result.chatRoomList
+                    val meta = result.cursorMeta
+                    return getLoadResult(pagedChatRoom, meta)
+                }
+                return LoadResult.Error(ResponseBodyEmptyException(response.errorBody()?.string()))
+            }
+            else -> return LoadResult.Error(
+                Exception(
+                    createExceptionMessage(
+                        response.code(),
+                        response.errorBody()?.string()
+                    )
+                )
+            )
+        }
     }
 
     private fun getLoadResult(

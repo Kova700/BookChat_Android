@@ -174,8 +174,8 @@ interface BookChatApiInterface {
 
     /**------------채팅방 목록------------*/
 
-    @GET("/v1/api/chatrooms")
-    suspend fun getChatRoomList(
+    @GET("/v1/api/users/chatrooms")
+    suspend fun getUserChatRoomList(
         @Query("postCursorId") postCursorId: Int,
         @Query("size") size: String,
     ): Response<ResponseGetChatRoomList>
