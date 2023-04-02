@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,6 +23,8 @@ class MakeChatRoomViewModel @Inject constructor(
     val chatRoomTitle = MutableStateFlow<String>("")
     val chatRoomTag = MutableStateFlow<String>("")
     val selectedBook = MutableStateFlow<Book?>(null)
+    val chatRoomProfileImage = MutableStateFlow(byteArrayOf())
+    val defaultProfileImageType = MutableStateFlow(Random().nextInt(7) + 1)
 
     fun clickDeleteTextBtn() {
         chatRoomTitle.value = ""
@@ -35,8 +38,12 @@ class MakeChatRoomViewModel @Inject constructor(
         startEvent(MakeChatRoomUiEvent.MoveSelectBook)
     }
 
-    fun clickDeletSelectBookBtn(){
+    fun clickDeleteSelectBookBtn(){
         selectedBook.value = null
+    }
+
+    fun clickImgEditBtn(){
+        startEvent(MakeChatRoomUiEvent.OpenGallery)
     }
 
     private fun startEvent(event: MakeChatRoomUiEvent) = viewModelScope.launch {
@@ -46,5 +53,6 @@ class MakeChatRoomViewModel @Inject constructor(
     sealed class MakeChatRoomUiEvent {
         object MoveToBack : MakeChatRoomUiEvent()
         object MoveSelectBook : MakeChatRoomUiEvent()
+        object OpenGallery : MakeChatRoomUiEvent()
     }
 }

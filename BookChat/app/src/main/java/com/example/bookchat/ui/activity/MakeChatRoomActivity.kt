@@ -2,6 +2,7 @@ package com.example.bookchat.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ActivityMakeChatRoomBinding
+import com.example.bookchat.utils.PermissionManager
 import com.example.bookchat.viewmodel.MakeChatRoomViewModel
 import com.example.bookchat.viewmodel.MakeChatRoomViewModel.MakeChatRoomUiEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,18 +20,39 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MakeChatRoomActivity : AppCompatActivity() {
 
+    private lateinit var permissionsLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var binding: ActivityMakeChatRoomBinding
     private val makeChatRoomViewModel: MakeChatRoomViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_make_chat_room)
+        permissionsLauncher = PermissionManager.getPermissionsLauncher(this) { openCropActivity() }
         with(binding) {
             viewmodel = makeChatRoomViewModel
             lifecycleOwner = this@MakeChatRoomActivity
         }
         observeUiEvent()
     }
+
+    private fun startImgEdit() {
+        permissionsLauncher.launch(PermissionManager.getGalleryPermissions())
+    }
+
+    private fun openCropActivity() {
+        val intent = Intent(this, ImageCropActivity::class.java)
+        cropActivityResultLauncher.launch(intent)
+    }
+
+    private val cropActivityResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val intent = result.data
+                val bitmapByteArray =
+                    intent?.getByteArrayExtra(ImageCropActivity.EXTRA_CROPPED_PROFILE_BYTE_ARRAY) ?: byteArrayOf()
+                makeChatRoomViewModel.chatRoomProfileImage.value = bitmapByteArray
+            }
+        }
 
     private fun moveToSelectBook() {
         val intent = Intent(this, MakeChatRoomSelectBookActivity::class.java)
@@ -52,5 +75,6 @@ class MakeChatRoomActivity : AppCompatActivity() {
     private fun handleEvent(event: MakeChatRoomUiEvent) = when (event) {
         MakeChatRoomUiEvent.MoveToBack -> finish()
         MakeChatRoomUiEvent.MoveSelectBook -> moveToSelectBook()
+        MakeChatRoomUiEvent.OpenGallery -> startImgEdit()
     }
 }

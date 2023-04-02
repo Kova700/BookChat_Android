@@ -84,7 +84,8 @@
                 android:layout_height="@dimen/make_chat_room_img_height_default"
                 android:scaleType="fitXY"
                 setMakeChatRoomImgSize="@{true}"
-                setRandomChatRoomImg="@{true}"
+                defaultImgNum="@{viewmodel.defaultProfileImageType}"
+                imgByteArray="@{viewmodel.chatRoomProfileImage}"
                 android:src="@drawable/default_chat_room_img1" />
         </androidx.cardview.widget.CardView>
 
@@ -96,6 +97,7 @@
             android:background="@drawable/getpicture_btn_back"
             android:baselineAlignBottom="true"
             android:elevation="3dp"
+            android:onClick="@{() -> viewmodel.clickImgEditBtn()}"
             app:layout_constraintBottom_toBottomOf="@+id/chat_room_img_card_view"
             app:layout_constraintEnd_toEndOf="@+id/chat_room_img_card_view"
             app:layout_constraintStart_toEndOf="@+id/chat_room_img_card_view"
@@ -331,7 +333,7 @@
             android:layout_marginTop="-5dp"
             android:visibility="@{viewmodel.selectedBook != null ? View.VISIBLE : View.INVISIBLE}"
             android:background="?android:selectableItemBackgroundBorderless"
-            android:onClick="@{() -> viewmodel.clickDeletSelectBookBtn()}"
+            android:onClick="@{() -> viewmodel.clickDeleteSelectBookBtn()}"
             android:elevation="5dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_text_delete_btn"

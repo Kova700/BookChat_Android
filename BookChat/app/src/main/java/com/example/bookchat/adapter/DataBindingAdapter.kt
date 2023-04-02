@@ -412,8 +412,8 @@ object DataBindingAdapter {
 
     @JvmStatic
     @BindingAdapter("setRandomChatRoomImg")
-    fun setRandomChatRoomImg(view :ImageView, bool :Boolean){
-        when(Random().nextInt(7) + 1){
+    fun setRandomChatRoomImg(view :ImageView, defaultImgNum :Int){
+        when(defaultImgNum){
             1 -> view.setImageResource(R.drawable.default_chat_room_img1)
             2 -> view.setImageResource(R.drawable.default_chat_room_img2)
             3 -> view.setImageResource(R.drawable.default_chat_room_img3)
@@ -423,6 +423,20 @@ object DataBindingAdapter {
             7 -> view.setImageResource(R.drawable.default_chat_room_img7)
         }
     }
+
+    @JvmStatic
+    @BindingAdapter("defaultImgNum", "imgByteArray", requireAll = false)
+    fun setMakeChatRoomImg(
+        view :ImageView,
+        defaultImgNum :Int,
+        imgByteArray: ByteArray?){
+        if (imgByteArray == null){
+            setRandomChatRoomImg(view, defaultImgNum)
+            return
+        }
+        loadByteArray(view, imgByteArray)
+    }
+
     @JvmStatic
     @BindingAdapter("setMakeChatRoomImgSize")
     fun setMakeChatRoomImgSize(view :ImageView, bool :Boolean){
