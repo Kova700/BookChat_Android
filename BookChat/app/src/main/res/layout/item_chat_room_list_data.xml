@@ -43,8 +43,9 @@
                 android:id="@+id/bookImg"
                 android:layout_width="75dp"
                 android:layout_height="75dp"
-                loadUrl="@{userChatRoomListItem.roomImageUri}"
-                android:background="#D9D9D9"
+                android:src="@drawable/default_chat_room_img1"
+                defaultImgNum="@{userChatRoomListItem.defaultRoomImageType}"
+                imgUrl="@{userChatRoomListItem.roomImageUri}"
                 android:scaleType="fitXY" />
         </androidx.cardview.widget.CardView>
 

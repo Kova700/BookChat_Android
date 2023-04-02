@@ -14,7 +14,7 @@ data class UserChatRoomListItem(
     @SerializedName("defaultRoomImageType")
     val defaultRoomImageType: Int,
     @SerializedName("roomImageUri")
-    val roomImageUri: String,
+    val roomImageUri: String?,
     @SerializedName("lastChatId")
     val lastChatId :Long,
     @SerializedName("lastActiveTime")

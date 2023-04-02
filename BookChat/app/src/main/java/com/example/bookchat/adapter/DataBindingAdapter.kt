@@ -390,11 +390,27 @@ object DataBindingAdapter {
         view.visibility = View.INVISIBLE
     }
 
+    /**UserChatRoomList 시간 Text 세팅*/
     @JvmStatic
     @BindingAdapter("getFormattingTimeText")
     fun getFormattingTimeText(view: TextView, inputedDateAndTimeString: String) {
         view.text = getFormattingText(inputedDateAndTimeString)
     }
+
+    @JvmStatic
+    @BindingAdapter("defaultImgNum", "imgUrl", requireAll = false)
+    fun setCharListItemImg(
+        view :ImageView,
+        defaultImgNum :Int,
+        imgUrl:String?
+    ){
+        if (imgUrl.isNullOrBlank()){
+            setRandomChatRoomImg(view, defaultImgNum)
+            return
+        }
+        loadUrl(view, imgUrl)
+    }
+
     @JvmStatic
     @BindingAdapter("setBookImgSize")
     fun setBookImgSize(view :View, bool :Boolean){
