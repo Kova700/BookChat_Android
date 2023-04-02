@@ -8,7 +8,7 @@
             type="com.example.bookchat.data.UserChatRoomListItem" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:foreground="?android:attr/selectableItemBackground"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
         android:clickable="true"
         android:focusable="true"
         android:layout_width="match_parent"

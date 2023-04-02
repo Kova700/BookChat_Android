@@ -399,7 +399,7 @@ object DataBindingAdapter {
 
     @JvmStatic
     @BindingAdapter("defaultImgNum", "imgUrl", requireAll = false)
-    fun setCharListItemImg(
+    fun setChatListItemImg(
         view :ImageView,
         defaultImgNum :Int,
         imgUrl:String?

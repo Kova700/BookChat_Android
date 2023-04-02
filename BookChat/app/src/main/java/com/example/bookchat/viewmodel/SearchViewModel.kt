@@ -14,6 +14,7 @@ import com.example.bookchat.data.SearchChatRoomListItem
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseGetBookSearch
 import com.example.bookchat.data.response.ResponseGetSearchChatRoomList
+import com.example.bookchat.paging.TestPagingDataSource
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.repository.ChatRoomRepository
 import com.example.bookchat.utils.ChatSearchFilter
@@ -115,7 +116,8 @@ class SearchViewModel @AssistedInject constructor(
         respond: ResponseGetSearchChatRoomList,
         keyword: String
     ) {
-        simpleChatRoomSearchResult.value = respond.chatRoomList
+        simpleChatRoomSearchResult.value = TestPagingDataSource.getSearchChatRoomData().chatRoomList
+//        simpleChatRoomSearchResult.value = respond.chatRoomList
         previousSearchKeyword = keyword
         if (simpleChatRoomSearchResult.value.isEmpty()) {
             chatResultState.value = SearchState.EmptyResult

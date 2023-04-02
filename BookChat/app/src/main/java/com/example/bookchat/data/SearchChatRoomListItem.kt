@@ -14,7 +14,7 @@ data class SearchChatRoomListItem(
     @SerializedName("defaultRoomImageType")
     val defaultRoomImageType: Int,
     @SerializedName("roomImageUri")
-    val roomImageUri: String,
+    val roomImageUri: String?,
     @SerializedName("tags")
     val tags: String,
     @SerializedName("lastChatId")

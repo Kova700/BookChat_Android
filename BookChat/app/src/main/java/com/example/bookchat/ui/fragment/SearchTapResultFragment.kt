@@ -50,6 +50,7 @@ class SearchTapResultFragment : Fragment() {
         initAdapter()
         initRcv()
         observeSimpleBookSearchResult()
+        observeSimpleChatRoomResult()
         return binding.root
     }
 
@@ -123,7 +124,7 @@ class SearchTapResultFragment : Fragment() {
         }
     }
 
-    private fun observeSimpleBookSearchResult() = lifecycleScope.launch(){
+    private fun observeSimpleBookSearchResult() = lifecycleScope.launch{
         searchViewModel.simpleBookSearchResult.collectLatest{ books ->
             searchResultBookSimpleDataAdapter.books = books
             searchResultBookSimpleDataAdapter.notifyDataSetChanged()
@@ -135,6 +136,13 @@ class SearchTapResultFragment : Fragment() {
         searchResultBookDummyAdapter.dummyItemCount =
             BookImgSizeManager.getFlexBoxDummyItemCount(searchResultBookSimpleDataAdapter.itemCount.toLong())
         searchResultBookDummyAdapter.notifyDataSetChanged()
+    }
+
+    private fun observeSimpleChatRoomResult() = lifecycleScope.launch{
+        searchViewModel.simpleChatRoomSearchResult.collectLatest { chatRooms ->
+            searchChatRoomSimpleAdapter.chatRooms = chatRooms
+            searchChatRoomSimpleAdapter.notifyDataSetChanged()
+        }
     }
 
     companion object {
