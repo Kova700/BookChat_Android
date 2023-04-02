@@ -56,7 +56,7 @@ class AgonyEditActivity : AppCompatActivity() {
     private fun openKeyboard(view : View) {
         Handler(Looper.getMainLooper()).postDelayed({
             imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
-        }, SignUpActivity.DELAY_TIME)
+        }, SignUpActivity.KEYBOARD_DELAY_TIME)
     }
 
     private fun getAgony() = intent.getSerializableExtra(EXTRA_AGONY) as Agony

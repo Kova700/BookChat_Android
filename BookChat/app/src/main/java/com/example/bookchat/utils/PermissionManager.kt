@@ -3,7 +3,6 @@ package com.example.bookchat.utils
 import android.Manifest.permission
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -13,12 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.bookchat.R
 
 object PermissionManager {
-
-    fun haveGalleryPermission(activity: AppCompatActivity): Boolean {
-        if (sdkVersionIsMoreTIRAMISU()) return activity.isGrantedPermission(permission.READ_MEDIA_IMAGES)
-        return (activity.isGrantedPermission(permission.READ_EXTERNAL_STORAGE) ||
-                activity.isGrantedPermission(permission.WRITE_EXTERNAL_STORAGE))
-    }
 
     fun getGalleryPermissions(): Array<String> {
         if (sdkVersionIsMoreTIRAMISU()) {
@@ -30,13 +23,18 @@ object PermissionManager {
         )
     }
 
-    fun getPermissionsLauncher(activity: AppCompatActivity) = activity.registerForActivityResult(
+    fun getPermissionsLauncher(
+        activity: AppCompatActivity,
+        successCallBack: () -> Unit
+    ) = activity.registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result: Map<String, Boolean> ->
         val deniedPermissionList = result.filter { !it.value }.map { it.key }
         if (deniedPermissionList.isNotEmpty()) {
             deniedPermissionHandler(activity, deniedPermissionList)
+            return@registerForActivityResult
         }
+        successCallBack()
     }
 
     private fun deniedPermissionHandler(
@@ -61,11 +59,8 @@ object PermissionManager {
         }
     }
 
-    private fun Activity.makeToast(stringId :Int) =
+    private fun Activity.makeToast(stringId: Int) =
         Toast.makeText(this, stringId, Toast.LENGTH_LONG).show()
-
-    private fun AppCompatActivity.isGrantedPermission(permission: String) =
-        this.checkSelfPermission(permission) == PERMISSION_GRANTED
 
     private fun sdkVersionIsMoreTIRAMISU(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
