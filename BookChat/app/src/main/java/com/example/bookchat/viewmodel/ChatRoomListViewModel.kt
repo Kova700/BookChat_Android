@@ -4,19 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.paging.ChatRoomListPagingSource
-import com.example.bookchat.repository.ChatRoomListRepository
+import com.example.bookchat.repository.ChatRoomRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatRoomListViewModel @Inject constructor(
-    private val chatRoomListRepository: ChatRoomListRepository
+    private val chatRoomRepository: ChatRoomRepository
 ) : ViewModel(){
 
     private val _eventFlow = MutableSharedFlow<ChatRoomListUiEvent>()

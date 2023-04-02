@@ -180,9 +180,10 @@ interface BookChatApiInterface {
         @Query("size") size: String,
     ): Response<ResponseGetChatRoomList>
 
+    @Multipart
     @POST("/v1/api/chatrooms")
     suspend fun makeChatRoom(
-        @Part chatRoomImage: MultipartBody.Part? = null,
-        @Part("createChatRoomRequest") requestMakeChatRoom: RequestMakeChatRoom
+        @Part("createChatRoomRequest") requestMakeChatRoom: RequestMakeChatRoom,
+        @Part chatRoomImage: MultipartBody.Part? = null
     ): Response<Unit>
 }

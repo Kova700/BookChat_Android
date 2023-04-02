@@ -410,8 +410,8 @@ object DataBindingAdapter {
         view.layoutParams.width = DialogSizeManager.dialogWidthPx
     }
 
+    /** MakeChatRoom */
     @JvmStatic
-    @BindingAdapter("setRandomChatRoomImg")
     fun setRandomChatRoomImg(view :ImageView, defaultImgNum :Int){
         when(defaultImgNum){
             1 -> view.setImageResource(R.drawable.default_chat_room_img1)
@@ -429,8 +429,8 @@ object DataBindingAdapter {
     fun setMakeChatRoomImg(
         view :ImageView,
         defaultImgNum :Int,
-        imgByteArray: ByteArray?){
-        if (imgByteArray == null){
+        imgByteArray: ByteArray){
+        if (imgByteArray.isEmpty()){
             setRandomChatRoomImg(view, defaultImgNum)
             return
         }
@@ -445,5 +445,18 @@ object DataBindingAdapter {
             layoutParams.width = sizeManager.chatRoomImgWidthPx
             layoutParams.height = sizeManager.chatRoomImgHeightPx
         }
+    }
+
+    /**독서취향 : 제출 버튼 색상 설정*/
+    @JvmStatic
+    @BindingAdapter("setSubmitTextColor")
+    fun setSubmitTextColor(textView : TextView, flag :Boolean){
+        if (flag) {
+            textView.setTextColor(Color.parseColor("#000000"))
+            textView.isClickable = true
+            return
+        }
+        textView.setTextColor(Color.parseColor("#B5B7BB"))
+        textView.isClickable = false
     }
 }

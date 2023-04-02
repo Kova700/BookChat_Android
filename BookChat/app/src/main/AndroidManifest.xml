@@ -68,13 +68,17 @@
         android:theme="@style/Theme.BookChat"
         tools:targetApi="n">
         <activity
+            android:name=".ui.activity.ChatRoomActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.activity.MakeChatRoomSelectBookActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.MakeChatRoomActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.WishActivity"
             android:exported="false"

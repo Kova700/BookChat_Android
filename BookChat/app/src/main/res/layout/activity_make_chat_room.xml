@@ -62,6 +62,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/finish"
+            android:textColor="#B5B7BB"
+            android:padding="4dp"
+            android:textSize="14sp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:onClick="@{() -> viewmodel.requestMakeChatRoom()}"
+            setSubmitTextColor="@{viewmodel.isPossibleMakeChatRoom(viewmodel.chatRoomTitle, viewmodel.chatRoomTag, viewmodel.selectedBook)}"
             app:layout_constraintBottom_toBottomOf="@+id/textView30"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintTop_toTopOf="@+id/textView30" />
