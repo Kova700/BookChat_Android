@@ -11,6 +11,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityMainBinding
 import com.example.bookchat.ui.fragment.*
 import com.example.bookchat.utils.RefreshManager
+import com.example.bookchat.utils.SearchPurpose
 import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.COMPLETE_TAB_INDEX
 import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.READING_TAB_INDEX
 import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.WISH_TAB_INDEX
@@ -23,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val homeFragment by lazy { HomeFragment() }
     private val bookShelfFragment by lazy { BookShelfFragment() }
-    private val searchFragment by lazy { SearchFragment() }
+    private val searchFragment by lazy { SearchFragment(SearchPurpose.Search) }
     private val chatRoomListFragment by lazy { ChatRoomListFragment() }
     private val myPageFragment by lazy { MyPageFragment() }
 

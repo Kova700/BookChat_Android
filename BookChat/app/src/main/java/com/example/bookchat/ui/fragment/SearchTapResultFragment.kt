@@ -14,8 +14,10 @@ import com.example.bookchat.adapter.booksearch.SearchResultBookDummyAdapter
 import com.example.bookchat.adapter.booksearch.SearchResultBookSimpleDataAdapter
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.FragmentSearchTapResultBinding
+import com.example.bookchat.ui.dialog.MakeChatRoomSelectBookDialog
 import com.example.bookchat.ui.dialog.SearchTapBookDialog
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.SearchPurpose
 import com.example.bookchat.viewmodel.SearchViewModel
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
@@ -96,8 +98,17 @@ class SearchTapResultFragment : Fragment() {
     private fun initSearchResultBookAdapter() {
         val bookItemClickListener = object : SearchResultBookSimpleDataAdapter.OnItemClickListener {
             override fun onItemClick(book: Book) {
-                val dialog = SearchTapBookDialog(book)
-                dialog.show(childFragmentManager, DIALOG_TAG_SEARCH_BOOK)
+                when(searchViewModel.searchPurpose){
+                    is SearchPurpose.Search -> {
+                        val dialog = SearchTapBookDialog(book)
+                        dialog.show(childFragmentManager, DIALOG_TAG_SEARCH_BOOK)
+                    }
+                    is SearchPurpose.MakeChatRoom -> {
+                        val dialog = MakeChatRoomSelectBookDialog(book)
+                        dialog.show(childFragmentManager, DIALOG_TAG_SELECT_BOOK)
+                    }
+                }
+
             }
         }
         searchResultBookSimpleDataAdapter = SearchResultBookSimpleDataAdapter()
@@ -119,5 +130,6 @@ class SearchTapResultFragment : Fragment() {
 
     companion object {
         private const val DIALOG_TAG_SEARCH_BOOK = "SearchTapBookDialog"
+        private const val DIALOG_TAG_SELECT_BOOK = "MakeChatRoomSelectBookDialog"
     }
 }

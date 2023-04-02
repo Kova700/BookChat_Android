@@ -18,16 +18,23 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentSearchBinding
 import com.example.bookchat.ui.activity.SearchTapResultDetailActivity
+import com.example.bookchat.utils.SearchPurpose
 import com.example.bookchat.viewmodel.SearchViewModel
 import com.example.bookchat.viewmodel.SearchViewModel.SearchTapStatus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class SearchFragment : Fragment() {
+class SearchFragment(searchPurpose: SearchPurpose) : Fragment() {
+
+    @Inject
+    lateinit var searchViewModelFactory: SearchViewModel.AssistedFactory
 
     private lateinit var binding: FragmentSearchBinding
-    private val searchViewModel: SearchViewModel by viewModels()
+    private val searchViewModel: SearchViewModel by viewModels{
+        SearchViewModel.provideFactory(searchViewModelFactory, searchPurpose)
+    }
     private val imm by lazy { requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
     private val defaultTapFragment by lazy { SearchTapDefaultFragment() }

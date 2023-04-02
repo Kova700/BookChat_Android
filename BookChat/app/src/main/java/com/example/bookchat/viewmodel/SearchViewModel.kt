@@ -5,6 +5,7 @@ import android.text.TextWatcher
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.R
@@ -13,15 +14,18 @@ import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseGetBookSearch
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.DataStoreManager
+import com.example.bookchat.utils.SearchPurpose
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel
-class SearchViewModel @Inject constructor(
-    private var bookRepository: BookRepository
+class SearchViewModel @AssistedInject constructor(
+    private val bookRepository: BookRepository,
+    @Assisted val searchPurpose: SearchPurpose
 ) : ViewModel() {
 
     val searchTapStatus = MutableStateFlow<SearchTapStatus>(SearchTapStatus.Default)
@@ -165,6 +169,22 @@ class SearchViewModel @Inject constructor(
                 makeToast(R.string.error_network)
             else -> makeToast(R.string.error_else)
 
+        }
+    }
+
+    @dagger.assisted.AssistedFactory
+    interface AssistedFactory {
+        fun create(searchPurpose: SearchPurpose) : SearchViewModel
+    }
+
+    companion object {
+        fun provideFactory(
+            assistedFactory: AssistedFactory,
+            searchPurpose: SearchPurpose
+        ) : ViewModelProvider.Factory = object : ViewModelProvider.Factory{
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return assistedFactory.create(searchPurpose) as T
+            }
         }
     }
 }
