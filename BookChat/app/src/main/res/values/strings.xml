@@ -46,8 +46,8 @@
 
     <!--main-->
     <string name="main_hello">안녕하세요</string>
-    <string name="today_book">오늘의 북</string>
-    <string name="today_chat">오늘의 챗</string>
+    <string name="main_book">독서 중인 도서</string>
+    <string name="main_chat">참여 중인 채팅방</string>
 
     <!--bookshelf-->
     <string name="bookshelf">서재</string>
