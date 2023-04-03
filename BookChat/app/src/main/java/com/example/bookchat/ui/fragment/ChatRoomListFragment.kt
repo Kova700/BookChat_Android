@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
 import com.example.bookchat.adapter.userchatroomlist.UserChatRoomListDataAdapter
 import com.example.bookchat.adapter.userchatroomlist.UserChatRoomListHeaderAdapter
+import com.example.bookchat.data.UserChatRoomListItem
 import com.example.bookchat.databinding.FragmentChatRoomListBinding
 import com.example.bookchat.ui.activity.MakeChatRoomActivity
 import com.example.bookchat.viewmodel.ChatRoomListViewModel
@@ -58,9 +59,15 @@ class ChatRoomListFragment : Fragment() {
     }
 
     private fun initAdapter() {
+        //롱클릭 리스너도 설정해줘야함
+        val chatRoomItemClickListener = object : UserChatRoomListDataAdapter.OnItemClickListener {
+            override fun onItemClick(userChatRoomListItem: UserChatRoomListItem) {
+                //채팅 누르면 채팅방 들어가고,
+            }
+        }
         userChatRoomListHeaderAdapter = UserChatRoomListHeaderAdapter()
         userChatRoomListDataAdapter = UserChatRoomListDataAdapter()
-        //클릭, 롱클릭 리스너 설정해줘야함
+        userChatRoomListDataAdapter.setItemClickListener(chatRoomItemClickListener)
     }
 
     private fun initRecyclerView() {

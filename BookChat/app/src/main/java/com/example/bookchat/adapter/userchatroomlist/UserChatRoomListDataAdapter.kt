@@ -7,6 +7,8 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
+import com.example.bookchat.adapter.readingbookshelf.ReadingBookShelfDataAdapter
+import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.data.UserChatRoomListItem
 import com.example.bookchat.databinding.ItemChatRoomListDataBinding
 
@@ -14,11 +16,15 @@ class UserChatRoomListDataAdapter :
     PagingDataAdapter<UserChatRoomListItem, UserChatRoomListDataAdapter.ChatRoomItemViewHolder>(CHAT_ROOM_LIST_ITEM_COMPARATOR) {
 
     private lateinit var bindingDataItem: ItemChatRoomListDataBinding
+    private lateinit var itemClickListener : OnItemClickListener
 
     inner class ChatRoomItemViewHolder(val binding: ItemChatRoomListDataBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(userChatRoomListItem: UserChatRoomListItem) {
             binding.userChatRoomListItem = userChatRoomListItem
+            binding.root.setOnClickListener {
+                itemClickListener.onItemClick(userChatRoomListItem)
+            }
         }
     }
 
@@ -32,6 +38,14 @@ class UserChatRoomListDataAdapter :
     override fun onBindViewHolder(holder: ChatRoomItemViewHolder, position: Int) {
         val currentItem = getItem(position)
         currentItem?.let { holder.bind(currentItem) }
+    }
+
+    interface OnItemClickListener {
+        fun onItemClick(userChatRoomListItem : UserChatRoomListItem)
+    }
+
+    fun setItemClickListener(onItemClickListener: OnItemClickListener) {
+        this.itemClickListener = onItemClickListener
     }
 
     override fun getItemViewType(position: Int): Int = R.layout.item_chat_room_list_data
