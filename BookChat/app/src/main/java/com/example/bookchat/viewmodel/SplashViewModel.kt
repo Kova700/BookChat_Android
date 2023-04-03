@@ -20,7 +20,7 @@ class SplashViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            runCatching { DataStoreManager.getBookchatToken() }
+            runCatching { DataStoreManager.getBookChatToken() }
                 .onSuccess { requestUserInfo() }
                 .onFailure { startEvent(SplashEvent.MoveToLogin) }
         }
