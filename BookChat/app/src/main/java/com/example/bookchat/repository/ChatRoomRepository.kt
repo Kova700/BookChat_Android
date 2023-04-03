@@ -46,7 +46,7 @@ class ChatRoomRepository @Inject constructor() {
         val requestSearchChatRoom = getSimpleSearchChatRoomsRequest(keyword, chatSearchFilter)
 
         val response = App.instance.bookChatApiClient.searchChatRoom(
-            postCursorId = 0,
+            postCursorId = null,
             size = SIMPLE_SEARCH_CHAT_ROOMS_LOAD_SIZE.toString(),
             roomName = requestSearchChatRoom.roomName,
             title = requestSearchChatRoom.title,
