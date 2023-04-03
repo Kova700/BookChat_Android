@@ -18,7 +18,7 @@ data class SearchChatRoomListItem(
     @SerializedName("tags")
     val tags: String,
     @SerializedName("lastChatId")
-    val lastChatId: String,
+    val lastChatId: String?,
     @SerializedName("lastActiveTime")
-    val lastActiveTime: String,
+    val lastActiveTime: String?,
 )

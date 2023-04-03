@@ -393,8 +393,9 @@ object DataBindingAdapter {
     /**UserChatRoomList 시간 Text 세팅*/
     @JvmStatic
     @BindingAdapter("getFormattingTimeText")
-    fun getFormattingTimeText(view: TextView, inputedDateAndTimeString: String) {
-        view.text = getFormattingText(inputedDateAndTimeString)
+    fun getFormattingTimeText(view: TextView, dateAndTimeString: String?) {
+        if (dateAndTimeString == null) return
+        view.text = getFormattingText(dateAndTimeString)
     }
 
     @JvmStatic

@@ -176,7 +176,7 @@ interface BookChatApiInterface {
 
     @GET("/v1/api/users/chatrooms")
     suspend fun getUserChatRoomList(
-        @Query("postCursorId") postCursorId: Int,
+        @Query("postCursorId") postCursorId: Int?,
         @Query("size") size: String,
     ): Response<ResponseGetUserChatRoomList>
 
@@ -189,12 +189,11 @@ interface BookChatApiInterface {
 
     @GET("/v1/api/chatrooms")
     suspend fun searchChatRoom(
-        @Query("postCursorId") postCursorId: Int,
+        @Query("postCursorId") postCursorId: Int?,
         @Query("size") size: String,
-        @Query("roomName") roomName: String? = null,
-        @Query("title") title: String? = null,
-        @Query("isbn") isbn: String? = null,
-        @Query("tags") tags: String? = null,
+        @Query("roomName") roomName: String?,
+        @Query("title") title: String?,
+        @Query("isbn") isbn: String?,
+        @Query("tags") tags: String?,
     ): Response<ResponseGetSearchChatRoomList>
-
 }
