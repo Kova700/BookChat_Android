@@ -17,6 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:elegantTextHeight="true"
+            android:layout_marginStart="@dimen/default_margin"
             android:fontFamily="@font/notosanskr_bold"
             android:text="@string/my_chat_room"
             android:textColor="#000000"

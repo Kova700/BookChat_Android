@@ -16,7 +16,8 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
-            android:layout_marginVertical="8dp"
+            android:layout_marginVertical="10dp"
+            android:layout_marginStart="@dimen/default_margin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -61,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginEnd="25dp"
+            android:layout_marginEnd="@dimen/default_margin"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_bold"
             android:text="999+"
@@ -90,7 +91,7 @@
             android:id="@+id/textView10"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="25dp"
+            android:layout_marginEnd="@dimen/default_margin"
             android:elegantTextHeight="true"
             android:ellipsize="end"
             android:fontFamily="@font/notosanskr_regular"
@@ -106,7 +107,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="25dp"
+            android:layout_marginEnd="@dimen/default_margin"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"
             android:text="@{String.valueOf(userChatRoomListItem.roomMemberCount) + @string/people_count_text}"
