@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.data.SearchChatRoomListItem
 import com.example.bookchat.databinding.ItemChatRoomSearchBinding
+import kotlin.math.min
 
 class SearchChatRoomSimpleAdapter :
     RecyclerView.Adapter<SearchChatRoomSimpleAdapter.SearchChatRoomItemViewHolder>() {
@@ -40,7 +41,7 @@ class SearchChatRoomSimpleAdapter :
     }
 
     override fun getItemCount(): Int {
-        return SHOW_SIZE
+        return minOf(chatRooms.size, SHOW_SIZE)
     }
 
     override fun getItemViewType(position: Int): Int = R.layout.item_chat_room_search
