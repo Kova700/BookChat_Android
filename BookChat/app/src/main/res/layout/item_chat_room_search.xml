@@ -34,9 +34,9 @@
                 android:layout_height="75dp"
                 android:background="#D9D9D9"
                 android:scaleType="fitXY"
+                android:src="@drawable/loading_img"
                 defaultImgNum="@{searchChatRoomListItem.defaultRoomImageType}"
-                imgUrl="@{searchChatRoomListItem.roomImageUri}"
-                android:src="@drawable/default_chat_room_img1" />
+                imgUrl="@{searchChatRoomListItem.roomImageUri}" />
         </androidx.cardview.widget.CardView>
 
         <TextView
@@ -46,7 +46,7 @@
             android:elegantTextHeight="true"
             android:layout_marginStart="@dimen/default_margin"
             android:layout_marginTop="5dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="@dimen/default_margin"
             android:fontFamily="@font/notosanskr_bold"
             android:textColor="#222222"
             android:textSize="14sp"
@@ -62,7 +62,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/default_margin"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="@dimen/default_margin"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"
             android:maxLines="1"
@@ -107,10 +107,11 @@
             android:id="@+id/textView43"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/default_margin"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"
             android:maxLines="1"
-            android:text="@{searchChatRoomListItem.lastActiveTime}"
+            getFormattedAbstractDateTimeText="@{searchChatRoomListItem.lastActiveTime}"
             android:textColor="#373737"
             android:textSize="10sp"
             app:layout_constrainedWidth="true"

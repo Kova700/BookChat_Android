@@ -13,7 +13,6 @@ import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.*
 import com.example.bookchat.utils.*
-import com.example.bookchat.utils.DateManager.getFormattingText
 import com.example.bookchat.viewmodel.AgonyViewModel.AgonyActivityState
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportStatus
 import java.util.*
@@ -392,12 +391,21 @@ object DataBindingAdapter {
 
     /**UserChatRoomList 시간 Text 세팅*/
     @JvmStatic
-    @BindingAdapter("getFormattingTimeText")
-    fun getFormattingTimeText(view: TextView, dateAndTimeString: String?) {
+    @BindingAdapter("getFormattedDetailDateTimeText")
+    fun getFormattedDetailDateTimeText(view: TextView, dateAndTimeString: String?) {
         if (dateAndTimeString == null) return
-        view.text = getFormattingText(dateAndTimeString)
+        view.text = DateManager.getFormattedDetailDateTimeText(dateAndTimeString)
     }
 
+    /**SearchChatRoom 시간 Text 세팅*/
+    @JvmStatic
+    @BindingAdapter("getFormattedAbstractDateTimeText")
+    fun getFormattedAbstractDateTimeText(view: TextView, dateAndTimeString: String?) {
+        if (dateAndTimeString == null) return
+        view.text = DateManager.getFormattedAbstractDateTimeText(dateAndTimeString)
+    }
+
+    /**UserChatRoomList 채팅방 이미지 세팅*/
     @JvmStatic
     @BindingAdapter("defaultImgNum", "imgUrl", requireAll = false)
     fun setChatListItemImg(
@@ -412,6 +420,7 @@ object DataBindingAdapter {
         loadUrl(view, imgUrl)
     }
 
+    /**화면 크기에 맞는 도서 이미지 크기 세팅*/
     @JvmStatic
     @BindingAdapter("setBookImgSize")
     fun setBookImgSize(view :View, bool :Boolean){
@@ -421,26 +430,14 @@ object DataBindingAdapter {
         }
     }
 
+    /**화면 크기에 맞는 Dialog 크기 세팅*/
     @JvmStatic
     @BindingAdapter("setDialogSize")
     fun setDialogSize(view :View, bool :Boolean){
         view.layoutParams.width = DialogSizeManager.dialogWidthPx
     }
 
-    /** MakeChatRoom */
-    @JvmStatic
-    fun setRandomChatRoomImg(view :ImageView, defaultImgNum :Int){
-        when(defaultImgNum){
-            1 -> view.setImageResource(R.drawable.default_chat_room_img1)
-            2 -> view.setImageResource(R.drawable.default_chat_room_img2)
-            3 -> view.setImageResource(R.drawable.default_chat_room_img3)
-            4 -> view.setImageResource(R.drawable.default_chat_room_img4)
-            5 -> view.setImageResource(R.drawable.default_chat_room_img5)
-            6 -> view.setImageResource(R.drawable.default_chat_room_img6)
-            7 -> view.setImageResource(R.drawable.default_chat_room_img7)
-        }
-    }
-
+    /** MakeChatRoom 채팅방 생성 기본 이미지 세팅*/
     @JvmStatic
     @BindingAdapter("defaultImgNum", "imgByteArray", requireAll = false)
     fun setMakeChatRoomImg(
@@ -454,6 +451,20 @@ object DataBindingAdapter {
         loadByteArray(view, imgByteArray)
     }
 
+    @JvmStatic
+    fun setRandomChatRoomImg(view :ImageView, defaultImgNum :Int){
+        when(defaultImgNum){
+            1 -> view.setImageResource(R.drawable.default_chat_room_img1)
+            2 -> view.setImageResource(R.drawable.default_chat_room_img2)
+            3 -> view.setImageResource(R.drawable.default_chat_room_img3)
+            4 -> view.setImageResource(R.drawable.default_chat_room_img4)
+            5 -> view.setImageResource(R.drawable.default_chat_room_img5)
+            6 -> view.setImageResource(R.drawable.default_chat_room_img6)
+            7 -> view.setImageResource(R.drawable.default_chat_room_img7)
+        }
+    }
+
+    /** MakeChatRoom 화면 크기에 맞는 채팅방 이미지 크기 세팅*/
     @JvmStatic
     @BindingAdapter("setMakeChatRoomImgSize")
     fun setMakeChatRoomImgSize(view :ImageView, bool :Boolean){
