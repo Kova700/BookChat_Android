@@ -125,6 +125,6 @@ class MakeChatRoomViewModel @Inject constructor(
         private const val CONTENT_TYPE_IMAGE_WEBP = "image/webp"
         private const val IMAGE_FILE_NAME = "profile_img"
         private const val IMAGE_FILE_EXTENSION_WEBP = ".webp"
-        private const val IMAGE_MULTIPART_NAME = "chatRoomProfileImage"
+        private const val IMAGE_MULTIPART_NAME = "chatRoomImage"
     }
 }
