@@ -125,6 +125,7 @@
     <string name="chat_room">채팅방</string>
     <string name="my_chat_room">나의 채팅방</string>
     <string name="make_chat_room">채팅방 만들기</string>
+    <string name="make_chat_room_select">선택하기</string>
     <string name="make_chat_room_title_hint">채팅방 제목을 작성해 주세요.</string>
     <string name="make_chat_room_tag_hint">#해시태그로 채팅방을 소개해 주세요.</string>
     <string name="make_chat_room_book_select">도서 선택</string>
