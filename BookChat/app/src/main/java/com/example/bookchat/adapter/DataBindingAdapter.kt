@@ -389,7 +389,7 @@ object DataBindingAdapter {
         view.visibility = View.INVISIBLE
     }
 
-    /**UserChatRoomList 시간 Text 세팅*/
+    /**UserChatRoomListItem 시간 Text 세팅*/
     @JvmStatic
     @BindingAdapter("getFormattedDetailDateTimeText")
     fun getFormattedDetailDateTimeText(view: TextView, dateAndTimeString: String?) {
@@ -397,15 +397,7 @@ object DataBindingAdapter {
         view.text = DateManager.getFormattedDetailDateTimeText(dateAndTimeString)
     }
 
-    /**SearchChatRoom 시간 Text 세팅*/
-    @JvmStatic
-    @BindingAdapter("getFormattedAbstractDateTimeText")
-    fun getFormattedAbstractDateTimeText(view: TextView, dateAndTimeString: String?) {
-        if (dateAndTimeString == null) return
-        view.text = DateManager.getFormattedAbstractDateTimeText(dateAndTimeString)
-    }
-
-    /**UserChatRoomList 채팅방 이미지 세팅*/
+    /**UserChatRoomListItem 채팅방 이미지 세팅*/
     @JvmStatic
     @BindingAdapter("defaultImgNum", "imgUrl", requireAll = false)
     fun setChatListItemImg(
@@ -418,6 +410,21 @@ object DataBindingAdapter {
             return
         }
         loadUrl(view, imgUrl)
+    }
+
+    /**SearchChatRoomItem 시간 Text 세팅*/
+    @JvmStatic
+    @BindingAdapter("getFormattedAbstractDateTimeText")
+    fun getFormattedAbstractDateTimeText(view: TextView, dateAndTimeString: String?) {
+        if (dateAndTimeString == null) return
+        view.text = DateManager.getFormattedAbstractDateTimeText(dateAndTimeString)
+    }
+
+    /**SearchChatRoomItem 태그 파싱*/
+    @JvmStatic
+    @BindingAdapter("parseHashTagText")
+    fun parseHashTagText(view: TextView, hashTagString: String){
+        view.text = hashTagString.split(",").joinToString("  ") { "#$it" }
     }
 
     /**화면 크기에 맞는 도서 이미지 크기 세팅*/

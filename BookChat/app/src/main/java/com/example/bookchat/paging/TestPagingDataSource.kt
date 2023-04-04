@@ -9,7 +9,7 @@ object TestPagingDataSource {
     fun getSearchChatRoomData() :ResponseGetSearchChatRoomList{
         val testDataList = mutableListOf<SearchChatRoomListItem>()
         val item = SearchChatRoomListItem(1L, "roomName", "roomSid", 51L, 1, "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Ft1.daumcdn.net%2Fcfile%2Ftistory%2F996333405A8280FC23",
-        "#태그 #집에 #좀 #보내줘", "1","2023-02-13T16:03:23.8916109")
+        "태그,집에,좀,보내줘", "1","2023-02-13T16:03:23.8916109")
         val item2 = item.copy(roomId = 2L,lastActiveTime = "2023-02-28T02:55:06", roomImageUri = null, defaultRoomImageType = 1)
         val item3 = item.copy(roomId = 3L,lastActiveTime = "2022-12-03T02:55:06",roomImageUri = null, defaultRoomImageType = 2)
         val item4 = item.copy(roomId = 4L,lastActiveTime = "2023-02-27T02:55:06")

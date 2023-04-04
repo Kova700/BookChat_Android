@@ -40,7 +40,7 @@ class MakeChatRoomViewModel @Inject constructor(
             .onFailure { makeToast(R.string.make_chat_room_fail) }
     }
 
-    private suspend fun makeChatRoom(){
+    private suspend fun makeChatRoom() {
         chatRoomRepository.makeChatRoom(
             getRequestMakeChatRoom(),
             getMultiPartBody(chatRoomProfileImage.value)
@@ -88,9 +88,8 @@ class MakeChatRoomViewModel @Inject constructor(
         )
     }
 
-    private fun getHashTags(): List<String> {
-        return chatRoomTag.value.trim().split(" ")
-    }
+    private fun getHashTags(): List<String> =
+        chatRoomTag.value.replace("#", "").trim().split(" ")
 
     private fun getMultiPartBody(bitmapByteArray: ByteArray): MultipartBody.Part? {
         if (bitmapByteArray.isEmpty()) return null
