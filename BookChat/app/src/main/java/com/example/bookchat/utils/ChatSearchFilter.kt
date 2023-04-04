@@ -1,5 +1,5 @@
 package com.example.bookchat.utils
 
 enum class ChatSearchFilter {
-    ROOMNAME, BOOKTITLE, BOOKISBN, ROOMTAGS
+    BOOK_TITLE, BOOK_ISBN, ROOM_NAME, ROOM_TAGS
 }

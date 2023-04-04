@@ -8,10 +8,10 @@ import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseBodyEmptyException
 import com.example.bookchat.data.response.ResponseGetSearchChatRoomList
 import com.example.bookchat.utils.ChatSearchFilter
-import com.example.bookchat.utils.ChatSearchFilter.BOOKISBN
-import com.example.bookchat.utils.ChatSearchFilter.ROOMTAGS
-import com.example.bookchat.utils.ChatSearchFilter.BOOKTITLE
-import com.example.bookchat.utils.ChatSearchFilter.ROOMNAME
+import com.example.bookchat.utils.ChatSearchFilter.BOOK_ISBN
+import com.example.bookchat.utils.ChatSearchFilter.ROOM_TAGS
+import com.example.bookchat.utils.ChatSearchFilter.BOOK_TITLE
+import com.example.bookchat.utils.ChatSearchFilter.ROOM_NAME
 import com.example.bookchat.utils.Constants.TAG
 import okhttp3.MultipartBody
 import javax.inject.Inject
@@ -74,10 +74,10 @@ class ChatRoomRepository @Inject constructor() {
             size = SIMPLE_SEARCH_CHAT_ROOMS_LOAD_SIZE.toString()
         )
         return when (chatSearchFilter) {
-            ROOMNAME -> requestSearchChatRoom.copy(roomName = keyword)
-            BOOKTITLE -> requestSearchChatRoom.copy(title = keyword)
-            BOOKISBN -> requestSearchChatRoom.copy(isbn = keyword)
-            ROOMTAGS -> requestSearchChatRoom.copy(tags = keyword)
+            ROOM_NAME -> requestSearchChatRoom.copy(roomName = keyword)
+            BOOK_TITLE -> requestSearchChatRoom.copy(title = keyword)
+            BOOK_ISBN -> requestSearchChatRoom.copy(isbn = keyword)
+            ROOM_TAGS -> requestSearchChatRoom.copy(tags = keyword)
         }
 
     }

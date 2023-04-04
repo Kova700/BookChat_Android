@@ -41,7 +41,7 @@ class SearchViewModel @AssistedInject constructor(
 
     val bookResultState = MutableStateFlow<SearchState>(SearchState.Loading)
     val chatResultState = MutableStateFlow<SearchState>(SearchState.Loading)
-    val chatSearchFilter = MutableStateFlow<ChatSearchFilter>(ChatSearchFilter.BOOKTITLE)
+    val chatSearchFilter = MutableStateFlow<ChatSearchFilter>(ChatSearchFilter.BOOK_TITLE)
 
     val editTextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
