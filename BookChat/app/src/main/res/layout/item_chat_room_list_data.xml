@@ -31,14 +31,14 @@
                 android:id="@+id/bookImg"
                 android:layout_width="75dp"
                 android:layout_height="75dp"
-                android:src="@drawable/default_chat_room_img1"
+                android:src="@drawable/loading_img"
                 defaultImgNum="@{userChatRoomListItem.defaultRoomImageType}"
                 imgUrl="@{userChatRoomListItem.roomImageUri}"
                 android:scaleType="fitXY" />
         </androidx.cardview.widget.CardView>
 
         <TextView
-            android:id="@+id/textView8"
+            android:id="@+id/chat_room_title_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -51,34 +51,35 @@
             android:textColor="#222222"
             android:textSize="14sp"
             app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toStartOf="@+id/textView9"
+            app:layout_constraintEnd_toStartOf="@+id/unchecked_chat_count_tv"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toEndOf="@+id/cardView"
             app:layout_constraintTop_toTopOf="@+id/cardView" />
 
         <TextView
-            android:id="@+id/textView9"
+            android:id="@+id/unchecked_chat_count_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginEnd="@dimen/default_margin"
+            android:layout_marginEnd="20dp"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_bold"
             android:text="999+"
             android:textColor="#5648FF"
             android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/textView8"
+            app:layout_constraintBottom_toBottomOf="@+id/chat_room_title_tv"
             app:layout_constraintEnd_toStartOf="@+id/textView11"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/textView8"
-            app:layout_constraintTop_toTopOf="@+id/textView8" />
+            app:layout_constraintStart_toEndOf="@+id/chat_room_title_tv"
+            app:layout_constraintTop_toTopOf="@+id/chat_room_title_tv" />
 
         <TextView
             android:id="@+id/textView11"
             getFormattingTimeText="@{userChatRoomListItem.lastActiveTime}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/default_margin"
             android:layout_marginTop="20dp"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"
@@ -88,10 +89,10 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView10"
+            android:id="@+id/chat_content_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/default_margin"
+            android:layout_marginEnd="20dp"
             android:elegantTextHeight="true"
             android:ellipsize="end"
             android:fontFamily="@font/notosanskr_regular"
@@ -100,23 +101,26 @@
             android:textColor="#373737"
             android:textSize="12sp"
             app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/textView8"
-            app:layout_constraintTop_toBottomOf="@+id/textView8" />
+            app:layout_constraintEnd_toStartOf="@+id/textView11"
+            app:layout_constraintStart_toStartOf="@+id/chat_room_title_tv"
+            app:layout_constraintTop_toBottomOf="@+id/chat_room_title_tv" />
 
         <TextView
+            android:id="@+id/chat_member_count"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/default_margin"
+            android:layout_marginEnd="20dp"
             android:elegantTextHeight="true"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:fontFamily="@font/notosanskr_regular"
             android:text="@{String.valueOf(userChatRoomListItem.roomMemberCount) + @string/people_count_text}"
             android:textColor="#373737"
             android:textSize="10sp"
             app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/textView10"
-            app:layout_constraintTop_toBottomOf="@+id/textView10" />
+            app:layout_constraintEnd_toStartOf="@+id/textView11"
+            app:layout_constraintStart_toStartOf="@+id/chat_content_tv"
+            app:layout_constraintTop_toBottomOf="@+id/chat_content_tv" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
