@@ -11,9 +11,14 @@ import com.example.bookchat.adapter.search.booksearch.SearchResultBookDetailData
 import com.example.bookchat.adapter.search.booksearch.SearchResultBookDummyAdapter
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ActivitySearchTapResultDetailBinding
+import com.example.bookchat.ui.dialog.MakeChatRoomSelectBookDialog
 import com.example.bookchat.ui.dialog.SearchTapBookDialog
 import com.example.bookchat.ui.fragment.SearchFragment
+import com.example.bookchat.ui.fragment.SearchFragment.Companion.EXTRA_SEARCH_PURPOSE
+import com.example.bookchat.ui.fragment.SearchTapResultFragment.Companion.DIALOG_TAG_SEARCH_BOOK
+import com.example.bookchat.ui.fragment.SearchTapResultFragment.Companion.DIALOG_TAG_SELECT_BOOK
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.SearchPurpose
 import com.example.bookchat.viewmodel.SearchDetailViewModel
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
@@ -33,8 +38,9 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchTapResultDetailBinding
     private lateinit var searchResultBookDetailDataAdapter: SearchResultBookDetailDataAdapter
     private lateinit var searchResultBookDummyAdapter: SearchResultBookDummyAdapter
+    private val searchPurpose: SearchPurpose by lazy { getExtraSearchPurpose() }
     private val searchDetailViewModel: SearchDetailViewModel by viewModels {
-        SearchDetailViewModel.provideFactory(searchDetailViewModelFactory, getSearchKeyWord())
+        SearchDetailViewModel.provideFactory(searchDetailViewModelFactory, getExtraSearchKeyWord())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +51,6 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
             activity = this@SearchTapResultDetailActivity
             viewmodel = searchDetailViewModel
         }
-
         initAdapter()
         initRecyclerView()
         observePagingBookData()
@@ -71,11 +76,22 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
     private fun initAdapter() {
         val bookItemClickListener = object : SearchResultBookDetailDataAdapter.OnItemClickListener {
             override fun onItemClick(book: Book) {
-                val dialog = SearchTapBookDialog(book)
-                dialog.show(
-                    this@SearchTapResultDetailActivity.supportFragmentManager,
-                    DIALOG_TAG_SEARCH
-                )
+                when (searchPurpose) {
+                    is SearchPurpose.Search -> {
+                        val dialog = SearchTapBookDialog(book)
+                        dialog.show(
+                            this@SearchTapResultDetailActivity.supportFragmentManager,
+                            DIALOG_TAG_SEARCH_BOOK
+                        )
+                    }
+                    is SearchPurpose.MakeChatRoom -> {
+                        val dialog = MakeChatRoomSelectBookDialog(book)
+                        dialog.show(
+                            this@SearchTapResultDetailActivity.supportFragmentManager,
+                            DIALOG_TAG_SELECT_BOOK
+                        )
+                    }
+                }
             }
         }
         searchResultBookDetailDataAdapter = SearchResultBookDetailDataAdapter()
@@ -104,8 +120,19 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun getSearchKeyWord(): String {
+    private fun getExtraSearchPurpose(): SearchPurpose {
+        return intent.getSerializableExtra(EXTRA_SEARCH_PURPOSE) as? SearchPurpose
+            ?: throw Exception("Search purpose does not exist.")
+    }
+
+    private fun getExtraSearchKeyWord(): String {
         return intent.getStringExtra(SearchFragment.EXTRA_SEARCH_KEYWORD) ?: ""
+    }
+
+    fun returnSelectedBook(book: Book) {
+        intent.putExtra(EXTRA_SELECTED_BOOK, book)
+        setResult(RESULT_OK, intent)
+        finish()
     }
 
     fun clickBackBtn() {
@@ -113,7 +140,6 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val DIALOG_TAG_SEARCH = "SearchTapBookDialog"
+        const val EXTRA_SELECTED_BOOK = "SELECTED_BOOK"
     }
-
 }

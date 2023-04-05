@@ -17,7 +17,6 @@ class MakeChatRoomSelectBookActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMakeChatRoomSelectBookBinding
     private val searchFragment by lazy { SearchFragment(SearchPurpose.MakeChatRoom) }
-    var selectedBook: Book? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,10 +33,10 @@ class MakeChatRoomSelectBookActivity : AppCompatActivity() {
             commitNow()
         }
     }
-    fun finishSelect(){
-        val intent = Intent(this, MakeChatRoomActivity::class.java)
-        intent.putExtra(EXTRA_SELECTED_BOOK, selectedBook)
-        setResult(RESULT_OK,intent)
+
+    fun finishBookSelect(book : Book?) {
+        intent.putExtra(EXTRA_SELECTED_BOOK, book)
+        setResult(RESULT_OK, intent)
         finish()
     }
 

@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnStart
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -16,7 +18,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
+import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.FragmentSearchBinding
+import com.example.bookchat.ui.activity.MakeChatRoomSelectBookActivity
 import com.example.bookchat.ui.activity.SearchTapResultDetailActivity
 import com.example.bookchat.utils.SearchPurpose
 import com.example.bookchat.viewmodel.SearchViewModel
@@ -26,13 +30,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SearchFragment(searchPurpose: SearchPurpose) : Fragment() {
+class SearchFragment(private val searchPurpose: SearchPurpose) : Fragment() {
 
     @Inject
     lateinit var searchViewModelFactory: SearchViewModel.AssistedFactory
 
     private lateinit var binding: FragmentSearchBinding
-    private val searchViewModel: SearchViewModel by viewModels{
+    private val searchViewModel: SearchViewModel by viewModels {
         SearchViewModel.provideFactory(searchViewModelFactory, searchPurpose)
     }
     private val imm by lazy { requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
@@ -57,7 +61,7 @@ class SearchFragment(searchPurpose: SearchPurpose) : Fragment() {
         return binding.root
     }
 
-    private fun initFragmentBackStackChangedListener(){
+    private fun initFragmentBackStackChangedListener() {
         childFragmentManager.addOnBackStackChangedListener {
             getInflatedSearchTapFragment()?.let { handleBackStackFragment(it) }
         }
@@ -73,49 +77,70 @@ class SearchFragment(searchPurpose: SearchPurpose) : Fragment() {
         when (searchTapStatus) {
             SearchTapStatus.Default -> {
                 closeSearchWindowAnimation()
-                replaceFragment(defaultTapFragment, FRAGMENT_TAG_DEFAULT,false)
+                replaceFragment(defaultTapFragment, FRAGMENT_TAG_DEFAULT, false)
             }
             SearchTapStatus.History -> {
                 openSearchWindowAnimation()
-                replaceFragment(historyTapFragment, FRAGMENT_TAG_HISTORY,true)
+                replaceFragment(historyTapFragment, FRAGMENT_TAG_HISTORY, true)
             }
             SearchTapStatus.Searching -> {
-                replaceFragment(searchingTapFragment, FRAGMENT_TAG_SEARCHING,true)
+                replaceFragment(searchingTapFragment, FRAGMENT_TAG_SEARCHING, true)
             }
             SearchTapStatus.Result -> {
                 closeKeyboard(binding.searchEditText)
-                replaceFragment(resultTapFragment, FRAGMENT_TAG_RESULT,true)
+                replaceFragment(resultTapFragment, FRAGMENT_TAG_RESULT, true)
             }
             SearchTapStatus.Detail -> {
                 moveToDetailActivity()
             }
         }
 
-    private fun handleBackStackFragment(inflatedFragment :Fragment){
-        when(inflatedFragment.tag){
+    private fun handleBackStackFragment(inflatedFragment: Fragment) {
+        when (inflatedFragment.tag) {
             FRAGMENT_TAG_DEFAULT -> {
                 searchViewModel.searchKeyWord.value = ""
                 searchViewModel.searchTapStatus.value = SearchTapStatus.Default
             }
-            FRAGMENT_TAG_HISTORY -> { searchViewModel.searchTapStatus.value = SearchTapStatus.History }
-            FRAGMENT_TAG_SEARCHING -> { searchViewModel.searchTapStatus.value = SearchTapStatus.Searching }
-            FRAGMENT_TAG_RESULT -> {  searchViewModel.searchTapStatus.value = SearchTapStatus.Result }
+            FRAGMENT_TAG_HISTORY -> {
+                searchViewModel.searchTapStatus.value = SearchTapStatus.History
+            }
+            FRAGMENT_TAG_SEARCHING -> {
+                searchViewModel.searchTapStatus.value = SearchTapStatus.Searching
+            }
+            FRAGMENT_TAG_RESULT -> {
+                searchViewModel.searchTapStatus.value = SearchTapStatus.Result
+            }
         }
     }
+
+    private val detailActivityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == AppCompatActivity.RESULT_OK) {
+                val intent = result.data
+                val selectedBook =
+                    intent?.getSerializableExtra(SearchTapResultDetailActivity.EXTRA_SELECTED_BOOK) as? Book
+                val parentActivity = requireActivity() as? MakeChatRoomSelectBookActivity
+                parentActivity?.finishBookSelect(selectedBook)
+            }
+        }
 
     private fun moveToDetailActivity() {
         val intent = Intent(requireContext(), SearchTapResultDetailActivity::class.java)
         intent.putExtra(EXTRA_SEARCH_KEYWORD, searchViewModel.searchKeyWord.value.trim())
-        startActivity(intent)
+        intent.putExtra(EXTRA_SEARCH_PURPOSE, searchPurpose)
+        detailActivityLauncher.launch(intent)
     }
 
-    private fun replaceFragment(newFragment: Fragment, tag: String, backStackFlag :Boolean) {
-        childFragmentManager.popBackStack(SEARCH_TAP_FRAGMENT_FLAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+    private fun replaceFragment(newFragment: Fragment, tag: String, backStackFlag: Boolean) {
+        childFragmentManager.popBackStack(
+            SEARCH_TAP_FRAGMENT_FLAG,
+            FragmentManager.POP_BACK_STACK_INCLUSIVE
+        )
         val childFragmentTransaction = childFragmentManager.beginTransaction()
         with(childFragmentTransaction) {
             setReorderingAllowed(true)
             replace(R.id.searchPage_layout, newFragment, tag)
-            if (backStackFlag){
+            if (backStackFlag) {
                 addToBackStack(SEARCH_TAP_FRAGMENT_FLAG)
             }
             commit()
@@ -217,7 +242,7 @@ class SearchFragment(searchPurpose: SearchPurpose) : Fragment() {
         super.onResume()
     }
 
-    private fun getInflatedSearchTapFragment() :Fragment?{
+    private fun getInflatedSearchTapFragment(): Fragment? {
         return childFragmentManager.fragments.firstOrNull { it.isVisible }
     }
 
@@ -227,6 +252,7 @@ class SearchFragment(searchPurpose: SearchPurpose) : Fragment() {
         const val FRAGMENT_TAG_SEARCHING = "Searching"
         const val FRAGMENT_TAG_RESULT = "Result"
         const val EXTRA_SEARCH_KEYWORD = "EXTRA_SEARCH_KEYWORD"
+        const val EXTRA_SEARCH_PURPOSE = "EXTRA_SEARCH_PURPOSE"
         const val SEARCH_TAP_FRAGMENT_FLAG = "SEARCH_TAP_FRAGMENT_FLAG"
     }
 }

@@ -146,7 +146,7 @@ class SearchTapResultFragment : Fragment() {
     }
 
     companion object {
-        private const val DIALOG_TAG_SEARCH_BOOK = "SearchTapBookDialog"
-        private const val DIALOG_TAG_SELECT_BOOK = "MakeChatRoomSelectBookDialog"
+        const val DIALOG_TAG_SEARCH_BOOK = "SearchTapBookDialog"
+        const val DIALOG_TAG_SELECT_BOOK = "MakeChatRoomSelectBookDialog"
     }
 }

@@ -1,6 +1,8 @@
 package com.example.bookchat.utils
 
-sealed class SearchPurpose{
-    object Search :SearchPurpose()
-    object MakeChatRoom :SearchPurpose()
+import java.io.Serializable
+
+sealed class SearchPurpose : Serializable {
+    object Search : SearchPurpose()
+    object MakeChatRoom : SearchPurpose()
 }
