@@ -24,8 +24,8 @@ import com.example.bookchat.ui.activity.AgonyActivity.Companion.EXTRA_AGONY
 import com.example.bookchat.ui.activity.AgonyActivity.Companion.EXTRA_BOOK
 import com.example.bookchat.ui.dialog.AgonyRecordWarningDialog
 import com.example.bookchat.viewmodel.AgonyRecordViewModel
-import com.example.bookchat.viewmodel.AgonyRecordViewModel.AgonyRecordUiState
 import com.example.bookchat.viewmodel.AgonyRecordViewModel.AgonyRecordUiEvent
+import com.example.bookchat.viewmodel.AgonyRecordViewModel.AgonyRecordUiState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -152,7 +152,6 @@ class AgonyRecordActivity : AppCompatActivity() {
 
     override fun onResume() {
         if (firstAgonyTitle != agonyRecordHeaderItemAdapter.agony.title){
-            val intent = Intent(this@AgonyRecordActivity, AgonyActivity::class.java)
             intent.putExtra(AgonyEditActivity.EXTRA_NEW_AGONY_TITLE, agonyRecordHeaderItemAdapter.agony.title)
             setResult(RESULT_OK,intent)
         }

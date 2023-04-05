@@ -1,6 +1,5 @@
 package com.example.bookchat.ui.activity
 
-import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
@@ -36,7 +35,6 @@ class ImageCropActivity : AppCompatActivity() {
         val bitmap: Bitmap =
             binding.cropImageView.getCroppedImage(CROPPED_IMG_SIZE_WIDTH, CROPPED_IMG_SIZE_HEIGHT)!!
         val byteArray = getByteArray(bitmap)
-        val intent = Intent(this@ImageCropActivity, SignUpActivity::class.java)
         intent.putExtra(EXTRA_CROPPED_PROFILE_BYTE_ARRAY, byteArray)
         setResult(RESULT_OK, intent)
         finish()
