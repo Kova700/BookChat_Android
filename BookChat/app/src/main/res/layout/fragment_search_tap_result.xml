@@ -42,7 +42,6 @@
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:layout_gravity="end"
-                    android:layout_marginEnd="3dp"
                     android:backgroundTint="#E6E6E6"
                     app:cardCornerRadius="5dp"
                     app:cardElevation="0dp" />
@@ -73,6 +72,58 @@
                     <include layout="@layout/item_flex_box_book_shimmer"/>
                     <include layout="@layout/item_flex_box_book_shimmer"/>
                 </GridLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_view_container_chat_room_header"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:shimmer_auto_start="true"
+                setShimmerAnimation="@{viewmodel.isStateLoading(viewmodel.chatResultState)}"
+                android:visibility="@{viewmodel.isStateLoading(viewmodel.chatResultState) ? View.VISIBLE : View.GONE}"
+                app:layout_constraintBottom_toBottomOf="@+id/chatRoomHeaderLayout"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+                app:layout_constraintStart_toStartOf="@+id/guideline_start"
+                app:layout_constraintTop_toTopOf="@+id/chatRoomHeaderLayout">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="75dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="start"
+                    android:backgroundTint="#E6E6E6"
+                    app:cardCornerRadius="5dp"
+                    app:cardElevation="0dp" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="end"
+                    android:backgroundTint="#E6E6E6"
+                    app:cardCornerRadius="5dp"
+                    app:cardElevation="0dp" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_chat_room_rcv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:shimmer_auto_start="true"
+                setShimmerAnimation="@{viewmodel.isStateLoading(viewmodel.chatResultState)}"
+                android:visibility="@{viewmodel.isStateLoading(viewmodel.chatResultState) ? View.VISIBLE : View.GONE}"
+                app:layout_constraintEnd_toEndOf="@+id/search_result_chatRoom_simple_Rcv"
+                app:layout_constraintStart_toStartOf="@+id/search_result_chatRoom_simple_Rcv"
+                app:layout_constraintTop_toTopOf="@+id/search_result_chatRoom_simple_Rcv" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/item_chat_room_search_shimmer"/>
+                    <include layout="@layout/item_chat_room_search_shimmer"/>
+                    <include layout="@layout/item_chat_room_search_shimmer"/>
+
+                </LinearLayout>
 
             </com.facebook.shimmer.ShimmerFrameLayout>
 
@@ -107,16 +158,6 @@
                 android:layout_height="wrap_content"
                 android:visibility="@{viewmodel.isBothEmptyResult(viewmodel.bookResultState, viewmodel.chatResultState) ? View.VISIBLE : View.GONE}"
                 app:constraint_referenced_ids="both_empty_result_img, both_empty_result_text"/>
-
-            <ProgressBar
-                android:id="@+id/progressBar2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="@{viewmodel.isStateLoading(viewmodel.chatResultState) ? View.VISIBLE : View.GONE}"
-                app:layout_constraintBottom_toBottomOf="@+id/empty_result_layout_chat"
-                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-                app:layout_constraintStart_toStartOf="@+id/guideline_start"
-                app:layout_constraintTop_toTopOf="@+id/empty_result_layout_chat" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/bookHeaderLayout"
@@ -159,7 +200,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="17dp"
                 android:overScrollMode="never"
-                android:minHeight="@dimen/book_img_height_default"
                 android:visibility="@{viewmodel.isStateHaveResult(viewmodel.bookResultState) ? View.VISIBLE : View.INVISIBLE}"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end_book_rcv"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start_book_rcv"
@@ -169,8 +209,8 @@
                 android:id="@+id/empty_result_layout_book"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:paddingVertical="20dp"
                 android:visibility="@{viewmodel.isOnlyBookEmptyResult(viewmodel.bookResultState, viewmodel.chatResultState) ? View.VISIBLE : View.INVISIBLE}"
-                app:layout_constraintBottom_toBottomOf="@+id/search_result_book_simple_Rcv"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start"
                 app:layout_constraintTop_toTopOf="@+id/search_result_book_simple_Rcv"
@@ -180,7 +220,6 @@
                     android:id="@+id/textView11"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
                     android:elegantTextHeight="true"
                     android:fontFamily="@font/notosanskr_bold"
                     android:text="@string/book_result_empty"
@@ -212,7 +251,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:barrierDirection="bottom"
-                app:constraint_referenced_ids="shimmer_book_rcv, search_result_book_simple_Rcv"/>
+                app:constraint_referenced_ids="shimmer_book_rcv, search_result_book_simple_Rcv, empty_result_layout_book"/>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/chatRoomHeaderLayout"
