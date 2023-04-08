@@ -41,9 +41,11 @@ class SearchTapResultFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_search_tap_result, container, false)
+            DataBindingUtil.inflate(
+                inflater, R.layout.fragment_search_tap_result, container, false
+            )
         binding.viewmodel = searchViewModel
         binding.lifecycleOwner = this
 
@@ -67,8 +69,8 @@ class SearchTapResultFragment : Fragment() {
     private fun initSearchResultBookAdapter() {
         val bookItemClickListener = object : SearchResultBookSimpleDataAdapter.OnItemClickListener {
             override fun onItemClick(book: Book) {
-                when(searchViewModel.searchPurpose){
-                    is SearchPurpose.Search -> {
+                when (searchViewModel.searchPurpose) {
+                    is SearchPurpose.DefaultSearch -> {
                         val dialog = SearchTapBookDialog(book)
                         dialog.show(childFragmentManager, DIALOG_TAG_SEARCH_BOOK)
                     }
@@ -76,6 +78,7 @@ class SearchTapResultFragment : Fragment() {
                         val dialog = MakeChatRoomSelectBookDialog(book)
                         dialog.show(childFragmentManager, DIALOG_TAG_SELECT_BOOK)
                     }
+                    else -> {}
                 }
 
             }
@@ -85,13 +88,13 @@ class SearchTapResultFragment : Fragment() {
         searchResultBookSimpleDataAdapter.setItemClickListener(bookItemClickListener)
     }
 
-    private fun initSearchResultChatRoomAdapter(){
-        val chatRoomItemClickListener = object :SearchChatRoomSimpleAdapter.OnItemClickListener{
+    private fun initSearchResultChatRoomAdapter() {
+        val chatRoomItemClickListener = object : SearchChatRoomSimpleAdapter.OnItemClickListener {
             override fun onItemClick(searchChatRoomListItem: SearchChatRoomListItem) {
                 //채팅방 소개 페이지로 이동 (입장 가능)
             }
         }
-        searchChatRoomSimpleAdapter =  SearchChatRoomSimpleAdapter()
+        searchChatRoomSimpleAdapter = SearchChatRoomSimpleAdapter()
         searchChatRoomSimpleAdapter.setItemClickListener(chatRoomItemClickListener)
     }
 
@@ -116,29 +119,29 @@ class SearchTapResultFragment : Fragment() {
         }
     }
 
-    private fun initSearchResultChatRoomRcv(){
-        with(binding){
+    private fun initSearchResultChatRoomRcv() {
+        with(binding) {
             searchResultChatRoomSimpleRcv.adapter = searchChatRoomSimpleAdapter
             searchResultChatRoomSimpleRcv.setHasFixedSize(true)
             searchResultChatRoomSimpleRcv.layoutManager = LinearLayoutManager(requireContext())
         }
     }
 
-    private fun observeSimpleBookSearchResult() = lifecycleScope.launch{
-        searchViewModel.simpleBookSearchResult.collectLatest{ books ->
+    private fun observeSimpleBookSearchResult() = lifecycleScope.launch {
+        searchViewModel.simpleBookSearchResult.collectLatest { books ->
             searchResultBookSimpleDataAdapter.books = books
             searchResultBookSimpleDataAdapter.notifyDataSetChanged()
             setDummyBookCount()
         }
     }
 
-    private fun setDummyBookCount(){
+    private fun setDummyBookCount() {
         searchResultBookDummyAdapter.dummyItemCount =
             BookImgSizeManager.getFlexBoxDummyItemCount(searchResultBookSimpleDataAdapter.itemCount.toLong())
         searchResultBookDummyAdapter.notifyDataSetChanged()
     }
 
-    private fun observeSimpleChatRoomResult() = lifecycleScope.launch{
+    private fun observeSimpleChatRoomResult() = lifecycleScope.launch {
         searchViewModel.simpleChatRoomSearchResult.collectLatest { chatRooms ->
             searchChatRoomSimpleAdapter.chatRooms = chatRooms
             searchChatRoomSimpleAdapter.notifyDataSetChanged()

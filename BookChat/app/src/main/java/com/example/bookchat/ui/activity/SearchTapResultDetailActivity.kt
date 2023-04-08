@@ -77,7 +77,7 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
         val bookItemClickListener = object : SearchResultBookDetailDataAdapter.OnItemClickListener {
             override fun onItemClick(book: Book) {
                 when (searchPurpose) {
-                    is SearchPurpose.Search -> {
+                    is SearchPurpose.DefaultSearch -> {
                         val dialog = SearchTapBookDialog(book)
                         dialog.show(
                             this@SearchTapResultDetailActivity.supportFragmentManager,
@@ -91,6 +91,7 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
                             DIALOG_TAG_SELECT_BOOK
                         )
                     }
+                    else -> {}
                 }
             }
         }

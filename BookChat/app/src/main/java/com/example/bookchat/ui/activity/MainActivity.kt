@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val homeFragment by lazy { HomeFragment() }
     private val bookShelfFragment by lazy { BookShelfFragment() }
-    private val searchFragment by lazy { SearchFragment(SearchPurpose.Search) }
+    private val searchFragment by lazy { SearchFragment(SearchPurpose.DefaultSearch) }
     private val chatRoomListFragment by lazy { ChatRoomListFragment() }
     private val myPageFragment by lazy { MyPageFragment() }
 

@@ -1,6 +1,5 @@
 package com.example.bookchat.ui.activity
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -34,7 +33,7 @@ class MakeChatRoomSelectBookActivity : AppCompatActivity() {
         }
     }
 
-    fun finishBookSelect(book : Book?) {
+    fun finishBookSelect(book: Book?) {
         intent.putExtra(EXTRA_SELECTED_BOOK, book)
         setResult(RESULT_OK, intent)
         finish()

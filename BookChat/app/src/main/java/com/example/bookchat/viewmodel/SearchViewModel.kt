@@ -67,18 +67,31 @@ class SearchViewModel @AssistedInject constructor(
         }
         if (isSameSearchKeyword(keyword)) return@launch
         DataStoreManager.saveSearchHistory(keyword)
-        simpleSearchBooks(keyword)
-        simpleSearchChatRoom(keyword)
+        requestSearchApi(keyword)
+    }
+
+    fun clickHistory(keyword: String) = viewModelScope.launch {
+        searchKeyWord.value = keyword
+        while (searchTapStatus.value != SearchTapStatus.Searching) delay(WAITING_DURATION)
+        requestSearchApi(keyword)
     }
 
     private fun isSameSearchKeyword(keyword: String) =
         (keyword == previousSearchKeyword) && (searchTapStatus.value == SearchTapStatus.Result)
 
-    fun clickHistory(keyword: String) = viewModelScope.launch {
-        searchKeyWord.value = keyword
-        while (searchTapStatus.value != SearchTapStatus.Searching) delay(200)
-        simpleSearchBooks(keyword)
-        simpleSearchChatRoom(keyword)
+    private fun requestSearchApi(keyword: String) {
+        when (searchPurpose) {
+            is SearchPurpose.DefaultSearch -> {
+                simpleSearchBooks(keyword)
+                simpleSearchChatRoom(keyword)
+            }
+            is SearchPurpose.MakeChatRoom -> {
+                simpleSearchBooks(keyword)
+            }
+            is SearchPurpose.SearchChatRoom -> {
+                simpleSearchChatRoom(keyword)
+            }
+        }
     }
 
     val keyboardEnterListener = TextView.OnEditorActionListener { _, _, _ ->
@@ -86,7 +99,7 @@ class SearchViewModel @AssistedInject constructor(
         false
     }
 
-    private suspend fun simpleSearchBooks(keyword: String) {
+    private fun simpleSearchBooks(keyword: String) = viewModelScope.launch {
         bookResultState.value = SearchState.Loading
         searchTapStatus.value = SearchTapStatus.Result
         runCatching { bookRepository.simpleSearchBooks(keyword) }
@@ -94,7 +107,8 @@ class SearchViewModel @AssistedInject constructor(
             .onFailure { failHandler(it) }
     }
 
-    private fun searchBooksSuccessCallBack(respond: ResponseGetBookSearch, keyword: String) {
+    private suspend fun searchBooksSuccessCallBack(respond: ResponseGetBookSearch, keyword: String) {
+        delay(SKELETON_DURATION)
         simpleBookSearchResult.value = respond.bookResponses
         previousSearchKeyword = keyword
         if (simpleBookSearchResult.value.isEmpty()) {
@@ -104,7 +118,7 @@ class SearchViewModel @AssistedInject constructor(
         bookResultState.value = SearchState.HaveResult
     }
 
-    private suspend fun simpleSearchChatRoom(keyword: String) {
+    private fun simpleSearchChatRoom(keyword: String) = viewModelScope.launch {
         chatResultState.value = SearchState.Loading
         searchTapStatus.value = SearchTapStatus.Result
         runCatching { chatRoomRepository.simpleSearchChatRooms(keyword, chatSearchFilter.value) }
@@ -112,10 +126,11 @@ class SearchViewModel @AssistedInject constructor(
             .onFailure { failHandler(it) }
     }
 
-    private fun searchChatRoomsSuccessCallBack(
+    private suspend fun searchChatRoomsSuccessCallBack(
         respond: ResponseGetSearchChatRoomList,
         keyword: String
     ) {
+        delay(SKELETON_DURATION)
         simpleChatRoomSearchResult.value = TestPagingDataSource.getSearchChatRoomData().chatRoomList
 //        simpleChatRoomSearchResult.value = respond.chatRoomList
         previousSearchKeyword = keyword
@@ -143,20 +158,55 @@ class SearchViewModel @AssistedInject constructor(
         searchKeyWord.value = ""
     }
 
-    fun isStateLoading(searchState: SearchState) =
+    private fun isDefaultSearchPurpose() =
+        searchPurpose == SearchPurpose.DefaultSearch
+
+    private fun isMakeChatRoomPurpose() =
+        searchPurpose == SearchPurpose.MakeChatRoom
+
+    private fun isSearchChatRoomPurpose() =
+        searchPurpose == SearchPurpose.SearchChatRoom
+
+    private fun isStateLoading(searchState: SearchState) =
         searchState == SearchState.Loading
 
-    fun isStateHaveResult(searchState: SearchState) =
-        (searchState == SearchState.HaveResult)
+    private fun isStateHaveResult(searchState: SearchState) =
+        searchState == SearchState.HaveResult
 
-    fun isOnlyBookEmptyResult(bookSearchState: SearchState, chatSearchState: SearchState) =
+    private fun isOnlyBookEmptyResult(bookSearchState: SearchState, chatSearchState: SearchState) =
         (bookSearchState == SearchState.EmptyResult) && (chatSearchState != SearchState.EmptyResult)
 
-    fun isOnlyChatEmptyResult(bookSearchState: SearchState, chatSearchState: SearchState) =
+    private fun isOnlyChatEmptyResult(bookSearchState: SearchState, chatSearchState: SearchState) =
         (bookSearchState != SearchState.EmptyResult) && (chatSearchState == SearchState.EmptyResult)
 
     fun isBothEmptyResult(bookSearchState: SearchState, chatSearchState: SearchState) =
         (bookSearchState == SearchState.EmptyResult) && (chatSearchState == SearchState.EmptyResult)
+
+    fun isVisibleBookResultHeader(bookSearchState: SearchState, chatSearchState: SearchState) =
+        !isSearchChatRoomPurpose() && !isBothEmptyResult(bookSearchState, chatSearchState)
+                && !isStateLoading(bookSearchState)
+
+    fun isVisibleBookRcv(bookSearchState: SearchState) =
+        !isSearchChatRoomPurpose() && isStateHaveResult(bookSearchState)
+
+    fun isVisibleBookEmptyResultLayout(bookSearchState: SearchState, chatSearchState: SearchState) =
+        !isSearchChatRoomPurpose() && isOnlyBookEmptyResult(bookSearchState, chatSearchState)
+
+    fun isVisibleChatRoomResultHeader(bookSearchState: SearchState, chatSearchState: SearchState) =
+        !isMakeChatRoomPurpose() && !isBothEmptyResult(bookSearchState, chatSearchState)
+                && !isStateLoading(chatSearchState)
+
+    fun isVisibleChatRoomRcv(chatSearchState: SearchState) =
+        !isMakeChatRoomPurpose() && isStateHaveResult(chatSearchState)
+
+    fun isVisibleChatRoomEmptyResultLayout(bookSearchState: SearchState, chatSearchState: SearchState) =
+        !isMakeChatRoomPurpose() && isOnlyChatEmptyResult(bookSearchState, chatSearchState)
+
+    fun isVisibleBookSkeleton(bookSearchState: SearchState) =
+        !isSearchChatRoomPurpose() && isStateLoading(bookSearchState)
+
+    fun isVisibleChatRoomSkeleton(chatSearchState: SearchState) =
+        !isMakeChatRoomPurpose() && isStateLoading(chatSearchState)
 
     sealed class SearchState {
         object Loading : SearchState()
@@ -187,7 +237,6 @@ class SearchViewModel @AssistedInject constructor(
             is NetworkIsNotConnectedException ->
                 makeToast(R.string.error_network)
             else -> makeToast(R.string.error_else)
-
         }
     }
 
@@ -197,6 +246,9 @@ class SearchViewModel @AssistedInject constructor(
     }
 
     companion object {
+        private const val WAITING_DURATION = 200L
+        private const val SKELETON_DURATION = 700L
+
         fun provideFactory(
             assistedFactory: AssistedFactory,
             searchPurpose: SearchPurpose
