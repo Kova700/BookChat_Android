@@ -11,7 +11,7 @@
     <!--flex_box-->
     <dimen name="flex_box_book_item_margin_horizontal">7.5dp</dimen>
     <dimen name="flex_box_book_item_margin_vertical">10dp</dimen>
-    <dimen name="flex_box_margin_horizontal">25dp</dimen>
+    <dimen name="flex_box_margin_horizontal">22.5dp</dimen>
     <!--bookshelf_swipe_item-->
     <dimen name="swipe_item_elevation">3dp</dimen>
     <dimen name="swipe_item_corner_radius">16dp</dimen>
