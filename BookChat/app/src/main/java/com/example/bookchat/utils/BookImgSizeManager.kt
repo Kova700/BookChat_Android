@@ -15,7 +15,6 @@ object BookImgSizeManager {
         contextResources.getDimensionPixelSize(R.dimen.flex_box_book_item_margin_vertical) * 2
     private val FLEX_BOX_MARGIN_HORIZONTAL_PX =
         contextResources.getDimensionPixelSize(R.dimen.flex_box_margin_horizontal) * 2
-    private val FLEX_BOX_WIDTH_PX = deviceWidthPx - FLEX_BOX_MARGIN_HORIZONTAL_PX
 
     private val DEFAULT_BOOK_IMG_WIDTH_PX =
         contextResources.getDimensionPixelSize(R.dimen.book_img_width_default)
@@ -27,11 +26,13 @@ object BookImgSizeManager {
     private val DEFAULT_BOOK_ITEM_HEIGHT_PX =
         DEFAULT_BOOK_IMG_HEIGHT_PX + BOOK_ITEM_MARGIN_VERTICAL_PX
 
-    val flexBoxBookSpanSize: Int =
-        FLEX_BOX_WIDTH_PX / DEFAULT_BOOK_ITEM_WIDTH_PX
+    private val flexBoxWidthPx = deviceWidthPx - FLEX_BOX_MARGIN_HORIZONTAL_PX
+    val flexBoxBookSpanSize: Int = flexBoxWidthPx / DEFAULT_BOOK_ITEM_WIDTH_PX
+
+    val bookItemWidthPx = (flexBoxWidthPx / flexBoxBookSpanSize)
 
     val bookImgWidthPx =
-        (FLEX_BOX_WIDTH_PX / flexBoxBookSpanSize) - BOOK_ITEM_MARGIN_HORIZONTAL_PX
+        bookItemWidthPx - BOOK_ITEM_MARGIN_HORIZONTAL_PX
 
     private val scaleRate: Float =
         (bookImgWidthPx.toFloat() / DEFAULT_BOOK_IMG_WIDTH_PX)
