@@ -18,6 +18,64 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_view_container_book_header"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                setShimmerAnimation="@{viewmodel.isStateLoading(viewmodel.bookResultState)}"
+                android:visibility="@{viewmodel.isStateLoading(viewmodel.bookResultState) ? View.VISIBLE : View.GONE}"
+                app:layout_constraintBottom_toBottomOf="@+id/bookHeaderLayout"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+                app:layout_constraintStart_toStartOf="@+id/guideline_start"
+                app:layout_constraintTop_toTopOf="@+id/bookHeaderLayout"
+                app:shimmer_auto_start="true">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="75dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="start"
+                    android:backgroundTint="#E6E6E6"
+                    app:cardCornerRadius="5dp"
+                    app:cardElevation="0dp" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="3dp"
+                    android:backgroundTint="#E6E6E6"
+                    app:cardCornerRadius="5dp"
+                    app:cardElevation="0dp" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_book_rcv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="17dp"
+                setShimmerAnimation="@{viewmodel.isStateLoading(viewmodel.bookResultState)}"
+                android:visibility="@{viewmodel.isStateLoading(viewmodel.bookResultState) ? View.VISIBLE : View.GONE}"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end_book_rcv"
+                app:layout_constraintStart_toStartOf="@+id/guideline_start_book_rcv"
+                app:layout_constraintTop_toBottomOf="@+id/shimmer_view_container_book_header"
+                app:shimmer_auto_start="true">
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    setShimmerGridLayout="@{true}"
+                    android:columnCount="3"
+                    android:rowCount="2">
+
+                    <include layout="@layout/item_flex_box_book_shimmer"/>
+                    <include layout="@layout/item_flex_box_book_shimmer"/>
+                    <include layout="@layout/item_flex_box_book_shimmer"/>
+                    <include layout="@layout/item_flex_box_book_shimmer"/>
+                    <include layout="@layout/item_flex_box_book_shimmer"/>
+                    <include layout="@layout/item_flex_box_book_shimmer"/>
+                </GridLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline_start"
                 app:layout_constraintGuide_begin="30dp"
@@ -51,29 +109,21 @@
                 app:constraint_referenced_ids="both_empty_result_img, both_empty_result_text"/>
 
             <ProgressBar
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="@{viewmodel.isStateLoading(viewmodel.bookResultState) ? View.VISIBLE : View.GONE}"
-                app:layout_constraintBottom_toBottomOf="@+id/search_result_book_simple_Rcv"
-                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-                app:layout_constraintStart_toStartOf="@+id/guideline_start"
-                app:layout_constraintTop_toTopOf="@+id/search_result_book_simple_Rcv" />
-
-            <ProgressBar
                 android:id="@+id/progressBar2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="@{viewmodel.isStateLoading(viewmodel.chatResultState) ? View.VISIBLE : View.GONE}"
-                app:layout_constraintBottom_toBottomOf="@+id/search_result_chatRoom_simple_Rcv"
+                app:layout_constraintBottom_toBottomOf="@+id/empty_result_layout_chat"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start"
-                app:layout_constraintTop_toTopOf="@+id/search_result_chatRoom_simple_Rcv" />
+                app:layout_constraintTop_toTopOf="@+id/empty_result_layout_chat" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/bookHeaderLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:visibility="@{viewmodel.isBothEmptyResult(viewmodel.bookResultState, viewmodel.chatResultState) ? View.INVISIBLE : View.VISIBLE}"
+                android:layout_marginTop="7dp"
+                android:visibility="@{viewmodel.isBothEmptyResult(viewmodel.bookResultState, viewmodel.chatResultState) || viewmodel.isStateLoading(viewmodel.bookResultState)? View.INVISIBLE : View.VISIBLE}"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start"
                 app:layout_constraintTop_toTopOf="parent">
@@ -157,15 +207,22 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/book_rcv_barrier_bottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="shimmer_book_rcv, search_result_book_simple_Rcv"/>
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/chatRoomHeaderLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:visibility="@{viewmodel.isBothEmptyResult(viewmodel.bookResultState, viewmodel.chatResultState) ? View.INVISIBLE : View.VISIBLE}"
+                android:visibility="@{viewmodel.isBothEmptyResult(viewmodel.bookResultState, viewmodel.chatResultState) || viewmodel.isStateLoading(viewmodel.chatResultState)? View.INVISIBLE : View.VISIBLE}"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start"
-                app:layout_constraintTop_toBottomOf="@+id/search_result_book_simple_Rcv" >
+                app:layout_constraintTop_toBottomOf="@+id/book_rcv_barrier_bottom" >
 
                 <TextView
                     android:id="@+id/textView24"

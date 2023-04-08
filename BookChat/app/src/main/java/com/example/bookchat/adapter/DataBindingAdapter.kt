@@ -15,6 +15,7 @@ import com.example.bookchat.data.*
 import com.example.bookchat.utils.*
 import com.example.bookchat.viewmodel.AgonyViewModel.AgonyActivityState
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportStatus
+import com.facebook.shimmer.ShimmerFrameLayout
 import java.util.*
 
 object DataBindingAdapter {
@@ -493,5 +494,24 @@ object DataBindingAdapter {
         }
         textView.setTextColor(Color.parseColor("#B5B7BB"))
         textView.isClickable = false
+    }
+
+    /**Shimmer내부 GirdLayout 설정*/
+    @JvmStatic
+    @BindingAdapter("setShimmerGridLayout")
+    fun setShimmerGridLayout(gridLayout :GridLayout, bool :Boolean){
+        gridLayout.columnCount = BookImgSizeManager.flexBoxBookSpanSize
+        gridLayout.rowCount = 2
+    }
+
+    /**Shimmer Animation Start/Stop 설정*/
+    @JvmStatic
+    @BindingAdapter("setShimmerAnimation")
+    fun setShimmerAnimation(
+        shimmerFrameLayout: ShimmerFrameLayout,
+        isVisible: Boolean
+    ) {
+        if (isVisible) return
+        shimmerFrameLayout.stopShimmer()
     }
 }
