@@ -18,7 +18,7 @@ class ChatRoomListPagingSource : PagingSource<Int, UserChatRoomListItem>() {
 
         try {
             response = App.instance.bookChatApiClient.getUserChatRoomList(
-                postCursorId = null,
+                postCursorId = params.key,
                 size = params.loadSize.toString()
             )
         } catch (e: Exception) {
@@ -60,12 +60,13 @@ class ChatRoomListPagingSource : PagingSource<Int, UserChatRoomListItem>() {
     private fun getPrevKey(cursorMeta: CursorMeta): Int? =
         if (cursorMeta.first) null else cursorMeta.nextCursorId
 
-    private fun getNextKey(cursorMeta: CursorMeta) : Int?{
+    private fun getNextKey(cursorMeta: CursorMeta): Int? {
         if (cursorMeta.last) return null
         return if (cursorMeta.first) cursorMeta.nextCursorId + 2 else cursorMeta.nextCursorId
     }
 
-    override fun getRefreshKey(state: PagingState<Int, UserChatRoomListItem>): Int = 0
+    override fun getRefreshKey(state: PagingState<Int, UserChatRoomListItem>): Int? =
+        STARTING_PAGE_INDEX
 
     private fun isNetworkConnected(): Boolean {
         return App.instance.isNetworkConnected()
@@ -73,5 +74,9 @@ class ChatRoomListPagingSource : PagingSource<Int, UserChatRoomListItem>() {
 
     private fun createExceptionMessage(responseCode: Int, responseErrorBody: String?): String {
         return "responseCode : $responseCode , responseErrorBody : $responseErrorBody"
+    }
+
+    companion object {
+        private val STARTING_PAGE_INDEX = null
     }
 }

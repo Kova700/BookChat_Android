@@ -24,6 +24,7 @@ import com.example.bookchat.ui.activity.MakeChatRoomSelectBookActivity
 import com.example.bookchat.ui.activity.SearchTapResultDetailActivity
 import com.example.bookchat.utils.SearchPurpose
 import com.example.bookchat.viewmodel.SearchViewModel
+import com.example.bookchat.viewmodel.SearchViewModel.NecessaryDataFlagInDetail
 import com.example.bookchat.viewmodel.SearchViewModel.SearchTapStatus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -90,8 +91,8 @@ class SearchFragment(private val searchPurpose: SearchPurpose) : Fragment() {
                 closeKeyboard(binding.searchEditText)
                 replaceFragment(resultTapFragment, FRAGMENT_TAG_RESULT, true)
             }
-            SearchTapStatus.Detail -> {
-                moveToDetailActivity()
+            is SearchTapStatus.Detail -> {
+                moveToDetailActivity(searchTapStatus.necessaryDataFlag)
             }
         }
 
@@ -124,10 +125,12 @@ class SearchFragment(private val searchPurpose: SearchPurpose) : Fragment() {
             }
         }
 
-    private fun moveToDetailActivity() {
+    private fun moveToDetailActivity(necessaryData: NecessaryDataFlagInDetail) {
         val intent = Intent(requireContext(), SearchTapResultDetailActivity::class.java)
         intent.putExtra(EXTRA_SEARCH_KEYWORD, searchViewModel.searchKeyWord.value.trim())
         intent.putExtra(EXTRA_SEARCH_PURPOSE, searchPurpose)
+        intent.putExtra(EXTRA_NECESSARY_DATA, necessaryData)
+        intent.putExtra(EXTRA_CHAT_SEARCH_FILTER, searchViewModel.chatSearchFilter.value)
         detailActivityLauncher.launch(intent)
     }
 
@@ -236,7 +239,7 @@ class SearchFragment(private val searchPurpose: SearchPurpose) : Fragment() {
     }
 
     override fun onResume() {
-        if (searchViewModel.searchTapStatus.value == SearchTapStatus.Detail) {
+        if (searchViewModel.searchTapStatus.value is SearchTapStatus.Detail) {
             searchViewModel.searchTapStatus.value = SearchTapStatus.Result
         }
         super.onResume()
@@ -253,6 +256,8 @@ class SearchFragment(private val searchPurpose: SearchPurpose) : Fragment() {
         const val FRAGMENT_TAG_RESULT = "Result"
         const val EXTRA_SEARCH_KEYWORD = "EXTRA_SEARCH_KEYWORD"
         const val EXTRA_SEARCH_PURPOSE = "EXTRA_SEARCH_PURPOSE"
+        const val EXTRA_NECESSARY_DATA = "EXTRA_NECESSARY_DATA"
+        const val EXTRA_CHAT_SEARCH_FILTER = "EXTRA_CHAT_SEARCH_FILTER"
         const val SEARCH_TAP_FRAGMENT_FLAG = "SEARCH_TAP_FRAGMENT_FLAG"
     }
 }

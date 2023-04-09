@@ -190,7 +190,7 @@ interface BookChatApiInterface {
     @GET("/v1/api/chatrooms")
     suspend fun searchChatRoom(
         @Query("postCursorId") postCursorId: Int?,
-        @Query("size") size: String,
+        @Query("size") size: String?,
         @Query("roomName") roomName: String?,
         @Query("title") title: String?,
         @Query("isbn") isbn: String?,

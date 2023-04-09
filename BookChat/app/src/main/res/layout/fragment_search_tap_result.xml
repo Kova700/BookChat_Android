@@ -322,6 +322,7 @@
                         android:layout_height="wrap_content"
                         android:background="?android:selectableItemBackgroundBorderless"
                         android:src="@drawable/ic_open_page_input_btn"
+                        android:onClick="@{() -> viewmodel.clickChatRoomDetailBtn()}"
                         app:layout_constraintBottom_toBottomOf="@+id/textView24"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/textView24" />

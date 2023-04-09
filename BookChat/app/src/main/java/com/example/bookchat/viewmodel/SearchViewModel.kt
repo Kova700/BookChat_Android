@@ -25,6 +25,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.io.Serializable
 
 class SearchViewModel @AssistedInject constructor(
     private val bookRepository: BookRepository,
@@ -52,7 +53,7 @@ class SearchViewModel @AssistedInject constructor(
     }
 
     private fun renewSearchTapStatus() {
-        if (searchKeyWord.value.isEmpty()) return
+        if (searchKeyWord.value.isEmpty()) return //다시 확인
         if (searchTapStatus.value != SearchTapStatus.Searching) {
             searchTapStatus.value = SearchTapStatus.Searching
         }
@@ -107,7 +108,10 @@ class SearchViewModel @AssistedInject constructor(
             .onFailure { failHandler(it) }
     }
 
-    private suspend fun searchBooksSuccessCallBack(respond: ResponseGetBookSearch, keyword: String) {
+    private suspend fun searchBooksSuccessCallBack(
+        respond: ResponseGetBookSearch,
+        keyword: String
+    ) {
         delay(SKELETON_DURATION)
         simpleBookSearchResult.value = respond.bookResponses
         previousSearchKeyword = keyword
@@ -131,6 +135,7 @@ class SearchViewModel @AssistedInject constructor(
         keyword: String
     ) {
         delay(SKELETON_DURATION)
+        //TestPagingDataSource 부분 채팅방 검색 API 수정시 삭제 예정
         simpleChatRoomSearchResult.value = TestPagingDataSource.getSearchChatRoomData().chatRoomList
 //        simpleChatRoomSearchResult.value = respond.chatRoomList
         previousSearchKeyword = keyword
@@ -141,8 +146,12 @@ class SearchViewModel @AssistedInject constructor(
         chatResultState.value = SearchState.HaveResult
     }
 
-    fun clickBookDetailBtn() = viewModelScope.launch {
-        searchTapStatus.value = SearchTapStatus.Detail
+    fun clickBookDetailBtn() {
+        searchTapStatus.value = SearchTapStatus.Detail(NecessaryDataFlagInDetail.Book)
+    }
+
+    fun clickChatRoomDetailBtn() {
+        searchTapStatus.value = SearchTapStatus.Detail(NecessaryDataFlagInDetail.ChatRoom)
     }
 
     fun clickSearchWindow() {
@@ -151,11 +160,11 @@ class SearchViewModel @AssistedInject constructor(
 
     fun clickBackBtn() {
         clearSearchWindow()
-        searchTapStatus.value = SearchTapStatus.Default
     }
 
     fun clearSearchWindow() {
         searchKeyWord.value = ""
+        searchTapStatus.value = SearchTapStatus.Default
     }
 
     private fun isDefaultSearchPurpose() =
@@ -199,7 +208,10 @@ class SearchViewModel @AssistedInject constructor(
     fun isVisibleChatRoomRcv(chatSearchState: SearchState) =
         !isMakeChatRoomPurpose() && isStateHaveResult(chatSearchState)
 
-    fun isVisibleChatRoomEmptyResultLayout(bookSearchState: SearchState, chatSearchState: SearchState) =
+    fun isVisibleChatRoomEmptyResultLayout(
+        bookSearchState: SearchState,
+        chatSearchState: SearchState
+    ) =
         !isMakeChatRoomPurpose() && isOnlyChatEmptyResult(bookSearchState, chatSearchState)
 
     fun isVisibleBookSkeleton(bookSearchState: SearchState) =
@@ -225,7 +237,12 @@ class SearchViewModel @AssistedInject constructor(
         object History : SearchTapStatus()
         object Searching : SearchTapStatus()
         object Result : SearchTapStatus()
-        object Detail : SearchTapStatus()
+        data class Detail(val necessaryDataFlag: NecessaryDataFlagInDetail) : SearchTapStatus()
+    }
+
+    sealed class NecessaryDataFlagInDetail : Serializable {
+        object Book : NecessaryDataFlagInDetail()
+        object ChatRoom : NecessaryDataFlagInDetail()
     }
 
     private fun makeToast(stringId: Int) {
