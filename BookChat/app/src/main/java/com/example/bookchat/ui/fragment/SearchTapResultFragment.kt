@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,8 @@ import com.example.bookchat.adapter.search.chatroomsearch.SearchChatRoomSimpleAd
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.SearchChatRoomListItem
 import com.example.bookchat.databinding.FragmentSearchTapResultBinding
+import com.example.bookchat.ui.activity.ChatRoomActivity
+import com.example.bookchat.ui.activity.ChatRoomInfoActivity
 import com.example.bookchat.ui.dialog.MakeChatRoomSelectBookDialog
 import com.example.bookchat.ui.dialog.SearchTapBookDialog
 import com.example.bookchat.utils.BookImgSizeManager
@@ -91,7 +94,8 @@ class SearchTapResultFragment : Fragment() {
     private fun initSearchResultChatRoomAdapter() {
         val chatRoomItemClickListener = object : SearchChatRoomSimpleAdapter.OnItemClickListener {
             override fun onItemClick(searchChatRoomListItem: SearchChatRoomListItem) {
-                //채팅방 소개 페이지로 이동 (입장 가능)
+                val intent = Intent(requireContext(), ChatRoomInfoActivity::class.java)
+                startActivity(intent)
             }
         }
         searchChatRoomSimpleAdapter = SearchChatRoomSimpleAdapter()

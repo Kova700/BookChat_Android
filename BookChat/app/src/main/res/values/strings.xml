@@ -120,7 +120,7 @@
     <string name="agony_record_delete_success">고민기록이 삭제되었습니다.</string>
     <string name="agony_record_delete_fail">고민기록 삭제를 실패했습니다.</string>
 
-    <!--chat-->
+    <!--make chat room-->
     <string name="chat">채팅</string>
     <string name="chat_room">채팅방</string>
     <string name="my_chat_room">나의 채팅방</string>
@@ -152,6 +152,9 @@
     <!--user setting-->
     <string name="sign_out">로그아웃</string>
     <string name="withdraw">회원탈퇴</string>
+
+    <!--chat room-->
+    <string name="chat_room_send_message">메시지 보내기</string>
 
     <!--util-->
     <string name="confirm">확인</string>

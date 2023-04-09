@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -75,13 +76,14 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun initRcvAdapter(){
+    private fun initRcvAdapter() {
         when (necessaryDataFlag) {
             is NecessaryDataFlagInDetail.Book -> initBookRcvAdapter()
             is NecessaryDataFlagInDetail.ChatRoom -> initChatRcvAdapter()
         }
     }
-    private fun initRcv(){
+
+    private fun initRcv() {
         when (necessaryDataFlag) {
             is NecessaryDataFlagInDetail.Book -> initBookRcv()
             is NecessaryDataFlagInDetail.ChatRoom -> initChatRoomtRcv()
@@ -147,7 +149,11 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
     private fun initChatRcvAdapter() {
         val chatRoomItemClickListener = object : SearchChatRoomDetailAdapter.OnItemClickListener {
             override fun onItemClick(searchChatRoomListItem: SearchChatRoomListItem) {
-                //채팅방 소개 페이지로 이동 (입장 가능)
+                val intent = Intent(
+                    this@SearchTapResultDetailActivity,
+                    ChatRoomInfoActivity::class.java
+                )
+                startActivity(intent)
             }
         }
         searchChatRoomDetailAdapter = SearchChatRoomDetailAdapter()

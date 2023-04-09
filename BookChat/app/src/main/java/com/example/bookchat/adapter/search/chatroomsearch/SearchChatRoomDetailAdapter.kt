@@ -21,6 +21,9 @@ class SearchChatRoomDetailAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(searchChatRoomListItem: SearchChatRoomListItem) {
             binding.searchChatRoomListItem = searchChatRoomListItem
+            binding.root.setOnClickListener{
+                itemClickListener.onItemClick(searchChatRoomListItem)
+            }
         }
     }
 

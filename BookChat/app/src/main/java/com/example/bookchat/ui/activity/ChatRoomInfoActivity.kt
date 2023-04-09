@@ -1,15 +1,15 @@
 package com.example.bookchat.ui.activity
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.bookchat.R
-import com.example.bookchat.databinding.ActivityChatRoomBinding
+import com.example.bookchat.databinding.ActivityChatRoomInfoBinding
 
 class ChatRoomInfoActivity : AppCompatActivity() {
-    private lateinit var binding :ActivityChatRoomBinding
+    private lateinit var binding :ActivityChatRoomInfoBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_chat_room)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_chat_room_info)
     }
 }

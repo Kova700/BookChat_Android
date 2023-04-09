@@ -16,6 +16,7 @@ import com.example.bookchat.adapter.userchatroomlist.UserChatRoomListDataAdapter
 import com.example.bookchat.adapter.userchatroomlist.UserChatRoomListHeaderAdapter
 import com.example.bookchat.data.UserChatRoomListItem
 import com.example.bookchat.databinding.FragmentChatRoomListBinding
+import com.example.bookchat.ui.activity.ChatRoomActivity
 import com.example.bookchat.ui.activity.MakeChatRoomActivity
 import com.example.bookchat.viewmodel.ChatRoomListViewModel
 import com.example.bookchat.viewmodel.ChatRoomListViewModel.ChatRoomListUiEvent
@@ -38,7 +39,8 @@ class ChatRoomListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_chat_room_list, container, false)
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_chat_room_list, container, false)
         binding.viewmodel = chatRoomListViewModel
         initAdapter()
         initRecyclerView()
@@ -48,21 +50,23 @@ class ChatRoomListFragment : Fragment() {
         return binding.root
     }
 
-    private fun observeUiEvent() = lifecycleScope.launch{
-        chatRoomListViewModel.eventFlow.collect{ event -> handleEvent(event) }
+    private fun observeUiEvent() = lifecycleScope.launch {
+        chatRoomListViewModel.eventFlow.collect { event -> handleEvent(event) }
     }
 
-    private fun observePagingData() = lifecycleScope.launch{
-        chatRoomListViewModel.chatRoomPagingData.collect{ pagingData ->
+    private fun observePagingData() = lifecycleScope.launch {
+        chatRoomListViewModel.chatRoomPagingData.collect { pagingData ->
             userChatRoomListDataAdapter.submitData(pagingData)
         }
     }
 
     private fun initAdapter() {
-        //롱클릭 리스너도 설정해줘야함
+        //롱클릭 리스너도 설정해줘야함 (채팅방 상단고정, 알림 끄기 설정 가능한 다이얼로그 띄우기)
+        //스와이프시에도 상단고정, 알림 끄기 UI 보이기
         val chatRoomItemClickListener = object : UserChatRoomListDataAdapter.OnItemClickListener {
             override fun onItemClick(userChatRoomListItem: UserChatRoomListItem) {
-                //채팅 누르면 채팅방 들어가고,
+                val intent = Intent(requireContext(), ChatRoomActivity::class.java)
+                startActivity(intent)
             }
         }
         userChatRoomListHeaderAdapter = UserChatRoomListHeaderAdapter()
@@ -85,7 +89,7 @@ class ChatRoomListFragment : Fragment() {
         }
     }
 
-    private fun handleEvent(event : ChatRoomListUiEvent) = when(event){
+    private fun handleEvent(event: ChatRoomListUiEvent) = when (event) {
         ChatRoomListUiEvent.MoveToMakeChatRoomPage -> {
             val intent = Intent(requireContext(), MakeChatRoomActivity::class.java)
             startActivity(intent)

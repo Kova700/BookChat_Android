@@ -72,8 +72,8 @@ class MakeChatRoomActivity : AppCompatActivity() {
         makeChatRoomViewModel.eventFlow.collect { event -> handleEvent(event) }
     }
 
-    private fun startChatRoomInfoActivity(){
-        val intent = Intent(this, ChatRoomInfoActivity::class.java)
+    private fun startChatRoomActivity(){
+        val intent = Intent(this, ChatRoomActivity::class.java)
         startActivity(intent)
         finish()
     }
@@ -82,6 +82,6 @@ class MakeChatRoomActivity : AppCompatActivity() {
         MakeChatRoomUiEvent.MoveToBack -> finish()
         MakeChatRoomUiEvent.MoveSelectBook -> moveToSelectBook()
         MakeChatRoomUiEvent.OpenGallery -> startImgEdit()
-        MakeChatRoomUiEvent.MoveToChatPage -> startChatRoomInfoActivity()
+        MakeChatRoomUiEvent.MoveToChatPage -> startChatRoomActivity()
     }
 }

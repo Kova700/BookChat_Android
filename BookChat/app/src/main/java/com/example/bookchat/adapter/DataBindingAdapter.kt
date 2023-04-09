@@ -4,6 +4,7 @@ import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -513,5 +514,20 @@ object DataBindingAdapter {
     ) {
         if (isVisible) return
         shimmerFrameLayout.stopShimmer()
+    }
+
+    /**Shimmer Animation Start/Stop 설정*/
+    @JvmStatic
+    @BindingAdapter("setChatInputEtFocusChangeListener")
+    fun setChatInputEtFocusChangeListener(editText: EditText, bool :Boolean){
+        editText.setOnFocusChangeListener { view, hasFocus ->
+            if (view !is EditText) return@setOnFocusChangeListener
+
+            if (hasFocus) {
+                view.maxLines = 4
+                return@setOnFocusChangeListener
+            }
+            view.maxLines = 1
+        }
     }
 }
