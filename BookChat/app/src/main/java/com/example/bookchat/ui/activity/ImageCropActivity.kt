@@ -1,60 +1,70 @@
 package com.example.bookchat.ui.activity
 
-import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityImageCropBinding
-import com.example.bookchat.ui.activity.SignUpActivity.Companion.EXTRA_USER_PROFILE_URI
-import com.example.bookchat.utils.Constants.TAG
 import java.io.ByteArrayOutputStream
 
 class ImageCropActivity : AppCompatActivity() {
 
-    companion object{
-        const val EXTRA_USER_PROFILE_BYTE_ARRAY1 = "EXTRA_USER_PROFILE_BYTE_ARRAY1"
-    }
-
-    private lateinit var binding : ActivityImageCropBinding
+    private lateinit var binding: ActivityImageCropBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_image_crop)
         binding.activity = this
-
-        val uri = intent.getStringExtra(EXTRA_USER_PROFILE_URI)!!.toUri()
-        binding.cropImageView.setImageUriAsync(uri)
-
+        galleryActivityResultLauncher.launch(LAUNCHER_INPUT_IMAGE)
     }
 
-    fun clickFinishBtn(){
-        Log.d(TAG, "ImageCropActivity: clickFinishBtn() - called")
-        val bitmap :Bitmap = binding.cropImageView.getCroppedImage(200,200)!!
+    private val galleryActivityResultLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { resultUri ->
+        if (resultUri == null) {
+            finish()
+            return@registerForActivityResult
+        }
+        binding.cropImageView.setImageUriAsync(resultUri)
+    }
+
+    fun clickFinishBtn() {
+        val bitmap: Bitmap =
+            binding.cropImageView.getCroppedImage(CROPPED_IMG_SIZE_WIDTH, CROPPED_IMG_SIZE_HEIGHT)!!
         val byteArray = getByteArray(bitmap)
-        val intent = Intent(this@ImageCropActivity, SignUpActivity::class.java)
-        intent.putExtra(EXTRA_USER_PROFILE_BYTE_ARRAY1,byteArray)
-        setResult(RESULT_OK,intent)
+        intent.putExtra(EXTRA_CROPPED_PROFILE_BYTE_ARRAY, byteArray)
+        setResult(RESULT_OK, intent)
         finish()
     }
 
-    private fun bitmapToByteArray(bitmap: Bitmap, compressFormat :Bitmap.CompressFormat) :ByteArray{
+    private fun bitmapToByteArray(
+        bitmap: Bitmap,
+        compressFormat: Bitmap.CompressFormat
+    ): ByteArray {
         val stream = ByteArrayOutputStream()
-        bitmap.compress(compressFormat,80,stream) //임시 80
+        bitmap.compress(compressFormat, BITMAP_COMPRESS_QUALITY, stream)
         return stream.toByteArray()
     }
 
-    private fun getByteArray(bitmap :Bitmap) :ByteArray{
-        return if(sdkVersionIsMoreR()) bitmapToByteArray(bitmap,Bitmap.CompressFormat.WEBP_LOSSLESS)
-        else bitmapToByteArray(bitmap,Bitmap.CompressFormat.WEBP)
+    private fun getByteArray(bitmap: Bitmap): ByteArray {
+        if (sdkVersionIsMoreR()) {
+            return bitmapToByteArray(bitmap, Bitmap.CompressFormat.WEBP_LOSSLESS)
+        }
+        return bitmapToByteArray(bitmap, Bitmap.CompressFormat.WEBP)
     }
 
-    private fun sdkVersionIsMoreR() :Boolean{
+    private fun sdkVersionIsMoreR(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     }
 
+    companion object {
+        private const val CROPPED_IMG_SIZE_WIDTH = 200 //임시 200
+        private const val CROPPED_IMG_SIZE_HEIGHT = 200 //임시 200
+        private const val BITMAP_COMPRESS_QUALITY = 80 //임시 80
+        const val EXTRA_CROPPED_PROFILE_BYTE_ARRAY = "EXTRA_USER_PROFILE_BYTE_ARRAY1"
+        const val LAUNCHER_INPUT_IMAGE = "image/*"
+    }
 }

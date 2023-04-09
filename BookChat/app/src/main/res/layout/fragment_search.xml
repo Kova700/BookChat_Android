@@ -3,46 +3,46 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-        <variable
-            name="fragment"
-            type="com.example.bookchat.ui.fragment.SearchFragment" />
+        <import type="android.view.View"/>
         <variable
             name="viewModel"
             type="com.example.bookchat.viewmodel.SearchViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:background="#FFFFFF"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <ImageButton
             android:id="@+id/back_btn"
-            setBackBtnViewVisibility="@{viewModel._searchTapStatus}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:layout_marginTop="27dp"
             android:background="?android:selectableItemBackgroundBorderless"
             android:onClick="@{() -> viewModel.clickBackBtn()}"
-            android:visibility="visible"
+            android:visibility="@{viewModel.isSearchTapDefault(viewModel.searchTapStatus) ? View.INVISIBLE : View.VISIBLE}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_back_btn" />
 
         <View
             android:id="@+id/animation_touchEvent_view"
-            setAnimationTouchViewVisibility="@{viewModel._searchTapStatus}"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
+            android:translationZ="30dp"
             android:background="#00000000"
-            android:elevation="30dp"
             android:onClick="@{() -> viewModel.clickSearchWindow()}"
-            app:layout_constraintTop_toTopOf="@+id/search_window"
-            app:layout_constraintBottom_toBottomOf="@+id/search_window"/>
+            android:visibility="@{viewModel.isSearchTapDefault(viewModel.searchTapStatus) ? View.VISIBLE : View.INVISIBLE}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/search_window"
+            app:layout_constraintTop_toTopOf="@+id/search_window" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/search_window"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginStart="30dp"
             android:layout_marginEnd="30dp"
@@ -67,15 +67,12 @@
             app:layout_constraintStart_toStartOf="@+id/search_window"
             app:layout_constraintTop_toTopOf="@+id/search_window" />
 
-        <!--에니메이션 작동시 enable = true로 수정-->
-        <EditText
+        <com.example.bookchat.BookChatEditText
             android:id="@+id/searchEditText"
             setEnterListener="@{viewModel.keyboardEnterListener}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
             android:paddingRight="60dp"
             android:background="@android:color/transparent"
             android:elevation="10dp"
@@ -83,7 +80,7 @@
             android:fontFamily="@font/notosanskr_regular"
             android:hint="@string/search_window_hint"
             android:inputType="text"
-            android:text="@={viewModel._searchKeyWord}"
+            android:text="@={viewModel.searchKeyWord}"
             android:textColor="#222222"
             android:textColorHint="#B1B3B8"
             android:textCursorDrawable="@drawable/edittext_cursor"
@@ -94,17 +91,16 @@
             app:layout_constraintStart_toEndOf="@+id/search_btn"
             app:layout_constraintTop_toTopOf="@+id/search_btn" />
 
-        <!--애니메이션 효과시 나타남-->
         <ImageButton
             android:id="@+id/search_delete_btn"
-            setSearchDeleteBtnVisibility="@{viewModel._searchTapStatus}"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_marginEnd="27dp"
             android:background="#00ff0000"
             android:elevation="10dp"
             android:onClick="@{() -> viewModel.clearSearchWindow()}"
             android:src="@drawable/ic_text_delete_btn"
+            android:visibility="@{viewModel.isSearchTapDefaultOrHistory(viewModel.searchTapStatus) ? View.INVISIBLE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@+id/search_window"
             app:layout_constraintEnd_toEndOf="@+id/search_window"
             app:layout_constraintTop_toTopOf="@+id/search_window" />
@@ -113,7 +109,7 @@
             android:id="@+id/searchPage_layout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

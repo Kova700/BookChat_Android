@@ -12,18 +12,22 @@
 
         <include
             android:id="@+id/swipe_background"
-            layout="@layout/item_bookshelf_swipe_background" />
+            layout="@layout/item_bookshelf_swipe_background"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/swipe_view"
+            app:layout_constraintEnd_toEndOf="@+id/swipe_view"
+            app:layout_constraintStart_toStartOf="@+id/swipe_view"
+            app:layout_constraintTop_toTopOf="@+id/swipe_view" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/swipe_view"
             android:layout_width="match_parent"
-            android:layout_height="182dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="10dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="3dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/bookshelf_swipe_item_margin_horizontal"
+            android:layout_marginVertical="@dimen/bookshelf_swipe_item_margin_vertical"
+            app:cardCornerRadius="@dimen/swipe_item_corner_radius"
+            app:cardElevation="@dimen/swipe_item_elevation"
             android:foreground="?android:attr/selectableItemBackground"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -33,24 +37,26 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_margin="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardView2"
-                    android:layout_width="93dp"
-                    android:layout_height="142dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginStart="10dp"
-                    app:cardCornerRadius="5dp"
-                    app:cardElevation="5dp"
+                    android:layout_margin="10dp"
+                    app:cardCornerRadius="@dimen/book_img_corner_radius"
+                    app:cardElevation="@dimen/book_img_elevation"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:id="@+id/bookImg"
+                        android:layout_width="@dimen/book_img_width_default"
+                        android:layout_height="@dimen/book_img_height_default"
                         android:scaleType="fitXY"
+                        setBookImgSize="@{true}"
                         loadUrl="@{bookShelfItem.bookCoverImageUrl}"
                         android:src="@drawable/empty_img"/>
                 </androidx.cardview.widget.CardView>

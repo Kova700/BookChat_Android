@@ -1,24 +1,25 @@
-package com.example.bookchat.adapter
+package com.example.bookchat.adapter.search.booksearch
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ItemBookSearchResultBinding
-import com.example.bookchat.utils.Constants
 
-class SearchResultBookSimpleAdapter : RecyclerView.Adapter<SearchResultBookSimpleAdapter.BookResultViewHolder>(){
+class SearchResultBookDetailDataAdapter
+    : PagingDataAdapter<Book, SearchResultBookDetailDataAdapter.BookResultViewHolder>(
+    BOOK_COMPARATOR
+) {
 
-    private lateinit var binding :ItemBookSearchResultBinding
-    private lateinit var itemClickListener :OnItemClickListener
-    var books :List<Book> = listOf()
+    private lateinit var binding : ItemBookSearchResultBinding
+    private lateinit var itemClickListener: OnItemClickListener
 
     inner class BookResultViewHolder(val binding: ItemBookSearchResultBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(book : Book){
-            Log.d(Constants.TAG, "BookResultViewHolder: bind() - ${book.title} 바인드됨")
             binding.book = book
             binding.root.setOnClickListener {
                 itemClickListener.onItemClick(book)
@@ -27,7 +28,6 @@ class SearchResultBookSimpleAdapter : RecyclerView.Adapter<SearchResultBookSimpl
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookResultViewHolder {
-        Log.d(Constants.TAG, "SearchResultBookAdapter: onCreateViewHolder() - called")
         binding = DataBindingUtil.inflate(
             LayoutInflater.from(parent.context),
             R.layout.item_book_search_result,
@@ -38,11 +38,8 @@ class SearchResultBookSimpleAdapter : RecyclerView.Adapter<SearchResultBookSimpl
     }
 
     override fun onBindViewHolder(holder: BookResultViewHolder, position: Int) {
-        if(books.isNotEmpty()) holder.bind(books[position])
-    }
-
-    override fun getItemCount(): Int {
-        return books.size
+        val currentItem = getItem(position)
+        currentItem?.let { holder.bind(currentItem) }
     }
 
     interface OnItemClickListener {
@@ -53,5 +50,16 @@ class SearchResultBookSimpleAdapter : RecyclerView.Adapter<SearchResultBookSimpl
         this.itemClickListener = onItemClickListener
     }
 
+    override fun getItemViewType(position: Int): Int = R.layout.item_book_search_result
+
+    companion object {
+        private val BOOK_COMPARATOR = object : DiffUtil.ItemCallback<Book>() {
+            override fun areItemsTheSame(oldItem: Book, newItem: Book) =
+                oldItem.isbn == newItem.isbn
+
+            override fun areContentsTheSame(oldItem: Book, newItem: Book) =
+                oldItem == newItem
+        }
+    }
 
 }

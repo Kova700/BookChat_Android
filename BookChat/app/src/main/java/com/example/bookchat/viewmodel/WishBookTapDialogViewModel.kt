@@ -27,8 +27,11 @@ class WishBookTapDialogViewModel @AssistedInject constructor(
     var isToggleChecked = MutableStateFlow<Boolean>(true)
 
     fun requestToggleApi() = viewModelScope.launch {
-        isToggleChecked.value = !(isToggleChecked.value)
-        if(isToggleChecked.value){
+        if (!isNetworkConnected()) {
+            makeToast(R.string.error_network)
+            return@launch
+        }
+        if(!isToggleChecked.value){
             requestAddWishBook()
             return@launch
         }
@@ -40,6 +43,7 @@ class WishBookTapDialogViewModel @AssistedInject constructor(
             .onSuccess {
                 makeToast(R.string.bookshelf_delete_wish_book)
                 startEvent(WishBookEvent.RemoveItem)
+                setToggleValueReverse()
             }
             .onFailure { makeToast(R.string.bookshelf_delete_fail) }
     }
@@ -47,7 +51,11 @@ class WishBookTapDialogViewModel @AssistedInject constructor(
     private suspend fun requestAddWishBook()= viewModelScope.launch {
         val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(bookShelfDataItem.bookShelfItem.getBook(),ReadingStatus.WISH)
         runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
-            .onSuccess { makeToast(R.string.wish_bookshelf_register_success) }
+            .onSuccess {
+                makeToast(R.string.wish_bookshelf_register_success)
+                startEvent(WishBookEvent.AddItem)
+                setToggleValueReverse()
+            }
             .onFailure { makeToast(R.string.wish_bookshelf_register_fail) }
     }
 
@@ -60,6 +68,14 @@ class WishBookTapDialogViewModel @AssistedInject constructor(
             .onFailure { makeToast(R.string.bookshelf_change_to_reading_fail) }
     }
 
+    private fun isNetworkConnected() :Boolean{
+        return App.instance.isNetworkConnected()
+    }
+
+    private fun setToggleValueReverse(){
+        isToggleChecked.value = !(isToggleChecked.value)
+    }
+
     private fun startEvent (event : WishBookEvent) = viewModelScope.launch {
         _eventFlow.emit(event)
     }
@@ -70,6 +86,7 @@ class WishBookTapDialogViewModel @AssistedInject constructor(
 
     sealed class WishBookEvent {
         object RemoveItem :WishBookEvent()
+        object AddItem :WishBookEvent()
         object MoveToReadingBook :WishBookEvent()
     }
 

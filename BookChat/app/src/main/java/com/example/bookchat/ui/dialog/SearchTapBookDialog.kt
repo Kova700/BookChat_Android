@@ -13,7 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.DialogSearchTapBookClickedBinding
-import com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel
 import com.example.bookchat.viewmodel.SearchTapBookDialogViewModel
 import com.example.bookchat.viewmodel.SearchTapBookDialogViewModel.SearchTapDialogEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,7 +60,7 @@ class SearchTapBookDialog(private val book: Book) : DialogFragment() {
     }
 
     private fun handleEvent(event: SearchTapDialogEvent) = when(event){
-            is SearchTapDialogEvent.OpenSetStarsDalog -> openSetStarsDialog()
+        is SearchTapDialogEvent.OpenSetStarsDialog -> openSetStarsDialog()
     }
 
     companion object{

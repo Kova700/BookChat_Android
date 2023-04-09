@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.App
 import com.example.bookchat.R
@@ -20,6 +21,8 @@ import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.utils.RefreshManager
 import com.example.bookchat.utils.RefreshManager.BookShelfRefreshFlag
 import com.example.bookchat.utils.toStarRating
+import com.example.bookchat.viewmodel.SearchTapBookDialogViewModel
+import com.example.bookchat.viewmodel.SearchTapBookDialogViewModel.SearchTapDialogState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +34,7 @@ class CompleteBookSetStarsDialog @AssistedInject constructor(
 ) : DialogFragment() {
 
     private lateinit var binding :DialogCompleteBookSetStarsBinding
+    private val searchTapBookDialogViewModel : SearchTapBookDialogViewModel by viewModels ({ requireParentFragment() })
 
     val starRating = MutableStateFlow<Float>(0.0F)
 
@@ -62,14 +66,18 @@ class CompleteBookSetStarsDialog @AssistedInject constructor(
     }
 
     private fun requestRegisterCompleteBook() = lifecycleScope.launch {
-        val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(book, ReadingStatus.COMPLETE, starRating.value.toStarRating())
+        val requestRegisterBookShelfBook =
+            RequestRegisterBookShelfBook(book, ReadingStatus.COMPLETE, starRating.value.toStarRating())
         runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
-            .onSuccess {
-                makeToast(R.string.complete_bookshelf_register_success)
-                RefreshManager.addBookShelfRefreshFlag(BookShelfRefreshFlag.Complete)
-                this@CompleteBookSetStarsDialog.dismiss()
-            }
+            .onSuccess { registerCompleteBookSuccessCallBack() }
             .onFailure { makeToast(R.string.complete_bookshelf_register_fail) }
+    }
+
+    private fun registerCompleteBookSuccessCallBack(){
+        makeToast(R.string.complete_bookshelf_register_success)
+        RefreshManager.addBookShelfRefreshFlag(BookShelfRefreshFlag.Complete)
+        searchTapBookDialogViewModel.setDialogState(SearchTapDialogState.AlreadyInBookShelf(ReadingStatus.COMPLETE))
+        this@CompleteBookSetStarsDialog.dismiss()
     }
 
     private fun makeToast(stringId :Int){
@@ -80,5 +88,4 @@ class CompleteBookSetStarsDialog @AssistedInject constructor(
     interface AssistedFactory {
         fun create(book: Book) : CompleteBookSetStarsDialog
     }
-
 }

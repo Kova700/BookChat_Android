@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 
 class ReadingBookShelfDataAdapter(private val bookShelfViewModel: BookShelfViewModel)
     : PagingDataAdapter<BookShelfDataItem, ReadingBookShelfDataAdapter.ReadingBookShelfDataViewHolder>(BOOK_SHELF_ITEM_COMPARATOR){
-    private lateinit var bindingDataItem : ItemReadingBookshelfDataBinding
+    private lateinit var binding : ItemReadingBookshelfDataBinding
     private lateinit var itemClickListener : OnItemClickListener
     private lateinit var pageBtnClickListener : OnItemClickListener
 
@@ -104,10 +104,10 @@ class ReadingBookShelfDataAdapter(private val bookShelfViewModel: BookShelfViewM
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReadingBookShelfDataViewHolder {
-        bindingDataItem = DataBindingUtil
+        binding = DataBindingUtil
             .inflate(LayoutInflater.from(parent.context),
                 R.layout.item_reading_bookshelf_data,parent,false)
-        return ReadingBookShelfDataViewHolder(bindingDataItem)
+        return ReadingBookShelfDataViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ReadingBookShelfDataViewHolder, position: Int) {

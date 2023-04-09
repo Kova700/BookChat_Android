@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
             name="bookShelfItem"
             type="com.example.bookchat.data.BookShelfItem" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
@@ -16,12 +16,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            app:cardCornerRadius="7dp"
-            app:cardElevation="5dp"
+            android:layout_marginHorizontal="@dimen/flex_box_book_item_margin_horizontal"
+            android:layout_marginVertical="@dimen/flex_box_book_item_margin_vertical"
+            app:cardCornerRadius="@dimen/book_img_corner_radius"
+            app:cardElevation="@dimen/book_img_elevation"
             android:foreground="?android:attr/selectableItemBackground"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -29,9 +27,11 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:layout_width="88dp"
-                android:layout_height="130dp"
+                android:id="@+id/bookImg"
+                android:layout_width="@dimen/book_img_width_default"
+                android:layout_height="@dimen/book_img_height_default"
                 android:scaleType="fitXY"
+                setBookImgSize="@{true}"
                 loadUrl="@{bookShelfItem.bookCoverImageUrl}"
                 android:src="@drawable/empty_img"/>
         </androidx.cardview.widget.CardView>

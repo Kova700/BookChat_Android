@@ -32,13 +32,17 @@ class SearchTapHistoryFragment : Fragment() {
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search_tap_history, container, false)
         binding.fragment = this
-        initAdapter()
-        initRcv()
+        roadHistory()
         return binding.root
     }
 
-    private fun initAdapter() = lifecycleScope.launch {
+    private fun roadHistory() = lifecycleScope.launch{
         val historyList = DataStoreManager.getSearchHistory() ?: mutableListOf()
+        initAdapter(historyList)
+        initRcv()
+    }
+
+    private fun initAdapter(historyList :MutableList<String>) {
         searchHistoryAdapter = SearchHistoryAdapter(historyList)
         searchHistoryAdapter.setHasStableIds(true)
         searchHistoryAdapter.setItemClickListener(object : SearchHistoryAdapter.OnItemClickListener {
@@ -50,9 +54,11 @@ class SearchTapHistoryFragment : Fragment() {
     }
 
     private fun initRcv() {
-        binding.historyRcv.adapter = searchHistoryAdapter
-        binding.historyRcv.setHasFixedSize(true)
-        binding.historyRcv.layoutManager = LinearLayoutManager(requireContext())
+        with(binding){
+            historyRcv.adapter = searchHistoryAdapter
+            historyRcv.setHasFixedSize(true)
+            historyRcv.layoutManager = LinearLayoutManager(requireContext())
+        }
     }
 
     fun clearHistory() = lifecycleScope.launch {

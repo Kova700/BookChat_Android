@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="default_margin">30dp</dimen>
+    <!--target_screen_size-->
+    <dimen name="target_screen_width">360dp</dimen>
+    <!--book_img-->
+    <dimen name="book_img_corner_radius">7dp</dimen>
+    <dimen name="book_img_elevation">5dp</dimen>
+    <dimen name="book_img_width_default">88dp</dimen>
+    <dimen name="book_img_height_default">130dp</dimen>
+    <!--flex_box-->
+    <dimen name="flex_box_book_item_margin_horizontal">7.5dp</dimen>
+    <dimen name="flex_box_book_item_margin_vertical">10dp</dimen>
+    <dimen name="flex_box_margin_horizontal">22.5dp</dimen>
+    <!--bookshelf_swipe_item-->
+    <dimen name="swipe_item_elevation">3dp</dimen>
+    <dimen name="swipe_item_corner_radius">16dp</dimen>
+    <dimen name="bookshelf_swipe_item_margin_horizontal">30dp</dimen>
+    <dimen name="bookshelf_swipe_item_margin_vertical">10dp</dimen>
+    <!--bookshelf_dialog-->
+    <dimen name="bookshelf_dialog_empty_area_horizontal">30dp</dimen>
+    <dimen name="bookshelf_dialog_white_padding_horizontal">25dp</dimen>
+    <dimen name="bookshelf_dialog_white_padding_top">25dp</dimen>
+    <dimen name="bookshelf_dialog_white_padding_bottom">30dp</dimen>
+    <dimen name="bookshelf_dialog_beige_area_top_margin">30dp</dimen>
+    <!--make_chat_room-->
+    <dimen name="make_chat_room_img_width_default">100dp</dimen>
+    <dimen name="make_chat_room_img_height_default">150dp</dimen>
+</resources>

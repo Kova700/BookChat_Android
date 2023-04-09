@@ -8,7 +8,6 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
@@ -16,6 +15,8 @@ import com.example.bookchat.data.*
 import com.example.bookchat.utils.*
 import com.example.bookchat.viewmodel.AgonyViewModel.AgonyActivityState
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportStatus
+import com.facebook.shimmer.ShimmerFrameLayout
+import java.util.*
 
 object DataBindingAdapter {
 
@@ -143,78 +144,6 @@ object DataBindingAdapter {
             NameCheckStatus.IsPerfect -> {
                 layout.background = ResourcesCompat.getDrawable(App.instance.resources,R.drawable.nickname_input_back_blue,null)
             }
-        }
-    }
-
-    /**검색창 : 검색어 삭제버튼 Visible 설정*/
-    @JvmStatic
-    @BindingAdapter("setSearchDeleteBtnVisibility")
-    fun setSearchDeleteBtnVisibility(view: View, searchTapStatus : SearchTapStatus){
-        if (searchTapStatus !is SearchTapStatus.Searching) {
-            view.visibility = View.INVISIBLE
-            return
-        }
-        view.visibility = View.VISIBLE
-    }
-
-    /**검색창 애니메이션 터치뷰 : 검색창 애니메이션 터치뷰 Visible 설정*/
-    @JvmStatic
-    @BindingAdapter("setAnimationTouchViewVisibility")
-    fun setAnimationTouchViewVisibility(view: View, searchTapStatus : SearchTapStatus){
-        if (searchTapStatus !is SearchTapStatus.Default) {
-            view.visibility = View.INVISIBLE
-            return
-        }
-        view.visibility = View.VISIBLE
-    }
-
-    /**검색창 뒤로가기 버튼 : 검색창 뒤로가기 버튼 Visible 설정*/
-    @JvmStatic
-    @BindingAdapter("setBackBtnViewVisibility")
-    fun setBackBtnViewVisibility(view: View, searchTapStatus : SearchTapStatus){
-        if (searchTapStatus !is SearchTapStatus.Default) {
-            view.visibility = View.VISIBLE
-            return
-        }
-        view.visibility = View.INVISIBLE
-    }
-
-    /**리사이클러뷰 아이템 연결*/
-    @JvmStatic
-    @BindingAdapter("setItem")
-    fun setItem(recyclerView: RecyclerView, data :List<Any>?){
-        if(data.isNullOrEmpty()) return
-
-        when(recyclerView.id){
-            R.id.search_result_book_simple_Rcv -> {
-                if(data.first() is Book) {
-                    val books = data.map { it as Book }
-                    val searchResultBookSimpleAdapter = recyclerView.adapter as SearchResultBookSimpleAdapter
-                    searchResultBookSimpleAdapter.books = books
-                }
-            }
-        }
-    }
-
-    /**ProgressBar Viisbilty 설정*/
-    @JvmStatic
-    @BindingAdapter("setProgressBarVisibility")
-    fun setProgressBarVisibility(view: View, loadState: LoadState){
-        when(loadState){
-            LoadState.Default,
-            LoadState.Result -> view.visibility = View.INVISIBLE
-            LoadState.Loading -> view.visibility = View.VISIBLE
-        }
-    }
-
-    /**RecyclerView Viisbilty 설정*/
-    @JvmStatic
-    @BindingAdapter("setRcvVisibility")
-    fun setRcvVisibility(view: View, loadState: LoadState){
-        when(loadState){
-            LoadState.Default,
-            LoadState.Result -> view.visibility = View.VISIBLE
-            LoadState.Loading -> view.visibility = View.INVISIBLE
         }
     }
 
@@ -459,5 +388,130 @@ object DataBindingAdapter {
             return
         }
         view.visibility = View.INVISIBLE
+    }
+
+    /**UserChatRoomListItem 시간 Text 세팅*/
+    @JvmStatic
+    @BindingAdapter("getFormattedDetailDateTimeText")
+    fun getFormattedDetailDateTimeText(view: TextView, dateAndTimeString: String?) {
+        if (dateAndTimeString == null) return
+        view.text = DateManager.getFormattedDetailDateTimeText(dateAndTimeString)
+    }
+
+    /**UserChatRoomListItem 채팅방 이미지 세팅*/
+    @JvmStatic
+    @BindingAdapter("defaultImgNum", "imgUrl", requireAll = false)
+    fun setChatListItemImg(
+        view :ImageView,
+        defaultImgNum :Int,
+        imgUrl:String?
+    ){
+        if (imgUrl.isNullOrBlank()){
+            setRandomChatRoomImg(view, defaultImgNum)
+            return
+        }
+        loadUrl(view, imgUrl)
+    }
+
+    /**SearchChatRoomItem 시간 Text 세팅*/
+    @JvmStatic
+    @BindingAdapter("getFormattedAbstractDateTimeText")
+    fun getFormattedAbstractDateTimeText(view: TextView, dateAndTimeString: String?) {
+        if (dateAndTimeString == null) return
+        view.text = DateManager.getFormattedAbstractDateTimeText(dateAndTimeString)
+    }
+
+    /**SearchChatRoomItem 태그 파싱*/
+    @JvmStatic
+    @BindingAdapter("parseHashTagText")
+    fun parseHashTagText(view: TextView, hashTagString: String){
+        view.text = hashTagString.split(",").joinToString("  ") { "#$it" }
+    }
+
+    /**화면 크기에 맞는 도서 이미지 크기 세팅*/
+    @JvmStatic
+    @BindingAdapter("setBookImgSize")
+    fun setBookImgSize(view :View, bool :Boolean){
+        with(view){
+            layoutParams.width = BookImgSizeManager.bookImgWidthPx
+            layoutParams.height = BookImgSizeManager.bookImgHeightPx
+        }
+    }
+
+    /**화면 크기에 맞는 Dialog 크기 세팅*/
+    @JvmStatic
+    @BindingAdapter("setDialogSize")
+    fun setDialogSize(view :View, bool :Boolean){
+        view.layoutParams.width = DialogSizeManager.dialogWidthPx
+    }
+
+    /** MakeChatRoom 채팅방 생성 기본 이미지 세팅*/
+    @JvmStatic
+    @BindingAdapter("defaultImgNum", "imgByteArray", requireAll = false)
+    fun setMakeChatRoomImg(
+        view :ImageView,
+        defaultImgNum :Int,
+        imgByteArray: ByteArray){
+        if (imgByteArray.isEmpty()){
+            setRandomChatRoomImg(view, defaultImgNum)
+            return
+        }
+        loadByteArray(view, imgByteArray)
+    }
+
+    @JvmStatic
+    fun setRandomChatRoomImg(view :ImageView, defaultImgNum :Int){
+        when(defaultImgNum){
+            1 -> view.setImageResource(R.drawable.default_chat_room_img1)
+            2 -> view.setImageResource(R.drawable.default_chat_room_img2)
+            3 -> view.setImageResource(R.drawable.default_chat_room_img3)
+            4 -> view.setImageResource(R.drawable.default_chat_room_img4)
+            5 -> view.setImageResource(R.drawable.default_chat_room_img5)
+            6 -> view.setImageResource(R.drawable.default_chat_room_img6)
+            7 -> view.setImageResource(R.drawable.default_chat_room_img7)
+        }
+    }
+
+    /** MakeChatRoom 화면 크기에 맞는 채팅방 이미지 크기 세팅*/
+    @JvmStatic
+    @BindingAdapter("setMakeChatRoomImgSize")
+    fun setMakeChatRoomImgSize(view :ImageView, bool :Boolean){
+        val sizeManager = MakeChatRoomImgSizeManager()
+        with(view){
+            layoutParams.width = sizeManager.chatRoomImgWidthPx
+            layoutParams.height = sizeManager.chatRoomImgHeightPx
+        }
+    }
+
+    /**독서취향 : 제출 버튼 색상 설정*/
+    @JvmStatic
+    @BindingAdapter("setSubmitTextColor")
+    fun setSubmitTextColor(textView : TextView, flag :Boolean){
+        if (flag) {
+            textView.setTextColor(Color.parseColor("#000000"))
+            textView.isClickable = true
+            return
+        }
+        textView.setTextColor(Color.parseColor("#B5B7BB"))
+        textView.isClickable = false
+    }
+
+    /**Shimmer내부 GirdLayout 설정*/
+    @JvmStatic
+    @BindingAdapter("setShimmerGridLayout")
+    fun setShimmerGridLayout(gridLayout :GridLayout, bool :Boolean){
+        gridLayout.columnCount = BookImgSizeManager.flexBoxBookSpanSize
+        gridLayout.rowCount = 2
+    }
+
+    /**Shimmer Animation Start/Stop 설정*/
+    @JvmStatic
+    @BindingAdapter("setShimmerAnimation")
+    fun setShimmerAnimation(
+        shimmerFrameLayout: ShimmerFrameLayout,
+        isVisible: Boolean
+    ) {
+        if (isVisible) return
+        shimmerFrameLayout.stopShimmer()
     }
 }

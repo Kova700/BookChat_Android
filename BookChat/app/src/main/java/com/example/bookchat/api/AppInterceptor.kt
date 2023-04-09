@@ -1,16 +1,12 @@
 package com.example.bookchat.api
 
-import android.util.Log
 import com.example.bookchat.BuildConfig.TOKEN_RENEWAL_URL
 import com.example.bookchat.data.Token
 import com.example.bookchat.data.response.BadRequestException
 import com.example.bookchat.data.response.ForbiddenException
 import com.example.bookchat.data.response.TokenRenewalFailException
-import com.example.bookchat.repository.UserRepository.Companion.CONTENT_TYPE_JSON
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
 import com.google.gson.Gson
-import kotlinx.coroutines.runBlocking
 import okhttp3.*
 import java.io.IOException
 
@@ -20,9 +16,8 @@ class AppInterceptor : Interceptor {
     override fun intercept(
         chain: Interceptor.Chain
     ): Response {
-        val bookChatToken = getBookchatToken().getOrElse { null }
+        val bookChatToken = DataStoreManager.getBookChatTokenSync().getOrNull()
         var response = requestWithAccessToken(chain, bookChatToken?.accessToken)
-        Log.d(TAG, "AppInterceptor: intercept(tokenAddedRequest) - response :$response")
 
         response = renewTokenOrPass(response, chain, bookChatToken)
         if (response.isSuccessful) return response
@@ -49,11 +44,9 @@ class AppInterceptor : Interceptor {
         refreshToken: String?
     ) :Token{
         val tokenRenewalResponse = requestTokenRenewal(chain, refreshToken)
-        Log.d(TAG, "AppInterceptor: intercept(refreshTokenRequest) - : $tokenRenewalResponse")
         if (!tokenRenewalResponse.isSuccessful) throw TokenRenewalFailException()
         val token = parseResponseToToken(tokenRenewalResponse.body()?.string())
-        Log.d(TAG, "AppInterceptor: intercept() - token : $token")
-        saveBookchatToken(token)
+        DataStoreManager.saveBookChatTokenSync(token)
         return token
     }
 
@@ -80,12 +73,6 @@ class AppInterceptor : Interceptor {
             403 -> ForbiddenException(errorResponseString)
             else -> null
         }
-
-    private fun getBookchatToken() =
-        runBlocking { runCatching { DataStoreManager.getBookchatToken() } }
-
-    private fun saveBookchatToken(token: Token) =
-        runBlocking { runCatching { DataStoreManager.saveBookchatToken(token) } }
 
     private fun Request.addHeader(headerName: String, headerContent: String): Request {
         return this.newBuilder()
@@ -122,6 +109,6 @@ class AppInterceptor : Interceptor {
 
     companion object {
         private const val AUTHORIZATION = "Authorization"
+        private const val CONTENT_TYPE_JSON = "application/json; charset=utf-8"
     }
-
 }

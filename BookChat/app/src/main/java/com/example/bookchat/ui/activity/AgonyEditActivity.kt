@@ -1,7 +1,6 @@
 package com.example.bookchat.ui.activity
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -56,7 +55,7 @@ class AgonyEditActivity : AppCompatActivity() {
     private fun openKeyboard(view : View) {
         Handler(Looper.getMainLooper()).postDelayed({
             imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
-        }, SignUpActivity.DELAY_TIME)
+        }, SignUpActivity.KEYBOARD_DELAY_TIME)
     }
 
     private fun getAgony() = intent.getSerializableExtra(EXTRA_AGONY) as Agony
@@ -84,7 +83,6 @@ class AgonyEditActivity : AppCompatActivity() {
     }
 
     private fun moveToPreviousActivity(newTitle :String){
-        val intent = Intent(this@AgonyEditActivity, AgonyRecordActivity::class.java)
         intent.putExtra(EXTRA_NEW_AGONY_TITLE, newTitle)
         setResult(RESULT_OK,intent)
         finish()

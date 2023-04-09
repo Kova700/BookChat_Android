@@ -46,8 +46,8 @@
 
     <!--main-->
     <string name="main_hello">안녕하세요</string>
-    <string name="today_book">오늘의 북</string>
-    <string name="today_chat">오늘의 챗</string>
+    <string name="main_book">독서 중인 도서</string>
+    <string name="main_chat">참여 중인 채팅방</string>
 
     <!--bookshelf-->
     <string name="bookshelf">서재</string>
@@ -86,6 +86,8 @@
     <string name="wish_bookshelf_register_fail">독서예정 등록을 실패했습니다.</string>
     <string name="chat_room_result_empty">채팅방이 없어요!</string>
     <string name="chat_room_add_slogan">새로운 채팅방을 추가하고\n북챗을 나눠보세요.</string>
+    <string name="book_result_empty">해당 도서가 없어요!</string>
+    <string name="book_result_empty_sub">검색어를 다시 확인해 주세요.</string>
 
     <!--book report-->
     <string name="book_report">독후감</string>
@@ -119,7 +121,15 @@
     <string name="agony_record_delete_fail">고민기록 삭제를 실패했습니다.</string>
 
     <!--chat-->
+    <string name="chat">채팅</string>
     <string name="chat_room">채팅방</string>
+    <string name="my_chat_room">나의 채팅방</string>
+    <string name="make_chat_room">채팅방 만들기</string>
+    <string name="make_chat_room_select">선택하기</string>
+    <string name="make_chat_room_title_hint">채팅방 제목을 작성해 주세요.</string>
+    <string name="make_chat_room_tag_hint">#해시태그로 채팅방을 소개해 주세요.</string>
+    <string name="make_chat_room_book_select">도서 선택</string>
+    <string name="make_chat_room_fail">채팅방 생성을 실패했습니다.</string>
 
     <!--my page-->
     <string name="my_page_title">나의 정보</string>
@@ -146,9 +156,11 @@
     <!--util-->
     <string name="confirm">확인</string>
     <string name="cancel">취소</string>
+    <string name="finish">완료</string>
     <string name="title">제목</string>
     <string name="content">내용</string>
     <string name="add">추가하기</string>
+    <string name="people_count_text">명</string>
     <string name="make_confirm">작성 완료</string>
     <string name="revise_confirm">수정 완료</string>
     <string name="all_delete">전체삭제</string>

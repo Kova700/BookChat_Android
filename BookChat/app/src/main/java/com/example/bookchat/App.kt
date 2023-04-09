@@ -14,15 +14,19 @@ import dagger.hilt.android.HiltAndroidApp
 class App : Application() {
 
     private val networkManager by lazy { NetworkManager() }
+    private lateinit var cachedUser: User
     val bookChatApiClient: BookChatApiInterface by lazy {
         RetrofitBuilder.getApiClient().create(BookChatApiInterface::class.java)
     }
-    private lateinit var cachedUser: User
 
     override fun onCreate() {
         super.onCreate()
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         instance = this
+        setKakaoSdk()
+    }
+
+    private fun setKakaoSdk() {
         KakaoSdk.init(
             context = this,
             appKey = KAKAO_APP_KEY

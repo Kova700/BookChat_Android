@@ -17,3 +17,5 @@ data class Book(
     @SerializedName("bookCoverImageUrl")
     val bookCoverImageUrl: String
 ) : Serializable
+
+fun getEmptyBook() = Book("","",listOf(),"","","")

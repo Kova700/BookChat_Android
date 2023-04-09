@@ -171,4 +171,29 @@ interface BookChatApiInterface {
         @Path("recordId") recordId: Long,
         @Body requestReviseAgonyRecord: RequestReviseAgonyRecord
     ): Response<Unit>
+
+    /**------------채팅방 목록------------*/
+
+    @GET("/v1/api/users/chatrooms")
+    suspend fun getUserChatRoomList(
+        @Query("postCursorId") postCursorId: Int?,
+        @Query("size") size: String,
+    ): Response<ResponseGetUserChatRoomList>
+
+    @Multipart
+    @POST("/v1/api/chatrooms")
+    suspend fun makeChatRoom(
+        @Part("createChatRoomRequest") requestMakeChatRoom: RequestMakeChatRoom,
+        @Part chatRoomImage: MultipartBody.Part? = null
+    ): Response<Unit>
+
+    @GET("/v1/api/chatrooms")
+    suspend fun searchChatRoom(
+        @Query("postCursorId") postCursorId: Int?,
+        @Query("size") size: String?,
+        @Query("roomName") roomName: String?,
+        @Query("title") title: String?,
+        @Query("isbn") isbn: String?,
+        @Query("tags") tags: String?,
+    ): Response<ResponseGetSearchChatRoomList>
 }

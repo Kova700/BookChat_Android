@@ -11,6 +11,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityMainBinding
 import com.example.bookchat.ui.fragment.*
 import com.example.bookchat.utils.RefreshManager
+import com.example.bookchat.utils.SearchPurpose
 import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.COMPLETE_TAB_INDEX
 import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.READING_TAB_INDEX
 import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.WISH_TAB_INDEX
@@ -23,8 +24,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val homeFragment by lazy { HomeFragment() }
     private val bookShelfFragment by lazy { BookShelfFragment() }
-    private val searchFragment by lazy { SearchFragment() }
-    private val chatFragment by lazy { ChatFragment() }
+    private val searchFragment by lazy { SearchFragment(SearchPurpose.DefaultSearch) }
+    private val chatRoomListFragment by lazy { ChatRoomListFragment() }
     private val myPageFragment by lazy { MyPageFragment() }
 
     private val bottomNaviFragmentStack = ArrayDeque<Fragment>()
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity() {
                     addOrReplaceFragment(searchFragment, FRAGMENT_TAG_SEARCH)
                 }
                 R.id.chat_navi_icon -> {
-                    addOrReplaceFragment(chatFragment, FRAGMENT_TAG_CHAT)
+                    addOrReplaceFragment(chatRoomListFragment, FRAGMENT_TAG_CHAT)
                 }
                 R.id.mypage_navi_icon -> {
                     addOrReplaceFragment(myPageFragment, FRAGMENT_TAG_MY_PAGE)
