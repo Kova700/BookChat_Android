@@ -6,7 +6,7 @@ import androidx.databinding.DataBindingUtil
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityChatRoomBinding
 
-class ChatRoomActivity : AppCompatActivity() {
+class ChatRoomInfoActivity : AppCompatActivity() {
     private lateinit var binding :ActivityChatRoomBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
