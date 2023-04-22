@@ -81,6 +81,13 @@ dependencies {
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
     //Facebook.Shimmer
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
+    //krossbow-stomp
+    implementation("org.hildan.krossbow:krossbow-stomp-core:5.1.0")
+    implementation("org.hildan.krossbow:krossbow-websocket-okhttp:5.1.0")
+    //OkHttp
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
 }
 
 kapt {

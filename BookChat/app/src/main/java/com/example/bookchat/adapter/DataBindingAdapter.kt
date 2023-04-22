@@ -58,21 +58,36 @@ object DataBindingAdapter {
     /**유저 프로필 이미지 출력*/
     @JvmStatic
     @BindingAdapter("loadUserProfile")
-    fun loadUserProfile(imageView: ImageView, user : User?){
+    fun loadUserProfile(imageView: ImageView, user: User?) {
         if (user == null) return
 
-        if (user.userProfileImageUri?.trim().isNullOrBlank()){
-            Glide.with(imageView.context)
-                .load(getUserDefaultProfileImage(user))
-                .placeholder(R.drawable.loading_img)
-                .error(R.drawable.error_img)
-                .into(imageView)
+        if (!user.userProfileImageUri?.trim().isNullOrBlank()) {
+            loadUrl(imageView, user.userProfileImageUri)
             return
         }
-        loadUrl(imageView, user.userProfileImageUri)
+        Glide.with(imageView.context)
+            .load(getUserDefaultProfileImage(user.defaultProfileImageType))
+            .placeholder(R.drawable.loading_img)
+            .error(R.drawable.error_img)
+            .into(imageView)
     }
 
-    private fun getUserDefaultProfileImage(user :User) = when (user.defaultProfileImageType) {
+    /**Chat Sender 프로필 이미지 출력*/
+    @JvmStatic
+    @BindingAdapter("loadSenderProfile")
+    fun loadSenderProfile(imageView: ImageView, chat :Chat){
+        if (!chat.senderProfileImageUrl?.trim().isNullOrBlank()){
+            loadUrl(imageView, chat.senderProfileImageUrl)
+            return
+        }
+        Glide.with(imageView.context)
+            .load(getUserDefaultProfileImage(chat.senderDefaultProfileImageType))
+            .placeholder(R.drawable.loading_img)
+            .error(R.drawable.error_img)
+            .into(imageView)
+    }
+
+    private fun getUserDefaultProfileImage(imageType :UserDefaultProfileImageType) = when (imageType) {
         UserDefaultProfileImageType.ONE -> R.drawable.default_profile_img1
         UserDefaultProfileImageType.TWO -> R.drawable.default_profile_img2
         UserDefaultProfileImageType.THREE -> R.drawable.default_profile_img3
@@ -529,5 +544,13 @@ object DataBindingAdapter {
             }
             view.maxLines = 1
         }
+    }
+
+    /**ChatItem 시간 Text 세팅*/
+    @JvmStatic
+    @BindingAdapter("getFormattedTimeText")
+    fun getFormattedTimeText(view: TextView, dateAndTimeString: String?) {
+        if (dateAndTimeString == null) return
+        view.text = DateManager.getFormattedTimeText(dateAndTimeString)
     }
 }

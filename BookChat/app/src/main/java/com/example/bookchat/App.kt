@@ -5,10 +5,12 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.example.bookchat.BuildConfig.KAKAO_APP_KEY
 import com.example.bookchat.api.BookChatApiInterface
 import com.example.bookchat.api.RetrofitBuilder
+import com.example.bookchat.api.StompBuilder
 import com.example.bookchat.data.User
 import com.example.bookchat.utils.NetworkManager
 import com.kakao.sdk.common.KakaoSdk
 import dagger.hilt.android.HiltAndroidApp
+import org.hildan.krossbow.stomp.StompClient
 
 @HiltAndroidApp
 class App : Application() {
@@ -18,6 +20,7 @@ class App : Application() {
     val bookChatApiClient: BookChatApiInterface by lazy {
         RetrofitBuilder.getApiClient().create(BookChatApiInterface::class.java)
     }
+    val stompClient: StompClient by lazy { StompBuilder.getStompClient() }
 
     override fun onCreate() {
         super.onCreate()

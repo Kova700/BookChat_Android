@@ -42,6 +42,9 @@ object DateManager {
             else -> EMPTY
         }
 
+    fun getFormattedTimeText(dateTimeString: String): String =
+        getDetailFormattedTodayText(dateTimeString)
+
     private fun getAbstractFormattedTodayText(dateTimeString: String): String {
         val (cTime, cMinute) = getTimeString(getCurrentDateTimeString()).split(COLON)
             .dropLast(1).map { it.toInt() }
