@@ -1,6 +1,7 @@
 package com.example.bookchat.data
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class UserChatRoomListItem(
     @SerializedName("roomId")
@@ -21,4 +22,4 @@ data class UserChatRoomListItem(
     val lastActiveTime :String?,
     @SerializedName("lastChatContent")
     val lastChatContent :String?
-)
+) : Serializable

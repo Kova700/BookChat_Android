@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.util.*
@@ -102,7 +103,7 @@ class MakeChatRoomViewModel @Inject constructor(
     }
 
     private fun byteArrayToRequestBody(byteArray: ByteArray): RequestBody {
-        return RequestBody.create(MediaType.parse(CONTENT_TYPE_IMAGE_WEBP), byteArray)
+        return RequestBody.create(CONTENT_TYPE_IMAGE_WEBP.toMediaTypeOrNull(), byteArray)
     }
 
     private fun makeToast(stringId: Int) {

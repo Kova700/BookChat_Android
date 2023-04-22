@@ -42,7 +42,7 @@ class SearchViewModel @AssistedInject constructor(
 
     val bookResultState = MutableStateFlow<SearchState>(SearchState.Loading)
     val chatResultState = MutableStateFlow<SearchState>(SearchState.Loading)
-    val chatSearchFilter = MutableStateFlow<ChatSearchFilter>(ChatSearchFilter.BOOK_TITLE)
+    val chatSearchFilter = MutableStateFlow<ChatSearchFilter>(ChatSearchFilter.ROOM_NAME)
 
     val editTextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -136,8 +136,8 @@ class SearchViewModel @AssistedInject constructor(
     ) {
         delay(SKELETON_DURATION)
         //TestPagingDataSource 부분 채팅방 검색 API 수정시 삭제 예정
-        simpleChatRoomSearchResult.value = TestPagingDataSource.getSearchChatRoomData().chatRoomList
-//        simpleChatRoomSearchResult.value = respond.chatRoomList
+//        simpleChatRoomSearchResult.value = TestPagingDataSource.getSearchChatRoomData().chatRoomList
+        simpleChatRoomSearchResult.value = respond.chatRoomList
         previousSearchKeyword = keyword
         if (simpleChatRoomSearchResult.value.isEmpty()) {
             chatResultState.value = SearchState.EmptyResult

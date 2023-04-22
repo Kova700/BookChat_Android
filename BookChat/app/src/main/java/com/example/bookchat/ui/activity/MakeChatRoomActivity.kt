@@ -61,9 +61,10 @@ class MakeChatRoomActivity : AppCompatActivity() {
 
     private val selectBookResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK){
+            if (result.resultCode == RESULT_OK) {
                 val intent = result.data
-                val selectBook = intent?.getSerializableExtra(MakeChatRoomSelectBookActivity.EXTRA_SELECTED_BOOK) as? Book
+                val selectBook =
+                    intent?.getSerializableExtra(MakeChatRoomSelectBookActivity.EXTRA_SELECTED_BOOK) as? Book
                 selectBook?.let { makeChatRoomViewModel.selectedBook.value = selectBook }
             }
         }
@@ -72,7 +73,8 @@ class MakeChatRoomActivity : AppCompatActivity() {
         makeChatRoomViewModel.eventFlow.collect { event -> handleEvent(event) }
     }
 
-    private fun startChatRoomActivity(){
+    /*Sid 가져오는 로직 추가해야함*/
+    private fun startChatRoomActivity() {
         val intent = Intent(this, ChatRoomActivity::class.java)
         startActivity(intent)
         finish()

@@ -18,7 +18,6 @@ import com.example.bookchat.adapter.search.chatroomsearch.SearchChatRoomSimpleAd
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.SearchChatRoomListItem
 import com.example.bookchat.databinding.FragmentSearchTapResultBinding
-import com.example.bookchat.ui.activity.ChatRoomActivity
 import com.example.bookchat.ui.activity.ChatRoomInfoActivity
 import com.example.bookchat.ui.dialog.MakeChatRoomSelectBookDialog
 import com.example.bookchat.ui.dialog.SearchTapBookDialog

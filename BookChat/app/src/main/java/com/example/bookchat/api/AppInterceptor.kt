@@ -2,12 +2,12 @@ package com.example.bookchat.api
 
 import com.example.bookchat.BuildConfig.TOKEN_RENEWAL_URL
 import com.example.bookchat.data.Token
-import com.example.bookchat.data.response.BadRequestException
 import com.example.bookchat.data.response.ForbiddenException
 import com.example.bookchat.data.response.TokenRenewalFailException
 import com.example.bookchat.utils.DataStoreManager
 import com.google.gson.Gson
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.io.IOException
 
 class AppInterceptor : Interceptor {
@@ -22,7 +22,7 @@ class AppInterceptor : Interceptor {
         response = renewTokenOrPass(response, chain, bookChatToken)
         if (response.isSuccessful) return response
 
-        val networkException = createException(response.code(), null)
+        val networkException = createException(response.code, null)
         networkException?.let { throw it }
 
         return response
@@ -42,10 +42,10 @@ class AppInterceptor : Interceptor {
     private fun renewToken(
         chain: Interceptor.Chain,
         refreshToken: String?
-    ) :Token{
+    ): Token {
         val tokenRenewalResponse = requestTokenRenewal(chain, refreshToken)
         if (!tokenRenewalResponse.isSuccessful) throw TokenRenewalFailException()
-        val token = parseResponseToToken(tokenRenewalResponse.body()?.string())
+        val token = parseResponseToToken(tokenRenewalResponse.body?.string())
         DataStoreManager.saveBookChatTokenSync(token)
         return token
     }
@@ -64,12 +64,14 @@ class AppInterceptor : Interceptor {
         return chain.proceed(tokenAddedRequest)
     }
 
+    //요청 하는 곳 마다 전부 예외처리 되어있는지 확인해보자.
+    //채팅 connect요청도 이거임(예외처리해야함)
     private fun createException(
         httpCode: Int,
         errorResponseString: String?
     ): Exception? =
         when (httpCode) {
-            400 -> BadRequestException(errorResponseString)
+            400 -> null //BadRequestException(errorResponseString)
             403 -> ForbiddenException(errorResponseString)
             else -> null
         }
@@ -91,7 +93,7 @@ class AppInterceptor : Interceptor {
     }
 
     private fun Response.isTokenExpired(): Boolean {
-        return this.code() == 401
+        return this.code == 401
     }
 
     private fun <T> getJsonRequestBody(
@@ -99,7 +101,7 @@ class AppInterceptor : Interceptor {
         contentType: String
     ): RequestBody {
         val jsonString = Gson().toJson(content)
-        val requestBody = RequestBody.create(MediaType.parse(contentType), jsonString)
+        val requestBody = RequestBody.create(contentType.toMediaTypeOrNull(), jsonString)
         return requestBody
     }
 

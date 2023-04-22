@@ -66,6 +66,7 @@ class ChatRoomListFragment : Fragment() {
         val chatRoomItemClickListener = object : UserChatRoomListDataAdapter.OnItemClickListener {
             override fun onItemClick(userChatRoomListItem: UserChatRoomListItem) {
                 val intent = Intent(requireContext(), ChatRoomActivity::class.java)
+                intent.putExtra(EXTRA_CHAT_ROOM_LIST_ITEM, userChatRoomListItem)
                 startActivity(intent)
             }
         }
@@ -97,4 +98,7 @@ class ChatRoomListFragment : Fragment() {
         ChatRoomListUiEvent.MoveToSearchChatRoomPage -> {}
     }
 
+    companion object{
+        const val EXTRA_CHAT_ROOM_LIST_ITEM = "EXTRA_CHAT_ROOM_LIST_ITEM"
+    }
 }
