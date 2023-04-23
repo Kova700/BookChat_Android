@@ -94,6 +94,7 @@ class SearchTapResultFragment : Fragment() {
         val chatRoomItemClickListener = object : SearchChatRoomSimpleAdapter.OnItemClickListener {
             override fun onItemClick(searchChatRoomListItem: SearchChatRoomListItem) {
                 val intent = Intent(requireContext(), ChatRoomInfoActivity::class.java)
+                intent.putExtra(EXTRA_CLICKED_CHAT_ROOM_ITEM,searchChatRoomListItem)
                 startActivity(intent)
             }
         }
@@ -154,5 +155,6 @@ class SearchTapResultFragment : Fragment() {
     companion object {
         const val DIALOG_TAG_SEARCH_BOOK = "SearchTapBookDialog"
         const val DIALOG_TAG_SELECT_BOOK = "MakeChatRoomSelectBookDialog"
+        const val EXTRA_CLICKED_CHAT_ROOM_ITEM = "EXTRA_CLICKED_CHAT_ROOM_ITEM"
     }
 }

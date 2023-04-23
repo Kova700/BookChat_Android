@@ -153,6 +153,7 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
                     this@SearchTapResultDetailActivity,
                     ChatRoomInfoActivity::class.java
                 )
+                intent.putExtra(EXTRA_CLICKED_CHAT_ROOM_ITEM, searchChatRoomListItem)
                 startActivity(intent)
             }
         }
@@ -222,5 +223,6 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_SELECTED_BOOK = "SELECTED_BOOK"
+        const val EXTRA_CLICKED_CHAT_ROOM_ITEM = "EXTRA_CLICKED_CHAT_ROOM_ITEM"
     }
 }

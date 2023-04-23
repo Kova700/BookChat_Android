@@ -4,7 +4,6 @@ import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.view.View
-import android.view.View.OnFocusChangeListener
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -57,16 +56,18 @@ object DataBindingAdapter {
 
     /**유저 프로필 이미지 출력*/
     @JvmStatic
-    @BindingAdapter("loadUserProfile")
-    fun loadUserProfile(imageView: ImageView, user: User?) {
-        if (user == null) return
-
-        if (!user.userProfileImageUri?.trim().isNullOrBlank()) {
-            loadUrl(imageView, user.userProfileImageUri)
+    @BindingAdapter("userProfileUrl", "userDefaultProfileImageType", requireAll = false)
+    fun loadUserProfile(
+        imageView: ImageView,
+        userProfileUrl: String?,
+        userDefaultProfileImageType: UserDefaultProfileImageType
+    ) {
+        if (!userProfileUrl?.trim().isNullOrBlank()) {
+            loadUrl(imageView, userProfileUrl)
             return
         }
         Glide.with(imageView.context)
-            .load(getUserDefaultProfileImage(user.defaultProfileImageType))
+            .load(getUserDefaultProfileImage(userDefaultProfileImageType))
             .placeholder(R.drawable.loading_img)
             .error(R.drawable.error_img)
             .into(imageView)

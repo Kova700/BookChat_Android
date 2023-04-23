@@ -156,6 +156,7 @@
 
     <!--chat room-->
     <string name="chat_room_send_message">메시지 보내기</string>
+    <string name="enter">입장</string>
 
     <!--util-->
     <string name="confirm">확인</string>
