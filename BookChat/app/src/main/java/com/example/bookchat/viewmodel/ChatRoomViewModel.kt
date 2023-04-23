@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import org.hildan.krossbow.stomp.ConnectionException
 import org.hildan.krossbow.stomp.MissingHeartBeatException
@@ -26,15 +27,18 @@ import org.hildan.krossbow.stomp.StompSession
 
 class ChatRoomViewModel @AssistedInject constructor(
     @Assisted val chatRoomListItem: UserChatRoomListItem,
+    @Assisted private val firstEnterFlag: Boolean,
     private val chatRepository: ChatRepository
 ) : ViewModel() {
-
     val eventFlow = MutableSharedFlow<ChatEvent>()
 
     val inputtedMessage = MutableStateFlow("")
     private lateinit var stompSession: StompSession
     val chatData = MutableStateFlow(listOf<Chat>())
     val errorList = mutableListOf<String>()
+
+    private val roomId = chatRoomListItem.roomId
+    private val roomSId = chatRoomListItem.roomSid
 
     init {
         viewModelScope.launch {
@@ -45,37 +49,50 @@ class ChatRoomViewModel @AssistedInject constructor(
     }
 
     private val observeChatFlowJob = viewModelScope.launch(start = CoroutineStart.LAZY) {
-        subscribeChatRoom(chatRoomListItem.roomSid).collect { msg ->
+        subscribeChatRoom(roomSId).collect { msg ->
             Log.d(TAG, "ChatRoomViewModel: ChatFlow() - called")
             chatData.value = chatData.value + Gson().fromJson(msg, Chat::class.java)
         }
     }
 
-    //예외처리 추가해야함
     private val observeErrorFlowJob = viewModelScope.launch(start = CoroutineStart.LAZY) {
-        subscribeErrorResponse().collect {
-            Log.d(TAG, "ChatRoomViewModel: ErrorFlow() - $it")
-        }
+        subscribeErrorResponse().collect { handleErrorFlow(it) }
     }
 
     private suspend fun connectSocket() {
-        Log.d(TAG, "ChatRoomViewModel: connectSocket() - called")
         runCatching { chatRepository.getStompSession() }
             .onSuccess { stompSession = it }
             .onFailure { handleError(it) }
     }
 
     private suspend fun subscribeChatRoom(roomSid: String): Flow<String> {
-        return chatRepository.subscribeChatRoom(stompSession, roomSid)
+        runCatching { chatRepository.subscribeChatRoom(stompSession, roomSid) }
+            .onSuccess { return successSubscribeChatRoomCallBack(it) }
+            .onFailure { handleError(it) }
+        return flowOf("")
+    }
+
+    private fun successSubscribeChatRoomCallBack(flow: Flow<String>): Flow<String> {
+        if (firstEnterFlag) sendEnterMessage()
+        return flow
     }
 
     private suspend fun subscribeErrorResponse(): Flow<String> {
-        return chatRepository.subscribeErrorResponse(stompSession)
+        runCatching { chatRepository.subscribeErrorResponse(stompSession) }
+            .onSuccess { return it }
+            .onFailure { handleError(it) }
+        return flowOf("")
     }
 
-    fun sendMessage(roomId: Long) = viewModelScope.launch(Dispatchers.IO) {
-        chatRepository.sendMessage(stompSession, roomId, inputtedMessage.value)
-        inputtedMessage.value = ""
+    fun sendMessage() = viewModelScope.launch(Dispatchers.IO) {
+        runCatching { chatRepository.sendMessage(stompSession, roomId, inputtedMessage.value) }
+            .onSuccess { inputtedMessage.value = "" }
+            .onFailure { handleError(it) }
+    }
+
+    private fun sendEnterMessage() = viewModelScope.launch(Dispatchers.IO) {
+        runCatching { chatRepository.sendEnterChatRoom(stompSession, roomId) }
+            .onFailure { handleError(it) }
     }
 
     fun finishActivity() {
@@ -104,12 +121,7 @@ class ChatRoomViewModel @AssistedInject constructor(
 
     private fun handleError(throwable: Throwable) {
         Log.d(TAG, "ChatRoomViewModel: handleError() $throwable")
-        Toast.makeText(
-            App.instance.applicationContext,
-            R.string.error_network_error,
-            Toast.LENGTH_SHORT
-        ).show()
-
+        makeToast(R.string.error_network_error)
         when (throwable) {
             is MissingHeartBeatException -> {
                 //연결 취소하고 다시 재연결해야함
@@ -121,6 +133,15 @@ class ChatRoomViewModel @AssistedInject constructor(
         }
     }
 
+    //예외처리 추가해야함
+    private fun handleErrorFlow(errorText :String){
+        Log.d(TAG, "ChatRoomViewModel: handleErrorFlow() - errorText : $errorText")
+    }
+
+    private fun makeToast(stringId: Int) {
+        Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
+    }
+
     sealed class ChatEvent {
         object MoveBack : ChatEvent()
         object CaptureChat : ChatEvent()
@@ -129,16 +150,20 @@ class ChatRoomViewModel @AssistedInject constructor(
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(chatRoomListItem: UserChatRoomListItem): ChatRoomViewModel
+        fun create(
+            chatRoomListItem: UserChatRoomListItem,
+            firstEnterFlag: Boolean
+        ): ChatRoomViewModel
     }
 
     companion object {
         fun provideFactory(
             assistedFactory: AssistedFactory,
-            chatRoomListItem: UserChatRoomListItem
+            chatRoomListItem: UserChatRoomListItem,
+            firstEnterFlag: Boolean
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(chatRoomListItem) as T
+                return assistedFactory.create(chatRoomListItem, firstEnterFlag) as T
             }
         }
     }

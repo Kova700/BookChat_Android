@@ -15,11 +15,11 @@ data class UserChatRoomListItem(
     @SerializedName("defaultRoomImageType")
     val defaultRoomImageType: Int,
     @SerializedName("roomImageUri")
-    val roomImageUri: String?,
+    val roomImageUri: String? = null,
     @SerializedName("lastChatId")
-    val lastChatId :Long?,
+    val lastChatId: Long? = null,
     @SerializedName("lastActiveTime")
-    val lastActiveTime :String?,
+    val lastActiveTime: String? = null,
     @SerializedName("lastChatContent")
-    val lastChatContent :String?
+    val lastChatContent: String? = null
 ) : Serializable

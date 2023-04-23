@@ -27,12 +27,23 @@ data class SearchChatRoomListItem(
     val roomMemberCount: Long,
     @SerializedName("defaultRoomImageType")
     val defaultRoomImageType: Int,
-    @SerializedName("roomImageUri")
-    val roomImageUri: String?,
     @SerializedName("tags")
     val tags: String,
+    @SerializedName("roomImageUri")
+    val roomImageUri: String? = null,
     @SerializedName("lastChatId")
-    val lastChatId: String?,
+    val lastChatId: String? = null,
     @SerializedName("lastActiveTime")
-    val lastActiveTime: String?,
-) : Serializable
+    val lastActiveTime: String? = null,
+) : Serializable {
+    fun getUserChatRoomListItem(): UserChatRoomListItem {
+        return UserChatRoomListItem(
+            roomId = roomId,
+            roomName = roomName,
+            roomSid = roomSid,
+            roomMemberCount = roomMemberCount,
+            defaultRoomImageType = defaultRoomImageType,
+            roomImageUri = roomImageUri
+        )
+    }
+}
