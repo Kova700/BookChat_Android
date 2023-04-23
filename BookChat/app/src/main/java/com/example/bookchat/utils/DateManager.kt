@@ -106,7 +106,7 @@ object DateManager {
         return cYear == iYear
     }
 
-    private const val DATE_AND_TIME_FORMAT = "yyyy-MM-dd hh:mm:ss"
+    private const val DATE_AND_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
     private const val YESTERDAY = "어제"
     private const val MONTH = "월"
     private const val AM = "오전"
