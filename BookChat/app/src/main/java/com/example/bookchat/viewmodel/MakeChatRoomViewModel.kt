@@ -90,7 +90,8 @@ class MakeChatRoomViewModel @Inject constructor(
     }
 
     private fun getHashTags(): List<String> =
-        chatRoomTag.value.replace("#", "").trim().split(" ")
+        chatRoomTag.value.split(" ").filter { it.isNotBlank() }
+            .map { it.split("#") }.flatten().filter { it.isNotBlank() }
 
     private fun getMultiPartBody(bitmapByteArray: ByteArray): MultipartBody.Part? {
         if (bitmapByteArray.isEmpty()) return null
