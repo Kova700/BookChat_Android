@@ -56,11 +56,12 @@ object DateManager {
     }
 
     private fun getDetailFormattedTodayText(dateTimeString: String): String {
-        val timeList = getTimeString(dateTimeString).split(COLON)
-        val flag = if (timeList[0].toInt() >= 12) PM else AM
+        val (time, minute, second) = getTimeString(dateTimeString).split(COLON)
+            .map { it.toFloat().toInt() }
+        val flag = if (time >= 12) PM else AM
         return when (flag) {
-            PM -> flag + SPACE + getPmTime(timeList[0].toInt()) + COLON + timeList[1]
-            AM -> flag + SPACE + timeList[0].toInt() + COLON + timeList[1]
+            PM -> flag + SPACE + getPmTime(time) + COLON + minute
+            AM -> flag + SPACE + getAmTime(time) + COLON + minute
             else -> throw Exception("Time Formatting is Fail")
         }
     }
@@ -77,8 +78,8 @@ object DateManager {
         return "$iYear.$iMonth.$iDay"
     }
 
-    private fun getPmTime(time: Int): Int =
-        if (time - 12 == 0) 12 else time - 12
+    private fun getPmTime(time: Int): Int = if (time - 12 == 0) 12 else time - 12
+    private fun getAmTime(time: Int): Int = if (time == 0) 12 else time
 
     private fun isToday(dateTimeString: String): Boolean {
         val (cYear, cMonth, cDay) = getDateString(getCurrentDateTimeString()).split(HYPHEN)
