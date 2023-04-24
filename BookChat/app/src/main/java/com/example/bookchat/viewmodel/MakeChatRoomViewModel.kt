@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
+import com.example.bookchat.data.UserChatRoomListItem
 import com.example.bookchat.data.request.RequestMakeChatRoom
 import com.example.bookchat.repository.ChatRoomRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +14,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -37,16 +37,13 @@ class MakeChatRoomViewModel @Inject constructor(
     fun requestMakeChatRoom() = viewModelScope.launch {
         if (!isPossibleMakeChatRoom()) return@launch
         runCatching { makeChatRoom() }
-            .onSuccess { startEvent(MakeChatRoomUiEvent.MoveToChatPage) }
+            .onSuccess { startEvent(MakeChatRoomUiEvent.MoveToChatPage(it)) }
             .onFailure { makeToast(R.string.make_chat_room_fail) }
     }
 
-    private suspend fun makeChatRoom() {
-        chatRoomRepository.makeChatRoom(
-            getRequestMakeChatRoom(),
-            getMultiPartBody(chatRoomProfileImage.value)
-        )
-    }
+    private suspend fun makeChatRoom() = chatRoomRepository.makeChatRoom(
+        getRequestMakeChatRoom(), getMultiPartBody(chatRoomProfileImage.value)
+    )
 
     fun clickDeleteTextBtn() {
         chatRoomTitle.value = ""
@@ -118,7 +115,7 @@ class MakeChatRoomViewModel @Inject constructor(
     sealed class MakeChatRoomUiEvent {
         object MoveToBack : MakeChatRoomUiEvent()
         object MoveSelectBook : MakeChatRoomUiEvent()
-        object MoveToChatPage : MakeChatRoomUiEvent()
+        data class MoveToChatPage(val chatRoomItem: UserChatRoomListItem) : MakeChatRoomUiEvent()
         object OpenGallery : MakeChatRoomUiEvent()
     }
 

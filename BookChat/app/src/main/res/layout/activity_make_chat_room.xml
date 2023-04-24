@@ -57,8 +57,8 @@
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
             app:layout_constraintTop_toTopOf="@+id/guideline_top" />
 
-        <!--채팅방 제목, 태그 , 도서 선택되면 활성화 아니면 비활성화-->
         <TextView
+            android:id="@+id/make_chat_room_finish_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/finish"
@@ -142,7 +142,6 @@
             app:layout_constraintEnd_toStartOf="@+id/text_count_tv"
             app:layout_constraintTop_toTopOf="@+id/chat_room_title_et" />
 
-        <!--현재 입력된 Text개수 카운팅-->
         <TextView
             android:id="@+id/text_count_tv"
             android:layout_width="wrap_content"

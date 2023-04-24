@@ -2,16 +2,14 @@ package com.example.bookchat.repository
 
 import android.util.Log
 import com.example.bookchat.App
+import com.example.bookchat.data.UserChatRoomListItem
 import com.example.bookchat.data.request.RequestMakeChatRoom
 import com.example.bookchat.data.request.RequestSearchChatRoom
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseBodyEmptyException
 import com.example.bookchat.data.response.ResponseGetSearchChatRoomList
 import com.example.bookchat.utils.ChatSearchFilter
-import com.example.bookchat.utils.ChatSearchFilter.BOOK_ISBN
-import com.example.bookchat.utils.ChatSearchFilter.ROOM_TAGS
-import com.example.bookchat.utils.ChatSearchFilter.BOOK_TITLE
-import com.example.bookchat.utils.ChatSearchFilter.ROOM_NAME
+import com.example.bookchat.utils.ChatSearchFilter.*
 import com.example.bookchat.utils.Constants.TAG
 import okhttp3.MultipartBody
 import javax.inject.Inject
@@ -21,7 +19,7 @@ class ChatRoomRepository @Inject constructor() {
     suspend fun makeChatRoom(
         requestMakeChatRoom: RequestMakeChatRoom,
         charRoomImage: MultipartBody.Part?
-    ) {
+    ): UserChatRoomListItem {
         if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val response = App.instance.bookChatApiClient.makeChatRoom(
@@ -30,11 +28,31 @@ class ChatRoomRepository @Inject constructor() {
         )
 
         when (response.code()) {
-            200 -> {}
+            201 -> {
+                val roomId = response.headers()["RoomId"]?.toLong()
+                    ?: throw Exception("Failed to receive roomId")
+                val roomSId = response.headers()["Location"]?.split("/")?.last()
+                    ?: throw Exception("Failed to receive roomSId")
+                return getUserChatRoomListItem(requestMakeChatRoom, roomId, roomSId)
+            }
             else -> throw Exception(
                 createExceptionMessage(response.code(), response.errorBody()?.string())
             )
         }
+    }
+
+    private fun getUserChatRoomListItem(
+        requestMakeChatRoom: RequestMakeChatRoom,
+        roomId: Long,
+        roomSId: String
+    ): UserChatRoomListItem {
+        return UserChatRoomListItem(
+            roomId = roomId,
+            roomSid = roomSId,
+            roomName = requestMakeChatRoom.roomName,
+            roomMemberCount = 1,
+            defaultRoomImageType = requestMakeChatRoom.defaultRoomImageType
+        )
     }
 
     suspend fun simpleSearchChatRooms(

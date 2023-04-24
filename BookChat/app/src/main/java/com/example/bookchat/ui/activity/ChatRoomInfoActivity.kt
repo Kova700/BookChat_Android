@@ -32,8 +32,7 @@ class ChatRoomInfoActivity : AppCompatActivity() {
 
     private fun startChatRoomActivity(){
         val intent = Intent(this, ChatRoomActivity::class.java)
-        //해당 채팅방이 내가 들어가있는지 아닌지 확인하는 API 필요
-//        intent.putExtra(EXTRA_FIRST_ENTER_FLAG, true)
+        intent.putExtra(EXTRA_FIRST_ENTER_FLAG, true)
         intent.putExtra(EXTRA_CHAT_ROOM_LIST_ITEM, getExtraChatRoomItem().getUserChatRoomListItem())
         startActivity(intent)
     }

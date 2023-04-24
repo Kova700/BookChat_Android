@@ -59,14 +59,13 @@ class ChatRepository @Inject constructor() {
     }
 
     //이렇게 보내면 토큰 자동 갱신은 어케 하누?
-    //채팅방 생성할 때, 호출해서 오류 안뜨나 확인해보자.
     suspend fun sendEnterChatRoom(stompSession: StompSession, roomId: Long) {
         Log.d(TAG, "ChatRepository: sendEnterChatRoom() - called")
         stompSession.send(
             StompSendHeaders(
                 destination = "$SEND_ENTER_CHAT_ROOM_DESTINATION$roomId",
                 customHeaders = getHeader()
-            ), FrameBody.Text("")
+            ), FrameBody.Text(Gson().toJson(RequestChat("")))
         )
     }
 
