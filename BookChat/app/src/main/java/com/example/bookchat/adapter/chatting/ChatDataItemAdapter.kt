@@ -6,43 +6,80 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Chat
 import com.example.bookchat.databinding.ItemChattingMineBinding
+import com.example.bookchat.databinding.ItemChattingNoticeBinding
+import com.example.bookchat.databinding.ItemChattingOtherBinding
 
 class ChatDataItemAdapter :
-    ListAdapter<Chat, ChatDataItemAdapter.ChatViewHolder>(CHAT_ITEM_COMPARATOR) {
-    val mynickName = App.instance.getCachedUser().userNickname
+    ListAdapter<Chat, RecyclerView.ViewHolder>(CHAT_ITEM_COMPARATOR) {
 
-    //일단 내 채팅만 보이게라도 구현해보자
-    private lateinit var binding: ItemChattingMineBinding
+    private lateinit var bindingChatMine: ItemChattingMineBinding
+    private lateinit var bindingChatOther: ItemChattingOtherBinding
+    private lateinit var bindingChatNotice: ItemChattingNoticeBinding
 
-    inner class ChatViewHolder(val binding: ItemChattingMineBinding) :
+    inner class MineChatViewHolder(val binding: ItemChattingMineBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(chat: Chat) {
             binding.chat = chat
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
-        binding = DataBindingUtil
-            .inflate(
-                LayoutInflater.from(parent.context),
-                R.layout.item_chatting_mine,
-                parent,
-                false
-            )
-        return ChatViewHolder(binding)
+    inner class OtherChatViewHolder(val binding: ItemChattingOtherBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(chat: Chat) {
+            binding.chat = chat
+        }
     }
 
-    override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
+    inner class NoticeChatViewHolder(val binding: ItemChattingNoticeBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(chat: Chat) {
+            binding.chat = chat
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            R.layout.item_chatting_mine -> {
+                bindingChatMine = DataBindingUtil.inflate(
+                    LayoutInflater.from(parent.context),
+                    R.layout.item_chatting_mine,
+                    parent, false
+                )
+                return MineChatViewHolder(bindingChatMine)
+            }
+            R.layout.item_chatting_other -> {
+                bindingChatOther = DataBindingUtil.inflate(
+                    LayoutInflater.from(parent.context),
+                    R.layout.item_chatting_other,
+                    parent, false
+                )
+                return OtherChatViewHolder(bindingChatOther)
+            }
+            R.layout.item_chatting_notice -> {
+                bindingChatNotice = DataBindingUtil.inflate(
+                    LayoutInflater.from(parent.context),
+                    R.layout.item_chatting_notice,
+                    parent, false
+                )
+                return NoticeChatViewHolder(bindingChatNotice)
+            }
+            else -> throw RuntimeException("Received unknown ViewHolderType")
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val currentItem = getItem(position)
-        currentItem?.let { holder.bind(currentItem) }
+        when (currentItem.getChatType()) {
+            R.layout.item_chatting_mine -> (holder as MineChatViewHolder).bind(currentItem)
+            R.layout.item_chatting_other -> (holder as OtherChatViewHolder).bind(currentItem)
+            R.layout.item_chatting_notice -> (holder as NoticeChatViewHolder).bind(currentItem)
+        }
     }
 
-    override fun getItemViewType(position: Int): Int =
-        R.layout.item_chatting_mine
+    override fun getItemViewType(position: Int): Int = getItem(position).getChatType()
 
     companion object {
         val CHAT_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<Chat>() {

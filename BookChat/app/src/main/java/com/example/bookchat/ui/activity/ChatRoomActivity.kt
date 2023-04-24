@@ -53,7 +53,7 @@ class ChatRoomActivity : AppCompatActivity() {
     private fun initRcv() {
         with(binding) {
             chattingRcv.adapter = chatDataItemAdapter
-            chattingRcv.setHasFixedSize(false) //true로 테스트 함 해보자.
+            chattingRcv.setHasFixedSize(true)
             chattingRcv.addItemDecoration(ChatItemDecoration())
             chattingRcv.layoutManager = LinearLayoutManager(this@ChatRoomActivity)
         }

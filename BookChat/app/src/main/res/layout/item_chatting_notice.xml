@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="chat"
+            type="com.example.bookchat.data.Chat" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -26,9 +33,10 @@
             android:background="@drawable/chat_notice_background"
             android:paddingHorizontal="15dp"
             android:paddingVertical="5dp"
-            app:layout_constrainedWidth="true"
             android:textColor="#4D4D4D"
+            android:text="@{chat.message}"
             android:textSize="10sp"
+            app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
