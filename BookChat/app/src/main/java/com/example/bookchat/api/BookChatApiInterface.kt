@@ -7,11 +7,11 @@ import com.example.bookchat.utils.BookSearchSortOption
 import com.example.bookchat.utils.BookSearchSortOption.ACCURACY
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.utils.SearchSortOption
+import com.example.bookchat.utils.SearchSortOption.ID_DESC
 import com.example.bookchat.utils.SearchSortOption.UPDATED_AT_DESC
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
-import retrofit2.http.Header
 
 interface BookChatApiInterface {
     //API 테스트
@@ -196,4 +196,14 @@ interface BookChatApiInterface {
         @Query("isbn") isbn: String?,
         @Query("tags") tags: String?,
     ): Response<ResponseGetSearchChatRoomList>
+
+    /**------------채팅내역------------*/
+
+    @GET("/v1/api/chatrooms/{roomId}/chats")
+    suspend fun getChat(
+        @Path("roomId") roomId: Long,
+        @Query("size") size: String,
+        @Query("postCursorId") postCursorId: Int?,
+        @Query("sort") sort: SearchSortOption = ID_DESC,
+    ): Response<RespondGetChat>
 }
