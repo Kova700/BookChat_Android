@@ -12,6 +12,10 @@ import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.*
+import com.example.bookchat.data.local.entity.ChatEntity
+import com.example.bookchat.data.local.entity.ChatEntity.ChatType
+import com.example.bookchat.data.local.entity.ChatEntity.Companion.FAIL
+import com.example.bookchat.data.local.entity.ChatEntity.Companion.LOADING
 import com.example.bookchat.utils.*
 import com.example.bookchat.viewmodel.AgonyViewModel.AgonyActivityState
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportStatus
@@ -76,13 +80,17 @@ object DataBindingAdapter {
     /**Chat Sender 프로필 이미지 출력*/
     @JvmStatic
     @BindingAdapter("loadSenderProfile")
-    fun loadSenderProfile(imageView: ImageView, chat :Chat){
+    fun loadSenderProfile(imageView: ImageView, chat :ChatEntity?){
+        if (chat == null) return
+        if (chat.chatType != ChatType.Other) return
+
         if (!chat.senderProfileImageUrl?.trim().isNullOrBlank()){
             loadUrl(imageView, chat.senderProfileImageUrl)
             return
         }
+
         Glide.with(imageView.context)
-            .load(getUserDefaultProfileImage(chat.senderDefaultProfileImageType))
+            .load(getUserDefaultProfileImage(chat.senderDefaultProfileImageType!!))
             .placeholder(R.drawable.loading_img)
             .error(R.drawable.error_img)
             .into(imageView)
@@ -553,5 +561,32 @@ object DataBindingAdapter {
     fun getFormattedTimeText(view: TextView, dateAndTimeString: String?) {
         if (dateAndTimeString == null) return
         view.text = DateManager.getFormattedTimeText(dateAndTimeString)
+    }
+
+    /**ChatItem 전송 이미지 Visibility 세팅*/
+    @JvmStatic
+    @BindingAdapter("setChatSendImgVisibility")
+    fun setChatSendImgVisibility(view: View, chatStatus :Int?){
+        view.visibility = when(chatStatus){
+            LOADING -> View.VISIBLE
+            else -> View.GONE
+        }
+    }
+
+    /**ChatItem 전송 실패 버튼 Visibility 세팅*/
+    @JvmStatic
+    @BindingAdapter("setChatFailBtnVisibility")
+    fun setChatFailBtnVisibility(view: View, chatStatus :Int?){
+        view.visibility = when(chatStatus){
+            FAIL -> View.VISIBLE
+            else -> View.GONE
+        }
+    }
+
+    /**다른 사람의 새로운 채팅 바텀 공지 Visibility 세팅*/
+    @JvmStatic
+    @BindingAdapter("setNewOtherChatNoticeVisibility")
+    fun setNewOtherChatNoticeVisibility(view: View, chatEntity: ChatEntity?) {
+        view.visibility = if (chatEntity == null) View.GONE else View.VISIBLE
     }
 }
