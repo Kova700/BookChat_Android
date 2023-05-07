@@ -64,8 +64,8 @@ dependencies {
     // LiveData
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.1"
     //activity-ktx
-    implementation "androidx.fragment:fragment-ktx:1.5.6"
-    implementation 'androidx.activity:activity-ktx:1.7.0'
+    implementation "androidx.fragment:fragment-ktx:1.5.7"
+    implementation 'androidx.activity:activity-ktx:1.7.1'
     // Paging3
     implementation "androidx.paging:paging-runtime:3.1.1"
     //Image Cropper
@@ -88,6 +88,11 @@ dependencies {
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
+    //Room
+    implementation "androidx.room:room-runtime:2.5.1"
+    kapt "androidx.room:room-compiler:2.5.1"
+    implementation "androidx.room:room-ktx:2.5.1"
+    implementation "androidx.room:room-paging:2.5.1"
 }
 
 kapt {
