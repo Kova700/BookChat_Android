@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
 import com.example.bookchat.adapter.userchatroomlist.UserChatRoomListDataAdapter
 import com.example.bookchat.adapter.userchatroomlist.UserChatRoomListHeaderAdapter
-import com.example.bookchat.data.UserChatRoomListItem
+import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.example.bookchat.databinding.FragmentChatRoomListBinding
 import com.example.bookchat.ui.activity.ChatRoomActivity
 import com.example.bookchat.ui.activity.MakeChatRoomActivity
@@ -23,9 +23,6 @@ import com.example.bookchat.viewmodel.ChatRoomListViewModel.ChatRoomListUiEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-/*상단 고정, 채팅방 알림 끄기도 구현해야함*/
-/*꾹 눌러서 설정창 띄우기*/
-/*우측으로 밀어서 설정창 보이기*/
 @AndroidEntryPoint
 class ChatRoomListFragment : Fragment() {
 
@@ -61,12 +58,12 @@ class ChatRoomListFragment : Fragment() {
     }
 
     private fun initAdapter() {
-        //롱클릭 리스너도 설정해줘야함 (채팅방 상단고정, 알림 끄기 설정 가능한 다이얼로그 띄우기)
-        //스와이프시에도 상단고정, 알림 끄기 UI 보이기
+        //TODO : long Click Listener(채팅방 상단고정, 알림 끄기 설정 가능한 다이얼로그 띄우기)
+        //TODO : Swipe (상단고정, 알림 끄기 UI 보이기)
         val chatRoomItemClickListener = object : UserChatRoomListDataAdapter.OnItemClickListener {
-            override fun onItemClick(userChatRoomListItem: UserChatRoomListItem) {
+            override fun onItemClick(chatRoomEntity: ChatRoomEntity) {
                 val intent = Intent(requireContext(), ChatRoomActivity::class.java)
-                intent.putExtra(EXTRA_CHAT_ROOM_LIST_ITEM, userChatRoomListItem)
+                intent.putExtra(EXTRA_CHAT_ROOM_LIST_ITEM, chatRoomEntity.toUserChatRoomListItem())
                 startActivity(intent)
             }
         }
@@ -98,7 +95,7 @@ class ChatRoomListFragment : Fragment() {
         ChatRoomListUiEvent.MoveToSearchChatRoomPage -> {}
     }
 
-    companion object{
+    companion object {
         const val EXTRA_CHAT_ROOM_LIST_ITEM = "EXTRA_CHAT_ROOM_LIST_ITEM"
     }
 }

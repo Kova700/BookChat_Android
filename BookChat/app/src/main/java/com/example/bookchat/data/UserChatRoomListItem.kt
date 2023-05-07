@@ -1,5 +1,6 @@
 package com.example.bookchat.data
 
+import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
@@ -22,4 +23,18 @@ data class UserChatRoomListItem(
     val lastActiveTime: String? = null,
     @SerializedName("lastChatContent")
     val lastChatContent: String? = null
-) : Serializable
+) : Serializable {
+
+    fun toChatRoomEntity() =
+        ChatRoomEntity(
+            roomId = roomId,
+            roomName = roomName,
+            roomSid = roomSid,
+            roomMemberCount = roomMemberCount,
+            defaultRoomImageType = defaultRoomImageType,
+            roomImageUri = roomImageUri,
+            lastChatId = lastChatId,
+            lastActiveTime = lastActiveTime,
+            lastChatContent = lastChatContent
+        )
+}
