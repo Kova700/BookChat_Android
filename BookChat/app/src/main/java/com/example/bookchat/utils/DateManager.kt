@@ -5,7 +5,7 @@ import java.util.*
 
 object DateManager {
 
-    private fun getCurrentDateTimeString(): String =
+    fun getCurrentDateTimeString(): String =
         SimpleDateFormat(DATE_AND_TIME_FORMAT, Locale.getDefault())
             .format(Date()).replace(SPACE, T)
 
@@ -57,11 +57,10 @@ object DateManager {
 
     private fun getDetailFormattedTodayText(dateTimeString: String): String {
         val (time, minute, second) = getTimeString(dateTimeString).split(COLON)
-            .map { it.toFloat().toInt() }
-        val flag = if (time >= 12) PM else AM
+        val flag = if (time.toInt() >= 12) PM else AM
         return when (flag) {
-            PM -> flag + SPACE + getPmTime(time) + COLON + minute
-            AM -> flag + SPACE + getAmTime(time) + COLON + minute
+            PM -> flag + SPACE + getPmTime(time.toInt()) + COLON + minute
+            AM -> flag + SPACE + getAmTime(time.toInt()) + COLON + minute
             else -> throw Exception("Time Formatting is Fail")
         }
     }
@@ -70,7 +69,7 @@ object DateManager {
 
     private fun getFormattedThisYearText(dateTimeString: String): String {
         val (iMonth, iDay) = getDateString(dateTimeString).split(HYPHEN).drop(1)
-        return iMonth.toInt().toString() + MONTH + iDay.toInt()
+        return iMonth.toInt().toString() + MONTH + iDay.toInt() + DAY
     }
 
     private fun getFormattedElseYearText(dateTimeString: String): String {
@@ -110,6 +109,7 @@ object DateManager {
     private const val DATE_AND_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
     private const val YESTERDAY = "어제"
     private const val MONTH = "월"
+    private const val DAY = "일"
     private const val AM = "오전"
     private const val PM = "오후"
     private const val JUST_AGO = "방금 전"
