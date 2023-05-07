@@ -30,6 +30,8 @@ class HomeFragment : Fragment() {
     private lateinit var mainReadingBookAdapter: WishBookShelfDataAdapter
     private lateinit var userChatRoomListAdapter: UserChatRoomListDataAdapter
 
+    //TODO : 서재 LocalDB 저장해온 걸 가져오는 형식으로 수정
+    // LocalDB에 없다면 특정 개수만 서버에 가져오는 방식으로 RemoteMediator 연결
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -69,13 +71,13 @@ class HomeFragment : Fragment() {
     }
 
     private fun initChatRoomAdapter() {
-        val chatRoomItemClickListener = object : UserChatRoomListDataAdapter.OnItemClickListener {
-            override fun onItemClick(userChatRoomListItem: UserChatRoomListItem) {
-                //채팅 누르면 채팅방 들어가고,
-            }
-        }
+//        val chatRoomItemClickListener = object : UserChatRoomListDataAdapter.OnItemClickListener {
+//            override fun onItemClick(userChatRoomListItem: UserChatRoomListItem) {
+//                채팅 누르면 채팅방 들어가고,
+//            }
+//        }
         userChatRoomListAdapter = UserChatRoomListDataAdapter()
-        userChatRoomListAdapter.setItemClickListener(chatRoomItemClickListener)
+//        userChatRoomListAdapter.setItemClickListener(chatRoomItemClickListener)
     }
 
     private fun initBookRcv() {
@@ -101,7 +103,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun observePagingData() = lifecycleScope.launch {
-        val firstPage = homeViewModel.chatRoomPagingData.first()
-        userChatRoomListAdapter.submitData(firstPage)
+//        val firstPage = homeViewModel.chatRoomPagingData.first()
+//        userChatRoomListAdapter.submitData(firstPage)
     }
 }
