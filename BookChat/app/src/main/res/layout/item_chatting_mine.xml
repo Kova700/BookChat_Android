@@ -2,9 +2,10 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
+        <import type="android.view.View"/>
         <variable
             name="chat"
-            type="com.example.bookchat.data.Chat" />
+            type="com.example.bookchat.data.local.entity.ChatEntity" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -17,6 +18,28 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.30"/>
+
+        <ImageView
+            android:id="@+id/chat_send_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/chat_wait_img"
+            android:visibility="gone"
+            setChatSendImgVisibility="@{chat.status}"
+            app:layout_constraintBottom_toTopOf="@+id/chatting_time_tv"
+            app:layout_constraintEnd_toEndOf="@+id/chatting_time_tv" />
+
+        <com.example.bookchat.AntiDupClickImageButton
+            android:id="@+id/chat_send_fail_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:visibility="gone"
+            setChatFailBtnVisibility="@{chat.status}"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:src="@drawable/chat_send_fail_btn"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/chatting_layout" />
 
         <TextView
             android:id="@+id/chatting_time_tv"
@@ -56,9 +79,9 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/notosanskr_regular"
                 android:elegantTextHeight="true"
-                android:text="@{chat.message}"
                 android:textColor="#303030"
                 android:textSize="12sp"
+                android:text="@{chat.message}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
