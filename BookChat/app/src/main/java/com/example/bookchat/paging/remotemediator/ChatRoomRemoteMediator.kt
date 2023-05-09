@@ -20,12 +20,14 @@ class ChatRoomRemoteMediator(
     private var isLast = false
     private var isFirst = true
 
+    private var loadKey :Long? = null
+
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, ChatRoomEntity>
     ): MediatorResult {
 
-        val loadKey = when (loadType) {
+        loadKey = when (loadType) {
             LoadType.REFRESH -> {
                 Log.d(TAG, "ChatRoomRemoteMediator: load() - LoadType.REFRESH called")
                 null
@@ -38,9 +40,10 @@ class ChatRoomRemoteMediator(
                 Log.d(TAG, "ChatRoomRemoteMediator: load() - LoadType.APPEND called")
                 //TODO : 끝까지 로드하지 않은 상황에서 채팅방 마지막 채팅 업데이트하면
                 // 여기서 마지막 페이지 로드 요청 보내는 이슈 있음 아래 상황과 같이 해결필요
-                val lastItem = state.lastItemOrNull()
-                    ?: return MediatorResult.Success(endOfPaginationReached = isLast)
-                lastItem.roomId
+//                val lastItem = state.lastItemOrNull()
+//                    ?: return MediatorResult.Success(endOfPaginationReached = isLast)
+//                lastItem.roomId
+                loadKey
             }
         }
 
@@ -55,6 +58,7 @@ class ChatRoomRemoteMediator(
             result?.let {
                 val pagedChatRoom = result.chatRoomList.map { it.toChatRoomEntity() }
                 val meta = result.cursorMeta
+                loadKey = meta.nextCursorId.toLong()
                 isLast = meta.last
                 isFirst = false
                 saveChatRoomInLocalDB(pagedChatRoom)
@@ -68,8 +72,7 @@ class ChatRoomRemoteMediator(
 
     private suspend fun saveChatRoomInLocalDB(pagedList: List<ChatRoomEntity>) {
         database.withTransaction {
-            database.chatRoomDAO()
-                .insertAllChat(pagedList)
+            database.chatRoomDAO().insertOrUpdateAllChatRoom(pagedList)
         }
     }
 

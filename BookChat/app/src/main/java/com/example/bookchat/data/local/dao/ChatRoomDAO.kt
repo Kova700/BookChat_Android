@@ -1,20 +1,61 @@
 package com.example.bookchat.data.local.dao
 
 import androidx.paging.PagingSource
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.bookchat.data.local.entity.ChatRoomEntity
 
 @Dao
 interface ChatRoomDAO {
+
     @Query("SELECT * FROM ChatRoom " +
             "ORDER BY top_pin_num DESC, last_chat_id DESC")
     fun pagingSource(): PagingSource<Int, ChatRoomEntity>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllChat(users: List<ChatRoomEntity>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIgnore(chatRoom : ChatRoomEntity) :Long
+
+    suspend fun insertOrUpdateAllChatRoom(chatRooms: List<ChatRoomEntity>){
+        for (chatRoom in chatRooms) { insertOrUpdateChatRoom(chatRoom) }
+    }
+
+    suspend fun insertOrUpdateChatRoom(chatRoom :ChatRoomEntity){
+        val id = insertIgnore(chatRoom)
+        if (id == -1L){
+            updateForInsert(
+                roomId = chatRoom.roomId,
+                roomName = chatRoom.roomName,
+                roomSid = chatRoom.roomSid,
+                roomMemberCount = chatRoom.roomMemberCount,
+                defaultRoomImageType = chatRoom.defaultRoomImageType,
+                roomImageUri = chatRoom.roomImageUri,
+                lastChatId = chatRoom.lastChatId,
+                lastActiveTime = chatRoom.lastActiveTime,
+                lastChatContent = chatRoom.lastChatContent,
+            )
+        }
+    }
+
+    @Query("UPDATE ChatRoom SET " +
+            "room_name = :roomName, " +
+            "room_socket_id = :roomSid, " +
+            "room_member_count = :roomMemberCount, " +
+            "default_room_image_type = :defaultRoomImageType, " +
+            "room_image_uri = :roomImageUri, " +
+            "last_chat_id = :lastChatId, " +
+            "last_active_time = :lastActiveTime, " +
+            "last_chat_content = :lastChatContent " +
+            "WHERE room_id = :roomId")
+    suspend fun updateForInsert(
+        roomId: Long,
+        roomName: String,
+        roomSid: String,
+        roomMemberCount: Long,
+        defaultRoomImageType: Int,
+        roomImageUri: String?,
+        lastChatId: Long?,
+        lastActiveTime: String?,
+        lastChatContent: String?
+    )
 
     @Query("UPDATE ChatRoom SET " +
             "last_chat_id = :lastChatId, " +
