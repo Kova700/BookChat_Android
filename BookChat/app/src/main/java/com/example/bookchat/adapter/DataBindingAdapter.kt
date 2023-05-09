@@ -13,9 +13,8 @@ import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.*
 import com.example.bookchat.data.local.entity.ChatEntity
+import com.example.bookchat.data.local.entity.ChatEntity.ChatStatus
 import com.example.bookchat.data.local.entity.ChatEntity.ChatType
-import com.example.bookchat.data.local.entity.ChatEntity.Companion.FAIL
-import com.example.bookchat.data.local.entity.ChatEntity.Companion.LOADING
 import com.example.bookchat.utils.*
 import com.example.bookchat.viewmodel.AgonyViewModel.AgonyActivityState
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportStatus
@@ -568,7 +567,7 @@ object DataBindingAdapter {
     @BindingAdapter("setChatSendImgVisibility")
     fun setChatSendImgVisibility(view: View, chatStatus :Int?){
         view.visibility = when(chatStatus){
-            LOADING -> View.VISIBLE
+            ChatStatus.LOADING -> View.VISIBLE
             else -> View.GONE
         }
     }
@@ -578,7 +577,7 @@ object DataBindingAdapter {
     @BindingAdapter("setChatFailBtnVisibility")
     fun setChatFailBtnVisibility(view: View, chatStatus :Int?){
         view.visibility = when(chatStatus){
-            FAIL -> View.VISIBLE
+            ChatStatus.FAIL -> View.VISIBLE
             else -> View.GONE
         }
     }

@@ -15,9 +15,8 @@ import com.example.bookchat.data.Chat
 import com.example.bookchat.data.UserChatRoomListItem
 import com.example.bookchat.data.local.dao.ChatDAO.Companion.MIN_CHAT_ID
 import com.example.bookchat.data.local.entity.ChatEntity
+import com.example.bookchat.data.local.entity.ChatEntity.ChatStatus
 import com.example.bookchat.data.local.entity.ChatEntity.ChatType
-import com.example.bookchat.data.local.entity.ChatEntity.Companion.LOADING
-import com.example.bookchat.data.local.entity.ChatEntity.Companion.SUCCESS
 import com.example.bookchat.paging.remotemediator.ChatRemoteMediator
 import com.example.bookchat.repository.ChatRepository
 import com.example.bookchat.utils.Constants.TAG
@@ -160,7 +159,7 @@ class ChatRoomViewModel @AssistedInject constructor(
         database.chatDAO().updateChatInfo(
             chatId = chat.chatId,
             dispatchTime = chat.dispatchTime,
-            status = SUCCESS,
+            status = ChatStatus.SUCCESS,
             targetChatId = targetChatId
         )
     }
@@ -207,7 +206,7 @@ class ChatRoomViewModel @AssistedInject constructor(
             senderProfileImageUrl = cachedUser.userProfileImageUri,
             senderDefaultProfileImageType = cachedUser.defaultProfileImageType,
             dispatchTime = DateManager.getCurrentDateTimeString(),
-            status = LOADING,
+            status = ChatStatus.LOADING,
             message = message,
             chatType = ChatType.Mine
         )

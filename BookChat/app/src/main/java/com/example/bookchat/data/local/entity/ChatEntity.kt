@@ -27,7 +27,7 @@ data class ChatEntity(
     @ColumnInfo(name = "dispatch_time") val dispatchTime: String,
     @ColumnInfo(name = "message") val message: String,
     @ColumnInfo(name = "chat_type") val chatType: ChatType,
-    @ColumnInfo(name = "status") val status: Int = SUCCESS,
+    @ColumnInfo(name = "status") val status: Int = ChatStatus.SUCCESS,
 ) {
 
     fun toChat() = Chat(
@@ -44,9 +44,11 @@ data class ChatEntity(
         Mine, Other, Notice
     }
 
-    companion object {
-        const val LOADING = -1
-        const val FAIL = 0
-        const val SUCCESS = 1
+    class ChatStatus {
+        companion object {
+            const val LOADING = -1
+            const val FAIL = 0
+            const val SUCCESS = 1
+        }
     }
 }
