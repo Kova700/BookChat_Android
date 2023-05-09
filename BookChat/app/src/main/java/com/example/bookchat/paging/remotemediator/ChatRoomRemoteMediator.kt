@@ -1,6 +1,5 @@
 package com.example.bookchat.paging.remotemediator
 
-import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -9,7 +8,6 @@ import androidx.room.withTransaction
 import com.example.bookchat.api.BookChatApiInterface
 import com.example.bookchat.data.local.BookChatDB
 import com.example.bookchat.data.local.entity.ChatRoomEntity
-import com.example.bookchat.utils.Constants.TAG
 
 @OptIn(ExperimentalPagingApi::class)
 class ChatRoomRemoteMediator(
@@ -20,26 +18,22 @@ class ChatRoomRemoteMediator(
     private var isLast = false
     private var isFirst = true
 
-    private var loadKey :Long? = null
+    private var loadKey: Long? = null
 
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, ChatRoomEntity>
     ): MediatorResult {
 
+        //TODO : 현재 nextCursorId 채팅방 LastChatID -> 추후 변경 nextCursorId 채팅방 RoomId
+        // 수정 대기 중
+
         loadKey = when (loadType) {
-            LoadType.REFRESH -> {
-                Log.d(TAG, "ChatRoomRemoteMediator: load() - LoadType.REFRESH called")
-                null
-            }
-            LoadType.PREPEND -> {
-                Log.d(TAG, "ChatRoomRemoteMediator: load() - LoadType.PREPEND called")
-                return MediatorResult.Success(endOfPaginationReached = true)
-            }
+            LoadType.REFRESH -> null
+            LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
             LoadType.APPEND -> {
-                Log.d(TAG, "ChatRoomRemoteMediator: load() - LoadType.APPEND called")
                 //TODO : 끝까지 로드하지 않은 상황에서 채팅방 마지막 채팅 업데이트하면
-                // 여기서 마지막 페이지 로드 요청 보내는 이슈 있음 아래 상황과 같이 해결필요
+                // 여기서 마지막 페이지 로드 요청 보내는 이슈 있음 위에 API 변경시 같이 해결
 //                val lastItem = state.lastItemOrNull()
 //                    ?: return MediatorResult.Success(endOfPaginationReached = isLast)
 //                lastItem.roomId
@@ -80,7 +74,6 @@ class ChatRoomRemoteMediator(
         return super.initialize()
     }
 
-    //TODO : 서버와 에러 협의 필요
     companion object {
         private const val CHAT_ROOM_LOAD_SIZE = 7
     }
