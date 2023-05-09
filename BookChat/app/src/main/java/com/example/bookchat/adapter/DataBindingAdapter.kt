@@ -589,4 +589,19 @@ object DataBindingAdapter {
     fun setNewOtherChatNoticeVisibility(view: View, chatEntity: ChatEntity?) {
         view.visibility = if (chatEntity == null) View.GONE else View.VISIBLE
     }
+
+    /**채팅 날짜 표시 텍스트 세팅*/
+    @JvmStatic
+    @BindingAdapter("getDateKoreanString")
+    fun getDateKoreanString(textView: TextView, chatEntity: ChatEntity){
+        textView.text = DateManager.getDateKoreanString(chatEntity.dispatchTime)
+    }
+
+
+    /**채팅 날짜 Visibility 세팅*/
+    @JvmStatic
+    @BindingAdapter("setDateChatVisibility")
+    fun setDateChatVisibility(view: View, bool :Boolean){
+        view.visibility = if (bool) View.GONE else View.VISIBLE
+    }
 }

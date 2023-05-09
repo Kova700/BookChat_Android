@@ -13,28 +13,32 @@ import com.example.bookchat.databinding.EmptyLayoutBinding
 import com.example.bookchat.databinding.ItemChattingMineBinding
 import com.example.bookchat.databinding.ItemChattingNoticeBinding
 import com.example.bookchat.databinding.ItemChattingOtherBinding
+import com.example.bookchat.utils.DateManager
 
 class ChatDataItemAdapter :
     PagingDataAdapter<ChatEntity, RecyclerView.ViewHolder>(CHAT_ITEM_COMPARATOR) {
 
     inner class MineChatViewHolder(val binding: ItemChattingMineBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(chat: ChatEntity) {
+        fun bind(chat: ChatEntity, isSameDate: Boolean) {
             binding.chat = chat
+            binding.isSameDate = isSameDate
         }
     }
 
     inner class OtherChatViewHolder(val binding: ItemChattingOtherBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(chat: ChatEntity) {
+        fun bind(chat: ChatEntity, isSameDate: Boolean) {
             binding.chat = chat
+            binding.isSameDate = isSameDate
         }
     }
 
     inner class NoticeChatViewHolder(val binding: ItemChattingNoticeBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(chat: ChatEntity) {
+        fun bind(chat: ChatEntity, isSameDate: Boolean) {
             binding.chat = chat
+            binding.isSameDate = isSameDate
         }
     }
 
@@ -81,11 +85,16 @@ class ChatDataItemAdapter :
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val currentItem = getItem(position)
+        val isSameDate = if (position != itemCount-1) {
+            val previousItem = getItem(position + 1)
+            DateManager.isSameDate(currentItem?.dispatchTime, previousItem?.dispatchTime)
+        } else false
+
         currentItem?.let {
             when (currentItem.chatType) {
-                ChatType.Mine -> (holder as MineChatViewHolder).bind(currentItem)
-                ChatType.Other -> (holder as OtherChatViewHolder).bind(currentItem)
-                ChatType.Notice -> (holder as NoticeChatViewHolder).bind(currentItem)
+                ChatType.Mine -> (holder as MineChatViewHolder).bind(currentItem, isSameDate)
+                ChatType.Other -> (holder as OtherChatViewHolder).bind(currentItem, isSameDate)
+                ChatType.Notice -> (holder as NoticeChatViewHolder).bind(currentItem, isSameDate)
             }
         }
     }

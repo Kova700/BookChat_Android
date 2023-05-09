@@ -5,15 +5,41 @@ import java.util.*
 
 object DateManager {
 
+    private fun stringToDate(dateString: String): Date? {
+        val format = SimpleDateFormat(DATE_AND_TIME_FORMAT, Locale.getDefault())
+        return format.parse(dateString)
+    }
+
     fun getCurrentDateTimeString(): String =
         SimpleDateFormat(DATE_AND_TIME_FORMAT, Locale.getDefault())
-            .format(Date()).replace(SPACE, T)
+            .format(Date())
 
     private fun getDateString(dateTimeString: String) =
         dateTimeString.split(T).first()
 
     private fun getTimeString(dateTimeString: String) =
         dateTimeString.split(T).last()
+
+    fun getDateKoreanString(dateTimeString: String): String {
+        val (year, month, day) = getDateString(dateTimeString).split(HYPHEN)
+        return "${year}$YEAR ${month.toInt()}$MONTH  ${day.toInt()}$DAY " +
+                getWeekKoreanString(dateTimeString)
+    }
+
+    private fun getWeekKoreanString(dateTimeString: String): String {
+        var date :Date? = null
+        runCatching { date = stringToDate(dateTimeString) }
+
+        val dayNum = Calendar.getInstance()
+            .apply { time = date ?: return "" }
+            .get(Calendar.DAY_OF_WEEK)
+
+        return when (dayNum) {
+            1 -> SUNDAY; 2 -> MONDAY; 3 -> TUESDAY
+            4 -> WEDNESDAY; 5 -> THURSDAY; 6 -> FRIDAY
+            7 -> SATURDAY; else -> ""
+        }
+    }
 
     fun getFormattedDetailDateTimeText(dateTimeString: String): String =
         when {
@@ -106,8 +132,16 @@ object DateManager {
         return cYear == iYear
     }
 
-    private const val DATE_AND_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
+    fun isSameDate(dateTimeString: String?, other: String?): Boolean {
+        if (dateTimeString == null || other == null) return false
+        val (year, month, day) = getDateString(dateTimeString).split(HYPHEN)
+        val (oYear, oMonth, oDay) = getDateString(other).split(HYPHEN)
+        return (year == oYear) && (month == oMonth) && (day == oDay)
+    }
+
+    private const val DATE_AND_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss"
     private const val YESTERDAY = "어제"
+    private const val YEAR = "년"
     private const val MONTH = "월"
     private const val DAY = "일"
     private const val AM = "오전"
@@ -120,4 +154,11 @@ object DateManager {
     private const val SPACE = " "
     private const val EMPTY = ""
     private const val T = "T"
+    private const val SUNDAY = "일요일"
+    private const val MONDAY = "월요일"
+    private const val TUESDAY = "화요일"
+    private const val WEDNESDAY = "수요일"
+    private const val THURSDAY = "목요일"
+    private const val FRIDAY = "금요일"
+    private const val SATURDAY = "토요일"
 }
