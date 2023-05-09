@@ -59,8 +59,15 @@ class ChatRemoteMediator(
 
     private suspend fun saveChatInLocalDB(pagedList: List<ChatEntity>) {
         database.withTransaction {
-            database.chatDAO()
-                .insertAllChat(pagedList)
+            database.chatDAO().insertAllChat(pagedList)
+
+            val lastChat = pagedList.firstOrNull() ?: return@withTransaction
+            database.chatRoomDAO().updateLastChatInfo(
+                roomId = chatRoomId,
+                lastChatId = lastChat.chatId,
+                lastActiveTime = lastChat.dispatchTime,
+                lastChatContent = lastChat.message
+            )
         }
     }
 
