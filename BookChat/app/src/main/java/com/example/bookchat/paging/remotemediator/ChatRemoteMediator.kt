@@ -34,11 +34,10 @@ class ChatRemoteMediator(
             }
         }
 
-        val loadSize = if (isFirst) 3 * CHAT_LOAD_SIZE else CHAT_LOAD_SIZE
         return try {
             val response = apiClient.getChat(
                 roomId = chatRoomId,
-                size = loadSize.toString(),
+                size = getLoadSize().toString(),
                 postCursorId = loadKey?.toInt()
             )
 
@@ -56,6 +55,8 @@ class ChatRemoteMediator(
             MediatorResult.Error(e)
         }
     }
+
+    private fun getLoadSize(): Int = if (isFirst) 3 * CHAT_LOAD_SIZE else CHAT_LOAD_SIZE
 
     private suspend fun saveChatInLocalDB(pagedList: List<ChatEntity>) {
         database.withTransaction {

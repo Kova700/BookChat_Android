@@ -41,11 +41,10 @@ class ChatRoomRemoteMediator(
             }
         }
 
-        val loadSize = if (isFirst) 3 * CHAT_ROOM_LOAD_SIZE else CHAT_ROOM_LOAD_SIZE
         return try {
             val response = apiClient.getUserChatRoomList(
                 postCursorId = loadKey?.toInt(),
-                size = loadSize.toString()
+                size = getLoadSize().toString()
             )
 
             val result = response.body()
@@ -64,6 +63,10 @@ class ChatRoomRemoteMediator(
         }
     }
 
+    private fun getLoadSize(): Int =
+        if (isFirst) 3 * REMOTE_USER_CHAT_ROOM_LOAD_SIZE
+        else REMOTE_USER_CHAT_ROOM_LOAD_SIZE
+
     private suspend fun saveChatRoomInLocalDB(pagedList: List<ChatRoomEntity>) {
         database.withTransaction {
             database.chatRoomDAO().insertOrUpdateAllChatRoom(pagedList)
@@ -75,6 +78,6 @@ class ChatRoomRemoteMediator(
     }
 
     companion object {
-        private const val CHAT_ROOM_LOAD_SIZE = 7
+        const val REMOTE_USER_CHAT_ROOM_LOAD_SIZE = 7
     }
 }
