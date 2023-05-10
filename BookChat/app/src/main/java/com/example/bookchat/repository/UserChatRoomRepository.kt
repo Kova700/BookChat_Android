@@ -4,6 +4,7 @@ import com.example.bookchat.App
 import com.example.bookchat.data.UserChatRoomListItem
 import com.example.bookchat.data.request.RequestMakeChatRoom
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.response.ResponseBodyEmptyException
 import okhttp3.MultipartBody
 import javax.inject.Inject
 
@@ -49,6 +50,26 @@ class UserChatRoomRepository @Inject constructor() {
             defaultRoomImageType = requestMakeChatRoom.defaultRoomImageType,
             roomImageUri = roomImageUri
         )
+    }
+
+    suspend fun getUserChatRoomList(loadSize: Int): List<UserChatRoomListItem> {
+        if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
+
+        val response = App.instance.bookChatApiClient.getUserChatRoomList(
+            postCursorId = null,
+            size = loadSize.toString()
+        )
+
+        when (response.code()) {
+            200 -> {
+                val result = response.body()
+                result?.let { return result.chatRoomList }
+                throw ResponseBodyEmptyException(response.errorBody()?.string())
+            }
+            else -> throw Exception(
+                createExceptionMessage(response.code(), response.errorBody()?.string())
+            )
+        }
     }
 
     private fun isNetworkConnected(): Boolean {
