@@ -3,6 +3,7 @@ package com.example.bookchat.data.local.dao
 import androidx.paging.PagingSource
 import androidx.room.*
 import com.example.bookchat.data.local.entity.ChatRoomEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ChatRoomDAO {
@@ -11,6 +12,11 @@ interface ChatRoomDAO {
             "ORDER BY top_pin_num DESC, last_chat_id DESC")
     fun pagingSource(): PagingSource<Int, ChatRoomEntity>
 
+    @Query("SELECT * FROM ChatRoom " +
+            "ORDER BY top_pin_num DESC, last_chat_id DESC " +
+            "LIMIT :loadSize")
+    fun getChatRoom(loadSize: Int): Flow<List<ChatRoomEntity>>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIgnore(chatRoom : ChatRoomEntity) :Long
 
@@ -18,21 +24,21 @@ interface ChatRoomDAO {
         for (chatRoom in chatRooms) { insertOrUpdateChatRoom(chatRoom) }
     }
 
-    suspend fun insertOrUpdateChatRoom(chatRoom :ChatRoomEntity){
+    suspend fun insertOrUpdateChatRoom(chatRoom: ChatRoomEntity) {
         val id = insertIgnore(chatRoom)
-        if (id == -1L){
-            updateForInsert(
-                roomId = chatRoom.roomId,
-                roomName = chatRoom.roomName,
-                roomSid = chatRoom.roomSid,
-                roomMemberCount = chatRoom.roomMemberCount,
-                defaultRoomImageType = chatRoom.defaultRoomImageType,
-                roomImageUri = chatRoom.roomImageUri,
-                lastChatId = chatRoom.lastChatId,
-                lastActiveTime = chatRoom.lastActiveTime,
-                lastChatContent = chatRoom.lastChatContent,
-            )
-        }
+        if (id != -1L) return
+
+        updateForInsert(
+            roomId = chatRoom.roomId,
+            roomName = chatRoom.roomName,
+            roomSid = chatRoom.roomSid,
+            roomMemberCount = chatRoom.roomMemberCount,
+            defaultRoomImageType = chatRoom.defaultRoomImageType,
+            roomImageUri = chatRoom.roomImageUri,
+            lastChatId = chatRoom.lastChatId,
+            lastActiveTime = chatRoom.lastActiveTime,
+            lastChatContent = chatRoom.lastChatContent,
+        )
     }
 
     @Query("UPDATE ChatRoom SET " +

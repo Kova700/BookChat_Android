@@ -8,17 +8,26 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import com.example.bookchat.App
 import com.example.bookchat.data.User
-import com.example.bookchat.paging.ChatRoomListPagingSource
 import com.example.bookchat.paging.ReadingBookTapPagingSource
+import com.example.bookchat.paging.remotemediator.ChatRoomRemoteMediator.Companion.REMOTE_USER_CHAT_ROOM_LOAD_SIZE
+import com.example.bookchat.repository.UserChatRoomRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor() : ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val userChatRoomRepository: UserChatRoomRepository
+) : ViewModel() {
 
     val user = MutableStateFlow<User>(App.instance.getCachedUser())
+    val database = App.instance.database
+
+    init {
+        getRemoteUserChatRoomList()
+    }
 
     val readingBookResult by lazy {
         Pager(
@@ -35,12 +44,13 @@ class HomeViewModel @Inject constructor() : ViewModel() {
             }.cachedIn(viewModelScope)
     }
 
-    val chatRoomPagingData = Pager(
-        config = PagingConfig(
-            pageSize = 10,
-            enablePlaceholders = false
-        ),
-        pagingSourceFactory = { ChatRoomListPagingSource() }
-    ).flow
-        .cachedIn(viewModelScope)
+    val chatRoomFlow = database.chatRoomDAO().getChatRoom(MAIN_CHAT_ROOM_LIST_LOAD_SIZE)
+
+    private fun getRemoteUserChatRoomList() = viewModelScope.launch {
+        userChatRoomRepository.getUserChatRoomList(REMOTE_USER_CHAT_ROOM_LOAD_SIZE)
+    }
+
+    companion object{
+        private const val MAIN_CHAT_ROOM_LIST_LOAD_SIZE = 3
+    }
 }
