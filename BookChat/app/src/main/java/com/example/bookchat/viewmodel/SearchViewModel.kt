@@ -10,13 +10,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
-import com.example.bookchat.data.SearchChatRoomListItem
+import com.example.bookchat.data.WholeChatRoomListItem
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseGetBookSearch
-import com.example.bookchat.data.response.ResponseGetSearchChatRoomList
-import com.example.bookchat.paging.TestPagingDataSource
+import com.example.bookchat.data.response.ResponseGetWholeChatRoomList
 import com.example.bookchat.repository.BookRepository
-import com.example.bookchat.repository.ChatRoomRepository
+import com.example.bookchat.repository.WholeChatRoomRepository
 import com.example.bookchat.utils.ChatSearchFilter
 import com.example.bookchat.utils.DataStoreManager
 import com.example.bookchat.utils.SearchPurpose
@@ -29,7 +28,7 @@ import java.io.Serializable
 
 class SearchViewModel @AssistedInject constructor(
     private val bookRepository: BookRepository,
-    private val chatRoomRepository: ChatRoomRepository,
+    private val wholeChatRoomRepository: WholeChatRoomRepository,
     @Assisted val searchPurpose: SearchPurpose
 ) : ViewModel() {
 
@@ -37,7 +36,7 @@ class SearchViewModel @AssistedInject constructor(
     val searchKeyWord = MutableStateFlow<String>("")
 
     var simpleBookSearchResult = MutableStateFlow<List<Book>>(listOf())
-    var simpleChatRoomSearchResult = MutableStateFlow<List<SearchChatRoomListItem>>(listOf())
+    var simpleChatRoomSearchResult = MutableStateFlow<List<WholeChatRoomListItem>>(listOf())
     var previousSearchKeyword = ""
 
     val bookResultState = MutableStateFlow<SearchState>(SearchState.Loading)
@@ -125,13 +124,13 @@ class SearchViewModel @AssistedInject constructor(
     private fun simpleSearchChatRoom(keyword: String) = viewModelScope.launch {
         chatResultState.value = SearchState.Loading
         searchTapStatus.value = SearchTapStatus.Result
-        runCatching { chatRoomRepository.simpleSearchChatRooms(keyword, chatSearchFilter.value) }
+        runCatching { wholeChatRoomRepository.getWholeChatRoomList(keyword, chatSearchFilter.value) }
             .onSuccess { searchChatRoomsSuccessCallBack(it, keyword) }
             .onFailure { failHandler(it) }
     }
 
     private suspend fun searchChatRoomsSuccessCallBack(
-        respond: ResponseGetSearchChatRoomList,
+        respond: ResponseGetWholeChatRoomList,
         keyword: String
     ) {
         delay(SKELETON_DURATION)

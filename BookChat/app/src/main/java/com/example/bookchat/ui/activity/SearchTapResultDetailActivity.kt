@@ -13,7 +13,7 @@ import com.example.bookchat.adapter.search.booksearch.SearchResultBookDetailData
 import com.example.bookchat.adapter.search.booksearch.SearchResultBookDummyAdapter
 import com.example.bookchat.adapter.search.chatroomsearch.SearchChatRoomDetailAdapter
 import com.example.bookchat.data.Book
-import com.example.bookchat.data.SearchChatRoomListItem
+import com.example.bookchat.data.WholeChatRoomListItem
 import com.example.bookchat.databinding.ActivitySearchTapResultDetailBinding
 import com.example.bookchat.ui.dialog.MakeChatRoomSelectBookDialog
 import com.example.bookchat.ui.dialog.SearchTapBookDialog
@@ -148,12 +148,12 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
 
     private fun initChatRcvAdapter() {
         val chatRoomItemClickListener = object : SearchChatRoomDetailAdapter.OnItemClickListener {
-            override fun onItemClick(searchChatRoomListItem: SearchChatRoomListItem) {
+            override fun onItemClick(wholeChatRoomListItem: WholeChatRoomListItem) {
                 val intent = Intent(
                     this@SearchTapResultDetailActivity,
                     ChatRoomInfoActivity::class.java
                 )
-                intent.putExtra(EXTRA_CLICKED_CHAT_ROOM_ITEM, searchChatRoomListItem)
+                intent.putExtra(EXTRA_CLICKED_CHAT_ROOM_ITEM, wholeChatRoomListItem)
                 startActivity(intent)
             }
         }

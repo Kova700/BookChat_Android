@@ -188,14 +188,14 @@ interface BookChatApiInterface {
     ): Response<Unit>
 
     @GET("/v1/api/chatrooms")
-    suspend fun searchChatRoom(
+    suspend fun getWholeChatRoomList(
         @Query("postCursorId") postCursorId: Int?,
         @Query("size") size: String?,
         @Query("roomName") roomName: String?,
         @Query("title") title: String?,
         @Query("isbn") isbn: String?,
         @Query("tags") tags: String?,
-    ): Response<ResponseGetSearchChatRoomList>
+    ): Response<ResponseGetWholeChatRoomList>
 
     /**------------채팅내역------------*/
 
@@ -206,4 +206,7 @@ interface BookChatApiInterface {
         @Query("postCursorId") postCursorId: Int?,
         @Query("sort") sort: SearchSortOption = ID_DESC,
     ): Response<RespondGetChat>
+
+    //TODO : postCursorId 전부 Long으로 수정
+    // 어댑터는 Int로 사용하되 다른 곳은 전부 Long으로 사용해야함
 }

@@ -7,11 +7,11 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.data.SearchChatRoomListItem
+import com.example.bookchat.data.WholeChatRoomListItem
 import com.example.bookchat.databinding.ItemChatRoomSearchBinding
 
 class SearchChatRoomDetailAdapter :
-    PagingDataAdapter<SearchChatRoomListItem, SearchChatRoomDetailAdapter.SearchChatRoomItemViewHolder>(
+    PagingDataAdapter<WholeChatRoomListItem, SearchChatRoomDetailAdapter.SearchChatRoomItemViewHolder>(
         CHAT_ROOM_COMPARATOR
     ) {
     private lateinit var binding: ItemChatRoomSearchBinding
@@ -19,10 +19,10 @@ class SearchChatRoomDetailAdapter :
 
     inner class SearchChatRoomItemViewHolder(val binding: ItemChatRoomSearchBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(searchChatRoomListItem: SearchChatRoomListItem) {
-            binding.searchChatRoomListItem = searchChatRoomListItem
+        fun bind(wholeChatRoomListItem: WholeChatRoomListItem) {
+            binding.searchChatRoomListItem = wholeChatRoomListItem
             binding.root.setOnClickListener{
-                itemClickListener.onItemClick(searchChatRoomListItem)
+                itemClickListener.onItemClick(wholeChatRoomListItem)
             }
         }
     }
@@ -46,7 +46,7 @@ class SearchChatRoomDetailAdapter :
     override fun getItemViewType(position: Int): Int = R.layout.item_chat_room_search
 
     interface OnItemClickListener {
-        fun onItemClick(searchChatRoomListItem: SearchChatRoomListItem)
+        fun onItemClick(wholeChatRoomListItem: WholeChatRoomListItem)
     }
 
     fun setItemClickListener(onItemClickListener: OnItemClickListener) {
@@ -55,15 +55,15 @@ class SearchChatRoomDetailAdapter :
 
     companion object {
         private val CHAT_ROOM_COMPARATOR =
-            object : DiffUtil.ItemCallback<SearchChatRoomListItem>() {
+            object : DiffUtil.ItemCallback<WholeChatRoomListItem>() {
                 override fun areItemsTheSame(
-                    oldItem: SearchChatRoomListItem,
-                    newItem: SearchChatRoomListItem
+                    oldItem: WholeChatRoomListItem,
+                    newItem: WholeChatRoomListItem
                 ) = oldItem.roomId == newItem.roomId
 
                 override fun areContentsTheSame(
-                    oldItem: SearchChatRoomListItem,
-                    newItem: SearchChatRoomListItem
+                    oldItem: WholeChatRoomListItem,
+                    newItem: WholeChatRoomListItem
                 ) = oldItem == newItem
             }
     }

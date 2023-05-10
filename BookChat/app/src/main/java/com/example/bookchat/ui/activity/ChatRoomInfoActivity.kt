@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.bookchat.R
-import com.example.bookchat.data.SearchChatRoomListItem
+import com.example.bookchat.data.WholeChatRoomListItem
 import com.example.bookchat.databinding.ActivityChatRoomInfoBinding
 import com.example.bookchat.ui.fragment.ChatRoomListFragment.Companion.EXTRA_CHAT_ROOM_LIST_ITEM
 import com.example.bookchat.ui.fragment.SearchTapResultFragment.Companion.EXTRA_CLICKED_CHAT_ROOM_ITEM
@@ -37,8 +37,8 @@ class ChatRoomInfoActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun getExtraChatRoomItem(): SearchChatRoomListItem {
-        return intent.getSerializableExtra(EXTRA_CLICKED_CHAT_ROOM_ITEM) as SearchChatRoomListItem
+    private fun getExtraChatRoomItem(): WholeChatRoomListItem {
+        return intent.getSerializableExtra(EXTRA_CLICKED_CHAT_ROOM_ITEM) as WholeChatRoomListItem
     }
 
     companion object{

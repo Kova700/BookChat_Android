@@ -4,7 +4,7 @@ import com.example.bookchat.utils.UserDefaultProfileImageType
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-data class SearchChatRoomListItem(
+data class WholeChatRoomListItem(
     @SerializedName("roomId")
     val roomId: Long,
     @SerializedName("roomName")
@@ -16,7 +16,7 @@ data class SearchChatRoomListItem(
     @SerializedName("bookCoverImageUri")
     val bookCoverImageUri: String,
     @SerializedName("bookAuthors")
-    val bookAuthors: String,
+    val bookAuthors: List<String>,
     @SerializedName("hostName")
     val hostName: String,
     @SerializedName("hostDefaultProfileImageType")
@@ -36,6 +36,9 @@ data class SearchChatRoomListItem(
     @SerializedName("lastActiveTime")
     val lastActiveTime: String? = null,
 ) : Serializable {
+
+    fun getBookAuthorsString() = bookAuthors.joinToString(",")
+
     fun getUserChatRoomListItem(): UserChatRoomListItem {
         return UserChatRoomListItem(
             roomId = roomId,
