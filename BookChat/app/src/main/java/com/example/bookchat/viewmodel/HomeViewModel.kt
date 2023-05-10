@@ -8,6 +8,7 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import com.example.bookchat.App
 import com.example.bookchat.data.User
+import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.example.bookchat.paging.ReadingBookTapPagingSource
 import com.example.bookchat.paging.remotemediator.ChatRoomRemoteMediator.Companion.REMOTE_USER_CHAT_ROOM_LOAD_SIZE
 import com.example.bookchat.repository.UserChatRoomRepository
@@ -47,10 +48,16 @@ class HomeViewModel @Inject constructor(
     val chatRoomFlow = database.chatRoomDAO().getChatRoom(MAIN_CHAT_ROOM_LIST_LOAD_SIZE)
 
     private fun getRemoteUserChatRoomList() = viewModelScope.launch {
-        userChatRoomRepository.getUserChatRoomList(REMOTE_USER_CHAT_ROOM_LOAD_SIZE)
+        val chatRoomList =
+            userChatRoomRepository.getUserChatRoomList(REMOTE_USER_CHAT_ROOM_LOAD_SIZE)
+        saveChatRoomInLocalDB(chatRoomList.map { it.toChatRoomEntity() })
     }
 
-    companion object{
+    private suspend fun saveChatRoomInLocalDB(chatRoomList: List<ChatRoomEntity>) {
+        database.chatRoomDAO().insertOrUpdateAllChatRoom(chatRoomList)
+    }
+
+    companion object {
         private const val MAIN_CHAT_ROOM_LIST_LOAD_SIZE = 3
     }
 }
