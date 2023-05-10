@@ -45,9 +45,9 @@ class ChatRemoteMediator(
             result?.let {
                 val pagedChatList = result.chatResponseList.map { it.toChatEntity(chatRoomId) }
                 val meta = result.cursorMeta
+                saveChatInLocalDB(pagedChatList)
                 isLast = meta.last
                 isFirst = false
-                saveChatInLocalDB(pagedChatList)
             }
 
             MediatorResult.Success(endOfPaginationReached = isLast)
@@ -62,13 +62,15 @@ class ChatRemoteMediator(
         database.withTransaction {
             database.chatDAO().insertAllChat(pagedList)
 
-            val lastChat = pagedList.firstOrNull() ?: return@withTransaction
-            database.chatRoomDAO().updateLastChatInfo(
-                roomId = chatRoomId,
-                lastChatId = lastChat.chatId,
-                lastActiveTime = lastChat.dispatchTime,
-                lastChatContent = lastChat.message
-            )
+            if (isFirst) {
+                val lastChat = pagedList.firstOrNull() ?: return@withTransaction
+                database.chatRoomDAO().updateLastChatInfo(
+                    roomId = chatRoomId,
+                    lastChatId = lastChat.chatId,
+                    lastActiveTime = lastChat.dispatchTime,
+                    lastChatContent = lastChat.message
+                )
+            }
         }
     }
 
