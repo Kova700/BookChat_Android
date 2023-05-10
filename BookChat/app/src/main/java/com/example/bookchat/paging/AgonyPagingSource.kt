@@ -19,10 +19,10 @@ import retrofit2.Response
 class AgonyPagingSource(
     private val book: BookShelfItem,
     private val sortOption: SearchSortOption
-) : PagingSource<Int, Agony>() {
+) : PagingSource<Long, Agony>() {
     private lateinit var response: Response<ResponseGetAgony>
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Agony> {
+    override suspend fun load(params: LoadParams<Long>): LoadResult<Long, Agony> {
         if (!isNetworkConnected()) return LoadResult.Error(NetworkIsNotConnectedException())
 
         val page = params.key ?: getFirstIndex(sortOption)
@@ -59,7 +59,7 @@ class AgonyPagingSource(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, Agony>): Int? {
+    override fun getRefreshKey(state: PagingState<Long, Agony>): Long? {
         return getFirstIndex(sortOption)
     }
 
@@ -67,7 +67,7 @@ class AgonyPagingSource(
         data: List<Agony>,
         cursorMeta: CursorMeta,
         sortOption: SearchSortOption
-    ): LoadResult<Int, Agony> {
+    ): LoadResult<Long, Agony> {
         return try {
             LoadResult.Page(
                 data = data,
@@ -79,13 +79,13 @@ class AgonyPagingSource(
         }
     }
 
-    private fun getPrevKey(cursorMeta: CursorMeta): Int? =
+    private fun getPrevKey(cursorMeta: CursorMeta): Long? =
         if (cursorMeta.first) null else cursorMeta.nextCursorId
 
     private fun getNextKey(
         cursorMeta: CursorMeta,
         sortOption: SearchSortOption
-    ): Int? {
+    ): Long? {
         if (cursorMeta.last) return null
 
         return when (sortOption) {
@@ -101,7 +101,7 @@ class AgonyPagingSource(
         }
     }
 
-    private fun getFirstIndex(sortOption: SearchSortOption): Int? {
+    private fun getFirstIndex(sortOption: SearchSortOption): Long? {
         return when (sortOption) {
             ID_DESC,
             UPDATED_AT_DESC -> null

@@ -16,11 +16,11 @@ class SearchResultChatRoomPagingSource(
     private val keyword: String,
     private val chatSearchFilter: ChatSearchFilter
 ) :
-    PagingSource<Int, WholeChatRoomListItem>() {
+    PagingSource<Long, WholeChatRoomListItem>() {
 
     private lateinit var response: Response<ResponseGetWholeChatRoomList>
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, WholeChatRoomListItem> {
+    override suspend fun load(params: LoadParams<Long>): LoadResult<Long, WholeChatRoomListItem> {
         if (!isNetworkConnected()) return LoadResult.Error(NetworkIsNotConnectedException())
 
         val requestSearchChatRoom = WholeChatRoomRepository.getRequestGetWholeChatRoomList(
@@ -64,13 +64,13 @@ class SearchResultChatRoomPagingSource(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, WholeChatRoomListItem>): Int? =
+    override fun getRefreshKey(state: PagingState<Long, WholeChatRoomListItem>): Long? =
         STARTING_PAGE_INDEX
 
     private fun getLoadResult(
         data: List<WholeChatRoomListItem>,
         cursorMeta: CursorMeta,
-    ): LoadResult<Int, WholeChatRoomListItem> {
+    ): LoadResult<Long, WholeChatRoomListItem> {
         return LoadResult.Page(
             data = data,
             prevKey = getPrevKey(cursorMeta),
@@ -78,10 +78,10 @@ class SearchResultChatRoomPagingSource(
         )
     }
 
-    private fun getPrevKey(cursorMeta: CursorMeta): Int? =
+    private fun getPrevKey(cursorMeta: CursorMeta): Long? =
         if (cursorMeta.first) null else cursorMeta.nextCursorId
 
-    private fun getNextKey(cursorMeta: CursorMeta): Int? {
+    private fun getNextKey(cursorMeta: CursorMeta): Long? {
         if (cursorMeta.last) return null
         return if (cursorMeta.first) cursorMeta.nextCursorId + 2 else cursorMeta.nextCursorId
     }

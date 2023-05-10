@@ -38,7 +38,7 @@ class ChatRemoteMediator(
             val response = apiClient.getChat(
                 roomId = chatRoomId,
                 size = getLoadSize().toString(),
-                postCursorId = loadKey?.toInt()
+                postCursorId = loadKey
             )
 
             val result = response.body()

@@ -43,7 +43,7 @@ class ChatRoomRemoteMediator(
 
         return try {
             val response = apiClient.getUserChatRoomList(
-                postCursorId = loadKey?.toInt(),
+                postCursorId = loadKey,
                 size = getLoadSize().toString()
             )
 
@@ -51,7 +51,7 @@ class ChatRoomRemoteMediator(
             result?.let {
                 val pagedChatRoom = result.chatRoomList.map { it.toChatRoomEntity() }
                 val meta = result.cursorMeta
-                loadKey = meta.nextCursorId.toLong()
+                loadKey = meta.nextCursorId
                 isLast = meta.last
                 isFirst = false
                 saveChatRoomInLocalDB(pagedChatRoom)
