@@ -25,7 +25,7 @@ class SearchResultChatRoomPagingSource(
 
         val requestSearchChatRoom = WholeChatRoomRepository.getRequestGetWholeChatRoomList(
             postCursorId = params.key,
-            size = params.loadSize.toString(),
+            size = params.loadSize,
             keyword = keyword,
             chatSearchFilter = chatSearchFilter
         )

@@ -57,7 +57,7 @@ class UserChatRoomRepository @Inject constructor() {
 
         val response = App.instance.bookChatApiClient.getUserChatRoomList(
             postCursorId = null,
-            size = loadSize.toString()
+            size = loadSize
         )
 
         when (response.code()) {

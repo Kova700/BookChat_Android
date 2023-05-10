@@ -30,7 +30,7 @@ class AgonyPagingSource(
         try {
             response = App.instance.bookChatApiClient.getAgony(
                 bookShelfId = book.bookShelfId,
-                size = params.loadSize.toString(),
+                size = params.loadSize,
                 sort = sortOption,
                 postCursorId = page
             )

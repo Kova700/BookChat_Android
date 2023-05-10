@@ -44,7 +44,7 @@ class ChatRoomRemoteMediator(
         return try {
             val response = apiClient.getUserChatRoomList(
                 postCursorId = loadKey,
-                size = getLoadSize().toString()
+                size = getLoadSize()
             )
 
             val result = response.body()

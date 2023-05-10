@@ -19,7 +19,7 @@ class WholeChatRoomRepository @Inject constructor() {
 
         val requestGetWholeChatRoomList = getRequestGetWholeChatRoomList(
             postCursorId = null,
-            size = SIMPLE_SEARCH_CHAT_ROOMS_LOAD_SIZE.toString(),
+            size = SIMPLE_SEARCH_CHAT_ROOMS_LOAD_SIZE,
             keyword = keyword,
             chatSearchFilter = chatSearchFilter
         )
@@ -57,7 +57,7 @@ class WholeChatRoomRepository @Inject constructor() {
 
         fun getRequestGetWholeChatRoomList(
             postCursorId: Long?,
-            size: String,
+            size: Int,
             keyword: String,
             chatSearchFilter: ChatSearchFilter
         ): RequestGetWholeChatRoomList {

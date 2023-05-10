@@ -121,7 +121,7 @@ interface BookChatApiInterface {
     @GET("/v1/api/bookshelves/{bookShelfId}/agonies")
     suspend fun getAgony(
         @Path("bookShelfId") bookShelfId: Long,
-        @Query("size") size: String,
+        @Query("size") size: Int,
         @Query("sort") sort: SearchSortOption,
         @Query("postCursorId") postCursorId: Long?,
     ): Response<ResponseGetAgony>
@@ -153,7 +153,7 @@ interface BookChatApiInterface {
         @Path("bookShelfId") bookShelfId: Long,
         @Path("agonyId") agonyId: Long,
         @Query("postCursorId") postCursorId: Long?,
-        @Query("size") size: String,
+        @Query("size") size: Int,
         @Query("sort") sort: SearchSortOption
     ): Response<ResponseGetAgonyRecord>
 
@@ -177,7 +177,7 @@ interface BookChatApiInterface {
     @GET("/v1/api/users/chatrooms")
     suspend fun getUserChatRoomList(
         @Query("postCursorId") postCursorId: Long?,
-        @Query("size") size: String,
+        @Query("size") size: Int,
     ): Response<ResponseGetUserChatRoomList>
 
     @Multipart
@@ -190,7 +190,7 @@ interface BookChatApiInterface {
     @GET("/v1/api/chatrooms")
     suspend fun getWholeChatRoomList(
         @Query("postCursorId") postCursorId: Long?,
-        @Query("size") size: String?,
+        @Query("size") size: Int,
         @Query("roomName") roomName: String?,
         @Query("title") title: String?,
         @Query("isbn") isbn: String?,
@@ -202,10 +202,8 @@ interface BookChatApiInterface {
     @GET("/v1/api/chatrooms/{roomId}/chats")
     suspend fun getChat(
         @Path("roomId") roomId: Long,
-        @Query("size") size: String,
+        @Query("size") size: Int,
         @Query("postCursorId") postCursorId: Long?,
         @Query("sort") sort: SearchSortOption = ID_DESC,
     ): Response<RespondGetChat>
-
-    //TODO : loadSize String인 곳들 전부 Int로 수정
 }

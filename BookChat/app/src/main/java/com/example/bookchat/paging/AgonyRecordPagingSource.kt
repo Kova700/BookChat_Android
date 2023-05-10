@@ -34,7 +34,7 @@ class AgonyRecordPagingSource(
                 bookShelfId = book.bookShelfId,
                 agonyId = agony.agonyId,
                 postCursorId = page,
-                size = params.loadSize.toString(),
+                size = params.loadSize,
                 sort = sortOption
             )
         }catch (e :Exception){
