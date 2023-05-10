@@ -23,12 +23,6 @@ class SearchDetailViewModel @AssistedInject constructor(
     @Assisted val chatSearchFilter: ChatSearchFilter
 ) : ViewModel() {
 
-    init {
-        setHeaderTitle()
-    }
-
-    val headerTitle = MutableStateFlow<String>("")
-
     val pagingBookData by lazy {
         Pager(
             config = PagingConfig(
@@ -56,8 +50,8 @@ class SearchDetailViewModel @AssistedInject constructor(
             .cachedIn(viewModelScope)
     }
 
-    private fun setHeaderTitle() {
-        headerTitle.value = when (necessaryDataFlag) {
+    fun getHeaderTitle(): String {
+        return when (necessaryDataFlag) {
             is NecessaryDataFlagInDetail.Book -> {
                 App.instance.applicationContext.resources.getString(R.string.book)
             }
