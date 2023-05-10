@@ -9,7 +9,7 @@
             type="com.example.bookchat.ui.activity.ChatRoomInfoActivity" />
         <variable
             name="chatRoomItem"
-            type="com.example.bookchat.data.SearchChatRoomListItem" />
+            type="com.example.bookchat.data.WholeChatRoomListItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -87,7 +87,7 @@
                     android:layout_marginTop="80dp"
                     android:elegantTextHeight="true"
                     android:fontFamily="@font/notosanskr_regular"
-                    android:text="@{chatRoomItem.bookAuthors}"
+                    android:text="@{chatRoomItem.getBookAuthorsString()}"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
                     app:layout_constrainedWidth="true"
