@@ -418,8 +418,8 @@ object DataBindingAdapter {
     @JvmStatic
     @BindingAdapter("getFormattedDetailDateTimeText")
     fun getFormattedDetailDateTimeText(view: TextView, dateAndTimeString: String?) {
-        if (dateAndTimeString == null) return
-        view.text = DateManager.getFormattedDetailDateTimeText(dateAndTimeString)
+        view.text = if (dateAndTimeString == null) ""
+        else DateManager.getFormattedDetailDateTimeText(dateAndTimeString)
     }
 
     /**UserChatRoomListItem 채팅방 이미지 세팅*/
