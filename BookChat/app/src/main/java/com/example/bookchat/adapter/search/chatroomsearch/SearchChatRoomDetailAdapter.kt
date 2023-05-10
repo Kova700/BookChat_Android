@@ -20,7 +20,7 @@ class SearchChatRoomDetailAdapter :
     inner class SearchChatRoomItemViewHolder(val binding: ItemChatRoomSearchBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(wholeChatRoomListItem: WholeChatRoomListItem) {
-            binding.searchChatRoomListItem = wholeChatRoomListItem
+            binding.wholeChatRoomListItem = wholeChatRoomListItem
             binding.root.setOnClickListener{
                 itemClickListener.onItemClick(wholeChatRoomListItem)
             }
