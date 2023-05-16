@@ -1,5 +1,6 @@
 package com.example.bookchat.data
 
+import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.example.bookchat.utils.UserDefaultProfileImageType
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
@@ -39,8 +40,19 @@ data class WholeChatRoomListItem(
 
     fun getBookAuthorsString() = bookAuthors.joinToString(",")
 
-    fun getUserChatRoomListItem(): UserChatRoomListItem {
+    fun toUserChatRoomListItem(): UserChatRoomListItem {
         return UserChatRoomListItem(
+            roomId = roomId,
+            roomName = roomName,
+            roomSid = roomSid,
+            roomMemberCount = roomMemberCount,
+            defaultRoomImageType = defaultRoomImageType,
+            roomImageUri = roomImageUri
+        )
+    }
+
+    fun toChatRoomEntity(): ChatRoomEntity {
+        return ChatRoomEntity(
             roomId = roomId,
             roomName = roomName,
             roomSid = roomSid,

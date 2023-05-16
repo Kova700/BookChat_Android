@@ -2,9 +2,7 @@ package com.example.bookchat.viewmodel
 
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -12,11 +10,11 @@ import androidx.room.withTransaction
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Chat
-import com.example.bookchat.data.UserChatRoomListItem
 import com.example.bookchat.data.local.dao.ChatDAO.Companion.MIN_CHAT_ID
 import com.example.bookchat.data.local.entity.ChatEntity
 import com.example.bookchat.data.local.entity.ChatEntity.ChatStatus
 import com.example.bookchat.data.local.entity.ChatEntity.ChatType
+import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.example.bookchat.paging.remotemediator.ChatRemoteMediator
 import com.example.bookchat.repository.ChatRepository
 import com.example.bookchat.utils.Constants.TAG
@@ -30,14 +28,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import org.hildan.krossbow.stomp.ConnectionException
-import org.hildan.krossbow.stomp.LostReceiptException
-import org.hildan.krossbow.stomp.MissingHeartBeatException
+import kotlinx.coroutines.withContext
 import org.hildan.krossbow.stomp.StompSession
 
 // TODO : 비즈니스 로직만 남기고 잡다한 요청은 Repository에 local, remote 구분해서 이전
 class ChatRoomViewModel @AssistedInject constructor(
-    @Assisted val chatRoomListItem: UserChatRoomListItem,
+    @Assisted val chatRoomEntity: ChatRoomEntity,
     @Assisted private var firstEnterFlag: Boolean,
     private val chatRepository: ChatRepository
 ) : ViewModel() {
@@ -46,8 +42,8 @@ class ChatRoomViewModel @AssistedInject constructor(
     val inputtedMessage = MutableStateFlow("")
     private lateinit var stompSession: StompSession
 
-    private val roomId = chatRoomListItem.roomId
-    private val roomSId = chatRoomListItem.roomSid
+    private val roomId = chatRoomEntity.roomId
+    private val roomSId = chatRoomEntity.roomSid
     val database = App.instance.database
 
     var newOtherChatNoticeFlow = MutableStateFlow<ChatEntity?>(null)
@@ -74,6 +70,10 @@ class ChatRoomViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
+            if (firstEnterFlag) sendEnterMessage() //이걸 집어넣을 마땅한 곳이 없음
+            //collect는 join해서 기다릴 수 없음
+            //채팅 Topic이 구독되면, 자동으로 입장 Send를 보내고 싶음
+            //하지만 collect는 실패하지 않으면 아래 코드가 실행되지 않음
             connectSocket()
             observeChatFlowJob.start()
             observeErrorFlowJob.start()
@@ -94,16 +94,12 @@ class ChatRoomViewModel @AssistedInject constructor(
             .onFailure { handleError(it) }
     }
 
+    //TODO : 채팅방 생성하고, 입장 Send 안넘어옴 원인 파악하기,
     private val observeChatFlowJob = viewModelScope
         .launch(start = CoroutineStart.LAZY) {
             runCatching { collectChat() }
-                .onSuccess { successSubscribeChatCallBack() }
                 .onFailure { handleError(it) }
         }
-
-    private fun successSubscribeChatCallBack() {
-        if (firstEnterFlag) sendEnterMessage()
-    }
 
     private val observeErrorFlowJob = viewModelScope
         .launch(start = CoroutineStart.LAZY) {
@@ -112,7 +108,9 @@ class ChatRoomViewModel @AssistedInject constructor(
         }
 
     private suspend fun collectChat() {
-        subscribeChatRoom(roomSId).collect { msg -> saveChatInLocalDB(msg.parseToChatEntity()) }
+        val chatFlow = subscribeChatRoom(roomSId)
+        if (firstEnterFlag) sendEnterMessage()
+        chatFlow.collect { msg -> saveChatInLocalDB(msg.parseToChatEntity()) }
     }
 
     private suspend fun collectSocketError() {
@@ -130,6 +128,9 @@ class ChatRoomViewModel @AssistedInject constructor(
         database.chatDAO().getWaitingChatList(roomId).collect { waitingChatList = it }
     }
 
+    //TODO : 누군가 입장했다 같은 이벤트도 구분해야함 (ChatRoomEntity에 인원 수 증가시켜야함)
+    // 선택지1. 채팅Text끝부분에 입장했습니다.가 붙은 Chat이 오면 내가 수작업한다. (공지 채팅 내부에서 구분 Flag 추가)
+    // 선택지2. 따로 채팅방 공지의 경우 따로 Topic을 파서 그거에 관련한 채팅만 주고 받는다 (그곳에서도 공지 타입을 구분해서 분기)
     private suspend fun saveChatInLocalDB(chat: ChatEntity) {
         val myUserId = App.instance.getCachedUser().userId
         database.withTransaction {
@@ -191,6 +192,7 @@ class ChatRoomViewModel @AssistedInject constructor(
         scrollForcedFlag = true
         insertNewChat(getMineChatEntity(inputtedMessage.value))
         runCatching { chatRepository.sendMessage(stompSession, roomId, inputtedMessage.value) }
+            .onSuccess { Log.d(TAG, "ChatRoomViewModel: sendMessage() - 메세지 전송 성공 !! $it") }
             .onFailure { handleError(it) }
             .also { inputtedMessage.value = "" }
     }
@@ -258,14 +260,17 @@ class ChatRoomViewModel @AssistedInject constructor(
     }
 
     //TODO : 예외처리 분기 추가해야함 (대부분이 현재 세션 연결 취소 후 다시 재연결 해야 함)
-    private fun handleError(throwable: Throwable) {
-        Log.d(TAG, "ChatRoomViewModel: handleError() ${throwable.cause?.message}")
-        makeToast(R.string.error_network_error)
-        when (throwable) {
-            is MissingHeartBeatException -> {}
-            is ConnectionException -> {}
-            is LostReceiptException -> {}
-            else -> {}
+    private suspend fun handleError(throwable: Throwable) {
+        withContext(Dispatchers.Main) {
+            when (throwable) {
+//            is MissingHeartBeatException -> {}
+//            is ConnectionException -> {}
+//            is LostReceiptException -> {}
+                else -> {
+                    Log.d(TAG, "ChatRoomViewModel: handleError() $throwable")
+                    makeToast(R.string.error_network_error)
+                }
+            }
         }
     }
 
@@ -283,7 +288,7 @@ class ChatRoomViewModel @AssistedInject constructor(
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
         fun create(
-            chatRoomListItem: UserChatRoomListItem,
+            chatRoomEntity: ChatRoomEntity,
             firstEnterFlag: Boolean
         ): ChatRoomViewModel
     }
@@ -293,11 +298,11 @@ class ChatRoomViewModel @AssistedInject constructor(
 
         fun provideFactory(
             assistedFactory: AssistedFactory,
-            chatRoomListItem: UserChatRoomListItem,
+            chatRoomEntity: ChatRoomEntity,
             firstEnterFlag: Boolean
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(chatRoomListItem, firstEnterFlag) as T
+                return assistedFactory.create(chatRoomEntity, firstEnterFlag) as T
             }
         }
     }

@@ -63,7 +63,7 @@ class ChatRoomListFragment : Fragment() {
         val chatRoomItemClickListener = object : UserChatRoomListDataAdapter.OnItemClickListener {
             override fun onItemClick(chatRoomEntity: ChatRoomEntity) {
                 val intent = Intent(requireContext(), ChatRoomActivity::class.java)
-                intent.putExtra(EXTRA_CHAT_ROOM_LIST_ITEM, chatRoomEntity.toUserChatRoomListItem())
+                intent.putExtra(EXTRA_CHAT_ROOM_LIST_ITEM, chatRoomEntity)
                 startActivity(intent)
             }
         }

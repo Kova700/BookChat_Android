@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.ChatItemDecoration
 import com.example.bookchat.R
 import com.example.bookchat.adapter.chatting.ChatDataItemAdapter
-import com.example.bookchat.data.UserChatRoomListItem
+import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.example.bookchat.databinding.ActivityChatRoomBinding
 import com.example.bookchat.ui.activity.ChatRoomInfoActivity.Companion.EXTRA_FIRST_ENTER_FLAG
 import com.example.bookchat.ui.fragment.ChatRoomListFragment.Companion.EXTRA_CHAT_ROOM_LIST_ITEM
@@ -31,13 +31,12 @@ class ChatRoomActivity : AppCompatActivity() {
     private val chatRoomViewModel: ChatRoomViewModel by viewModels {
         ChatRoomViewModel.provideFactory(
             chatRoomViewModelFactory,
-            getChatRoomListItem(),
+            getChatRoomEntity(),
             getFirstEnterFlag()
         )
     }
 
-    //TODO : 채팅방에 들어왔을때, 채팅스크롤의 위치는 내가 마지막으로 받았던 채팅
-    //TODO : 날짜 구분선, 여기까지 읽었습니다 구현해야함
+    //TODO : 채팅방에 들어왔을때, 채팅스크롤의 위치는 내가 마지막으로 받았던 채팅 (여기까지 읽었습니다) [보류]
     //TODO : 전송 중 상태로 어플 종료 시 전송실패로 변경된 UI로 보이게 수정해야함
     //TODO : 또한 전송 중 상태에서 다시 인터넷이 연결되면 자동으로 전송이 되어야함
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -139,13 +138,13 @@ class ChatRoomActivity : AppCompatActivity() {
         }
     }
 
-    override fun onPause() {
+    override fun onStop() {
         //TODO : EditText에 입력해놓은 내용이 있다면 자동저장 기능 추가
-        super.onPause()
+        super.onStop()
     }
 
-    private fun getChatRoomListItem(): UserChatRoomListItem {
-        return intent.getSerializableExtra(EXTRA_CHAT_ROOM_LIST_ITEM) as UserChatRoomListItem
+    private fun getChatRoomEntity(): ChatRoomEntity {
+        return intent.getSerializableExtra(EXTRA_CHAT_ROOM_LIST_ITEM) as ChatRoomEntity
     }
 
     private fun getFirstEnterFlag(): Boolean {

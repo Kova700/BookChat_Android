@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.MainBookItemDecoration
 import com.example.bookchat.R
 import com.example.bookchat.adapter.home.MainUserChatRoomListAdapter
-import com.example.bookchat.adapter.userchatroomlist.UserChatRoomListDataAdapter
 import com.example.bookchat.adapter.wishbookshelf.WishBookShelfDataAdapter
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.data.local.entity.ChatRoomEntity
@@ -77,10 +76,7 @@ class HomeFragment : Fragment() {
         val chatRoomItemClickListener = object : MainUserChatRoomListAdapter.OnItemClickListener {
             override fun onItemClick(chatRoomEntity: ChatRoomEntity) {
                 val intent = Intent(requireContext(), ChatRoomActivity::class.java)
-                intent.putExtra(
-                    ChatRoomListFragment.EXTRA_CHAT_ROOM_LIST_ITEM,
-                    chatRoomEntity.toUserChatRoomListItem()
-                )
+                intent.putExtra(ChatRoomListFragment.EXTRA_CHAT_ROOM_LIST_ITEM, chatRoomEntity)
                 startActivity(intent)
             }
         }

@@ -79,7 +79,7 @@ class MakeChatRoomActivity : AppCompatActivity() {
 
     private fun startChatRoomActivity(chatRoomItem: UserChatRoomListItem) {
         val intent = Intent(this, ChatRoomActivity::class.java)
-        intent.putExtra(EXTRA_CHAT_ROOM_LIST_ITEM, chatRoomItem)
+        intent.putExtra(EXTRA_CHAT_ROOM_LIST_ITEM, chatRoomItem.toChatRoomEntity())
         intent.putExtra(EXTRA_FIRST_ENTER_FLAG, true)
         startActivity(intent)
         finish()
