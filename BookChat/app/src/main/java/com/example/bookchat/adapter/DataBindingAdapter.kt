@@ -600,7 +600,7 @@ object DataBindingAdapter {
     /**채팅 날짜 Visibility 세팅*/
     @JvmStatic
     @BindingAdapter("setDateChatVisibility")
-    fun setDateChatVisibility(view: View, bool :Boolean){
-        view.visibility = if (bool) View.GONE else View.VISIBLE
+    fun setDateChatVisibility(view: View, bool :Boolean?){
+        view.visibility = if (bool == false) View.VISIBLE else View.GONE
     }
 }

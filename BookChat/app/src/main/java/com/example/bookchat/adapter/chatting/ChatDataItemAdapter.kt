@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.data.local.entity.ChatEntity
+import com.example.bookchat.data.local.entity.ChatEntity.ChatStatus
 import com.example.bookchat.data.local.entity.ChatEntity.ChatType
 import com.example.bookchat.databinding.EmptyLayoutBinding
 import com.example.bookchat.databinding.ItemChattingMineBinding
@@ -22,7 +23,7 @@ class ChatDataItemAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(chat: ChatEntity, isSameDate: Boolean) {
             binding.chat = chat
-            binding.isSameDate = isSameDate
+            if (chat.status == ChatStatus.SUCCESS) binding.isSameDate = isSameDate
         }
     }
 
@@ -30,7 +31,7 @@ class ChatDataItemAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(chat: ChatEntity, isSameDate: Boolean) {
             binding.chat = chat
-            binding.isSameDate = isSameDate
+            if (chat.status == ChatStatus.SUCCESS) binding.isSameDate = isSameDate
         }
     }
 
@@ -38,7 +39,7 @@ class ChatDataItemAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(chat: ChatEntity, isSameDate: Boolean) {
             binding.chat = chat
-            binding.isSameDate = isSameDate
+            if (chat.status == ChatStatus.SUCCESS) binding.isSameDate = isSameDate
         }
     }
 
@@ -85,7 +86,7 @@ class ChatDataItemAdapter :
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val currentItem = getItem(position)
-        val isSameDate = if (position != itemCount-1) {
+        val isSameDate = if (position != itemCount - 1) {
             val previousItem = getItem(position + 1)
             DateManager.isSameDate(currentItem?.dispatchTime, previousItem?.dispatchTime)
         } else false
