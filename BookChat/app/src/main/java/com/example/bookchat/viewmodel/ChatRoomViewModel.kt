@@ -39,7 +39,7 @@ class ChatRoomViewModel @AssistedInject constructor(
 ) : ViewModel() {
     val eventFlow = MutableSharedFlow<ChatEvent>()
 
-    val inputtedMessage = MutableStateFlow("")
+    val inputtedMessage = MutableStateFlow(chatRoomEntity.tempSavedMessage ?: "")
     private lateinit var stompSession: StompSession
 
     private val roomId = chatRoomEntity.roomId
@@ -70,6 +70,8 @@ class ChatRoomViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
+            clearTempSavedMessage()
+
             if (firstEnterFlag) sendEnterMessage() //이걸 집어넣을 마땅한 곳이 없음
             //collect는 join해서 기다릴 수 없음
             //채팅 Topic이 구독되면, 자동으로 입장 Send를 보내고 싶음
@@ -78,6 +80,12 @@ class ChatRoomViewModel @AssistedInject constructor(
             observeChatFlowJob.start()
             observeErrorFlowJob.start()
             observeWaitingChatFlowJob.start()
+        }
+    }
+
+    private suspend fun clearTempSavedMessage() {
+        database.withTransaction {
+            database.chatRoomDAO().setTempSavedMessage(roomId, "")
         }
     }
 
@@ -188,13 +196,12 @@ class ChatRoomViewModel @AssistedInject constructor(
 
     fun sendMessage() = viewModelScope.launch(Dispatchers.IO) {
         if (inputtedMessage.value.isBlank()) return@launch
-
+        val message = inputtedMessage.value.also { inputtedMessage.value = "" }
         scrollForcedFlag = true
-        insertNewChat(getMineChatEntity(inputtedMessage.value))
-        runCatching { chatRepository.sendMessage(stompSession, roomId, inputtedMessage.value) }
+        insertNewChat(getMineChatEntity(message))
+        runCatching { chatRepository.sendMessage(stompSession, roomId, message) }
             .onSuccess { Log.d(TAG, "ChatRoomViewModel: sendMessage() - 메세지 전송 성공 !! $it") }
             .onFailure { handleError(it) }
-            .also { inputtedMessage.value = "" }
     }
 
     private suspend fun getMineChatEntity(message: String): ChatEntity {

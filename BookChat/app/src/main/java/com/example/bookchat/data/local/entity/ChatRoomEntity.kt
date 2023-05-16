@@ -19,8 +19,8 @@ data class ChatRoomEntity(
     @ColumnInfo(name = "last_active_time") val lastActiveTime: String? = null,
     @ColumnInfo(name = "last_chat_content") val lastChatContent: String? = null,
     @ColumnInfo(name = "notification_flag") val notificationFlag: Boolean = true,
-    @ColumnInfo(name = "top_pin_num") val topPinNum: Int = 0
-
+    @ColumnInfo(name = "top_pin_num") val topPinNum: Int = 0,
+    @ColumnInfo(name = "temp_saved_message") val tempSavedMessage: String? = null,
 ) : Serializable {
     // TODO : last_chat_id를 채팅방 별 읽지 않은 채팅 수 표시할 떄 사용 가능(백엔드와 협의)
     fun toUserChatRoomListItem() =

@@ -8,6 +8,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.withTransaction
+import com.example.bookchat.App
 import com.example.bookchat.ChatItemDecoration
 import com.example.bookchat.R
 import com.example.bookchat.adapter.chatting.ChatDataItemAdapter
@@ -139,8 +141,21 @@ class ChatRoomActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        //TODO : EditText에 입력해놓은 내용이 있다면 자동저장 기능 추가
+        saveTempSavedMessage(chatRoomViewModel.inputtedMessage.value)
         super.onStop()
+    }
+
+    private fun saveTempSavedMessage(message: String) = lifecycleScope.launch {
+        if (message.isBlank()) return@launch
+
+        with(App.instance.database) {
+            withTransaction {
+                chatRoomDAO().setTempSavedMessage(
+                    roomId = getChatRoomEntity().roomId,
+                    message = chatRoomViewModel.inputtedMessage.value
+                )
+            }
+        }
     }
 
     private fun getChatRoomEntity(): ChatRoomEntity {
