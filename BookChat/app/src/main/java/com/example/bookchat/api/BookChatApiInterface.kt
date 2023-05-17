@@ -172,7 +172,7 @@ interface BookChatApiInterface {
         @Body requestReviseAgonyRecord: RequestReviseAgonyRecord
     ): Response<Unit>
 
-    /**------------채팅방 목록------------*/
+    /**------------채팅방------------*/
 
     @GET("/v1/api/users/chatrooms")
     suspend fun getUserChatRoomList(
@@ -185,6 +185,16 @@ interface BookChatApiInterface {
     suspend fun makeChatRoom(
         @Part("createChatRoomRequest") requestMakeChatRoom: RequestMakeChatRoom,
         @Part chatRoomImage: MultipartBody.Part? = null
+    ): Response<Unit>
+
+    @POST("/v1/api/enter/chatrooms/{roomId}")
+    suspend fun enterChatRoom(
+        @Query("roomId") roomId: Long
+    ): Response<Unit>
+
+    @DELETE("/v1/api/leave/chatrooms/{roomId}")
+    suspend fun leaveChatRoom(
+        @Query("roomId") roomId: Long
     ): Response<Unit>
 
     @GET("/v1/api/chatrooms")

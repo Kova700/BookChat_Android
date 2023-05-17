@@ -131,6 +131,7 @@
     <string name="make_chat_room_tag_hint">#해시태그로 채팅방을 소개해 주세요.</string>
     <string name="make_chat_room_book_select">도서 선택</string>
     <string name="make_chat_room_fail">채팅방 생성을 실패했습니다.</string>
+    <string name="enter_chat_room_fail">채팅방 입장에 실패했습니다.</string>
 
     <!--my page-->
     <string name="my_page_title">나의 정보</string>

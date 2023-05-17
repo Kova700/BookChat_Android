@@ -15,7 +15,6 @@ import com.example.bookchat.R
 import com.example.bookchat.adapter.chatting.ChatDataItemAdapter
 import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.example.bookchat.databinding.ActivityChatRoomBinding
-import com.example.bookchat.ui.activity.ChatRoomInfoActivity.Companion.EXTRA_FIRST_ENTER_FLAG
 import com.example.bookchat.ui.fragment.ChatRoomListFragment.Companion.EXTRA_CHAT_ROOM_LIST_ITEM
 import com.example.bookchat.viewmodel.ChatRoomViewModel
 import com.example.bookchat.viewmodel.ChatRoomViewModel.ChatEvent
@@ -31,11 +30,7 @@ class ChatRoomActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChatRoomBinding
     private lateinit var chatDataItemAdapter: ChatDataItemAdapter
     private val chatRoomViewModel: ChatRoomViewModel by viewModels {
-        ChatRoomViewModel.provideFactory(
-            chatRoomViewModelFactory,
-            getChatRoomEntity(),
-            getFirstEnterFlag()
-        )
+        ChatRoomViewModel.provideFactory(chatRoomViewModelFactory, getChatRoomEntity())
     }
 
     //TODO : 채팅방에 들어왔을때, 채팅스크롤의 위치는 내가 마지막으로 받았던 채팅 (여기까지 읽었습니다) [보류]
@@ -55,7 +50,6 @@ class ChatRoomActivity : AppCompatActivity() {
         observeChatEvent()
     }
 
-    //TODO : 새 채팅 페이지 가져올때 상단에 로딩 UI 표시 하는게 좋을 듯
     private fun initAdapter() {
         chatDataItemAdapter = ChatDataItemAdapter()
             .apply { registerAdapterDataObserver(adapterDataObserver) }
@@ -160,9 +154,5 @@ class ChatRoomActivity : AppCompatActivity() {
 
     private fun getChatRoomEntity(): ChatRoomEntity {
         return intent.getSerializableExtra(EXTRA_CHAT_ROOM_LIST_ITEM) as ChatRoomEntity
-    }
-
-    private fun getFirstEnterFlag(): Boolean {
-        return intent.getBooleanExtra(EXTRA_FIRST_ENTER_FLAG, false)
     }
 }

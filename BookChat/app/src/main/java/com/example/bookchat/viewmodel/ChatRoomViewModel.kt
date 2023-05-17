@@ -30,11 +30,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.hildan.krossbow.stomp.StompSession
+import kotlin.time.Duration.Companion.minutes
 
 // TODO : 비즈니스 로직만 남기고 잡다한 요청은 Repository에 local, remote 구분해서 이전
 class ChatRoomViewModel @AssistedInject constructor(
     @Assisted val chatRoomEntity: ChatRoomEntity,
-    @Assisted private var firstEnterFlag: Boolean,
     private val chatRepository: ChatRepository
 ) : ViewModel() {
     val eventFlow = MutableSharedFlow<ChatEvent>()
@@ -71,11 +71,6 @@ class ChatRoomViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch {
             clearTempSavedMessage()
-
-            if (firstEnterFlag) sendEnterMessage() //이걸 집어넣을 마땅한 곳이 없음
-            //collect는 join해서 기다릴 수 없음
-            //채팅 Topic이 구독되면, 자동으로 입장 Send를 보내고 싶음
-            //하지만 collect는 실패하지 않으면 아래 코드가 실행되지 않음
             connectSocket()
             observeChatFlowJob.start()
             observeErrorFlowJob.start()
@@ -89,8 +84,18 @@ class ChatRoomViewModel @AssistedInject constructor(
         }
     }
 
+    private fun startAutoTokenRenewal() {
+        //특정 시간 주기로 갱신 요청시
+        //  일정 시간(13분)마다 토큰 갱신 요청을 보내야함
+        //갱신을 실패하면 어쩔?
+        //  Activity의 생명주기가 Stop되었을 때는, 갱신요청을 보내면 안됨
+        //  Activity의 생명주기가 Resume이 되면 다시 갱신 요청 보내고 그 시점부터 특정 간격당 계속 보내야함
+        // + 해당 Activity 들어오기 전에 혹은 들어오자말자 토큰 갱신부터 하고, 성공 시 소켓 연결 하는걸로 구현해야함함
+    }
+
     //TODO : 20분 간격으로 토큰 갱신 요청 보내는 로직 추가해야함 (화면이 꺼졌을 떄는 안보내는게 좋을듯) (더 좋은 방법 생각)
     //TODO : 채팅 켜둔채로 화면 꺼졌다가 다시 들어왔을때, 토큰이 만료되어서 채팅 전송이 실패할 수 도 있음 (예외처리)
+
     //TODO : 전송 대기중에 인터넷이 끊겨도, 인터넷이 연결되는 즉시 전송이 되어야함 (인터넷 연결상태를 observe하고 있어야함)
     //TODO : 요청 실패시 다시 실패했던 요청 재 전송해야함 (실패 이유별로 분기 필요)
     //TODO : 소켓 연결 끊기면 마지막 채팅으로 페이징 한 번 하고 다시 소켓 연결 (특정횟수만큼 소켓 재연결 요청)
@@ -102,7 +107,6 @@ class ChatRoomViewModel @AssistedInject constructor(
             .onFailure { handleError(it) }
     }
 
-    //TODO : 채팅방 생성하고, 입장 Send 안넘어옴 원인 파악하기,
     private val observeChatFlowJob = viewModelScope
         .launch(start = CoroutineStart.LAZY) {
             runCatching { collectChat() }
@@ -117,7 +121,6 @@ class ChatRoomViewModel @AssistedInject constructor(
 
     private suspend fun collectChat() {
         val chatFlow = subscribeChatRoom(roomSId)
-        if (firstEnterFlag) sendEnterMessage()
         chatFlow.collect { msg -> saveChatInLocalDB(msg.parseToChatEntity()) }
     }
 
@@ -198,13 +201,13 @@ class ChatRoomViewModel @AssistedInject constructor(
         if (inputtedMessage.value.isBlank()) return@launch
         val message = inputtedMessage.value.also { inputtedMessage.value = "" }
         scrollForcedFlag = true
-        insertNewChat(getMineChatEntity(message))
+        insertNewChat(getLoadingChatEntity(message))
         runCatching { chatRepository.sendMessage(stompSession, roomId, message) }
             .onSuccess { Log.d(TAG, "ChatRoomViewModel: sendMessage() - 메세지 전송 성공 !! $it") }
             .onFailure { handleError(it) }
     }
 
-    private suspend fun getMineChatEntity(message: String): ChatEntity {
+    private suspend fun getLoadingChatEntity(message: String): ChatEntity {
         val cachedUser = App.instance.getCachedUser()
 
         return ChatEntity(
@@ -225,12 +228,6 @@ class ChatRoomViewModel @AssistedInject constructor(
         val minChatId = database.chatDAO().getMinLoadingChatId()
         return if ((minChatId == null) || (minChatId > 0L)) MIN_CHAT_ID
         else database.chatDAO().getMaxLoadingChatId()?.plus(1) ?: MIN_CHAT_ID
-    }
-
-    private fun sendEnterMessage() = viewModelScope.launch(Dispatchers.IO) {
-        runCatching { chatRepository.sendEnterChatRoom(stompSession, roomId) }
-            .onSuccess { firstEnterFlag = false }
-            .onFailure { handleError(it) }
     }
 
     fun finishActivity() {
@@ -294,22 +291,19 @@ class ChatRoomViewModel @AssistedInject constructor(
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(
-            chatRoomEntity: ChatRoomEntity,
-            firstEnterFlag: Boolean
-        ): ChatRoomViewModel
+        fun create(chatRoomEntity: ChatRoomEntity): ChatRoomViewModel
     }
 
     companion object {
+        private val TOKEN_RENEW_DURATION = 20.minutes
         private const val LOCAL_DATA_CHAT_LOAD_SIZE = 25
 
         fun provideFactory(
             assistedFactory: AssistedFactory,
-            chatRoomEntity: ChatRoomEntity,
-            firstEnterFlag: Boolean
+            chatRoomEntity: ChatRoomEntity
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(chatRoomEntity, firstEnterFlag) as T
+                return assistedFactory.create(chatRoomEntity) as T
             }
         }
     }

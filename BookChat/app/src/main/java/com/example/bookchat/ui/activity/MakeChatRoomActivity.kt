@@ -12,7 +12,6 @@ import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.UserChatRoomListItem
 import com.example.bookchat.databinding.ActivityMakeChatRoomBinding
-import com.example.bookchat.ui.activity.ChatRoomInfoActivity.Companion.EXTRA_FIRST_ENTER_FLAG
 import com.example.bookchat.ui.fragment.ChatRoomListFragment.Companion.EXTRA_CHAT_ROOM_LIST_ITEM
 import com.example.bookchat.utils.PermissionManager
 import com.example.bookchat.viewmodel.MakeChatRoomViewModel
@@ -80,7 +79,6 @@ class MakeChatRoomActivity : AppCompatActivity() {
     private fun startChatRoomActivity(chatRoomItem: UserChatRoomListItem) {
         val intent = Intent(this, ChatRoomActivity::class.java)
         intent.putExtra(EXTRA_CHAT_ROOM_LIST_ITEM, chatRoomItem.toChatRoomEntity())
-        intent.putExtra(EXTRA_FIRST_ENTER_FLAG, true)
         startActivity(intent)
         finish()
     }

@@ -8,6 +8,7 @@ import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.UserChatRoomListItem
 import com.example.bookchat.data.request.RequestMakeChatRoom
+import com.example.bookchat.repository.ChatRoomManagementRepository
 import com.example.bookchat.repository.UserChatRoomRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,7 +23,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MakeChatRoomViewModel @Inject constructor(
-    private val userChatRoomRepository: UserChatRoomRepository
+    private val userChatRoomRepository: UserChatRoomRepository,
+    private val chatRoomManagementRepository: ChatRoomManagementRepository
 ) : ViewModel() {
 
     private val _eventFlow = MutableSharedFlow<MakeChatRoomUiEvent>()
@@ -37,8 +39,14 @@ class MakeChatRoomViewModel @Inject constructor(
     fun requestMakeChatRoom() = viewModelScope.launch {
         if (!isPossibleMakeChatRoom()) return@launch
         runCatching { makeChatRoom() }
-            .onSuccess { startEvent(MakeChatRoomUiEvent.MoveToChatPage(it)) }
+            .onSuccess { enterChatRoom(it) }
             .onFailure { makeToast(R.string.make_chat_room_fail) }
+    }
+
+    private fun enterChatRoom(chatRoomItem: UserChatRoomListItem) = viewModelScope.launch {
+        runCatching { chatRoomManagementRepository.enterChatRoom(chatRoomItem.roomId) }
+            .onSuccess { startEvent(MakeChatRoomUiEvent.MoveToChatPage(chatRoomItem)) }
+            .onFailure { makeToast(R.string.enter_chat_room_fail) }
     }
 
     private suspend fun makeChatRoom() = userChatRoomRepository.makeChatRoom(

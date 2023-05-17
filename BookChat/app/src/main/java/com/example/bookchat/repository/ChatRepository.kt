@@ -9,6 +9,7 @@ import com.example.bookchat.utils.DataStoreManager
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.hildan.krossbow.stomp.StompReceipt
 import org.hildan.krossbow.stomp.StompSession
 import org.hildan.krossbow.stomp.frame.FrameBody
 import org.hildan.krossbow.stomp.headers.StompSendHeaders
@@ -48,24 +49,13 @@ class ChatRepository @Inject constructor() {
     }
 
     //이렇게 보내면 토큰 자동 갱신은 어케 하누?
-    suspend fun sendMessage(stompSession: StompSession, roomId: Long, message: String) {
+    suspend fun sendMessage(stompSession: StompSession, roomId: Long, message: String): StompReceipt? {
         Log.d(TAG, "ChatRepository: sendMessage() - called")
-        stompSession.send(
+        return stompSession.send(
             StompSendHeaders(
                 destination = "$SEND_MESSAGE_DESTINATION$roomId",
                 customHeaders = getHeader()
             ), FrameBody.Text(Gson().toJson(RequestChat(message)))
-        )
-    }
-
-    //이렇게 보내면 토큰 자동 갱신은 어케 하누?
-    suspend fun sendEnterChatRoom(stompSession: StompSession, roomId: Long) {
-        Log.d(TAG, "ChatRepository: sendEnterChatRoom() - called")
-        stompSession.send(
-            StompSendHeaders(
-                destination = "$SEND_ENTER_CHAT_ROOM_DESTINATION$roomId",
-                customHeaders = getHeader()
-            ), FrameBody.Text(Gson().toJson(RequestChat("")))
         )
     }
 
