@@ -44,7 +44,11 @@ class AppInterceptor : Interceptor {
         refreshToken: String?
     ): Token {
         val tokenRenewalResponse = requestTokenRenewal(chain, refreshToken)
-        if (!tokenRenewalResponse.isSuccessful) throw TokenRenewalFailException()
+        if (!tokenRenewalResponse.isSuccessful) {
+            // TODO : 리프레시 토큰마저 만료되었음으로 새로 로그인 해야함
+            //  모든 작업 종료하고 로그인 페이지로 이동하게 수정
+            throw TokenRenewalFailException()
+        }
         val token = parseResponseToToken(tokenRenewalResponse.body?.string())
         DataStoreManager.saveBookChatTokenSync(token)
         return token
