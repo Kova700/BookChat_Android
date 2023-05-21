@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
+import androidx.room.withTransaction
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.WholeChatRoomListItem
@@ -18,11 +19,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ChatRoomInfoActivity @Inject constructor(
-    private val chatRoomManagementRepository: ChatRoomManagementRepository
-) : AppCompatActivity() {
+class ChatRoomInfoActivity : AppCompatActivity() {
+    @Inject
+    lateinit var chatRoomManagementRepository: ChatRoomManagementRepository
+    val database = App.instance.database
+
     private lateinit var binding: ActivityChatRoomInfoBinding
-    private val chatRoomItem = getExtraChatRoomItem()
+    private val chatRoomItem: WholeChatRoomListItem by lazy { getExtraChatRoomItem() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,8 +42,19 @@ class ChatRoomInfoActivity @Inject constructor(
 
     fun clickEnterBtn() = lifecycleScope.launch {
         runCatching { chatRoomManagementRepository.enterChatRoom(chatRoomItem.roomId) }
-            .onSuccess { startChatRoomActivity() }
+            .onSuccess { enterSuccessCallback() }
             .onFailure { makeToast(R.string.enter_chat_room_fail) }
+    }
+
+    private suspend fun enterSuccessCallback() {
+        saveChatRoomInLocalDB()
+        startChatRoomActivity()
+    }
+
+    private suspend fun saveChatRoomInLocalDB() {
+        database.withTransaction {
+            database.chatRoomDAO().insertOrUpdateChatRoom(chatRoomItem.toChatRoomEntity())
+        }
     }
 
     private fun startChatRoomActivity() {
