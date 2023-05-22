@@ -9,7 +9,8 @@ import androidx.paging.PagingConfig
 import androidx.room.withTransaction
 import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.data.Chat
+import com.example.bookchat.data.MessageType.*
+import com.example.bookchat.data.SocketMessage
 import com.example.bookchat.data.local.dao.ChatDAO.Companion.MIN_CHAT_ID
 import com.example.bookchat.data.local.entity.ChatEntity
 import com.example.bookchat.data.local.entity.ChatEntity.ChatStatus
@@ -17,9 +18,9 @@ import com.example.bookchat.data.local.entity.ChatEntity.ChatType
 import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.example.bookchat.paging.remotemediator.ChatRemoteMediator
 import com.example.bookchat.repository.ChatRepository
+import com.example.bookchat.repository.ChatRoomManagementRepository
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DateManager
-import com.google.gson.Gson
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineStart
@@ -35,7 +36,8 @@ import kotlin.time.Duration.Companion.minutes
 // TODO : 비즈니스 로직만 남기고 잡다한 요청은 Repository에 local, remote 구분해서 이전
 class ChatRoomViewModel @AssistedInject constructor(
     @Assisted val chatRoomEntity: ChatRoomEntity,
-    private val chatRepository: ChatRepository
+    private val chatRepository: ChatRepository,
+    private val chatRoomManagementRepository: ChatRoomManagementRepository
 ) : ViewModel() {
     val eventFlow = MutableSharedFlow<ChatEvent>()
 
@@ -55,6 +57,7 @@ class ChatRoomViewModel @AssistedInject constructor(
     // 자동으로 채팅이 전송됨
 
     //TODO : 전송 대기 중이던 채팅 전송 실패 UI로 전환 구현해야함
+    // 소켓 연결 끊어졌을 때, 전송 대기중인 채팅 있다면 전부 전송 실패로 변경
     private var waitingChatList = listOf<ChatEntity>()
 
     @OptIn(ExperimentalPagingApi::class)
@@ -72,8 +75,8 @@ class ChatRoomViewModel @AssistedInject constructor(
         viewModelScope.launch {
             clearTempSavedMessage()
             connectSocket()
-            observeChatFlowJob.start()
             observeErrorFlowJob.start()
+            observeChatFlowJob.start()
             observeWaitingChatFlowJob.start()
         }
     }
@@ -109,57 +112,102 @@ class ChatRoomViewModel @AssistedInject constructor(
 
     private val observeChatFlowJob = viewModelScope
         .launch(start = CoroutineStart.LAZY) {
-            runCatching { collectChat() }
+            runCatching { collectChatTopic() }
                 .onFailure { handleError(it) }
         }
 
     private val observeErrorFlowJob = viewModelScope
         .launch(start = CoroutineStart.LAZY) {
-            runCatching { collectSocketError() }
+            runCatching { collectErrorTopic() }
                 .onFailure { handleError(it) }
         }
 
-    private suspend fun collectChat() {
-        val chatFlow = subscribeChatRoom(roomSId)
-        chatFlow.collect { msg -> saveChatInLocalDB(msg.parseToChatEntity()) }
-    }
-
-    private suspend fun collectSocketError() {
-        subscribeSocketError().collect { handleErrorFlow(it) }
-    }
-
-    private fun String.parseToChatEntity(): ChatEntity {
-        return Gson().fromJson(this, Chat::class.java).toChatEntity(roomId)
-    }
-
     private val observeWaitingChatFlowJob = viewModelScope
         .launch(start = CoroutineStart.LAZY) { collectWaitingChatList() }
+
+    private suspend fun collectChatTopic() {
+        subscribeChatTopic(roomSId).collect { socketMessage -> saveChatInLocalDB(socketMessage) }
+    }
+
+    private suspend fun collectErrorTopic() {
+        subscribeErrorTopic().collect { handleErrorTopic(it) }
+    }
 
     private suspend fun collectWaitingChatList() {
         database.chatDAO().getWaitingChatList(roomId).collect { waitingChatList = it }
     }
 
-    //TODO : 누군가 입장했다 같은 이벤트도 구분해야함 (ChatRoomEntity에 인원 수 증가시켜야함)
-    // 선택지1. 채팅Text끝부분에 입장했습니다.가 붙은 Chat이 오면 내가 수작업한다. (공지 채팅 내부에서 구분 Flag 추가)
-    // 선택지2. 따로 채팅방 공지의 경우 따로 Topic을 파서 그거에 관련한 채팅만 주고 받는다 (그곳에서도 공지 타입을 구분해서 분기)
-    private suspend fun saveChatInLocalDB(chat: ChatEntity) {
+    private suspend fun saveChatInLocalDB(socketMessage: SocketMessage) {
+        when (socketMessage) {
+            is SocketMessage.CommonMessage -> saveCommonMessageInLocalDB(socketMessage)
+            is SocketMessage.NotificationMessage -> saveNoticeMessageInLocalDB(socketMessage)
+        }
+    }
+
+    private suspend fun saveCommonMessageInLocalDB(
+        socketMessage: SocketMessage.CommonMessage
+    ) {
         val myUserId = App.instance.getCachedUser().userId
+        val chatEntity = socketMessage.toChatEntity(roomId)
+
         database.withTransaction {
-            if (chat.senderId != myUserId) {
-                if (!isFirstItemOnScreen) newOtherChatNoticeFlow.value = chat
-                insertNewChat(chat)
-                updateChatRoomLastChatInfo(chat)
+            if (socketMessage.senderId != myUserId) {
+                if (!isFirstItemOnScreen) newOtherChatNoticeFlow.value = chatEntity
+                insertNewChat(chatEntity)
+                updateChatRoomLastChatInfo(chatEntity)
                 return@withTransaction
             }
 
-            //TODO : message로 비교하는거 상당히 별로인데.,, 다른값으로 비교 가능하면 수정
+            //TODO : 현재 message로 비교하는로직 수정 예정
+            // 헤더에 ReceiptID가 추가로 넘어오거나
+            // Receipt Frame으로 성공여부 판별되게
             for (waitingChat in waitingChatList) {
-                if (waitingChat.message.length != chat.message.length) continue
-                if (waitingChat.message != chat.message) continue
-                updateChatInfo(chat, waitingChat.chatId)
+                if (waitingChat.message.length != socketMessage.message.length) continue
+                if (waitingChat.message != socketMessage.message) continue
+                updateChatInfo(chatEntity, waitingChat.chatId)
                 break
             }
-            updateChatRoomLastChatInfo(chat)
+            updateChatRoomLastChatInfo(chatEntity)
+        }
+    }
+
+    private suspend fun saveNoticeMessageInLocalDB(
+        socketMessage: SocketMessage.NotificationMessage
+    ) {
+        val chatEntity = socketMessage.toChatEntity(roomId)
+        // TODO :Target에 대한 DB수정 작업해야함
+        database.withTransaction {
+            val noticeTarget = socketMessage.targetId
+
+            when (socketMessage.messageType) {
+                CHAT -> {}
+                ENTER -> {
+                    database.chatRoomDAO().updateMemberCount(roomId, 1)
+                }
+                EXIT -> {
+                    //만약 방장이 나갔다면 채팅방 삭제 후 공지 띄워야함,
+                    //채팅방 인원 수 감소
+                    database.chatRoomDAO().updateMemberCount(roomId, -1)
+                }
+                NOTICE_KICK -> {
+                    //채팅방 인원 수 감소
+                    database.chatRoomDAO().updateMemberCount(roomId, -1)
+                }
+                NOTICE_HOST_DELEGATE -> {
+                    //방장 변경
+                }
+                NOTICE_SUB_HOST_DISMISS -> {
+                    //Target 부방장 해임
+                }
+                NOTICE_SUB_HOST_DELEGATE -> {
+                    //Target 부방장 위임
+                }
+            }
+
+            if (!isFirstItemOnScreen) newOtherChatNoticeFlow.value = chatEntity
+            insertNewChat(chatEntity)
+            updateChatRoomLastChatInfo(chatEntity)
+            return@withTransaction
         }
     }
 
@@ -185,14 +233,14 @@ class ChatRoomViewModel @AssistedInject constructor(
         )
     }
 
-    private suspend fun subscribeChatRoom(roomSid: String): Flow<String> {
-        runCatching { chatRepository.subscribeChatRoom(stompSession, roomSid) }
+    private suspend fun subscribeChatTopic(roomSid: String): Flow<SocketMessage> {
+        runCatching { chatRepository.subscribeChatTopic(stompSession, roomSid) }
             .onSuccess { return it }
         throw Exception("Fail subscribeChatRoom")
     }
 
-    private suspend fun subscribeSocketError(): Flow<String> {
-        runCatching { chatRepository.subscribeErrorResponse(stompSession) }
+    private suspend fun subscribeErrorTopic(): Flow<String> {
+        runCatching { chatRepository.subscribeErrorTopic(stompSession) }
             .onSuccess { return it }
         throw Exception("Fail subscribeSocketError")
     }
@@ -240,6 +288,7 @@ class ChatRoomViewModel @AssistedInject constructor(
         disconnectSocket()
     }
 
+    //TODO : cancel 성공여부 보고 disconnect하기
     private fun unSubscribeTopic() {
         observeChatFlowJob.cancel()
         observeErrorFlowJob.cancel()
@@ -259,7 +308,7 @@ class ChatRoomViewModel @AssistedInject constructor(
     }
 
     //TODO : 예외처리 분기 추가해야함
-    private fun handleErrorFlow(errorText: String) {
+    private fun handleErrorTopic(errorText: String) {
         Log.d(TAG, "ChatRoomViewModel: handleErrorFlow() - errorText : $errorText")
     }
 

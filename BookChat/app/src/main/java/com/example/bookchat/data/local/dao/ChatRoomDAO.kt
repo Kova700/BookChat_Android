@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.Flow
 interface ChatRoomDAO {
 
     @Query("SELECT * FROM ChatRoom " +
-            "ORDER BY top_pin_num DESC, last_chat_id DESC")
+            "ORDER BY top_pin_num DESC, last_chat_id DESC, room_id DESC")
     fun pagingSource(): PagingSource<Int, ChatRoomEntity>
 
     @Query("SELECT * FROM ChatRoom " +
-            "ORDER BY top_pin_num DESC, last_chat_id DESC " +
+            "ORDER BY top_pin_num DESC, last_chat_id DESC, room_id DESC " +
             "LIMIT :loadSize")
     fun getChatRoom(loadSize: Int): Flow<List<ChatRoomEntity>>
 
@@ -34,10 +34,7 @@ interface ChatRoomDAO {
             roomSid = chatRoom.roomSid,
             roomMemberCount = chatRoom.roomMemberCount,
             defaultRoomImageType = chatRoom.defaultRoomImageType,
-            roomImageUri = chatRoom.roomImageUri,
-            lastChatId = chatRoom.lastChatId,
-            lastActiveTime = chatRoom.lastActiveTime,
-            lastChatContent = chatRoom.lastChatContent,
+            roomImageUri = chatRoom.roomImageUri
         )
     }
 
@@ -46,10 +43,7 @@ interface ChatRoomDAO {
             "room_socket_id = :roomSid, " +
             "room_member_count = :roomMemberCount, " +
             "default_room_image_type = :defaultRoomImageType, " +
-            "room_image_uri = :roomImageUri, " +
-            "last_chat_id = :lastChatId, " +
-            "last_active_time = :lastActiveTime, " +
-            "last_chat_content = :lastChatContent " +
+            "room_image_uri = :roomImageUri " +
             "WHERE room_id = :roomId")
     suspend fun updateForInsert(
         roomId: Long,
@@ -57,10 +51,7 @@ interface ChatRoomDAO {
         roomSid: String,
         roomMemberCount: Long,
         defaultRoomImageType: Int,
-        roomImageUri: String?,
-        lastChatId: Long?,
-        lastActiveTime: String?,
-        lastChatContent: String?
+        roomImageUri: String?
     )
 
     @Query("UPDATE ChatRoom SET " +
@@ -73,6 +64,13 @@ interface ChatRoomDAO {
         lastChatId: Long,
         lastActiveTime: String,
         lastChatContent: String
+    )
+
+    @Query("UPDATE ChatRoom SET " +
+            "room_member_count = room_member_count + :offset " +
+            "WHERE room_id = :roomId")
+    suspend fun updateMemberCount(
+        roomId: Long, offset: Int
     )
 
     @Query("SELECT MAX(top_pin_num) FROM ChatRoom")

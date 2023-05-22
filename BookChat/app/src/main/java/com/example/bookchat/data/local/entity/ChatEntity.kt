@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.example.bookchat.data.Chat
 import com.example.bookchat.utils.UserDefaultProfileImageType
 
 @Entity(
@@ -29,17 +28,6 @@ data class ChatEntity(
     @ColumnInfo(name = "chat_type") val chatType: ChatType,
     @ColumnInfo(name = "status") val status: Int = ChatStatus.SUCCESS,
 ) {
-
-    fun toChat() = Chat(
-        chatId = this.chatId,
-        senderId = this.senderId,
-        senderNickname = this.senderNickname,
-        senderProfileImageUrl = this.senderProfileImageUrl,
-        senderDefaultProfileImageType = this.senderDefaultProfileImageType,
-        dispatchTime = this.dispatchTime,
-        message = this.message
-    )
-
     enum class ChatType {
         Mine, Other, Notice
     }
