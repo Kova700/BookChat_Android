@@ -8,6 +8,7 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
+import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
@@ -596,11 +597,17 @@ object DataBindingAdapter {
         textView.text = DateManager.getDateKoreanString(chatEntity.dispatchTime)
     }
 
-
     /**채팅 날짜 Visibility 세팅*/
     @JvmStatic
     @BindingAdapter("setDateChatVisibility")
     fun setDateChatVisibility(view: View, bool :Boolean?){
         view.visibility = if (bool == false) View.VISIBLE else View.GONE
+    }
+
+    /**DrawerLayout 스와이프 off 세팅*/
+    @JvmStatic
+    @BindingAdapter("setDrawerLayoutSwipeOff")
+    fun setDrawerLayoutSwipeOff(view: DrawerLayout, bool :Boolean?){
+        view.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
     }
 }

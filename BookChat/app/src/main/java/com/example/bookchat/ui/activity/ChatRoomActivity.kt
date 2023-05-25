@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,6 +26,11 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ChatRoomActivity : AppCompatActivity() {
 
+    //TODO : 장문의 긴 채팅 길이 접기 구현해야함, 누르면 전체보기 가능하게
+    // 채팅 꾹 누르면 복사 가능하게도 구현
+
+    //TODO : 뒤로가기 누를 때, 혹시 채팅방 메뉴 켜져 있으면 닫고, 화면 안꺼지게 수정
+
     @Inject
     lateinit var chatRoomViewModelFactory: ChatRoomViewModel.AssistedFactory
     private lateinit var binding: ActivityChatRoomBinding
@@ -34,6 +40,10 @@ class ChatRoomActivity : AppCompatActivity() {
     }
 
     //TODO : 채팅방에 들어왔을때, 채팅스크롤의 위치는 내가 마지막으로 받았던 채팅 (여기까지 읽었습니다) [보류]
+    //   ==> 아마 마지막으로 읽었던 채팅까지 페이징해서 데이터를 가져오기 전까지 RecyclerView는 Invisible 상태로 두고,
+    //   해당 위치까지 채팅을 다 가져왔다면 그 위치를 제일 상단에 보이게 스크롤을 이동하고,
+    //   RecyclerView를 Visible상태로 변경하는 걸로 보임 (결론은 데이터는 DESC로 가져오지만, 채팅을 보이는 형식은 ASC형식)
+
     //TODO : 전송 중 상태로 어플 종료 시 전송실패로 변경된 UI로 보이게 수정해야함
     //TODO : 또한 전송 중 상태에서 다시 인터넷이 연결되면 자동으로 전송이 되어야함
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -129,9 +139,18 @@ class ChatRoomActivity : AppCompatActivity() {
         when (event) {
             ChatEvent.MoveBack -> finish()
             ChatEvent.CaptureChat -> {}
-            ChatEvent.OpenMenu -> {}
             ChatEvent.ScrollNewChatItem -> scrollNewChatItem()
+            ChatEvent.OpenOrCloseDrawer -> openOrCloseDrawer()
         }
+    }
+
+    private fun openOrCloseDrawer() {
+        val drawerLayout = binding.drawerLayout
+        if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
+            drawerLayout.closeDrawer(GravityCompat.END)
+            return
+        }
+        drawerLayout.openDrawer(GravityCompat.END)
     }
 
     override fun onStop() {
@@ -146,7 +165,7 @@ class ChatRoomActivity : AppCompatActivity() {
             withTransaction {
                 chatRoomDAO().setTempSavedMessage(
                     roomId = getChatRoomEntity().roomId,
-                    message = chatRoomViewModel.inputtedMessage.value
+                    message = message
                 )
             }
         }

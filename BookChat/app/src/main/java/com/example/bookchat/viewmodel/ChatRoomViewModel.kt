@@ -32,12 +32,13 @@ import kotlin.time.Duration.Companion.minutes
 
 // TODO : 비즈니스 로직만 남기고 잡다한 요청은 Repository에 local, remote 구분해서 이전
 class ChatRoomViewModel @AssistedInject constructor(
-    @Assisted val chatRoomEntity: ChatRoomEntity,
+    @Assisted var chatRoomEntity: ChatRoomEntity,
     private val chatRepository: ChatRepository,
     private val chatRoomManagementRepository: ChatRoomManagementRepository
 ) : ViewModel() {
     val eventFlow = MutableSharedFlow<ChatEvent>()
 
+    val chatRoomInfoFlow = MutableStateFlow<ChatRoomEntity>(chatRoomEntity)
     val inputtedMessage = MutableStateFlow(chatRoomEntity.tempSavedMessage ?: "")
     private lateinit var stompSession: StompSession
 
@@ -95,6 +96,7 @@ class ChatRoomViewModel @AssistedInject constructor(
             observeErrorFlowJob.start()
             observeChatFlowJob.start()
             observeWaitingChatFlowJob.start()
+            observeChatRoomEntityJob.start()
         }
     }
 
@@ -138,6 +140,9 @@ class ChatRoomViewModel @AssistedInject constructor(
                 .onFailure { handleError(it) }
         }
 
+    private val observeChatRoomEntityJob = viewModelScope
+        .launch(start = CoroutineStart.LAZY) { collectChatRoomEntity() }
+
     private val observeWaitingChatFlowJob = viewModelScope
         .launch(start = CoroutineStart.LAZY) { collectWaitingChatList() }
 
@@ -147,6 +152,10 @@ class ChatRoomViewModel @AssistedInject constructor(
 
     private suspend fun collectErrorTopic() {
         subscribeErrorTopic().collect { handleErrorTopic(it) }
+    }
+
+    private suspend fun collectChatRoomEntity() {
+        database.chatRoomDAO().getChatRoom(roomId).collect { chatRoomInfoFlow.value = it }
     }
 
     private suspend fun collectWaitingChatList() {
@@ -248,6 +257,7 @@ class ChatRoomViewModel @AssistedInject constructor(
             lastChatContent = chat.message
         )
     }
+
     // TODO :launch(Dispatchers.IO) 추가 해야할 것 같으면 추가하기
     private suspend fun subscribeChatTopic(roomSid: String): Flow<SocketMessage> {
         runCatching { chatRepository.subscribeChatTopic(stompSession, roomSid) }
@@ -320,6 +330,10 @@ class ChatRoomViewModel @AssistedInject constructor(
         startEvent(ChatEvent.ScrollNewChatItem)
     }
 
+    fun clickMenuBtn() {
+        startEvent(ChatEvent.OpenOrCloseDrawer)
+    }
+
     private fun startEvent(event: ChatEvent) = viewModelScope.launch {
         eventFlow.emit(event)
     }
@@ -351,8 +365,8 @@ class ChatRoomViewModel @AssistedInject constructor(
     sealed class ChatEvent {
         object MoveBack : ChatEvent()
         object CaptureChat : ChatEvent()
-        object OpenMenu : ChatEvent()
         object ScrollNewChatItem : ChatEvent()
+        object OpenOrCloseDrawer : ChatEvent()
     }
 
     @dagger.assisted.AssistedFactory

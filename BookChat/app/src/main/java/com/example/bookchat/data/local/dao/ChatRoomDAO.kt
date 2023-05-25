@@ -15,7 +15,11 @@ interface ChatRoomDAO {
     @Query("SELECT * FROM ChatRoom " +
             "ORDER BY top_pin_num DESC, last_chat_id DESC, room_id DESC " +
             "LIMIT :loadSize")
-    fun getChatRoom(loadSize: Int): Flow<List<ChatRoomEntity>>
+    fun getActivatedChatRoomList(loadSize: Int): Flow<List<ChatRoomEntity>>
+
+    @Query("SELECT * FROM ChatRoom " +
+            "WHERE room_id = :roomId")
+    fun getChatRoom(roomId: Long): Flow<ChatRoomEntity>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIgnore(chatRoom : ChatRoomEntity) :Long
