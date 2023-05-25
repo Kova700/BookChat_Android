@@ -23,13 +23,10 @@ import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DateManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.hildan.krossbow.stomp.StompSession
 import kotlin.time.Duration.Companion.minutes
 
@@ -58,6 +55,8 @@ class ChatRoomViewModel @AssistedInject constructor(
 
     //TODO : 전송 대기 중이던 채팅 전송 실패 UI로 전환 구현해야함
     // 소켓 연결 끊어졌을 때, 전송 대기중인 채팅 있다면 전부 전송 실패로 변경
+    // 소켓 재 연결 시마다, 채팅방 정보 조회 API 호출해서 수정사항 전부 덮어쓰기
+    // 소켓 재 연결 시마다, 내가 가지고 있던 채팅부터 서버의 마지막 채팅(isLast가 올 때)까지 페이징 요청
     private var waitingChatList = listOf<ChatEntity>()
 
     @OptIn(ExperimentalPagingApi::class)
@@ -72,7 +71,25 @@ class ChatRoomViewModel @AssistedInject constructor(
     ).flow
 
     init {
+//        viewModelScope.launch(Dispatchers.IO) {
         viewModelScope.launch {
+            chatRoomManagementRepository.getChatRoomInfo(roomId)
+            //채팅방 정보 조회 API 호출 (성공 여부 상관없음)
+            //소켓 연결 요청
+            //소켓 연결 성공시 채팅 Topic 구독
+            //소켓 연결 성공시 에러 Topic 구독
+            //소켓 연결 성공 /실패 상관 없이 끝나면 채팅방 채팅 내역 조회
+            //전송 대기 혹은 전송 실패 채팅 가져오기
+
+            //채팅방 정보 조회 실패시 Queue에서 해당 내용 지우지 않음
+            //소켓 연결 실패시 요청 Queue에서 해당 내용 지우지 않음
+
+            //Queue에 있던 내용은 실패 시 Queue의 마지막으로 넣고
+            //성공시 빼는 걸로,
+            //소켓 연결이 끊기면 소켓 연결이 끊겼을 떄 해야하는 작업들을 Queue에 넣어야 함
+            //이거 혹시 Queue가 아니라 WorkManager?? (이거 였으면 좋겠다..)
+
+            //전송 중 상태인 채팅들 전송 실패로 바꾸는건 WorkManager로 하면 될 듯
             clearTempSavedMessage()
             connectSocket()
             observeErrorFlowJob.start()
@@ -88,6 +105,8 @@ class ChatRoomViewModel @AssistedInject constructor(
     }
 
     private fun startAutoTokenRenewal() {
+        //TODO : 20분 간격으로 토큰 갱신 요청 보내는 로직 추가해야함 (화면이 꺼졌을 떄는 안보내는게 좋을듯) (더 좋은 방법 생각)
+        //TODO : 채팅 켜둔채로 화면 꺼졌다가 다시 들어왔을때, 토큰이 만료되어서 채팅 전송이 실패할 수 도 있음 (예외처리)
         //특정 시간 주기로 갱신 요청시
         //  일정 시간(13분)마다 토큰 갱신 요청을 보내야함
         //갱신을 실패하면 어쩔?
@@ -95,9 +114,6 @@ class ChatRoomViewModel @AssistedInject constructor(
         //  Activity의 생명주기가 Resume이 되면 다시 갱신 요청 보내고 그 시점부터 특정 간격당 계속 보내야함
         // + 해당 Activity 들어오기 전에 혹은 들어오자말자 토큰 갱신부터 하고, 성공 시 소켓 연결 하는걸로 구현해야함함
     }
-
-    //TODO : 20분 간격으로 토큰 갱신 요청 보내는 로직 추가해야함 (화면이 꺼졌을 떄는 안보내는게 좋을듯) (더 좋은 방법 생각)
-    //TODO : 채팅 켜둔채로 화면 꺼졌다가 다시 들어왔을때, 토큰이 만료되어서 채팅 전송이 실패할 수 도 있음 (예외처리)
 
     //TODO : 전송 대기중에 인터넷이 끊겨도, 인터넷이 연결되는 즉시 전송이 되어야함 (인터넷 연결상태를 observe하고 있어야함)
     //TODO : 요청 실패시 다시 실패했던 요청 재 전송해야함 (실패 이유별로 분기 필요)
@@ -232,13 +248,14 @@ class ChatRoomViewModel @AssistedInject constructor(
             lastChatContent = chat.message
         )
     }
-
+    // TODO :launch(Dispatchers.IO) 추가 해야할 것 같으면 추가하기
     private suspend fun subscribeChatTopic(roomSid: String): Flow<SocketMessage> {
         runCatching { chatRepository.subscribeChatTopic(stompSession, roomSid) }
             .onSuccess { return it }
         throw Exception("Fail subscribeChatRoom")
     }
 
+    // TODO :launch(Dispatchers.IO) 추가 해야할 것 같으면 추가하기
     private suspend fun subscribeErrorTopic(): Flow<String> {
         runCatching { chatRepository.subscribeErrorTopic(stompSession) }
             .onSuccess { return it }
@@ -283,18 +300,18 @@ class ChatRoomViewModel @AssistedInject constructor(
         startEvent(ChatEvent.MoveBack)
     }
 
-    private fun closeSocket() {
+    private fun closeSocket() = viewModelScope.launch {
         unSubscribeTopic()
         disconnectSocket()
     }
 
     //TODO : cancel 성공여부 보고 disconnect하기
-    private fun unSubscribeTopic() {
-        observeChatFlowJob.cancel()
-        observeErrorFlowJob.cancel()
+    private suspend fun unSubscribeTopic() {
+        observeChatFlowJob.cancelAndJoin()
+        observeErrorFlowJob.cancelAndJoin()
     }
 
-    private fun disconnectSocket() = viewModelScope.launch {
+    private suspend fun disconnectSocket() {
         runCatching { stompSession.disconnect() }
             .onFailure { handleError(it) }
     }

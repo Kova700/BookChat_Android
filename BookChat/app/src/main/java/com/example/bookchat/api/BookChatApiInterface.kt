@@ -189,12 +189,12 @@ interface BookChatApiInterface {
 
     @POST("/v1/api/enter/chatrooms/{roomId}")
     suspend fun enterChatRoom(
-        @Query("roomId") roomId: Long
+        @Path("roomId") roomId: Long
     ): Response<Unit>
 
     @DELETE("/v1/api/leave/chatrooms/{roomId}")
     suspend fun leaveChatRoom(
-        @Query("roomId") roomId: Long
+        @Path("roomId") roomId: Long
     ): Response<Unit>
 
     @GET("/v1/api/chatrooms")
@@ -206,6 +206,11 @@ interface BookChatApiInterface {
         @Query("isbn") isbn: String?,
         @Query("tags") tags: String?,
     ): Response<ResponseGetWholeChatRoomList>
+
+    @GET("/v1/api/chatrooms/{roomId}")
+    suspend fun getChatRoomInfo(
+        @Path("roomId") roomId: Long
+    ): Response<RespondChatRoomInfo>
 
     /**------------채팅내역------------*/
 
