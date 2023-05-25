@@ -45,7 +45,7 @@ class HomeViewModel @Inject constructor(
             }.cachedIn(viewModelScope)
     }
 
-    val chatRoomFlow = database.chatRoomDAO().getChatRoom(MAIN_CHAT_ROOM_LIST_LOAD_SIZE)
+    val chatRoomFlow = database.chatRoomDAO().getActivatedChatRoomList(MAIN_CHAT_ROOM_LIST_LOAD_SIZE)
 
     private fun getRemoteUserChatRoomList() = viewModelScope.launch {
         val chatRoomList =
