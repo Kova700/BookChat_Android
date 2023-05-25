@@ -7,17 +7,24 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.bookchat.data.local.dao.ChatDAO
 import com.example.bookchat.data.local.dao.ChatRoomDAO
+import com.example.bookchat.data.local.dao.UserDao
 import com.example.bookchat.data.local.entity.ChatEntity
 import com.example.bookchat.data.local.entity.ChatRoomEntity
+import com.example.bookchat.data.local.entity.UserEntity
 import com.example.bookchat.data.local.typeconverter.LongListTypeConverter
 import com.example.bookchat.data.local.typeconverter.StringListTypeConverter
 import com.google.gson.Gson
 
-@Database(entities = [ChatRoomEntity::class, ChatEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [ChatRoomEntity::class, ChatEntity::class, UserEntity::class],
+    version = 1,
+    exportSchema = false
+)
 @TypeConverters(value = [StringListTypeConverter::class, LongListTypeConverter::class])
 abstract class BookChatDB : RoomDatabase() {
     abstract fun chatDAO(): ChatDAO
     abstract fun chatRoomDAO(): ChatRoomDAO
+    abstract fun userDAO(): UserDao
 
     companion object {
         private const val DB_NAME = "BookChat_DB"

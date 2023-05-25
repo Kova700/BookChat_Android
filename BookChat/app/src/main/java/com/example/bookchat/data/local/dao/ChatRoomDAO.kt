@@ -67,6 +67,28 @@ interface ChatRoomDAO {
     )
 
     @Query("UPDATE ChatRoom SET " +
+            "host_id = :hostId, " +
+            "sub_host_ids = :subHostIds, " +
+            "guest_ids = :guestIds, " +
+            "book_title = :bookTitle, " +
+            "book_authors = :bookAuthors, " +
+            "book_cover_image_url = :bookCoverImageUrl, " +
+            "room_tags = :roomTags, " +
+            "room_capacity = :roomCapacity " +
+            "WHERE room_id = :roomId")
+    suspend fun updateDetailInfo(
+        roomId: Long,
+        hostId: Long,
+        subHostIds: List<Long>?,
+        guestIds: List<Long>?,
+        bookTitle: String,
+        bookAuthors: List<String>,
+        bookCoverImageUrl: String,
+        roomTags: List<String>,
+        roomCapacity: Int
+    )
+
+    @Query("UPDATE ChatRoom SET " +
             "room_member_count = room_member_count + :offset " +
             "WHERE room_id = :roomId")
     suspend fun updateMemberCount(

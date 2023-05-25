@@ -1,8 +1,7 @@
 package com.example.bookchat.data.response
 
-import com.example.bookchat.data.RoomGuest
-import com.example.bookchat.data.RoomHost
-import com.example.bookchat.data.RoomSubHost
+import com.example.bookchat.data.local.entity.UserEntity
+import com.example.bookchat.utils.UserDefaultProfileImageType
 import com.google.gson.annotations.SerializedName
 
 data class RespondChatRoomInfo(
@@ -17,9 +16,28 @@ data class RespondChatRoomInfo(
     @SerializedName("bookAuthors")
     val bookAuthors: List<String>,
     @SerializedName("roomHost")
-    val roomHost: RoomHost,
+    val roomHost: ChatRoomUser,
     @SerializedName("roomSubHostList")
-    val roomSubHostList: List<RoomSubHost>,
+    val roomSubHostList: List<ChatRoomUser>?,
     @SerializedName("roomGuestList")
-    val roomGuestList: List<RoomGuest>
+    val roomGuestList: List<ChatRoomUser>?
 )
+
+data class ChatRoomUser(
+    @SerializedName("id")
+    val id: Long,
+    @SerializedName("nickname")
+    val nickname: String,
+    @SerializedName("profileImageUrl")
+    val profileImageUrl: String,
+    @SerializedName("defaultProfileImageType")
+    val defaultProfileImageType: UserDefaultProfileImageType
+) {
+    fun toUserEntity() =
+        UserEntity(
+            id = this.id,
+            nickname = this.nickname,
+            profileImageUrl = this.profileImageUrl,
+            defaultProfileImageType = this.defaultProfileImageType
+        )
+}
