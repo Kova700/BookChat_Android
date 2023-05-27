@@ -70,11 +70,7 @@ object DataBindingAdapter {
             loadUrl(imageView, userProfileUrl)
             return
         }
-        Glide.with(imageView.context)
-            .load(getUserDefaultProfileImage(userDefaultProfileImageType))
-            .placeholder(R.drawable.loading_img)
-            .error(R.drawable.error_img)
-            .into(imageView)
+        inflateUserDefaultProfileImage(imageView, userDefaultProfileImageType)
     }
 
     /**Chat Sender 프로필 이미지 출력*/
@@ -88,9 +84,16 @@ object DataBindingAdapter {
             loadUrl(imageView, chat.senderProfileImageUrl)
             return
         }
+        inflateUserDefaultProfileImage(imageView, chat.senderDefaultProfileImageType!!)
+    }
 
+    private fun inflateUserDefaultProfileImage(
+        imageView: ImageView,
+        imageType: UserDefaultProfileImageType
+    ) {
         Glide.with(imageView.context)
-            .load(getUserDefaultProfileImage(chat.senderDefaultProfileImageType!!))
+            .load(getUserDefaultProfileImage(imageType))
+            .fitCenter()
             .placeholder(R.drawable.loading_img)
             .error(R.drawable.error_img)
             .into(imageView)

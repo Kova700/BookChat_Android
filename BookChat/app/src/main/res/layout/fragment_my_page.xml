@@ -55,7 +55,7 @@
             android:layout_height="100dp"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            app:cardCornerRadius="35dp"
+            app:cardCornerRadius="40dp"
             app:cardElevation="0dp"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
