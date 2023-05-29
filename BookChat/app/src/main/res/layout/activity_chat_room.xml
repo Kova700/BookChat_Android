@@ -15,11 +15,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include
-            android:id="@+id/chat_drawer_layout"
-            app:viewmodel="@{viewmodel}"
-            layout="@layout/layout_chat_room_drawer"/>
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/chat_main_layout"
             android:layout_width="match_parent"
@@ -289,6 +284,11 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <include
+            android:id="@+id/chat_drawer_layout"
+            app:viewmodel="@{viewmodel}"
+            layout="@layout/layout_chat_room_drawer"/>
 
     </androidx.drawerlayout.widget.DrawerLayout>
 </layout>

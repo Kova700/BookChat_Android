@@ -64,7 +64,7 @@ object DataBindingAdapter {
     fun loadUserProfile(
         imageView: ImageView,
         userProfileUrl: String?,
-        userDefaultProfileImageType: UserDefaultProfileImageType
+        userDefaultProfileImageType: UserDefaultProfileImageType?
     ) {
         if (!userProfileUrl?.trim().isNullOrBlank()) {
             loadUrl(imageView, userProfileUrl)
@@ -89,7 +89,7 @@ object DataBindingAdapter {
 
     private fun inflateUserDefaultProfileImage(
         imageView: ImageView,
-        imageType: UserDefaultProfileImageType
+        imageType: UserDefaultProfileImageType?
     ) {
         Glide.with(imageView.context)
             .load(getUserDefaultProfileImage(imageType))
@@ -99,7 +99,8 @@ object DataBindingAdapter {
             .into(imageView)
     }
 
-    private fun getUserDefaultProfileImage(imageType :UserDefaultProfileImageType) = when (imageType) {
+    private fun getUserDefaultProfileImage(imageType :UserDefaultProfileImageType?) = when (imageType) {
+        null,
         UserDefaultProfileImageType.ONE -> R.drawable.default_profile_img1
         UserDefaultProfileImageType.TWO -> R.drawable.default_profile_img2
         UserDefaultProfileImageType.THREE -> R.drawable.default_profile_img3

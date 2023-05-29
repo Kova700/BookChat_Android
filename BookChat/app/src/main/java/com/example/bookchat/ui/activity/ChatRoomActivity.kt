@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.withTransaction
@@ -14,7 +15,10 @@ import com.example.bookchat.App
 import com.example.bookchat.ChatItemDecoration
 import com.example.bookchat.R
 import com.example.bookchat.adapter.chatting.ChatDataItemAdapter
+import com.example.bookchat.adapter.chatting.chatdrawer.ChatRoomDrawerDataAdapter
+import com.example.bookchat.adapter.chatting.chatdrawer.ChatRoomDrawerHeaderAdapter
 import com.example.bookchat.data.local.entity.ChatRoomEntity
+import com.example.bookchat.data.local.entity.UserEntity
 import com.example.bookchat.databinding.ActivityChatRoomBinding
 import com.example.bookchat.ui.fragment.ChatRoomListFragment.Companion.EXTRA_CHAT_ROOM_LIST_ITEM
 import com.example.bookchat.viewmodel.ChatRoomViewModel
@@ -35,6 +39,8 @@ class ChatRoomActivity : AppCompatActivity() {
     lateinit var chatRoomViewModelFactory: ChatRoomViewModel.AssistedFactory
     private lateinit var binding: ActivityChatRoomBinding
     private lateinit var chatDataItemAdapter: ChatDataItemAdapter
+    private lateinit var chatRoomDrawerHeaderAdapter: ChatRoomDrawerHeaderAdapter
+    private lateinit var chatRoomDrawerDataAdapter: ChatRoomDrawerDataAdapter
     private val chatRoomViewModel: ChatRoomViewModel by viewModels {
         ChatRoomViewModel.provideFactory(chatRoomViewModelFactory, getChatRoomEntity())
     }
@@ -58,11 +64,18 @@ class ChatRoomActivity : AppCompatActivity() {
         initRcv()
         observeChat()
         observeChatEvent()
+        observeChatRoomInfoFlow()
+        observeChatRoomUserListFlow()
+        observeChatRoomUserMapFlow()
     }
 
     private fun initAdapter() {
-        chatDataItemAdapter = ChatDataItemAdapter()
-            .apply { registerAdapterDataObserver(adapterDataObserver) }
+        chatDataItemAdapter =
+            ChatDataItemAdapter(chatRoomViewModel.chatRoomUserMapFlow.value)
+                .apply { registerAdapterDataObserver(adapterDataObserver) }
+        chatRoomDrawerHeaderAdapter =
+            ChatRoomDrawerHeaderAdapter(chatRoomViewModel.initChatRoomEntity)
+        chatRoomDrawerDataAdapter = ChatRoomDrawerDataAdapter()
     }
 
     private val adapterDataObserver = object : RecyclerView.AdapterDataObserver() {
@@ -88,8 +101,8 @@ class ChatRoomActivity : AppCompatActivity() {
     }
 
     private fun initRcv() {
-        val linearLayoutManager = LinearLayoutManager(this@ChatRoomActivity)
-            .apply { reverseLayout = true }
+        val linearLayoutManager =
+            LinearLayoutManager(this@ChatRoomActivity).apply { reverseLayout = true }
 
         binding.chattingRcv.apply {
             adapter = chatDataItemAdapter
@@ -97,6 +110,17 @@ class ChatRoomActivity : AppCompatActivity() {
             addItemDecoration(ChatItemDecoration())
             layoutManager = linearLayoutManager
             addOnScrollListener(rcvScrollListener)
+        }
+
+        binding.chatDrawerLayout.chatroomDrawerRcv.apply {
+            val concatAdapterConfig =
+                ConcatAdapter.Config.Builder().apply { setIsolateViewTypes(false) }.build()
+            val concatAdapter = ConcatAdapter(
+                concatAdapterConfig, chatRoomDrawerHeaderAdapter, chatRoomDrawerDataAdapter
+            )
+            adapter = concatAdapter
+            layoutManager = LinearLayoutManager(this@ChatRoomActivity)
+            setHasFixedSize(true)
         }
     }
 
@@ -129,6 +153,34 @@ class ChatRoomActivity : AppCompatActivity() {
         chatRoomViewModel.chatDataFlow.collect { pagingData ->
             chatDataItemAdapter.submitData(pagingData)
         }
+    }
+
+    private fun observeChatRoomInfoFlow() = lifecycleScope.launch {
+        chatRoomViewModel.chatRoomInfoFlow.collect { chatRoomEntity ->
+            updateDrawerHeader(chatRoomEntity)
+        }
+    }
+
+    private fun observeChatRoomUserListFlow() = lifecycleScope.launch {
+        chatRoomViewModel.chatRoomUserListFlow.collect { userList ->
+            updateDrawerUserList(userList)
+        }
+    }
+
+    private fun observeChatRoomUserMapFlow() = lifecycleScope.launch {
+        chatRoomViewModel.chatRoomUserMapFlow.collect{ userMap ->
+            chatDataItemAdapter.userMap = userMap
+            chatDataItemAdapter.notifyDataSetChanged()
+        }
+    }
+
+    private fun updateDrawerHeader(chatRoomEntity: ChatRoomEntity) {
+        chatRoomDrawerHeaderAdapter.chatRoomEntity = chatRoomEntity
+        chatRoomDrawerHeaderAdapter.notifyItemChanged(0)
+    }
+
+    private fun updateDrawerUserList(userList: List<UserEntity>) {
+        chatRoomDrawerDataAdapter.submitList(userList)
     }
 
     private fun observeChatEvent() = lifecycleScope.launch {
@@ -164,7 +216,7 @@ class ChatRoomActivity : AppCompatActivity() {
         with(App.instance.database) {
             withTransaction {
                 chatRoomDAO().setTempSavedMessage(
-                    roomId = getChatRoomEntity().roomId,
+                    roomId = chatRoomViewModel.initChatRoomEntity.roomId,
                     message = message
                 )
             }

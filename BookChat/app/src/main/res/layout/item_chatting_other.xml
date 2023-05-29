@@ -8,6 +8,9 @@
             name="chat"
             type="com.example.bookchat.data.local.entity.ChatEntity" />
         <variable
+            name="sender"
+            type="com.example.bookchat.data.local.entity.UserEntity" />
+        <variable
             name="isSameDate"
             type="Boolean" />
     </data>
@@ -47,7 +50,8 @@
 
                 <ImageView
                     android:id="@+id/user_profile_iv"
-                    loadSenderProfile="@{chat}"
+                    userProfileUrl="@{sender.profileImageUrl}"
+                    userDefaultProfileImageType="@{sender.defaultProfileImageType}"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:scaleType="fitXY"
@@ -63,7 +67,7 @@
                 android:ellipsize="end"
                 android:fontFamily="@font/notosanskr_regular"
                 android:maxLines="1"
-                android:text="@{chat.senderNickname}"
+                android:text="@{sender.nickname}"
                 android:textColor="#000000"
                 android:textSize="10sp"
                 app:layout_constrainedWidth="true"
