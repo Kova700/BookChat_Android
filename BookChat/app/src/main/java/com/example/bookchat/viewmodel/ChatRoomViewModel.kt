@@ -16,6 +16,7 @@ import com.example.bookchat.data.local.entity.ChatEntity
 import com.example.bookchat.data.local.entity.ChatEntity.ChatStatus
 import com.example.bookchat.data.local.entity.ChatEntity.ChatType
 import com.example.bookchat.data.local.entity.ChatRoomEntity
+import com.example.bookchat.data.local.entity.UserEntity
 import com.example.bookchat.paging.remotemediator.ChatRemoteMediator
 import com.example.bookchat.repository.ChatRepository
 import com.example.bookchat.repository.ChatRoomManagementRepository
@@ -32,18 +33,28 @@ import kotlin.time.Duration.Companion.minutes
 
 // TODO : 비즈니스 로직만 남기고 잡다한 요청은 Repository에 local, remote 구분해서 이전
 class ChatRoomViewModel @AssistedInject constructor(
-    @Assisted var chatRoomEntity: ChatRoomEntity,
+    @Assisted var initChatRoomEntity: ChatRoomEntity,
     private val chatRepository: ChatRepository,
     private val chatRoomManagementRepository: ChatRoomManagementRepository
 ) : ViewModel() {
     val eventFlow = MutableSharedFlow<ChatEvent>()
 
-    val chatRoomInfoFlow = MutableStateFlow<ChatRoomEntity>(chatRoomEntity)
-    val inputtedMessage = MutableStateFlow(chatRoomEntity.tempSavedMessage ?: "")
+    val chatRoomInfoFlow = MutableStateFlow<ChatRoomEntity>(initChatRoomEntity)
+    val chatRoomUserListFlow = MutableStateFlow<List<UserEntity>>(listOf())
+
+    //이거 ChatDataAdapter에 전달해줘야함
+    //이게 있어야 ChatItem의 UserId랑 UserEntity를 1대1 매칭시킬 수 있음
+    //( UserEntity랑 Left Join 으로 수정 예정)
+    val chatRoomUserMapFlow = MutableStateFlow<Map<Long, UserEntity>>(hashMapOf())
+
+    // TODO : message 객체 구성 변경 receiptID 추가
+    //  전체 채팅방 조회시 채팅방 정원 추가됨
+
+    val inputtedMessage = MutableStateFlow(initChatRoomEntity.tempSavedMessage ?: "")
     private lateinit var stompSession: StompSession
 
-    private val roomId = chatRoomEntity.roomId
-    private val roomSId = chatRoomEntity.roomSid
+    private val roomId = initChatRoomEntity.roomId
+    private val roomSId = initChatRoomEntity.roomSid
     val database = App.instance.database
 
     var newOtherChatNoticeFlow = MutableStateFlow<ChatEntity?>(null)
@@ -74,7 +85,7 @@ class ChatRoomViewModel @AssistedInject constructor(
     init {
 //        viewModelScope.launch(Dispatchers.IO) {
         viewModelScope.launch {
-            chatRoomManagementRepository.getChatRoomInfo(roomId)
+            getChatRoomInfo()
             //채팅방 정보 조회 API 호출 (성공 여부 상관없음)
             //소켓 연결 요청
             //소켓 연결 성공시 채팅 Topic 구독
@@ -93,11 +104,15 @@ class ChatRoomViewModel @AssistedInject constructor(
             //전송 중 상태인 채팅들 전송 실패로 바꾸는건 WorkManager로 하면 될 듯
             clearTempSavedMessage()
             connectSocket()
-            observeErrorFlowJob.start()
             observeChatFlowJob.start()
-            observeWaitingChatFlowJob.start()
-            observeChatRoomEntityJob.start()
+            observeWaitingChatInLocalDBJob.start()
+            observeChatRoomEntityInLocalDBJob.start()
+            observeChatRoomUserListJob.start()
         }
+    }
+
+    private suspend fun getChatRoomInfo() {
+        runCatching { chatRoomManagementRepository.getChatRoomInfo(roomId) }
     }
 
     private suspend fun clearTempSavedMessage() {
@@ -134,28 +149,47 @@ class ChatRoomViewModel @AssistedInject constructor(
                 .onFailure { handleError(it) }
         }
 
-    private val observeErrorFlowJob = viewModelScope
-        .launch(start = CoroutineStart.LAZY) {
-            runCatching { collectErrorTopic() }
-                .onFailure { handleError(it) }
-        }
-
-    private val observeChatRoomEntityJob = viewModelScope
+    private val observeChatRoomEntityInLocalDBJob = viewModelScope
         .launch(start = CoroutineStart.LAZY) { collectChatRoomEntity() }
 
-    private val observeWaitingChatFlowJob = viewModelScope
+    private val observeChatRoomUserListJob = viewModelScope
+        .launch(start = CoroutineStart.LAZY) { collectChatRoomUserList() }
+
+    private val observeWaitingChatInLocalDBJob = viewModelScope
         .launch(start = CoroutineStart.LAZY) { collectWaitingChatList() }
 
     private suspend fun collectChatTopic() {
         subscribeChatTopic(roomSId).collect { socketMessage -> saveChatInLocalDB(socketMessage) }
     }
 
-    private suspend fun collectErrorTopic() {
-        subscribeErrorTopic().collect { handleErrorTopic(it) }
+    private suspend fun collectChatRoomEntity() {
+        database.chatRoomDAO().getChatRoom(roomId).collect { chatRoomEntity ->
+            chatRoomInfoFlow.value = chatRoomEntity
+            //받은 유저 정보 ChatEntity에 매핑해서 ChatID = User정보 붙여서 다시 저장하기
+            //지금 ChatRoomId에 해당하는 채팅 정보 전부 가져와서
+            //senderId 와 같은 유저 정보 매칭 시켜서 저장하기
+            //고로 SenderId만 남길게 아니고 최초에는 SenderId만 가지고 있고 프로필 Url이나 defaultImageType같은
+            //경우는 나중에 데이터 받아서 집어넣는걸로
+            updateChatRoomUserList(chatRoomEntity)
+        }
     }
 
-    private suspend fun collectChatRoomEntity() {
-        database.chatRoomDAO().getChatRoom(roomId).collect { chatRoomInfoFlow.value = it }
+    private suspend fun collectChatRoomUserList() {
+        chatRoomUserListFlow.collect { userList ->
+            updateChatRoomUserMap(userList)
+        }
+    }
+
+    private fun updateChatRoomUserMap(userList: List<UserEntity>) {
+        chatRoomUserMapFlow.value = userList.associateBy { it.id }
+    }
+
+    private suspend fun updateChatRoomUserList(chatRoomEntity: ChatRoomEntity) {
+        val userIdList: MutableList<Long> = mutableListOf()
+        chatRoomEntity.hostId?.let { userIdList.add(it) }
+        chatRoomEntity.subHostIds?.let { userIdList.addAll(it) }
+        chatRoomEntity.guestIds?.let { userIdList.addAll(it) }
+        chatRoomUserListFlow.value = database.userDAO().getUserList(userIdList)
     }
 
     private suspend fun collectWaitingChatList() {
@@ -204,14 +238,36 @@ class ChatRoomViewModel @AssistedInject constructor(
         database.withTransaction {
             val noticeTarget = socketMessage.targetId
 
+            //TODO : ++ ㅁㅁ님이 입장하셨습니다.
+            // ㅁㅁ님이 퇴장하셨습니다.
+            // 같이 공지채팅에서 유저이름을 언급하는 경우
+            // 실제 닉네임이 아니라 UserId로 주는게 더 좋아보임
+            // 문제는 없나..?
+            // 메모장에서 언급했던 오래 전 채팅에서 보이는 유저 정보가
+            // 최신 정보임을 보장하지 못하는 내용 (그 사람이 현재 채팅방에 없다면)
+            // 닉네임, 프로필 사진 등
+            // 하지만 카톡도 이렇게 보이는 현상이 있음
+            // 이거 결론 짓고, 전달하면 될 듯
+
             when (socketMessage.messageType) {
                 CHAT -> {}
                 ENTER -> {
+                    //TODO : 채팅방 정보 조회를 다시하거나
+                    // Enter NOTICE 속에 유저 정보(채팅방 정보조회의 유저 객체처럼)가
+                    // 있어야할 것같음 [Id, nickname, profileUrl, defaultImageType]
+
+                    //TODO : ㅁㅁ님이 입장 하셨습니다.
+                    // 이것도 일반 텍스트가 아닌, UserID님이 입장하셨습니다로 보내고
+                    // 이걸 클라이언트가 해당 유저 정보를 가지고 있는 값으로 누구님이 입장하셨습니다로 변경하는게 좋을 듯
                     database.chatRoomDAO().updateMemberCount(roomId, 1)
                 }
                 EXIT -> {
-                    //만약 방장이 나갔다면 채팅방 삭제 후 공지 띄워야함,
-                    //채팅방 인원 수 감소
+                    //TODO : 채팅방 퇴장 시에 서버에서 넣어주는 채팅 ㅁㅁ님이 퇴장 하셨습니다.
+                    // 이걸 일반 텍스트가 아닌, UserId님이 퇴장하셨습니다로 보내고
+                    // 이걸 클라이언트가 해당 유저 정보를 가지고 있는 값으로 누구님이 퇴장하셨습니다로 변경하는게 좋을 듯
+
+                    //TODO : 만약 방장이 나갔다면 채팅방 삭제 후 공지 띄우고 채팅 입력 막아야함.
+                    // 채팅방 인원 수 감소
                     database.chatRoomDAO().updateMemberCount(roomId, -1)
                 }
                 NOTICE_KICK -> {
@@ -229,7 +285,9 @@ class ChatRoomViewModel @AssistedInject constructor(
                 }
             }
 
-            if (!isFirstItemOnScreen) newOtherChatNoticeFlow.value = chatEntity
+            //TODO : 터질 확률이 높음
+            // 유저채팅이 아니고, 프로필도 없고, defaultImageType도 없음으로로
+            // if (!isFirstItemOnScreen) newOtherChatNoticeFlow.value = chatEntity
             insertNewChat(chatEntity)
             updateChatRoomLastChatInfo(chatEntity)
             return@withTransaction
@@ -263,13 +321,6 @@ class ChatRoomViewModel @AssistedInject constructor(
         runCatching { chatRepository.subscribeChatTopic(stompSession, roomSid) }
             .onSuccess { return it }
         throw Exception("Fail subscribeChatRoom")
-    }
-
-    // TODO :launch(Dispatchers.IO) 추가 해야할 것 같으면 추가하기
-    private suspend fun subscribeErrorTopic(): Flow<String> {
-        runCatching { chatRepository.subscribeErrorTopic(stompSession) }
-            .onSuccess { return it }
-        throw Exception("Fail subscribeSocketError")
     }
 
     fun sendMessage() = viewModelScope.launch(Dispatchers.IO) {
@@ -318,7 +369,6 @@ class ChatRoomViewModel @AssistedInject constructor(
     //TODO : cancel 성공여부 보고 disconnect하기
     private suspend fun unSubscribeTopic() {
         observeChatFlowJob.cancelAndJoin()
-        observeErrorFlowJob.cancelAndJoin()
     }
 
     private suspend fun disconnectSocket() {
@@ -336,11 +386,6 @@ class ChatRoomViewModel @AssistedInject constructor(
 
     private fun startEvent(event: ChatEvent) = viewModelScope.launch {
         eventFlow.emit(event)
-    }
-
-    //TODO : 예외처리 분기 추가해야함
-    private fun handleErrorTopic(errorText: String) {
-        Log.d(TAG, "ChatRoomViewModel: handleErrorFlow() - errorText : $errorText")
     }
 
     //TODO : 예외처리 분기 추가해야함 (대부분이 현재 세션 연결 취소 후 다시 재연결 해야 함)
