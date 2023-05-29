@@ -2,8 +2,10 @@ package com.example.bookchat.data.local.dao
 
 import androidx.paging.PagingSource
 import androidx.room.*
+import com.example.bookchat.App
 import com.example.bookchat.data.local.entity.ChatEntity
-import kotlinx.coroutines.flow.Flow
+import com.example.bookchat.utils.DateManager
+import kotlin.math.max
 
 @Dao
 interface ChatDAO {
@@ -12,11 +14,13 @@ interface ChatDAO {
             "ORDER BY status, chat_id DESC")
     fun pagingSource(chatRoomId: Long): PagingSource<Int, ChatEntity>
 
+    // TODO : 채팅도 ChatRoom과 마찬가지로 이미 있으면 업데이트 ,없으면 삽입으로 수정
+    //  CASCADE사용하지말 것
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllChat(users: List<ChatEntity>)
+    suspend fun insertAllChat(chats: List<ChatEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertChat(chat: ChatEntity)
+    suspend fun insertChat(chat: ChatEntity): Long
 
     @Query("UPDATE Chat SET " +
             "chat_id = :chatId, " +
@@ -30,19 +34,40 @@ interface ChatDAO {
         targetChatId: Long,
     )
 
-    @Query("SELECT MIN(chat_id) FROM Chat")
-    suspend fun getMinLoadingChatId(): Long?
-
-    @Query("SELECT MAX(chat_id) FROM Chat "+
+    @Query("SELECT MAX(chat_id) FROM Chat " +
             "WHERE chat_id BETWEEN $MIN_CHAT_ID AND 0")
-    suspend fun getMaxLoadingChatId(): Long?
+    suspend fun getMaxWaitingChatId(): Long?
 
-    @Query("SELECT * FROM Chat " +
-            "WHERE chat_room_id = :chatRoomId " +
-            "AND chat_id BETWEEN $MIN_CHAT_ID AND 0")
-    fun getWaitingChatList(chatRoomId: Long): Flow<List<ChatEntity>>
+    suspend fun insertWaitingChat(
+        roomId: Long,
+        message: String
+    ): Long {
+        val cachedUser = App.instance.getCachedUser()
+
+        val chat = ChatEntity(
+            chatId = getWaitingChatId(),
+            chatRoomId = roomId,
+            senderId = cachedUser.userId,
+            dispatchTime = DateManager.getCurrentDateTimeString(),
+            status = ChatEntity.ChatStatus.LOADING,
+            message = message,
+            chatType = ChatEntity.ChatType.Mine,
+            //--------------------삭제 예정
+            senderNickname = cachedUser.userNickname,
+            senderProfileImageUrl = cachedUser.userProfileImageUri,
+            senderDefaultProfileImageType = cachedUser.defaultProfileImageType,
+        )
+        return insertChat(chat)
+    }
+
+    private suspend fun getWaitingChatId(): Long {
+        maxWaitingChatId =
+            max(maxWaitingChatId, getMaxWaitingChatId()?.plus(1) ?: maxWaitingChatId)
+        return maxWaitingChatId++
+    }
 
     companion object {
-        const val MIN_CHAT_ID = -1_000_000_000L
+        private const val MIN_CHAT_ID = -1_000_000_000L
+        private var maxWaitingChatId = MIN_CHAT_ID
     }
 }

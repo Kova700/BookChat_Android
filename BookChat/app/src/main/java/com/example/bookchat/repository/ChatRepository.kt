@@ -3,15 +3,14 @@ package com.example.bookchat.repository
 import android.util.Log
 import com.example.bookchat.App
 import com.example.bookchat.BuildConfig
-import com.example.bookchat.data.RequestChat
 import com.example.bookchat.data.SocketMessage
+import com.example.bookchat.data.request.RequestSendChat
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import org.hildan.krossbow.stomp.StompReceipt
 import org.hildan.krossbow.stomp.StompSession
 import org.hildan.krossbow.stomp.frame.FrameBody
 import org.hildan.krossbow.stomp.headers.StompSendHeaders
@@ -44,6 +43,7 @@ class ChatRepository @Inject constructor() {
         ).map { it.bodyAsText.parseToSocketMessage() }
     }
 
+    //TODO : Gson() 이거 의존성 주입으로 수정
     private fun String.parseToSocketMessage(): SocketMessage {
         runCatching { Gson().fromJson(this, SocketMessage.CommonMessage::class.java) }
             .onSuccess { return it }
@@ -53,28 +53,19 @@ class ChatRepository @Inject constructor() {
     }
 
     //이렇게 보내면 토큰 자동 갱신은 어케 하누?
-    suspend fun subscribeErrorTopic(stompSession: StompSession): Flow<String> {
-        Log.d(TAG, "ChatRepository: subscribeErrorResponse() - called")
-        return stompSession.subscribe(
-            StompSubscribeHeaders(
-                destination = SUB_ERROR_DESTINATION,
-                customHeaders = getHeader()
-            )
-        ).map { it.bodyAsText }
-    }
-
-    //이렇게 보내면 토큰 자동 갱신은 어케 하누?
+    //TODO : Gson() 이거 의존성 주입으로 수정
     suspend fun sendMessage(
         stompSession: StompSession,
         roomId: Long,
+        receiptId: Long,
         message: String
-    ): StompReceipt? {
+    ) {
         Log.d(TAG, "ChatRepository: sendMessage() - called")
-        return stompSession.send(
+        stompSession.send(
             StompSendHeaders(
                 destination = "$SEND_MESSAGE_DESTINATION$roomId",
                 customHeaders = getHeader()
-            ), FrameBody.Text(Gson().toJson(RequestChat(message)))
+            ), FrameBody.Text(Gson().toJson(RequestSendChat(receiptId, message)))
         )
     }
 
@@ -83,19 +74,13 @@ class ChatRepository @Inject constructor() {
             Pair(
                 AUTHORIZATION,
                 "${DataStoreManager.getBookChatTokenSync().getOrNull()?.accessToken}"
-            ),
-            Pair(
-                "ack",
-                "auto"
             )
         )
     }
 
     companion object {
         private const val AUTHORIZATION = "Authorization"
-        private const val SEND_ENTER_CHAT_ROOM_DESTINATION = "/subscriptions/enter/chatrooms/"
         private const val SEND_MESSAGE_DESTINATION = "/subscriptions/send/chatrooms/"
-        private const val SUB_ERROR_DESTINATION = "/user/exchange/amq.direct/error"
         private const val SUB_CHAT_ROOM_DESTINATION = "/topic/"
     }
 }

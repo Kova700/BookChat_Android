@@ -15,18 +15,21 @@ sealed interface SocketMessage {
         val chatId: Long,
         @SerializedName("senderId")
         val senderId: Long?,
-        @SerializedName("senderNickname")
-        val senderNickname: String?,
-        @SerializedName("senderProfileImageUrl")
-        val senderProfileImageUrl: String?,
-        @SerializedName("senderDefaultProfileImageType")
-        val senderDefaultProfileImageType: UserDefaultProfileImageType?,
+        @SerializedName("receiptId")
+        val receiptId :Long,
         @SerializedName("dispatchTime")
         val dispatchTime: String,
         @SerializedName("message")
         val message: String,
         @SerializedName("messageType")
-        val messageType: MessageType
+        val messageType: MessageType,
+        //--------------------삭제 예정-------------------------
+        @SerializedName("senderNickname")
+        val senderNickname: String?,
+        @SerializedName("senderProfileImageUrl")
+        val senderProfileImageUrl: String?,
+        @SerializedName("senderDefaultProfileImageType")
+        val senderDefaultProfileImageType: UserDefaultProfileImageType?
     ) : SocketMessage {
 
         override fun toChatEntity(chatRoomId: Long): ChatEntity =
@@ -34,12 +37,13 @@ sealed interface SocketMessage {
                 chatId = this.chatId,
                 chatRoomId = chatRoomId,
                 senderId = this.senderId,
+                message = this.message,
+                chatType = getChatType(),
+                //--------------------삭제 예정-------------------------
                 senderNickname = this.senderNickname,
                 senderProfileImageUrl = this.senderProfileImageUrl,
                 senderDefaultProfileImageType = this.senderDefaultProfileImageType,
                 dispatchTime = this.dispatchTime,
-                message = this.message,
-                chatType = getChatType()
             )
 
         private fun getChatType(): ChatType {

@@ -11,17 +11,14 @@ import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.MessageType.*
 import com.example.bookchat.data.SocketMessage
-import com.example.bookchat.data.local.dao.ChatDAO.Companion.MIN_CHAT_ID
 import com.example.bookchat.data.local.entity.ChatEntity
 import com.example.bookchat.data.local.entity.ChatEntity.ChatStatus
-import com.example.bookchat.data.local.entity.ChatEntity.ChatType
 import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.example.bookchat.data.local.entity.UserEntity
 import com.example.bookchat.paging.remotemediator.ChatRemoteMediator
 import com.example.bookchat.repository.ChatRepository
 import com.example.bookchat.repository.ChatRoomManagementRepository
 import com.example.bookchat.utils.Constants.TAG
-import com.example.bookchat.utils.DateManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
@@ -44,7 +41,7 @@ class ChatRoomViewModel @AssistedInject constructor(
 
     //이거 ChatDataAdapter에 전달해줘야함
     //이게 있어야 ChatItem의 UserId랑 UserEntity를 1대1 매칭시킬 수 있음
-    //( UserEntity랑 Left Join 으로 수정 예정)
+    //(UserEntity랑 Left Join 으로 수정 예정)
     val chatRoomUserMapFlow = MutableStateFlow<Map<Long, UserEntity>>(hashMapOf())
 
     // TODO : message 객체 구성 변경 receiptID 추가
@@ -66,10 +63,11 @@ class ChatRoomViewModel @AssistedInject constructor(
     // 자동으로 채팅이 전송됨
 
     //TODO : 전송 대기 중이던 채팅 전송 실패 UI로 전환 구현해야함
-    // 소켓 연결 끊어졌을 때, 전송 대기중인 채팅 있다면 전부 전송 실패로 변경
+    // 소켓 연결 끊어졌을 때, 해당 채팅방에 전송 대기중인 채팅 있다면 전부 전송 실패로 변경
+    // 우리 서비스는 무거운 채팅을 보내지 않음으로 특정시간이 지나면 전송 실패로 간주하는게 좋을 듯,
+    // .
     // 소켓 재 연결 시마다, 채팅방 정보 조회 API 호출해서 수정사항 전부 덮어쓰기
     // 소켓 재 연결 시마다, 내가 가지고 있던 채팅부터 서버의 마지막 채팅(isLast가 올 때)까지 페이징 요청
-    private var waitingChatList = listOf<ChatEntity>()
 
     @OptIn(ExperimentalPagingApi::class)
     val chatDataFlow = Pager(
@@ -105,7 +103,6 @@ class ChatRoomViewModel @AssistedInject constructor(
             clearTempSavedMessage()
             connectSocket()
             observeChatFlowJob.start()
-            observeWaitingChatInLocalDBJob.start()
             observeChatRoomEntityInLocalDBJob.start()
             observeChatRoomUserListJob.start()
         }
@@ -155,9 +152,6 @@ class ChatRoomViewModel @AssistedInject constructor(
     private val observeChatRoomUserListJob = viewModelScope
         .launch(start = CoroutineStart.LAZY) { collectChatRoomUserList() }
 
-    private val observeWaitingChatInLocalDBJob = viewModelScope
-        .launch(start = CoroutineStart.LAZY) { collectWaitingChatList() }
-
     private suspend fun collectChatTopic() {
         subscribeChatTopic(roomSId).collect { socketMessage -> saveChatInLocalDB(socketMessage) }
     }
@@ -192,10 +186,6 @@ class ChatRoomViewModel @AssistedInject constructor(
         chatRoomUserListFlow.value = database.userDAO().getUserList(userIdList)
     }
 
-    private suspend fun collectWaitingChatList() {
-        database.chatDAO().getWaitingChatList(roomId).collect { waitingChatList = it }
-    }
-
     private suspend fun saveChatInLocalDB(socketMessage: SocketMessage) {
         when (socketMessage) {
             is SocketMessage.CommonMessage -> saveCommonMessageInLocalDB(socketMessage)
@@ -207,6 +197,7 @@ class ChatRoomViewModel @AssistedInject constructor(
         socketMessage: SocketMessage.CommonMessage
     ) {
         val myUserId = App.instance.getCachedUser().userId
+        val receiptId = socketMessage.receiptId
         val chatEntity = socketMessage.toChatEntity(roomId)
 
         database.withTransaction {
@@ -216,16 +207,7 @@ class ChatRoomViewModel @AssistedInject constructor(
                 updateChatRoomLastChatInfo(chatEntity)
                 return@withTransaction
             }
-
-            //TODO : 현재 message로 비교하는로직 수정 예정
-            // 헤더에 ReceiptID가 추가로 넘어오거나
-            // Receipt Frame으로 성공여부 판별되게
-            for (waitingChat in waitingChatList) {
-                if (waitingChat.message.length != socketMessage.message.length) continue
-                if (waitingChat.message != socketMessage.message) continue
-                updateChatInfo(chatEntity, waitingChat.chatId)
-                break
-            }
+            updateChatInfo(chatEntity, receiptId)
             updateChatRoomLastChatInfo(chatEntity)
         }
     }
@@ -252,7 +234,7 @@ class ChatRoomViewModel @AssistedInject constructor(
             when (socketMessage.messageType) {
                 CHAT -> {}
                 ENTER -> {
-                    //TODO : 채팅방 정보 조회를 다시하거나
+                    //TODO : 채팅방 정보 조회를 다시하거나 (당첨)
                     // Enter NOTICE 속에 유저 정보(채팅방 정보조회의 유저 객체처럼)가
                     // 있어야할 것같음 [Id, nickname, profileUrl, defaultImageType]
 
@@ -327,33 +309,13 @@ class ChatRoomViewModel @AssistedInject constructor(
         if (inputtedMessage.value.isBlank()) return@launch
         val message = inputtedMessage.value.also { inputtedMessage.value = "" }
         scrollForcedFlag = true
-        insertNewChat(getLoadingChatEntity(message))
-        runCatching { chatRepository.sendMessage(stompSession, roomId, message) }
-            .onSuccess { Log.d(TAG, "ChatRoomViewModel: sendMessage() - 메세지 전송 성공 !! $it") }
+        val waitingChatId = insertWaitingChat(roomId, message)
+        runCatching { chatRepository.sendMessage(stompSession, roomId, waitingChatId, message) }
             .onFailure { handleError(it) }
     }
 
-    private suspend fun getLoadingChatEntity(message: String): ChatEntity {
-        val cachedUser = App.instance.getCachedUser()
-
-        return ChatEntity(
-            chatId = getWaitingChatId(),
-            chatRoomId = roomId,
-            senderId = cachedUser.userId,
-            senderNickname = cachedUser.userNickname,
-            senderProfileImageUrl = cachedUser.userProfileImageUri,
-            senderDefaultProfileImageType = cachedUser.defaultProfileImageType,
-            dispatchTime = DateManager.getCurrentDateTimeString(),
-            status = ChatStatus.LOADING,
-            message = message,
-            chatType = ChatType.Mine
-        )
-    }
-
-    private suspend fun getWaitingChatId(): Long {
-        val minChatId = database.chatDAO().getMinLoadingChatId()
-        return if ((minChatId == null) || (minChatId > 0L)) MIN_CHAT_ID
-        else database.chatDAO().getMaxLoadingChatId()?.plus(1) ?: MIN_CHAT_ID
+    private suspend fun insertWaitingChat(roomId: Long, message: String): Long {
+        return database.chatDAO().insertWaitingChat(roomId, message)
     }
 
     fun finishActivity() {
