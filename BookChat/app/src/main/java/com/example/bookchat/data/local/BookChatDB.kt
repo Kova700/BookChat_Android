@@ -7,16 +7,21 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.bookchat.data.local.dao.ChatDAO
 import com.example.bookchat.data.local.dao.ChatRoomDAO
-import com.example.bookchat.data.local.dao.UserDao
+import com.example.bookchat.data.local.dao.TempMessageDAO
+import com.example.bookchat.data.local.dao.UserDAO
 import com.example.bookchat.data.local.entity.ChatEntity
 import com.example.bookchat.data.local.entity.ChatRoomEntity
+import com.example.bookchat.data.local.entity.TempMessageEntity
 import com.example.bookchat.data.local.entity.UserEntity
 import com.example.bookchat.data.local.typeconverter.LongListTypeConverter
 import com.example.bookchat.data.local.typeconverter.StringListTypeConverter
 import com.google.gson.Gson
 
 @Database(
-    entities = [ChatRoomEntity::class, ChatEntity::class, UserEntity::class],
+    entities = [
+        ChatRoomEntity::class, ChatEntity::class,
+        UserEntity::class, TempMessageEntity::class
+    ],
     version = 1,
     exportSchema = false
 )
@@ -24,7 +29,8 @@ import com.google.gson.Gson
 abstract class BookChatDB : RoomDatabase() {
     abstract fun chatDAO(): ChatDAO
     abstract fun chatRoomDAO(): ChatRoomDAO
-    abstract fun userDAO(): UserDao
+    abstract fun userDAO(): UserDAO
+    abstract fun tempMessageDAO(): TempMessageDAO
 
     companion object {
         private const val DB_NAME = "BookChat_DB"
