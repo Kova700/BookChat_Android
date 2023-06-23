@@ -2,6 +2,15 @@
 <img width="100%" height="100%" alt="bookchat_introduce" src="https://github.com/Kova700/RESUME/assets/81726145/111b59da-19ed-4666-b260-cac748fed015"> <br>
 
 ### What is BookChat? 
+- 책의 난이도가 자신과 맞지 않는 사용자
+
+- 책의 특정 부분이 이해되지 않는 사용자
+
+- 책에 대한 자신의 생각을 다른 사람들과 나누고 싶은 사용자
+
+- 한 책을 같이 스터디 할 수 있는 환경이 필요한 사용자
+
+이런 사용자들이 모여 책의 특정 부분에 대해 독서 토론 혹은 질문을 채팅으로 나눌 수 있는 플랫폼
 
 ***
 ### Challenge Goal
@@ -27,20 +36,20 @@
 
 ***
 ### Related Tech
-- `MVVM`, `Data Binding`,  `Room`, `Hilt`, `Pager3`, 
+- `MVVM`, `Data Binding`, `Room`, `Hilt`, `Pager3`, 
 - `RemoteMediator`, `List Adapter`, `LiveData`, `Flow`
 - `DataStore`, `OAuth`, `OIDC`, `Stomp`, `WebSocket`,
-- `Retrofit2`, `OkHttp3`,`Coroutines`, `FCM`, `ViewModel`, 
-- `Glide`, `AAC`, `JetPack`.`krossbow`, `FlexBox`, `Shimmer`
+- `Retrofit2`, `OkHttp3`, `Coroutines`, `FCM`, `ViewModel`, 
+- `Glide`, `AAC`, `JetPack`, `Krossbow`, `FlexBox`, `Shimmer`
 
 ***
 ### Library
 - 
 
 ***
-### Team
+### Team 
 - [Android Developer](https://github.com/Kova700)
-- [BackEnd Developer](https://github.com/Kova700)
+- [BackEnd Developer](https://github.com/geneaky)
 - [Designer](https://kse0313.creatorlink.net/ABOUT)
 
 ***
@@ -59,9 +68,9 @@
 </p>
 
 <p align="center">
-<img src="https://github.com/Kova700/BookChat_Android/assets/81726145/9a73096e-d918-4efd-8703-f132ee7069aa" width="25%"></img>
-<img src="https://github.com/Kova700/BookChat_Android/assets/81726145/3556a892-812c-41c3-ad05-b93c2a98f9a9" width="25%"></img>
-<img src="https://github.com/Kova700/BookChat_Android/assets/81726145/fb61738a-00c2-45cf-bea5-68b7aca0a1b6" width="25%"></img>
+<img src="https://github.com/Kova700/BookChat_Android/assets/81726145/9a73096e-d918-4efd-8703-f132ee7069aa" width="25%"/>
+<img src="https://github.com/Kova700/BookChat_Android/assets/81726145/3556a892-812c-41c3-ad05-b93c2a98f9a9" width="25%"/>
+<img src="https://github.com/Kova700/BookChat_Android/assets/81726145/fb61738a-00c2-45cf-bea5-68b7aca0a1b6" width="25%"/>
 </p>
 
 ***
