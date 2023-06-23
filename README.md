@@ -39,12 +39,9 @@
 - `MVVM`, `Data Binding`, `Room`, `Hilt`, `Pager3`, 
 - `RemoteMediator`, `List Adapter`, `LiveData`, `Flow`
 - `DataStore`, `OAuth`, `OIDC`, `Stomp`, `WebSocket`,
-- `Retrofit2`, `OkHttp3`, `Coroutines`, `FCM`, `ViewModel`, 
-- `Glide`, `AAC`, `JetPack`, `Krossbow`, `FlexBox`, `Shimmer`
-
-***
-### Library
-- 
+- [`Retrofit2`](https://github.com/square/retrofit), [`OkHttp3`](https://github.com/square/okhttp), `Coroutines`, `FCM`, `ViewModel`, 
+- [`Glide`](https://github.com/bumptech/glide), `AAC`, `JetPack`, [`Krossbow`](https://github.com/joffrey-bion/krossbow), [`FlexBox`](https://github.com/google/flexbox-layout), [`Shimmer`](https://github.com/facebook/shimmer-android)
+- [`SimpleRatingBar`](https://github.com/williamyyu/SimpleRatingBar), [`ImageCropper`](https://github.com/CanHub/Android-Image-Cropper), [`Gson`](https://github.com/google/gson)(수정 예정)
 
 ***
 ### Team 
@@ -80,10 +77,3 @@
 ### App Design ([Figma](https://www.figma.com/file/h6ZwMa9QzWDn1TyCJmawsb/BookChat?node-id=693%3A2079)) 
 ![image](https://github.com/Kova700/BookChat_Android/assets/81726145/c7cefba2-1013-4d08-b6fd-c5655fc5a734)
 이전 디자인 ([Figma](https://www.figma.com/file/h6ZwMa9QzWDn1TyCJmawsb/BookChat?type=design&node-id=0%3A1&mode=design&t=0ceQ3aaZuYh3IsM4-1)) 
-
-***
-### License
-
-```
-
-```
