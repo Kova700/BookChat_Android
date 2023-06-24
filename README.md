@@ -38,7 +38,7 @@
 ### Related Tech
 - `MVVM`, `Data Binding`, `Room`, `Hilt`, `Pager3`, 
 - `RemoteMediator`, `List Adapter`, `LiveData`, `Flow`
-- `DataStore`, `OAuth`, `OIDC`, `Stomp`, `WebSocket`,
+- `DataStore`, `OAuth`, `OIDC`, [`Stomp`](https://stomp.github.io), `WebSocket`,
 - [`Retrofit2`](https://github.com/square/retrofit), [`OkHttp3`](https://github.com/square/okhttp), `Coroutines`, `FCM`, `ViewModel`, 
 - [`Glide`](https://github.com/bumptech/glide), `AAC`, `JetPack`, [`Krossbow`](https://github.com/joffrey-bion/krossbow), [`FlexBox`](https://github.com/google/flexbox-layout), [`Shimmer`](https://github.com/facebook/shimmer-android)
 - [`SimpleRatingBar`](https://github.com/williamyyu/SimpleRatingBar), [`ImageCropper`](https://github.com/CanHub/Android-Image-Cropper), [`Gson`](https://github.com/google/gson)(수정 예정)
