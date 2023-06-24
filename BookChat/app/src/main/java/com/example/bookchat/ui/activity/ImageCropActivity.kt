@@ -40,6 +40,18 @@ class ImageCropActivity : AppCompatActivity() {
         finish()
     }
 
+    fun clickCancelBtn() {
+        finish()
+    }
+
+    fun clickOtherPictureBtn() {
+        galleryActivityResultLauncher.launch(LAUNCHER_INPUT_IMAGE)
+    }
+
+    fun clickRightRotatePictureBtn() {
+        binding.cropImageView.rotateImage(90)
+    }
+
     private fun bitmapToByteArray(
         bitmap: Bitmap,
         compressFormat: Bitmap.CompressFormat

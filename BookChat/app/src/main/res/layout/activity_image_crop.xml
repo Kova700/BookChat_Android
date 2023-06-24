@@ -1,45 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
         <variable
             name="activity"
             type="com.example.bookchat.ui.activity.ImageCropActivity" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.activity.ImageCropActivity">
 
-        <Button
-            android:id="@+id/getCropImageBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Button"
-            android:onClick="@{() -> activity.clickFinishBtn()}"
-            app:layout_constraintBottom_toTopOf="@+id/cropImageView"
-            app:layout_constraintEnd_toStartOf="@+id/cropImageView"
-            app:layout_constraintHorizontal_bias="0.49"
+        <View
+            android:id="@+id/image_crop_header"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.example.bookchat.AntiDupClickImageButton
+            android:id="@+id/cancel_btn"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="30dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:onClick="@{() -> activity.clickCancelBtn()}"
+            android:src="@drawable/x_icon"
+            app:layout_constraintBottom_toBottomOf="@+id/image_crop_header"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.example.bookchat.AntiDupClickImageButton
+            android:id="@+id/img_rotate_btn"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="15dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:onClick="@{() -> activity.clickRightRotatePictureBtn()}"
+            android:src="@drawable/img_right_rotate_icon"
+            app:layout_constraintBottom_toBottomOf="@+id/image_crop_header"
+            app:layout_constraintEnd_toStartOf="@+id/textView10"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_bold"
+            android:onClick="@{() -> activity.clickOtherPictureBtn()}"
+            android:padding="5dp"
+            android:text="사진 선택"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="@+id/image_crop_header"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="30dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_medium"
+            android:onClick="@{() -> activity.clickFinishBtn()}"
+            android:text="확인"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/image_crop_header"
+            app:layout_constraintEnd_toEndOf="@+id/image_crop_header"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.canhub.cropper.CropImageView
             android:id="@+id/cropImageView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:background="#CC000000"
+            app:cropBackgroundColor="#CC000000"
             app:cropFixAspectRatio="true"
             app:cropGuidelines="on"
+            app:cropInitialCropWindowPaddingRatio="0"
             app:cropScaleType="fitCenter"
             app:cropShape="oval"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/getCropImageBtn"
-            app:layout_constraintVertical_weight="1">
-        </com.canhub.cropper.CropImageView>
+            app:layout_constraintTop_toBottomOf="@+id/image_crop_header"
+            app:layout_constraintVertical_weight="1" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
