@@ -1,5 +1,5 @@
 # BookChat - Android
-<img width="100%" height="100%" alt="bookchat_introduce" src="https://github.com/Kova700/RESUME/assets/81726145/111b59da-19ed-4666-b260-cac748fed015"> <br>
+<img width="100%" height="100%" alt="bookchat_introduce" src="https://github.com/Kova700/BookChat_Android/assets/81726145/8a61b1cc-6cff-4320-bddb-83234cf8d4e5"> <br>
 
 ### What is BookChat? 
 - 책의 난이도가 자신과 맞지 않는 사용자
