@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
+        <import type="android.view.View"/>
         <variable
             name="viewModel"
             type="com.example.bookchat.viewmodel.SignUpViewModel" />
@@ -14,55 +15,69 @@
         android:layout_height="match_parent"
         tools:context=".ui.activity.SignUpActivity">
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="30dp"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="30dp"/>
+
+        <com.example.bookchat.AntiDupClickImageButton
+            android:id="@+id/imageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="27dp"
+            android:elevation="10dp"
+            android:onClick="@{()->viewModel.clickBackBtn()}"
+            android:background="?android:selectableItemBackgroundBorderless"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_back_btn" />
+
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="20dp"
+            android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"
             android:text="@string/sign_up_main"
             android:textColor="#222222"
             android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="@+id/imageButton"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
             app:layout_constraintTop_toBottomOf="@+id/imageButton" />
-
-        <ImageButton
-            android:id="@+id/imageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="22dp"
-            android:layout_marginTop="27dp"
-            android:background="#00ff0000"
-            android:elevation="10dp"
-            android:onClick="@{()->viewModel.clickBackBtn()}"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_back_btn" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/user_profile_cardview"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_gravity="center"
+            android:layout_marginTop="50dp"
             app:cardCornerRadius="40dp"
             app:cardElevation="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
             app:layout_constraintTop_toBottomOf="@+id/textView2"
             app:layout_constraintVertical_bias="0.06999999">
 
             <ImageView
                 android:id="@+id/userProfile_iv"
+                loadByteArray="@{viewModel.userProfileByteArray}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:scaleType="fitCenter"
-                android:src="@drawable/default_profile_img1"
-                loadByteArray="@{viewModel.userProfilByteArray}"/>
+                android:src="@drawable/default_profile_img1" />
         </androidx.cardview.widget.CardView>
 
-        <ImageButton
+        <com.example.bookchat.AntiDupClickImageButton
             android:id="@+id/imageButton2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -73,66 +88,94 @@
             app:layout_constraintEnd_toEndOf="@+id/user_profile_cardview"
             app:srcCompat="@drawable/ic_getpicture_btn" />
 
-        <LinearLayout
+        <View
             android:id="@+id/nickName_layout"
             setLayoutFromCheckResult="@{viewModel.nameCheckStatus}"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="50dp"
-            android:layout_marginStart="30dp"
             android:layout_marginTop="40dp"
-            android:layout_marginEnd="30dp"
             android:background="@drawable/nickname_input_back_white"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/user_profile_cardview"
-            app:layout_constraintVertical_bias="0.0">
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/user_profile_cardview"/>
 
-            <EditText
-                android:id="@+id/nickName_et"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:background="@null"
-                android:hint="@string/sign_up_input_hint"
-                android:text="@={viewModel._signUpDto.nickname}"
-                android:textColorHint="#CFCFCF"
-                android:textSize="13sp"
-                app:addTextChangedListener="@{viewModel.editTextWatcher}"
-                app:filters="@{viewModel.specialCharFilter}" />
-        </LinearLayout>
+        <EditText
+            android:id="@+id/nickName_et"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="10dp"
+            android:background="@null"
+            android:hint="@string/sign_up_input_hint"
+            android:text="@={viewModel.inputtedNickname}"
+            android:textColorHint="#CFCFCF"
+            android:textSize="13sp"
+            android:singleLine="true"
+            app:addTextChangedListener="@{viewModel.editTextWatcher}"
+            app:filters="@{viewModel.specialCharFilter}"
+            app:layout_constraintBottom_toBottomOf="@+id/nickName_layout"
+            app:layout_constraintEnd_toStartOf="@+id/text_clear_btn"
+            app:layout_constraintStart_toStartOf="@+id/nickName_layout"
+            app:layout_constraintTop_toTopOf="@+id/nickName_layout" />
 
-        <Button
+        <ImageButton
+            android:id="@+id/text_clear_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:visibility="@{viewModel.inputtedNickname.length() == 0 ? View.INVISIBLE : View.VISIBLE}"
+            android:onClick="@{() -> viewModel.clickClearNickNameBtn()}"
+            android:src="@drawable/ic_text_delete_btn"
+            app:layout_constraintBottom_toBottomOf="@+id/nickName_layout"
+            app:layout_constraintEnd_toStartOf="@+id/text_length_tv"
+            app:layout_constraintTop_toTopOf="@+id/nickName_layout" />
+
+        <TextView
+            android:id="@+id/text_length_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elegantTextHeight="true"
+            android:layout_marginEnd="15dp"
+            android:fontFamily="@font/notosanskr_regular"
+            android:textColor="#303030"
+            android:text="@{String.valueOf(viewModel.inputtedNickname.length()) + '/' + String.valueOf(20)}"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/nickName_layout"
+            app:layout_constraintEnd_toEndOf="@+id/nickName_layout"
+            app:layout_constraintTop_toTopOf="@+id/nickName_layout" />
+
+        <com.example.bookchat.AntiDupClickButton
             android:id="@+id/startBookchat_btn"
-            android:layout_width="match_parent"
-            android:layout_height="57dp"
-            android:layout_marginStart="30dp"
-            android:layout_marginEnd="30dp"
-            android:backgroundTint="#5648FF"
-            android:onClick="@{() -> viewModel.clickStartBtn()}"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="35dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:cornerRadius="5dp"
+            android:textSize="14sp"
             android:text="@string/sign_up_submit_btn"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nickName_layout"
-            app:layout_constraintVertical_bias="0.116" />
+            android:textColor="#FFFFFF"
+            android:elegantTextHeight="true"
+            android:backgroundTint="#5648FF"
+            android:fontFamily="@font/notosanskr_regular"
+            android:onClick="@{() -> viewModel.clickStartBtn()}"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/nickName_layout" />
 
         <TextView
             android:id="@+id/checkResult_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="10sp"
+            android:layout_marginStart="15dp"
             android:text=""
+            android:textSize="10sp"
             setTextViewFromCheckResult="@{viewModel.nameCheckStatus}"
             app:layout_constraintBottom_toTopOf="@+id/startBookchat_btn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.143"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
             app:layout_constraintTop_toBottomOf="@+id/nickName_layout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

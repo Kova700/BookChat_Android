@@ -79,27 +79,31 @@ class SignUpActivity : AppCompatActivity() {
                 val intent = result.data
                 val bitmapByteArray =
                     intent?.getByteArrayExtra(EXTRA_CROPPED_PROFILE_BYTE_ARRAY) ?: byteArrayOf()
-                signUpViewModel._userProfilByteArray.value = bitmapByteArray
+                signUpViewModel.userProfileByteArray.value = bitmapByteArray
             }
         }
 
+    private fun moveToSelectTaste(event: SignUpEvent.MoveToSelectTaste) {
+        val intent = Intent(this, SelectTasteActivity::class.java)
+        intent.putExtra(EXTRA_SIGNUP_USER_NICKNAME, event.userNickname)
+        intent.putExtra(EXTRA_USER_PROFILE_BYTE_ARRAY2, event.userProfilByteArray)
+        startActivity(intent)
+    }
+
+    private fun showSnackBar(messageId :Int){
+        Snackbar.make(binding.signUpLayout,messageId, Snackbar.LENGTH_SHORT).show()
+    }
+
     private fun handleEvent(event: SignUpEvent) = when (event) {
-        is SignUpEvent.UnknownError -> {
-            Snackbar.make(binding.signUpLayout, R.string.error_else, Snackbar.LENGTH_SHORT).show()
-        }
+        is SignUpEvent.UnknownError -> showSnackBar(R.string.error_else)
         is SignUpEvent.PermissionCheck -> startUserProfileEdit()
         is SignUpEvent.MoveToBack -> finish()
-        is SignUpEvent.MoveToSelectTaste -> {
-            val intent = Intent(this, SelectTasteActivity::class.java)
-            intent.putExtra(EXTRA_SIGNUP_DTO, event.signUpDto)
-            intent.putExtra(EXTRA_USER_PROFILE_BYTE_ARRAY2, event.userProfilByteArray)
-            startActivity(intent)
-        }
+        is SignUpEvent.MoveToSelectTaste -> moveToSelectTaste(event)
     }
 
     companion object {
         const val KEYBOARD_DELAY_TIME = 200L
-        const val EXTRA_SIGNUP_DTO = "EXTRA_SIGNUP_DTO"
+        const val EXTRA_SIGNUP_USER_NICKNAME = "EXTRA_SIGNUP_USER_NICKNAME"
         const val EXTRA_USER_PROFILE_BYTE_ARRAY2 = "EXTRA_USER_PROFILE_BYTE_ARRAY2"
     }
 }

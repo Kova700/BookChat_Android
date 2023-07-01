@@ -15,7 +15,7 @@ import com.example.bookchat.R
 import com.example.bookchat.data.*
 import com.example.bookchat.data.local.entity.ChatEntity
 import com.example.bookchat.data.local.entity.ChatEntity.ChatStatus
-import com.example.bookchat.data.local.entity.ChatEntity.ChatType
+import com.example.bookchat.data.local.entity.ChatWithUser
 import com.example.bookchat.utils.*
 import com.example.bookchat.viewmodel.AgonyViewModel.AgonyActivityState
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportStatus
@@ -73,20 +73,6 @@ object DataBindingAdapter {
         inflateUserDefaultProfileImage(imageView, userDefaultProfileImageType)
     }
 
-    /**Chat Sender 프로필 이미지 출력*/
-    @JvmStatic
-    @BindingAdapter("loadSenderProfile")
-    fun loadSenderProfile(imageView: ImageView, chat :ChatEntity?){
-        if (chat == null) return
-        if (chat.chatType != ChatType.Other) return
-
-        if (!chat.senderProfileImageUrl?.trim().isNullOrBlank()){
-            loadUrl(imageView, chat.senderProfileImageUrl)
-            return
-        }
-        inflateUserDefaultProfileImage(imageView, chat.senderDefaultProfileImageType!!)
-    }
-
     private fun inflateUserDefaultProfileImage(
         imageView: ImageView,
         imageType: UserDefaultProfileImageType?
@@ -106,6 +92,16 @@ object DataBindingAdapter {
         UserDefaultProfileImageType.THREE -> R.drawable.default_profile_img3
         UserDefaultProfileImageType.FOUR -> R.drawable.default_profile_img4
         UserDefaultProfileImageType.FIVE -> R.drawable.default_profile_img5
+    }
+
+    @JvmStatic
+    @BindingAdapter("setUserNickname")
+    fun setUserNickname(textview :TextView, nickname :String?){
+        if (nickname.isNullOrBlank()){
+            textview.text = "(알 수 없음)"
+            return
+        }
+        textview.text = nickname
     }
 
     /** EditText 엔터이벤트 등록*/
@@ -160,18 +156,18 @@ object DataBindingAdapter {
     //레이아웃 (테두리)
     @JvmStatic
     @BindingAdapter("setLayoutFromCheckResult")
-    fun setLayoutFromCheckResult(layout :LinearLayout, nameCheckStatus: NameCheckStatus){
+    fun setLayoutFromCheckResult(view :View, nameCheckStatus: NameCheckStatus){
         when(nameCheckStatus){
             NameCheckStatus.Default ->{
-                layout.background = ResourcesCompat.getDrawable(App.instance.resources,R.drawable.nickname_input_back_white,null)
+                view.background = ResourcesCompat.getDrawable(App.instance.resources,R.drawable.nickname_input_back_white,null)
             }
             NameCheckStatus.IsShort,
             NameCheckStatus.IsDuplicate,
             NameCheckStatus.IsSpecialCharInText -> {
-                layout.background = ResourcesCompat.getDrawable(App.instance.resources,R.drawable.nickname_input_back_red,null)
+                view.background = ResourcesCompat.getDrawable(App.instance.resources,R.drawable.nickname_input_back_red,null)
             }
             NameCheckStatus.IsPerfect -> {
-                layout.background = ResourcesCompat.getDrawable(App.instance.resources,R.drawable.nickname_input_back_blue,null)
+                view.background = ResourcesCompat.getDrawable(App.instance.resources,R.drawable.nickname_input_back_blue,null)
             }
         }
     }
@@ -590,8 +586,8 @@ object DataBindingAdapter {
     /**다른 사람의 새로운 채팅 바텀 공지 Visibility 세팅*/
     @JvmStatic
     @BindingAdapter("setNewOtherChatNoticeVisibility")
-    fun setNewOtherChatNoticeVisibility(view: View, chatEntity: ChatEntity?) {
-        view.visibility = if (chatEntity == null) View.GONE else View.VISIBLE
+    fun setNewOtherChatNoticeVisibility(view: View, chat: ChatWithUser?) {
+        view.visibility = if (chat == null) View.GONE else View.VISIBLE
     }
 
     /**채팅 날짜 표시 텍스트 세팅*/
