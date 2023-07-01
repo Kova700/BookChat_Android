@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         setBottomNavigation()
-        addFragment(homeFragment, FRAGMENT_TAG_HOME)
+        addOrReplaceFragment(homeFragment, FRAGMENT_TAG_HOME)
         setBackPressedDispatcher()
     }
 
@@ -76,25 +76,26 @@ class MainActivity : AppCompatActivity() {
         addFragment(newFragment, tag)
     }
 
-    private fun refreshBookShelf(){
-        with(bookShelfFragment.pagerAdapter){
-            val bookshelfRefreshFlag = RefreshManager.bookShelfRefreshList.removeFirstOrNull() ?: return
-            when(bookshelfRefreshFlag){
+    private fun refreshBookShelf() {
+        with(bookShelfFragment.pagerAdapter) {
+            val bookshelfRefreshFlag =
+                RefreshManager.bookShelfRefreshList.removeFirstOrNull() ?: return
+            when (bookshelfRefreshFlag) {
                 RefreshManager.BookShelfRefreshFlag.Wish -> {
                     bookShelfFragment.changeTab(WISH_TAB_INDEX)
-                    if(bookShelfFragment.bookShelfViewModel.isWishBookLoaded){
+                    if (bookShelfFragment.bookShelfViewModel.isWishBookLoaded) {
                         wishBookBookShelfFragment.wishBookShelfDataAdapter.refresh()
                     }
                 }
                 RefreshManager.BookShelfRefreshFlag.Reading -> {
                     bookShelfFragment.changeTab(READING_TAB_INDEX)
-                    if(bookShelfFragment.bookShelfViewModel.isReadingBookLoaded){
+                    if (bookShelfFragment.bookShelfViewModel.isReadingBookLoaded) {
                         readingBookShelfFragment.readingBookShelfDataAdapter.refresh()
                     }
                 }
                 RefreshManager.BookShelfRefreshFlag.Complete -> {
                     bookShelfFragment.changeTab(COMPLETE_TAB_INDEX)
-                    if(bookShelfFragment.bookShelfViewModel.isCompleteBookLoaded){
+                    if (bookShelfFragment.bookShelfViewModel.isCompleteBookLoaded) {
                         completeBookShelfFragment.completeBookShelfDataAdapter.refresh()
                     }
                 }
@@ -195,7 +196,7 @@ class MainActivity : AppCompatActivity() {
     private fun setBackPressedDispatcher() {
         onBackPressedDispatcher.addCallback {
             val nowInflatedBtmNaviFgmt = getInflatedBottomNaviFragment(getInflatedFragmentList())
-            if (nowInflatedBtmNaviFgmt.hasChildBackStack()){
+            if (nowInflatedBtmNaviFgmt.hasChildBackStack()) {
                 nowInflatedBtmNaviFgmt.popChildBackStack()
                 return@addCallback
             }
@@ -205,7 +206,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun Fragment?.popChildBackStack(){
+    private fun Fragment?.popChildBackStack() {
         this?.childFragmentManager?.popBackStackImmediate()
     }
 
