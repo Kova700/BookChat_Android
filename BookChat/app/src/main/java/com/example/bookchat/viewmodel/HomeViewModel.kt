@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//TODO : 도서, 채팅 Room에서 가져오는 로직으로 수정
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val userChatRoomRepository: UserChatRoomRepository

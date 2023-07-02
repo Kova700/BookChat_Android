@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.MainBookItemDecoration
@@ -32,8 +34,6 @@ class HomeFragment : Fragment() {
     private lateinit var mainReadingBookAdapter: WishBookShelfDataAdapter
     private lateinit var mainUserChatRoomListAdapter: MainUserChatRoomListAdapter
 
-    //TODO : 서재 LocalDB 저장해온 걸 가져오는 형식으로 수정
-    // LocalDB에 없다면 특정 개수만 서버에 가져오는 방식으로 RemoteMediator 연결
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,6 +48,7 @@ class HomeFragment : Fragment() {
         initRecyclerView()
         observePagingReadingBookData()
         observePagingChatRoomData()
+        observeReadingBookLoadStateFlow()
 
         return binding.root
     }
@@ -101,6 +102,7 @@ class HomeFragment : Fragment() {
         }
     }
 
+    //도서도 LocalDB에 저장할 수 있게 BookID가 추가되면 좋을 듯함
     private fun observePagingReadingBookData() = lifecycleScope.launch {
         val firstPage = homeViewModel.readingBookResult.first()
         mainReadingBookAdapter.submitData(firstPage)
@@ -109,6 +111,18 @@ class HomeFragment : Fragment() {
     private fun observePagingChatRoomData() = lifecycleScope.launch {
         homeViewModel.chatRoomFlow.collect { list ->
             mainUserChatRoomListAdapter.submitList(list)
+            val isListEmpty = mainUserChatRoomListAdapter.itemCount == 0
+            binding.emptyChatRoomLayout.isVisible = isListEmpty
+        }
+    }
+
+    //메인에서 독서중 도서, 채팅방 목록 load시에 Paging이 필요하지 않음으로 그냥 ListAdapter로 수정
+    //매번 서버로부터 데이터 로드하고, 로컬에서는 캐시데이터를 보여주는 느낌으로
+    private fun observeReadingBookLoadStateFlow() = lifecycleScope.launch {
+        mainReadingBookAdapter.loadStateFlow.collect { loadState ->
+            val isListEmpty = loadState.refresh is LoadState.NotLoading &&
+                    mainReadingBookAdapter.itemCount == 0
+            binding.emptyReadingBookLayout.isVisible = isListEmpty
         }
     }
 }
