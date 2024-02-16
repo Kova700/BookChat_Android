@@ -94,9 +94,9 @@
 |<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/624d311d-571e-4d86-ab72-9810a3adfb7a">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/4ef42617-bf58-42c7-8864-2094b171eb19">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/948b7944-9358-483e-97b3-34ede765b33e">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/ae9fd2e6-edc9-4e2b-8be6-78713e9640ae">
 
 독후감
-|수정|수정 중 이탈|작성|
-|:-----:|:-----:|:-----:|
-|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/c0aa4b27-a54c-4f0c-a4e5-40d86e65457f">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/78fcdf91-7ebb-4103-a7d7-a6b7c29e3db2">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/78fcdf91-7ebb-4103-a7d7-a6b7c29e3db2">|
+|작성|작성 중 이탈|수정|삭제|
+|:-----:|:-----:|:-----:|:-----:|
+|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/ecb267a2-923b-457a-855a-3aed5a938684">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/b03a5d29-c1a7-4fba-96eb-f9e591d07564">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/f64abaca-5672-43f2-b717-d3d3d505f8cf">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/1366a362-f7f5-44a2-9827-94d505a9f601">|
 
 고민기록[폴더]
 |폴더 추가|폴더 삭제|폴더명 수정|
