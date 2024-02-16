@@ -101,18 +101,28 @@
 고민기록[폴더]
 |폴더 추가|폴더 삭제|폴더명 수정|
 |:-----:|:-----:|:-----:|
-|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/c0aa4b27-a54c-4f0c-a4e5-40d86e65457f">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/78fcdf91-7ebb-4103-a7d7-a6b7c29e3db2">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/78fcdf91-7ebb-4103-a7d7-a6b7c29e3db2">|
+|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/8eef88a9-a1a5-4a32-83ef-a0c9e39b77ea">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/ae523a03-75ad-4770-8850-9bb8828efce3">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/f9d85cc0-111f-4f39-b469-95257f704913">|
 
 고민기록
 |고민 기록 추가|고민 기록 삭제|고민 기록 수정|
 |:-----:|:-----:|:-----:|
-|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/c0aa4b27-a54c-4f0c-a4e5-40d86e65457f">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/78fcdf91-7ebb-4103-a7d7-a6b7c29e3db2">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/78fcdf91-7ebb-4103-a7d7-a6b7c29e3db2">|
+||||
 
+검색
+|검색 기록|종합 검색 결과|
+|:-----:|:-----:|
+|||||
 
-- 검색
-  - 검색 기록
-  - 검색 결과
-  - 디테일 페이지
+검색[도서]
+|도서 검색 결과|독서 예정|독서 중|독서 완료|
+|:-----:|:-----:|:-----:|:-----:|
+|||||
+
+검색[채팅방]
+|채팅 검색 결과|채팅방 입장|
+|:-----:|:-----:|
+|||
+
 
 - 채팅
   - 채팅방 목록
