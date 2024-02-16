@@ -78,25 +78,36 @@
 
 - 메인 화면
 
-- 서재
-  - 서재(독서 예정)
-    - 상세 설정 Dialog 
-  - 서재(독서 중)
-    - 책갈피   
-    - 상세 설정 Dialog
-    - 꾹 눌러서 삭제
-  - 서재(독서 완료)
-    - 상세 설정 Dialog
-    - 독후감
-    - 고민 기록
-   
-- 독후감
+서재 [독서 예정]
+|[독서예정] 삭제|[독서중]으로 이동|
+|:-----:|:-----:|
+|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/c0aa4b27-a54c-4f0c-a4e5-40d86e65457f">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/78fcdf91-7ebb-4103-a7d7-a6b7c29e3db2">|
 
-- 고민 폴더
-  - 고민 폴더 삭제
-  - 고민 폴더 명 수정
-  - 고민 기록
-    - 밀어서 삭제
+서재[독서 중]
+|책갈피|[독서중] 삭제|[독서완료]로 이동|[고민기록]으로 이동
+|:-----:|:-----:|:-----:|:-----:|
+|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/127036aa-3593-4806-8bb1-c3e8bebeceba">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/01625726-42e3-49fc-823d-11c88dbdf540">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/d1803821-4c99-42a1-9550-521d8b82d79c">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/3748c0dc-c66e-49f0-b5b8-cfcf5386208b">
+
+서재[독서 완료]
+|[독서 완료] 삭제|[고민기록]으로 이동|[독후감]으로 이동 </br>(작성된 독후감 X)|[독후감]으로 이동 </br>(작성된 독후감 O)|
+|:-----:|:-----:|:-----:|:-----:|
+|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/624d311d-571e-4d86-ab72-9810a3adfb7a">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/4ef42617-bf58-42c7-8864-2094b171eb19">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/948b7944-9358-483e-97b3-34ede765b33e">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/ae9fd2e6-edc9-4e2b-8be6-78713e9640ae">
+
+독후감
+|수정|수정 중 이탈|작성|
+|:-----:|:-----:|:-----:|
+|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/c0aa4b27-a54c-4f0c-a4e5-40d86e65457f">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/78fcdf91-7ebb-4103-a7d7-a6b7c29e3db2">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/78fcdf91-7ebb-4103-a7d7-a6b7c29e3db2">|
+
+고민기록[폴더]
+|폴더 추가|폴더 삭제|폴더명 수정|
+|:-----:|:-----:|:-----:|
+|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/c0aa4b27-a54c-4f0c-a4e5-40d86e65457f">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/78fcdf91-7ebb-4103-a7d7-a6b7c29e3db2">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/78fcdf91-7ebb-4103-a7d7-a6b7c29e3db2">|
+
+고민기록
+|고민 기록 추가|고민 기록 삭제|고민 기록 수정|
+|:-----:|:-----:|:-----:|
+|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/c0aa4b27-a54c-4f0c-a4e5-40d86e65457f">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/78fcdf91-7ebb-4103-a7d7-a6b7c29e3db2">|<img width="240" src="https://github.com/Kova700/BookChat_Android/assets/81726145/78fcdf91-7ebb-4103-a7d7-a6b7c29e3db2">|
+
 
 - 검색
   - 검색 기록
