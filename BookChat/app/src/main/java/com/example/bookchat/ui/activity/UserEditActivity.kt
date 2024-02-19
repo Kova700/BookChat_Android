@@ -15,8 +15,8 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityUserEditBinding
 import com.example.bookchat.ui.activity.ImageCropActivity.Companion.EXTRA_CROPPED_PROFILE_BYTE_ARRAY
 import com.example.bookchat.utils.PermissionManager
-import com.example.bookchat.viewmodel.UserEditViewModel
-import com.example.bookchat.viewmodel.UserEditViewModel.UserEditUiEvent
+import com.example.bookchat.ui.viewmodel.UserEditViewModel
+import com.example.bookchat.ui.viewmodel.UserEditViewModel.UserEditUiEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

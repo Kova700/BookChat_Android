@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.viewmodel.HomeViewModel" />
+            type="com.example.bookchat.ui.viewmodel.HomeViewModel" />
     </data>
 
     <androidx.core.widget.NestedScrollView
@@ -129,7 +129,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView23" />
 
-                <com.example.bookchat.AntiDupClickButton
+                <com.example.bookchat.ui.customview.AntiDupClickButton
                     android:id="@+id/antiDupClickButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -221,7 +221,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/chatroom_empty_tv" />
 
-                <com.example.bookchat.AntiDupClickButton
+                <com.example.bookchat.ui.customview.AntiDupClickButton
                     android:id="@+id/chat_room_add_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

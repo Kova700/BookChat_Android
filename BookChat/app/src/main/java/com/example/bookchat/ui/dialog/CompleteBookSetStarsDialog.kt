@@ -16,24 +16,24 @@ import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.request.RequestRegisterBookShelfBook
 import com.example.bookchat.databinding.DialogCompleteBookSetStarsBinding
-import com.example.bookchat.repository.BookRepository
+import com.example.bookchat.data.repository.BookRepository
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.utils.RefreshManager
 import com.example.bookchat.utils.RefreshManager.BookShelfRefreshFlag
 import com.example.bookchat.utils.toStarRating
-import com.example.bookchat.viewmodel.SearchTapBookDialogViewModel
-import com.example.bookchat.viewmodel.SearchTapBookDialogViewModel.SearchTapDialogState
+import com.example.bookchat.ui.viewmodel.SearchTapBookDialogViewModel
+import com.example.bookchat.ui.viewmodel.SearchTapBookDialogViewModel.SearchTapDialogState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class CompleteBookSetStarsDialog @AssistedInject constructor(
-    private val bookRepository: BookRepository,
-    @Assisted val book :Book
+	private val bookRepository: BookRepository,
+	@Assisted val book :Book
 ) : DialogFragment() {
 
-    private lateinit var binding :DialogCompleteBookSetStarsBinding
+    private lateinit var binding : DialogCompleteBookSetStarsBinding
     private val searchTapBookDialogViewModel : SearchTapBookDialogViewModel by viewModels ({ requireParentFragment() })
 
     val starRating = MutableStateFlow<Float>(0.0F)

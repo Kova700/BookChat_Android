@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.viewmodel.WishBookTapDialogViewModel" />
+            type="com.example.bookchat.ui.viewmodel.WishBookTapDialogViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/wish_dialog_layout"
@@ -104,7 +104,7 @@
                 app:layout_constraintStart_toStartOf="@+id/sub_background_wish"
                 app:layout_constraintTop_toBottomOf="@+id/textView27" />
 
-            <com.example.bookchat.AntiDupClickToggleButton
+            <com.example.bookchat.ui.customview.AntiDupClickToggleButton
                 android:id="@+id/wish_heart_toggle_btn"
                 android:layout_width="32dp"
                 android:layout_height="32dp"

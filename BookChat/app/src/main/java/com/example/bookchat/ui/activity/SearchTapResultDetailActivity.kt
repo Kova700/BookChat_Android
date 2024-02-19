@@ -9,9 +9,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
-import com.example.bookchat.adapter.search.booksearch.SearchResultBookDetailDataAdapter
-import com.example.bookchat.adapter.search.booksearch.SearchResultBookDummyAdapter
-import com.example.bookchat.adapter.search.chatroomsearch.SearchChatRoomDetailAdapter
+import com.example.bookchat.ui.adapter.search.booksearch.SearchResultBookDetailDataAdapter
+import com.example.bookchat.ui.adapter.search.booksearch.SearchResultBookDummyAdapter
+import com.example.bookchat.ui.adapter.search.chatroomsearch.SearchChatRoomDetailAdapter
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.WholeChatRoomListItem
 import com.example.bookchat.databinding.ActivitySearchTapResultDetailBinding
@@ -26,8 +26,8 @@ import com.example.bookchat.ui.fragment.SearchTapResultFragment.Companion.DIALOG
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.ChatSearchFilter
 import com.example.bookchat.utils.SearchPurpose
-import com.example.bookchat.viewmodel.SearchDetailViewModel
-import com.example.bookchat.viewmodel.SearchViewModel.NecessaryDataFlagInDetail
+import com.example.bookchat.ui.viewmodel.SearchDetailViewModel
+import com.example.bookchat.ui.viewmodel.SearchViewModel.NecessaryDataFlagInDetail
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager

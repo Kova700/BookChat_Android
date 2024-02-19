@@ -12,9 +12,9 @@ import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.DialogPageInputBottomSheetBinding
 import com.example.bookchat.ui.fragment.BookShelfFragment
 import com.example.bookchat.utils.ReadingStatus
-import com.example.bookchat.viewmodel.BookShelfViewModel
-import com.example.bookchat.viewmodel.PageInputDialogViewModel
-import com.example.bookchat.viewmodel.PageInputDialogViewModel.PageInputDialogEvnet
+import com.example.bookchat.ui.viewmodel.BookShelfViewModel
+import com.example.bookchat.ui.viewmodel.PageInputDialogViewModel
+import com.example.bookchat.ui.viewmodel.PageInputDialogViewModel.PageInputDialogEvnet
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

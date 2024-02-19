@@ -12,8 +12,8 @@ import androidx.fragment.app.viewModels
 import com.example.bookchat.R
 import com.example.bookchat.data.AgonyRecordFirstItemStatus
 import com.example.bookchat.databinding.DialogAgonyRecordWarningBinding
-import com.example.bookchat.viewmodel.AgonyRecordViewModel
-import com.example.bookchat.viewmodel.AgonyRecordViewModel.AgonyRecordUiState
+import com.example.bookchat.ui.viewmodel.AgonyRecordViewModel
+import com.example.bookchat.ui.viewmodel.AgonyRecordViewModel.AgonyRecordUiState
 
 class AgonyRecordWarningDialog : DialogFragment() {
 

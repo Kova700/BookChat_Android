@@ -3,7 +3,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.viewmodel.BookShelfViewModel" />
+            type="com.example.bookchat.ui.viewmodel.BookShelfViewModel" />
         <import type="android.view.View"/>
         <variable
             name="visibilty"

@@ -11,7 +11,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogBookReportWarningBinding
-import com.example.bookchat.viewmodel.BookReportViewModel
+import com.example.bookchat.ui.viewmodel.BookReportViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

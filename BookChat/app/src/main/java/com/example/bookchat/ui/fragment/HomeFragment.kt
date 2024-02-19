@@ -15,13 +15,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.MainBookItemDecoration
 import com.example.bookchat.R
-import com.example.bookchat.adapter.home.MainBookAdapter
-import com.example.bookchat.adapter.home.MainUserChatRoomListAdapter
+import com.example.bookchat.ui.adapter.home.MainBookAdapter
+import com.example.bookchat.ui.adapter.home.MainUserChatRoomListAdapter
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.example.bookchat.databinding.FragmentHomeBinding
 import com.example.bookchat.ui.activity.ChatRoomActivity
-import com.example.bookchat.viewmodel.HomeViewModel
+import com.example.bookchat.ui.viewmodel.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

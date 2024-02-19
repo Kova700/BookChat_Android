@@ -15,7 +15,7 @@ import com.example.bookchat.R
 import com.example.bookchat.data.Agony
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ActivityAgonyEditBinding
-import com.example.bookchat.repository.AgonyRepository
+import com.example.bookchat.data.repository.AgonyRepository
 import com.example.bookchat.ui.activity.AgonyActivity.Companion.EXTRA_AGONY
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.viewmodel.AgonyRecordViewModel" />
+            type="com.example.bookchat.ui.viewmodel.AgonyRecordViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -33,7 +33,7 @@
             app:layout_constraintStart_toStartOf="@+id/cardView4"
             app:layout_constraintTop_toTopOf="@+id/cardView4" />
 
-        <com.example.bookchat.AntiDupClickImageButton
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
             android:id="@+id/antiDupClickImageButton5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

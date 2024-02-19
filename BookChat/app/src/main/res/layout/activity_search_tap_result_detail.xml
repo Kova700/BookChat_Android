@@ -9,7 +9,7 @@
             type="com.example.bookchat.ui.activity.SearchTapResultDetailActivity" />
         <variable
             name="viewmodel"
-            type="com.example.bookchat.viewmodel.SearchDetailViewModel" />
+            type="com.example.bookchat.ui.viewmodel.SearchDetailViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

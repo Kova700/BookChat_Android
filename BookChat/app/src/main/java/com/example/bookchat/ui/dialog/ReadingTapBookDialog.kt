@@ -18,10 +18,10 @@ import com.example.bookchat.ui.activity.AgonyActivity
 import com.example.bookchat.ui.fragment.BookShelfFragment
 import com.example.bookchat.ui.fragment.CompleteBookShelfFragment
 import com.example.bookchat.utils.ReadingStatus
-import com.example.bookchat.viewmodel.BookShelfViewModel
-import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.COMPLETE_TAB_INDEX
-import com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel
-import com.example.bookchat.viewmodel.ReadingBookTapDialogViewModel.ReadingBookEvent
+import com.example.bookchat.ui.viewmodel.BookShelfViewModel
+import com.example.bookchat.ui.viewmodel.BookShelfViewModel.Companion.COMPLETE_TAB_INDEX
+import com.example.bookchat.ui.viewmodel.ReadingBookTapDialogViewModel
+import com.example.bookchat.ui.viewmodel.ReadingBookTapDialogViewModel.ReadingBookEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject

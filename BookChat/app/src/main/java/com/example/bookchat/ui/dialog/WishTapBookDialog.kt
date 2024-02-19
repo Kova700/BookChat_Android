@@ -16,11 +16,11 @@ import com.example.bookchat.databinding.DialogWishBookTapClickedBinding
 import com.example.bookchat.ui.fragment.BookShelfFragment
 import com.example.bookchat.ui.fragment.ReadingBookShelfFragment
 import com.example.bookchat.utils.ReadingStatus
-import com.example.bookchat.viewmodel.BookShelfViewModel
-import com.example.bookchat.viewmodel.BookShelfViewModel.BookShelfEvent
-import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.READING_TAB_INDEX
-import com.example.bookchat.viewmodel.WishBookTapDialogViewModel
-import com.example.bookchat.viewmodel.WishBookTapDialogViewModel.WishBookEvent
+import com.example.bookchat.ui.viewmodel.BookShelfViewModel
+import com.example.bookchat.ui.viewmodel.BookShelfViewModel.BookShelfEvent
+import com.example.bookchat.ui.viewmodel.BookShelfViewModel.Companion.READING_TAB_INDEX
+import com.example.bookchat.ui.viewmodel.WishBookTapDialogViewModel
+import com.example.bookchat.ui.viewmodel.WishBookTapDialogViewModel.WishBookEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject

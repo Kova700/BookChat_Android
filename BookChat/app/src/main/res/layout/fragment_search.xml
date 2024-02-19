@@ -6,7 +6,7 @@
         <import type="android.view.View"/>
         <variable
             name="viewModel"
-            type="com.example.bookchat.viewmodel.SearchViewModel" />
+            type="com.example.bookchat.ui.viewmodel.SearchViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -67,7 +67,7 @@
             app:layout_constraintStart_toStartOf="@+id/search_window"
             app:layout_constraintTop_toTopOf="@+id/search_window" />
 
-        <com.example.bookchat.BookChatEditText
+        <com.example.bookchat.ui.customview.BookChatEditText
             android:id="@+id/searchEditText"
             setEnterListener="@{viewModel.keyboardEnterListener}"
             android:layout_width="0dp"

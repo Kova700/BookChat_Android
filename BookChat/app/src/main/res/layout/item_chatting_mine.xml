@@ -44,7 +44,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/chatting_time_tv"
                 app:layout_constraintEnd_toEndOf="@+id/chatting_time_tv" />
 
-            <com.example.bookchat.AntiDupClickImageButton
+            <com.example.bookchat.ui.customview.AntiDupClickImageButton
                 android:id="@+id/chat_send_fail_btn"
                 setChatFailBtnVisibility="@{chatWithUser.chat.status}"
                 android:layout_width="wrap_content"

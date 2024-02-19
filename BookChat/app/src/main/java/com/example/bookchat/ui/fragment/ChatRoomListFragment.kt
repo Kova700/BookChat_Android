@@ -12,14 +12,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
-import com.example.bookchat.adapter.userchatroomlist.UserChatRoomListDataAdapter
-import com.example.bookchat.adapter.userchatroomlist.UserChatRoomListHeaderAdapter
+import com.example.bookchat.ui.adapter.userchatroomlist.UserChatRoomListDataAdapter
+import com.example.bookchat.ui.adapter.userchatroomlist.UserChatRoomListHeaderAdapter
 import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.example.bookchat.databinding.FragmentChatRoomListBinding
 import com.example.bookchat.ui.activity.ChatRoomActivity
 import com.example.bookchat.ui.activity.MakeChatRoomActivity
-import com.example.bookchat.viewmodel.ChatRoomListViewModel
-import com.example.bookchat.viewmodel.ChatRoomListViewModel.ChatRoomListUiEvent
+import com.example.bookchat.ui.viewmodel.ChatRoomListViewModel
+import com.example.bookchat.ui.viewmodel.ChatRoomListViewModel.ChatRoomListUiEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

@@ -5,7 +5,7 @@ import android.view.View
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_SWIPE
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookchat.adapter.agonyrecord.AgonyRecordDataItemAdapter
+import com.example.bookchat.ui.adapter.agonyrecord.AgonyRecordDataItemAdapter
 import kotlin.math.max
 import kotlin.math.min
 

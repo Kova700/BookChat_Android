@@ -5,14 +5,14 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.viewmodel.AgonyRecordViewModel" />
+            type="com.example.bookchat.ui.viewmodel.AgonyRecordViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.activity.AgonyRecordActivity">
 
-        <com.example.bookchat.AntiDupClickImageButton
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
             android:id="@+id/back_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_back_btn" />
 
-        <com.example.bookchat.AntiDupClickImageButton
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
             android:id="@+id/folder_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

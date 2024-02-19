@@ -3,9 +3,9 @@ package com.example.bookchat
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.bookchat.BuildConfig.KAKAO_APP_KEY
-import com.example.bookchat.api.BookChatApiInterface
-import com.example.bookchat.api.RetrofitBuilder
-import com.example.bookchat.api.StompBuilder
+import com.example.bookchat.data.api.BookChatApiInterface
+import com.example.bookchat.data.api.RetrofitBuilder
+import com.example.bookchat.data.api.StompBuilder
 import com.example.bookchat.data.User
 import com.example.bookchat.data.local.BookChatDB
 import com.example.bookchat.utils.NetworkManager

@@ -23,9 +23,9 @@ import com.example.bookchat.databinding.FragmentSearchBinding
 import com.example.bookchat.ui.activity.MakeChatRoomSelectBookActivity
 import com.example.bookchat.ui.activity.SearchTapResultDetailActivity
 import com.example.bookchat.utils.SearchPurpose
-import com.example.bookchat.viewmodel.SearchViewModel
-import com.example.bookchat.viewmodel.SearchViewModel.NecessaryDataFlagInDetail
-import com.example.bookchat.viewmodel.SearchViewModel.SearchTapStatus
+import com.example.bookchat.ui.viewmodel.SearchViewModel
+import com.example.bookchat.ui.viewmodel.SearchViewModel.NecessaryDataFlagInDetail
+import com.example.bookchat.ui.viewmodel.SearchViewModel.SearchTapStatus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject

@@ -8,7 +8,7 @@
 
         <variable
             name="viewmodel"
-            type="com.example.bookchat.viewmodel.MakeAgonyDialogViewModel" />
+            type="com.example.bookchat.ui.viewmodel.MakeAgonyDialogViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -12,9 +12,9 @@ import com.example.bookchat.databinding.ActivityMainBinding
 import com.example.bookchat.ui.fragment.*
 import com.example.bookchat.utils.RefreshManager
 import com.example.bookchat.utils.SearchPurpose
-import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.COMPLETE_TAB_INDEX
-import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.READING_TAB_INDEX
-import com.example.bookchat.viewmodel.BookShelfViewModel.Companion.WISH_TAB_INDEX
+import com.example.bookchat.ui.viewmodel.BookShelfViewModel.Companion.COMPLETE_TAB_INDEX
+import com.example.bookchat.ui.viewmodel.BookShelfViewModel.Companion.READING_TAB_INDEX
+import com.example.bookchat.ui.viewmodel.BookShelfViewModel.Companion.WISH_TAB_INDEX
 import com.google.android.material.navigation.NavigationBarView
 import dagger.hilt.android.AndroidEntryPoint
 

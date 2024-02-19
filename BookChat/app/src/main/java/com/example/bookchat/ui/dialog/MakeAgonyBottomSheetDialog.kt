@@ -10,9 +10,9 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.DialogMakeAgonyBottomSheetBinding
-import com.example.bookchat.viewmodel.AgonyViewModel
-import com.example.bookchat.viewmodel.MakeAgonyDialogViewModel
-import com.example.bookchat.viewmodel.MakeAgonyDialogViewModel.MakeAgonyUiEvent
+import com.example.bookchat.ui.viewmodel.AgonyViewModel
+import com.example.bookchat.ui.viewmodel.MakeAgonyDialogViewModel
+import com.example.bookchat.ui.viewmodel.MakeAgonyDialogViewModel.MakeAgonyUiEvent
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

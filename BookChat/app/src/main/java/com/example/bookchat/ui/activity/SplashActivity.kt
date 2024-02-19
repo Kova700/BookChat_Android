@@ -8,8 +8,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
-import com.example.bookchat.viewmodel.SplashViewModel
-import com.example.bookchat.viewmodel.SplashViewModel.SplashEvent
+import com.example.bookchat.ui.viewmodel.SplashViewModel
+import com.example.bookchat.ui.viewmodel.SplashViewModel.SplashEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

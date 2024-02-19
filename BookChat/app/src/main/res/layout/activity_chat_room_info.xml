@@ -31,7 +31,7 @@
             android:orientation="vertical"
             app:layout_constraintGuide_begin="30dp" />
 
-        <com.example.bookchat.AntiDupClickImageButton
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
             android:id="@+id/antiDupClickImageButton9"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -223,7 +223,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>
 
-        <com.example.bookchat.AntiDupClickButton
+        <com.example.bookchat.ui.customview.AntiDupClickButton
             android:id="@+id/enter_chat_room_btn"
             android:layout_width="0dp"
             android:layout_height="45dp"
