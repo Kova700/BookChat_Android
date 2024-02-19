@@ -13,7 +13,7 @@ interface TempMessageDAO {
         "SELECT * FROM TempMessage " +
                 "WHERE chat_room_id = :roomId"
     )
-    suspend fun getTempMessage(roomId: Long): TempMessageEntity
+    suspend fun getTempMessage(roomId: Long): TempMessageEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertIgnore(tempMessageEntity: TempMessageEntity): Long

@@ -1,0 +1,49 @@
+// TODO : last_chat_id 채팅방 별 읽지 않은 채팅 수 표시할 때 사용 가능(백엔드와 협의)
+@Entity(tableName = "ChatRoom")
+data class ChatRoomEntity(
+    val roomId: Long,
+    val roomSid: String,
+    val defaultRoomImageType: Int,
+    ===갱신 多 (정보 조회 API)===
+    val roomName: String,
+    val roomImageUri: String? = null,
+    =======갱신 多 (채팅)=======
+    val roomMemberCount: Long,
+    val lastChatId: Long? = null,
+    val lastActiveTime: String? = null,
+    val lastChatContent: String? = null,
+    =========로컬 옵션==========
+    val notificationFlag: Boolean = true,
+    val topPinNum: Int = 0,
+    val chatRoomStatus: ChatRoomStatus = AVAILABLE,
+    // ---------------여기까지 기본 테이블로 하고, 아래는 ChatRoomDetail테이블로 따로 빼자---------------
+    //채팅방 정보 API받으면 roomName,roomImageUri는 갱신되지만, 테이블이 분리되어있어서
+    //ChatRoomEntity만 따로 받고 (채팅방 목록은 ChatRoomEntity까지만 호출)
+    //채팅방 내부에서 ChatRoomEntity Flow도 받아서 구독하고 있어야지 채팅방 제목, 이미지 변경을 알 수 있음
+    //Detail정보는 따로 Flow만들어서 받으면 됨
+    // ---------------테이블 분리 (위에는 서버로부터 기본적으로 받는 데이터)---------------
+    // -----------------------테이블 분리(현재 정보 조회 API)-------------------------
+    ====갱신 多 (정보 조회 API)====
+    val hostId: Long? = null,
+    val subHostIds: List<Long>? = null,
+    val guestIds: List<Long>? = null,
+    val roomTags: List<String>? = null,
+    val roomCapacity: Int? = null
+    ==========================
+    val bookTitle: String? = null,
+    val bookAuthors: List<String>? = null,
+    val bookCoverImageUrl: String? = null
+) : Serializable
+
+enum class ChatRoomStatus {
+    AVAILABLE, UNAVAILABLE
+}
+
+//
+
+// TODO : -- 아래는 처음에는 안가지고 있는 데이터
+//  채팅방 들어가면 채팅방 정보조회 API 호출해서 서버로부터 가져오기
+//  성공 여부와 상관없이 요청이 끝나면 이전 채팅 로드,
+//  만약 실패했었다면, Queue에서 해당 작업이 사라지면 안됨,
+//  작업 Queue는 인터넷 재연결 Trigger를 받으면
+//  남아 있는 작업 끝내기위해서 노력하기

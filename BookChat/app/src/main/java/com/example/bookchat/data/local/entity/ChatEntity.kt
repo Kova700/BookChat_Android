@@ -19,10 +19,6 @@ data class ChatEntity(
     @ColumnInfo(name = "chat_id") val chatId: Long,
     @ColumnInfo(name = "chat_room_id") val chatRoomId: Long,
     @ColumnInfo(name = "sender_id") val senderId: Long?,
-    @ColumnInfo(name = "sender_nickname") val senderNickname: String?,
-    @ColumnInfo(name = "sender_profile_image_url") val senderProfileImageUrl: String?,
-    @ColumnInfo(name = "sender_default_profile_image_type")
-    val senderDefaultProfileImageType: UserDefaultProfileImageType?,
     @ColumnInfo(name = "dispatch_time") val dispatchTime: String,
     @ColumnInfo(name = "message") val message: String,
     @ColumnInfo(name = "chat_type") val chatType: ChatType,

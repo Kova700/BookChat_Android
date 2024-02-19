@@ -10,7 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
-import com.example.bookchat.data.UserChatRoomListItem
+import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.example.bookchat.databinding.ActivityMakeChatRoomBinding
 import com.example.bookchat.ui.fragment.ChatRoomListFragment.Companion.EXTRA_CHAT_ROOM_LIST_ITEM
 import com.example.bookchat.utils.PermissionManager
@@ -76,9 +76,9 @@ class MakeChatRoomActivity : AppCompatActivity() {
         makeChatRoomViewModel.eventFlow.collect { event -> handleEvent(event) }
     }
 
-    private fun startChatRoomActivity(chatRoomItem: UserChatRoomListItem) {
+    private fun startChatRoomActivity(chatRoomEntity: ChatRoomEntity) {
         val intent = Intent(this, ChatRoomActivity::class.java)
-        intent.putExtra(EXTRA_CHAT_ROOM_LIST_ITEM, chatRoomItem.toChatRoomEntity())
+        intent.putExtra(EXTRA_CHAT_ROOM_LIST_ITEM, chatRoomEntity)
         startActivity(intent)
         finish()
     }
@@ -87,6 +87,6 @@ class MakeChatRoomActivity : AppCompatActivity() {
         is MakeChatRoomUiEvent.MoveToBack -> finish()
         is MakeChatRoomUiEvent.MoveSelectBook -> moveToSelectBook()
         is MakeChatRoomUiEvent.OpenGallery -> startImgEdit()
-        is MakeChatRoomUiEvent.MoveToChatPage -> startChatRoomActivity(event.chatRoomItem)
+        is MakeChatRoomUiEvent.MoveToChatPage -> startChatRoomActivity(event.chatRoomEntity)
     }
 }

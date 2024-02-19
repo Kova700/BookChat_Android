@@ -16,6 +16,8 @@
     <string name="login_google_btn">구글로 시작하기</string>
     <string name="login_fast_sign_up">3초만에 빠른 회원가입</string>
     <string name="login_forbidden_user">권한이 없는 접근이거나, 차단된 사용자입니다."\n 24시간 후에 다시 시도해 주세요.</string>
+    <string name="login_device_warning_main">현재 기기로 접속하시겠습니까?</string>
+    <string name="login_device_warning_sub">이전에 접속된 기기가 있다면 \n해당 기기의 접속은 해제됩니다.</string>
 
     <!--sign up-->
     <string name="sign_up_main">북챗에서 활동할\n프로필을 설정해 주세요.</string>

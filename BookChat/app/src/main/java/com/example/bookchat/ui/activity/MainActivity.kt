@@ -37,7 +37,8 @@ class MainActivity : AppCompatActivity() {
         with(binding) {
             lifecycleOwner = this@MainActivity
         }
-
+        //여기서  if (savedInstanceState != null) return  작업을 안해줘서 Fragment가 뷰가 다시 그려질 때,
+        //겹쳐서 보이는건가 (다크모드 변경 화면 전환 외에도 onCreate()가 다시 호출되는 경우는 있음으로 지역, 언어, 입력기기 변경 등)
         setBottomNavigation()
         addOrReplaceFragment(homeFragment, FRAGMENT_TAG_HOME)
         setBackPressedDispatcher()

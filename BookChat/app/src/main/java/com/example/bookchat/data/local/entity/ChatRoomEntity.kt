@@ -3,16 +3,8 @@ package com.example.bookchat.data.local.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.bookchat.data.local.entity.ChatRoomStatus.AVAILABLE
 import java.io.Serializable
-
-//TODO :
-// 각 채팅방 별로 들어가 있는 사람들 리스트를 가지고 있고,
-// 채팅방에 들어와서 채팅방 정보 API를 통해서 채팅방에 들어와있는 사람 User정보를 받고,
-// 로컬 DB에 저장해두고, 매번 채팅방에 들어올 때마다 채팅방 UserId로 해당 유저들 정보
-// USER 테이블에서 가져오는 방식으로 수정
-// List<User> -> HashMap<UserId, User> 이런식으로 변환 후 BindingAdapter에서 매핑해서 사용
-// Key에 해당하는 Value가 없다면 "알 수 없음"같은 표시 남기기
-
 // TODO : last_chat_id 채팅방 별 읽지 않은 채팅 수 표시할 때 사용 가능(백엔드와 협의)
 @Entity(tableName = "ChatRoom")
 data class ChatRoomEntity(
@@ -28,18 +20,33 @@ data class ChatRoomEntity(
     @ColumnInfo(name = "last_chat_content") val lastChatContent: String? = null,
     @ColumnInfo(name = "notification_flag") val notificationFlag: Boolean = true,
     @ColumnInfo(name = "top_pin_num") val topPinNum: Int = 0,
-    @ColumnInfo(name = "temp_saved_message") val tempSavedMessage: String? = null,
-    // ---------------------------------------------------------------
+    @ColumnInfo(name = "chat_room_status") val chatRoomStatus: ChatRoomStatus = AVAILABLE,
+    // -----------------------테이블 분리-------------------------
     @ColumnInfo(name = "host_id") val hostId: Long? = null,
     @ColumnInfo(name = "sub_host_ids") val subHostIds: List<Long>? = null,
     @ColumnInfo(name = "guest_ids") val guestIds: List<Long>? = null,
+    //Prticipaint 형식으로 가면 여기에 참여자 정보를 안가지고 있어도 되는데
+    // Prticipaint형식으로 가면 아래 Book정보랑 태그정보를 어디다 두지,,
+    // ChatRoomDetail테이블 따로 파서 저장하려고 했는데,,
+    //그리고 채팅방 용량같은 경우는 처음부터 있어야 할 것같은 데이터인데,
+    //이걸 Detail이런곳에 넣을 순 없음.. (넣을 수 있을 것같기도 하고)
+
+    //Detail에 넣을 수 있는데,
+    //유저가 채팅방을 나가거나, 들어오거나 할때,
+    //Participaint식으로 관리하면 좀 더 관리하기가 쉽긴해,
+    //페이징 해서 가져올 수도 있기도 하고,
+    // ---------------------------------------------------------------
     @ColumnInfo(name = "book_title") val bookTitle: String? = null,
     @ColumnInfo(name = "book_authors") val bookAuthors: List<String>? = null,
     @ColumnInfo(name = "book_cover_image_url") val bookCoverImageUrl: String? = null,
+    // ---------------------------------------------------------------
     @ColumnInfo(name = "room_tags") val roomTags: List<String>? = null,
     @ColumnInfo(name = "room_capacity") val roomCapacity: Int? = null
 ) : Serializable
 
+enum class ChatRoomStatus {
+    AVAILABLE, UNAVAILABLE
+}
 // TODO : -- 아래는 처음에는 안가지고 있는 데이터
 //  채팅방 들어가면 채팅방 정보조회 API 호출해서 서버로부터 가져오기
 //  성공 여부와 상관없이 요청이 끝나면 이전 채팅 로드,

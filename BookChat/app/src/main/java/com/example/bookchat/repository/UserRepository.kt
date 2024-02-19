@@ -4,6 +4,7 @@ import com.example.bookchat.App
 import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.data.request.RequestUserSignIn
 import com.example.bookchat.data.request.RequestUserSignUp
+import com.example.bookchat.data.response.NeedToDeviceWarningException
 import com.example.bookchat.data.response.NeedToSignUpException
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.NickNameDuplicateException
@@ -13,11 +14,15 @@ import javax.inject.Inject
 
 class UserRepository @Inject constructor(){
 
-    suspend fun signIn() {
+    suspend fun signIn(approveChangingDevice: Boolean = false) {
         if(!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
         val idToken = DataStoreManager.getIdToken()
-        val requestUserSignIn = RequestUserSignIn(idToken.oAuth2Provider)
+        val fcmToken = DataStoreManager.getFCMToken()
+        val deviceID = DataStoreManager.getDeviceID()
+        val requestUserSignIn = RequestUserSignIn(
+            fcmToken, deviceID, approveChangingDevice, idToken.oAuth2Provider
+        )
 
         val response = App.instance.bookChatApiClient.signIn(idToken.token, requestUserSignIn)
         when(response.code()){
@@ -27,6 +32,7 @@ class UserRepository @Inject constructor(){
                 throw ResponseBodyEmptyException(response.errorBody()?.string())
             }
             404 ->  throw NeedToSignUpException(response.errorBody()?.string())
+            409 -> throw NeedToDeviceWarningException(response.errorBody()?.string())
             else -> throw Exception(createExceptionMessage(response.code(),response.errorBody()?.string()))
         }
     }

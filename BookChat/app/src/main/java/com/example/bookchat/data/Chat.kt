@@ -11,12 +11,6 @@ data class Chat(
     val chatId: Long,
     @SerializedName("senderId")
     val senderId: Long?,
-    @SerializedName("senderNickname")
-    val senderNickname: String?,
-    @SerializedName("senderProfileImageUrl")
-    val senderProfileImageUrl: String?,
-    @SerializedName("senderDefaultProfileImageType")
-    val senderDefaultProfileImageType: UserDefaultProfileImageType?,
     @SerializedName("dispatchTime")
     val dispatchTime: String,
     @SerializedName("message")
@@ -37,9 +31,6 @@ data class Chat(
             chatId = this.chatId,
             chatRoomId = chatRoomId,
             senderId = this.senderId,
-            senderNickname = this.senderNickname,
-            senderProfileImageUrl = this.senderProfileImageUrl,
-            senderDefaultProfileImageType = this.senderDefaultProfileImageType,
             dispatchTime = this.dispatchTime,
             message = this.message,
             chatType = getChatType()

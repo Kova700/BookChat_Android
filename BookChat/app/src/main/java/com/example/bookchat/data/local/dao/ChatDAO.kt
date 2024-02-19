@@ -4,6 +4,8 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import com.example.bookchat.App
 import com.example.bookchat.data.local.entity.ChatEntity
+import com.example.bookchat.data.local.entity.ChatRoomEntity
+import com.example.bookchat.data.local.entity.ChatWithUser
 import com.example.bookchat.utils.DateManager
 import kotlin.math.max
 
@@ -14,6 +16,12 @@ interface ChatDAO {
             "ORDER BY status, chat_id DESC")
     fun pagingSource(chatRoomId: Long): PagingSource<Int, ChatEntity>
 
+    @Transaction
+    @Query("SELECT * FROM Chat " +
+            "WHERE chat_room_id = :chatRoomId "+
+            "ORDER BY status, chat_id DESC")
+    fun getChatWithUserPagingSource(chatRoomId: Long) :PagingSource<Int, ChatWithUser>
+
     // TODO : 채팅도 ChatRoom과 마찬가지로 이미 있으면 업데이트 ,없으면 삽입으로 수정
     //  CASCADE사용하지말 것
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -21,6 +29,13 @@ interface ChatDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertChat(chat: ChatEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIgnore(chat: ChatEntity) :Long
+
+//    suspend fun insertOrUpdateAllChatRoom(chatRooms: List<ChatRoomEntity>){
+//        for (chatRoom in chatRooms) { insertOrUpdateChatRoom(chatRoom) }
+//    }
 
     @Query("UPDATE Chat SET " +
             "chat_id = :chatId, " +
@@ -52,10 +67,6 @@ interface ChatDAO {
             status = ChatEntity.ChatStatus.LOADING,
             message = message,
             chatType = ChatEntity.ChatType.Mine,
-            //--------------------삭제 예정
-            senderNickname = cachedUser.userNickname,
-            senderProfileImageUrl = cachedUser.userProfileImageUri,
-            senderDefaultProfileImageType = cachedUser.defaultProfileImageType,
         )
         return insertChat(chat)
     }

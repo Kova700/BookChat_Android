@@ -152,7 +152,8 @@
                             android:layout_width="22dp"
                             android:layout_height="22dp"
                             android:scaleType="fitXY"
-                            loadSenderProfile="@{viewmodel.newOtherChatNoticeFlow}"
+                            userProfileUrl="@{viewmodel.newOtherChatNoticeFlow.user.profileImageUrl}"
+                            userDefaultProfileImageType="@{viewmodel.newOtherChatNoticeFlow.user.defaultProfileImageType}"
                             android:src="@drawable/loading_img" />
                     </androidx.cardview.widget.CardView>
 
@@ -165,7 +166,7 @@
                         android:ellipsize="end"
                         android:fontFamily="@font/notosanskr_regular"
                         android:maxLines="1"
-                        android:text="@{viewmodel.newOtherChatNoticeFlow.senderNickname}"
+                        android:text="@{viewmodel.newOtherChatNoticeFlow.user.nickname}"
                         app:layout_constrainedWidth="true"
                         android:textColor="#A0A0A5"
                         android:textSize="12sp"
@@ -184,7 +185,7 @@
                         android:layout_marginStart="7dp"
                         app:layout_constrainedWidth="true"
                         android:maxLines="1"
-                        android:text="@{viewmodel.newOtherChatNoticeFlow.message}"
+                        android:text="@{viewmodel.newOtherChatNoticeFlow.chat.message}"
                         android:textColor="#303030"
                         android:textSize="12sp"
                         app:layout_constraintTop_toTopOf="@+id/user_profile_cardview"

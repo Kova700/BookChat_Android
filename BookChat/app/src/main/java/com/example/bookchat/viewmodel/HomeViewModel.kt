@@ -31,6 +31,8 @@ class HomeViewModel @Inject constructor(
         getRemoteUserChatRoomList()
     }
 
+    //PagingSource로 가져오는게 아닌,
+    // API로 1회 호출해서 가져오게 수정
     val readingBookResult by lazy {
         Pager(
             config = PagingConfig(
@@ -46,7 +48,8 @@ class HomeViewModel @Inject constructor(
             }.cachedIn(viewModelScope)
     }
 
-    val chatRoomFlow = database.chatRoomDAO().getActivatedChatRoomList(MAIN_CHAT_ROOM_LIST_LOAD_SIZE)
+    val chatRoomFlow =
+        database.chatRoomDAO().getActivatedChatRoomList(MAIN_CHAT_ROOM_LIST_LOAD_SIZE)
 
     private fun getRemoteUserChatRoomList() = viewModelScope.launch {
         val chatRoomList =

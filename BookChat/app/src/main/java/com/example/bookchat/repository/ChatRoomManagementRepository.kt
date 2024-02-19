@@ -62,6 +62,7 @@ class ChatRoomManagementRepository @Inject constructor() {
 
     private suspend fun saveChatRoomDataInLocalDB(roomId: Long, chatRoomInfo: RespondChatRoomInfo) {
 
+        // TODO : 채팅방 제목이 추가되어야함 (채팅방 제목 바뀌면 알 수가 없음)
         database.chatRoomDAO().updateDetailInfo(
             roomId = roomId,
             hostId = chatRoomInfo.roomHost.id,

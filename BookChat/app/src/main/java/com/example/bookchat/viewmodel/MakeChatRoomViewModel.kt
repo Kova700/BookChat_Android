@@ -7,6 +7,7 @@ import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.UserChatRoomListItem
+import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.example.bookchat.data.request.RequestMakeChatRoom
 import com.example.bookchat.repository.ChatRoomManagementRepository
 import com.example.bookchat.repository.UserChatRoomRepository
@@ -45,8 +46,17 @@ class MakeChatRoomViewModel @Inject constructor(
 
     private fun enterChatRoom(chatRoomItem: UserChatRoomListItem) = viewModelScope.launch {
         runCatching { chatRoomManagementRepository.enterChatRoom(chatRoomItem.roomId) }
-            .onSuccess { startEvent(MakeChatRoomUiEvent.MoveToChatPage(chatRoomItem)) }
+            .onSuccess { enterChatRoomSuccessCallBack(chatRoomItem.toChatRoomEntity()) }
             .onFailure { makeToast(R.string.enter_chat_room_fail) }
+    }
+
+    private fun enterChatRoomSuccessCallBack(chatRoomEntity: ChatRoomEntity) {
+        saveChatRoomInLocalDB(chatRoomEntity.copy(lastChatId = Long.MAX_VALUE))
+        startEvent(MakeChatRoomUiEvent.MoveToChatPage(chatRoomEntity))
+    }
+
+    private fun saveChatRoomInLocalDB(chatRoomEntity: ChatRoomEntity) = viewModelScope.launch {
+        App.instance.database.chatRoomDAO().insertOrUpdateChatRoom(chatRoomEntity)
     }
 
     private suspend fun makeChatRoom() = userChatRoomRepository.makeChatRoom(
@@ -123,7 +133,7 @@ class MakeChatRoomViewModel @Inject constructor(
     sealed class MakeChatRoomUiEvent {
         object MoveToBack : MakeChatRoomUiEvent()
         object MoveSelectBook : MakeChatRoomUiEvent()
-        data class MoveToChatPage(val chatRoomItem: UserChatRoomListItem) : MakeChatRoomUiEvent()
+        data class MoveToChatPage(val chatRoomEntity: ChatRoomEntity) : MakeChatRoomUiEvent()
         object OpenGallery : MakeChatRoomUiEvent()
     }
 

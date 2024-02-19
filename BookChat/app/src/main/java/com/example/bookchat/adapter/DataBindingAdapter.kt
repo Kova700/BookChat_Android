@@ -19,6 +19,7 @@ import com.example.bookchat.data.local.entity.ChatWithUser
 import com.example.bookchat.utils.*
 import com.example.bookchat.viewmodel.AgonyViewModel.AgonyActivityState
 import com.example.bookchat.viewmodel.BookReportViewModel.BookReportStatus
+import com.example.bookchat.viewmodel.LoginViewModel.LoginUiState
 import com.facebook.shimmer.ShimmerFrameLayout
 import java.util.*
 
@@ -409,6 +410,17 @@ object DataBindingAdapter {
         nowFirstItemStatus : AgonyRecordDataItemStatus
     ){
         if(nowFirstItemStatus == AgonyRecordDataItemStatus.Loading){
+            view.visibility = View.VISIBLE
+            return
+        }
+        view.visibility = View.INVISIBLE
+    }
+
+    /**Login페이지 Loading UI Visibility 설정*/
+    @JvmStatic
+    @BindingAdapter("setVisibilityLoadingUIInLogin")
+    fun setVisibilityLoadingUIInLogin(view :View, uiState:LoginUiState){
+        if (uiState == LoginUiState.Loading) {
             view.visibility = View.VISIBLE
             return
         }

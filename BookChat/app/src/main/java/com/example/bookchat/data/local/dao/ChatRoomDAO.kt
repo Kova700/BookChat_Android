@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import com.example.bookchat.data.local.entity.ChatRoomEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Dao
 interface ChatRoomDAO {
@@ -101,12 +102,4 @@ interface ChatRoomDAO {
 
     @Query("SELECT MAX(top_pin_num) FROM ChatRoom")
     suspend fun getMaxPinNum() :Int?
-
-    @Query("UPDATE ChatRoom SET " +
-            "temp_saved_message = :message " +
-            "WHERE room_id = :roomId")
-    suspend fun setTempSavedMessage(
-        roomId: Long,
-        message :String
-    )
 }

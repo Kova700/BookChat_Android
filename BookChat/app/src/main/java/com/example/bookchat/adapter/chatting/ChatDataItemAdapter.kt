@@ -3,47 +3,43 @@ package com.example.bookchat.adapter.chatting
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.data.local.entity.ChatEntity
 import com.example.bookchat.data.local.entity.ChatEntity.ChatStatus
 import com.example.bookchat.data.local.entity.ChatEntity.ChatType
-import com.example.bookchat.data.local.entity.UserEntity
+import com.example.bookchat.data.local.entity.ChatWithUser
 import com.example.bookchat.databinding.EmptyLayoutBinding
 import com.example.bookchat.databinding.ItemChattingMineBinding
 import com.example.bookchat.databinding.ItemChattingNoticeBinding
 import com.example.bookchat.databinding.ItemChattingOtherBinding
 import com.example.bookchat.utils.DateManager
 
-class ChatDataItemAdapter(var userMap: Map<Long, UserEntity>) :
-    PagingDataAdapter<ChatEntity, RecyclerView.ViewHolder>(CHAT_ITEM_COMPARATOR) {
+class ChatDataItemAdapter :
+    PagingDataAdapter<ChatWithUser, RecyclerView.ViewHolder>(CHAT_ITEM_COMPARATOR) {
 
     inner class MineChatViewHolder(val binding: ItemChattingMineBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(chat: ChatEntity, isSameDate: Boolean) {
-            binding.chat = chat
-            if (chat.status == ChatStatus.SUCCESS) binding.isSameDate = isSameDate
+        fun bind(chatWithUser: ChatWithUser, isSameDate: Boolean) {
+            binding.chatWithUser = chatWithUser
+            if (chatWithUser.chat.status == ChatStatus.SUCCESS) binding.isSameDate = isSameDate
         }
     }
 
     inner class OtherChatViewHolder(val binding: ItemChattingOtherBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(chat: ChatEntity, isSameDate: Boolean) {
-            binding.chat = chat
-            userMap[chat.senderId]?.let { binding.sender = it }
-            if (chat.status == ChatStatus.SUCCESS) binding.isSameDate = isSameDate
+        fun bind(chatWithUser: ChatWithUser, isSameDate: Boolean) {
+            binding.chatWithUser = chatWithUser
+            if (chatWithUser.chat.status == ChatStatus.SUCCESS) binding.isSameDate = isSameDate
         }
     }
 
     inner class NoticeChatViewHolder(val binding: ItemChattingNoticeBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(chat: ChatEntity, isSameDate: Boolean) {
-            binding.chat = chat
-            if (chat.status == ChatStatus.SUCCESS) binding.isSameDate = isSameDate
+        fun bind(chatWithUser: ChatWithUser, isSameDate: Boolean) {
+            binding.chatWithUser = chatWithUser
+            if (chatWithUser.chat.status == ChatStatus.SUCCESS) binding.isSameDate = isSameDate
         }
     }
 
@@ -95,11 +91,14 @@ class ChatDataItemAdapter(var userMap: Map<Long, UserEntity>) :
         val currentItem = getItem(position)
         val isSameDate = if (position != itemCount - 1) {
             val previousItem = getItem(position + 1)
-            DateManager.isSameDate(currentItem?.dispatchTime, previousItem?.dispatchTime)
+            DateManager.isSameDate(
+                currentItem?.chat?.dispatchTime,
+                previousItem?.chat?.dispatchTime
+            )
         } else false
 
         currentItem?.let {
-            when (currentItem.chatType) {
+            when (currentItem.chat.chatType) {
                 ChatType.Mine -> (holder as MineChatViewHolder).bind(currentItem, isSameDate)
                 ChatType.Other -> (holder as OtherChatViewHolder).bind(currentItem, isSameDate)
                 ChatType.Notice -> (holder as NoticeChatViewHolder).bind(currentItem, isSameDate)
@@ -110,7 +109,7 @@ class ChatDataItemAdapter(var userMap: Map<Long, UserEntity>) :
     override fun getItemViewType(position: Int): Int {
         if (position == -1 || getItem(position) == null) return R.layout.empty_layout
 
-        return when (getItem(position)?.chatType) {
+        return when (getItem(position)?.chat?.chatType) {
             ChatType.Mine -> R.layout.item_chatting_mine
             ChatType.Other -> R.layout.item_chatting_other
             ChatType.Notice -> R.layout.item_chatting_notice
@@ -119,11 +118,11 @@ class ChatDataItemAdapter(var userMap: Map<Long, UserEntity>) :
     }
 
     companion object {
-        val CHAT_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<ChatEntity>() {
-            override fun areItemsTheSame(oldItem: ChatEntity, newItem: ChatEntity) =
-                oldItem.chatId == newItem.chatId
+        val CHAT_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<ChatWithUser>() {
+            override fun areItemsTheSame(oldItem: ChatWithUser, newItem: ChatWithUser) =
+                oldItem.chat.chatId == newItem.chat.chatId
 
-            override fun areContentsTheSame(oldItem: ChatEntity, newItem: ChatEntity) =
+            override fun areContentsTheSame(oldItem: ChatWithUser, newItem: ChatWithUser) =
                 oldItem == newItem
         }
     }

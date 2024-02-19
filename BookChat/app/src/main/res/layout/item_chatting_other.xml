@@ -5,11 +5,8 @@
         <import type="android.view.View"/>
 
         <variable
-            name="chat"
-            type="com.example.bookchat.data.local.entity.ChatEntity" />
-        <variable
-            name="sender"
-            type="com.example.bookchat.data.local.entity.UserEntity" />
+            name="chatWithUser"
+            type="com.example.bookchat.data.local.entity.ChatWithUser" />
         <variable
             name="isSameDate"
             type="Boolean" />
@@ -22,7 +19,7 @@
         <include
             android:id="@+id/date_layout"
             layout="@layout/item_chatting_date"
-            app:chat = "@{chat}"
+            app:chat = "@{chatWithUser.chat}"
             android:visibility="gone"
             app:isSameDate = "@{isSameDate}"/>
 
@@ -50,8 +47,8 @@
 
                 <ImageView
                     android:id="@+id/user_profile_iv"
-                    userProfileUrl="@{sender.profileImageUrl}"
-                    userDefaultProfileImageType="@{sender.defaultProfileImageType}"
+                    userProfileUrl="@{chatWithUser.user.profileImageUrl}"
+                    userDefaultProfileImageType="@{chatWithUser.user.defaultProfileImageType}"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:scaleType="fitXY"
@@ -67,7 +64,7 @@
                 android:ellipsize="end"
                 android:fontFamily="@font/notosanskr_regular"
                 android:maxLines="1"
-                android:text="@{sender.nickname}"
+                setUserNickname="@{chatWithUser.user.nickname}"
                 android:textColor="#000000"
                 android:textSize="10sp"
                 app:layout_constrainedWidth="true"
@@ -78,7 +75,7 @@
 
             <TextView
                 android:id="@+id/chatting_time_tv"
-                getFormattedTimeText="@{chat.dispatchTime}"
+                getFormattedTimeText="@{chatWithUser.chat.dispatchTime}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
@@ -113,7 +110,7 @@
                     android:layout_height="wrap_content"
                     android:elegantTextHeight="true"
                     android:fontFamily="@font/notosanskr_regular"
-                    android:text="@{chat.message}"
+                    android:text="@{chatWithUser.chat.message}"
                     android:textColor="#303030"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"

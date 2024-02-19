@@ -4,6 +4,7 @@ import com.example.bookchat.data.local.entity.UserEntity
 import com.example.bookchat.utils.UserDefaultProfileImageType
 import com.google.gson.annotations.SerializedName
 
+// TODO : 채팅방 제목이 추가되어야함 (채팅방 제목 바뀌면 알 수가 없음)
 data class RespondChatRoomInfo(
     @SerializedName("roomSize")
     val roomCapacity: Int,

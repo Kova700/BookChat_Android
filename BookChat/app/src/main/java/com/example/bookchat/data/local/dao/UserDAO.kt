@@ -8,7 +8,7 @@ import com.example.bookchat.data.local.entity.UserEntity
 import com.example.bookchat.utils.UserDefaultProfileImageType
 
 @Dao
-interface UserDao {
+interface UserDAO {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIgnore(user: UserEntity): Long
@@ -43,4 +43,16 @@ interface UserDao {
         profileImageUrl: String?,
         defaultProfileImageType: UserDefaultProfileImageType
     )
+
+    @Query(
+        "SELECT * FROM User " +
+                "WHERE id IN (:userIdList)"
+    )
+    suspend fun getUserList(userIdList: List<Long>): List<UserEntity>
+
+    @Query(
+        "SELECT * FROM User " +
+                "WHERE id = :userId"
+    )
+    suspend fun getUser(userId: Long): UserEntity
 }

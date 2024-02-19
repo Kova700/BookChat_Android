@@ -14,7 +14,7 @@ sealed interface SocketMessage {
         @SerializedName("chatId")
         val chatId: Long,
         @SerializedName("senderId")
-        val senderId: Long?,
+        val senderId: Long,
         @SerializedName("receiptId")
         val receiptId :Long,
         @SerializedName("dispatchTime")
@@ -22,14 +22,7 @@ sealed interface SocketMessage {
         @SerializedName("message")
         val message: String,
         @SerializedName("messageType")
-        val messageType: MessageType,
-        //--------------------삭제 예정-------------------------
-        @SerializedName("senderNickname")
-        val senderNickname: String?,
-        @SerializedName("senderProfileImageUrl")
-        val senderProfileImageUrl: String?,
-        @SerializedName("senderDefaultProfileImageType")
-        val senderDefaultProfileImageType: UserDefaultProfileImageType?
+        val messageType: MessageType
     ) : SocketMessage {
 
         override fun toChatEntity(chatRoomId: Long): ChatEntity =
@@ -39,11 +32,7 @@ sealed interface SocketMessage {
                 senderId = this.senderId,
                 message = this.message,
                 chatType = getChatType(),
-                //--------------------삭제 예정-------------------------
-                senderNickname = this.senderNickname,
-                senderProfileImageUrl = this.senderProfileImageUrl,
-                senderDefaultProfileImageType = this.senderDefaultProfileImageType,
-                dispatchTime = this.dispatchTime,
+                dispatchTime = this.dispatchTime
             )
 
         private fun getChatType(): ChatType {
@@ -51,7 +40,6 @@ sealed interface SocketMessage {
 
             return when (this.senderId) {
                 myId -> ChatType.Mine
-                null -> ChatType.Notice
                 else -> ChatType.Other
             }
         }
@@ -74,9 +62,6 @@ sealed interface SocketMessage {
                 chatId = this.chatId,
                 chatRoomId = chatRoomId,
                 senderId = null,
-                senderNickname = null,
-                senderProfileImageUrl = null,
-                senderDefaultProfileImageType = null,
                 dispatchTime = this.dispatchTime,
                 message = this.message,
                 chatType = ChatType.Notice
@@ -84,6 +69,14 @@ sealed interface SocketMessage {
     }
 }
 
+//TODO : CHAT은 어차피 CommonMessage로 구분이 되니까 필요 없어보임
+// + CommonMessage에도 MessageType 필드가 필요없어보임
+// 또한 MessageType -> NoticeMessageType느낌으로 사용
+// ENTER, EXIT에도 NOTICE를 앞에 붙이거나, 아예 전부 뺴거나,
+// 채팅방 터지는경우(방장 나가는경우)에 대한 Notice도 필요함
+// NOTICE_ENTER
+// NOTICE_USER_EXIT
+// NOTICE_HOST_EXIT
 enum class MessageType {
     CHAT, ENTER, EXIT,
     NOTICE_HOST_DELEGATE,

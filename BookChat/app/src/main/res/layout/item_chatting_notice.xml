@@ -6,8 +6,8 @@
         <import type="android.view.View"/>
 
         <variable
-            name="chat"
-            type="com.example.bookchat.data.local.entity.ChatEntity" />
+            name="chatWithUser"
+            type="com.example.bookchat.data.local.entity.ChatWithUser" />
         <variable
             name="isSameDate"
             type="Boolean" />
@@ -20,7 +20,7 @@
         <include
             android:id="@+id/date_layout"
             layout="@layout/item_chatting_date"
-            app:chat = "@{chat}"
+            app:chat = "@{chatWithUser.chat}"
             android:visibility="gone"
             app:isSameDate = "@{isSameDate}"/>
 
@@ -50,7 +50,7 @@
                 android:background="@drawable/chat_notice_background"
                 android:paddingHorizontal="15dp"
                 android:paddingVertical="5dp"
-                android:text="@{chat.message}"
+                android:text="@{chatWithUser.chat.message}"
                 android:textColor="#4D4D4D"
                 android:textSize="10sp"
                 app:layout_constrainedWidth="true"
