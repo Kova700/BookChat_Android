@@ -7,31 +7,32 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.adapter.readingbookshelf.ReadingBookShelfDataAdapter
-import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.data.UserChatRoomListItem
+import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.example.bookchat.databinding.ItemChatRoomListDataBinding
 
 class UserChatRoomListDataAdapter :
-    PagingDataAdapter<UserChatRoomListItem, UserChatRoomListDataAdapter.ChatRoomItemViewHolder>(CHAT_ROOM_LIST_ITEM_COMPARATOR) {
+    PagingDataAdapter<ChatRoomEntity, UserChatRoomListDataAdapter.ChatRoomItemViewHolder>(
+        CHAT_ROOM_LIST_ITEM_COMPARATOR
+    ) {
 
-    private lateinit var bindingDataItem: ItemChatRoomListDataBinding
-    private lateinit var itemClickListener : OnItemClickListener
+    private lateinit var itemClickListener: OnItemClickListener
 
     inner class ChatRoomItemViewHolder(val binding: ItemChatRoomListDataBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(userChatRoomListItem: UserChatRoomListItem) {
-            binding.userChatRoomListItem = userChatRoomListItem
+        fun bind(chatRoomEntity: ChatRoomEntity) {
+            binding.chatRoom = chatRoomEntity
             binding.root.setOnClickListener {
-                itemClickListener.onItemClick(userChatRoomListItem)
+                itemClickListener.onItemClick(chatRoomEntity)
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatRoomItemViewHolder {
-        bindingDataItem = DataBindingUtil
-            .inflate(LayoutInflater.from(parent.context), R.layout.item_chat_room_list_data,
-                parent, false)
+        val bindingDataItem: ItemChatRoomListDataBinding = DataBindingUtil.inflate(
+            LayoutInflater.from(parent.context), R.layout.item_chat_room_list_data,
+            parent, false
+        )
         return ChatRoomItemViewHolder(bindingDataItem)
     }
 
@@ -41,7 +42,7 @@ class UserChatRoomListDataAdapter :
     }
 
     interface OnItemClickListener {
-        fun onItemClick(userChatRoomListItem : UserChatRoomListItem)
+        fun onItemClick(chatRoomEntity: ChatRoomEntity)
     }
 
     fun setItemClickListener(onItemClickListener: OnItemClickListener) {
@@ -51,11 +52,11 @@ class UserChatRoomListDataAdapter :
     override fun getItemViewType(position: Int): Int = R.layout.item_chat_room_list_data
 
     companion object {
-        val CHAT_ROOM_LIST_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<UserChatRoomListItem>() {
-            override fun areItemsTheSame(oldItem: UserChatRoomListItem, newItem: UserChatRoomListItem) =
+        val CHAT_ROOM_LIST_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<ChatRoomEntity>() {
+            override fun areItemsTheSame(oldItem: ChatRoomEntity, newItem: ChatRoomEntity) =
                 oldItem.roomId == newItem.roomId
 
-            override fun areContentsTheSame(oldItem: UserChatRoomListItem, newItem: UserChatRoomListItem) =
+            override fun areContentsTheSame(oldItem: ChatRoomEntity, newItem: ChatRoomEntity) =
                 oldItem == newItem
         }
     }

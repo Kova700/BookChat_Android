@@ -29,6 +29,12 @@ class ReadingBookTapPagingSource : PagingSource<Int, Pair<BookShelfItem, Long>>(
         }catch (e :Exception){
             return LoadResult.Error(e)
         }
+        //PagingSource에서 호출해서 서버로부터 데이터 가져오고,
+        //Room에 저장
+        //Rcv에서는 Room으로부터 PagingSource받아서 가져오는 로직,
+        //이게 Remotemadiator
+        //문제점 : 이미 가져와있는 데이터가 있으면, 해당 데이터가 맞다고 판단하고
+        //  더이상 데이터를 로드하지 않음
 
         when(response.code()){
             200 -> {

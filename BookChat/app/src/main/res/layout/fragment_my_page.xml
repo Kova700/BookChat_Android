@@ -55,7 +55,7 @@
             android:layout_height="100dp"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            app:cardCornerRadius="35dp"
+            app:cardCornerRadius="40dp"
             app:cardElevation="0dp"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
@@ -65,7 +65,8 @@
                 android:id="@+id/userProfile_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                loadUserProfile="@{user}"
+                userProfileUrl="@{user.userProfileImageUri}"
+                userDefaultProfileImageType="@{user.defaultProfileImageType}"
                 android:scaleType="fitCenter"
                 android:src="@drawable/default_profile_img1" />
         </androidx.cardview.widget.CardView>

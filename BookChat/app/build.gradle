@@ -4,6 +4,7 @@ plugins {
     id 'kotlin-kapt'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
     id 'com.google.dagger.hilt.android'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -50,6 +51,12 @@ dependencies {
     implementation "com.kakao.sdk:v2-user:2.11.0"
     // Google Login
     implementation 'com.google.android.gms:play-services-auth:20.5.0'
+    //Firebase BoM(Bill of Materials)
+    implementation platform('com.google.firebase:firebase-bom:32.0.0')
+    //Firebase Analytics
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    //Firebase FCM
+    implementation 'com.google.firebase:firebase-messaging-ktx:23.1.2'
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     // Gson converter
@@ -64,8 +71,8 @@ dependencies {
     // LiveData
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.1"
     //activity-ktx
-    implementation "androidx.fragment:fragment-ktx:1.5.6"
-    implementation 'androidx.activity:activity-ktx:1.7.0'
+    implementation "androidx.fragment:fragment-ktx:1.5.7"
+    implementation 'androidx.activity:activity-ktx:1.7.1'
     // Paging3
     implementation "androidx.paging:paging-runtime:3.1.1"
     //Image Cropper
@@ -81,6 +88,18 @@ dependencies {
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
     //Facebook.Shimmer
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
+    //krossbow-stomp
+    implementation("org.hildan.krossbow:krossbow-stomp-core:5.1.0")
+    implementation("org.hildan.krossbow:krossbow-websocket-okhttp:5.1.0")
+    //OkHttp
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
+    //Room
+    implementation "androidx.room:room-runtime:2.5.1"
+    kapt "androidx.room:room-compiler:2.5.1"
+    implementation "androidx.room:room-ktx:2.5.1"
+    implementation "androidx.room:room-paging:2.5.1"
 }
 
 kapt {

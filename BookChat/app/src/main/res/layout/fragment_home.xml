@@ -61,15 +61,13 @@
                 android:maxLines="1"
                 android:text="@{viewmodel.user.userNickname + '님'}"
                 android:ellipsize="end"
-                app:layout_constrainedWidth="true"
                 android:textColor="#222222"
                 android:textSize="20sp"
+                app:layout_constrainedWidth="true"
                 app:layout_constraintEnd_toStartOf="@+id/imageView8"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start"
-
                 app:layout_constraintTop_toBottomOf="@+id/textView5" />
-
 
             <ImageView
                 android:id="@+id/imageView8"
@@ -93,6 +91,69 @@
                 app:layout_constraintStart_toStartOf="@+id/guideline_start"
                 app:layout_constraintTop_toBottomOf="@+id/nickName_tv" />
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/empty_reading_book_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:minHeight="135dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView6" >
+
+                <TextView
+                    android:id="@+id/textView23"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:elegantTextHeight="true"
+                    android:fontFamily="@font/notosanskr_bold"
+                    android:text="@string/book_is_empty"
+                    android:textColor="#222222"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/textView44"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:elegantTextHeight="true"
+                    android:fontFamily="@font/notosanskr_regular"
+                    android:gravity="center"
+                    android:text="@string/book_is_empty_sub_text"
+                    android:textColor="#222222"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView23" />
+
+                <com.example.bookchat.AntiDupClickButton
+                    android:id="@+id/antiDupClickButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:backgroundTint="#FFFFFF"
+                    android:elegantTextHeight="true"
+                    android:fontFamily="@font/notosanskr_regular"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minWidth="75dp"
+                    android:minHeight="35dp"
+                    android:stateListAnimator="@null"
+                    android:text="@string/add"
+                    android:textColor="#5648FF"
+                    android:textSize="12sp"
+                    app:cornerRadius="30dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView44"
+                    app:strokeColor="#5648FF"
+                    app:strokeWidth="1dp" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/reading_book_rcv_main"
                 android:layout_width="0dp"
@@ -101,6 +162,13 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView6" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/reading_book_barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="reading_book_rcv_main, empty_reading_book_layout"/>
 
             <TextView
                 android:id="@+id/textView7"
@@ -113,7 +181,70 @@
                 android:textColor="#222222"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start"
-                app:layout_constraintTop_toBottomOf="@+id/reading_book_rcv_main" />
+                app:layout_constraintTop_toBottomOf="@+id/reading_book_barrier" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/empty_chat_room_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:minHeight="135dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView7">
+
+                <TextView
+                    android:id="@+id/chatroom_empty_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:elegantTextHeight="true"
+                    android:fontFamily="@font/notosanskr_bold"
+                    android:text="@string/chat_room_is_empty"
+                    android:textColor="#222222"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/chatroom_empty_tv2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:elegantTextHeight="true"
+                    android:gravity="center"
+                    android:fontFamily="@font/notosanskr_regular"
+                    android:text="@string/chat_room_is_empty_sub_text"
+                    android:textColor="#222222"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/chatroom_empty_tv" />
+
+                <com.example.bookchat.AntiDupClickButton
+                    android:id="@+id/chat_room_add_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:backgroundTint="#FFFFFF"
+                    android:elegantTextHeight="true"
+                    android:fontFamily="@font/notosanskr_regular"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minWidth="75dp"
+                    android:minHeight="35dp"
+                    android:stateListAnimator="@null"
+                    android:text="@string/add"
+                    android:textColor="#5648FF"
+                    android:textSize="12sp"
+                    app:cornerRadius="30dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/chatroom_empty_tv2"
+                    app:strokeColor="#5648FF"
+                    app:strokeWidth="1dp" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/chat_room_user_in_rcv"

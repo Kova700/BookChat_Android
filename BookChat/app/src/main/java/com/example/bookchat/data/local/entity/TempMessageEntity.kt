@@ -1,0 +1,20 @@
+package com.example.bookchat.data.local.entity
+
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
+
+@Entity(
+    tableName = "TempMessage", foreignKeys = [ForeignKey(
+        entity = ChatRoomEntity::class,
+        parentColumns = arrayOf("room_id"),
+        childColumns = arrayOf("chat_room_id"),
+        onDelete = ForeignKey.CASCADE,
+    )]
+)
+data class TempMessageEntity(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "chat_room_id") val chatRoomId: Long,
+    @ColumnInfo(name = "message") val message: String,
+)

@@ -10,13 +10,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
-import com.example.bookchat.data.SearchChatRoomListItem
+import com.example.bookchat.data.WholeChatRoomListItem
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseGetBookSearch
-import com.example.bookchat.data.response.ResponseGetSearchChatRoomList
-import com.example.bookchat.paging.TestPagingDataSource
+import com.example.bookchat.data.response.ResponseGetWholeChatRoomList
 import com.example.bookchat.repository.BookRepository
-import com.example.bookchat.repository.ChatRoomRepository
+import com.example.bookchat.repository.WholeChatRoomRepository
 import com.example.bookchat.utils.ChatSearchFilter
 import com.example.bookchat.utils.DataStoreManager
 import com.example.bookchat.utils.SearchPurpose
@@ -29,7 +28,7 @@ import java.io.Serializable
 
 class SearchViewModel @AssistedInject constructor(
     private val bookRepository: BookRepository,
-    private val chatRoomRepository: ChatRoomRepository,
+    private val wholeChatRoomRepository: WholeChatRoomRepository,
     @Assisted val searchPurpose: SearchPurpose
 ) : ViewModel() {
 
@@ -37,12 +36,12 @@ class SearchViewModel @AssistedInject constructor(
     val searchKeyWord = MutableStateFlow<String>("")
 
     var simpleBookSearchResult = MutableStateFlow<List<Book>>(listOf())
-    var simpleChatRoomSearchResult = MutableStateFlow<List<SearchChatRoomListItem>>(listOf())
+    var simpleChatRoomSearchResult = MutableStateFlow<List<WholeChatRoomListItem>>(listOf())
     var previousSearchKeyword = ""
 
     val bookResultState = MutableStateFlow<SearchState>(SearchState.Loading)
     val chatResultState = MutableStateFlow<SearchState>(SearchState.Loading)
-    val chatSearchFilter = MutableStateFlow<ChatSearchFilter>(ChatSearchFilter.BOOK_TITLE)
+    val chatSearchFilter = MutableStateFlow<ChatSearchFilter>(ChatSearchFilter.ROOM_NAME)
 
     val editTextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -125,19 +124,19 @@ class SearchViewModel @AssistedInject constructor(
     private fun simpleSearchChatRoom(keyword: String) = viewModelScope.launch {
         chatResultState.value = SearchState.Loading
         searchTapStatus.value = SearchTapStatus.Result
-        runCatching { chatRoomRepository.simpleSearchChatRooms(keyword, chatSearchFilter.value) }
+        runCatching { wholeChatRoomRepository.getWholeChatRoomList(keyword, chatSearchFilter.value) }
             .onSuccess { searchChatRoomsSuccessCallBack(it, keyword) }
             .onFailure { failHandler(it) }
     }
 
     private suspend fun searchChatRoomsSuccessCallBack(
-        respond: ResponseGetSearchChatRoomList,
+        respond: ResponseGetWholeChatRoomList,
         keyword: String
     ) {
         delay(SKELETON_DURATION)
         //TestPagingDataSource 부분 채팅방 검색 API 수정시 삭제 예정
-        simpleChatRoomSearchResult.value = TestPagingDataSource.getSearchChatRoomData().chatRoomList
-//        simpleChatRoomSearchResult.value = respond.chatRoomList
+//        simpleChatRoomSearchResult.value = TestPagingDataSource.getSearchChatRoomData().chatRoomList
+        simpleChatRoomSearchResult.value = respond.chatRoomList
         previousSearchKeyword = keyword
         if (simpleChatRoomSearchResult.value.isEmpty()) {
             chatResultState.value = SearchState.EmptyResult

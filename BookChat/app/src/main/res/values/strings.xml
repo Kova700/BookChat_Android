@@ -2,6 +2,7 @@
     <string name="app_name">BookChat</string>
     <!--error-->
     <string name="error_network">네트워크가 연결되어 있지 않습니다.\n네트워크를 연결해주세요.</string>
+    <string name="error_network_error">네트워크가 불안정합니다.\n계속해서 문제가 발생하는 경우 문의를 부탁드립니다.</string>
     <string name="error_kakao_login">카카오 로그인에 문제가 발생하였습니다. 잠시 후 다시 시도해 주세요.</string>
     <string name="error_else">일시적인 현상이거나 네트워크 문제일 수 있으니,\n잠시 후 다시 시도해 주세요.\n계속해서 문제가 발생하는 경우 문의를 부탁드립니다.</string>
 
@@ -15,6 +16,8 @@
     <string name="login_google_btn">구글로 시작하기</string>
     <string name="login_fast_sign_up">3초만에 빠른 회원가입</string>
     <string name="login_forbidden_user">권한이 없는 접근이거나, 차단된 사용자입니다."\n 24시간 후에 다시 시도해 주세요.</string>
+    <string name="login_device_warning_main">현재 기기로 접속하시겠습니까?</string>
+    <string name="login_device_warning_sub">이전에 접속된 기기가 있다면 \n해당 기기의 접속은 해제됩니다.</string>
 
     <!--sign up-->
     <string name="sign_up_main">북챗에서 활동할\n프로필을 설정해 주세요.</string>
@@ -48,6 +51,10 @@
     <string name="main_hello">안녕하세요</string>
     <string name="main_book">독서 중인 도서</string>
     <string name="main_chat">참여 중인 채팅방</string>
+    <string name="book_is_empty">도서가 없어요!</string>
+    <string name="book_is_empty_sub_text">새로운 도서를 추가하고\n북챗을 사용해 보세요.</string>
+    <string name="chat_room_is_empty">채팅방이 없어요!</string>
+    <string name="chat_room_is_empty_sub_text">새로운 채팅방을 추가하고\n북챗을 나눠보세요.</string>
 
     <!--bookshelf-->
     <string name="bookshelf">서재</string>
@@ -120,7 +127,7 @@
     <string name="agony_record_delete_success">고민기록이 삭제되었습니다.</string>
     <string name="agony_record_delete_fail">고민기록 삭제를 실패했습니다.</string>
 
-    <!--chat-->
+    <!--make chat room-->
     <string name="chat">채팅</string>
     <string name="chat_room">채팅방</string>
     <string name="my_chat_room">나의 채팅방</string>
@@ -130,6 +137,7 @@
     <string name="make_chat_room_tag_hint">#해시태그로 채팅방을 소개해 주세요.</string>
     <string name="make_chat_room_book_select">도서 선택</string>
     <string name="make_chat_room_fail">채팅방 생성을 실패했습니다.</string>
+    <string name="enter_chat_room_fail">채팅방 입장에 실패했습니다.</string>
 
     <!--my page-->
     <string name="my_page_title">나의 정보</string>
@@ -152,6 +160,10 @@
     <!--user setting-->
     <string name="sign_out">로그아웃</string>
     <string name="withdraw">회원탈퇴</string>
+
+    <!--chat room-->
+    <string name="chat_room_send_message">메시지 보내기</string>
+    <string name="enter">입장</string>
 
     <!--util-->
     <string name="confirm">확인</string>

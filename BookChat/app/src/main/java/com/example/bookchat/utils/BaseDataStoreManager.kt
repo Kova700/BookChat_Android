@@ -32,7 +32,7 @@ open class BaseDataStoreManager {
 
     fun getDataFlow(): Flow<Preferences> {
         return App.instance.applicationContext.dataStore.data
-            .catch { exception -> if (exception is IOException) emit(emptyPreferences()) }
+            .catch { emit(emptyPreferences()) }
     }
 
     companion object{

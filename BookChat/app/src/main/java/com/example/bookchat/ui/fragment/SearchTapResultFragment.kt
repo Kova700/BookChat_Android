@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,8 +16,9 @@ import com.example.bookchat.adapter.search.booksearch.SearchResultBookDummyAdapt
 import com.example.bookchat.adapter.search.booksearch.SearchResultBookSimpleDataAdapter
 import com.example.bookchat.adapter.search.chatroomsearch.SearchChatRoomSimpleAdapter
 import com.example.bookchat.data.Book
-import com.example.bookchat.data.SearchChatRoomListItem
+import com.example.bookchat.data.WholeChatRoomListItem
 import com.example.bookchat.databinding.FragmentSearchTapResultBinding
+import com.example.bookchat.ui.activity.ChatRoomInfoActivity
 import com.example.bookchat.ui.dialog.MakeChatRoomSelectBookDialog
 import com.example.bookchat.ui.dialog.SearchTapBookDialog
 import com.example.bookchat.utils.BookImgSizeManager
@@ -90,8 +92,10 @@ class SearchTapResultFragment : Fragment() {
 
     private fun initSearchResultChatRoomAdapter() {
         val chatRoomItemClickListener = object : SearchChatRoomSimpleAdapter.OnItemClickListener {
-            override fun onItemClick(searchChatRoomListItem: SearchChatRoomListItem) {
-                //채팅방 소개 페이지로 이동 (입장 가능)
+            override fun onItemClick(wholeChatRoomListItem: WholeChatRoomListItem) {
+                val intent = Intent(requireContext(), ChatRoomInfoActivity::class.java)
+                intent.putExtra(EXTRA_CLICKED_CHAT_ROOM_ITEM,wholeChatRoomListItem)
+                startActivity(intent)
             }
         }
         searchChatRoomSimpleAdapter = SearchChatRoomSimpleAdapter()
@@ -151,5 +155,6 @@ class SearchTapResultFragment : Fragment() {
     companion object {
         const val DIALOG_TAG_SEARCH_BOOK = "SearchTapBookDialog"
         const val DIALOG_TAG_SELECT_BOOK = "MakeChatRoomSelectBookDialog"
+        const val EXTRA_CLICKED_CHAT_ROOM_ITEM = "EXTRA_CLICKED_CHAT_ROOM_ITEM"
     }
 }

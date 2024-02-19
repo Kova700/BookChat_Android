@@ -7,11 +7,11 @@ import com.example.bookchat.utils.BookSearchSortOption
 import com.example.bookchat.utils.BookSearchSortOption.ACCURACY
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.utils.SearchSortOption
+import com.example.bookchat.utils.SearchSortOption.ID_DESC
 import com.example.bookchat.utils.SearchSortOption.UPDATED_AT_DESC
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
-import retrofit2.http.Header
 
 interface BookChatApiInterface {
     //API 테스트
@@ -121,9 +121,9 @@ interface BookChatApiInterface {
     @GET("/v1/api/bookshelves/{bookShelfId}/agonies")
     suspend fun getAgony(
         @Path("bookShelfId") bookShelfId: Long,
-        @Query("size") size: String,
+        @Query("size") size: Int,
         @Query("sort") sort: SearchSortOption,
-        @Query("postCursorId") postCursorId: Int?,
+        @Query("postCursorId") postCursorId: Long?,
     ): Response<ResponseGetAgony>
 
     @DELETE("/v1/api/bookshelves/{bookShelfId}/agonies/{bookIdListString}")
@@ -152,8 +152,8 @@ interface BookChatApiInterface {
     suspend fun getAgonyRecord(
         @Path("bookShelfId") bookShelfId: Long,
         @Path("agonyId") agonyId: Long,
-        @Query("postCursorId") postCursorId: Int?,
-        @Query("size") size: String,
+        @Query("postCursorId") postCursorId: Long?,
+        @Query("size") size: Int,
         @Query("sort") sort: SearchSortOption
     ): Response<ResponseGetAgonyRecord>
 
@@ -172,12 +172,12 @@ interface BookChatApiInterface {
         @Body requestReviseAgonyRecord: RequestReviseAgonyRecord
     ): Response<Unit>
 
-    /**------------채팅방 목록------------*/
+    /**------------채팅방------------*/
 
     @GET("/v1/api/users/chatrooms")
     suspend fun getUserChatRoomList(
-        @Query("postCursorId") postCursorId: Int?,
-        @Query("size") size: String,
+        @Query("postCursorId") postCursorId: Long?,
+        @Query("size") size: Int,
     ): Response<ResponseGetUserChatRoomList>
 
     @Multipart
@@ -187,13 +187,38 @@ interface BookChatApiInterface {
         @Part chatRoomImage: MultipartBody.Part? = null
     ): Response<Unit>
 
+    @POST("/v1/api/enter/chatrooms/{roomId}")
+    suspend fun enterChatRoom(
+        @Path("roomId") roomId: Long
+    ): Response<Unit>
+
+    @DELETE("/v1/api/leave/chatrooms/{roomId}")
+    suspend fun leaveChatRoom(
+        @Path("roomId") roomId: Long
+    ): Response<Unit>
+
     @GET("/v1/api/chatrooms")
-    suspend fun searchChatRoom(
-        @Query("postCursorId") postCursorId: Int?,
-        @Query("size") size: String?,
+    suspend fun getWholeChatRoomList(
+        @Query("postCursorId") postCursorId: Long?,
+        @Query("size") size: Int,
         @Query("roomName") roomName: String?,
         @Query("title") title: String?,
         @Query("isbn") isbn: String?,
         @Query("tags") tags: String?,
-    ): Response<ResponseGetSearchChatRoomList>
+    ): Response<ResponseGetWholeChatRoomList>
+
+    @GET("/v1/api/chatrooms/{roomId}")
+    suspend fun getChatRoomInfo(
+        @Path("roomId") roomId: Long
+    ): Response<RespondChatRoomInfo>
+
+    /**------------채팅내역------------*/
+
+    @GET("/v1/api/chatrooms/{roomId}/chats")
+    suspend fun getChat(
+        @Path("roomId") roomId: Long,
+        @Query("size") size: Int,
+        @Query("postCursorId") postCursorId: Long?,
+        @Query("sort") sort: SearchSortOption = ID_DESC,
+    ): Response<RespondGetChat>
 }

@@ -80,7 +80,8 @@
                     android:id="@+id/userProfile_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    loadUserProfile="@{viewmodel.cachedUser}"
+                    userProfileUrl="@{viewmodel.cachedUser.userProfileImageUri}"
+                    userDefaultProfileImageType="@{viewmodel.cachedUser.defaultProfileImageType}"
                     loadByteArray="@{viewmodel.newProfileImage}"
                     android:scaleType="fitCenter"
                     android:src="@drawable/default_profile_img1" />

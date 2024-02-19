@@ -4,12 +4,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <variable
-            name="loginType"
-            type="com.example.bookchat.utils.OAuth2Provider" />
+        <import type="android.view.View"/>
+        <import type="com.example.bookchat.viewmodel.LoginViewModel.LoginUiState"/>
         <variable
             name="activity"
             type="com.example.bookchat.ui.activity.LoginActivity" />
+        <variable
+            name="viewmodel"
+            type="com.example.bookchat.viewmodel.LoginViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -29,6 +31,16 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.276"
             app:srcCompat="@drawable/ic_bookchat_logo" />
+
+        <ProgressBar
+            android:id="@+id/progressbar1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            setVisibilityLoadingUIInLogin="@{viewmodel.uiStateFlow}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textView"

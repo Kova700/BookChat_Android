@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
             android:fontFamily="@font/notosanskr_bold"
-            android:text="@{viewmodel.headerTitle}"
+            android:text="@{viewmodel.getHeaderTitle()}"
             android:textColor="#222222"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="@+id/back_btn"

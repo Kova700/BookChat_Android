@@ -4,6 +4,8 @@ import com.example.bookchat.utils.UserDefaultProfileImageType
 import com.google.gson.annotations.SerializedName
 
 data class User(
+    @SerializedName("userId")
+    val userId : Long,
     @SerializedName("userNickname")
     val userNickname: String,
     @SerializedName("userEmail")

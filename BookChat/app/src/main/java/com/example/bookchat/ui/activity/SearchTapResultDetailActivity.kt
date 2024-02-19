@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +13,7 @@ import com.example.bookchat.adapter.search.booksearch.SearchResultBookDetailData
 import com.example.bookchat.adapter.search.booksearch.SearchResultBookDummyAdapter
 import com.example.bookchat.adapter.search.chatroomsearch.SearchChatRoomDetailAdapter
 import com.example.bookchat.data.Book
-import com.example.bookchat.data.SearchChatRoomListItem
+import com.example.bookchat.data.WholeChatRoomListItem
 import com.example.bookchat.databinding.ActivitySearchTapResultDetailBinding
 import com.example.bookchat.ui.dialog.MakeChatRoomSelectBookDialog
 import com.example.bookchat.ui.dialog.SearchTapBookDialog
@@ -75,13 +76,14 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun initRcvAdapter(){
+    private fun initRcvAdapter() {
         when (necessaryDataFlag) {
             is NecessaryDataFlagInDetail.Book -> initBookRcvAdapter()
             is NecessaryDataFlagInDetail.ChatRoom -> initChatRcvAdapter()
         }
     }
-    private fun initRcv(){
+
+    private fun initRcv() {
         when (necessaryDataFlag) {
             is NecessaryDataFlagInDetail.Book -> initBookRcv()
             is NecessaryDataFlagInDetail.ChatRoom -> initChatRoomtRcv()
@@ -146,8 +148,13 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
 
     private fun initChatRcvAdapter() {
         val chatRoomItemClickListener = object : SearchChatRoomDetailAdapter.OnItemClickListener {
-            override fun onItemClick(searchChatRoomListItem: SearchChatRoomListItem) {
-                //채팅방 소개 페이지로 이동 (입장 가능)
+            override fun onItemClick(wholeChatRoomListItem: WholeChatRoomListItem) {
+                val intent = Intent(
+                    this@SearchTapResultDetailActivity,
+                    ChatRoomInfoActivity::class.java
+                )
+                intent.putExtra(EXTRA_CLICKED_CHAT_ROOM_ITEM, wholeChatRoomListItem)
+                startActivity(intent)
             }
         }
         searchChatRoomDetailAdapter = SearchChatRoomDetailAdapter()
@@ -216,5 +223,6 @@ class SearchTapResultDetailActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_SELECTED_BOOK = "SELECTED_BOOK"
+        const val EXTRA_CLICKED_CHAT_ROOM_ITEM = "EXTRA_CLICKED_CHAT_ROOM_ITEM"
     }
 }

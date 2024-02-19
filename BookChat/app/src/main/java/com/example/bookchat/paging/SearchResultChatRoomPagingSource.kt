@@ -3,12 +3,12 @@ package com.example.bookchat.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.bookchat.App
-import com.example.bookchat.data.SearchChatRoomListItem
-import com.example.bookchat.data.request.RequestSearchChatRoom
+import com.example.bookchat.data.WholeChatRoomListItem
 import com.example.bookchat.data.response.CursorMeta
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseBodyEmptyException
-import com.example.bookchat.data.response.ResponseGetSearchChatRoomList
+import com.example.bookchat.data.response.ResponseGetWholeChatRoomList
+import com.example.bookchat.repository.WholeChatRoomRepository
 import com.example.bookchat.utils.ChatSearchFilter
 import retrofit2.Response
 
@@ -16,21 +16,22 @@ class SearchResultChatRoomPagingSource(
     private val keyword: String,
     private val chatSearchFilter: ChatSearchFilter
 ) :
-    PagingSource<Int, SearchChatRoomListItem>() {
+    PagingSource<Long, WholeChatRoomListItem>() {
 
-    private lateinit var response: Response<ResponseGetSearchChatRoomList>
+    private lateinit var response: Response<ResponseGetWholeChatRoomList>
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, SearchChatRoomListItem> {
+    override suspend fun load(params: LoadParams<Long>): LoadResult<Long, WholeChatRoomListItem> {
         if (!isNetworkConnected()) return LoadResult.Error(NetworkIsNotConnectedException())
 
-        val requestSearchChatRoom = getSimpleSearchChatRoomsRequest(
-            params.key,
-            params.loadSize.toString(),
-            keyword,
-            chatSearchFilter
+        val requestSearchChatRoom = WholeChatRoomRepository.getRequestGetWholeChatRoomList(
+            postCursorId = params.key,
+            size = params.loadSize,
+            keyword = keyword,
+            chatSearchFilter = chatSearchFilter
         )
+
         try {
-            response = App.instance.bookChatApiClient.searchChatRoom(
+            response = App.instance.bookChatApiClient.getWholeChatRoomList(
                 postCursorId = requestSearchChatRoom.postCursorId,
                 size = requestSearchChatRoom.size,
                 roomName = requestSearchChatRoom.roomName,
@@ -63,13 +64,13 @@ class SearchResultChatRoomPagingSource(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, SearchChatRoomListItem>): Int? =
+    override fun getRefreshKey(state: PagingState<Long, WholeChatRoomListItem>): Long? =
         STARTING_PAGE_INDEX
 
     private fun getLoadResult(
-        data: List<SearchChatRoomListItem>,
+        data: List<WholeChatRoomListItem>,
         cursorMeta: CursorMeta,
-    ): LoadResult<Int, SearchChatRoomListItem> {
+    ): LoadResult<Long, WholeChatRoomListItem> {
         return LoadResult.Page(
             data = data,
             prevKey = getPrevKey(cursorMeta),
@@ -77,30 +78,12 @@ class SearchResultChatRoomPagingSource(
         )
     }
 
-    private fun getPrevKey(cursorMeta: CursorMeta): Int? =
+    private fun getPrevKey(cursorMeta: CursorMeta): Long? =
         if (cursorMeta.first) null else cursorMeta.nextCursorId
 
-    private fun getNextKey(cursorMeta: CursorMeta): Int? {
+    private fun getNextKey(cursorMeta: CursorMeta): Long? {
         if (cursorMeta.last) return null
         return if (cursorMeta.first) cursorMeta.nextCursorId + 2 else cursorMeta.nextCursorId
-    }
-
-    private fun getSimpleSearchChatRoomsRequest(
-        postCursorId: Int?,
-        size: String,
-        keyword: String,
-        chatSearchFilter: ChatSearchFilter
-    ): RequestSearchChatRoom {
-        val requestSearchChatRoom = RequestSearchChatRoom(
-            postCursorId = postCursorId,
-            size = size
-        )
-        return when (chatSearchFilter) {
-            ChatSearchFilter.ROOM_NAME -> requestSearchChatRoom.copy(roomName = keyword)
-            ChatSearchFilter.BOOK_TITLE -> requestSearchChatRoom.copy(title = keyword)
-            ChatSearchFilter.BOOK_ISBN -> requestSearchChatRoom.copy(isbn = keyword)
-            ChatSearchFilter.ROOM_TAGS -> requestSearchChatRoom.copy(tags = keyword)
-        }
     }
 
     private fun createExceptionMessage(responseCode: Int, responseErrorBody: String?): String {

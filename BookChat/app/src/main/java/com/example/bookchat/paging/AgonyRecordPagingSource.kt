@@ -21,10 +21,10 @@ class AgonyRecordPagingSource(
     private val agony: Agony,
     private val book: BookShelfItem,
     private val sortOption: SearchSortOption
-    ) : PagingSource<Int, AgonyRecord>() {
+    ) : PagingSource<Long, AgonyRecord>() {
     private lateinit var response : Response<ResponseGetAgonyRecord>
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, AgonyRecord> {
+    override suspend fun load(params: LoadParams<Long>): LoadResult<Long, AgonyRecord> {
         if(!isNetworkConnected()) return LoadResult.Error(NetworkIsNotConnectedException())
 
         val page = params.key ?: getFirstIndex(sortOption)
@@ -34,7 +34,7 @@ class AgonyRecordPagingSource(
                 bookShelfId = book.bookShelfId,
                 agonyId = agony.agonyId,
                 postCursorId = page,
-                size = params.loadSize.toString(),
+                size = params.loadSize,
                 sort = sortOption
             )
         }catch (e :Exception){
@@ -59,7 +59,7 @@ class AgonyRecordPagingSource(
         data :List<AgonyRecord>,
         cursorMeta: CursorMeta,
         sortOption: SearchSortOption
-    ): LoadResult<Int, AgonyRecord>{
+    ): LoadResult<Long, AgonyRecord>{
         return try {
             LoadResult.Page(
                 data = data,
@@ -74,7 +74,7 @@ class AgonyRecordPagingSource(
     private fun getNextKey(
         cursorMeta: CursorMeta,
         sortOption: SearchSortOption
-    ) :Int?{
+    ) :Long?{
         if (cursorMeta.last) return null
 
         return when (sortOption) {
@@ -90,14 +90,14 @@ class AgonyRecordPagingSource(
         }
     }
 
-    private fun getPrevKey(cursorMeta: CursorMeta): Int? =
+    private fun getPrevKey(cursorMeta: CursorMeta): Long? =
         if (cursorMeta.first) null else cursorMeta.nextCursorId
 
-    override fun getRefreshKey(state: PagingState<Int, AgonyRecord>): Int? {
+    override fun getRefreshKey(state: PagingState<Long, AgonyRecord>): Long? {
         return getFirstIndex(sortOption)
     }
 
-    private fun getFirstIndex(sortOption: SearchSortOption): Int? {
+    private fun getFirstIndex(sortOption: SearchSortOption): Long? {
         return when (sortOption) {
             ID_DESC,
             UPDATED_AT_DESC -> null

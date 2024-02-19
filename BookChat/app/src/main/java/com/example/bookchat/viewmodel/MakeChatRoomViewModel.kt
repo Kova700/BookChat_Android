@@ -6,14 +6,17 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
+import com.example.bookchat.data.UserChatRoomListItem
+import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.example.bookchat.data.request.RequestMakeChatRoom
-import com.example.bookchat.repository.ChatRoomRepository
+import com.example.bookchat.repository.ChatRoomManagementRepository
+import com.example.bookchat.repository.UserChatRoomRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.util.*
@@ -21,7 +24,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MakeChatRoomViewModel @Inject constructor(
-    private val chatRoomRepository: ChatRoomRepository
+    private val userChatRoomRepository: UserChatRoomRepository,
+    private val chatRoomManagementRepository: ChatRoomManagementRepository
 ) : ViewModel() {
 
     private val _eventFlow = MutableSharedFlow<MakeChatRoomUiEvent>()
@@ -36,16 +40,28 @@ class MakeChatRoomViewModel @Inject constructor(
     fun requestMakeChatRoom() = viewModelScope.launch {
         if (!isPossibleMakeChatRoom()) return@launch
         runCatching { makeChatRoom() }
-            .onSuccess { startEvent(MakeChatRoomUiEvent.MoveToChatPage) }
+            .onSuccess { enterChatRoom(it) }
             .onFailure { makeToast(R.string.make_chat_room_fail) }
     }
 
-    private suspend fun makeChatRoom() {
-        chatRoomRepository.makeChatRoom(
-            getRequestMakeChatRoom(),
-            getMultiPartBody(chatRoomProfileImage.value)
-        )
+    private fun enterChatRoom(chatRoomItem: UserChatRoomListItem) = viewModelScope.launch {
+        runCatching { chatRoomManagementRepository.enterChatRoom(chatRoomItem.roomId) }
+            .onSuccess { enterChatRoomSuccessCallBack(chatRoomItem.toChatRoomEntity()) }
+            .onFailure { makeToast(R.string.enter_chat_room_fail) }
     }
+
+    private fun enterChatRoomSuccessCallBack(chatRoomEntity: ChatRoomEntity) {
+        saveChatRoomInLocalDB(chatRoomEntity.copy(lastChatId = Long.MAX_VALUE))
+        startEvent(MakeChatRoomUiEvent.MoveToChatPage(chatRoomEntity))
+    }
+
+    private fun saveChatRoomInLocalDB(chatRoomEntity: ChatRoomEntity) = viewModelScope.launch {
+        App.instance.database.chatRoomDAO().insertOrUpdateChatRoom(chatRoomEntity)
+    }
+
+    private suspend fun makeChatRoom() = userChatRoomRepository.makeChatRoom(
+        getRequestMakeChatRoom(), getMultiPartBody(chatRoomProfileImage.value)
+    )
 
     fun clickDeleteTextBtn() {
         chatRoomTitle.value = ""
@@ -89,7 +105,8 @@ class MakeChatRoomViewModel @Inject constructor(
     }
 
     private fun getHashTags(): List<String> =
-        chatRoomTag.value.replace("#", "").trim().split(" ")
+        chatRoomTag.value.split(" ").filter { it.isNotBlank() }
+            .map { it.split("#") }.flatten().filter { it.isNotBlank() }
 
     private fun getMultiPartBody(bitmapByteArray: ByteArray): MultipartBody.Part? {
         if (bitmapByteArray.isEmpty()) return null
@@ -102,7 +119,7 @@ class MakeChatRoomViewModel @Inject constructor(
     }
 
     private fun byteArrayToRequestBody(byteArray: ByteArray): RequestBody {
-        return RequestBody.create(MediaType.parse(CONTENT_TYPE_IMAGE_WEBP), byteArray)
+        return RequestBody.create(CONTENT_TYPE_IMAGE_WEBP.toMediaTypeOrNull(), byteArray)
     }
 
     private fun makeToast(stringId: Int) {
@@ -116,7 +133,7 @@ class MakeChatRoomViewModel @Inject constructor(
     sealed class MakeChatRoomUiEvent {
         object MoveToBack : MakeChatRoomUiEvent()
         object MoveSelectBook : MakeChatRoomUiEvent()
-        object MoveToChatPage : MakeChatRoomUiEvent()
+        data class MoveToChatPage(val chatRoomEntity: ChatRoomEntity) : MakeChatRoomUiEvent()
         object OpenGallery : MakeChatRoomUiEvent()
     }
 

@@ -37,9 +37,10 @@ class MainActivity : AppCompatActivity() {
         with(binding) {
             lifecycleOwner = this@MainActivity
         }
-
+        //여기서  if (savedInstanceState != null) return  작업을 안해줘서 Fragment가 뷰가 다시 그려질 때,
+        //겹쳐서 보이는건가 (다크모드 변경 화면 전환 외에도 onCreate()가 다시 호출되는 경우는 있음으로 지역, 언어, 입력기기 변경 등)
         setBottomNavigation()
-        addFragment(homeFragment, FRAGMENT_TAG_HOME)
+        addOrReplaceFragment(homeFragment, FRAGMENT_TAG_HOME)
         setBackPressedDispatcher()
     }
 
@@ -76,25 +77,26 @@ class MainActivity : AppCompatActivity() {
         addFragment(newFragment, tag)
     }
 
-    private fun refreshBookShelf(){
-        with(bookShelfFragment.pagerAdapter){
-            val bookshelfRefreshFlag = RefreshManager.bookShelfRefreshList.removeFirstOrNull() ?: return
-            when(bookshelfRefreshFlag){
+    private fun refreshBookShelf() {
+        with(bookShelfFragment.pagerAdapter) {
+            val bookshelfRefreshFlag =
+                RefreshManager.bookShelfRefreshList.removeFirstOrNull() ?: return
+            when (bookshelfRefreshFlag) {
                 RefreshManager.BookShelfRefreshFlag.Wish -> {
                     bookShelfFragment.changeTab(WISH_TAB_INDEX)
-                    if(bookShelfFragment.bookShelfViewModel.isWishBookLoaded){
+                    if (bookShelfFragment.bookShelfViewModel.isWishBookLoaded) {
                         wishBookBookShelfFragment.wishBookShelfDataAdapter.refresh()
                     }
                 }
                 RefreshManager.BookShelfRefreshFlag.Reading -> {
                     bookShelfFragment.changeTab(READING_TAB_INDEX)
-                    if(bookShelfFragment.bookShelfViewModel.isReadingBookLoaded){
+                    if (bookShelfFragment.bookShelfViewModel.isReadingBookLoaded) {
                         readingBookShelfFragment.readingBookShelfDataAdapter.refresh()
                     }
                 }
                 RefreshManager.BookShelfRefreshFlag.Complete -> {
                     bookShelfFragment.changeTab(COMPLETE_TAB_INDEX)
-                    if(bookShelfFragment.bookShelfViewModel.isCompleteBookLoaded){
+                    if (bookShelfFragment.bookShelfViewModel.isCompleteBookLoaded) {
                         completeBookShelfFragment.completeBookShelfDataAdapter.refresh()
                     }
                 }
@@ -195,7 +197,7 @@ class MainActivity : AppCompatActivity() {
     private fun setBackPressedDispatcher() {
         onBackPressedDispatcher.addCallback {
             val nowInflatedBtmNaviFgmt = getInflatedBottomNaviFragment(getInflatedFragmentList())
-            if (nowInflatedBtmNaviFgmt.hasChildBackStack()){
+            if (nowInflatedBtmNaviFgmt.hasChildBackStack()) {
                 nowInflatedBtmNaviFgmt.popChildBackStack()
                 return@addCallback
             }
@@ -205,7 +207,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun Fragment?.popChildBackStack(){
+    private fun Fragment?.popChildBackStack() {
         this?.childFragmentManager?.popBackStackImmediate()
     }
 

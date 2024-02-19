@@ -10,7 +10,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
+import com.example.bookchat.data.local.entity.ChatRoomEntity
 import com.example.bookchat.databinding.ActivityMakeChatRoomBinding
+import com.example.bookchat.ui.fragment.ChatRoomListFragment.Companion.EXTRA_CHAT_ROOM_LIST_ITEM
 import com.example.bookchat.utils.PermissionManager
 import com.example.bookchat.viewmodel.MakeChatRoomViewModel
 import com.example.bookchat.viewmodel.MakeChatRoomViewModel.MakeChatRoomUiEvent
@@ -49,7 +51,8 @@ class MakeChatRoomActivity : AppCompatActivity() {
             if (result.resultCode == RESULT_OK) {
                 val intent = result.data
                 val bitmapByteArray =
-                    intent?.getByteArrayExtra(ImageCropActivity.EXTRA_CROPPED_PROFILE_BYTE_ARRAY) ?: byteArrayOf()
+                    intent?.getByteArrayExtra(ImageCropActivity.EXTRA_CROPPED_PROFILE_BYTE_ARRAY)
+                        ?: byteArrayOf()
                 makeChatRoomViewModel.chatRoomProfileImage.value = bitmapByteArray
             }
         }
@@ -61,9 +64,10 @@ class MakeChatRoomActivity : AppCompatActivity() {
 
     private val selectBookResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK){
+            if (result.resultCode == RESULT_OK) {
                 val intent = result.data
-                val selectBook = intent?.getSerializableExtra(MakeChatRoomSelectBookActivity.EXTRA_SELECTED_BOOK) as? Book
+                val selectBook =
+                    intent?.getSerializableExtra(MakeChatRoomSelectBookActivity.EXTRA_SELECTED_BOOK) as? Book
                 selectBook?.let { makeChatRoomViewModel.selectedBook.value = selectBook }
             }
         }
@@ -72,16 +76,17 @@ class MakeChatRoomActivity : AppCompatActivity() {
         makeChatRoomViewModel.eventFlow.collect { event -> handleEvent(event) }
     }
 
-    private fun startChatRoomActivity(){
+    private fun startChatRoomActivity(chatRoomEntity: ChatRoomEntity) {
         val intent = Intent(this, ChatRoomActivity::class.java)
+        intent.putExtra(EXTRA_CHAT_ROOM_LIST_ITEM, chatRoomEntity)
         startActivity(intent)
         finish()
     }
 
     private fun handleEvent(event: MakeChatRoomUiEvent) = when (event) {
-        MakeChatRoomUiEvent.MoveToBack -> finish()
-        MakeChatRoomUiEvent.MoveSelectBook -> moveToSelectBook()
-        MakeChatRoomUiEvent.OpenGallery -> startImgEdit()
-        MakeChatRoomUiEvent.MoveToChatPage -> startChatRoomActivity()
+        is MakeChatRoomUiEvent.MoveToBack -> finish()
+        is MakeChatRoomUiEvent.MoveSelectBook -> moveToSelectBook()
+        is MakeChatRoomUiEvent.OpenGallery -> startImgEdit()
+        is MakeChatRoomUiEvent.MoveToChatPage -> startChatRoomActivity(event.chatRoomEntity)
     }
 }

@@ -24,6 +24,8 @@ class WishBookShelfHeaderAdapter(private val bookShelfViewModel: BookShelfViewMo
         parent: ViewGroup,
         viewType: Int
     ): WishBookShelfHeaderViewHolder {
+        WishBookShelfHeaderViewHolder(bindingHeaderItem)
+
         bindingHeaderItem = DataBindingUtil
             .inflate(
                 LayoutInflater.from(parent.context),

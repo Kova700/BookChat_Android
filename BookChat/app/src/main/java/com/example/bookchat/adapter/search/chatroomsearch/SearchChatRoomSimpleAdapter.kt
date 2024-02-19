@@ -5,21 +5,23 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.data.SearchChatRoomListItem
+import com.example.bookchat.data.WholeChatRoomListItem
 import com.example.bookchat.databinding.ItemChatRoomSearchBinding
-import kotlin.math.min
 
 class SearchChatRoomSimpleAdapter :
     RecyclerView.Adapter<SearchChatRoomSimpleAdapter.SearchChatRoomItemViewHolder>() {
 
     private lateinit var binding :ItemChatRoomSearchBinding
     private lateinit var itemClickListener: OnItemClickListener
-    var chatRooms: List<SearchChatRoomListItem> = listOf()
+    var chatRooms: List<WholeChatRoomListItem> = listOf()
 
     inner class SearchChatRoomItemViewHolder(val binding: ItemChatRoomSearchBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(searchChatRoomListItem: SearchChatRoomListItem) {
-            binding.searchChatRoomListItem = searchChatRoomListItem
+        fun bind(wholeChatRoomListItem: WholeChatRoomListItem) {
+            binding.wholeChatRoomListItem = wholeChatRoomListItem
+            binding.root.setOnClickListener{
+                itemClickListener.onItemClick(wholeChatRoomListItem)
+            }
         }
     }
 
@@ -47,7 +49,7 @@ class SearchChatRoomSimpleAdapter :
     override fun getItemViewType(position: Int): Int = R.layout.item_chat_room_search
 
     interface OnItemClickListener {
-        fun onItemClick(searchChatRoomListItem: SearchChatRoomListItem)
+        fun onItemClick(wholeChatRoomListItem: WholeChatRoomListItem)
     }
 
     fun setItemClickListener(onItemClickListener: OnItemClickListener) {

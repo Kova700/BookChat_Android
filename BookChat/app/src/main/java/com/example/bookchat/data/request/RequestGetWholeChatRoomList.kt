@@ -1,8 +1,8 @@
 package com.example.bookchat.data.request
 
-data class RequestSearchChatRoom(
-    val postCursorId: Int?,
-    val size: String?,
+data class RequestGetWholeChatRoomList(
+    val postCursorId: Long?,
+    val size: Int,
     var roomName: String? = null,
     var title: String? = null,
     var isbn: String? = null,
