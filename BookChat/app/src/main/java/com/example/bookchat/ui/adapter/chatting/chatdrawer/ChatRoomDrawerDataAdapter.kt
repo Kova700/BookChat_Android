@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.data.local.entity.UserEntity
+import com.example.bookchat.data.database.model.UserEntity
 import com.example.bookchat.databinding.ItemChatDrawerDataBinding
 
 class ChatRoomDrawerDataAdapter :

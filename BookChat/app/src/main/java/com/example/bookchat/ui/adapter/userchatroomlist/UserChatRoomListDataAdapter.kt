@@ -7,8 +7,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.data.UserChatRoomListItem
-import com.example.bookchat.data.local.entity.ChatRoomEntity
+import com.example.bookchat.data.database.model.ChatRoomEntity
 import com.example.bookchat.databinding.ItemChatRoomListDataBinding
 
 class UserChatRoomListDataAdapter :

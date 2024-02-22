@@ -18,13 +18,15 @@ import com.example.bookchat.data.MessageType.NOTICE_KICK
 import com.example.bookchat.data.MessageType.NOTICE_SUB_HOST_DELEGATE
 import com.example.bookchat.data.MessageType.NOTICE_SUB_HOST_DISMISS
 import com.example.bookchat.data.SocketMessage
-import com.example.bookchat.data.local.entity.ChatEntity
-import com.example.bookchat.data.local.entity.ChatEntity.ChatStatus
-import com.example.bookchat.data.local.entity.ChatRoomEntity
-import com.example.bookchat.data.local.entity.ChatWithUser
+import com.example.bookchat.data.User
+import com.example.bookchat.data.database.model.ChatEntity
+import com.example.bookchat.data.database.model.ChatEntity.ChatStatus
+import com.example.bookchat.data.database.model.ChatRoomEntity
+import com.example.bookchat.data.database.model.ChatWithUser
 import com.example.bookchat.data.paging.remotemediator.ChatRemoteMediator
-import com.example.bookchat.data.repository.ChatRepository
-import com.example.bookchat.data.repository.ChatRoomManagementRepository
+import com.example.bookchat.domain.repository.ChatRepository
+import com.example.bookchat.domain.repository.ChatRoomManagementRepository
+import com.example.bookchat.domain.repository.UserRepository
 import com.example.bookchat.ui.fragment.ChatRoomListFragment.Companion.EXTRA_CHAT_ROOM_LIST_ITEM
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineStart
@@ -37,6 +39,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.hildan.krossbow.stomp.StompSession
@@ -48,7 +51,8 @@ import kotlin.time.Duration.Companion.minutes
 class ChatRoomViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val chatRepository: ChatRepository,
-	private val chatRoomManagementRepository: ChatRoomManagementRepository
+	private val chatRoomManagementRepository: ChatRoomManagementRepository,
+	private val userRepository: UserRepository,
 ) : ViewModel() {
 
 	private val database = App.instance.database
@@ -59,6 +63,7 @@ class ChatRoomViewModel @Inject constructor(
 	private val roomSId = initChatRoomEntity.roomSid
 
 	val eventFlow = MutableSharedFlow<ChatEvent>()
+	val cachedUser = MutableStateFlow<User>(User.Default)
 
 	val chatRoomInfoFlow = database.chatRoomDAO().getChatRoom(roomId)
 		.stateIn(
@@ -115,7 +120,8 @@ class ChatRoomViewModel @Inject constructor(
 		remoteMediator = ChatRemoteMediator(
 			database = database,
 			chatRoomId = roomId,
-			apiClient = App.instance.bookChatApiClient
+			chatRepository = chatRepository,
+			userRepository = userRepository,
 		),
 		pagingSourceFactory = { database.chatDAO().getChatWithUserPagingSource(roomId) }
 	).flow.distinctUntilChanged()
@@ -123,6 +129,7 @@ class ChatRoomViewModel @Inject constructor(
 	init {
 //        viewModelScope.launch(Dispatchers.IO) {
 		viewModelScope.launch {
+			getUserInfo()
 			getTempSavedMessage()
 			requestChatRoomInfo()
 			//채팅방 정보 조회 API 호출 (성공 여부 상관없음)
@@ -218,9 +225,12 @@ class ChatRoomViewModel @Inject constructor(
 	private suspend fun saveCommonMessageInLocalDB(
 		socketMessage: SocketMessage.CommonMessage
 	) {
-		val myUserId = App.instance.getCachedUser().userId
+		val myUserId = userRepository.getUserProfile().userId
 		val receiptId = socketMessage.receiptId
-		val chatEntity = socketMessage.toChatEntity(roomId)
+		val chatEntity = socketMessage.toChatEntity(
+			chatRoomId = roomId,
+			myUserId = cachedUser.value.userId
+		)
 
 		database.withTransaction {
 			if (socketMessage.senderId != myUserId) {
@@ -244,7 +254,10 @@ class ChatRoomViewModel @Inject constructor(
 	private suspend fun saveNoticeMessageInLocalDB(
 		socketMessage: SocketMessage.NotificationMessage
 	) {
-		val chatEntity = socketMessage.toChatEntity(roomId)
+		val chatEntity = socketMessage.toChatEntity(
+			chatRoomId = roomId,
+			myUserId = cachedUser.value.userId
+		)
 		// TODO :Target에 대한 DB수정 작업해야함
 		database.withTransaction {
 			val noticeTarget = socketMessage.targetId
@@ -350,7 +363,14 @@ class ChatRoomViewModel @Inject constructor(
 	}
 
 	private suspend fun insertWaitingChat(roomId: Long, message: String): Long {
-		return database.chatDAO().insertWaitingChat(roomId, message)
+		return database.chatDAO().insertWaitingChat(
+			roomId = roomId, message = message, myUserId = cachedUser.value.userId
+		)
+	}
+
+	private fun getUserInfo() = viewModelScope.launch {
+		runCatching { userRepository.getUserProfile() }
+			.onSuccess { cachedUser.update { it } }
 	}
 
 	// TODO : Distroy 될 때도 소켓 닫게 수정

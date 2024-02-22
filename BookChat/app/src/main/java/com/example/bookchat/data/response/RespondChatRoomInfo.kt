@@ -1,6 +1,6 @@
 package com.example.bookchat.data.response
 
-import com.example.bookchat.data.local.entity.UserEntity
+import com.example.bookchat.data.database.model.UserEntity
 import com.example.bookchat.utils.UserDefaultProfileImageType
 import com.google.gson.annotations.SerializedName
 

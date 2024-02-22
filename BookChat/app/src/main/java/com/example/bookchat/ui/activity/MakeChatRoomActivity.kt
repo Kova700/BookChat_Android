@@ -10,7 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
-import com.example.bookchat.data.local.entity.ChatRoomEntity
+import com.example.bookchat.data.database.model.ChatRoomEntity
 import com.example.bookchat.databinding.ActivityMakeChatRoomBinding
 import com.example.bookchat.ui.fragment.ChatRoomListFragment.Companion.EXTRA_CHAT_ROOM_LIST_ITEM
 import com.example.bookchat.utils.PermissionManager

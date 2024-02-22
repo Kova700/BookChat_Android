@@ -31,7 +31,6 @@ class MyPageFragment : Fragment()  {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_my_page,container,false)
         with(binding){
             lifecycleOwner = this@MyPageFragment
-            user = App.instance.getCachedUser()
             viewmodel = myPageViewModel
         }
         observeEvent()

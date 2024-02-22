@@ -4,14 +4,24 @@ import com.example.bookchat.utils.UserDefaultProfileImageType
 import com.google.gson.annotations.SerializedName
 
 data class User(
-    @SerializedName("userId")
-    val userId : Long,
-    @SerializedName("userNickname")
-    val userNickname: String,
-    @SerializedName("userEmail")
-    val userEmail: String,
-    @SerializedName("userProfileImageUri")
-    val userProfileImageUri: String?,
-    @SerializedName("defaultProfileImageType")
-    val defaultProfileImageType: UserDefaultProfileImageType
-)
+	@SerializedName("userId")
+	val userId: Long,
+	@SerializedName("userNickname")
+	val userNickname: String,
+	@SerializedName("userEmail")
+	val userEmail: String,
+	@SerializedName("userProfileImageUri")
+	val userProfileImageUri: String?,
+	@SerializedName("defaultProfileImageType")
+	val defaultProfileImageType: UserDefaultProfileImageType
+) {
+	companion object {
+		val Default = User(
+			userId = -1L,
+			userNickname = "",
+			userEmail = "",
+			userProfileImageUri = null,
+			defaultProfileImageType = UserDefaultProfileImageType.ONE
+		)
+	}
+}

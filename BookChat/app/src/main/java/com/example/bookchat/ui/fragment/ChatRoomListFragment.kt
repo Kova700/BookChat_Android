@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
 import com.example.bookchat.ui.adapter.userchatroomlist.UserChatRoomListDataAdapter
 import com.example.bookchat.ui.adapter.userchatroomlist.UserChatRoomListHeaderAdapter
-import com.example.bookchat.data.local.entity.ChatRoomEntity
+import com.example.bookchat.data.database.model.ChatRoomEntity
 import com.example.bookchat.databinding.FragmentChatRoomListBinding
 import com.example.bookchat.ui.activity.ChatRoomActivity
 import com.example.bookchat.ui.activity.MakeChatRoomActivity

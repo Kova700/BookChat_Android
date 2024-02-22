@@ -18,7 +18,7 @@ import com.example.bookchat.R
 import com.example.bookchat.ui.adapter.home.MainBookAdapter
 import com.example.bookchat.ui.adapter.home.MainUserChatRoomListAdapter
 import com.example.bookchat.data.BookShelfDataItem
-import com.example.bookchat.data.local.entity.ChatRoomEntity
+import com.example.bookchat.data.database.model.ChatRoomEntity
 import com.example.bookchat.databinding.FragmentHomeBinding
 import com.example.bookchat.ui.activity.ChatRoomActivity
 import com.example.bookchat.ui.viewmodel.HomeViewModel

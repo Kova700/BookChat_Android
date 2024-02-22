@@ -1,11 +1,10 @@
-package com.example.bookchat.data.local.dao
+package com.example.bookchat.data.database.dao
 
 import androidx.paging.PagingSource
 import androidx.room.*
 import com.example.bookchat.App
-import com.example.bookchat.data.local.entity.ChatEntity
-import com.example.bookchat.data.local.entity.ChatRoomEntity
-import com.example.bookchat.data.local.entity.ChatWithUser
+import com.example.bookchat.data.database.model.ChatEntity
+import com.example.bookchat.data.database.model.ChatWithUser
 import com.example.bookchat.utils.DateManager
 import kotlin.math.max
 
@@ -55,14 +54,13 @@ interface ChatDAO {
 
     suspend fun insertWaitingChat(
         roomId: Long,
-        message: String
+        message: String,
+        myUserId :Long
     ): Long {
-        val cachedUser = App.instance.getCachedUser()
-
         val chat = ChatEntity(
             chatId = getWaitingChatId(),
             chatRoomId = roomId,
-            senderId = cachedUser.userId,
+            senderId = myUserId,
             dispatchTime = DateManager.getCurrentDateTimeString(),
             status = ChatEntity.ChatStatus.LOADING,
             message = message,

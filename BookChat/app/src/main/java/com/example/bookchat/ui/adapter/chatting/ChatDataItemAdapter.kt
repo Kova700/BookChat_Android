@@ -7,9 +7,9 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.data.local.entity.ChatEntity.ChatStatus
-import com.example.bookchat.data.local.entity.ChatEntity.ChatType
-import com.example.bookchat.data.local.entity.ChatWithUser
+import com.example.bookchat.data.database.model.ChatEntity.ChatStatus
+import com.example.bookchat.data.database.model.ChatEntity.ChatType
+import com.example.bookchat.data.database.model.ChatWithUser
 import com.example.bookchat.databinding.EmptyLayoutBinding
 import com.example.bookchat.databinding.ItemChattingMineBinding
 import com.example.bookchat.databinding.ItemChattingNoticeBinding

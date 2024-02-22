@@ -1,6 +1,6 @@
 package com.example.bookchat.data
 
-import com.example.bookchat.data.local.entity.ChatRoomEntity
+import com.example.bookchat.data.database.model.ChatRoomEntity
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 

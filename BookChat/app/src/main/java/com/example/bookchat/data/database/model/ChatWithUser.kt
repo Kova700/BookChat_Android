@@ -1,4 +1,4 @@
-package com.example.bookchat.data.local.entity
+package com.example.bookchat.data.database.model
 
 import androidx.room.Embedded
 import androidx.room.Relation

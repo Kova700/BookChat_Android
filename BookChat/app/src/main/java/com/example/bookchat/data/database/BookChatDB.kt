@@ -1,20 +1,20 @@
-package com.example.bookchat.data.local
+package com.example.bookchat.data.database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.bookchat.data.local.dao.ChatDAO
-import com.example.bookchat.data.local.dao.ChatRoomDAO
-import com.example.bookchat.data.local.dao.TempMessageDAO
-import com.example.bookchat.data.local.dao.UserDAO
-import com.example.bookchat.data.local.entity.ChatEntity
-import com.example.bookchat.data.local.entity.ChatRoomEntity
-import com.example.bookchat.data.local.entity.TempMessageEntity
-import com.example.bookchat.data.local.entity.UserEntity
-import com.example.bookchat.data.local.typeconverter.LongListTypeConverter
-import com.example.bookchat.data.local.typeconverter.StringListTypeConverter
+import com.example.bookchat.data.database.dao.ChatDAO
+import com.example.bookchat.data.database.dao.ChatRoomDAO
+import com.example.bookchat.data.database.dao.TempMessageDAO
+import com.example.bookchat.data.database.dao.UserDAO
+import com.example.bookchat.data.database.model.ChatEntity
+import com.example.bookchat.data.database.model.ChatRoomEntity
+import com.example.bookchat.data.database.model.TempMessageEntity
+import com.example.bookchat.data.database.model.UserEntity
+import com.example.bookchat.data.database.typeconverter.LongListTypeConverter
+import com.example.bookchat.data.database.typeconverter.StringListTypeConverter
 import com.google.gson.Gson
 
 @Database(

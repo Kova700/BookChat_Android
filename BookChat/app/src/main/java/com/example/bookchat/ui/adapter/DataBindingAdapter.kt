@@ -13,9 +13,9 @@ import com.bumptech.glide.Glide
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.*
-import com.example.bookchat.data.local.entity.ChatEntity
-import com.example.bookchat.data.local.entity.ChatEntity.ChatStatus
-import com.example.bookchat.data.local.entity.ChatWithUser
+import com.example.bookchat.data.database.model.ChatEntity
+import com.example.bookchat.data.database.model.ChatEntity.ChatStatus
+import com.example.bookchat.data.database.model.ChatWithUser
 import com.example.bookchat.utils.*
 import com.example.bookchat.ui.viewmodel.AgonyViewModel.AgonyActivityState
 import com.example.bookchat.ui.viewmodel.BookReportViewModel.BookReportStatus

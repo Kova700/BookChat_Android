@@ -1,9 +1,9 @@
-package com.example.bookchat.data.local.entity
+package com.example.bookchat.data.database.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.bookchat.data.local.entity.ChatRoomStatus.AVAILABLE
+import com.example.bookchat.data.database.model.ChatRoomStatus.AVAILABLE
 import java.io.Serializable
 // TODO : last_chat_id 채팅방 별 읽지 않은 채팅 수 표시할 때 사용 가능(백엔드와 협의)
 @Entity(tableName = "ChatRoom")

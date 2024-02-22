@@ -1,10 +1,9 @@
-package com.example.bookchat.data.local.dao
+package com.example.bookchat.data.database.dao
 
 import androidx.paging.PagingSource
 import androidx.room.*
-import com.example.bookchat.data.local.entity.ChatRoomEntity
+import com.example.bookchat.data.database.model.ChatRoomEntity
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Dao
 interface ChatRoomDAO {

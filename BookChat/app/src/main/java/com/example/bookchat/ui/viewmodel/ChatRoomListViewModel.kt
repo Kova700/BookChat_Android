@@ -7,6 +7,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import com.example.bookchat.App
 import com.example.bookchat.data.paging.remotemediator.ChatRoomRemoteMediator
+import com.example.bookchat.domain.repository.UserChatRoomRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -14,7 +15,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ChatRoomListViewModel @Inject constructor() : ViewModel() {
+class ChatRoomListViewModel @Inject constructor(
+    private val userChatRoomRepository : UserChatRoomRepository
+) : ViewModel() {
 
     private val _eventFlow = MutableSharedFlow<ChatRoomListUiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -27,7 +30,7 @@ class ChatRoomListViewModel @Inject constructor() : ViewModel() {
         ),
         remoteMediator = ChatRoomRemoteMediator(
             database = App.instance.database,
-            apiClient = App.instance.bookChatApiClient
+            userChatRoomRepository = userChatRoomRepository
         ),
         pagingSourceFactory = { App.instance.database.chatRoomDAO().pagingSource() }
     ).flow

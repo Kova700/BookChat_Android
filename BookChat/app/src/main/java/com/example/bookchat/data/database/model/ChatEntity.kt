@@ -1,10 +1,9 @@
-package com.example.bookchat.data.local.entity
+package com.example.bookchat.data.database.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.example.bookchat.utils.UserDefaultProfileImageType
 
 @Entity(
     tableName = "Chat", foreignKeys = [ForeignKey(

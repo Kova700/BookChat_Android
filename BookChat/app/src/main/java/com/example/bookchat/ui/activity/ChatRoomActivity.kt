@@ -15,8 +15,8 @@ import com.example.bookchat.R
 import com.example.bookchat.ui.adapter.chatting.ChatDataItemAdapter
 import com.example.bookchat.ui.adapter.chatting.chatdrawer.ChatRoomDrawerDataAdapter
 import com.example.bookchat.ui.adapter.chatting.chatdrawer.ChatRoomDrawerHeaderAdapter
-import com.example.bookchat.data.local.entity.ChatRoomEntity
-import com.example.bookchat.data.local.entity.UserEntity
+import com.example.bookchat.data.database.model.ChatRoomEntity
+import com.example.bookchat.data.database.model.UserEntity
 import com.example.bookchat.databinding.ActivityChatRoomBinding
 import com.example.bookchat.ui.fragment.ChatRoomListFragment.Companion.EXTRA_CHAT_ROOM_LIST_ITEM
 import com.example.bookchat.ui.viewmodel.ChatRoomViewModel

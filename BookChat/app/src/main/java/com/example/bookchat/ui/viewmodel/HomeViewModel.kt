@@ -8,60 +8,74 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import com.example.bookchat.App
 import com.example.bookchat.data.User
-import com.example.bookchat.data.local.entity.ChatRoomEntity
+import com.example.bookchat.data.database.model.ChatRoomEntity
 import com.example.bookchat.data.paging.ReadingBookTapPagingSource
-import com.example.bookchat.data.paging.remotemediator.ChatRoomRemoteMediator.Companion.REMOTE_USER_CHAT_ROOM_LOAD_SIZE
-import com.example.bookchat.data.repository.UserChatRoomRepository
+import com.example.bookchat.domain.repository.BookRepository
+import com.example.bookchat.domain.repository.UserChatRoomRepository
+import com.example.bookchat.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 //TODO : 도서, 채팅 Room에서 가져오는 로직으로 수정
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val userChatRoomRepository: UserChatRoomRepository
+	private val bookRepository: BookRepository,
+	private val userRepository: UserRepository,
+	private val userChatRoomRepository: UserChatRoomRepository
 ) : ViewModel() {
 
-    val user = MutableStateFlow<User>(App.instance.getCachedUser())
-    val database = App.instance.database
+	val cachedUser = MutableStateFlow<User>(User.Default)
+	val database = App.instance.database
 
-    init {
-        getRemoteUserChatRoomList()
-    }
+	init {
+		getUserInfo()
+		getRemoteUserChatRoomList()
+	}
 
-    //PagingSource로 가져오는게 아닌,
-    // API로 1회 호출해서 가져오게 수정
-    val readingBookResult by lazy {
-        Pager(
-            config = PagingConfig(
-                pageSize = 10,
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = { ReadingBookTapPagingSource() }
-        ).flow
-            .map { pagingData ->
-                pagingData.map { pair ->
-                    pair.first.getBookShelfDataItem()
-                }
-            }.cachedIn(viewModelScope)
-    }
+	//PagingSource로 가져오는게 아닌,
+	// API로 1회 호출해서 가져오게 수정
+	val readingBookResult by lazy {
+		Pager(
+			config = PagingConfig(
+				pageSize = 10,
+				enablePlaceholders = false
+			),
+			pagingSourceFactory = {
+				ReadingBookTapPagingSource(
+					bookRepository = bookRepository
+				)
+			}
+		).flow
+			.map { pagingData ->
+				pagingData.map { pair ->
+					pair.first.getBookShelfDataItem()
+				}
+			}.cachedIn(viewModelScope)
+	}
 
-    val chatRoomFlow =
-        database.chatRoomDAO().getActivatedChatRoomList(MAIN_CHAT_ROOM_LIST_LOAD_SIZE)
+	private fun getUserInfo() = viewModelScope.launch {
+		runCatching { userRepository.getUserProfile() }
+			.onSuccess { cachedUser.update { it } }
+	}
 
-    private fun getRemoteUserChatRoomList() = viewModelScope.launch {
-        val chatRoomList =
-            userChatRoomRepository.getUserChatRoomList(REMOTE_USER_CHAT_ROOM_LOAD_SIZE)
-        saveChatRoomInLocalDB(chatRoomList.map { it.toChatRoomEntity() })
-    }
+	val chatRoomFlow =
+		database.chatRoomDAO().getActivatedChatRoomList(MAIN_CHAT_ROOM_LIST_LOAD_SIZE)
 
-    private suspend fun saveChatRoomInLocalDB(chatRoomList: List<ChatRoomEntity>) {
-        database.chatRoomDAO().insertOrUpdateAllChatRoom(chatRoomList)
-    }
+	private fun getRemoteUserChatRoomList() = viewModelScope.launch {
+		val chatRoomList =
+			userChatRoomRepository.getUserChatRoomList().chatRoomList
+		saveChatRoomInLocalDB(chatRoomList.map { it.toChatRoomEntity() })
+	}
 
-    companion object {
-        private const val MAIN_CHAT_ROOM_LIST_LOAD_SIZE = 3
-    }
+	private suspend fun saveChatRoomInLocalDB(chatRoomList: List<ChatRoomEntity>) {
+		database.chatRoomDAO().insertOrUpdateAllChatRoom(chatRoomList)
+	}
+
+	companion object {
+		private const val MAIN_CHAT_ROOM_LIST_LOAD_SIZE = 3
+	}
 }

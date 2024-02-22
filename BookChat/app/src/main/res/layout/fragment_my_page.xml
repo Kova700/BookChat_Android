@@ -6,9 +6,6 @@
             name="viewmodel"
             type="com.example.bookchat.ui.viewmodel.MyPageViewModel" />
         <variable
-            name="user"
-            type="com.example.bookchat.data.User" />
-        <variable
             name="buildConfig"
             type="com.example.bookchat.BuildConfig" />
     </data>
@@ -65,8 +62,8 @@
                 android:id="@+id/userProfile_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                userProfileUrl="@{user.userProfileImageUri}"
-                userDefaultProfileImageType="@{user.defaultProfileImageType}"
+                userProfileUrl="@{viewmodel.cachedUser.userProfileImageUri}"
+                userDefaultProfileImageType="@{viewmodel.cachedUser.defaultProfileImageType}"
                 android:scaleType="fitCenter"
                 android:src="@drawable/default_profile_img1" />
         </androidx.cardview.widget.CardView>
@@ -82,7 +79,7 @@
             android:fontFamily="@font/notosanskr_bold"
             android:maxLength="20"
             android:maxLines="1"
-            android:text="@{user.userNickname}"
+            android:text="@{viewmodel.cachedUser.userNickname}"
             android:textColor="#373737"
             android:textSize="20sp"
             app:layout_constrainedWidth="true"

@@ -3,6 +3,7 @@ package com.example.bookchat.data.repository
 import com.example.bookchat.App
 import com.example.bookchat.data.User
 import com.example.bookchat.data.UserSignUpDto
+import com.example.bookchat.data.api.BookChatApi
 import com.example.bookchat.data.request.RequestUserSignIn
 import com.example.bookchat.data.request.RequestUserSignUp
 import com.example.bookchat.data.response.NeedToDeviceWarningException
@@ -14,7 +15,9 @@ import com.example.bookchat.domain.repository.UserRepository
 import com.example.bookchat.utils.DataStoreManager
 import javax.inject.Inject
 
-class UserRepositoryImpl @Inject constructor() : UserRepository {
+class UserRepositoryImpl @Inject constructor(
+	private val bookChatApi: BookChatApi
+) : UserRepository {
 
 	private var cachedMyUser: User? = null
 
@@ -28,7 +31,7 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
 			fcmToken, deviceID, approveChangingDevice, idToken.oAuth2Provider
 		)
 
-		val response = App.instance.bookChatApiClient.signIn(idToken.token, requestUserSignIn)
+		val response = bookChatApi.signIn(idToken.token, requestUserSignIn)
 		when (response.code()) {
 			200 -> {
 				val token = response.body()
@@ -57,7 +60,7 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
 			readingTastes = userSignUpDto.readingTastes
 		)
 
-		val response = App.instance.bookChatApiClient.signUp(
+		val response = bookChatApi.signUp(
 			idToken = idToken.token,
 			userProfileImage = userSignUpDto.userProfileImage,
 			requestUserSignUp = requestUserSignUp
@@ -81,7 +84,7 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
 	//회원 탈퇴 후 재가입 가능 기간 정책 결정해야함
 	override suspend fun withdraw() {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-		val response = App.instance.bookChatApiClient.withdraw()
+		val response = bookChatApi.withdraw()
 		when (response.code()) {
 			200 -> signOut()
 			else -> throw Exception(
@@ -97,7 +100,7 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 		cachedMyUser?.let { return it }
 
-		val response = App.instance.bookChatApiClient.getUserProfile()
+		val response = bookChatApi.getUserProfile()
 		when (response.code()) {
 			200 -> {
 				response.body()?.let { cachedMyUser = it }
@@ -116,7 +119,7 @@ class UserRepositoryImpl @Inject constructor() : UserRepository {
 	override suspend fun checkForDuplicateUserName(nickName: String) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-		val response = App.instance.bookChatApiClient.requestNameDuplicateCheck(nickName)
+		val response = bookChatApi.requestNameDuplicateCheck(nickName)
 		when (response.code()) {
 			200 -> {}
 			409 -> throw NickNameDuplicateException(response.errorBody()?.string())

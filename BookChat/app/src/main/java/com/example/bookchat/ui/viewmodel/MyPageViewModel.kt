@@ -2,14 +2,25 @@ package com.example.bookchat.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bookchat.data.User
+import com.example.bookchat.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MyPageViewModel @Inject constructor() : ViewModel() {
+class MyPageViewModel @Inject constructor(
+    private val userRepository: UserRepository
+) : ViewModel() {
+    val cachedUser = MutableStateFlow<User>(User.Default)
+
+    init {
+    	getUserInfo()
+    }
 
     private val _eventFlow = MutableSharedFlow<MyPageEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -28,6 +39,11 @@ class MyPageViewModel @Inject constructor() : ViewModel() {
     }
     fun clickAppSetBtn(){
         startEvent(MyPageEvent.MoveToAppSetting)
+    }
+
+    private fun getUserInfo() = viewModelScope.launch {
+        runCatching { userRepository.getUserProfile() }
+            .onSuccess { cachedUser.update { it } }
     }
 
     private fun startEvent (event : MyPageEvent) = viewModelScope.launch {

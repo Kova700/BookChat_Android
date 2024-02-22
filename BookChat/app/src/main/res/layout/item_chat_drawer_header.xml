@@ -4,7 +4,7 @@
     <data>
         <variable
             name="chatRoomEntity"
-            type="com.example.bookchat.data.local.entity.ChatRoomEntity" />
+            type="com.example.bookchat.data.database.model.ChatRoomEntity" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

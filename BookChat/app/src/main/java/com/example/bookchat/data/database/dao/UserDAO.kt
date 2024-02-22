@@ -1,10 +1,10 @@
-package com.example.bookchat.data.local.dao
+package com.example.bookchat.data.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.bookchat.data.local.entity.UserEntity
+import com.example.bookchat.data.database.model.UserEntity
 import com.example.bookchat.utils.UserDefaultProfileImageType
 
 @Dao
