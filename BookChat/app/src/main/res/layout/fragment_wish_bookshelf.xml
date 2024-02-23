@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.viewmodel.BookShelfViewModel" />
+            type="com.example.bookchat.ui.viewmodel.BookShelfViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -27,7 +27,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintVertical_bias="0.0" >
 
-            <com.example.bookchat.ViewPagerInnerRecyclerView
+            <com.example.bookchat.ui.customview.ViewPagerInnerRecyclerView
                 android:id="@+id/wishBookRcv"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"

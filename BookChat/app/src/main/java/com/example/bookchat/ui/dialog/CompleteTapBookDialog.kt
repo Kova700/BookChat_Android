@@ -16,8 +16,8 @@ import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.DialogCompleteBookTapClickedBinding
 import com.example.bookchat.ui.activity.AgonyActivity
 import com.example.bookchat.ui.activity.BookReportActivity
-import com.example.bookchat.viewmodel.CompleteBookTapDialogViewModel
-import com.example.bookchat.viewmodel.CompleteBookTapDialogViewModel.CompleteBookEvent
+import com.example.bookchat.ui.viewmodel.CompleteBookTapDialogViewModel
+import com.example.bookchat.ui.viewmodel.CompleteBookTapDialogViewModel.CompleteBookEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject

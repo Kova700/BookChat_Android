@@ -11,8 +11,8 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityLoginBinding
 import com.example.bookchat.oauth.GoogleSDK
 import com.example.bookchat.ui.dialog.DeviceWarningDialog
-import com.example.bookchat.viewmodel.LoginViewModel
-import com.example.bookchat.viewmodel.LoginViewModel.LoginEvent
+import com.example.bookchat.ui.viewmodel.LoginViewModel
+import com.example.bookchat.ui.viewmodel.LoginViewModel.LoginEvent
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

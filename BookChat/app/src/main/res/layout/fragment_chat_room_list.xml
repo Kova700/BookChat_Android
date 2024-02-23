@@ -4,7 +4,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.viewmodel.ChatRoomListViewModel" />
+            type="com.example.bookchat.ui.viewmodel.ChatRoomListViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -43,7 +43,7 @@
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
             app:layout_constraintTop_toTopOf="@+id/guideline_top" />
 
-        <com.example.bookchat.AntiDupClickImageButton
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
             android:id="@+id/antiDupClickImageButton8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
             app:layout_constraintEnd_toStartOf="@+id/antiDupClickImageButton4"
             app:layout_constraintTop_toTopOf="@+id/guideline_top" />
 
-        <com.example.bookchat.AntiDupClickImageButton
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
             android:id="@+id/antiDupClickImageButton4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -12,15 +12,15 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
-import com.example.bookchat.adapter.completebookshelf.CompleteBookShelfDataAdapter
-import com.example.bookchat.adapter.completebookshelf.CompleteBookShelfHeaderAdapter
+import com.example.bookchat.ui.adapter.bookshelf.complete.CompleteBookShelfDataAdapter
+import com.example.bookchat.ui.adapter.bookshelf.complete.CompleteBookShelfHeaderAdapter
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.databinding.FragmentCompleteBookshelfBinding
 import com.example.bookchat.ui.dialog.CompleteTapBookDialog
 import com.example.bookchat.utils.RefreshManager
 import com.example.bookchat.utils.RefreshManager.popRefreshCompleteFlag
-import com.example.bookchat.viewmodel.BookShelfViewModel
-import com.example.bookchat.viewmodel.BookShelfViewModel.PagingViewEvent
+import com.example.bookchat.ui.viewmodel.BookShelfViewModel
+import com.example.bookchat.ui.viewmodel.BookShelfViewModel.PagingViewEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

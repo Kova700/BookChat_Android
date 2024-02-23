@@ -11,8 +11,8 @@ import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ActivityBookReportBinding
 import com.example.bookchat.ui.dialog.BookReportWarningDialog
 import com.example.bookchat.ui.dialog.CompleteTapBookDialog.Companion.EXTRA_BOOKREPORT_BOOK
-import com.example.bookchat.viewmodel.BookReportViewModel
-import com.example.bookchat.viewmodel.BookReportViewModel.BookReportUIEvent
+import com.example.bookchat.ui.viewmodel.BookReportViewModel
+import com.example.bookchat.ui.viewmodel.BookReportViewModel.BookReportUIEvent
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

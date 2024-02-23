@@ -7,7 +7,7 @@
 
         <variable
             name="viewmodel"
-            type="com.example.bookchat.viewmodel.SearchTapBookDialogViewModel" />
+            type="com.example.bookchat.ui.viewmodel.SearchTapBookDialogViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/dialog_layout"
@@ -44,7 +44,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.example.bookchat.AntiDupClickToggleButton
+        <com.example.bookchat.ui.customview.AntiDupClickToggleButton
             android:id="@+id/heart_btn"
             android:layout_width="32dp"
             android:layout_height="32dp"

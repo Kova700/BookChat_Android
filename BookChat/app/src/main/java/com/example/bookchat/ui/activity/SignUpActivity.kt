@@ -18,8 +18,8 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySignUpBinding
 import com.example.bookchat.ui.activity.ImageCropActivity.Companion.EXTRA_CROPPED_PROFILE_BYTE_ARRAY
 import com.example.bookchat.utils.PermissionManager
-import com.example.bookchat.viewmodel.SignUpViewModel
-import com.example.bookchat.viewmodel.SignUpViewModel.SignUpEvent
+import com.example.bookchat.ui.viewmodel.SignUpViewModel
+import com.example.bookchat.ui.viewmodel.SignUpViewModel.SignUpEvent
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

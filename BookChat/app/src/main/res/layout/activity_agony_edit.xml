@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         tools:context=".ui.activity.AgonyEditActivity">
 
-        <com.example.bookchat.AntiDupClickImageButton
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
             android:id="@+id/antiDupClickImageButton6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

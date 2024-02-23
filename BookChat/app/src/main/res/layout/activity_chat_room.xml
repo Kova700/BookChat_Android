@@ -7,7 +7,7 @@
         <import type="android.view.View"/>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.viewmodel.ChatRoomViewModel" />
+            type="com.example.bookchat.ui.viewmodel.ChatRoomViewModel" />
     </data>
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
@@ -21,7 +21,7 @@
             android:layout_height="match_parent"
             tools:context=".ui.activity.ChatRoomActivity">
 
-            <com.example.bookchat.AntiDupClickImageButton
+            <com.example.bookchat.ui.customview.AntiDupClickImageButton
                 android:id="@+id/back_btn"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
@@ -33,7 +33,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_back_btn" />
 
-            <com.example.bookchat.AntiDupClickImageButton
+            <com.example.bookchat.ui.customview.AntiDupClickImageButton
                 android:id="@+id/menu_btn_in_chat_room"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
@@ -218,7 +218,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
-            <com.example.bookchat.AntiDupClickImageButton
+            <com.example.bookchat.ui.customview.AntiDupClickImageButton
                 android:id="@+id/capture_btn"
                 android:layout_width="60dp"
                 android:layout_height="0dp"
@@ -247,7 +247,7 @@
                     android:orientation="vertical"
                     app:layout_constraintGuide_end="45dp"/>
 
-                <com.example.bookchat.BookChatEditText
+                <com.example.bookchat.ui.customview.BookChatEditText
                     android:id="@+id/chat_input_et"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -270,7 +270,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/chat_send_btn"/>
 
-                <com.example.bookchat.AntiDupClickImageButton
+                <com.example.bookchat.ui.customview.AntiDupClickImageButton
                     android:id="@+id/chat_send_btn"
                     android:layout_width="0dp"
                     android:layout_height="0dp"

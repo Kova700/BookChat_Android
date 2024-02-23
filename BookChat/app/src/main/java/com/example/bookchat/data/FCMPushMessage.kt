@@ -4,13 +4,13 @@ import com.google.gson.annotations.SerializedName
 
 data class FCMPushMessage(
 	@SerializedName("pushType")
-	val pushType : PushType,
+	val pushType: PushType,
 	@SerializedName("body")
-	val body :FCMBody,
+	val body: FCMBody,
 	@SerializedName("order")
-	val order :Int,
+	val order: Int?,
 	@SerializedName("isLast")
-	val isLast :Boolean
+	val isLast: Boolean?
 )
 
 data class FCMBody(

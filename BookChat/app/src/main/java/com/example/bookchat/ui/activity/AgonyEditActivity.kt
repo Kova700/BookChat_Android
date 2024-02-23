@@ -15,92 +15,101 @@ import com.example.bookchat.R
 import com.example.bookchat.data.Agony
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.databinding.ActivityAgonyEditBinding
-import com.example.bookchat.repository.AgonyRepository
+import com.example.bookchat.domain.repository.AgonyRepository
 import com.example.bookchat.ui.activity.AgonyActivity.Companion.EXTRA_AGONY
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 //API하나만 호출하면 됨으로 ViewModel 없이 진행
 @AndroidEntryPoint
 class AgonyEditActivity : AppCompatActivity() {
 
-    private lateinit var binding :ActivityAgonyEditBinding
-    private lateinit var oldAgony :Agony
-    private lateinit var book :BookShelfItem
-    val agonyTitle = MutableStateFlow<String>("")
-    val agonyRepository = AgonyRepository()
+	private lateinit var binding: ActivityAgonyEditBinding
+	private lateinit var oldAgony: Agony
+	private lateinit var book: BookShelfItem
+	val agonyTitle = MutableStateFlow<String>("")
 
-    private val imm by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
+	@Inject
+	lateinit var agonyRepository: AgonyRepository
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_agony_edit)
-        with(binding){
-            lifecycleOwner = this@AgonyEditActivity
-            activity = this@AgonyEditActivity
-        }
-        oldAgony = getAgony()
-        agonyTitle.value = oldAgony.title
-        book = getBook()
+	private val imm by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
-        setFocus()
-    }
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		binding = DataBindingUtil.setContentView(this, R.layout.activity_agony_edit)
+		with(binding) {
+			lifecycleOwner = this@AgonyEditActivity
+			activity = this@AgonyEditActivity
+		}
+		oldAgony = getAgony()
+		agonyTitle.value = oldAgony.title
+		book = getBook()
 
-    private fun setFocus(){
-        binding.agonyTitleEditText.requestFocus()
-        openKeyboard(binding.agonyTitleEditText)
-    }
+		setFocus()
+	}
 
-    private fun openKeyboard(view : View) {
-        Handler(Looper.getMainLooper()).postDelayed({
-            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
-        }, SignUpActivity.KEYBOARD_DELAY_TIME)
-    }
+	private fun setFocus() {
+		binding.agonyTitleEditText.requestFocus()
+		openKeyboard(binding.agonyTitleEditText)
+	}
 
-    private fun getAgony() = intent.getSerializableExtra(EXTRA_AGONY) as Agony
-    private fun getBook() = intent.getSerializableExtra(AgonyActivity.EXTRA_BOOK) as BookShelfItem
+	private fun openKeyboard(view: View) {
+		Handler(Looper.getMainLooper()).postDelayed({
+			imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+		}, SignUpActivity.KEYBOARD_DELAY_TIME)
+	}
 
-    fun clickConfirmBtn(){
-        if (oldAgony.title == agonyTitle.value) {
-            finish()
-            return
-        }
-        if(agonyTitle.value.isBlank()){
-            makeToast(R.string.agony_title_empty)
-            return
-        }
-        reviseAgony(agonyTitle.value.trim())
-    }
+	private fun getAgony() = intent.getSerializableExtra(EXTRA_AGONY) as Agony
+	private fun getBook() = intent.getSerializableExtra(AgonyActivity.EXTRA_BOOK) as BookShelfItem
 
-    private fun reviseAgony(newTitle :String) = lifecycleScope.launch{
-        runCatching { agonyRepository.reviseAgony(bookShelfId = book.bookShelfId, agony = oldAgony, newTitle = newTitle) }
-            .onSuccess {
-                makeToast(R.string.agony_title_edit_success)
-                moveToPreviousActivity(newTitle)
-            }
-            .onFailure { makeToast(R.string.agony_title_edit_fail) }
-    }
+	fun clickConfirmBtn() {
+		if (oldAgony.title == agonyTitle.value) {
+			finish()
+			return
+		}
+		if (agonyTitle.value.isBlank()) {
+			makeToast(R.string.agony_title_empty)
+			return
+		}
+		reviseAgony(agonyTitle.value.trim())
+	}
 
-    private fun moveToPreviousActivity(newTitle :String){
-        intent.putExtra(EXTRA_NEW_AGONY_TITLE, newTitle)
-        setResult(RESULT_OK,intent)
-        finish()
-    }
+	private fun reviseAgony(newTitle: String) = lifecycleScope.launch {
+		runCatching {
+			agonyRepository.reviseAgony(
+				bookShelfId = book.bookShelfId,
+				agony = oldAgony,
+				newTitle = newTitle
+			)
+		}
+			.onSuccess {
+				makeToast(R.string.agony_title_edit_success)
+				moveToPreviousActivity(newTitle)
+			}
+			.onFailure { makeToast(R.string.agony_title_edit_fail) }
+	}
 
-    fun clickXBtn(){
-        finish()
-    }
+	private fun moveToPreviousActivity(newTitle: String) {
+		intent.putExtra(EXTRA_NEW_AGONY_TITLE, newTitle)
+		setResult(RESULT_OK, intent)
+		finish()
+	}
 
-    fun clickDeleteTextBtn() {
-        agonyTitle.value = ""
-    }
+	fun clickXBtn() {
+		finish()
+	}
 
-    private fun makeToast(stringId :Int){
-        Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
-    }
+	fun clickDeleteTextBtn() {
+		agonyTitle.value = ""
+	}
 
-    companion object{
-        const val EXTRA_NEW_AGONY_TITLE = "EXTRA_NEW_AGONY_TITLE"
-    }
+	private fun makeToast(stringId: Int) {
+		Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
+	}
+
+	companion object {
+		const val EXTRA_NEW_AGONY_TITLE = "EXTRA_NEW_AGONY_TITLE"
+	}
 }

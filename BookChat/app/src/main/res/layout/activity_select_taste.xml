@@ -11,7 +11,7 @@
             type="com.example.bookchat.ui.activity.SelectTasteActivity" />
         <variable
             name="viewModel"
-            type="com.example.bookchat.viewmodel.SelectTasteViewModel" />
+            type="com.example.bookchat.ui.viewmodel.SelectTasteViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/selectTasteLayout"

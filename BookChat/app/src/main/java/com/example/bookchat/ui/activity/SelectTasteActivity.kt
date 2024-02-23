@@ -10,8 +10,8 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySelectTasteBinding
 import com.example.bookchat.ui.activity.SignUpActivity.Companion.EXTRA_SIGNUP_USER_NICKNAME
 import com.example.bookchat.ui.activity.SignUpActivity.Companion.EXTRA_USER_PROFILE_BYTE_ARRAY2
-import com.example.bookchat.viewmodel.SelectTasteViewModel
-import com.example.bookchat.viewmodel.SelectTasteViewModel.SelectTasteEvent
+import com.example.bookchat.ui.viewmodel.SelectTasteViewModel
+import com.example.bookchat.ui.viewmodel.SelectTasteViewModel.SelectTasteEvent
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

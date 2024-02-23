@@ -13,8 +13,8 @@ import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentMyPageBinding
 import com.example.bookchat.ui.activity.*
-import com.example.bookchat.viewmodel.MyPageViewModel
-import com.example.bookchat.viewmodel.MyPageViewModel.MyPageEvent
+import com.example.bookchat.ui.viewmodel.MyPageViewModel
+import com.example.bookchat.ui.viewmodel.MyPageViewModel.MyPageEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -31,7 +31,6 @@ class MyPageFragment : Fragment()  {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_my_page,container,false)
         with(binding){
             lifecycleOwner = this@MyPageFragment
-            user = App.instance.getCachedUser()
             viewmodel = myPageViewModel
         }
         observeEvent()

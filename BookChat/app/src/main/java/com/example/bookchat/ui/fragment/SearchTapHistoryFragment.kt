@@ -11,10 +11,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
-import com.example.bookchat.adapter.SearchHistoryAdapter
+import com.example.bookchat.ui.adapter.search.searchhistory.SearchHistoryAdapter
 import com.example.bookchat.databinding.FragmentSearchTapHistoryBinding
 import com.example.bookchat.utils.DataStoreManager
-import com.example.bookchat.viewmodel.SearchViewModel
+import com.example.bookchat.ui.viewmodel.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

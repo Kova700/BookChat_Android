@@ -1,72 +1,69 @@
 package com.example.bookchat.data
 
-import com.example.bookchat.App
-import com.example.bookchat.data.local.entity.ChatEntity
-import com.example.bookchat.data.local.entity.ChatEntity.ChatType
-import com.example.bookchat.utils.UserDefaultProfileImageType
+import com.example.bookchat.data.database.model.ChatEntity
 import com.google.gson.annotations.SerializedName
 
 sealed interface SocketMessage {
 
-    fun toChatEntity(chatRoomId: Long): ChatEntity
+	fun toChatEntity(
+		chatRoomId: Long,
+		myUserId: Long
+	): ChatEntity
 
-    data class CommonMessage(
-        @SerializedName("chatId")
-        val chatId: Long,
-        @SerializedName("senderId")
-        val senderId: Long,
-        @SerializedName("receiptId")
-        val receiptId :Long,
-        @SerializedName("dispatchTime")
-        val dispatchTime: String,
-        @SerializedName("message")
-        val message: String,
-        @SerializedName("messageType")
-        val messageType: MessageType
-    ) : SocketMessage {
+	data class CommonMessage(
+		@SerializedName("chatId")
+		val chatId: Long,
+		@SerializedName("senderId")
+		val senderId: Long,
+		@SerializedName("receiptId")
+		val receiptId: Long,
+		@SerializedName("dispatchTime")
+		val dispatchTime: String,
+		@SerializedName("message")
+		val message: String,
+		@SerializedName("messageType")
+		val messageType: MessageType
+	) : SocketMessage {
 
-        override fun toChatEntity(chatRoomId: Long): ChatEntity =
-            ChatEntity(
-                chatId = this.chatId,
-                chatRoomId = chatRoomId,
-                senderId = this.senderId,
-                message = this.message,
-                chatType = getChatType(),
-                dispatchTime = this.dispatchTime
-            )
+		override fun toChatEntity(chatRoomId: Long, myUserId: Long): ChatEntity =
+			ChatEntity(
+				chatId = this.chatId,
+				chatRoomId = chatRoomId,
+				senderId = this.senderId,
+				message = this.message,
+				chatType = getChatType(
+					senderId = senderId,
+					myUserId = myUserId
+				),
+				dispatchTime = this.dispatchTime,
+			)
+	}
 
-        private fun getChatType(): ChatType {
-            val myId = App.instance.getCachedUser().userId
-
-            return when (this.senderId) {
-                myId -> ChatType.Mine
-                else -> ChatType.Other
-            }
-        }
-    }
-
-    data class NotificationMessage(
-        @SerializedName("targetId")
-        val targetId: Long,
-        @SerializedName("chatId")
-        val chatId: Long,
-        @SerializedName("message")
-        val message: String,
-        @SerializedName("dispatchTime")
-        val dispatchTime: String,
-        @SerializedName("messageType")
-        val messageType: MessageType
-    ) : SocketMessage {
-        override fun toChatEntity(chatRoomId: Long): ChatEntity =
-            ChatEntity(
-                chatId = this.chatId,
-                chatRoomId = chatRoomId,
-                senderId = null,
-                dispatchTime = this.dispatchTime,
-                message = this.message,
-                chatType = ChatType.Notice
-            )
-    }
+	data class NotificationMessage(
+		@SerializedName("targetId")
+		val targetId: Long,
+		@SerializedName("chatId")
+		val chatId: Long,
+		@SerializedName("message")
+		val message: String,
+		@SerializedName("dispatchTime")
+		val dispatchTime: String,
+		@SerializedName("messageType")
+		val messageType: MessageType
+	) : SocketMessage {
+		override fun toChatEntity(chatRoomId: Long, myUserId: Long): ChatEntity =
+			ChatEntity(
+				chatId = this.chatId,
+				chatRoomId = chatRoomId,
+				senderId = null,
+				dispatchTime = this.dispatchTime,
+				message = this.message,
+				chatType = getChatType(
+					senderId = null,
+					myUserId = myUserId
+				),
+			)
+	}
 }
 
 //TODO : CHAT은 어차피 CommonMessage로 구분이 되니까 필요 없어보임
@@ -78,9 +75,9 @@ sealed interface SocketMessage {
 // NOTICE_USER_EXIT
 // NOTICE_HOST_EXIT
 enum class MessageType {
-    CHAT, ENTER, EXIT,
-    NOTICE_HOST_DELEGATE,
-    NOTICE_KICK,
-    NOTICE_SUB_HOST_DISMISS,
-    NOTICE_SUB_HOST_DELEGATE
+	CHAT, ENTER, EXIT,
+	NOTICE_HOST_DELEGATE,
+	NOTICE_KICK,
+	NOTICE_SUB_HOST_DISMISS,
+	NOTICE_SUB_HOST_DELEGATE
 }

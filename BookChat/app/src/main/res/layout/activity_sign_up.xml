@@ -6,7 +6,7 @@
         <import type="android.view.View"/>
         <variable
             name="viewModel"
-            type="com.example.bookchat.viewmodel.SignUpViewModel" />
+            type="com.example.bookchat.ui.viewmodel.SignUpViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -29,7 +29,7 @@
             android:orientation="vertical"
             app:layout_constraintGuide_end="30dp"/>
 
-        <com.example.bookchat.AntiDupClickImageButton
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
             android:id="@+id/imageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
                 android:src="@drawable/default_profile_img1" />
         </androidx.cardview.widget.CardView>
 
-        <com.example.bookchat.AntiDupClickImageButton
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
             android:id="@+id/imageButton2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -147,7 +147,7 @@
             app:layout_constraintEnd_toEndOf="@+id/nickName_layout"
             app:layout_constraintTop_toTopOf="@+id/nickName_layout" />
 
-        <com.example.bookchat.AntiDupClickButton
+        <com.example.bookchat.ui.customview.AntiDupClickButton
             android:id="@+id/startBookchat_btn"
             android:layout_width="0dp"
             android:layout_height="45dp"

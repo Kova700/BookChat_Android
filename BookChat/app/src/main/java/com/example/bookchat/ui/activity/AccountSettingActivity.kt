@@ -8,8 +8,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAccountSettingBinding
-import com.example.bookchat.viewmodel.AccountSettingViewModel
-import com.example.bookchat.viewmodel.AccountSettingViewModel.AccountSettingUiEvent
+import com.example.bookchat.ui.viewmodel.AccountSettingViewModel
+import com.example.bookchat.ui.viewmodel.AccountSettingViewModel.AccountSettingUiEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

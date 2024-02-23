@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.viewmodel.BookReportViewModel" />
+            type="com.example.bookchat.ui.viewmodel.BookReportViewModel" />
     </data>
     <ScrollView
         android:id="@+id/bookReport_Layout"
@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.example.bookchat.AntiDupClickImageButton
+            <com.example.bookchat.ui.customview.AntiDupClickImageButton
                 android:id="@+id/back_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
                 app:layout_constraintStart_toEndOf="@+id/back_btn"
                 app:layout_constraintTop_toTopOf="@+id/back_btn" />
 
-            <com.example.bookchat.AntiDupClickImageButton
+            <com.example.bookchat.ui.customview.AntiDupClickImageButton
                 android:id="@+id/antiDupClickImageButton"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
@@ -56,7 +56,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/back_btn" />
 
-            <com.example.bookchat.AntiDupClickImageButton
+            <com.example.bookchat.ui.customview.AntiDupClickImageButton
                 android:id="@+id/antiDupClickImageButton2"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
@@ -69,7 +69,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/antiDupClickImageButton"
                 app:layout_constraintTop_toTopOf="@+id/antiDupClickImageButton" />
 
-            <com.example.bookchat.AntiDupClickButton
+            <com.example.bookchat.ui.customview.AntiDupClickButton
                 android:id="@+id/register_bookReport_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

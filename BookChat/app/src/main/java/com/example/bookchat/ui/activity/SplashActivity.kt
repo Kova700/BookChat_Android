@@ -8,8 +8,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
-import com.example.bookchat.viewmodel.SplashViewModel
-import com.example.bookchat.viewmodel.SplashViewModel.SplashEvent
+import com.example.bookchat.ui.viewmodel.SplashViewModel
+import com.example.bookchat.ui.viewmodel.SplashViewModel.SplashEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -25,11 +25,6 @@ class SplashActivity : AppCompatActivity() {
             observeUiEvent()
         },SPLASH_DURATION)
     }
-
-    //onNewToken에 로컬DB에 FCM토큰을 저장하는 로직을 넣어둔다.
-    //SplashActivity에서 FCM토큰을 매번 가져와서 로컬DB에 저장된 FCM토큰과 같은 토큰인지 확인한다.
-    //두 토큰이 서로 다르다면 새로 받은 토큰을 로컬 DB에 저장하고, 새로 저장한 FCM토큰을 서버로 보내 FCM토큰을 업데이트한다.
-    //두 토큰이 서로 같다면 토큰이 변경되지 않았음으로, 다시 일반적인 로직으로 돌아간다. (토큰이 유효하면 MainActivity등..)
 
     private fun observeUiEvent() = lifecycleScope.launch {
         splashViewModel.eventFlow.collect { event -> handleEvent(event) }
