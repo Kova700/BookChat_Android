@@ -76,7 +76,8 @@ class UserEditViewModel @Inject constructor(
 	}
 
 	private fun haveNewNickName() =
-		newNickname.value.trim() != cachedUser.value.userNickname.trim()
+		newNickname.value.isNotBlank() &&
+						(newNickname.value.trim() != cachedUser.value.userNickname.trim())
 
 	private fun haveNewProfile() =
 		newProfileImage.value.isNotEmpty()
@@ -133,7 +134,7 @@ class UserEditViewModel @Inject constructor(
 
 	private fun getUserInfo() = viewModelScope.launch {
 		runCatching { userRepository.getUserProfile() }
-			.onSuccess { cachedUser.update { it } }
+			.onSuccess { user -> cachedUser.update { user } }
 	}
 
 	fun clickBackBtn() {

@@ -14,47 +14,51 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
-    private val userRepository: UserRepository
+	private val userRepository: UserRepository
 ) : ViewModel() {
-    val cachedUser = MutableStateFlow<User>(User.Default)
+	val cachedUser = MutableStateFlow<User>(User.Default)
 
-    init {
-    	getUserInfo()
-    }
+	init {
+		getUserInfo()
+	}
 
-    private val _eventFlow = MutableSharedFlow<MyPageEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+	private val _eventFlow = MutableSharedFlow<MyPageEvent>()
+	val eventFlow = _eventFlow.asSharedFlow()
 
-    fun clickUserEditBtn(){
-        startEvent(MyPageEvent.MoveToUserEditPage)
-    }
-    fun clickWishBtn(){
-        startEvent(MyPageEvent.MoveToWish)
-    }
-    fun clickNoticeBtn(){
-        startEvent(MyPageEvent.MoveToNotice)
-    }
-    fun clickAccountSetBtn(){
-        startEvent(MyPageEvent.MoveToAccountSetting)
-    }
-    fun clickAppSetBtn(){
-        startEvent(MyPageEvent.MoveToAppSetting)
-    }
+	fun clickUserEditBtn() {
+		startEvent(MyPageEvent.MoveToUserEditPage)
+	}
 
-    private fun getUserInfo() = viewModelScope.launch {
-        runCatching { userRepository.getUserProfile() }
-            .onSuccess { cachedUser.update { it } }
-    }
+	fun clickWishBtn() {
+		startEvent(MyPageEvent.MoveToWish)
+	}
 
-    private fun startEvent (event : MyPageEvent) = viewModelScope.launch {
-        _eventFlow.emit(event)
-    }
+	fun clickNoticeBtn() {
+		startEvent(MyPageEvent.MoveToNotice)
+	}
 
-    sealed class MyPageEvent{
-        object MoveToUserEditPage :MyPageEvent()
-        object MoveToWish :MyPageEvent()
-        object MoveToNotice :MyPageEvent()
-        object MoveToAccountSetting :MyPageEvent()
-        object MoveToAppSetting :MyPageEvent()
-    }
+	fun clickAccountSetBtn() {
+		startEvent(MyPageEvent.MoveToAccountSetting)
+	}
+
+	fun clickAppSetBtn() {
+		startEvent(MyPageEvent.MoveToAppSetting)
+	}
+
+	private fun getUserInfo() = viewModelScope.launch {
+		runCatching { userRepository.getUserProfile() }
+			.onSuccess { user -> cachedUser.update { user } }
+	}
+
+	private fun startEvent(event: MyPageEvent) = viewModelScope.launch {
+		_eventFlow.emit(event)
+	}
+
+	sealed class MyPageEvent {
+		object MoveToUserEditPage : MyPageEvent()
+		object MoveToWish : MyPageEvent()
+		object MoveToNotice : MyPageEvent()
+		object MoveToAccountSetting : MyPageEvent()
+		object MoveToAppSetting : MyPageEvent()
+	}
 }

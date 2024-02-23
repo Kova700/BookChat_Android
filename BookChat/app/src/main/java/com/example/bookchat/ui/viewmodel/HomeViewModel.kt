@@ -59,7 +59,7 @@ class HomeViewModel @Inject constructor(
 
 	private fun getUserInfo() = viewModelScope.launch {
 		runCatching { userRepository.getUserProfile() }
-			.onSuccess { cachedUser.update { it } }
+			.onSuccess { user -> cachedUser.update { user } }
 	}
 
 	val chatRoomFlow =
