@@ -44,7 +44,7 @@ interface BookChatApi {
 
 	@GET("/v1/api/users/profile")
 	suspend fun getUserProfile(
-	): Response<User>
+	): User
 
 	/**------------도서------------*/
 

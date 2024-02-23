@@ -77,8 +77,12 @@ class UserRepositoryImpl @Inject constructor(
 		}
 	}
 
-	override suspend fun signOut() {
+	override suspend fun signOut(needAServer: Boolean) {
+		if (needAServer) {
+			//Server FCM토큰 삭제 or logout API 호출
+		}
 		DataStoreManager.deleteBookChatToken()
+		//로컬에 FCM 토큰, 북챗 토큰, Room, DataStore 초기화
 	}
 
 	//회원 탈퇴 후 재가입 가능 기간 정책 결정해야함
@@ -99,21 +103,7 @@ class UserRepositoryImpl @Inject constructor(
 	override suspend fun getUserProfile(): User {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 		cachedMyUser?.let { return it }
-
-		val response = bookChatApi.getUserProfile()
-		when (response.code()) {
-			200 -> {
-				response.body()?.let { cachedMyUser = it }
-				throw ResponseBodyEmptyException(response.errorBody()?.string())
-			}
-
-			else -> throw Exception(
-				createExceptionMessage(
-					response.code(),
-					response.errorBody()?.string()
-				)
-			)
-		}
+		return bookChatApi.getUserProfile().also { cachedMyUser = it }
 	}
 
 	override suspend fun checkForDuplicateUserName(nickName: String) {
@@ -130,6 +120,9 @@ class UserRepositoryImpl @Inject constructor(
 				)
 			)
 		}
+	}
+
+	override suspend fun renewFCMToken(token: String) {
 	}
 
 	private fun createExceptionMessage(responseCode: Int, responseErrorBody: String?): String {
