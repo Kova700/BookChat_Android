@@ -46,7 +46,7 @@ object DataStoreManager : BaseDataStoreManager() {
 		return token
 	}
 
-	fun isTokenExist(): Boolean {
+	fun isAccessTokenExist(): Boolean {
 		return getBookChatTokenSync().getOrNull()?.accessToken.isNullOrBlank()
 	}
 

@@ -8,39 +8,51 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.example.bookchat.data.FCMBody
 import com.example.bookchat.data.FCMPushMessage
+import com.example.bookchat.data.PushType
+import com.example.bookchat.domain.repository.UserRepository
 import com.example.bookchat.utils.DataStoreManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FCMService : FirebaseMessagingService() {
+	@Inject
+	lateinit var gson: Gson
+
+	@Inject
+	lateinit var userRepository: UserRepository
 
 	override fun onNewToken(token: String) {
-		DataStoreManager.saveFCMTokenSync(token)
-		if (DataStoreManager.isTokenExist().not()) return
-
-		// TODO : FCM 토큰 갱신 API 호출
-		// TODO : 로그인 시점에 토큰 갱신 API 호출 한 번 더
-		//  혹은 전송 실패시 Flag 기록하고 앱 켤 때마다 확인 후 True라면 API 호출 되게 최적화 가능
-
 		super.onNewToken(token)
+		DataStoreManager.saveFCMTokenSync(token)
+		if (DataStoreManager.isAccessTokenExist().not()) return
+//		userRepository.renewFCMToken(token)
 
 		//1.    로컬 DB에 FCM 토큰 저장
 		//2-1.  access 토큰을 가지고 있다면, 저장된 FCM 토큰 서버로 전송
 		//2-2.  없다면, 전송 x
 		//3.    토큰 만료 혹은 API 실패로 해당 토큰이 서버로 전달 안되었을 경우를 감안해
 		//      로그인 API 다음 이어서 매번 서버에 FCM토큰 갱신 API호출해서 서버에 매번 덮어쓰기
+		//      혹은 전송 실패시 Flag 기록하고 앱 켤 때마다 확인 후 True라면 API 호출 되게 최적화 가능
 	}
 
 	override fun onMessageReceived(message: RemoteMessage) {
 		super.onMessageReceived(message)
-		//로컬 DB에 채팅 저장
-		sendNotification(message)
+		val hashMap = gson.fromJson(message.data["body"], LinkedHashMap::class.java)
+		if (hashMap["pushType"] == PushType.LOGIN.toString()) {
+			//userRepository.signOut() // TODO : 로그인 페이지로 이동 혹은 이동할 수 있는 Dialog 노출
+			return
+		}
+		val fcmPushMessage = gson.fromJson(message.data["body"], FCMPushMessage::class.java)
+		//TODO : 로컬 DB에 채팅 저장
+		sendNotification(fcmPushMessage)
 	}
 
-	private fun sendNotification(message: RemoteMessage) {
+	private fun sendNotification(fcmPushMessage: FCMPushMessage) {
 		val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-		val fcmPushMessage = Gson().fromJson(message.data["body"], FCMPushMessage::class.java)
 		val fcmBody = fcmPushMessage.body
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -97,10 +109,6 @@ class FCMService : FirebaseMessagingService() {
 	}
 
 }
-
-//로그 아웃 시
-//서버에 로그 아웃 API 호출해서 서버에 저장된 FCM 토큰 삭제 해야함 (로그 아웃되었을 때, 채팅 푸시 방지)
-//해당 API 성공하면 로컬에 FCM 토큰, 북챗 토큰, Room, DataStore 초기화
 
 //서버에서 전송시에 Priorty High로 보내는지 확인
 //서버 메세지 time_to_live 시간 4주(기본값) 확인
