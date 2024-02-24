@@ -5,7 +5,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.room.withTransaction
-import com.example.bookchat.App
 import com.example.bookchat.BuildConfig
 import com.example.bookchat.data.Chat
 import com.example.bookchat.data.MessageType
@@ -14,7 +13,6 @@ import com.example.bookchat.data.api.BookChatApi
 import com.example.bookchat.data.database.BookChatDB
 import com.example.bookchat.data.database.dao.ChatDAO
 import com.example.bookchat.data.database.dao.ChatRoomDAO
-import com.example.bookchat.data.database.dao.UserDAO
 import com.example.bookchat.data.database.model.ChatEntity
 import com.example.bookchat.data.database.model.ChatWithUser
 import com.example.bookchat.data.mapper.toChatEntity
@@ -30,6 +28,7 @@ import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.StompSession
 import org.hildan.krossbow.stomp.frame.FrameBody
 import org.hildan.krossbow.stomp.headers.StompSendHeaders
@@ -40,15 +39,18 @@ import javax.inject.Inject
 class ChatRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi,
 	private val bookChatDB: BookChatDB,
+	private val stompClient: StompClient,
 	private val chatDAO: ChatDAO,
 	private val chatRoomDAO: ChatRoomDAO,
 	private val userRepository: UserRepository,
 	private val gson: Gson
 ) : ChatRepository {
 
+	private lateinit var stompSession: StompSession
+
 	// TODO :SEND를 제외한 모든 Frame에 Receipt받게 헤더 수정 필요함
 
-	override fun getChatDataFlow(roomId: Long): Flow<PagingData<ChatWithUser>> {
+	override fun getPagedChatFlow(roomId: Long): Flow<PagingData<ChatWithUser>> {
 		return Pager(
 			config = PagingConfig(pageSize = LOCAL_DATA_CHAT_LOAD_SIZE),
 			remoteMediator = ChatRemoteMediator(
@@ -59,15 +61,28 @@ class ChatRepositoryImpl @Inject constructor(
 		).flow
 	}
 
-	override suspend fun getStompSession(): StompSession {
-		return App.instance.stompClient.connect(
+	override suspend fun connectSocket(roomSid: String, roomId: Long): Flow<SocketMessage> {
+		stompSession = getStompSession()
+		return subscribeChatTopic(
+			stompSession = stompSession,
+			roomSid = roomSid,
+			roomId = roomId
+		)
+	}
+
+	override suspend fun disconnectSocket() {
+		stompSession.disconnect()
+	}
+
+	private suspend fun getStompSession(): StompSession {
+		return stompClient.connect(
 			url = BuildConfig.STOMP_CONNECTION_URL,
 			customStompConnectHeaders = getHeader()
 		)
 	}
 
 	//이렇게 보내면 토큰 자동 갱신은 어케 하누?
-	override suspend fun subscribeChatTopic(
+	private suspend fun subscribeChatTopic(
 		stompSession: StompSession,
 		roomSid: String,
 		roomId: Long
@@ -208,43 +223,15 @@ class ChatRepositoryImpl @Inject constructor(
 		return chatDAO.getLastChatOfOtherUser(roomId)
 	}
 
-	private suspend fun insertNewChat(chat: ChatEntity) {
-		chatDAO.insertChat(chat)
-	}
-
-	private suspend fun updateChatInfo(chat: ChatEntity, targetChatId: Long) {
-		chatDAO.updateChatInfo(
-			chatId = chat.chatId,
-			dispatchTime = chat.dispatchTime,
-			status = ChatEntity.ChatStatus.SUCCESS,
-			targetChatId = targetChatId
-		)
-	}
-
-	private suspend fun updateChatRoomLastChatInfo(chat: ChatEntity) {
-		chatRoomDAO.updateLastChatInfo(
-			roomId = chat.chatRoomId,
-			lastChatId = chat.chatId,
-			lastActiveTime = chat.dispatchTime,
-			lastChatContent = chat.message
-		)
-	}
-
-	private fun String.parseToSocketMessage(): SocketMessage {
-		runCatching { gson.fromJson(this, SocketMessage.CommonMessage::class.java) }
-			.onSuccess { return it }
-		runCatching { gson.fromJson(this, SocketMessage.NotificationMessage::class.java) }
-			.onSuccess { return it }
-		throw JsonSyntaxException("Json cannot be deserialized to SocketMessage")
-	}
-
 	//이렇게 보내면 토큰 자동 갱신은 어케 하누?
 	override suspend fun sendMessage(
-		stompSession: StompSession,
 		roomId: Long,
-		receiptId: Long,
 		message: String
 	) {
+		val receiptId = insertWaitingChat(
+			roomId = roomId,
+			message = message
+		)
 		stompSession.send(
 			StompSendHeaders(
 				destination = "$SEND_MESSAGE_DESTINATION$roomId",
@@ -296,6 +283,43 @@ class ChatRepositoryImpl @Inject constructor(
 				)
 			}
 		}
+	}
+
+	private suspend fun insertNewChat(chat: ChatEntity) {
+		chatDAO.insertChat(chat)
+	}
+
+	private suspend fun insertWaitingChat(roomId: Long, message: String): Long {
+		val myUserId = userRepository.getUserProfile().userId
+		return chatDAO.insertWaitingChat(
+			roomId = roomId, message = message, myUserId = myUserId
+		)
+	}
+
+	private suspend fun updateChatInfo(chat: ChatEntity, targetChatId: Long) {
+		chatDAO.updateChatInfo(
+			chatId = chat.chatId,
+			dispatchTime = chat.dispatchTime,
+			status = ChatEntity.ChatStatus.SUCCESS,
+			targetChatId = targetChatId
+		)
+	}
+
+	private suspend fun updateChatRoomLastChatInfo(chat: ChatEntity) {
+		chatRoomDAO.updateLastChatInfo(
+			roomId = chat.chatRoomId,
+			lastChatId = chat.chatId,
+			lastActiveTime = chat.dispatchTime,
+			lastChatContent = chat.message
+		)
+	}
+
+	private fun String.parseToSocketMessage(): SocketMessage {
+		runCatching { gson.fromJson(this, SocketMessage.CommonMessage::class.java) }
+			.onSuccess { return it }
+		runCatching { gson.fromJson(this, SocketMessage.NotificationMessage::class.java) }
+			.onSuccess { return it }
+		throw JsonSyntaxException("Json cannot be deserialized to SocketMessage")
 	}
 
 	private fun getHeader(): Map<String, String> {

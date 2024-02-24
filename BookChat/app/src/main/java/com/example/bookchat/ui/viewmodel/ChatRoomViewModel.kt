@@ -1,34 +1,28 @@
 package com.example.bookchat.ui.viewmodel
 
-import android.widget.Toast
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.data.SocketMessage
-import com.example.bookchat.data.User
 import com.example.bookchat.data.database.model.ChatRoomEntity
 import com.example.bookchat.data.database.model.ChatWithUser
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ChatRoomManagementRepository
-import com.example.bookchat.domain.repository.UserRepository
 import com.example.bookchat.ui.fragment.ChatRoomListFragment.Companion.EXTRA_CHAT_ROOM_LIST_ITEM
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.hildan.krossbow.stomp.StompSession
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -38,7 +32,6 @@ class ChatRoomViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val chatRepository: ChatRepository,
 	private val chatRoomManagementRepository: ChatRoomManagementRepository,
-	private val userRepository: UserRepository,
 ) : ViewModel() {
 
 	private val database = App.instance.database
@@ -49,7 +42,6 @@ class ChatRoomViewModel @Inject constructor(
 	private val roomSId = initChatRoomEntity.roomSid
 
 	val eventFlow = MutableSharedFlow<ChatEvent>()
-	val cachedUser = MutableStateFlow<User>(User.Default)
 
 	val chatRoomInfoFlow = database.chatRoomDAO().getChatRoom(roomId)
 		.stateIn(
@@ -66,7 +58,6 @@ class ChatRoomViewModel @Inject constructor(
 	//  전체 채팅방 조회시 채팅방 정원 추가됨
 
 	val inputtedMessage = MutableStateFlow("")
-	private lateinit var stompSession: StompSession
 
 	//아래 안보고 있을 때, 채팅들어오면 데이터 마지막 채팅 Notice 보여주는 방식으로 수정
 	var newOtherChatNoticeFlow = MutableStateFlow<ChatWithUser?>(null)
@@ -101,12 +92,12 @@ class ChatRoomViewModel @Inject constructor(
 	//모바일 기술의 네트워크가 여러 번 변경될 수 있고 상태 변경을 모니터링하고
 	// 필요한 경우 기존 연결을 해제하고 다시 만들어야 한다는 사실을 수용해야 합니다.
 
-	val chatDataFlow = chatRepository.getChatDataFlow(roomId)
+	val chatDataFlow = chatRepository.getPagedChatFlow(roomId)
+	private val socketChatJob = connectSocket()
 
 	init {
 //        viewModelScope.launch(Dispatchers.IO) {
 		viewModelScope.launch {
-			getUserInfo()
 			getTempSavedMessage()
 			requestChatRoomInfo()
 			//채팅방 정보 조회 API 호출 (성공 여부 상관없음)
@@ -125,8 +116,6 @@ class ChatRoomViewModel @Inject constructor(
 
 			//전송 중 상태인 채팅들 전송 실패로 바꾸는건 WorkManager로 하면 될 듯
 			clearTempSavedMessage()
-			connectSocket()
-			observeChatFlowJob.start()
 		}
 	}
 
@@ -168,38 +157,17 @@ class ChatRoomViewModel @Inject constructor(
 	//TODO : 소켓 연결 끊기면 마지막 채팅으로 페이징 한 번 하고 다시 소켓 연결 (특정횟수만큼 소켓 재연결 요청)
 	//TODO : 예외별로 예외처리
 
-	private suspend fun connectSocket() {
-		runCatching { chatRepository.getStompSession() }
-			.onSuccess { stompSession = it }
-			.onFailure { handleError(it) }
-	}
-
-	private val observeChatFlowJob = viewModelScope
-		.launch(start = CoroutineStart.LAZY) {
-			runCatching { collectChatTopic() }
-				.onFailure { handleError(it) }
-		}
-
-	// TODO :launch(Dispatchers.IO) 추가 해야할 것 같으면 추가하기
-	private suspend fun subscribeChatTopic(roomSid: String): Flow<SocketMessage> {
-		runCatching {
-			chatRepository.subscribeChatTopic(
-				stompSession = stompSession,
-				roomSid = roomSid,
-				roomId = roomId
-			)
-		}
-			.onSuccess { return it }
-		throw Exception("Fail subscribeChatRoom")
-	}
-
-	private suspend fun collectChatTopic() {
-		subscribeChatTopic(roomSId).collect {
-			if (isFirstItemOnScreen.not()) {
-				newOtherChatNoticeFlow.value =
-					chatRepository.getLastChatOfOtherUser(roomId = roomId)
+	private fun connectSocket() = viewModelScope.launch {
+		chatRepository.connectSocket(
+			roomId = roomId,
+			roomSid = roomSId
+		).catch { handleError(it) }
+			.collect {
+				if (isFirstItemOnScreen.not()) {
+					newOtherChatNoticeFlow.value =
+						chatRepository.getLastChatOfOtherUser(roomId = roomId)
+				}
 			}
-		}
 	}
 
 	private fun getChatRoomUserIds(chatRoomEntity: ChatRoomEntity): List<Long> {
@@ -210,44 +178,27 @@ class ChatRoomViewModel @Inject constructor(
 		}
 	}
 
-	fun sendMessage() = viewModelScope.launch(Dispatchers.IO) {
-		if (inputtedMessage.value.isBlank()) return@launch
-		val message = inputtedMessage.value.also { inputtedMessage.value = "" }
-		scrollForcedFlag = true
-		val waitingChatId = insertWaitingChat(roomId, message)
-		runCatching { chatRepository.sendMessage(stompSession, roomId, waitingChatId, message) }
-			.onFailure { handleError(it) }
-	}
+	fun sendMessage() {
+		if (inputtedMessage.value.isBlank()) return
 
-	private suspend fun insertWaitingChat(roomId: Long, message: String): Long {
-		return database.chatDAO().insertWaitingChat(
-			roomId = roomId, message = message, myUserId = cachedUser.value.userId
-		)
-	}
-
-	private fun getUserInfo() = viewModelScope.launch {
-		runCatching { userRepository.getUserProfile() }
-			.onSuccess { cachedUser.update { it } }
+		val message = inputtedMessage.value
+		viewModelScope.launch(Dispatchers.IO) {
+			inputtedMessage.value = ""
+			scrollForcedFlag = true
+			runCatching { chatRepository.sendMessage(roomId, message) }
+				.onFailure { handleError(it) }
+		}
 	}
 
 	// TODO : Distroy 될 때도 소켓 닫게 수정
 	fun finishActivity() {
-		closeSocket()
+		disconnectSocket()
 		startEvent(ChatEvent.MoveBack)
 	}
 
-	private fun closeSocket() = viewModelScope.launch {
-		unSubscribeTopic()
-		disconnectSocket()
-	}
-
-	//TODO : cancel 성공여부 보고 disconnect하기
-	private suspend fun unSubscribeTopic() {
-		observeChatFlowJob.cancelAndJoin()
-	}
-
-	private suspend fun disconnectSocket() {
-		runCatching { stompSession.disconnect() }
+	private fun disconnectSocket() = viewModelScope.launch {
+		socketChatJob.cancelAndJoin()
+		runCatching { chatRepository.disconnectSocket() }
 			.onFailure { handleError(it) }
 	}
 
@@ -275,10 +226,6 @@ class ChatRoomViewModel @Inject constructor(
 				}
 			}
 		}
-	}
-
-	private fun makeToast(stringId: Int) {
-		Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
 	}
 
 	sealed class ChatEvent {

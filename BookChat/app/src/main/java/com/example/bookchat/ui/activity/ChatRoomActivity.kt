@@ -214,9 +214,4 @@ class ChatRoomActivity : AppCompatActivity() {
 		chatRoomViewModel.saveTempSavedMessage()
 		super.onStop()
 	}
-
-	private fun getChatRoomEntity(): ChatRoomEntity {
-		return intent.getSerializableExtra(EXTRA_CHAT_ROOM_LIST_ITEM) as ChatRoomEntity
-	}
-
 }

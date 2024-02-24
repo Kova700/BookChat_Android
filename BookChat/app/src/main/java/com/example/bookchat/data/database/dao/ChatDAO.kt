@@ -23,7 +23,7 @@ interface ChatDAO {
     @Query("SELECT * FROM Chat " +
             "WHERE chat_room_id = :chatRoomId "+
             "ORDER BY status, chat_id DESC")
-    fun getLastChatOfOtherUser(chatRoomId: Long) :ChatWithUser
+    suspend fun getLastChatOfOtherUser(chatRoomId: Long) :ChatWithUser
 
     // TODO : 채팅도 ChatRoom과 마찬가지로 이미 있으면 업데이트 ,없으면 삽입으로 수정
     //  CASCADE사용하지말 것
