@@ -1,5 +1,6 @@
 package com.example.bookchat.data
 
+import com.example.bookchat.data.database.model.ChatEntity
 import com.google.gson.annotations.SerializedName
 
 data class FCMPushMessage(
@@ -27,3 +28,14 @@ data class FCMBody(
 	@SerializedName("dispatchTime")
 	val dispatchTime: String
 )
+
+fun FCMBody.toChatEntity() : ChatEntity{
+	return ChatEntity(
+		chatId = chatId,
+		chatRoomId = chatRoomId,
+		senderId = senderId,
+		message = message,
+		dispatchTime = dispatchTime,
+		chatType = ChatEntity.ChatType.Other
+	)
+}

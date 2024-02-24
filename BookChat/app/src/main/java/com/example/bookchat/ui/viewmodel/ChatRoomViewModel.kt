@@ -4,26 +4,13 @@ import android.widget.Toast
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.ExperimentalPagingApi
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.room.withTransaction
 import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.data.MessageType.CHAT
-import com.example.bookchat.data.MessageType.ENTER
-import com.example.bookchat.data.MessageType.EXIT
-import com.example.bookchat.data.MessageType.NOTICE_HOST_DELEGATE
-import com.example.bookchat.data.MessageType.NOTICE_KICK
-import com.example.bookchat.data.MessageType.NOTICE_SUB_HOST_DELEGATE
-import com.example.bookchat.data.MessageType.NOTICE_SUB_HOST_DISMISS
 import com.example.bookchat.data.SocketMessage
 import com.example.bookchat.data.User
-import com.example.bookchat.data.database.model.ChatEntity
-import com.example.bookchat.data.database.model.ChatEntity.ChatStatus
 import com.example.bookchat.data.database.model.ChatRoomEntity
 import com.example.bookchat.data.database.model.ChatWithUser
-import com.example.bookchat.data.paging.remotemediator.ChatRemoteMediator
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ChatRoomManagementRepository
 import com.example.bookchat.domain.repository.UserRepository
@@ -36,7 +23,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -82,6 +68,7 @@ class ChatRoomViewModel @Inject constructor(
 	val inputtedMessage = MutableStateFlow("")
 	private lateinit var stompSession: StompSession
 
+	//아래 안보고 있을 때, 채팅들어오면 데이터 마지막 채팅 Notice 보여주는 방식으로 수정
 	var newOtherChatNoticeFlow = MutableStateFlow<ChatWithUser?>(null)
 	var isFirstItemOnScreen = true
 	var scrollForcedFlag = false
@@ -114,17 +101,7 @@ class ChatRoomViewModel @Inject constructor(
 	//모바일 기술의 네트워크가 여러 번 변경될 수 있고 상태 변경을 모니터링하고
 	// 필요한 경우 기존 연결을 해제하고 다시 만들어야 한다는 사실을 수용해야 합니다.
 
-	@OptIn(ExperimentalPagingApi::class)
-	val chatDataFlow = Pager(
-		config = PagingConfig(pageSize = LOCAL_DATA_CHAT_LOAD_SIZE),
-		remoteMediator = ChatRemoteMediator(
-			database = database,
-			chatRoomId = roomId,
-			chatRepository = chatRepository,
-			userRepository = userRepository,
-		),
-		pagingSourceFactory = { database.chatDAO().getChatWithUserPagingSource(roomId) }
-	).flow.distinctUntilChanged()
+	val chatDataFlow = chatRepository.getChatDataFlow(roomId)
 
 	init {
 //        viewModelScope.launch(Dispatchers.IO) {
@@ -203,8 +180,26 @@ class ChatRoomViewModel @Inject constructor(
 				.onFailure { handleError(it) }
 		}
 
+	// TODO :launch(Dispatchers.IO) 추가 해야할 것 같으면 추가하기
+	private suspend fun subscribeChatTopic(roomSid: String): Flow<SocketMessage> {
+		runCatching {
+			chatRepository.subscribeChatTopic(
+				stompSession = stompSession,
+				roomSid = roomSid,
+				roomId = roomId
+			)
+		}
+			.onSuccess { return it }
+		throw Exception("Fail subscribeChatRoom")
+	}
+
 	private suspend fun collectChatTopic() {
-		subscribeChatTopic(roomSId).collect { socketMessage -> saveChatInLocalDB(socketMessage) }
+		subscribeChatTopic(roomSId).collect {
+			if (isFirstItemOnScreen.not()) {
+				newOtherChatNoticeFlow.value =
+					chatRepository.getLastChatOfOtherUser(roomId = roomId)
+			}
+		}
 	}
 
 	private fun getChatRoomUserIds(chatRoomEntity: ChatRoomEntity): List<Long> {
@@ -213,144 +208,6 @@ class ChatRoomViewModel @Inject constructor(
 			chatRoomEntity.subHostIds?.let { addAll(it) }
 			chatRoomEntity.guestIds?.let { addAll(it) }
 		}
-	}
-
-	private suspend fun saveChatInLocalDB(socketMessage: SocketMessage) {
-		when (socketMessage) {
-			is SocketMessage.CommonMessage -> saveCommonMessageInLocalDB(socketMessage)
-			is SocketMessage.NotificationMessage -> saveNoticeMessageInLocalDB(socketMessage)
-		}
-	}
-
-	private suspend fun saveCommonMessageInLocalDB(
-		socketMessage: SocketMessage.CommonMessage
-	) {
-		val myUserId = userRepository.getUserProfile().userId
-		val receiptId = socketMessage.receiptId
-		val chatEntity = socketMessage.toChatEntity(
-			chatRoomId = roomId,
-			myUserId = cachedUser.value.userId
-		)
-
-		database.withTransaction {
-			if (socketMessage.senderId != myUserId) {
-				if (!isFirstItemOnScreen) {
-					newOtherChatNoticeFlow.value = getChatWithUser(chatEntity)
-				}
-				insertNewChat(chatEntity)
-				updateChatRoomLastChatInfo(chatEntity)
-				return@withTransaction
-			}
-			updateChatInfo(chatEntity, receiptId)
-			updateChatRoomLastChatInfo(chatEntity)
-		}
-	}
-
-	private suspend fun getChatWithUser(chatEntity: ChatEntity): ChatWithUser {
-		val sender = database.userDAO().getUser(chatEntity.senderId!!)
-		return ChatWithUser(user = sender, chat = chatEntity)
-	}
-
-	private suspend fun saveNoticeMessageInLocalDB(
-		socketMessage: SocketMessage.NotificationMessage
-	) {
-		val chatEntity = socketMessage.toChatEntity(
-			chatRoomId = roomId,
-			myUserId = cachedUser.value.userId
-		)
-		// TODO :Target에 대한 DB수정 작업해야함
-		database.withTransaction {
-			val noticeTarget = socketMessage.targetId
-
-			//TODO : ++ ㅁㅁ님이 입장하셨습니다.
-			// ㅁㅁ님이 퇴장하셨습니다.
-			// 같이 공지채팅에서 유저이름을 언급하는 경우
-			// 실제 닉네임이 아니라 UserId로 주는게 더 좋아보임
-			// 문제는 없나..?
-			// 메모장에서 언급했던 오래 전 채팅에서 보이는 유저 정보가
-			// 최신 정보임을 보장하지 못하는 내용 (그 사람이 현재 채팅방에 없다면)
-			// 닉네임, 프로필 사진 등
-			// 하지만 카톡도 이렇게 보이는 현상이 있음
-			// 이거 결론 짓고, 전달하면 될 듯
-
-			when (socketMessage.messageType) {
-				//TODO : 채팅방 터짐(방장 나감)도 추가해야함 + Notice이름 좀 바꾸자.
-				CHAT -> {}
-				ENTER -> {
-					//TODO : 채팅방 정보 조회를 다시하거나 (당첨)
-					// Enter NOTICE 속에 유저 정보(채팅방 정보조회의 유저 객체처럼)가
-					// 있어야할 것같음 [Id, nickname, profileUrl, defaultImageType]
-
-					//TODO : ㅁㅁ님이 입장 하셨습니다.
-					// 이것도 일반 텍스트가 아닌, UserID님이 입장하셨습니다로 보내고
-					// 이걸 클라이언트가 해당 유저 정보를 가지고 있는 값으로 누구님이 입장하셨습니다로 변경하는게 좋을 듯
-					database.chatRoomDAO().updateMemberCount(roomId, 1)
-				}
-
-				EXIT -> {
-					//TODO : 채팅방 퇴장 시에 서버에서 넣어주는 채팅 ㅁㅁ님이 퇴장 하셨습니다.
-					// 이걸 일반 텍스트가 아닌, UserId님이 퇴장하셨습니다로 보내고
-					// 이걸 클라이언트가 해당 유저 정보를 가지고 있는 값으로 누구님이 퇴장하셨습니다로 변경하는게 좋을 듯
-
-					//TODO : 만약 방장이 나갔다면 채팅방 삭제 후 공지 띄우고 채팅 입력 막아야함.
-					// 채팅방 인원 수 감소
-					database.chatRoomDAO().updateMemberCount(roomId, -1)
-				}
-
-				NOTICE_KICK -> {
-					//채팅방 인원 수 감소
-					database.chatRoomDAO().updateMemberCount(roomId, -1)
-				}
-
-				NOTICE_HOST_DELEGATE -> {
-					//방장 변경
-				}
-
-				NOTICE_SUB_HOST_DISMISS -> {
-					//Target 부방장 해임
-				}
-
-				NOTICE_SUB_HOST_DELEGATE -> {
-					//Target 부방장 위임
-				}
-			}
-
-			//TODO : 터질 확률이 높음
-			// 유저채팅이 아니고, 프로필도 없고, defaultImageType도 없음으로로
-			// if (!isFirstItemOnScreen) newOtherChatNoticeFlow.value = chatEntity
-			insertNewChat(chatEntity)
-			updateChatRoomLastChatInfo(chatEntity)
-			return@withTransaction
-		}
-	}
-
-	private suspend fun insertNewChat(chat: ChatEntity) {
-		database.chatDAO().insertChat(chat)
-	}
-
-	private suspend fun updateChatInfo(chat: ChatEntity, targetChatId: Long) {
-		database.chatDAO().updateChatInfo(
-			chatId = chat.chatId,
-			dispatchTime = chat.dispatchTime,
-			status = ChatStatus.SUCCESS,
-			targetChatId = targetChatId
-		)
-	}
-
-	private suspend fun updateChatRoomLastChatInfo(chat: ChatEntity) {
-		database.chatRoomDAO().updateLastChatInfo(
-			roomId = chat.chatRoomId,
-			lastChatId = chat.chatId,
-			lastActiveTime = chat.dispatchTime,
-			lastChatContent = chat.message
-		)
-	}
-
-	// TODO :launch(Dispatchers.IO) 추가 해야할 것 같으면 추가하기
-	private suspend fun subscribeChatTopic(roomSid: String): Flow<SocketMessage> {
-		runCatching { chatRepository.subscribeChatTopic(stompSession, roomSid) }
-			.onSuccess { return it }
-		throw Exception("Fail subscribeChatRoom")
 	}
 
 	fun sendMessage() = viewModelScope.launch(Dispatchers.IO) {

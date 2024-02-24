@@ -2,7 +2,6 @@ package com.example.bookchat.data.database.dao
 
 import androidx.paging.PagingSource
 import androidx.room.*
-import com.example.bookchat.App
 import com.example.bookchat.data.database.model.ChatEntity
 import com.example.bookchat.data.database.model.ChatWithUser
 import com.example.bookchat.utils.DateManager
@@ -20,6 +19,11 @@ interface ChatDAO {
             "WHERE chat_room_id = :chatRoomId "+
             "ORDER BY status, chat_id DESC")
     fun getChatWithUserPagingSource(chatRoomId: Long) :PagingSource<Int, ChatWithUser>
+
+    @Query("SELECT * FROM Chat " +
+            "WHERE chat_room_id = :chatRoomId "+
+            "ORDER BY status, chat_id DESC")
+    fun getLastChatOfOtherUser(chatRoomId: Long) :ChatWithUser
 
     // TODO : 채팅도 ChatRoom과 마찬가지로 이미 있으면 업데이트 ,없으면 삽입으로 수정
     //  CASCADE사용하지말 것
