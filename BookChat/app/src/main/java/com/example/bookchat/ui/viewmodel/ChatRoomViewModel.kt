@@ -3,13 +3,14 @@ package com.example.bookchat.ui.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.withTransaction
-import com.example.bookchat.App
 import com.example.bookchat.R
+import com.example.bookchat.data.database.dao.ChatRoomDAO
+import com.example.bookchat.data.database.dao.TempMessageDAO
 import com.example.bookchat.data.database.model.ChatRoomEntity
 import com.example.bookchat.data.database.model.ChatWithUser
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ChatRoomManagementRepository
+import com.example.bookchat.domain.repository.UserRepository
 import com.example.bookchat.ui.fragment.ChatRoomListFragment.Companion.EXTRA_CHAT_ROOM_LIST_ITEM
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,10 +32,12 @@ import kotlin.time.Duration.Companion.minutes
 class ChatRoomViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val chatRepository: ChatRepository,
+	private val chatRoomDAO: ChatRoomDAO,
+	private val tempMessageDAO: TempMessageDAO,
+	private val userRepository: UserRepository,
 	private val chatRoomManagementRepository: ChatRoomManagementRepository,
 ) : ViewModel() {
 
-	private val database = App.instance.database
 	val initChatRoomEntity: ChatRoomEntity =
 		savedStateHandle.get<ChatRoomEntity>(EXTRA_CHAT_ROOM_LIST_ITEM)
 			?: throw Exception("ChatRoom Information Does Not Exist")
@@ -43,7 +46,7 @@ class ChatRoomViewModel @Inject constructor(
 
 	val eventFlow = MutableSharedFlow<ChatEvent>()
 
-	val chatRoomInfoFlow = database.chatRoomDAO().getChatRoom(roomId)
+	val chatRoomInfoFlow = chatRoomDAO.getChatRoom(roomId)
 		.stateIn(
 			scope = viewModelScope,
 			started = SharingStarted.Lazily,
@@ -51,7 +54,7 @@ class ChatRoomViewModel @Inject constructor(
 		)
 
 	val chatRoomUserListFlow = chatRoomInfoFlow.map { chatRoomEntity ->
-		database.userDAO().getUserList(getChatRoomUserIds(chatRoomEntity))
+		userRepository.getChatRoomUserList(chatRoomEntity)
 	}
 
 	// TODO : message 객체 구성 변경 receiptID 추가
@@ -121,24 +124,21 @@ class ChatRoomViewModel @Inject constructor(
 
 	private suspend fun requestChatRoomInfo() {
 		runCatching { chatRoomManagementRepository.getChatRoomInfo(roomId) }
+			.onFailure { handleError(it) }
 	}
 
 	private suspend fun getTempSavedMessage() {
-		inputtedMessage.value = database.tempMessageDAO().getTempMessage(roomId)?.message ?: ""
+		inputtedMessage.value = tempMessageDAO.getTempMessage(roomId)?.message ?: ""
 	}
 
 	fun saveTempSavedMessage() = viewModelScope.launch {
 		val tempMessage = inputtedMessage.value
 		if (tempMessage.isBlank()) return@launch
-		database.withTransaction {
-			database.tempMessageDAO().insertOrUpdateTempMessage(roomId, tempMessage)
-		}
+		  tempMessageDAO.insertOrUpdateTempMessage(roomId, tempMessage)
 	}
 
 	private suspend fun clearTempSavedMessage() {
-		database.withTransaction {
-			database.tempMessageDAO().setTempSavedMessage(roomId, "")
-		}
+			tempMessageDAO.setTempSavedMessage(roomId, "")
 	}
 
 	private fun startAutoTokenRenewal() {
@@ -157,7 +157,7 @@ class ChatRoomViewModel @Inject constructor(
 	//TODO : 소켓 연결 끊기면 마지막 채팅으로 페이징 한 번 하고 다시 소켓 연결 (특정횟수만큼 소켓 재연결 요청)
 	//TODO : 예외별로 예외처리
 
-	private fun connectSocket() = viewModelScope.launch {
+	private fun connectSocket() = viewModelScope.launch(Dispatchers.IO) {
 		chatRepository.connectSocket(
 			roomId = roomId,
 			roomSid = roomSId
@@ -168,14 +168,6 @@ class ChatRoomViewModel @Inject constructor(
 						chatRepository.getLastChatOfOtherUser(roomId = roomId)
 				}
 			}
-	}
-
-	private fun getChatRoomUserIds(chatRoomEntity: ChatRoomEntity): List<Long> {
-		return mutableListOf<Long>().apply {
-			chatRoomEntity.hostId?.let { add(it) }
-			chatRoomEntity.subHostIds?.let { addAll(it) }
-			chatRoomEntity.guestIds?.let { addAll(it) }
-		}
 	}
 
 	fun sendMessage() {

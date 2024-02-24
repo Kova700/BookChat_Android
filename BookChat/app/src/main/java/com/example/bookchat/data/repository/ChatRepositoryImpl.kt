@@ -12,7 +12,6 @@ import com.example.bookchat.data.SocketMessage
 import com.example.bookchat.data.api.BookChatApi
 import com.example.bookchat.data.database.BookChatDB
 import com.example.bookchat.data.database.dao.ChatDAO
-import com.example.bookchat.data.database.dao.ChatRoomDAO
 import com.example.bookchat.data.database.model.ChatEntity
 import com.example.bookchat.data.database.model.ChatWithUser
 import com.example.bookchat.data.mapper.toChatEntity
@@ -20,6 +19,7 @@ import com.example.bookchat.data.paging.remotemediator.ChatRemoteMediator
 import com.example.bookchat.data.request.RequestSendChat
 import com.example.bookchat.data.response.RespondGetChat
 import com.example.bookchat.domain.repository.ChatRepository
+import com.example.bookchat.domain.repository.ChatRoomManagementRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.utils.DataStoreManager
 import com.example.bookchat.utils.SearchSortOption
@@ -41,7 +41,7 @@ class ChatRepositoryImpl @Inject constructor(
 	private val bookChatDB: BookChatDB,
 	private val stompClient: StompClient,
 	private val chatDAO: ChatDAO,
-	private val chatRoomDAO: ChatRoomDAO,
+	private val chatRoomManagementRepository: ChatRoomManagementRepository,
 	private val clientRepository: ClientRepository,
 	private val gson: Gson
 ) : ChatRepository {
@@ -139,7 +139,7 @@ class ChatRepositoryImpl @Inject constructor(
 				updateChatRoomLastChatInfo(chatEntity)
 				return@withTransaction
 			}
-			updateChatInfo(chatEntity, receiptId)
+			updateChatInfo(chatEntity, receiptId) //전송 대기 상태 -> 전송 완료로 상태 변경
 			updateChatRoomLastChatInfo(chatEntity)
 		}
 	}
@@ -179,7 +179,7 @@ class ChatRepositoryImpl @Inject constructor(
 					//TODO : ㅁㅁ님이 입장 하셨습니다.
 					// 이것도 일반 텍스트가 아닌, UserID님이 입장하셨습니다로 보내고
 					// 이걸 클라이언트가 해당 유저 정보를 가지고 있는 값으로 누구님이 입장하셨습니다로 변경하는게 좋을 듯
-					chatRoomDAO.updateMemberCount(roomId, 1)
+					chatRoomManagementRepository.updateMemberCount(roomId, 1)
 				}
 
 				MessageType.EXIT -> {
@@ -189,12 +189,12 @@ class ChatRepositoryImpl @Inject constructor(
 
 					//TODO : 만약 방장이 나갔다면 채팅방 삭제 후 공지 띄우고 채팅 입력 막아야함.
 					// 채팅방 인원 수 감소
-					chatRoomDAO.updateMemberCount(roomId, -1)
+					chatRoomManagementRepository.updateMemberCount(roomId, -1)
 				}
 
 				MessageType.NOTICE_KICK -> {
 					//채팅방 인원 수 감소
-					chatRoomDAO.updateMemberCount(roomId, -1)
+					chatRoomManagementRepository.updateMemberCount(roomId, -1)
 				}
 
 				MessageType.NOTICE_HOST_DELEGATE -> {
@@ -275,11 +275,11 @@ class ChatRepositoryImpl @Inject constructor(
 			)
 			if (isFirst) {
 				val lastChat = pagedList.firstOrNull() ?: return@withTransaction
-				chatRoomDAO.updateLastChatInfo(
-					roomId = roomId,
-					lastChatId = lastChat.chatId,
-					lastActiveTime = lastChat.dispatchTime,
-					lastChatContent = lastChat.message
+				chatRoomManagementRepository.updateLastChat(
+					lastChat.toChatEntity(
+						chatRoomId = roomId,
+						myUserId = clientRepository.getClientProfile().userId
+					)
 				)
 			}
 		}
@@ -306,12 +306,7 @@ class ChatRepositoryImpl @Inject constructor(
 	}
 
 	private suspend fun updateChatRoomLastChatInfo(chat: ChatEntity) {
-		chatRoomDAO.updateLastChatInfo(
-			roomId = chat.chatRoomId,
-			lastChatId = chat.chatId,
-			lastActiveTime = chat.dispatchTime,
-			lastChatContent = chat.message
-		)
+		chatRoomManagementRepository.updateLastChat(chat)
 	}
 
 	private fun String.parseToSocketMessage(): SocketMessage {

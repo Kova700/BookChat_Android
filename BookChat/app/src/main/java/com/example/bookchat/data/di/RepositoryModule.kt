@@ -8,6 +8,7 @@ import com.example.bookchat.data.repository.ChatRepositoryImpl
 import com.example.bookchat.data.repository.ChatRoomManagementRepositoryImpl
 import com.example.bookchat.data.repository.UserChatRoomRepositoryImpl
 import com.example.bookchat.data.repository.ClientRepositoryImpl
+import com.example.bookchat.data.repository.UserRepositoryImpl
 import com.example.bookchat.data.repository.WholeChatRoomRepositoryImpl
 import com.example.bookchat.domain.repository.AgonyRecordRepository
 import com.example.bookchat.domain.repository.AgonyRepository
@@ -17,6 +18,7 @@ import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ChatRoomManagementRepository
 import com.example.bookchat.domain.repository.UserChatRoomRepository
 import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.domain.repository.UserRepository
 import com.example.bookchat.domain.repository.WholeChatRoomRepository
 import dagger.Binds
 import dagger.Module
@@ -69,6 +71,12 @@ interface RepositoryModule {
 	fun bindChatRoomManagementRepository(
 		repository: ChatRoomManagementRepositoryImpl
 	): ChatRoomManagementRepository
+
+	@Binds
+	@Singleton
+	fun bindUserRepository(
+		repository: UserRepositoryImpl
+	): UserRepository
 
 	@Binds
 	@Singleton

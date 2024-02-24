@@ -2,73 +2,60 @@ package com.example.bookchat.data.repository
 
 import com.example.bookchat.App
 import com.example.bookchat.data.api.BookChatApi
+import com.example.bookchat.data.database.dao.ChatRoomDAO
+import com.example.bookchat.data.database.model.ChatEntity
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.RespondChatRoomInfo
-import com.example.bookchat.data.response.ResponseBodyEmptyException
 import com.example.bookchat.domain.repository.ChatRoomManagementRepository
+import com.example.bookchat.domain.repository.UserRepository
 import javax.inject.Inject
 
 class ChatRoomManagementRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi,
+	private val chatRoomDAO: ChatRoomDAO,
+	private val userRepository: UserRepository,
 ) : ChatRoomManagementRepository {
-	val database = App.instance.database
 
 	override suspend fun enterChatRoom(roomId: Long) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-		val response = bookChatApi.enterChatRoom(roomId)
-
-		when (response.code()) {
-			200 -> {}
-			else -> throw Exception(
-				createExceptionMessage(response.code(), response.errorBody()?.string())
-			)
-		}
+		bookChatApi.enterChatRoom(roomId)
 	}
 
 	override suspend fun leaveChatRoom(roomId: Long) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-		val response = bookChatApi.leaveChatRoom(roomId)
-
-		when (response.code()) {
-			200 -> {}
-			else -> throw Exception(
-				createExceptionMessage(response.code(), response.errorBody()?.string())
-			)
-		}
+		bookChatApi.leaveChatRoom(roomId)
 	}
 
 	override suspend fun getChatRoomInfo(roomId: Long) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 		val response = bookChatApi.getChatRoomInfo(roomId)
+		saveUserDataInLocalDB(response)
+		saveChatRoomDataInLocalDB(roomId, response)
+	}
 
-		when (response.code()) {
-			200 -> {
-				val chatRoomInfo = response.body()
-				chatRoomInfo?.let { it ->
-					saveUserDataInLocalDB(it)
-					saveChatRoomDataInLocalDB(roomId, it)
-					return
-				}
-				throw ResponseBodyEmptyException(response.errorBody()?.string())
-			}
+	override suspend fun updateMemberCount(roomId: Long, offset: Int) {
+		chatRoomDAO.updateMemberCount(roomId, offset)
+	}
 
-			else -> throw Exception(
-				createExceptionMessage(response.code(), response.errorBody()?.string())
-			)
-		}
+	override suspend fun updateLastChat(chat: ChatEntity) {
+		chatRoomDAO.updateLastChatInfo(
+			roomId = chat.chatRoomId,
+			lastChatId = chat.chatId,
+			lastActiveTime = chat.dispatchTime,
+			lastChatContent = chat.message
+		)
 	}
 
 	private suspend fun saveUserDataInLocalDB(chatRoomInfo: RespondChatRoomInfo) {
 		val chatRoomUserList = mutableListOf(chatRoomInfo.roomHost)
 		chatRoomInfo.roomSubHostList?.let { chatRoomUserList.addAll(it) }
 		chatRoomInfo.roomGuestList?.let { chatRoomUserList.addAll(it) }
-		database.userDAO().insertOrUpdateAllUser(chatRoomUserList.map { it.toUserEntity() })
+		userRepository.insertOrUpdateAllUser(chatRoomUserList.map { it.toUserEntity() })
 	}
 
 	private suspend fun saveChatRoomDataInLocalDB(roomId: Long, chatRoomInfo: RespondChatRoomInfo) {
-
 		// TODO : 채팅방 제목이 추가되어야함 (채팅방 제목 바뀌면 알 수가 없음)
-		database.chatRoomDAO().updateDetailInfo(
+		chatRoomDAO.updateDetailInfo(
 			roomId = roomId,
 			hostId = chatRoomInfo.roomHost.id,
 			subHostIds = chatRoomInfo.roomSubHostList?.map { it.id },

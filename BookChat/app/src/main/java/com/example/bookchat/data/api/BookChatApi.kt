@@ -210,7 +210,7 @@ interface BookChatApi {
 	@GET("/v1/api/chatrooms/{roomId}")
 	suspend fun getChatRoomInfo(
 		@Path("roomId") roomId: Long
-	): Response<RespondChatRoomInfo>
+	): RespondChatRoomInfo
 
 	/**------------채팅내역------------*/
 
