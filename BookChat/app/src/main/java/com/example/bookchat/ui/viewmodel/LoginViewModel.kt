@@ -12,7 +12,7 @@ import com.example.bookchat.data.response.KakaoLoginUserCancelException
 import com.example.bookchat.data.response.NeedToDeviceWarningException
 import com.example.bookchat.data.response.NeedToSignUpException
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
-import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.oauth.GoogleSDK
 import com.example.bookchat.oauth.KakaoSDK
 import com.example.bookchat.utils.Constants.TAG
@@ -25,7 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-	private val userRepository: UserRepository
+	private val clientRepository: ClientRepository
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<LoginEvent>()
@@ -35,7 +35,7 @@ class LoginViewModel @Inject constructor(
 
 	private fun requestUserInfo() = viewModelScope.launch {
 		Log.d(TAG, "LoginViewModel: requestUserInfo() - called")
-		runCatching { userRepository.getUserProfile() }
+		runCatching { clientRepository.getClientProfile() }
 			.onSuccess { startEvent(LoginEvent.MoveToMain) }
 			.onFailure { failHandler(it) }
 	}
@@ -51,7 +51,7 @@ class LoginViewModel @Inject constructor(
 	fun bookchatLogin(approveChangingDevice: Boolean = false) = viewModelScope.launch {
 		Log.d(TAG, "LoginViewModel: bookchatLogin() - called")
 		setUiStateToLoading()
-		runCatching { userRepository.signIn(approveChangingDevice) }
+		runCatching { clientRepository.signIn(approveChangingDevice) }
 			.onSuccess { requestUserInfo() }
 			.onFailure { failHandler(it) }
 			.also { setUiStateToDefault() }

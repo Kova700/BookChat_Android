@@ -3,9 +3,9 @@ package com.example.bookchat.domain.repository
 import com.example.bookchat.data.User
 import com.example.bookchat.data.UserSignUpDto
 
-interface UserRepository {
+interface ClientRepository {
 	suspend fun signIn(approveChangingDevice: Boolean = false)
-	suspend fun getUserProfile(): User
+	suspend fun getClientProfile(): User
 	suspend fun signUp(userSignUpDto: UserSignUpDto)
 	suspend fun signOut(needAServer: Boolean = false)
 	suspend fun withdraw()

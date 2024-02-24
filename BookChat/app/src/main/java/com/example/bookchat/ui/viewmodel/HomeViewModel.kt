@@ -12,7 +12,7 @@ import com.example.bookchat.data.database.model.ChatRoomEntity
 import com.example.bookchat.data.paging.ReadingBookTapPagingSource
 import com.example.bookchat.domain.repository.BookRepository
 import com.example.bookchat.domain.repository.UserChatRoomRepository
-import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.domain.repository.ClientRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -24,15 +24,15 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
 	private val bookRepository: BookRepository,
-	private val userRepository: UserRepository,
+	private val clientRepository: ClientRepository,
 	private val userChatRoomRepository: UserChatRoomRepository
 ) : ViewModel() {
 
-	val cachedUser = MutableStateFlow<User>(User.Default)
+	val cachedClient = MutableStateFlow<User>(User.Default)
 	val database = App.instance.database
 
 	init {
-		getUserInfo()
+		getClientInfo()
 		getRemoteUserChatRoomList()
 	}
 
@@ -57,9 +57,9 @@ class HomeViewModel @Inject constructor(
 			}.cachedIn(viewModelScope)
 	}
 
-	private fun getUserInfo() = viewModelScope.launch {
-		runCatching { userRepository.getUserProfile() }
-			.onSuccess { user -> cachedUser.update { user } }
+	private fun getClientInfo() = viewModelScope.launch {
+		runCatching { clientRepository.getClientProfile() }
+			.onSuccess { user -> cachedClient.update { user } }
 	}
 
 	val chatRoomFlow =

@@ -20,7 +20,7 @@ import com.example.bookchat.data.paging.remotemediator.ChatRemoteMediator
 import com.example.bookchat.data.request.RequestSendChat
 import com.example.bookchat.data.response.RespondGetChat
 import com.example.bookchat.domain.repository.ChatRepository
-import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.utils.DataStoreManager
 import com.example.bookchat.utils.SearchSortOption
 import com.google.gson.Gson
@@ -42,7 +42,7 @@ class ChatRepositoryImpl @Inject constructor(
 	private val stompClient: StompClient,
 	private val chatDAO: ChatDAO,
 	private val chatRoomDAO: ChatRoomDAO,
-	private val userRepository: UserRepository,
+	private val clientRepository: ClientRepository,
 	private val gson: Gson
 ) : ChatRepository {
 
@@ -126,7 +126,7 @@ class ChatRepositoryImpl @Inject constructor(
 		socketMessage: SocketMessage.CommonMessage,
 		roomId: Long
 	) {
-		val myUserId = userRepository.getUserProfile().userId
+		val myUserId = clientRepository.getClientProfile().userId
 		val receiptId = socketMessage.receiptId
 		val chatEntity = socketMessage.toChatEntity(
 			chatRoomId = roomId,
@@ -148,7 +148,7 @@ class ChatRepositoryImpl @Inject constructor(
 		socketMessage: SocketMessage.NotificationMessage,
 		roomId: Long
 	) {
-		val myUserId = userRepository.getUserProfile().userId
+		val myUserId = clientRepository.getClientProfile().userId
 		val chatEntity = socketMessage.toChatEntity(
 			chatRoomId = roomId,
 			myUserId = myUserId
@@ -270,7 +270,7 @@ class ChatRepositoryImpl @Inject constructor(
 			chatDAO.insertAllChat(
 				pagedList.toChatEntity(
 					chatRoomId = roomId,
-					myUserId = userRepository.getUserProfile().userId
+					myUserId = clientRepository.getClientProfile().userId
 				)
 			)
 			if (isFirst) {
@@ -290,7 +290,7 @@ class ChatRepositoryImpl @Inject constructor(
 	}
 
 	private suspend fun insertWaitingChat(roomId: Long, message: String): Long {
-		val myUserId = userRepository.getUserProfile().userId
+		val myUserId = clientRepository.getClientProfile().userId
 		return chatDAO.insertWaitingChat(
 			roomId = roomId, message = message, myUserId = myUserId
 		)

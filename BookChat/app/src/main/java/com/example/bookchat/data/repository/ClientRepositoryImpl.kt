@@ -11,15 +11,15 @@ import com.example.bookchat.data.response.NeedToSignUpException
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.NickNameDuplicateException
 import com.example.bookchat.data.response.ResponseBodyEmptyException
-import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.utils.DataStoreManager
 import javax.inject.Inject
 
-class UserRepositoryImpl @Inject constructor(
+class ClientRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi
-) : UserRepository {
+) : ClientRepository {
 
-	private var cachedMyUser: User? = null
+	private var cachedClient: User? = null
 
 	override suspend fun signIn(approveChangingDevice: Boolean) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
@@ -100,10 +100,10 @@ class UserRepositoryImpl @Inject constructor(
 		}
 	}
 
-	override suspend fun getUserProfile(): User {
+	override suspend fun getClientProfile(): User {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-		cachedMyUser?.let { return it }
-		return bookChatApi.getUserProfile().also { cachedMyUser = it }
+		cachedClient?.let { return it }
+		return bookChatApi.getUserProfile().also { cachedClient = it }
 	}
 
 	override suspend fun checkForDuplicateUserName(nickName: String) {

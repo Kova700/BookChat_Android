@@ -59,7 +59,7 @@
                 android:elegantTextHeight="true"
                 android:fontFamily="@font/notosanskr_bold"
                 android:maxLines="1"
-                android:text="@{viewmodel.cachedUser.userNickname + '님'}"
+                android:text="@{viewmodel.cachedClient.userNickname + '님'}"
                 android:ellipsize="end"
                 android:textColor="#222222"
                 android:textSize="20sp"

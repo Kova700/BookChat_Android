@@ -62,8 +62,8 @@
                 android:id="@+id/userProfile_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                userProfileUrl="@{viewmodel.cachedUser.userProfileImageUri}"
-                userDefaultProfileImageType="@{viewmodel.cachedUser.defaultProfileImageType}"
+                userProfileUrl="@{viewmodel.cachedClient.userProfileImageUri}"
+                userDefaultProfileImageType="@{viewmodel.cachedClient.defaultProfileImageType}"
                 android:scaleType="fitCenter"
                 android:src="@drawable/default_profile_img1" />
         </androidx.cardview.widget.CardView>
@@ -79,7 +79,7 @@
             android:fontFamily="@font/notosanskr_bold"
             android:maxLength="20"
             android:maxLines="1"
-            android:text="@{viewmodel.cachedUser.userNickname}"
+            android:text="@{viewmodel.cachedClient.userNickname}"
             android:textColor="#373737"
             android:textSize="20sp"
             app:layout_constrainedWidth="true"

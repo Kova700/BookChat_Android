@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.data.response.ForbiddenException
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
-import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.ReadingTaste
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SelectTasteViewModel @Inject constructor(
-	private val userRepository: UserRepository
+	private val clientRepository: ClientRepository
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<SelectTasteEvent>()
@@ -34,21 +34,21 @@ class SelectTasteViewModel @Inject constructor(
 
 	fun signUp() = viewModelScope.launch {
 		_signUpDto.value.readingTastes = selectedTastes
-		runCatching { userRepository.signUp(_signUpDto.value) }
+		runCatching { clientRepository.signUp(_signUpDto.value) }
 			.onSuccess { signIn() }
 			.onFailure { failHandler(it) }
 	}
 
 	private fun signIn() = viewModelScope.launch {
 		Log.d(TAG, "SelectTasteViewModel: signIn() - called")
-		runCatching { userRepository.signIn() }
+		runCatching { clientRepository.signIn() }
 			.onSuccess { requestUserInfo() }
 			.onFailure { failHandler(it) }
 	}
 
 	private fun requestUserInfo() = viewModelScope.launch {
 		Log.d(TAG, "LoginViewModel: requestUserInfo() - called")
-		runCatching { userRepository.getUserProfile() }
+		runCatching { clientRepository.getClientProfile() }
 			.onSuccess { startEvent(SelectTasteEvent.MoveToMain) }
 			.onFailure { failHandler(it) }
 	}
