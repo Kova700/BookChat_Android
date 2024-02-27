@@ -44,7 +44,7 @@ interface BookChatApi {
 
 	@GET("/v1/api/users/profile")
 	suspend fun getUserProfile(
-	): User
+	): UserResponse
 
 	/**------------도서------------*/
 
@@ -175,10 +175,10 @@ interface BookChatApi {
 	/**------------채팅방------------*/
 
 	@GET("/v1/api/users/chatrooms")
-	suspend fun getUserChatRoomList(
+	suspend fun getChannels(
 		@Query("postCursorId") postCursorId: Long?,
 		@Query("size") size: Int,
-	): ResponseGetUserChatRoomList
+	): GetUserChannelResponse
 
 	@Multipart
 	@POST("/v1/api/chatrooms")

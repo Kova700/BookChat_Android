@@ -5,7 +5,7 @@
     <data>
         <variable
             name="chat"
-            type="com.example.bookchat.data.database.model.ChatEntity" />
+            type="com.example.bookchat.domain.model.Chat" />
         <variable
             name="isSameDate"
             type="Boolean" />

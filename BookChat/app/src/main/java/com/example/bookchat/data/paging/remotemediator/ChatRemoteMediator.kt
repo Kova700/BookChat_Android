@@ -4,21 +4,21 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import com.example.bookchat.data.database.model.ChatWithUser
+import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.repository.ChatRepository
 
 @OptIn(ExperimentalPagingApi::class)
 class ChatRemoteMediator(
 	private val chatRoomId: Long,
 	private val chatRepository: ChatRepository,
-) : RemoteMediator<Int, ChatWithUser>() {
+) : RemoteMediator<Int, Chat>() {
 
 	private var isLast = false
 	private var isFirst = true
 
 	override suspend fun load(
 		loadType: LoadType,
-		state: PagingState<Int, ChatWithUser>
+		state: PagingState<Int, Chat>
 	): MediatorResult {
 
 		val loadKey = when (loadType) {
@@ -27,7 +27,7 @@ class ChatRemoteMediator(
 			LoadType.APPEND -> {
 				val lastItem = state.lastItemOrNull()
 					?: return MediatorResult.Success(endOfPaginationReached = isLast)
-				lastItem.chat.chatId
+				lastItem.chatId
 			}
 		}
 

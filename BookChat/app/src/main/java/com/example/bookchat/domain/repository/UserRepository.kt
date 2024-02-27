@@ -1,11 +1,11 @@
 package com.example.bookchat.domain.repository
 
-import com.example.bookchat.data.database.model.ChatRoomEntity
-import com.example.bookchat.data.database.model.UserEntity
+import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.User
 
 interface UserRepository {
-	suspend fun getUserList(userIdList: List<Long>): List<UserEntity>
-	suspend fun getChatRoomUserList(chatRoomEntity: ChatRoomEntity): List<UserEntity>
-	suspend fun getUser(userId: Long): UserEntity
-	suspend fun insertOrUpdateAllUser(users: List<UserEntity>)
+	suspend fun getUsers(userIds: List<Long>): List<User>
+	suspend fun getChannelUsers(channel: Channel): List<User>
+	suspend fun getUser(userId: Long): User
+	suspend fun upsertAllUsers(users: List<User>)
 }

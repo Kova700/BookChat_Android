@@ -1,22 +1,11 @@
 package com.example.bookchat.domain.repository
 
-import androidx.paging.PagingData
-import com.example.bookchat.data.SocketMessage
-import com.example.bookchat.data.database.model.ChatWithUser
 import com.example.bookchat.data.response.RespondGetChat
+import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.utils.SearchSortOption
-import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
-	fun getPagedChatFlow(roomId: Long): Flow<PagingData<ChatWithUser>>
-
-	suspend fun connectSocket(roomSid: String, roomId: Long): Flow<SocketMessage>
-	suspend fun disconnectSocket()
-
-	suspend fun sendMessage(
-		roomId: Long,
-		message: String
-	)
+//	fun getPagedChatFlow(roomId: Long): Flow<PagingData<Chat>>
 
 	suspend fun getChat(
 		roomId: Long,
@@ -26,5 +15,19 @@ interface ChatRepository {
 		sort: SearchSortOption = SearchSortOption.ID_DESC,
 	): RespondGetChat
 
-	suspend fun getLastChatOfOtherUser(roomId: Long): ChatWithUser
+	suspend fun insertChat(chat: Chat)
+	suspend fun insertWaitingChat(
+		roomId: Long,
+		message: String,
+		myUserId: Long
+	): Long
+
+	suspend fun updateWaitingChat(
+		newChatId: Long,
+		dispatchTime: String,
+		status: Int,
+		targetChatId: Long,
+	)
+
+	suspend fun getLastChatOfOtherUser(roomId: Long): Chat
 }

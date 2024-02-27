@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     private val homeFragment by lazy { HomeFragment() }
     private val bookShelfFragment by lazy { BookShelfFragment() }
     private val searchFragment by lazy { SearchFragment(SearchPurpose.DefaultSearch) }
-    private val chatRoomListFragment by lazy { ChatRoomListFragment() }
+    private val channelListFragment by lazy { ChannelListFragment() }
     private val myPageFragment by lazy { MyPageFragment() }
 
     private val bottomNaviFragmentStack = ArrayDeque<Fragment>()
@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
                     addOrReplaceFragment(searchFragment, FRAGMENT_TAG_SEARCH)
                 }
                 R.id.chat_navi_icon -> {
-                    addOrReplaceFragment(chatRoomListFragment, FRAGMENT_TAG_CHAT)
+                    addOrReplaceFragment(channelListFragment, FRAGMENT_TAG_CHAT)
                 }
                 R.id.mypage_navi_icon -> {
                     addOrReplaceFragment(myPageFragment, FRAGMENT_TAG_MY_PAGE)

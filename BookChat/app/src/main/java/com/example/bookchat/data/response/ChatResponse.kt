@@ -1,8 +1,8 @@
-package com.example.bookchat.data
+package com.example.bookchat.data.response
 
 import com.google.gson.annotations.SerializedName
 
-data class Chat(
+data class ChatResponse(
 	@SerializedName("chatId")
 	val chatId: Long,
 	@SerializedName("senderId")

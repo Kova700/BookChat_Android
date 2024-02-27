@@ -1,7 +1,7 @@
 package com.example.bookchat.domain.repository
 
-import com.example.bookchat.data.User
 import com.example.bookchat.data.UserSignUpDto
+import com.example.bookchat.domain.model.User
 
 interface ClientRepository {
 	suspend fun signIn(approveChangingDevice: Boolean = false)

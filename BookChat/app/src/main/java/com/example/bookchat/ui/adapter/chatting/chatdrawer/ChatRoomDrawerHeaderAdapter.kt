@@ -6,16 +6,16 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.ui.adapter.chatting.chatdrawer.ChatRoomDrawerHeaderAdapter.ChatDrawerHeaderItemViewHolder
-import com.example.bookchat.data.database.model.ChatRoomEntity
 import com.example.bookchat.databinding.ItemChatDrawerHeaderBinding
+import com.example.bookchat.domain.model.Channel
 
-class ChatRoomDrawerHeaderAdapter(var chatRoomEntity: ChatRoomEntity) :
+class ChatRoomDrawerHeaderAdapter(var channel: Channel) :
     RecyclerView.Adapter<ChatDrawerHeaderItemViewHolder>() {
 
     inner class ChatDrawerHeaderItemViewHolder(val binding: ItemChatDrawerHeaderBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind() {
-            binding.chatRoomEntity = chatRoomEntity
+            binding.channel = channel
         }
     }
 

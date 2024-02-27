@@ -3,8 +3,8 @@ package com.example.bookchat.data.database.di
 import android.content.Context
 import androidx.room.Room
 import com.example.bookchat.data.database.BookChatDB
+import com.example.bookchat.data.database.dao.ChannelDAO
 import com.example.bookchat.data.database.dao.ChatDAO
-import com.example.bookchat.data.database.dao.ChatRoomDAO
 import com.example.bookchat.data.database.dao.TempMessageDAO
 import com.example.bookchat.data.database.dao.UserDAO
 import com.example.bookchat.data.database.typeconverter.LongListTypeConverter
@@ -43,8 +43,8 @@ object BookChatDBModule {
 
 	@Provides
 	@Singleton
-	fun provideChatRoomDAO(bookChatDB: BookChatDB): ChatRoomDAO {
-		return bookChatDB.chatRoomDAO()
+	fun provideChatRoomDAO(bookChatDB: BookChatDB): ChannelDAO {
+		return bookChatDB.channelDAO()
 	}
 
 	@Provides

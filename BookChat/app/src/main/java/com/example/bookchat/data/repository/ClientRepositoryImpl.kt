@@ -1,9 +1,9 @@
 package com.example.bookchat.data.repository
 
 import com.example.bookchat.App
-import com.example.bookchat.data.User
 import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.data.api.BookChatApi
+import com.example.bookchat.data.mapper.toUser
 import com.example.bookchat.data.request.RequestUserSignIn
 import com.example.bookchat.data.request.RequestUserSignUp
 import com.example.bookchat.data.response.NeedToDeviceWarningException
@@ -11,6 +11,7 @@ import com.example.bookchat.data.response.NeedToSignUpException
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.NickNameDuplicateException
 import com.example.bookchat.data.response.ResponseBodyEmptyException
+import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.utils.DataStoreManager
 import javax.inject.Inject
@@ -103,7 +104,7 @@ class ClientRepositoryImpl @Inject constructor(
 	override suspend fun getClientProfile(): User {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 		cachedClient?.let { return it }
-		return bookChatApi.getUserProfile().also { cachedClient = it }
+		return bookChatApi.getUserProfile().toUser().also { cachedClient = it }
 	}
 
 	override suspend fun checkForDuplicateUserName(nickName: String) {
