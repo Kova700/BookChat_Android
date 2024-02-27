@@ -1,14 +1,8 @@
 package com.example.bookchat.data
 
-import com.example.bookchat.data.database.model.ChatEntity
 import com.google.gson.annotations.SerializedName
 
 sealed interface SocketMessage {
-
-	fun toChatEntity(
-		chatRoomId: Long,
-		myUserId: Long
-	): ChatEntity
 
 	data class CommonMessage(
 		@SerializedName("chatId")
@@ -23,21 +17,7 @@ sealed interface SocketMessage {
 		val message: String,
 		@SerializedName("messageType")
 		val messageType: MessageType
-	) : SocketMessage {
-
-		override fun toChatEntity(chatRoomId: Long, myUserId: Long): ChatEntity =
-			ChatEntity(
-				chatId = this.chatId,
-				chatRoomId = chatRoomId,
-				senderId = this.senderId,
-				message = this.message,
-				chatType = getChatType(
-					senderId = senderId,
-					myUserId = myUserId
-				),
-				dispatchTime = this.dispatchTime,
-			)
-	}
+	) : SocketMessage
 
 	data class NotificationMessage(
 		@SerializedName("targetId")
@@ -50,20 +30,7 @@ sealed interface SocketMessage {
 		val dispatchTime: String,
 		@SerializedName("messageType")
 		val messageType: MessageType
-	) : SocketMessage {
-		override fun toChatEntity(chatRoomId: Long, myUserId: Long): ChatEntity =
-			ChatEntity(
-				chatId = this.chatId,
-				chatRoomId = chatRoomId,
-				senderId = null,
-				dispatchTime = this.dispatchTime,
-				message = this.message,
-				chatType = getChatType(
-					senderId = null,
-					myUserId = myUserId
-				),
-			)
-	}
+	) : SocketMessage
 }
 
 //TODO : CHAT은 어차피 CommonMessage로 구분이 되니까 필요 없어보임

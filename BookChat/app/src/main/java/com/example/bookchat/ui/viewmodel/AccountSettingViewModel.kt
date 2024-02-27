@@ -4,7 +4,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
-import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.domain.repository.ClientRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AccountSettingViewModel @Inject constructor(
-	private val userRepository: UserRepository
+	private val clientRepository: ClientRepository
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<AccountSettingUiEvent>()
@@ -30,7 +30,7 @@ class AccountSettingViewModel @Inject constructor(
 	}
 
 	private fun requestWithdraw() = viewModelScope.launch {
-		runCatching { userRepository.withdraw() }
+		runCatching { clientRepository.withdraw() }
 			.onSuccess {
 				Toast.makeText(App.instance.applicationContext, "회원이 탈퇴되었습니다(임시)", Toast.LENGTH_SHORT)
 					.show()

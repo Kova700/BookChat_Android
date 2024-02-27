@@ -4,8 +4,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable
-            name="chatRoom"
-            type="com.example.bookchat.data.database.model.ChatRoomEntity" />
+            name="channel"
+            type="com.example.bookchat.domain.model.Channel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:foreground="?android:attr/selectableItemBackgroundBorderless"
@@ -32,8 +32,8 @@
                 android:layout_width="75dp"
                 android:layout_height="75dp"
                 android:src="@drawable/loading_img"
-                defaultImgNum="@{chatRoom.defaultRoomImageType}"
-                imgUrl="@{chatRoom.roomImageUri}"
+                defaultImgNum="@{channel.defaultRoomImageType}"
+                imgUrl="@{channel.roomImageUri}"
                 android:scaleType="fitXY" />
         </androidx.cardview.widget.CardView>
 
@@ -47,7 +47,7 @@
             android:ellipsize="end"
             android:fontFamily="@font/notosanskr_bold"
             android:maxLines="1"
-            android:text="@{chatRoom.roomName}"
+            android:text="@{channel.roomName}"
             android:textColor="#222222"
             android:textSize="14sp"
             app:layout_constrainedWidth="true"
@@ -76,7 +76,7 @@
 
         <TextView
             android:id="@+id/textView11"
-            getFormattedDetailDateTimeText="@{chatRoom.lastActiveTime}"
+            getFormattedDetailDateTimeText="@{channel.lastChat.dispatchTime}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/default_margin"
@@ -97,7 +97,7 @@
             android:ellipsize="end"
             android:fontFamily="@font/notosanskr_regular"
             android:maxLines="1"
-            android:text="@{chatRoom.lastChatContent}"
+            android:text="@{channel.lastChat.message}"
             android:textColor="#373737"
             android:textSize="12sp"
             app:layout_constrainedWidth="true"
@@ -114,7 +114,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:fontFamily="@font/notosanskr_regular"
-            android:text="@{String.valueOf(chatRoom.roomMemberCount) + @string/people_count_text}"
+            android:text="@{String.valueOf(channel.roomMemberCount) + @string/people_count_text}"
             android:textColor="#373737"
             android:textSize="10sp"
             app:layout_constrainedWidth="true"

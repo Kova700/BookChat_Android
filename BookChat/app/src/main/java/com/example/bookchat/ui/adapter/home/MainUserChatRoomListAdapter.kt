@@ -3,15 +3,15 @@ package com.example.bookchat.ui.adapter.home
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.DiffUtil
 import com.example.bookchat.R
-import com.example.bookchat.data.database.model.ChatRoomEntity
 import com.example.bookchat.databinding.ItemChatRoomListDataBinding
+import com.example.bookchat.domain.model.Channel
 
 class MainUserChatRoomListAdapter :
-    ListAdapter<ChatRoomEntity, MainUserChatRoomListAdapter.ChatRoomItemViewHolder>(
+    ListAdapter<Channel, MainUserChatRoomListAdapter.ChatRoomItemViewHolder>(
         CHAT_ROOM_LIST_ITEM_COMPARATOR
     ) {
 
@@ -19,10 +19,10 @@ class MainUserChatRoomListAdapter :
 
     inner class ChatRoomItemViewHolder(val binding: ItemChatRoomListDataBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(chatRoomEntity: ChatRoomEntity) {
-            binding.chatRoom = chatRoomEntity
+        fun bind(channel: Channel) {
+            binding.channel = channel
             binding.root.setOnClickListener {
-                itemClickListener.onItemClick(chatRoomEntity)
+                itemClickListener.onItemClick(channel)
             }
         }
     }
@@ -41,7 +41,7 @@ class MainUserChatRoomListAdapter :
     }
 
     interface OnItemClickListener {
-        fun onItemClick(chatRoomEntity: ChatRoomEntity)
+        fun onItemClick(channel: Channel)
     }
 
     fun setItemClickListener(onItemClickListener: OnItemClickListener) {
@@ -49,11 +49,11 @@ class MainUserChatRoomListAdapter :
     }
 
     companion object {
-        val CHAT_ROOM_LIST_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<ChatRoomEntity>() {
-            override fun areItemsTheSame(oldItem: ChatRoomEntity, newItem: ChatRoomEntity) =
+        val CHAT_ROOM_LIST_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<Channel>() {
+            override fun areItemsTheSame(oldItem: Channel, newItem: Channel) =
                 oldItem.roomId == newItem.roomId
 
-            override fun areContentsTheSame(oldItem: ChatRoomEntity, newItem: ChatRoomEntity) =
+            override fun areContentsTheSame(oldItem: Channel, newItem: Channel) =
                 oldItem == newItem
         }
     }

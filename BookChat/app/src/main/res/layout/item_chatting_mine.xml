@@ -5,8 +5,8 @@
         <import type="android.view.View"/>
 
         <variable
-            name="chatWithUser"
-            type="com.example.bookchat.data.database.model.ChatWithUser" />
+            name="chat"
+            type="com.example.bookchat.domain.model.Chat" />
         <variable
             name="isSameDate"
             type="Boolean" />
@@ -18,7 +18,7 @@
         <include
             android:id="@+id/date_layout"
             layout="@layout/item_chatting_date"
-            app:chat = "@{chatWithUser.chat}"
+            app:chat = "@{chat}"
             android:visibility="gone"
             app:isSameDate = "@{isSameDate}"/>
 
@@ -36,7 +36,7 @@
 
             <ImageView
                 android:id="@+id/chat_send_img"
-                setChatSendImgVisibility="@{chatWithUser.chat.status}"
+                setChatSendImgVisibility="@{chat.status}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/chat_wait_img"
@@ -46,7 +46,7 @@
 
             <com.example.bookchat.ui.customview.AntiDupClickImageButton
                 android:id="@+id/chat_send_fail_btn"
-                setChatFailBtnVisibility="@{chatWithUser.chat.status}"
+                setChatFailBtnVisibility="@{chat.status}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="5dp"
@@ -58,7 +58,7 @@
 
             <TextView
                 android:id="@+id/chatting_time_tv"
-                getFormattedTimeText="@{chatWithUser.chat.dispatchTime}"
+                getFormattedTimeText="@{chat.dispatchTime}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="5dp"
@@ -94,7 +94,7 @@
                     android:layout_height="wrap_content"
                     android:elegantTextHeight="true"
                     android:fontFamily="@font/notosanskr_regular"
-                    android:text="@{chatWithUser.chat.message}"
+                    android:text="@{chat.message}"
                     android:textColor="#303030"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"

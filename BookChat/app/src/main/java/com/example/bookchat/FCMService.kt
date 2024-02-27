@@ -9,7 +9,8 @@ import androidx.core.app.NotificationCompat
 import com.example.bookchat.data.FCMBody
 import com.example.bookchat.data.FCMPushMessage
 import com.example.bookchat.data.PushType
-import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.domain.repository.ChatRepository
+import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.utils.DataStoreManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -23,7 +24,10 @@ class FCMService : FirebaseMessagingService() {
 	lateinit var gson: Gson
 
 	@Inject
-	lateinit var userRepository: UserRepository
+	lateinit var clientRepository: ClientRepository
+
+	@Inject
+	lateinit var chatRepository: ChatRepository
 
 	override fun onNewToken(token: String) {
 		super.onNewToken(token)
@@ -43,17 +47,17 @@ class FCMService : FirebaseMessagingService() {
 		super.onMessageReceived(message)
 		val hashMap = gson.fromJson(message.data["body"], LinkedHashMap::class.java)
 		if (hashMap["pushType"] == PushType.LOGIN.toString()) {
-			//userRepository.signOut() // TODO : 로그인 페이지로 이동 혹은 이동할 수 있는 Dialog 노출
+			//clientRepository.signOut() // TODO : 로그인 페이지로 이동 혹은 이동할 수 있는 Dialog 노출
 			return
 		}
 		val fcmPushMessage = gson.fromJson(message.data["body"], FCMPushMessage::class.java)
-		//TODO : 로컬 DB에 채팅 저장
-		sendNotification(fcmPushMessage)
+		//TODO : 로컬 DB에 채팅 저장 (FCM 분할 수신 처리 추가)
+//		chatRepository.insertNewChat(fcmPushMessage.body.toChatEntity())
+		sendNotification(fcmPushMessage.body)
 	}
 
-	private fun sendNotification(fcmPushMessage: FCMPushMessage) {
+	private fun sendNotification(fcmBody: FCMBody) {
 		val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-		val fcmBody = fcmPushMessage.body
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			val importance = NotificationManager.IMPORTANCE_HIGH

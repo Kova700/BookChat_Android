@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "TempMessage", foreignKeys = [ForeignKey(
-        entity = ChatRoomEntity::class,
+        entity = ChannelEntity::class,
         parentColumns = arrayOf("room_id"),
         childColumns = arrayOf("chat_room_id"),
         onDelete = ForeignKey.CASCADE,

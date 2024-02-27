@@ -6,7 +6,7 @@ import android.text.TextWatcher
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.data.response.NickNameDuplicateException
-import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.utils.NameCheckStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-	private var userRepository: UserRepository
+	private var clientRepository: ClientRepository
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<SignUpEvent>()
@@ -80,7 +80,7 @@ class SignUpViewModel @Inject constructor(
 	}
 
 	private suspend fun requestNameDuplicateCheck(nickName: String) {
-		runCatching { userRepository.checkForDuplicateUserName(nickName) }
+		runCatching { clientRepository.checkForDuplicateUserName(nickName) }
 			.onSuccess { nameDuplicateCheckSuccessCallBack() }
 			.onFailure { failHandler(it) }
 	}

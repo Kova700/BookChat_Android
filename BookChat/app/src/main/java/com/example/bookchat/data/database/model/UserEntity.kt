@@ -3,7 +3,7 @@ package com.example.bookchat.data.database.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.bookchat.utils.UserDefaultProfileImageType
+import com.example.bookchat.domain.model.UserDefaultProfileImageType
 
 @Entity(tableName = "User")
 data class UserEntity(

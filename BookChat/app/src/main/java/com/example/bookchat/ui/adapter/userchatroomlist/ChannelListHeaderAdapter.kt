@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemChatRoomListHeaderBinding
 
-class UserChatRoomListHeaderAdapter : RecyclerView.Adapter<UserChatRoomListHeaderAdapter.ChatHeaderViewHolder>() {
+class ChannelListHeaderAdapter : RecyclerView.Adapter<ChannelListHeaderAdapter.ChatHeaderViewHolder>() {
 
     private lateinit var bindingHeaderItem: ItemChatRoomListHeaderBinding
 

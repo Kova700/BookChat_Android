@@ -10,9 +10,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
-import com.example.bookchat.data.database.model.ChatRoomEntity
 import com.example.bookchat.databinding.ActivityMakeChatRoomBinding
-import com.example.bookchat.ui.fragment.ChatRoomListFragment.Companion.EXTRA_CHAT_ROOM_LIST_ITEM
+import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.ui.fragment.ChannelListFragment.Companion.EXTRA_CHAT_ROOM_ID
 import com.example.bookchat.utils.PermissionManager
 import com.example.bookchat.ui.viewmodel.MakeChatRoomViewModel
 import com.example.bookchat.ui.viewmodel.MakeChatRoomViewModel.MakeChatRoomUiEvent
@@ -76,9 +76,9 @@ class MakeChatRoomActivity : AppCompatActivity() {
         makeChatRoomViewModel.eventFlow.collect { event -> handleEvent(event) }
     }
 
-    private fun startChatRoomActivity(chatRoomEntity: ChatRoomEntity) {
-        val intent = Intent(this, ChatRoomActivity::class.java)
-        intent.putExtra(EXTRA_CHAT_ROOM_LIST_ITEM, chatRoomEntity)
+    private fun startChatRoomActivity(channelId: Long) {
+        val intent = Intent(this, ChannelActivity::class.java)
+        intent.putExtra(EXTRA_CHAT_ROOM_ID, channelId)
         startActivity(intent)
         finish()
     }
@@ -87,6 +87,6 @@ class MakeChatRoomActivity : AppCompatActivity() {
         is MakeChatRoomUiEvent.MoveToBack -> finish()
         is MakeChatRoomUiEvent.MoveSelectBook -> moveToSelectBook()
         is MakeChatRoomUiEvent.OpenGallery -> startImgEdit()
-        is MakeChatRoomUiEvent.MoveToChatPage -> startChatRoomActivity(event.chatRoomEntity)
+        is MakeChatRoomUiEvent.MoveToChatPage -> startChatRoomActivity(event.channelId)
     }
 }

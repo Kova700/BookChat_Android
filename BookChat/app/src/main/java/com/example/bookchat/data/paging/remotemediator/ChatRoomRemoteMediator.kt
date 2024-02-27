@@ -4,16 +4,13 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import androidx.room.withTransaction
-import com.example.bookchat.data.database.BookChatDB
-import com.example.bookchat.data.database.model.ChatRoomEntity
-import com.example.bookchat.domain.repository.UserChatRoomRepository
+import com.example.bookchat.data.database.model.ChannelEntity
+import com.example.bookchat.domain.repository.ChannelRepository
 
 @OptIn(ExperimentalPagingApi::class)
 class ChatRoomRemoteMediator(
-	private val database: BookChatDB,
-	private val userChatRoomRepository: UserChatRoomRepository
-) : RemoteMediator<Int, ChatRoomEntity>() {
+	private val channelRepository: ChannelRepository
+) : RemoteMediator<Int, ChannelEntity>() {
 
 	private var isLast = false
 	private var isFirst = true
@@ -22,7 +19,7 @@ class ChatRoomRemoteMediator(
 
 	override suspend fun load(
 		loadType: LoadType,
-		state: PagingState<Int, ChatRoomEntity>
+		state: PagingState<Int, ChannelEntity>
 	): MediatorResult {
 
 		//TODO : 현재 nextCursorId 채팅방 LastChatID -> 추후 변경 nextCursorId 채팅방 RoomId
@@ -42,17 +39,14 @@ class ChatRoomRemoteMediator(
 		}
 
 		return try {
-			val response = userChatRoomRepository.getUserChatRoomList(
+			val response = channelRepository.getChannels(
 				loadSize = getLoadSize(),
-				postCursorId = loadKey
+//				postCursorId = loadKey
 			)
 
-			val pagedChatRoom = response.chatRoomList.map { it.toChatRoomEntity() }
-			val meta = response.cursorMeta
-			loadKey = meta.nextCursorId
-			isLast = meta.last
+//			loadKey = response.cursorMeta.nextCursorId
+//			isLast = response.cursorMeta.last
 			isFirst = false
-			saveChatRoomInLocalDB(pagedChatRoom)
 
 			MediatorResult.Success(endOfPaginationReached = isLast)
 		} catch (e: Exception) {
@@ -63,12 +57,6 @@ class ChatRoomRemoteMediator(
 	private fun getLoadSize(): Int =
 		if (isFirst) 3 * REMOTE_USER_CHAT_ROOM_LOAD_SIZE
 		else REMOTE_USER_CHAT_ROOM_LOAD_SIZE
-
-	private suspend fun saveChatRoomInLocalDB(pagedList: List<ChatRoomEntity>) {
-		database.withTransaction {
-			database.chatRoomDAO().insertOrUpdateAllChatRoom(pagedList)
-		}
-	}
 
 	override suspend fun initialize(): InitializeAction {
 		return super.initialize()

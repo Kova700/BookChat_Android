@@ -6,11 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
-import com.example.bookchat.data.UserChatRoomListItem
-import com.example.bookchat.data.database.model.ChatRoomEntity
-import com.example.bookchat.data.repository.UserChatRoomRepositoryImpl
 import com.example.bookchat.data.request.RequestMakeChatRoom
-import com.example.bookchat.domain.repository.ChatRoomManagementRepository
+import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.repository.ChannelRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,8 +22,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MakeChatRoomViewModel @Inject constructor(
-	private val userChatRoomRepository: UserChatRoomRepositoryImpl,
-	private val chatRoomManagementRepository: ChatRoomManagementRepository
+	private val channelRepository: ChannelRepository,
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<MakeChatRoomUiEvent>()
@@ -38,28 +35,19 @@ class MakeChatRoomViewModel @Inject constructor(
 	val defaultProfileImageType = MutableStateFlow(Random().nextInt(7) + 1)
 
 	fun requestMakeChatRoom() = viewModelScope.launch {
-		if (!isPossibleMakeChatRoom()) return@launch
-		runCatching { makeChatRoom() }
-			.onSuccess { enterChatRoom(it) }
+		if (!isPossibleMakeChannel()) return@launch
+		runCatching { makeChannel() }
+			.onSuccess { enterChannel(it) }
 			.onFailure { makeToast(R.string.make_chat_room_fail) }
 	}
 
-	private fun enterChatRoom(chatRoomItem: UserChatRoomListItem) = viewModelScope.launch {
-		runCatching { chatRoomManagementRepository.enterChatRoom(chatRoomItem.roomId) }
-			.onSuccess { enterChatRoomSuccessCallBack(chatRoomItem.toChatRoomEntity()) }
+	private fun enterChannel(channel: Channel) = viewModelScope.launch {
+		runCatching { channelRepository.enter(channel) }
+			.onSuccess { startEvent(MakeChatRoomUiEvent.MoveToChatPage(channel.roomId)) }
 			.onFailure { makeToast(R.string.enter_chat_room_fail) }
 	}
 
-	private fun enterChatRoomSuccessCallBack(chatRoomEntity: ChatRoomEntity) {
-		saveChatRoomInLocalDB(chatRoomEntity.copy(lastChatId = Long.MAX_VALUE))
-		startEvent(MakeChatRoomUiEvent.MoveToChatPage(chatRoomEntity))
-	}
-
-	private fun saveChatRoomInLocalDB(chatRoomEntity: ChatRoomEntity) = viewModelScope.launch {
-		App.instance.database.chatRoomDAO().insertOrUpdateChatRoom(chatRoomEntity)
-	}
-
-	private suspend fun makeChatRoom() = userChatRoomRepository.makeChatRoom(
+	private suspend fun makeChannel() = channelRepository.makeChannel(
 		getRequestMakeChatRoom(), getMultiPartBody(chatRoomProfileImage.value)
 	)
 
@@ -83,14 +71,14 @@ class MakeChatRoomViewModel @Inject constructor(
 		startEvent(MakeChatRoomUiEvent.OpenGallery)
 	}
 
-	fun isPossibleMakeChatRoom(
+	fun isPossibleMakeChannel(
 		chatRoomTitle: String,
 		chatRoomTag: String,
 		selectedBook: Book?,
 	) = chatRoomTitle.trim().isNotBlank() &&
 					chatRoomTag.trim().isNotBlank() && (selectedBook != null)
 
-	private fun isPossibleMakeChatRoom() =
+	private fun isPossibleMakeChannel() =
 		chatRoomTitle.value.trim().isNotBlank() &&
 						chatRoomTag.value.trim().isNotBlank() && (selectedBook.value != null)
 
@@ -133,7 +121,7 @@ class MakeChatRoomViewModel @Inject constructor(
 	sealed class MakeChatRoomUiEvent {
 		object MoveToBack : MakeChatRoomUiEvent()
 		object MoveSelectBook : MakeChatRoomUiEvent()
-		data class MoveToChatPage(val chatRoomEntity: ChatRoomEntity) : MakeChatRoomUiEvent()
+		data class MoveToChatPage(val channelId: Long) : MakeChatRoomUiEvent()
 		object OpenGallery : MakeChatRoomUiEvent()
 	}
 

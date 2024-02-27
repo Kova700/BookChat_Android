@@ -11,8 +11,8 @@ import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.WholeChatRoomListItem
 import com.example.bookchat.databinding.ActivityChatRoomInfoBinding
-import com.example.bookchat.domain.repository.ChatRoomManagementRepository
-import com.example.bookchat.ui.fragment.ChatRoomListFragment.Companion.EXTRA_CHAT_ROOM_LIST_ITEM
+import com.example.bookchat.domain.repository.ChannelRepository
+import com.example.bookchat.ui.fragment.ChannelListFragment.Companion.EXTRA_CHAT_ROOM_ID
 import com.example.bookchat.ui.fragment.SearchTapResultFragment.Companion.EXTRA_CLICKED_CHAT_ROOM_ITEM
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -21,7 +21,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ChatRoomInfoActivity : AppCompatActivity() {
 	@Inject
-	lateinit var chatRoomManagementRepository: ChatRoomManagementRepository
+	lateinit var channelRepository: ChannelRepository
 	val database = App.instance.database
 
 	private lateinit var binding: ActivityChatRoomInfoBinding
@@ -53,7 +53,7 @@ class ChatRoomInfoActivity : AppCompatActivity() {
 	//  채팅방 인원이 다 차서 못들어가는지, 이미 들어와있는 유저인지 ,
 	//  성공적으로 입장했는지, 분기가 필요함
 	fun clickEnterBtn() = lifecycleScope.launch {
-		runCatching { chatRoomManagementRepository.enterChatRoom(chatRoomItem.roomId) }
+		runCatching { channelRepository.enter(chatRoomItem.toChannel()) }
 			.onSuccess { enterSuccessCallback() }
 			.onFailure {
 				failHandler(it)
@@ -70,16 +70,16 @@ class ChatRoomInfoActivity : AppCompatActivity() {
 
 	private suspend fun saveChatRoomInLocalDB() {
 		database.withTransaction {
-			database.chatRoomDAO().insertOrUpdateChatRoom(
-				chatRoomItem.toChatRoomEntity()
+			database.channelDAO().upsertChannel(
+				chatRoomItem.toChannelEntity()
 					.copy(lastChatId = Long.MAX_VALUE)
 			)
 		}
 	}
 
 	private fun startChatRoomActivity() {
-		val intent = Intent(this, ChatRoomActivity::class.java)
-		intent.putExtra(EXTRA_CHAT_ROOM_LIST_ITEM, chatRoomItem.toChatRoomEntity())
+		val intent = Intent(this, ChannelActivity::class.java)
+		intent.putExtra(EXTRA_CHAT_ROOM_ID, chatRoomItem.roomId)
 		startActivity(intent)
 	}
 

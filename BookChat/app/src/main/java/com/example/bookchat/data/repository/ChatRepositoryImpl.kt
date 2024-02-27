@@ -1,79 +1,50 @@
 package com.example.bookchat.data.repository
 
-import com.example.bookchat.App
-import com.example.bookchat.BuildConfig
-import com.example.bookchat.data.SocketMessage
+import androidx.paging.ExperimentalPagingApi
+import androidx.room.withTransaction
 import com.example.bookchat.data.api.BookChatApi
-import com.example.bookchat.data.request.RequestSendChat
+import com.example.bookchat.data.database.BookChatDB
+import com.example.bookchat.data.database.dao.ChannelDAO
+import com.example.bookchat.data.database.dao.ChatDAO
+import com.example.bookchat.data.mapper.toChat
+import com.example.bookchat.data.mapper.toChatEntity
+import com.example.bookchat.data.response.ChatResponse
 import com.example.bookchat.data.response.RespondGetChat
+import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.repository.ChatRepository
-import com.example.bookchat.utils.DataStoreManager
+import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.utils.SearchSortOption
-import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import org.hildan.krossbow.stomp.StompSession
-import org.hildan.krossbow.stomp.frame.FrameBody
-import org.hildan.krossbow.stomp.headers.StompSendHeaders
-import org.hildan.krossbow.stomp.headers.StompSubscribeHeaders
 import javax.inject.Inject
 
+@OptIn(ExperimentalPagingApi::class)
 class ChatRepositoryImpl @Inject constructor(
-	private val bookChatApi: BookChatApi
+	private val bookChatApi: BookChatApi,
+	private val chatDAO: ChatDAO,
+	private val channelDAO: ChannelDAO,
+	private val clientRepository: ClientRepository,
+	private val bookChatDB: BookChatDB,
 ) : ChatRepository {
 
-	// TODO :SEND를 제외한 모든 Frame에 Receipt받게 헤더 수정 필요함
+//	override fun getPagedChatFlow(roomId: Long): Flow<PagingData<Chat>> {
+//		return Pager(
+//			config = PagingConfig(pageSize = LOCAL_DATA_CHAT_LOAD_SIZE),
+//			remoteMediator = ChatRemoteMediator(
+//				chatRoomId = roomId,
+//				chatRepository = this,
+//			),
+//			pagingSourceFactory = { chatDAO.getChatWithUserPagingSource(roomId) }
+//		).flow.map { it }
+//	}
 
-	override suspend fun getStompSession(): StompSession {
-		return App.instance.stompClient.connect(
-			url = BuildConfig.STOMP_CONNECTION_URL,
-			customStompConnectHeaders = getHeader()
-		)
-	}
-
-	//이렇게 보내면 토큰 자동 갱신은 어케 하누?
-	override suspend fun subscribeChatTopic(
-		stompSession: StompSession,
-		roomSid: String
-	): Flow<SocketMessage> {
-		return stompSession.subscribe(
-			StompSubscribeHeaders(
-				destination = "$SUB_CHAT_ROOM_DESTINATION$roomSid",
-				customHeaders = getHeader()
-			)
-		).map { it.bodyAsText.parseToSocketMessage() }
-	}
-
-	//TODO : Gson() 이거 의존성 주입으로 수정
-	private fun String.parseToSocketMessage(): SocketMessage {
-		runCatching { Gson().fromJson(this, SocketMessage.CommonMessage::class.java) }
-			.onSuccess { return it }
-		runCatching { Gson().fromJson(this, SocketMessage.NotificationMessage::class.java) }
-			.onSuccess { return it }
-		throw JsonSyntaxException("Json cannot be deserialized to SocketMessage")
-	}
-
-	//이렇게 보내면 토큰 자동 갱신은 어케 하누?
-	//TODO : Gson() 이거 의존성 주입으로 수정
-	override suspend fun sendMessage(
-		stompSession: StompSession,
-		roomId: Long,
-		receiptId: Long,
-		message: String
-	) {
-		stompSession.send(
-			StompSendHeaders(
-				destination = "$SEND_MESSAGE_DESTINATION$roomId",
-				customHeaders = getHeader()
-			), FrameBody.Text(Gson().toJson(RequestSendChat(receiptId, message)))
-		)
+	override suspend fun getLastChatOfOtherUser(roomId: Long): Chat {
+		return chatDAO.getLastChatOfOtherUser(roomId).toChat()
 	}
 
 	override suspend fun getChat(
 		roomId: Long,
 		size: Int,
 		postCursorId: Long?,
+		isFirst: Boolean,
 		sort: SearchSortOption
 	): RespondGetChat {
 		return bookChatApi.getChat(
@@ -81,21 +52,61 @@ class ChatRepositoryImpl @Inject constructor(
 			size = size,
 			postCursorId = postCursorId,
 			sort = sort
-		)
-	}
-
-	private fun getHeader(): Map<String, String> {
-		return mapOf(
-			Pair(
-				AUTHORIZATION,
-				"${DataStoreManager.getBookChatTokenSync().getOrNull()?.accessToken}"
+		).also {
+			saveChatInLocalDB(
+				pagedList = it.chatResponseList,
+				roomId = roomId,
+				isFirst = isFirst
 			)
+		}
+	}
+
+	override suspend fun insertChat(chat: Chat) {
+		chatDAO.insertChat(chat.toChatEntity())
+	}
+
+	override suspend fun insertWaitingChat(roomId: Long, message: String, myUserId: Long): Long {
+		return chatDAO.insertWaitingChat(roomId, message, myUserId)
+	}
+
+	override suspend fun updateWaitingChat(
+		newChatId: Long,
+		dispatchTime: String,
+		status: Int,
+		targetChatId: Long
+	) {
+		chatDAO.updateWaitingChat(newChatId, dispatchTime, status, targetChatId)
+	}
+
+	private suspend fun saveChatInLocalDB(
+		pagedList: List<ChatResponse>,
+		roomId: Long,
+		isFirst: Boolean
+	) {
+		bookChatDB.withTransaction {
+			chatDAO.insertAllChat(
+				pagedList.toChatEntity(
+					chatRoomId = roomId,
+					myUserId = clientRepository.getClientProfile().id
+				)
+			)
+			if (isFirst) {
+				val lastChat = pagedList.firstOrNull() ?: return@withTransaction
+				updateChannelLastChat(
+					lastChat.toChat(
+						chatRoomId = roomId,
+						myUserId = clientRepository.getClientProfile().id
+					)
+				)
+			}
+		}
+	}
+
+	private suspend fun updateChannelLastChat(chat: Chat) {
+		channelDAO.updateLastChat(
+			roomId = chat.chatRoomId,
+			lastChatId = chat.chatId
 		)
 	}
 
-	companion object {
-		private const val AUTHORIZATION = "Authorization"
-		private const val SEND_MESSAGE_DESTINATION = "/subscriptions/send/chatrooms/"
-		private const val SUB_CHAT_ROOM_DESTINATION = "/topic/"
-	}
 }

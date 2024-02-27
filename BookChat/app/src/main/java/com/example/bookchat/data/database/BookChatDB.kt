@@ -6,11 +6,11 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.bookchat.data.database.dao.ChatDAO
-import com.example.bookchat.data.database.dao.ChatRoomDAO
+import com.example.bookchat.data.database.dao.ChannelDAO
 import com.example.bookchat.data.database.dao.TempMessageDAO
 import com.example.bookchat.data.database.dao.UserDAO
 import com.example.bookchat.data.database.model.ChatEntity
-import com.example.bookchat.data.database.model.ChatRoomEntity
+import com.example.bookchat.data.database.model.ChannelEntity
 import com.example.bookchat.data.database.model.TempMessageEntity
 import com.example.bookchat.data.database.model.UserEntity
 import com.example.bookchat.data.database.typeconverter.LongListTypeConverter
@@ -19,7 +19,7 @@ import com.google.gson.Gson
 
 @Database(
     entities = [
-        ChatRoomEntity::class, ChatEntity::class,
+        ChannelEntity::class, ChatEntity::class,
         UserEntity::class, TempMessageEntity::class
     ],
     version = 1,
@@ -28,7 +28,7 @@ import com.google.gson.Gson
 @TypeConverters(value = [StringListTypeConverter::class, LongListTypeConverter::class])
 abstract class BookChatDB : RoomDatabase() {
     abstract fun chatDAO(): ChatDAO
-    abstract fun chatRoomDAO(): ChatRoomDAO
+    abstract fun channelDAO(): ChannelDAO
     abstract fun userDAO(): UserDAO
     abstract fun tempMessageDAO(): TempMessageDAO
 

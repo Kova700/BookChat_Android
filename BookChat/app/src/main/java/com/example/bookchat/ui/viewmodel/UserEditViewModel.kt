@@ -8,9 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.data.User
 import com.example.bookchat.data.response.NickNameDuplicateException
-import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.domain.model.User
+import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.utils.NameCheckStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,9 +23,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserEditViewModel @Inject constructor(
-	private val userRepository: UserRepository
+	private val clientRepository: ClientRepository
 ) : ViewModel() {
-	val cachedUser = MutableStateFlow<User>(User.Default)
+	val cachedClient = MutableStateFlow<User>(User.Default)
 
 	private val _eventFlow = MutableSharedFlow<UserEditUiEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
@@ -77,7 +77,7 @@ class UserEditViewModel @Inject constructor(
 
 	private fun haveNewNickName() =
 		newNickname.value.isNotBlank() &&
-						(newNickname.value.trim() != cachedUser.value.userNickname.trim())
+						(newNickname.value.trim() != cachedClient.value.nickname.trim())
 
 	private fun haveNewProfile() =
 		newProfileImage.value.isNotEmpty()
@@ -124,7 +124,7 @@ class UserEditViewModel @Inject constructor(
 
 	private fun requestNameDuplicateCheck(nickName: String) =
 		viewModelScope.launch {
-			runCatching { userRepository.checkForDuplicateUserName(nickName) }
+			runCatching { clientRepository.checkForDuplicateUserName(nickName) }
 				.onSuccess {
 					nameCheckStatus.value = NameCheckStatus.IsPerfect
 					isNotDuplicateFlag = true
@@ -133,8 +133,8 @@ class UserEditViewModel @Inject constructor(
 		}
 
 	private fun getUserInfo() = viewModelScope.launch {
-		runCatching { userRepository.getUserProfile() }
-			.onSuccess { user -> cachedUser.update { user } }
+		runCatching { clientRepository.getClientProfile() }
+			.onSuccess { user -> cachedClient.update { user } }
 	}
 
 	fun clickBackBtn() {

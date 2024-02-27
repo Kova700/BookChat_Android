@@ -6,13 +6,11 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.example.bookchat.App
-import com.example.bookchat.data.User
-import com.example.bookchat.data.database.model.ChatRoomEntity
 import com.example.bookchat.data.paging.ReadingBookTapPagingSource
+import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.BookRepository
-import com.example.bookchat.domain.repository.UserChatRoomRepository
-import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.domain.repository.ChannelRepository
+import com.example.bookchat.domain.repository.ClientRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -24,15 +22,14 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
 	private val bookRepository: BookRepository,
-	private val userRepository: UserRepository,
-	private val userChatRoomRepository: UserChatRoomRepository
+	private val clientRepository: ClientRepository,
+	private val channelRepository: ChannelRepository
 ) : ViewModel() {
 
-	val cachedUser = MutableStateFlow<User>(User.Default)
-	val database = App.instance.database
+	val cachedClient = MutableStateFlow<User>(User.Default)
 
 	init {
-		getUserInfo()
+		getClientInfo()
 		getRemoteUserChatRoomList()
 	}
 
@@ -57,22 +54,15 @@ class HomeViewModel @Inject constructor(
 			}.cachedIn(viewModelScope)
 	}
 
-	private fun getUserInfo() = viewModelScope.launch {
-		runCatching { userRepository.getUserProfile() }
-			.onSuccess { user -> cachedUser.update { user } }
-	}
-
-	val chatRoomFlow =
-		database.chatRoomDAO().getActivatedChatRoomList(MAIN_CHAT_ROOM_LIST_LOAD_SIZE)
+	val chatRoomFlow = channelRepository.getChannelsFlow()
 
 	private fun getRemoteUserChatRoomList() = viewModelScope.launch {
-		val chatRoomList =
-			userChatRoomRepository.getUserChatRoomList().chatRoomList
-		saveChatRoomInLocalDB(chatRoomList.map { it.toChatRoomEntity() })
+		channelRepository.getChannels()
 	}
 
-	private suspend fun saveChatRoomInLocalDB(chatRoomList: List<ChatRoomEntity>) {
-		database.chatRoomDAO().insertOrUpdateAllChatRoom(chatRoomList)
+	private fun getClientInfo() = viewModelScope.launch {
+		runCatching { clientRepository.getClientProfile() }
+			.onSuccess { user -> cachedClient.update { user } }
 	}
 
 	companion object {

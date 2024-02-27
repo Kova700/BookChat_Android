@@ -67,7 +67,7 @@
             android:textSize="14sp"
             android:background="?android:selectableItemBackgroundBorderless"
             android:onClick="@{() -> viewmodel.requestMakeChatRoom()}"
-            setSubmitTextColor="@{viewmodel.isPossibleMakeChatRoom(viewmodel.chatRoomTitle, viewmodel.chatRoomTag, viewmodel.selectedBook)}"
+            setSubmitTextColor="@{viewmodel.isPossibleMakeChannel(viewmodel.chatRoomTitle, viewmodel.chatRoomTag, viewmodel.selectedBook)}"
             app:layout_constraintBottom_toBottomOf="@+id/textView30"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintTop_toTopOf="@+id/textView30" />

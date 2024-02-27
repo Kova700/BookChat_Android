@@ -1,4 +1,4 @@
-package com.example.bookchat.utils
+package com.example.bookchat.domain.model
 
 import com.google.gson.annotations.SerializedName
 

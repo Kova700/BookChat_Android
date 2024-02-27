@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.bookchat.data.database.model.UserEntity
-import com.example.bookchat.utils.UserDefaultProfileImageType
+import com.example.bookchat.domain.model.UserDefaultProfileImageType
 
 @Dao
 interface UserDAO {
@@ -13,7 +13,7 @@ interface UserDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIgnore(user: UserEntity): Long
 
-    suspend fun insertOrUpdateAllUser(users: List<UserEntity>) {
+    suspend fun upsertAllUsers(users: List<UserEntity>) {
         for (user in users) insertOrUpdateUser(user)
     }
 
