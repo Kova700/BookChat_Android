@@ -1,9 +1,7 @@
 package com.example.bookchat.data.response
 
-import android.util.Log
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatType
-import com.example.bookchat.utils.Constants.TAG
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
@@ -28,7 +26,6 @@ data class ChannelResponse(
 ) : Serializable
 
 fun ChannelResponse.getLastChat(): Chat? {
-	Log.d(TAG, ": getLastChat() - lastChatId :$lastChatId, lastChatContent : $lastChatContent")
 	if (lastChatId == null || lastChatContent == null) return null
 	return Chat(
 		chatId = lastChatId,
