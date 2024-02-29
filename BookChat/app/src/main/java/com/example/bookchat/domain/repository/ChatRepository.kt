@@ -1,19 +1,15 @@
 package com.example.bookchat.domain.repository
 
-import com.example.bookchat.data.response.RespondGetChat
 import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.utils.SearchSortOption
+import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
-//	fun getPagedChatFlow(roomId: Long): Flow<PagingData<Chat>>
+	suspend fun getChatFlow(): Flow<List<Chat>>
 
-	suspend fun getChat(
-		roomId: Long,
-		size: Int,
-		postCursorId: Long?,
-		isFirst: Boolean,
-		sort: SearchSortOption = SearchSortOption.ID_DESC,
-	): RespondGetChat
+	suspend fun getChats(
+		channelId: Long,
+		size: Int = CHAT_LOAD_SIZE
+	): List<Chat>
 
 	suspend fun insertChat(chat: Chat)
 	suspend fun insertWaitingChat(
@@ -29,5 +25,9 @@ interface ChatRepository {
 		targetChatId: Long,
 	)
 
-	suspend fun getLastChatOfOtherUser(roomId: Long): Chat
+	suspend fun insertAllChats(chats: List<Chat>)
+
+	companion object {
+		const val CHAT_LOAD_SIZE = 30
+	}
 }

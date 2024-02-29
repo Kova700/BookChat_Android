@@ -6,6 +6,7 @@ import com.example.bookchat.data.response.ChatResponse
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.ChatType
+import com.example.bookchat.domain.model.User
 
 fun ChatResponse.toChatEntity(
 	chatRoomId: Long,
@@ -39,7 +40,11 @@ fun ChatResponse.toChat(
 			senderId = senderId,
 			myUserId = myUserId
 		),
-		sender = null
+		sender = senderId?.let {
+			User.Default.copy(
+				id = it
+			)
+		}
 	)
 }
 

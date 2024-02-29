@@ -15,7 +15,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityChannelBinding
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.User
-import com.example.bookchat.domain.model.participantIds
+import com.example.bookchat.domain.model.participants
 import com.example.bookchat.ui.adapter.chatting.ChatDataItemAdapter
 import com.example.bookchat.ui.adapter.chatting.chatdrawer.ChatRoomDrawerDataAdapter
 import com.example.bookchat.ui.adapter.chatting.chatdrawer.ChatRoomDrawerHeaderAdapter
@@ -48,11 +48,11 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun initAdapter() {
-//		chatDataItemAdapter = ChatDataItemAdapter()
-//			.apply { registerAdapterDataObserver(adapterDataObserver) }
-//		chatRoomDrawerHeaderAdapter =
-//			ChatRoomDrawerHeaderAdapter(channelViewModel.channelId)
-//		chatRoomDrawerDataAdapter = ChatRoomDrawerDataAdapter()
+		chatDataItemAdapter = ChatDataItemAdapter()
+			.apply { registerAdapterDataObserver(adapterDataObserver) }
+		chatRoomDrawerHeaderAdapter =
+			ChatRoomDrawerHeaderAdapter(channelViewModel.uiStateFlow.value.channel)
+		chatRoomDrawerDataAdapter = ChatRoomDrawerDataAdapter()
 	}
 
 	private val adapterDataObserver = object : RecyclerView.AdapterDataObserver() {
@@ -81,6 +81,21 @@ class ChannelActivity : AppCompatActivity() {
 		val linearLayoutManager =
 			LinearLayoutManager(this@ChannelActivity).apply { reverseLayout = true }
 
+		// TODO : 스크롤 위로 올리면 아래로 스크롤 내릴 수 있는 버튼 보이기
+		val rcvScrollListener = object : RecyclerView.OnScrollListener() {
+			override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+				super.onScrolled(recyclerView, dx, dy)
+				channelViewModel.loadNextChats(
+					linearLayoutManager.findLastVisibleItemPosition()
+				)
+				val isFirstItemOnScreen = isFistItemOnScreen(recyclerView)
+				channelViewModel.isFirstItemOnScreen = isFirstItemOnScreen
+				if (isFirstItemOnScreen) {
+					channelViewModel.newOtherChatNoticeFlow.value = null
+				}
+			}
+		}
+
 		binding.chattingRcv.apply {
 			adapter = chatDataItemAdapter
 			setHasFixedSize(true)
@@ -101,18 +116,6 @@ class ChannelActivity : AppCompatActivity() {
 		}
 	}
 
-	// TODO : 스크롤 위로 올리면 아래로 스크롤 내릴 수 있는 버튼 보이기
-	private val rcvScrollListener = object : RecyclerView.OnScrollListener() {
-		override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-			super.onScrolled(recyclerView, dx, dy)
-			val isFirstItemOnScreen = isFistItemOnScreen(recyclerView)
-			channelViewModel.isFirstItemOnScreen = isFirstItemOnScreen
-			if (isFirstItemOnScreen) {
-				channelViewModel.newOtherChatNoticeFlow.value = null
-			}
-		}
-	}
-
 	private fun isFistItemOnScreen(recyclerView: RecyclerView): Boolean {
 		val lm = recyclerView.layoutManager as LinearLayoutManager
 		val firstVisiblePosition: Int = lm.findFirstVisibleItemPosition()
@@ -130,7 +133,7 @@ class ChannelActivity : AppCompatActivity() {
 		channelViewModel.uiStateFlow.collect { uiState ->
 			chatDataItemAdapter.submitList(uiState.chats)
 			updateDrawerHeader(uiState.channel)
-			updateDrawerUserList(uiState.channel.participantIds())
+			updateDrawerUserList(uiState.channel.participants())
 		}
 	}
 

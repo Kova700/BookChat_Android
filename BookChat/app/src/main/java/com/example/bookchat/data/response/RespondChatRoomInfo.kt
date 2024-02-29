@@ -22,7 +22,16 @@ data class RespondChatRoomInfo(
 	val roomSubHostList: List<ChatRoomUser>?,
 	@SerializedName("roomGuestList")
 	val roomGuestList: List<ChatRoomUser>?
-)
+) {
+	fun getParticipants(): List<User> {
+		return mutableListOf<User>().apply {
+			add(roomHost.toUser())
+			roomSubHostList?.let { addAll(it.map(ChatRoomUser::toUser)) }
+			roomGuestList?.let { addAll(it.map(ChatRoomUser::toUser)) }
+		}.toList()
+	}
+}
+
 
 //TODO : 개선 필요
 data class ChatRoomUser(

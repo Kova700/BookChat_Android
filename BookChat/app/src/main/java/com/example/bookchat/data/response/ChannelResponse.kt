@@ -19,6 +19,7 @@ data class ChannelResponse(
 	@SerializedName("roomImageUri")
 	val roomImageUri: String? = null,
 	//추후 Chat타입으로 Sender 유저 정보,dispatchTime과 함께 한 번에 받을 수 있으면 수정 부탁
+	//TODO : 마지막 활성화 시간이 초기화 되거나 마지막 Chat을 받거나 되어야함
 	@SerializedName("lastChatId")
 	val lastChatId: Long? = null,
 	@SerializedName("lastChatContent")

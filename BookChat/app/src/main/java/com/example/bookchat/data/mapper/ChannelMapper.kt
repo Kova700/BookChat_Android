@@ -1,7 +1,7 @@
 package com.example.bookchat.data.mapper
 
 import com.example.bookchat.data.database.model.ChannelEntity
-import com.example.bookchat.data.database.model.combined.ChannelWithChat
+import com.example.bookchat.data.database.model.combined.ChannelWithInfo
 import com.example.bookchat.data.response.ChannelResponse
 import com.example.bookchat.data.response.getLastChat
 import com.example.bookchat.domain.model.Channel
@@ -39,9 +39,9 @@ fun Channel.toChannelEntity(): ChannelEntity {
 		defaultRoomImageType = defaultRoomImageType,
 		roomImageUri = roomImageUri,
 		lastChatId = lastChat?.chatId,
-		hostId = hostId,
-		subHostIds = subHostIds,
-		guestIds = guestIds,
+		hostId = host?.id,
+		subHostIds = subHosts?.map { it.id },
+		guestIds = guests?.map { it.id },
 		roomTags = roomTags,
 		roomCapacity = roomCapacity,
 		bookTitle = bookTitle,
@@ -50,7 +50,7 @@ fun Channel.toChannelEntity(): ChannelEntity {
 	)
 }
 
-fun ChannelWithChat.toChannel(): Channel {
+fun ChannelWithInfo.toChannel(): Channel {
 	return Channel(
 		roomId = channelEntity.roomId,
 		roomName = channelEntity.roomName,
@@ -59,9 +59,9 @@ fun ChannelWithChat.toChannel(): Channel {
 		defaultRoomImageType = channelEntity.defaultRoomImageType,
 		roomImageUri = channelEntity.roomImageUri,
 		lastChat = chatEntity?.toChat(), // sender 정보 없음
-		hostId = channelEntity.hostId,
-		subHostIds = channelEntity.subHostIds,
-		guestIds = channelEntity.guestIds,
+		host = hostUserEntity?.toUser(),
+		subHosts = subHostUserEntities?.toUser(),
+		guests = guestUserEntities?.toUser(),
 		roomTags = channelEntity.roomTags,
 		roomCapacity = channelEntity.roomCapacity,
 		bookTitle = channelEntity.bookTitle,

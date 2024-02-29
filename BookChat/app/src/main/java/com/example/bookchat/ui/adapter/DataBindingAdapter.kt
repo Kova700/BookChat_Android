@@ -476,7 +476,7 @@ object DataBindingAdapter {
 	@JvmStatic
 	@BindingAdapter("getFormattedDetailDateTimeText")
 	fun getFormattedDetailDateTimeText(view: TextView, dateAndTimeString: String?) {
-		view.text = if (dateAndTimeString == null) ""
+		view.text = if (dateAndTimeString.isNullOrBlank()) ""
 		else DateManager.getFormattedDetailDateTimeText(dateAndTimeString)
 	}
 
