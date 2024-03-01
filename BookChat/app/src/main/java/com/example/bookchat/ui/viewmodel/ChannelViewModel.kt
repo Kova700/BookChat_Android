@@ -86,7 +86,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun observeChats() = viewModelScope.launch {
-		chattingRepositoryFacade.getChatFlow(channelId).collect { chats ->
+		chattingRepositoryFacade.getChatsFlow(channelId).collect { chats ->
 			updateState { copy(chats = chats) }
 			if (isFirstItemOnScreen) return@collect
 			newChatNoticeFlow.update { chats.first() }

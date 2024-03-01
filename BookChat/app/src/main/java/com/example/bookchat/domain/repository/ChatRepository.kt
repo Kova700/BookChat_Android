@@ -4,7 +4,7 @@ import com.example.bookchat.domain.model.Chat
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
-	suspend fun getChatFlow(channelId :Long): Flow<List<Chat>>
+	suspend fun getChatsFlow(channelId :Long): Flow<List<Chat>>
 
 	suspend fun getChats(
 		channelId: Long,

@@ -27,9 +27,9 @@ class ChattingRepositoryFacade @Inject constructor(
 		return channels
 	}
 
-	override suspend fun getChatFlow(channelId: Long): Flow<List<Chat>> {
+	override suspend fun getChatsFlow(channelId: Long): Flow<List<Chat>> {
 		return channelRepository.getChannelFlow(channelId)
-			.combine(chatRepository.getChatFlow(channelId)) { channel, chats ->
+			.combine(chatRepository.getChatsFlow(channelId)) { channel, chats ->
 				val participants = channel.participants().associateBy { it.id }
 				chats.map { chat -> chat.copy(sender = participants[chat.sender?.id]) }
 			}

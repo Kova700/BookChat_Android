@@ -33,7 +33,7 @@ class ChatRepositoryImpl @Inject constructor(
 	private var currentPage: Long? = null
 	private var isEndPage = false
 
-	override suspend fun getChatFlow(channelId: Long): Flow<List<Chat>> {
+	override suspend fun getChatsFlow(channelId: Long): Flow<List<Chat>> {
 		return sortedChats
 	}
 
