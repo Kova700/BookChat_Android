@@ -9,7 +9,7 @@ import com.example.bookchat.ui.adapter.chatting.chatdrawer.ChatRoomDrawerHeaderA
 import com.example.bookchat.databinding.ItemChatDrawerHeaderBinding
 import com.example.bookchat.domain.model.Channel
 
-class ChatRoomDrawerHeaderAdapter(var channel: Channel?) :
+class ChatRoomDrawerHeaderAdapter(var channel: Channel? = null) :
     RecyclerView.Adapter<ChatDrawerHeaderItemViewHolder>() {
 
     inner class ChatDrawerHeaderItemViewHolder(val binding: ItemChatDrawerHeaderBinding) :

@@ -50,8 +50,7 @@ class ChannelActivity : AppCompatActivity() {
 	private fun initAdapter() {
 		chatDataItemAdapter = ChatDataItemAdapter()
 			.apply { registerAdapterDataObserver(adapterDataObserver) }
-		chatRoomDrawerHeaderAdapter =
-			ChatRoomDrawerHeaderAdapter(channelViewModel.uiStateFlow.value.channel)
+		chatRoomDrawerHeaderAdapter = ChatRoomDrawerHeaderAdapter()
 		chatRoomDrawerDataAdapter = ChatRoomDrawerDataAdapter()
 	}
 
