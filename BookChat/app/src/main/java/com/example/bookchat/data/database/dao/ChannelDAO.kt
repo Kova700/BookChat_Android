@@ -10,27 +10,21 @@ import com.example.bookchat.data.database.model.combined.ChannelWithInfo
 @Dao
 interface ChannelDAO {
 
-//	@Query(
-//		"SELECT * FROM Channel " +
-//						"ORDER BY top_pin_num DESC, last_chat_id DESC, room_id DESC"
-//	)
-//	fun pagingSource(): PagingSource<Int, ChannelWithChat>
-
-//	@Query(
-//		"SELECT * FROM Channel " +
-//						"ORDER BY top_pin_num DESC, last_chat_id DESC, room_id DESC " +
-//						"LIMIT :loadSize"
-//	)
-//	fun getActivatedChannelList(loadSize: Int): Flow<List<ChannelWithChat>>
+	@Query(
+		"SELECT * FROM Channel " +
+						"WHERE room_id IN (:channelIds) " +
+						"ORDER BY top_pin_num DESC, last_chat_id DESC, room_id DESC"
+	)
+	suspend fun getChannels(channelIds: List<Long>): List<ChannelWithInfo>
 
 	@Query(
 		"SELECT * FROM Channel " +
-						"WHERE room_id = :roomId"
+						"WHERE room_id = :channelId"
 	)
-	suspend fun getChannel(roomId: Long): ChannelWithInfo
+	suspend fun getChannel(channelId: Long): ChannelWithInfo
 
 	@Insert(onConflict = OnConflictStrategy.IGNORE)
-	suspend fun insertIgnore(chatRoom: ChannelEntity): Long
+	suspend fun insertIfNotPresent(chatRoom: ChannelEntity): Long
 
 	suspend fun upsertAllChannels(channels: List<ChannelEntity>) {
 		for (channel in channels) {
@@ -39,7 +33,7 @@ interface ChannelDAO {
 	}
 
 	suspend fun upsertChannel(chatRoom: ChannelEntity) {
-		val id = insertIgnore(chatRoom)
+		val id = insertIfNotPresent(chatRoom)
 		if (id != -1L) return
 
 		updateForInsert(
@@ -72,11 +66,11 @@ interface ChannelDAO {
 
 	suspend fun updateLastChatIfNeeded(
 		roomId: Long,
-		lastChatId: Long
+		newLastChatId: Long
 	) {
-		val existingLastId = getChannel(roomId).chatEntity?.chatId ?: return
-		if (lastChatId <= existingLastId) return
-		updateLastChat(roomId, lastChatId)
+		val existingLastId = getChannel(roomId).chatEntity.chatId
+		if (newLastChatId <= existingLastId) return
+		updateLastChat(roomId, newLastChatId)
 	}
 
 	@Query(

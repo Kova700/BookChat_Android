@@ -6,6 +6,8 @@ data class Channel(
 	val roomSid: String,
 	val roomMemberCount: Long,
 	val defaultRoomImageType: Int, //개선 필요
+	val notificationFlag :Boolean = true,
+	val topPinNum :Int = 0,
 	val roomImageUri: String? = null,
 	val lastChat: Chat? = null,
 	val host: User? = null,

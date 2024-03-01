@@ -36,7 +36,7 @@ class ChattingRepositoryFacade @Inject constructor(
 		//서버로부터 가져온 채팅 로컬 DB에 저장
 		val chats = chatRepository.getChats(channelId, size)
 		//채널의 마지막 채팅을 로컬 DB에 삽입
-		chats.lastOrNull()?.chatId?.let { channelRepository.updateLastChat(channelId, it) }
+		chats.firstOrNull()?.chatId?.let { channelRepository.updateLastChat(channelId, it) }
 		return chats
 	}
 

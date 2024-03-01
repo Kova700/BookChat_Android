@@ -149,7 +149,6 @@ class ChannelActivity : AppCompatActivity() {
 		chatRoomDrawerDataAdapter.submitList(users)
 	}
 
-
 	private fun handleEvent(event: ChannelEvent) {
 		when (event) {
 			ChannelEvent.MoveBack -> finish()

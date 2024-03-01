@@ -56,7 +56,11 @@ fun ChatEntity.toChat(): Chat {
 		message = message,
 		chatType = chatType,
 		status = ChatStatus.getType(status)!!,
-		sender = null
+		sender = senderId?.let {
+			User.Default.copy(
+				id = it
+			)
+		}
 	)
 }
 

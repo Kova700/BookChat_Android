@@ -37,6 +37,8 @@ fun Channel.toChannelEntity(): ChannelEntity {
 		roomSid = roomSid,
 		roomMemberCount = roomMemberCount,
 		defaultRoomImageType = defaultRoomImageType,
+		notificationFlag = notificationFlag,
+		topPinNum = topPinNum,
 		roomImageUri = roomImageUri,
 		lastChatId = lastChat?.chatId,
 		hostId = host?.id,
@@ -57,8 +59,10 @@ fun ChannelWithInfo.toChannel(): Channel {
 		roomSid = channelEntity.roomSid,
 		roomMemberCount = channelEntity.roomMemberCount,
 		defaultRoomImageType = channelEntity.defaultRoomImageType,
+		notificationFlag = channelEntity.notificationFlag,
+		topPinNum = channelEntity.topPinNum,
 		roomImageUri = channelEntity.roomImageUri,
-		lastChat = chatEntity?.toChat(), // sender 정보 없음
+		lastChat = chatEntity.toChat(), // sender 정보 없을 수 있음
 		host = hostUserEntity?.toUser(),
 		subHosts = subHostUserEntities?.toUser(),
 		guests = guestUserEntities?.toUser(),
@@ -71,4 +75,4 @@ fun ChannelWithInfo.toChannel(): Channel {
 }
 
 fun List<ChannelResponse>.toChannelEntity() = this.map { it.toChannelEntity() }
-fun List<ChannelResponse>.toChannel() = this.map { it.toChannel() }
+fun List<ChannelWithInfo>.toChannel() = this.map { it.toChannel() }

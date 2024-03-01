@@ -72,7 +72,7 @@ class ChatRoomInfoActivity : AppCompatActivity() {
 		database.withTransaction {
 			database.channelDAO().upsertChannel(
 				chatRoomItem.toChannelEntity()
-					.copy(lastChatId = Long.MAX_VALUE)
+					.copy(lastChatId = Long.MAX_VALUE) //수정 필요
 			)
 		}
 	}

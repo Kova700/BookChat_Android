@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,11 +8,13 @@ import com.example.bookchat.R
 import com.example.bookchat.data.database.dao.TempMessageDAO
 import com.example.bookchat.data.repository.ChattingRepositoryFacade
 import com.example.bookchat.domain.model.Chat
+import com.example.bookchat.domain.model.participants
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.ui.fragment.ChannelListFragment.Companion.EXTRA_CHAT_ROOM_ID
 import com.example.bookchat.ui.viewmodel.contract.ChannelEvent
 import com.example.bookchat.ui.viewmodel.contract.ChannelUiState
 import com.example.bookchat.ui.viewmodel.contract.ChannelUiState.UiState
+import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +42,7 @@ import javax.inject.Inject
 //TODO : 채팅방 정보 조회 실패 시 예외 처리
 //TODO : 채널 LastChat 이후 부터 채팅 페이징 요청
 //TODO : 소켓 연결 성공 /실패 상관 없이 끝나면 채팅방 채팅 내역 조회
+//TODO : 공지 채팅 유저명 연결
 
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
@@ -74,6 +78,7 @@ class ChannelViewModel @Inject constructor(
 
 	private fun observeChannel() = viewModelScope.launch {
 		chattingRepositoryFacade.getChannelFlow(channelId).collect { channel ->
+			Log.d(TAG, "ChannelViewModel: observeChannel() - channel.participants() : ${channel.participants()}")
 			updateState { copy(channel = channel) }
 		}
 	}

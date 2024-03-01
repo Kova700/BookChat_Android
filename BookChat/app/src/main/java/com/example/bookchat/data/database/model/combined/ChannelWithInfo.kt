@@ -10,7 +10,7 @@ data class ChannelWithInfo(
 	@Embedded
 	val channelEntity: ChannelEntity,
 	@Relation(parentColumn = "last_chat_id", entityColumn = "chat_id")
-	val chatEntity: ChatEntity? = null,
+	val chatEntity: ChatEntity,
 	@Relation(parentColumn = "host_id", entityColumn = "id")
 	val hostUserEntity: UserEntity? = null,
 	@Relation(parentColumn = "sub_host_ids", entityColumn = "id")

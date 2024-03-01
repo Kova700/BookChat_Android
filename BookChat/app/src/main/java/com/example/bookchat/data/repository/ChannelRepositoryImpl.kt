@@ -1,5 +1,6 @@
 package com.example.bookchat.data.repository
 
+import android.util.Log
 import com.example.bookchat.App
 import com.example.bookchat.data.api.BookChatApi
 import com.example.bookchat.data.database.dao.ChannelDAO
@@ -11,6 +12,7 @@ import com.example.bookchat.data.response.RespondChatRoomInfo
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.utils.Constants.TAG
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -31,7 +33,16 @@ class ChannelRepositoryImpl @Inject constructor(
 ) : ChannelRepository {
 
 	private val mapChannels = MutableStateFlow<Map<Long, Channel>>(emptyMap())//(channelId, Channel)
-	private val channels = mapChannels.map { it.values.toList() }.onEach { cachedChannels = it }
+	//ORDER BY top_pin_num DESC, last_chat_id DESC, room_id DESC
+	private val channels = mapChannels.map {
+		it.values.toList().sortedWith(
+			compareBy(
+				{ channel -> -channel.topPinNum },
+				{ channel -> channel.lastChat?.chatId?.unaryMinus() },
+				{ channel -> -channel.roomId })
+		)
+	}
+		.onEach { cachedChannels = it }
 	private var cachedChannels: List<Channel> = emptyList()
 
 	private val currentChannelId = MutableStateFlow<Long?>(null)
@@ -75,9 +86,11 @@ class ChannelRepositoryImpl @Inject constructor(
 		)
 		isEndPage = response.cursorMeta.last
 		currentPage = response.cursorMeta.nextCursorId
+
 		channelDAO.upsertAllChannels(response.channels.toChannelEntity())
-		val newMapChannels =
-			mapChannels.value + response.channels.associate { it.roomId to it.toChannel() }
+		val channelIds = response.channels.map { it.roomId }
+		val newChannels = channelDAO.getChannels(channelIds).toChannel()
+		val newMapChannels = mapChannels.value + newChannels.associateBy { it.roomId }
 		setChannels(newMapChannels)
 		return newMapChannels.map { it.value }
 	}
@@ -147,8 +160,9 @@ class ChannelRepositoryImpl @Inject constructor(
 	override suspend fun updateLastChat(channelId: Long, chatId: Long) {
 		channelDAO.updateLastChatIfNeeded(
 			roomId = channelId,
-			lastChatId = chatId,
+			newLastChatId = chatId,
 		)
+		Log.d(TAG, "ChannelRepositoryImpl: updateLastChat() - called")
 		val updatedChannel = channelDAO.getChannel(channelId).toChannel()
 		setChannels(mapChannels.value + mapOf(Pair(channelId, updatedChannel)))
 	}
