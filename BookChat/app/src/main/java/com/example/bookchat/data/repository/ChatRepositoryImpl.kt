@@ -73,6 +73,7 @@ class ChatRepositoryImpl @Inject constructor(
 	override suspend fun insertChat(chat: Chat) {
 		val chatId = chatDAO.insertChat(chat.toChatEntity())
 		val newChat = chatDAO.getChat(chatId).toChat()
+		if (chat.chatRoomId != cachedChannelId) return
 		val newMapChats = mapChats.value + (chatId to newChat)
 		mapChats.emit(newMapChats)
 	}
