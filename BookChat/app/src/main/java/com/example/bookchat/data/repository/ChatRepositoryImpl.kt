@@ -43,8 +43,10 @@ class ChatRepositoryImpl @Inject constructor(
 		size: Int
 	): List<Chat> {
 		if (cachedChannelId != channelId) {
+			//TODO : 추후 채팅방별 isEndPage , currentPage, mapChats 캐싱 해놓고 다시 가져다 쓸 수 있게 수정
 			isEndPage = false
 			currentPage = null
+			mapChats.value = emptyMap()
 		}
 		if (isEndPage) return cachedChat
 
