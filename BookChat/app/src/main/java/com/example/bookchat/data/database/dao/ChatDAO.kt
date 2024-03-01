@@ -21,18 +21,6 @@ interface ChatDAO {
 	)
 	suspend fun getLastChatInChannel(channelId: Long): ChatWithUser
 
-	@Query(
-		"SELECT * FROM Chat " +
-						"WHERE chat_room_id = :channelId " +
-						"ORDER BY status, chat_id DESC " +
-						"LIMIT :size"
-
-	)
-	suspend fun getChatWithUsersInChannel(
-		channelId: Long,
-		size: Int
-	): List<ChatWithUser>
-
 	@Query("SELECT * FROM Chat WHERE chat_id = :chatId")
 	suspend fun getChat(chatId: Long): ChatWithUser
 
