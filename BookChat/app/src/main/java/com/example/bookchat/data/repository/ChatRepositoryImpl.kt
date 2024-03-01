@@ -26,15 +26,14 @@ class ChatRepositoryImpl @Inject constructor(
 				.sortedWith(
 					compareBy({ chat -> chat.status }, { chat -> -chat.chatId })
 				)
-		}
-		.onEach { cachedChat = it }
+		}.onEach { cachedChat = it }
 	private var cachedChat: List<Chat> = emptyList()
 
 	private var cachedChannelId: Long? = null
 	private var currentPage: Long? = null
 	private var isEndPage = false
 
-	override suspend fun getChatFlow(): Flow<List<Chat>> {
+	override suspend fun getChatFlow(channelId: Long): Flow<List<Chat>> {
 		return sortedChats
 	}
 
@@ -72,16 +71,14 @@ class ChatRepositoryImpl @Inject constructor(
 
 	override suspend fun insertChat(chat: Chat) {
 		val chatId = chatDAO.insertChat(chat.toChatEntity())
-		val newChat = chatDAO.getChat(chatId).toChat()
 		if (chat.chatRoomId != cachedChannelId) return
-		val newMapChats = mapChats.value + (chatId to newChat)
+		val newMapChats = mapChats.value + (chatId to chat)
 		mapChats.emit(newMapChats)
 	}
 
 	override suspend fun insertAllChats(chats: List<Chat>) {
-		val chatIds = chatDAO.insertAllChat(chats.toChatEntity())
-		val newMapChats = mapChats.value + chatDAO.getChats(chatIds)
-			.associate { it.chatEntity.chatId to it.toChat() }
+		chatDAO.insertAllChat(chats.toChatEntity())
+		val newMapChats = mapChats.value + chats.associateBy { it.chatId }
 		mapChats.emit(newMapChats)
 	}
 

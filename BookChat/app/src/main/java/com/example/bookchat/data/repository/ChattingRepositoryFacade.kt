@@ -2,9 +2,11 @@ package com.example.bookchat.data.repository
 
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
+import com.example.bookchat.domain.model.participants
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
 class ChattingRepositoryFacade @Inject constructor(
@@ -25,8 +27,12 @@ class ChattingRepositoryFacade @Inject constructor(
 		return channels
 	}
 
-	override suspend fun getChatFlow(): Flow<List<Chat>> {
-		return chatRepository.getChatFlow()
+	override suspend fun getChatFlow(channelId: Long): Flow<List<Chat>> {
+		return channelRepository.getChannelFlow(channelId)
+			.combine(chatRepository.getChatFlow(channelId)) { channel, chats ->
+				val participants = channel.participants().associateBy { it.id }
+				chats.map { chat -> chat.copy(sender = participants[chat.sender?.id]) }
+			}
 	}
 
 	override suspend fun getChats(

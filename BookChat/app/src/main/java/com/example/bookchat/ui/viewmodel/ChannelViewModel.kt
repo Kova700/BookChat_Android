@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
+import com.example.bookchat.data.database.dao.ChatDAO
 import com.example.bookchat.data.database.dao.TempMessageDAO
 import com.example.bookchat.data.repository.ChattingRepositoryFacade
 import com.example.bookchat.domain.model.Chat
@@ -49,6 +50,7 @@ class ChannelViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val tempMessageDAO: TempMessageDAO, //개선 필요
 	private val stompHandler: StompHandler,
+	private val chatDAO: ChatDAO,
 	private val chattingRepositoryFacade: ChattingRepositoryFacade,
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHAT_ROOM_ID)!!
@@ -84,7 +86,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun observeChats() = viewModelScope.launch {
-		chattingRepositoryFacade.getChatFlow().collect { chats ->
+		chattingRepositoryFacade.getChatFlow(channelId).collect { chats ->
 			updateState { copy(chats = chats) }
 			if (isFirstItemOnScreen) return@collect
 			newChatNoticeFlow.update { chats.first() }
