@@ -1,7 +1,8 @@
 package com.example.bookchat.data
 
-import com.example.bookchat.data.database.model.ChatEntity
-import com.example.bookchat.domain.model.ChatType
+import com.example.bookchat.data.mapper.getChatType
+import com.example.bookchat.domain.model.Chat
+import com.example.bookchat.domain.model.User
 import com.google.gson.annotations.SerializedName
 
 data class FCMPushMessage(
@@ -34,13 +35,18 @@ data class FCMBody(
 	val dispatchTime: String
 )
 
-fun FCMBody.toChatEntity() : ChatEntity{
-	return ChatEntity(
+fun FCMBody.toChat(myUserId: Long): Chat {
+	return Chat(
 		chatId = chatId,
 		chatRoomId = chatRoomId,
-		senderId = senderId,
+		sender = User.Default.copy(
+			id = senderId
+		),
 		message = message,
 		dispatchTime = dispatchTime,
-		chatType = ChatType.Other
+		chatType = getChatType(
+			senderId = senderId,
+			myUserId = myUserId
+		)
 	)
 }

@@ -9,6 +9,8 @@ import androidx.core.app.NotificationCompat
 import com.example.bookchat.data.FCMBody
 import com.example.bookchat.data.FCMPushMessage
 import com.example.bookchat.data.PushType
+import com.example.bookchat.data.toChat
+import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.utils.DataStoreManager
@@ -16,6 +18,9 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -28,6 +33,9 @@ class FCMService : FirebaseMessagingService() {
 
 	@Inject
 	lateinit var chatRepository: ChatRepository
+
+	@Inject
+	lateinit var channelRepository: ChannelRepository
 
 	override fun onNewToken(token: String) {
 		super.onNewToken(token)
@@ -51,9 +59,16 @@ class FCMService : FirebaseMessagingService() {
 			return
 		}
 		val fcmPushMessage = gson.fromJson(message.data["body"], FCMPushMessage::class.java)
-		//TODO : 로컬 DB에 채팅 저장 (FCM 분할 수신 처리 추가)
-//		chatRepository.insertNewChat(fcmPushMessage.body.toChatEntity())
-		sendNotification(fcmPushMessage.body)
+		insertNotificationData(fcmPushMessage)
+		sendNotification(fcmPushMessage.body) //TODO : 유저ID로 유저 정보 가져와서 유저정보와 함께 띄우기
+	}
+
+	private fun insertNotificationData(fcmPushMessage: FCMPushMessage) {
+		CoroutineScope(Dispatchers.IO).launch {
+			val newChat = fcmPushMessage.body.toChat(clientRepository.getClientProfile().id)
+			chatRepository.insertChat(newChat)
+			channelRepository.updateLastChat(newChat.chatRoomId, newChat.chatId)
+		}
 	}
 
 	private fun sendNotification(fcmBody: FCMBody) {
