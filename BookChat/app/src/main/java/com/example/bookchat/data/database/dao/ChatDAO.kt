@@ -24,12 +24,26 @@ interface ChatDAO {
 	@Query(
 		"SELECT * FROM Chat " +
 						"WHERE chat_room_id = :channelId " +
-						"ORDER BY status, chat_id DESC"
+						"ORDER BY status, chat_id DESC " +
+						"LIMIT :size"
+
 	)
-	suspend fun getChatWithUsersInChannel(channelId: Long): List<ChatWithUser>
+	suspend fun getChatWithUsersInChannel(
+		channelId: Long,
+		size: Int
+	): List<ChatWithUser>
+
+	@Query("SELECT * FROM Chat WHERE chat_id = :chatId")
+	suspend fun getChat(chatId: Long): ChatWithUser
+
+	@Query(
+		"SELECT * FROM Chat WHERE chat_id IN (:chatIds) " +
+						"ORDER BY status, chat_id DESC "
+	)
+	suspend fun getChats(chatIds: List<Long>): List<ChatWithUser>
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	suspend fun insertAllChat(chats: List<ChatEntity>)
+	suspend fun insertAllChat(chats: List<ChatEntity>): List<Long>
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insertChat(chat: ChatEntity): Long

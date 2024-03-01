@@ -91,7 +91,7 @@ class ChannelActivity : AppCompatActivity() {
 				val isFirstItemOnScreen = isFistItemOnScreen(recyclerView)
 				channelViewModel.isFirstItemOnScreen = isFirstItemOnScreen
 				if (isFirstItemOnScreen) {
-					channelViewModel.newOtherChatNoticeFlow.value = null
+					channelViewModel.newChatNoticeFlow.value = null
 				}
 			}
 		}
@@ -132,8 +132,8 @@ class ChannelActivity : AppCompatActivity() {
 	private fun observeUiState() = lifecycleScope.launch {
 		channelViewModel.uiStateFlow.collect { uiState ->
 			chatDataItemAdapter.submitList(uiState.chats)
-			updateDrawerHeader(uiState.channel)
-			updateDrawerUserList(uiState.channel.participants())
+			uiState.channel?.let { updateDrawerHeader(it) }
+			uiState.channel?.participants()?.let { updateDrawerUserList(it) }
 		}
 	}
 

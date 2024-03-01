@@ -9,6 +9,8 @@ import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 class ChatRepositoryImpl @Inject constructor(
@@ -17,14 +19,23 @@ class ChatRepositoryImpl @Inject constructor(
 	private val clientRepository: ClientRepository,
 ) : ChatRepository {
 
-	private val chats = MutableStateFlow<List<Chat>>(emptyList())
+	private val mapChats = MutableStateFlow<Map<Long, Chat>>(emptyMap()) //(chatId, Chat)
+	private val sortedChats = mapChats
+		.map {
+			it.values.toList()
+				.sortedWith(
+					compareBy({ chat -> chat.status }, { chat -> -chat.chatId })
+				)
+		}
+		.onEach { cachedChat = it }
 	private var cachedChat: List<Chat> = emptyList()
+
 	private var cachedChannelId: Long? = null
 	private var currentPage: Long? = null
 	private var isEndPage = false
 
 	override suspend fun getChatFlow(): Flow<List<Chat>> {
-		return chats
+		return sortedChats
 	}
 
 	override suspend fun getChats(
@@ -47,32 +58,36 @@ class ChatRepositoryImpl @Inject constructor(
 		isEndPage = response.cursorMeta.last
 		currentPage = response.cursorMeta.nextCursorId
 
-		//채팅 DB에 저장
-		insertAllChats(response.chatResponseList.map {
+		val newChats = response.chatResponseList.map {
 			it.toChat(
 				chatRoomId = channelId,
 				myUserId = clientRepository.getClientProfile().id
 			)
-		})
-
-		//User와 Chat이 묶인 데이터로 Flow에 방출
-		//TODO :페이징 사이즈 수정
-		val newChatList =
-			chatDAO.getChatWithUsersInChannel(channelId).map { it.toChat() }.also { cachedChat = it }
-		chats.emit(newChatList)
-		return cachedChat
+		}
+		insertAllChats(newChats)
+		return newChats
 	}
 
 	override suspend fun insertChat(chat: Chat) {
-		chatDAO.insertChat(chat.toChatEntity())
+		val chatId = chatDAO.insertChat(chat.toChatEntity())
+		val newChat = chatDAO.getChat(chatId).toChat()
+		val newMapChats = mapChats.value + (chatId to newChat)
+		mapChats.emit(newMapChats)
 	}
 
 	override suspend fun insertAllChats(chats: List<Chat>) {
-		chatDAO.insertAllChat(chats.toChatEntity())
+		val chatIds = chatDAO.insertAllChat(chats.toChatEntity())
+		val newMapChats = mapChats.value + chatDAO.getChats(chatIds)
+			.associate { it.chatEntity.chatId to it.toChat() }
+		mapChats.emit(newMapChats)
 	}
 
 	override suspend fun insertWaitingChat(roomId: Long, message: String, myUserId: Long): Long {
-		return chatDAO.insertWaitingChat(roomId, message, myUserId)
+		val chatId = chatDAO.insertWaitingChat(roomId, message, myUserId)
+		val newChat = chatDAO.getChat(chatId).toChat()
+		val newMapChats = mapChats.value + (chatId to newChat)
+		mapChats.emit(newMapChats)
+		return chatId
 	}
 
 	override suspend fun updateWaitingChat(
@@ -82,6 +97,9 @@ class ChatRepositoryImpl @Inject constructor(
 		targetChatId: Long
 	) {
 		chatDAO.updateWaitingChat(newChatId, dispatchTime, status, targetChatId)
+		val newChat = chatDAO.getChat(newChatId).toChat()
+		val newMapChats = mapChats.value - (targetChatId) + (newChatId to newChat)
+		mapChats.emit(newMapChats)
 	}
 
 }

@@ -1,10 +1,8 @@
 package com.example.bookchat.data.repository
 
-import androidx.room.withTransaction
 import com.example.bookchat.BuildConfig
 import com.example.bookchat.data.MessageType
 import com.example.bookchat.data.SocketMessage
-import com.example.bookchat.data.database.BookChatDB
 import com.example.bookchat.data.mapper.toChat
 import com.example.bookchat.data.request.RequestSendChat
 import com.example.bookchat.domain.model.Chat
@@ -30,7 +28,6 @@ import javax.inject.Inject
 // TODO :SEND를 제외한 모든 Frame에 Receipt받게 헤더 수정 필요함
 
 class StompHandlerImpl @Inject constructor(
-	private val bookChatDB: BookChatDB,
 	private val stompClient: StompClient,
 	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository,
@@ -41,19 +38,19 @@ class StompHandlerImpl @Inject constructor(
 
 	private lateinit var stompSession: StompSession
 
+	override suspend fun connectSocket(channelSId: String, channelId: Long): Flow<SocketMessage> {
+		stompSession = getStompSession()
+		return subscribeChatTopic(
+			stompSession = stompSession,
+			channelSId = channelSId,
+			channelId = channelId
+		)
+	}
+
 	private suspend fun getStompSession(): StompSession {
 		return stompClient.connect(
 			url = BuildConfig.STOMP_CONNECTION_URL,
 			customStompConnectHeaders = getHeader()
-		)
-	}
-
-	override suspend fun connectSocket(roomSid: String, roomId: Long): Flow<SocketMessage> {
-		stompSession = getStompSession()
-		return subscribeChatTopic(
-			stompSession = stompSession,
-			roomSid = roomSid,
-			roomId = roomId
 		)
 	}
 
@@ -63,170 +60,165 @@ class StompHandlerImpl @Inject constructor(
 
 	//이렇게 보내면 토큰 자동 갱신은 어케 하누?
 	override suspend fun sendMessage(
-		roomId: Long,
+		channelId: Long,
 		message: String
 	) {
 		val receiptId = insertWaitingChat(
-			roomId = roomId,
+			channelId = channelId,
 			message = message
 		)
 		stompSession.send(
 			StompSendHeaders(
-				destination = "${SEND_MESSAGE_DESTINATION}$roomId",
+				destination = "${SEND_MESSAGE_DESTINATION}$channelId",
 				customHeaders = getHeader()
 			), FrameBody.Text(gson.toJson(RequestSendChat(receiptId, message)))
 		)
 	}
 
-
 	//이렇게 보내면 토큰 자동 갱신은 어케 하누?
 	private suspend fun subscribeChatTopic(
 		stompSession: StompSession,
-		roomSid: String,
-		roomId: Long
+		channelSId: String,
+		channelId: Long
 	): Flow<SocketMessage> {
 		return stompSession.subscribe(
 			StompSubscribeHeaders(
-				destination = "${SUB_CHAT_ROOM_DESTINATION}$roomSid",
+				destination = "${SUBSCRIBE_CHANNEL_DESTINATION}$channelSId",
 				customHeaders = getHeader()
 			)
 		).map { it.bodyAsText.parseToSocketMessage() }
 			.onEach { socketMessage ->
-				//TODO : 메모리 FLow에 새로운 채팅 emit
-				saveChatInLocalDB(
+				handleSocketMessage(
 					socketMessage = socketMessage,
-					roomId = roomId
+					channelId = channelId
 				)
 			}
 	}
 
-	private suspend fun saveChatInLocalDB(
+	private suspend fun handleSocketMessage(
 		socketMessage: SocketMessage,
-		roomId: Long
+		channelId: Long
 	) {
 		when (socketMessage) {
 			is SocketMessage.CommonMessage -> {
-				saveCommonMessageInLocalDB(
+				handleCommonMessage(
 					socketMessage = socketMessage,
-					roomId = roomId
+					channelId = channelId
 				)
 			}
 
 			is SocketMessage.NotificationMessage -> {
-				saveNoticeMessageInLocalDB(
+				handleNoticeMessage(
 					socketMessage = socketMessage,
-					roomId = roomId
+					channelId = channelId
 				)
 			}
 		}
 	}
 
-	private suspend fun saveCommonMessageInLocalDB(
+	private suspend fun handleCommonMessage(
 		socketMessage: SocketMessage.CommonMessage,
-		roomId: Long
+		channelId: Long
 	) {
 		val myUserId = clientRepository.getClientProfile().id
 		val receiptId = socketMessage.receiptId
+
 		val chat = socketMessage.toChat(
-			chatRoomId = roomId,
+			chatRoomId = channelId,
 			myUserId = myUserId,
 			sender = userRepository.getUser(socketMessage.senderId)
 		)
 
-		bookChatDB.withTransaction {
-			if (socketMessage.senderId != myUserId) {
-				insertNewChat(chat)
-				updateChannelLastChat(chat)
-				return@withTransaction
-			}
-			updateWaitingChatToSuccess(chat, receiptId)
+		if (socketMessage.senderId != myUserId) {
+			insertNewChat(chat)
 			updateChannelLastChat(chat)
+			return
 		}
+
+		updateWaitingChatToSuccess(chat, receiptId)
+		updateChannelLastChat(chat)
 	}
 
-	private suspend fun saveNoticeMessageInLocalDB(
+	private suspend fun handleNoticeMessage(
 		socketMessage: SocketMessage.NotificationMessage,
-		roomId: Long
+		channelId: Long
 	) {
 		val myUserId = clientRepository.getClientProfile().id
 		val chat = socketMessage.toChat(
-			chatRoomId = roomId,
+			chatRoomId = channelId,
 			myUserId = myUserId
 		)
 		// TODO :Target에 대한 DB수정 작업해야함
-		bookChatDB.withTransaction {
-			val noticeTarget = socketMessage.targetId
+		val noticeTarget = socketMessage.targetId
 
-			//TODO : ++ ㅁㅁ님이 입장하셨습니다.
-			// ㅁㅁ님이 퇴장하셨습니다.
-			// 같이 공지채팅에서 유저이름을 언급하는 경우
-			// 실제 닉네임이 아니라 UserId로 주는게 더 좋아보임
-			// 문제는 없나..?
-			// 메모장에서 언급했던 오래 전 채팅에서 보이는 유저 정보가
-			// 최신 정보임을 보장하지 못하는 내용 (그 사람이 현재 채팅방에 없다면)
-			// 닉네임, 프로필 사진 등
-			// 하지만 카톡도 이렇게 보이는 현상이 있음
-			// 이거 결론 짓고, 전달하면 될 듯
+		//TODO : ++ ㅁㅁ님이 입장하셨습니다.
+		// ㅁㅁ님이 퇴장하셨습니다.
+		// 같이 공지채팅에서 유저이름을 언급하는 경우
+		// 실제 닉네임이 아니라 UserId로 주는게 더 좋아보임
+		// 문제는 없나..?
+		// 메모장에서 언급했던 오래 전 채팅에서 보이는 유저 정보가
+		// 최신 정보임을 보장하지 못하는 내용 (그 사람이 현재 채팅방에 없다면)
+		// 닉네임, 프로필 사진 등
+		// 하지만 카톡도 이렇게 보이는 현상이 있음
+		// 이거 결론 짓고, 전달하면 될 듯
 
-			when (socketMessage.messageType) {
-				//TODO : 채팅방 터짐(방장 나감)도 추가해야함 + Notice이름 좀 바꾸자.
-				MessageType.CHAT -> Unit
-				MessageType.ENTER -> {
-					//TODO : 채팅방 정보 조회를 다시하거나 (당첨)
-					// Enter NOTICE 속에 유저 정보(채팅방 정보조회의 유저 객체처럼)가
-					// 있어야할 것같음 [Id, nickname, profileUrl, defaultImageType]
+		when (socketMessage.messageType) {
+			//TODO : 채팅방 터짐(방장 나감)도 추가해야함 + Notice이름 좀 바꾸자.
+			MessageType.CHAT -> Unit
+			MessageType.ENTER -> {
+				//TODO : 채팅방 정보 조회를 다시하거나 (당첨)
+				// Enter NOTICE 속에 유저 정보(채팅방 정보조회의 유저 객체처럼)가
+				// 있어야할 것같음 [Id, nickname, profileUrl, defaultImageType]
 
-					//TODO : ㅁㅁ님이 입장 하셨습니다.
-					// 이것도 일반 텍스트가 아닌, UserID님이 입장하셨습니다로 보내고
-					// 이걸 클라이언트가 해당 유저 정보를 가지고 있는 값으로 누구님이 입장하셨습니다로 변경하는게 좋을 듯
-					channelRepository.updateMemberCount(roomId, 1)
-				}
-
-				MessageType.EXIT -> {
-					//TODO : 채팅방 퇴장 시에 서버에서 넣어주는 채팅 ㅁㅁ님이 퇴장 하셨습니다.
-					// 이걸 일반 텍스트가 아닌, UserId님이 퇴장하셨습니다로 보내고
-					// 이걸 클라이언트가 해당 유저 정보를 가지고 있는 값으로 누구님이 퇴장하셨습니다로 변경하는게 좋을 듯
-
-					//TODO : 만약 방장이 나갔다면 채팅방 삭제 후 공지 띄우고 채팅 입력 막아야함.
-					// 채팅방 인원 수 감소
-					channelRepository.updateMemberCount(roomId, -1)
-				}
-
-				MessageType.NOTICE_KICK -> {
-					//채팅방 인원 수 감소
-					channelRepository.updateMemberCount(roomId, -1)
-				}
-
-				MessageType.NOTICE_HOST_DELEGATE -> {
-					//방장 변경
-				}
-
-				MessageType.NOTICE_SUB_HOST_DISMISS -> {
-					//Target 부방장 해임
-				}
-
-				MessageType.NOTICE_SUB_HOST_DELEGATE -> {
-					//Target 부방장 위임
-				}
+				//TODO : ㅁㅁ님이 입장 하셨습니다.
+				// 이것도 일반 텍스트가 아닌, UserID님이 입장하셨습니다로 보내고
+				// 이걸 클라이언트가 해당 유저 정보를 가지고 있는 값으로 누구님이 입장하셨습니다로 변경하는게 좋을 듯
+				channelRepository.updateMemberCount(channelId, 1)
 			}
 
-			//TODO : 터질 확률이 높음
-			// 유저채팅이 아니고, 프로필도 없고, defaultImageType도 없음으로로
-			// if (!isFirstItemOnScreen) newOtherChatNoticeFlow.value = chatEntity
-			insertNewChat(chat)
-			updateChannelLastChat(chat)
-			return@withTransaction
+			MessageType.EXIT -> {
+				//TODO : 채팅방 퇴장 시에 서버에서 넣어주는 채팅 ㅁㅁ님이 퇴장 하셨습니다.
+				// 이걸 일반 텍스트가 아닌, UserId님이 퇴장하셨습니다로 보내고
+				// 이걸 클라이언트가 해당 유저 정보를 가지고 있는 값으로 누구님이 퇴장하셨습니다로 변경하는게 좋을 듯
+
+				//TODO : 만약 방장이 나갔다면 채팅방 삭제 후 공지 띄우고 채팅 입력 막아야함.
+				// 채팅방 인원 수 감소
+				channelRepository.updateMemberCount(channelId, -1)
+			}
+
+			MessageType.NOTICE_KICK -> {
+				//채팅방 인원 수 감소
+				channelRepository.updateMemberCount(channelId, -1)
+			}
+
+			MessageType.NOTICE_HOST_DELEGATE -> {
+				//방장 변경
+			}
+
+			MessageType.NOTICE_SUB_HOST_DISMISS -> {
+				//Target 부방장 해임
+			}
+
+			MessageType.NOTICE_SUB_HOST_DELEGATE -> {
+				//Target 부방장 위임
+			}
 		}
+
+		//TODO : 터질 확률이 높음
+		// 유저채팅이 아니고, 프로필도 없고, defaultImageType도 없음으로로
+		// if (!isFirstItemOnScreen) newOtherChatNoticeFlow.value = chatEntity
+		insertNewChat(chat)
+		updateChannelLastChat(chat)
 	}
 
 	private suspend fun insertNewChat(chat: Chat) {
 		chatRepository.insertChat(chat)
 	}
 
-	private suspend fun insertWaitingChat(roomId: Long, message: String): Long {
+	private suspend fun insertWaitingChat(channelId: Long, message: String): Long {
 		val myUserId = clientRepository.getClientProfile().id
 		return chatRepository.insertWaitingChat(
-			roomId = roomId, message = message, myUserId = myUserId
+			roomId = channelId, message = message, myUserId = myUserId
 		)
 	}
 
@@ -234,7 +226,7 @@ class StompHandlerImpl @Inject constructor(
 		chatRepository.updateWaitingChat(
 			targetChatId = receiptId,
 			newChatId = chat.chatId,
-			dispatchTime = chat.dispatchTime ?: "", //개선 필요
+			dispatchTime = chat.dispatchTime,
 			status = ChatStatus.SUCCESS.code
 		)
 	}
@@ -256,17 +248,15 @@ class StompHandlerImpl @Inject constructor(
 
 	private fun getHeader(): Map<String, String> {
 		return mapOf(
-			Pair(
-				AUTHORIZATION,
-				"${DataStoreManager.getBookChatTokenSync().getOrNull()?.accessToken}"
-			)
+			AUTHORIZATION to
+							"${DataStoreManager.getBookChatTokenSync().getOrNull()?.accessToken}"
 		)
 	}
 
 	companion object {
 		private const val AUTHORIZATION = "Authorization"
 		private const val SEND_MESSAGE_DESTINATION = "/subscriptions/send/chatrooms/"
-		private const val SUB_CHAT_ROOM_DESTINATION = "/topic/"
+		private const val SUBSCRIBE_CHANNEL_DESTINATION = "/topic/"
 		private const val LOCAL_DATA_CHAT_LOAD_SIZE = 25
 	}
 }

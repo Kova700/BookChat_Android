@@ -33,6 +33,7 @@ fun ChannelResponse.getLastChat(): Chat? {
 		chatRoomId = roomId,
 		message = lastChatContent,
 		chatType = ChatType.UNKNOWN,
+		dispatchTime = "", //개선 필요
 		sender = null
 	)
 }

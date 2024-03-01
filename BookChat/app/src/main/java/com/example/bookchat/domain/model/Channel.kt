@@ -16,17 +16,7 @@ data class Channel(
 	val bookTitle: String? = null,
 	val bookAuthors: List<String>? = null,
 	val bookCoverImageUrl: String? = null,
-) {
-	companion object {
-		val DEFAULT = Channel(
-			roomId = 0L,
-			roomName = "",
-			roomSid = "",
-			roomMemberCount = 0,
-			defaultRoomImageType = 0,
-		)
-	}
-}
+)
 
 fun Channel.participants() =
 	mutableListOf<User>().apply {

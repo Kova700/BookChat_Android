@@ -652,7 +652,7 @@ object DataBindingAdapter {
 	@JvmStatic
 	@BindingAdapter("getDateKoreanString")
 	fun getDateKoreanString(textView: TextView, chat: Chat) {
-		textView.text = DateManager.getDateKoreanString(chat.dispatchTime ?: "") //개선 필요
+		textView.text = DateManager.getDateKoreanString(chat.dispatchTime)
 	}
 
 	/**채팅 날짜 Visibility 세팅*/

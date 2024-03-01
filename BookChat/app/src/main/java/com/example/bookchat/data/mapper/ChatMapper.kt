@@ -77,7 +77,7 @@ fun Chat.toChatEntity(): ChatEntity {
 		chatId = chatId,
 		chatRoomId = chatRoomId,
 		senderId = sender?.id,
-		dispatchTime = dispatchTime ?: "", //개선필요
+		dispatchTime = dispatchTime,
 		message = message,
 		chatType = chatType,
 		status = status.code

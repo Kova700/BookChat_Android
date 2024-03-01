@@ -8,6 +8,6 @@ data class Chat(
 	val message: String,
 	val chatType: ChatType,
 	val status: ChatStatus = SUCCESS,
-	val dispatchTime: String? = null, //개선 필요
+	val dispatchTime: String,
 	val sender: User?
 )

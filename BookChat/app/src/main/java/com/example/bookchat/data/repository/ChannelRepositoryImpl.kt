@@ -30,7 +30,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	private val userRepository: UserRepository,
 ) : ChannelRepository {
 
-	private val mapChannels = MutableStateFlow<Map<Long, Channel>>(emptyMap())//(cid, channel)
+	private val mapChannels = MutableStateFlow<Map<Long, Channel>>(emptyMap())//(channelId, Channel)
 	private val channels = mapChannels.map { it.values.toList() }.onEach { cachedChannels = it }
 	private var cachedChannels: List<Channel> = emptyList()
 

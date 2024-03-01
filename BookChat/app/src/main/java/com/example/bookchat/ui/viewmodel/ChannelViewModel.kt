@@ -15,10 +15,11 @@ import com.example.bookchat.ui.viewmodel.contract.ChannelUiState.UiState
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -57,11 +58,9 @@ class ChannelViewModel @Inject constructor(
 	val inputtedMessage = MutableStateFlow("")
 
 	//아래 안보고 있을 때, 채팅들어오면 데이터 마지막 채팅 Notice 보여주는 방식으로 수정
-	var newOtherChatNoticeFlow = MutableStateFlow<Chat?>(null)
+	var newChatNoticeFlow = MutableStateFlow<Chat?>(null)
 	var isFirstItemOnScreen = true
 	var scrollForcedFlag = false
-
-	private val socketChatJob = connectSocket()
 
 	init {
 		observeChannel()
@@ -70,6 +69,7 @@ class ChannelViewModel @Inject constructor(
 		getChats(channelId)
 		getTempSavedMessage()
 		clearTempSavedMessage()
+		connectSocket()
 	}
 
 	private fun observeChannel() = viewModelScope.launch {
@@ -81,6 +81,8 @@ class ChannelViewModel @Inject constructor(
 	private fun observeChats() = viewModelScope.launch {
 		chattingRepositoryFacade.getChatFlow().collect { chats ->
 			updateState { copy(chats = chats) }
+			if (isFirstItemOnScreen) return@collect
+			newChatNoticeFlow.update { chats.first() }
 		}
 	}
 
@@ -129,16 +131,10 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun connectSocket() = viewModelScope.launch(Dispatchers.IO) {
-//		stompHandler.connectSocket(
-//			roomId = channelId,
-//			roomSid = roomSId
-//		).catch { handleError(it) }
-//			.collect {
-//				if (isFirstItemOnScreen.not()) {
-//					newOtherChatNoticeFlow.value =
-//						chatRepository.getLastChatOfOtherUser(roomId = channelId)
-//				}
-//			}
+		stompHandler.connectSocket(
+			channelSId = uiStateFlow.value.channel?.roomSid ?: return@launch,
+			channelId = channelId
+		).catch { handleError(it) }.collect()
 	}
 
 	fun sendMessage() {
@@ -146,7 +142,7 @@ class ChannelViewModel @Inject constructor(
 
 		val message = inputtedMessage.value
 		viewModelScope.launch(Dispatchers.IO) {
-			inputtedMessage.value = ""
+			inputtedMessage.update { "" }
 			scrollForcedFlag = true
 			runCatching { stompHandler.sendMessage(channelId, message) }
 				.onFailure { handleError(it) }
@@ -160,7 +156,6 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun disconnectSocket() = viewModelScope.launch {
-		socketChatJob.cancelAndJoin()
 		runCatching { stompHandler.disconnectSocket() }
 			.onFailure { handleError(it) }
 	}
