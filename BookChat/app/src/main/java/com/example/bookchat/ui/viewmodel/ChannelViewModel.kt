@@ -1,21 +1,17 @@
 package com.example.bookchat.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
-import com.example.bookchat.data.database.dao.ChatDAO
 import com.example.bookchat.data.database.dao.TempMessageDAO
 import com.example.bookchat.data.repository.ChattingRepositoryFacade
 import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.model.participants
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.ui.fragment.ChannelListFragment.Companion.EXTRA_CHAT_ROOM_ID
 import com.example.bookchat.ui.viewmodel.contract.ChannelEvent
 import com.example.bookchat.ui.viewmodel.contract.ChannelUiState
 import com.example.bookchat.ui.viewmodel.contract.ChannelUiState.UiState
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +19,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -41,7 +36,6 @@ import javax.inject.Inject
 //TODO : 소켓 헤더에서 토큰 빼기 Or 특정 시간 주기로 토큰 갱신 API 호출 Or 소켓 끊길 때마다 리커넥션 요청으로 토큰 갱신 (백엔드와 협의)
 //TODO : 소켓 연결 실패 시 예외 처리
 //TODO : 채팅방 정보 조회 실패 시 예외 처리
-//TODO : 채널 LastChat 이후 부터 채팅 페이징 요청
 //TODO : 소켓 연결 성공 /실패 상관 없이 끝나면 채팅방 채팅 내역 조회
 //TODO : 공지 채팅 유저명 연결
 
@@ -85,7 +79,18 @@ class ChannelViewModel @Inject constructor(
 
 	private fun observeChats() = viewModelScope.launch {
 		chattingRepositoryFacade.getChatsFlow(channelId).collect { chats ->
+			updateNewChatNotice(chats)
 			updateState { copy(chats = chats) }
+		}
+	}
+
+	private fun updateNewChatNotice(newChats: List<Chat>) {
+		if (isFirstItemOnScreen) return
+
+		val newLastChat = newChats.firstOrNull() ?: return
+		val existingLastChat = uiStateFlow.value.chats.firstOrNull()
+		if (existingLastChat?.chatId == null || newLastChat.chatId > existingLastChat.chatId) {
+			newChatNoticeFlow.update { newLastChat }
 		}
 	}
 
@@ -137,7 +142,7 @@ class ChannelViewModel @Inject constructor(
 		stompHandler.connectSocket(
 			channelSId = uiStateFlow.value.channel?.roomSid ?: return@launch,
 			channelId = channelId
-		).catch { handleError(it) }.collect{
+		).catch { handleError(it) }.collect {
 
 		}
 	}
