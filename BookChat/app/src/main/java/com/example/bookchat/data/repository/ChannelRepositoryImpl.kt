@@ -9,7 +9,9 @@ import com.example.bookchat.data.request.RequestMakeChatRoom
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.RespondChatRoomInfo
 import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.repository.ChannelRepository
+import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import okhttp3.Headers
 import okhttp3.MultipartBody
 import javax.inject.Inject
@@ -28,22 +31,21 @@ class ChannelRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi,
 	private val channelDAO: ChannelDAO,
 	private val userRepository: UserRepository,
+	private val chatRepository: ChatRepository
 ) : ChannelRepository {
 
 	private val mapChannels = MutableStateFlow<Map<Long, Channel>>(emptyMap())//(channelId, Channel)
-
-	//ORDER BY top_pin_num DESC, last_chat_id DESC, room_id DESC
 	private val channels = mapChannels.map {
+		//ORDER BY top_pin_num DESC, last_chat_id DESC, room_id DESC
 		it.values.toList().sortedWith(
 			compareBy(
 				{ channel -> -channel.topPinNum },
 				{ channel -> channel.lastChat?.chatId?.unaryMinus() },
 				{ channel -> -channel.roomId })
 		)
-	}
-		.onEach { cachedChannels = it }
-	private var cachedChannels: List<Channel> = emptyList()
+	}.onEach { cachedChannels = it }
 
+	private var cachedChannels: List<Channel> = emptyList()
 	private val currentChannelId = MutableStateFlow<Long?>(null)
 	private val currentChannel = channels.combine(currentChannelId) { channels, channelId ->
 		channels.firstOrNull { channel -> channel.roomId == channelId }
@@ -62,19 +64,19 @@ class ChannelRepositoryImpl @Inject constructor(
 		return currentChannel
 	}
 
-	private suspend fun setChannels(newChannels: Map<Long, Channel>) {
-		mapChannels.emit(newChannels)
+	private fun setChannels(newChannels: Map<Long, Channel>) {
+		mapChannels.update { newChannels }
 	}
 
-	override suspend fun getChannel(channelId: Long) {
+	override suspend fun getChannel(channelId: Long): Channel {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
 		getChannelInfo(channelId)
-		//ChannelsFlow 수정
-		val updatedChannel = channelDAO.getChannel(channelId).toChannel()
+		val updatedChannel = getChannelWithInfo(channelId)
 		setChannels(mapChannels.value + (channelId to updatedChannel))
+		return updatedChannel
 	}
 
+	//Channel 세부 정보는 채팅방 들어 가면 getChannel에 의해 갱신될 예정
 	override suspend fun getChannels(loadSize: Int): List<Channel> {
 		if (isEndPage) return cachedChannels
 		if (isNetworkConnected().not()) throw NetworkIsNotConnectedException()
@@ -87,11 +89,29 @@ class ChannelRepositoryImpl @Inject constructor(
 		currentPage = response.cursorMeta.nextCursorId
 
 		channelDAO.upsertAllChannels(response.channels.toChannelEntity())
-		val channelIds = response.channels.map { it.roomId }
-		val newChannels = channelDAO.getChannels(channelIds).toChannel()
-		val newMapChannels = mapChannels.value + newChannels.associateBy { it.roomId }
-		setChannels(newMapChannels)
-		return newMapChannels.map { it.value }
+		val chats = response.channels.map {
+			Chat.DEFAULT.copy(
+				chatId = it.lastChatId,
+				chatRoomId = it.roomId,
+				message = it.lastChatContent
+			)
+		}
+		chatRepository.insertAllChats(chats)
+		val newChannels = response.channels.map { getChannelWithInfo(it.roomId) }
+		setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
+		return newChannels
+	}
+
+	//DB에 저장된 LastChat과, 기존에 저장되어있던 채널 정보들을 묶어서 반환 (like topPin..)
+	private suspend fun getChannelWithInfo(channelId: Long): Channel {
+		val channel =
+			channelDAO.getChannel(channelId)?.toChannel() ?: Channel.DEFAULT.copy(roomId = channelId)
+		return channel.copy(
+			lastChat = channel.lastChat?.chatId?.let { chatRepository.getChat(it) },
+			host = channel.host?.id?.let { userRepository.getUser(it) },
+			subHosts = channel.subHosts?.map { user -> userRepository.getUser(user.id) },
+			guests = channel.guests?.map { user -> userRepository.getUser(user.id) }
+		)
 	}
 
 	override suspend fun makeChannel(
@@ -157,12 +177,16 @@ class ChannelRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun updateLastChat(channelId: Long, chatId: Long) {
-		channelDAO.updateLastChatIfNeeded(
+		val existingLastChatId = channelDAO.getChannel(channelId)?.toChannel()?.lastChat?.chatId
+		if (existingLastChatId != null && chatId <= existingLastChatId) return
+
+		channelDAO.updateLastChat(
 			roomId = channelId,
-			newLastChatId = chatId,
+			lastChatId = chatId,
 		)
-		val updatedChannel = channelDAO.getChannel(channelId).toChannel()
-		setChannels(mapChannels.value + mapOf(Pair(channelId, updatedChannel)))
+
+		val updatedChannel = getChannelWithInfo(channelId)
+		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
 	private suspend fun saveParticipantsDataInLocalDB(chatRoomInfo: RespondChatRoomInfo) {

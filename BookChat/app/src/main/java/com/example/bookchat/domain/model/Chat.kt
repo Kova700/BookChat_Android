@@ -10,4 +10,15 @@ data class Chat(
 	val status: ChatStatus = SUCCESS,
 	val dispatchTime: String,
 	val sender: User?
-)
+) {
+	companion object {
+		val DEFAULT = Chat(
+			chatId = 0L,
+			chatRoomId = 0L,
+			message = "",
+			chatType = ChatType.UNKNOWN,
+			dispatchTime = "",
+			sender = null,
+		)
+	}
+}

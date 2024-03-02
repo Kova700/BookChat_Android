@@ -79,7 +79,6 @@ class ChannelViewModel @Inject constructor(
 
 	private fun observeChannel() = viewModelScope.launch {
 		chattingRepositoryFacade.getChannelFlow(channelId).collect { channel ->
-			Log.d(TAG, "ChannelViewModel: observeChannel() - channel.participants() : ${channel.participants()}")
 			updateState { copy(channel = channel) }
 		}
 	}
@@ -87,8 +86,6 @@ class ChannelViewModel @Inject constructor(
 	private fun observeChats() = viewModelScope.launch {
 		chattingRepositoryFacade.getChatsFlow(channelId).collect { chats ->
 			updateState { copy(chats = chats) }
-			if (isFirstItemOnScreen) return@collect
-			newChatNoticeFlow.update { chats.firstOrNull() }
 		}
 	}
 
@@ -140,7 +137,9 @@ class ChannelViewModel @Inject constructor(
 		stompHandler.connectSocket(
 			channelSId = uiStateFlow.value.channel?.roomSid ?: return@launch,
 			channelId = channelId
-		).catch { handleError(it) }.collect()
+		).catch { handleError(it) }.collect{
+
+		}
 	}
 
 	fun sendMessage() {

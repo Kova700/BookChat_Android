@@ -19,10 +19,10 @@ interface ChatDAO {
 						"WHERE chat_room_id = :channelId " +
 						"ORDER BY status, chat_id DESC"
 	)
-	suspend fun getLastChatInChannel(channelId: Long): ChatWithUser
+	suspend fun getLastChatInChannel(channelId: Long): ChatWithUser?
 
 	@Query("SELECT * FROM Chat WHERE chat_id = :chatId")
-	suspend fun getChat(chatId: Long): ChatWithUser
+	suspend fun getChat(chatId: Long): ChatWithUser?
 
 	@Query(
 		"SELECT * FROM Chat WHERE chat_id IN (:chatIds) " +

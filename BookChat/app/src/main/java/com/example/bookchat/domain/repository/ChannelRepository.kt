@@ -13,7 +13,7 @@ interface ChannelRepository {
 		loadSize: Int = REMOTE_CHANNELS_LOAD_SIZE,
 	): List<Channel>
 
-	suspend fun getChannel(channelId: Long)
+	suspend fun getChannel(channelId: Long): Channel
 
 	suspend fun enter(channel: Channel)
 	suspend fun leave(channelId: Long)
@@ -25,8 +25,7 @@ interface ChannelRepository {
 		charRoomImage: MultipartBody.Part?
 	): Channel
 
-
 	companion object {
-		const val REMOTE_CHANNELS_LOAD_SIZE = 7
+		const val REMOTE_CHANNELS_LOAD_SIZE = 20
 	}
 }

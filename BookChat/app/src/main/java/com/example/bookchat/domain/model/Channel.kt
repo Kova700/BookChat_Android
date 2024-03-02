@@ -6,8 +6,8 @@ data class Channel(
 	val roomSid: String,
 	val roomMemberCount: Long,
 	val defaultRoomImageType: Int, //개선 필요
-	val notificationFlag :Boolean = true,
-	val topPinNum :Int = 0,
+	val notificationFlag: Boolean = true,
+	val topPinNum: Int = 0,
 	val roomImageUri: String? = null,
 	val lastChat: Chat? = null,
 	val host: User? = null,
@@ -18,7 +18,17 @@ data class Channel(
 	val bookTitle: String? = null,
 	val bookAuthors: List<String>? = null,
 	val bookCoverImageUrl: String? = null,
-)
+) {
+	companion object {
+		val DEFAULT = Channel(
+			roomId = 0L,
+			roomName = "",
+			roomSid = "",
+			roomMemberCount = 0,
+			defaultRoomImageType = 0
+		)
+	}
+}
 
 fun Channel.participants() =
 	mutableListOf<User>().apply {

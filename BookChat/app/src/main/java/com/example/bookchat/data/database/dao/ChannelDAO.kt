@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.bookchat.data.database.model.ChannelEntity
-import com.example.bookchat.data.database.model.combined.ChannelWithInfo
 
 @Dao
 interface ChannelDAO {
@@ -15,13 +14,13 @@ interface ChannelDAO {
 						"WHERE room_id IN (:channelIds) " +
 						"ORDER BY top_pin_num DESC, last_chat_id DESC, room_id DESC"
 	)
-	suspend fun getChannels(channelIds: List<Long>): List<ChannelWithInfo>
+	suspend fun getChannels(channelIds: List<Long>): List<ChannelEntity>
 
 	@Query(
 		"SELECT * FROM Channel " +
 						"WHERE room_id = :channelId"
 	)
-	suspend fun getChannel(channelId: Long): ChannelWithInfo
+	suspend fun getChannel(channelId: Long): ChannelEntity?
 
 	@Insert(onConflict = OnConflictStrategy.IGNORE)
 	suspend fun insertIfNotPresent(chatRoom: ChannelEntity): Long
@@ -63,15 +62,6 @@ interface ChannelDAO {
 		defaultRoomImageType: Int,
 		roomImageUri: String?
 	)
-
-	suspend fun updateLastChatIfNeeded(
-		roomId: Long,
-		newLastChatId: Long
-	) {
-		val existingLastId = getChannel(roomId).chatEntity.chatId
-		if (newLastChatId <= existingLastId) return
-		updateLastChat(roomId, newLastChatId)
-	}
 
 	@Query(
 		"UPDATE Channel SET " +

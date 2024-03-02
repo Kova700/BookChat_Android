@@ -5,6 +5,8 @@ import com.example.bookchat.data.database.model.combined.ChannelWithInfo
 import com.example.bookchat.data.response.ChannelResponse
 import com.example.bookchat.data.response.getLastChat
 import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.Chat
+import com.example.bookchat.domain.model.User
 
 fun ChannelResponse.toChannelEntity(): ChannelEntity {
 	return ChannelEntity(
@@ -52,6 +54,28 @@ fun Channel.toChannelEntity(): ChannelEntity {
 	)
 }
 
+fun ChannelEntity.toChannel(): Channel {
+	return Channel(
+		roomId = roomId,
+		roomName = roomName,
+		roomSid = roomSid,
+		roomMemberCount = roomMemberCount,
+		defaultRoomImageType = defaultRoomImageType,
+		notificationFlag = notificationFlag,
+		topPinNum = topPinNum,
+		roomImageUri = roomImageUri,
+		lastChat = lastChatId?.let { Chat.DEFAULT.copy(chatId = it) }, // sender 정보 없을 수 있음
+		host = hostId?.let { User.Default.copy(id = it) }, //ChannelRepository에서 보충 예정
+		subHosts = subHostIds?.map { User.Default.copy(id = it) },
+		guests = guestIds?.map { User.Default.copy(id = it) },
+		roomTags = roomTags,
+		roomCapacity = roomCapacity,
+		bookTitle = bookTitle,
+		bookAuthors = bookAuthors,
+		bookCoverImageUrl = bookCoverImageUrl,
+	)
+}
+
 fun ChannelWithInfo.toChannel(): Channel {
 	return Channel(
 		roomId = channelEntity.roomId,
@@ -75,4 +99,4 @@ fun ChannelWithInfo.toChannel(): Channel {
 }
 
 fun List<ChannelResponse>.toChannelEntity() = this.map { it.toChannelEntity() }
-fun List<ChannelWithInfo>.toChannel() = this.map { it.toChannel() }
+fun List<ChannelEntity>.toChannel() = this.map { it.toChannel() }
