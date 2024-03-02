@@ -31,7 +31,8 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 
-	private lateinit var binding: FragmentHomeBinding
+	private var _binding: FragmentHomeBinding? = null
+	private val binding get() = _binding!!
 	private val homeViewModel: HomeViewModel by viewModels()
 	private lateinit var mainReadingBookAdapter: MainBookAdapter
 	private lateinit var mainUserChatRoomListAdapter: MainUserChatRoomListAdapter
@@ -40,18 +41,25 @@ class HomeFragment : Fragment() {
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedInstanceState: Bundle?
-	): View? {
-		binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
-		with(binding) {
-			lifecycleOwner = this@HomeFragment
-			viewmodel = homeViewModel
-		}
+	): View {
+		_binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
+		binding.lifecycleOwner = this
+		binding.viewmodel = homeViewModel
+		return binding.root
+	}
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
 		initAdapter()
 		initRecyclerView()
 		observePagingReadingBookData()
 		observePagingChatRoomData()
 		observeReadingBookLoadStateFlow()
-		return binding.root
+	}
+
+	override fun onDestroyView() {
+		super.onDestroyView()
+		_binding = null
 	}
 
 	private fun initAdapter() {
