@@ -34,6 +34,7 @@ class MakeChatRoomViewModel @Inject constructor(
 	val chatRoomProfileImage = MutableStateFlow(byteArrayOf())
 	val defaultProfileImageType = MutableStateFlow(Random().nextInt(7) + 1)
 
+	//TODO : 로딩 상태 변경으로 연속 요청 방지해야함 (채팅방 중복 생성됨)
 	fun requestMakeChatRoom() = viewModelScope.launch {
 		if (!isPossibleMakeChannel()) return@launch
 		runCatching { makeChannel() }

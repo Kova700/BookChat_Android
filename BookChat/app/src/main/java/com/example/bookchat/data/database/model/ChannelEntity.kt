@@ -18,9 +18,6 @@ data class ChannelEntity(
 	@ColumnInfo(name = "notification_flag") val notificationFlag: Boolean = true,
 	@ColumnInfo(name = "top_pin_num") val topPinNum: Int = 0,
 	@ColumnInfo(name = "last_chat_id") val lastChatId: Long? = null,
-//	@ColumnInfo(name = "last_active_time") val lastActiveTime: String? = null,
-//	@ColumnInfo(name = "last_chat_content") val lastChatContent: String? = null,
-	// -----------------------infoId만 남기고 테이블 분리------------------------- 2차
 	@ColumnInfo(name = "host_id") val hostId: Long? = null,
 	@ColumnInfo(name = "sub_host_ids") val subHostIds: List<Long>? = null,
 	@ColumnInfo(name = "guest_ids") val guestIds: List<Long>? = null,

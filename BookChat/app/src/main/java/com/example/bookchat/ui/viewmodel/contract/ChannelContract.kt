@@ -6,13 +6,23 @@ import com.example.bookchat.domain.model.Chat
 
 data class ChannelUiState(
 	val inputtedMessage: String,
-	val channel: Channel,
+	val channel: Channel?,
+	val uiState :UiState,
 	val chats: List<Chat>,
 ) {
+
+	enum class UiState {
+		SUCCESS,
+		LOADING,
+		ERROR,
+		EMPTY,
+	}
+
 	companion object {
 		val DEFAULT = ChannelUiState(
 			inputtedMessage = "",
-			channel = Channel.DEFAULT,
+			channel = null,
+			uiState = UiState.EMPTY,
 			chats = emptyList()
 		)
 	}

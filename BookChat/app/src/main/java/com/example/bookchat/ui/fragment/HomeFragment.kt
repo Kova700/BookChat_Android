@@ -26,6 +26,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+//TODO : 독서중 도서 API 요청 후 로컬 DB 저장 (API 스펙에 BOOKID가 추가되어야함)
+
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 
@@ -49,31 +51,6 @@ class HomeFragment : Fragment() {
 		observePagingReadingBookData()
 		observePagingChatRoomData()
 		observeReadingBookLoadStateFlow()
-
-		//독서중인 책 서버로부터 가져오기
-		//그리고 로컬 DB에 저장하기,
-		//BookShelfFragment에서도 각 페이지 별로 서버로부터 도서 가져오기, (독서예정, 독서중, 독서완료)
-		//그리고 각 도서 로컬 DB에 저장하기
-		//로컬 DB에서 저장된 도서 가져오기
-		//이 작업을 페이징으로 구현( 페이징으로 서버에서 가져옴 -> 로컬 DB에 저장함 -> 처음부터 지금 가져온거까지 로컬DB에서 가져옴 )
-
-		//서재에 있는 도서 값 수정의 경우에는 서버 API 성공시 로컬 DB 수정하는 방향으로 구현
-		//서버만 성공하고 LocalDB는 실패하면? (강제종료시에 가능성이 있긴하잖아)
-		//어차피 매번 서버로부터 가져오니까 불일치가 생겨도 덮어씌워지니까 상관없을듯
-
-		//채팅방 목록의 경우에도, HomeFragment가 켜지면, 서버로부터 채팅방 목록을 받아와서 로컬 DB에 저장
-		//로컬 DB에 저장된 채팅방 목록을 가져와서 List에 뿌림
-
-		//ChatRoomListFragment에서도 서버로부터 채팅방 목록을 가져옴
-		//그리고 로컬 DB에 저장함
-		//저장된 채팅방 목록을 가져와서 List에 뿌림,
-
-		///암튼 위에까지는 확실함
-		//FCM을 받으면, 로컬 DB에 채팅방 목록에 마지막 채팅 또한 갱신하거나 채팅또한 DB에 저장
-		//채팅을 받으면 채팅방 별 마지막 채팅을 채팅방 DB에 저장해야하나, 혹은
-		//외래키로 채팅을 채팅 테이블에서 가져오는 형식으로 짜야하나 고민이긴함..
-		//이건 stream chat app확인해보자 어떻게 저장하고 어떻게 가져오는지
-
 		return binding.root
 	}
 

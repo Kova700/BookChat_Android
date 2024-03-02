@@ -1,38 +1,29 @@
 package com.example.bookchat.data.database.dao
 
-import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.bookchat.data.database.model.ChannelEntity
-import com.example.bookchat.data.database.model.combined.ChannelWithChat
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ChannelDAO {
 
 	@Query(
 		"SELECT * FROM Channel " +
+						"WHERE room_id IN (:channelIds) " +
 						"ORDER BY top_pin_num DESC, last_chat_id DESC, room_id DESC"
 	)
-	fun pagingSource(): PagingSource<Int, ChannelWithChat>
+	suspend fun getChannels(channelIds: List<Long>): List<ChannelEntity>
 
 	@Query(
 		"SELECT * FROM Channel " +
-						"ORDER BY top_pin_num DESC, last_chat_id DESC, room_id DESC " +
-						"LIMIT :loadSize"
+						"WHERE room_id = :channelId"
 	)
-	fun getActivatedChannelList(loadSize: Int): Flow<List<ChannelWithChat>>
-
-	@Query(
-		"SELECT * FROM Channel " +
-						"WHERE room_id = :roomId"
-	)
-	suspend fun getChannel(roomId: Long): ChannelWithChat
+	suspend fun getChannel(channelId: Long): ChannelEntity?
 
 	@Insert(onConflict = OnConflictStrategy.IGNORE)
-	suspend fun insertIgnore(chatRoom: ChannelEntity): Long
+	suspend fun insertIfNotPresent(chatRoom: ChannelEntity): Long
 
 	suspend fun upsertAllChannels(channels: List<ChannelEntity>) {
 		for (channel in channels) {
@@ -41,7 +32,7 @@ interface ChannelDAO {
 	}
 
 	suspend fun upsertChannel(chatRoom: ChannelEntity) {
-		val id = insertIgnore(chatRoom)
+		val id = insertIfNotPresent(chatRoom)
 		if (id != -1L) return
 
 		updateForInsert(

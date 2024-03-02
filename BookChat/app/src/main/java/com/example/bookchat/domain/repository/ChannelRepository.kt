@@ -3,11 +3,18 @@ package com.example.bookchat.domain.repository
 import com.example.bookchat.data.request.RequestMakeChatRoom
 import com.example.bookchat.domain.model.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import okhttp3.MultipartBody
 
 interface ChannelRepository {
-	suspend fun getChannelInfo(roomId: Long)
+	fun getChannelsFlow(): Flow<List<Channel>>
+	fun getChannelFlow(channelId: Long): Flow<Channel>
+
+	suspend fun getChannels(
+		loadSize: Int = REMOTE_CHANNELS_LOAD_SIZE,
+	): List<Channel>
+
+	suspend fun getChannel(channelId: Long): Channel
+
 	suspend fun enter(channel: Channel)
 	suspend fun leave(channelId: Long)
 	suspend fun updateMemberCount(channelId: Long, offset: Int)
@@ -18,14 +25,7 @@ interface ChannelRepository {
 		charRoomImage: MultipartBody.Part?
 	): Channel
 
-	suspend fun getChannels(
-		loadSize: Int = REMOTE_CHANNELS_LOAD_SIZE,
-	)
-
-	fun getChannelsFlow(): Flow<List<Channel>>
-	fun getChannelFlow(channelId: Long): StateFlow<Channel?>
-
 	companion object {
-		const val REMOTE_CHANNELS_LOAD_SIZE = 7
+		const val REMOTE_CHANNELS_LOAD_SIZE = 20
 	}
 }

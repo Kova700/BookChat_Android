@@ -476,8 +476,8 @@ object DataBindingAdapter {
 	@JvmStatic
 	@BindingAdapter("getFormattedDetailDateTimeText")
 	fun getFormattedDetailDateTimeText(view: TextView, dateAndTimeString: String?) {
-		view.text = if (dateAndTimeString == null) ""
-		else DateManager.getFormattedDetailDateTimeText(dateAndTimeString)
+		if (dateAndTimeString.isNullOrBlank()) return
+		view.text = DateManager.getFormattedDetailDateTimeText(dateAndTimeString)
 	}
 
 	/**UserChatRoomListItem 채팅방 이미지 세팅*/
@@ -499,7 +499,7 @@ object DataBindingAdapter {
 	@JvmStatic
 	@BindingAdapter("getFormattedAbstractDateTimeText")
 	fun getFormattedAbstractDateTimeText(view: TextView, dateAndTimeString: String?) {
-		if (dateAndTimeString == null) return
+		if (dateAndTimeString.isNullOrBlank()) return
 		view.text = DateManager.getFormattedAbstractDateTimeText(dateAndTimeString)
 	}
 
@@ -617,7 +617,7 @@ object DataBindingAdapter {
 	@JvmStatic
 	@BindingAdapter("getFormattedTimeText")
 	fun getFormattedTimeText(view: TextView, dateAndTimeString: String?) {
-		if (dateAndTimeString == null) return
+		if (dateAndTimeString.isNullOrBlank()) return
 		view.text = DateManager.getFormattedTimeText(dateAndTimeString)
 	}
 
@@ -652,7 +652,9 @@ object DataBindingAdapter {
 	@JvmStatic
 	@BindingAdapter("getDateKoreanString")
 	fun getDateKoreanString(textView: TextView, chat: Chat) {
-		textView.text = DateManager.getDateKoreanString(chat.dispatchTime ?: "") //개선 필요
+		val dispatchTime = chat.dispatchTime
+		if (dispatchTime.isBlank()) return
+		textView.text = DateManager.getDateKoreanString(dispatchTime)
 	}
 
 	/**채팅 날짜 Visibility 세팅*/

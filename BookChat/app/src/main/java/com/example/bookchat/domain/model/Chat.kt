@@ -8,6 +8,17 @@ data class Chat(
 	val message: String,
 	val chatType: ChatType,
 	val status: ChatStatus = SUCCESS,
-	val dispatchTime: String? = null, //개선 필요
+	val dispatchTime: String,
 	val sender: User?
-)
+) {
+	companion object {
+		val DEFAULT = Chat(
+			chatId = 0L,
+			chatRoomId = 0L,
+			message = "",
+			chatType = ChatType.UNKNOWN,
+			dispatchTime = "",
+			sender = null,
+		)
+	}
+}

@@ -6,11 +6,13 @@ data class Channel(
 	val roomSid: String,
 	val roomMemberCount: Long,
 	val defaultRoomImageType: Int, //개선 필요
+	val notificationFlag: Boolean = true,
+	val topPinNum: Int = 0,
 	val roomImageUri: String? = null,
 	val lastChat: Chat? = null,
-	val hostId: Long? = null,
-	val subHostIds: List<Long>? = null,
-	val guestIds: List<Long>? = null,
+	val host: User? = null,
+	val subHosts: List<User>? = null,
+	val guests: List<User>? = null,
 	val roomTags: List<String>? = null,
 	val roomCapacity: Int? = null,
 	val bookTitle: String? = null,
@@ -23,15 +25,22 @@ data class Channel(
 			roomName = "",
 			roomSid = "",
 			roomMemberCount = 0,
-			defaultRoomImageType = 0,
+			defaultRoomImageType = 0
 		)
 	}
 }
 
+fun Channel.participants() =
+	mutableListOf<User>().apply {
+		host?.let { add(it) }
+		subHosts?.let { addAll(it) }
+		guests?.let { addAll(it) }
+	}.toList()
+
 fun Channel.participantIds() =
 	mutableListOf<Long>().apply {
-		hostId?.let { add(it) }
-		subHostIds?.let { addAll(it) }
-		guestIds?.let { addAll(it) }
+		host?.id?.let { add(it) }
+		subHosts?.map { it.id }?.let { addAll(it) }
+		guests?.map { it.id }?.let { addAll(it) }
 	}.toList()
 

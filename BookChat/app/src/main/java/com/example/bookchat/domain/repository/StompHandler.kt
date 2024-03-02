@@ -5,11 +5,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface StompHandler {
 
-	suspend fun connectSocket(roomSid: String, roomId: Long): Flow<SocketMessage>
+	suspend fun connectSocket(channelSId: String, channelId: Long): Flow<SocketMessage>
 	suspend fun disconnectSocket()
 
 	suspend fun sendMessage(
-		roomId: Long,
+		channelId: Long,
 		message: String
 	)
 

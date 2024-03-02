@@ -1,10 +1,12 @@
 package com.example.bookchat.data.mapper
 
 import com.example.bookchat.data.database.model.ChannelEntity
-import com.example.bookchat.data.database.model.combined.ChannelWithChat
+import com.example.bookchat.data.database.model.combined.ChannelWithInfo
 import com.example.bookchat.data.response.ChannelResponse
 import com.example.bookchat.data.response.getLastChat
 import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.Chat
+import com.example.bookchat.domain.model.User
 
 fun ChannelResponse.toChannelEntity(): ChannelEntity {
 	return ChannelEntity(
@@ -37,11 +39,13 @@ fun Channel.toChannelEntity(): ChannelEntity {
 		roomSid = roomSid,
 		roomMemberCount = roomMemberCount,
 		defaultRoomImageType = defaultRoomImageType,
+		notificationFlag = notificationFlag,
+		topPinNum = topPinNum,
 		roomImageUri = roomImageUri,
 		lastChatId = lastChat?.chatId,
-		hostId = hostId,
-		subHostIds = subHostIds,
-		guestIds = guestIds,
+		hostId = host?.id,
+		subHostIds = subHosts?.map { it.id },
+		guestIds = guests?.map { it.id },
 		roomTags = roomTags,
 		roomCapacity = roomCapacity,
 		bookTitle = bookTitle,
@@ -50,18 +54,42 @@ fun Channel.toChannelEntity(): ChannelEntity {
 	)
 }
 
-fun ChannelWithChat.toChannel(): Channel {
+fun ChannelEntity.toChannel(): Channel {
+	return Channel(
+		roomId = roomId,
+		roomName = roomName,
+		roomSid = roomSid,
+		roomMemberCount = roomMemberCount,
+		defaultRoomImageType = defaultRoomImageType,
+		notificationFlag = notificationFlag,
+		topPinNum = topPinNum,
+		roomImageUri = roomImageUri,
+		lastChat = lastChatId?.let { Chat.DEFAULT.copy(chatId = it) }, // sender 정보 없을 수 있음
+		host = hostId?.let { User.Default.copy(id = it) }, //ChannelRepository에서 보충 예정
+		subHosts = subHostIds?.map { User.Default.copy(id = it) },
+		guests = guestIds?.map { User.Default.copy(id = it) },
+		roomTags = roomTags,
+		roomCapacity = roomCapacity,
+		bookTitle = bookTitle,
+		bookAuthors = bookAuthors,
+		bookCoverImageUrl = bookCoverImageUrl,
+	)
+}
+
+fun ChannelWithInfo.toChannel(): Channel {
 	return Channel(
 		roomId = channelEntity.roomId,
 		roomName = channelEntity.roomName,
 		roomSid = channelEntity.roomSid,
 		roomMemberCount = channelEntity.roomMemberCount,
 		defaultRoomImageType = channelEntity.defaultRoomImageType,
+		notificationFlag = channelEntity.notificationFlag,
+		topPinNum = channelEntity.topPinNum,
 		roomImageUri = channelEntity.roomImageUri,
-		lastChat = chatEntity?.toChat(), // sender 정보 없음
-		hostId = channelEntity.hostId,
-		subHostIds = channelEntity.subHostIds,
-		guestIds = channelEntity.guestIds,
+		lastChat = chatEntity.toChat(), // sender 정보 없을 수 있음
+		host = hostUserEntity?.toUser(),
+		subHosts = subHostUserEntities?.toUser(),
+		guests = guestUserEntities?.toUser(),
 		roomTags = channelEntity.roomTags,
 		roomCapacity = channelEntity.roomCapacity,
 		bookTitle = channelEntity.bookTitle,
@@ -71,4 +99,4 @@ fun ChannelWithChat.toChannel(): Channel {
 }
 
 fun List<ChannelResponse>.toChannelEntity() = this.map { it.toChannelEntity() }
-fun List<ChannelResponse>.toChannel() = this.map { it.toChannel() }
+fun List<ChannelEntity>.toChannel() = this.map { it.toChannel() }

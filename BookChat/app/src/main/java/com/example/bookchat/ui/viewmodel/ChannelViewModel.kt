@@ -5,21 +5,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.data.database.dao.TempMessageDAO
+import com.example.bookchat.data.repository.ChattingRepositoryFacade
 import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.repository.ChannelRepository
-import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.ui.fragment.ChannelListFragment.Companion.EXTRA_CHAT_ROOM_ID
-import com.example.bookchat.ui.viewmodel.contract.ChannelListUiState
 import com.example.bookchat.ui.viewmodel.contract.ChannelEvent
 import com.example.bookchat.ui.viewmodel.contract.ChannelUiState
+import com.example.bookchat.ui.viewmodel.contract.ChannelUiState.UiState
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -36,14 +36,15 @@ import javax.inject.Inject
 //TODO : 소켓 헤더에서 토큰 빼기 Or 특정 시간 주기로 토큰 갱신 API 호출 Or 소켓 끊길 때마다 리커넥션 요청으로 토큰 갱신 (백엔드와 협의)
 //TODO : 소켓 연결 실패 시 예외 처리
 //TODO : 채팅방 정보 조회 실패 시 예외 처리
+//TODO : 소켓 연결 성공 /실패 상관 없이 끝나면 채팅방 채팅 내역 조회
+//TODO : 공지 채팅 유저명 연결
 
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val tempMessageDAO: TempMessageDAO, //개선 필요
 	private val stompHandler: StompHandler,
-	private val chatRepository: ChatRepository,
-	private val channelRepository: ChannelRepository,
+	private val chattingRepositoryFacade: ChattingRepositoryFacade,
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHAT_ROOM_ID)!!
 
@@ -52,36 +53,78 @@ class ChannelViewModel @Inject constructor(
 
 	private val _uiStateFlow = MutableStateFlow<ChannelUiState>(ChannelUiState.DEFAULT)
 	val uiStateFlow = _uiStateFlow.asStateFlow()
+
 	val inputtedMessage = MutableStateFlow("")
 
 	//아래 안보고 있을 때, 채팅들어오면 데이터 마지막 채팅 Notice 보여주는 방식으로 수정
-	var newOtherChatNoticeFlow = MutableStateFlow<Chat?>(null)
+	var newChatNoticeFlow = MutableStateFlow<Chat?>(null)
 	var isFirstItemOnScreen = true
 	var scrollForcedFlag = false
 
-	//	val chatDataFlow = chatRepository.getPagedChatFlow(roomId)
-	private val socketChatJob = connectSocket()
-
 	init {
-		viewModelScope.launch {
-			getTempSavedMessage()
-			getChannelInfo()
-			//채널 LastChat 이후 부터 채팅 페이징 요청
+		observeChannel()
+		getChannel(channelId)
+		observeChats()
+		getChats(channelId)
+		getTempSavedMessage()
+		clearTempSavedMessage()
+		connectSocket()
+	}
 
-			//소켓 연결 성공 /실패 상관 없이 끝나면 채팅방 채팅 내역 조회
-			clearTempSavedMessage()
+	private fun observeChannel() = viewModelScope.launch {
+		chattingRepositoryFacade.getChannelFlow(channelId).collect { channel ->
+			updateState { copy(channel = channel) }
 		}
 	}
-	//channelRepository에서 현재 채널에 대한 FLow와
-	//chatRepository에 있는 채팅 리스트 FLow를 구독하고 있어야함
 
-	private suspend fun getChannelInfo() {
-		//여기서 FLow 받아오게 수정
-		runCatching { channelRepository.getChannelInfo(channelId) }
-			.onFailure { handleError(it) }
+	private fun observeChats() = viewModelScope.launch {
+		chattingRepositoryFacade.getChatsFlow(channelId).collect { chats ->
+			updateNewChatNotice(chats)
+			updateState { copy(chats = chats) }
+		}
 	}
 
-	private suspend fun getTempSavedMessage() {
+	private fun updateNewChatNotice(newChats: List<Chat>) {
+		if (isFirstItemOnScreen) return
+
+		val newLastChat = newChats.firstOrNull() ?: return
+		val existingLastChat = uiStateFlow.value.chats.firstOrNull()
+		if (existingLastChat?.chatId == null || newLastChat.chatId > existingLastChat.chatId) {
+			newChatNoticeFlow.update { newLastChat }
+		}
+	}
+
+	private fun getChats(channelId: Long) = viewModelScope.launch {
+		updateState { copy(uiState = UiState.LOADING) }
+		runCatching { chattingRepositoryFacade.getChats(channelId) }
+			.onSuccess {
+				updateState { copy(uiState = UiState.SUCCESS) }
+			}
+			.onFailure {
+				handleError(it)
+				updateState { copy(uiState = UiState.ERROR) }
+			}
+	}
+
+	private fun getChannel(channelId: Long) = viewModelScope.launch {
+		runCatching { chattingRepositoryFacade.getChannel(channelId) }
+			.onSuccess {
+				updateState { copy(uiState = UiState.SUCCESS) }
+			}
+			.onFailure {
+				handleError(it)
+				updateState { copy(uiState = UiState.ERROR) }
+			}
+	}
+
+	fun loadNextChats(lastVisibleItemPosition: Int) {
+		if (uiStateFlow.value.chats.size - 1 > lastVisibleItemPosition ||
+			uiStateFlow.value.uiState == UiState.LOADING
+		) return
+		getChats(channelId)
+	}
+
+	private fun getTempSavedMessage() = viewModelScope.launch {
 		inputtedMessage.value = tempMessageDAO.getTempMessage(channelId)?.message ?: ""
 	}
 
@@ -91,21 +134,17 @@ class ChannelViewModel @Inject constructor(
 		tempMessageDAO.insertOrUpdateTempMessage(channelId, tempMessage)
 	}
 
-	private suspend fun clearTempSavedMessage() {
+	private fun clearTempSavedMessage() = viewModelScope.launch {
 		tempMessageDAO.setTempSavedMessage(channelId, "")
 	}
 
 	private fun connectSocket() = viewModelScope.launch(Dispatchers.IO) {
-//		stompHandler.connectSocket(
-//			roomId = channelId,
-//			roomSid = roomSId
-//		).catch { handleError(it) }
-//			.collect {
-//				if (isFirstItemOnScreen.not()) {
-//					newOtherChatNoticeFlow.value =
-//						chatRepository.getLastChatOfOtherUser(roomId = channelId)
-//				}
-//			}
+		stompHandler.connectSocket(
+			channelSId = uiStateFlow.value.channel?.roomSid ?: return@launch,
+			channelId = channelId
+		).catch { handleError(it) }.collect {
+
+		}
 	}
 
 	fun sendMessage() {
@@ -113,7 +152,7 @@ class ChannelViewModel @Inject constructor(
 
 		val message = inputtedMessage.value
 		viewModelScope.launch(Dispatchers.IO) {
-			inputtedMessage.value = ""
+			inputtedMessage.update { "" }
 			scrollForcedFlag = true
 			runCatching { stompHandler.sendMessage(channelId, message) }
 				.onFailure { handleError(it) }
@@ -127,7 +166,6 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun disconnectSocket() = viewModelScope.launch {
-		socketChatJob.cancelAndJoin()
 		runCatching { stompHandler.disconnectSocket() }
 			.onFailure { handleError(it) }
 	}
@@ -155,6 +193,12 @@ class ChannelViewModel @Inject constructor(
 					makeToast(R.string.error_network_error)
 				}
 			}
+		}
+	}
+
+	private inline fun updateState(block: ChannelUiState.() -> ChannelUiState) {
+		_uiStateFlow.update {
+			_uiStateFlow.value.block()
 		}
 	}
 }

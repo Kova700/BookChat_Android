@@ -6,6 +6,7 @@ import com.example.bookchat.data.response.ChatResponse
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.ChatType
+import com.example.bookchat.domain.model.User
 
 fun ChatResponse.toChatEntity(
 	chatRoomId: Long,
@@ -39,7 +40,11 @@ fun ChatResponse.toChat(
 			senderId = senderId,
 			myUserId = myUserId
 		),
-		sender = null
+		sender = senderId?.let {
+			User.Default.copy(
+				id = it
+			)
+		}
 	)
 }
 
@@ -51,7 +56,11 @@ fun ChatEntity.toChat(): Chat {
 		message = message,
 		chatType = chatType,
 		status = ChatStatus.getType(status)!!,
-		sender = null
+		sender = senderId?.let {
+			User.Default.copy(
+				id = it
+			)
+		}
 	)
 }
 
@@ -72,7 +81,7 @@ fun Chat.toChatEntity(): ChatEntity {
 		chatId = chatId,
 		chatRoomId = chatRoomId,
 		senderId = sender?.id,
-		dispatchTime = dispatchTime ?: "", //개선필요
+		dispatchTime = dispatchTime,
 		message = message,
 		chatType = chatType,
 		status = status.code

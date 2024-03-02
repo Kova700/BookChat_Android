@@ -1,11 +1,9 @@
 package com.example.bookchat.data.database.dao
 
-import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import com.example.bookchat.data.database.model.ChatEntity
 import com.example.bookchat.data.database.model.combined.ChatWithUser
 import com.example.bookchat.domain.model.ChatStatus
@@ -15,42 +13,28 @@ import kotlin.math.max
 
 @Dao
 interface ChatDAO {
-	@Query(
-		"SELECT * FROM Chat " +
-						"WHERE chat_room_id = :chatRoomId " +
-						"ORDER BY status, chat_id DESC"
-	)
-	fun pagingSource(chatRoomId: Long): PagingSource<Int, ChatEntity>
-
-	@Transaction
-	@Query(
-		"SELECT * FROM Chat " +
-						"WHERE chat_room_id = :chatRoomId " +
-						"ORDER BY status, chat_id DESC"
-	)
-	fun getChatWithUserPagingSource(chatRoomId: Long): PagingSource<Int, ChatWithUser>
 
 	@Query(
 		"SELECT * FROM Chat " +
-						"WHERE chat_room_id = :chatRoomId " +
+						"WHERE chat_room_id = :channelId " +
 						"ORDER BY status, chat_id DESC"
 	)
-	suspend fun getLastChatOfOtherUser(chatRoomId: Long): ChatWithUser
+	suspend fun getLastChatInChannel(channelId: Long): ChatWithUser?
 
-	// TODO : 채팅도 ChatRoom과 마찬가지로 이미 있으면 업데이트 ,없으면 삽입으로 수정
-	//  CASCADE사용하지말 것
+	@Query("SELECT * FROM Chat WHERE chat_id = :chatId")
+	suspend fun getChat(chatId: Long): ChatWithUser?
+
+	@Query(
+		"SELECT * FROM Chat WHERE chat_id IN (:chatIds) " +
+						"ORDER BY status, chat_id DESC "
+	)
+	suspend fun getChats(chatIds: List<Long>): List<ChatWithUser>
+
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	suspend fun insertAllChat(chats: List<ChatEntity>)
+	suspend fun insertAllChat(chats: List<ChatEntity>): List<Long>
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insertChat(chat: ChatEntity): Long
-
-	@Insert(onConflict = OnConflictStrategy.IGNORE)
-	suspend fun insertIgnore(chat: ChatEntity): Long
-
-//    suspend fun insertOrUpdateAllChatRoom(chatRooms: List<ChatRoomEntity>){
-//        for (chatRoom in chatRooms) { insertOrUpdateChatRoom(chatRoom) }
-//    }
 
 	@Query(
 		"UPDATE Chat SET " +
