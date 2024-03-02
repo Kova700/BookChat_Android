@@ -26,9 +26,9 @@ class ChatRepositoryImpl @Inject constructor(
 			.sortedWith(
 				compareBy({ chat -> chat.status }, { chat -> -chat.chatId })
 			)
-	}.onEach { cachedChat = it }
+	}.onEach { cachedChats = it }
 
-	private var cachedChat: List<Chat> = emptyList()
+	private var cachedChats: List<Chat> = emptyList()
 	private var cachedChannelId: Long? = null
 	private var currentPage: Long? = null
 	private var isEndPage = false
@@ -46,7 +46,7 @@ class ChatRepositoryImpl @Inject constructor(
 			currentPage = null
 			mapChats.value = emptyMap()
 		}
-		if (isEndPage) return cachedChat
+		if (isEndPage) return cachedChats
 
 		val response = bookChatApi.getChat(
 			roomId = channelId,
