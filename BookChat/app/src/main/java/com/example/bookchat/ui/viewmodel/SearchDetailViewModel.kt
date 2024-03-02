@@ -10,7 +10,7 @@ import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.paging.SearchResultBookPagingSource
 import com.example.bookchat.data.paging.SearchResultChatRoomPagingSource
-import com.example.bookchat.domain.repository.BookRepository
+import com.example.bookchat.domain.repository.BookSearchRepository
 import com.example.bookchat.domain.repository.WholeChatRoomRepository
 import com.example.bookchat.ui.viewmodel.SearchViewModel.NecessaryDataFlagInDetail
 import com.example.bookchat.utils.BookImgSizeManager
@@ -19,7 +19,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 class SearchDetailViewModel @AssistedInject constructor(
-	private val bookRepository: BookRepository,
+	private val bookSearchRepository: BookSearchRepository,
 	private val wholeChatRoomRepository: WholeChatRoomRepository,
 	@Assisted private val searchKeyword: String,
 	@Assisted val necessaryDataFlag: NecessaryDataFlagInDetail,
@@ -35,7 +35,7 @@ class SearchDetailViewModel @AssistedInject constructor(
 			pagingSourceFactory = {
 				SearchResultBookPagingSource(
 					searchKeyword = searchKeyword,
-					bookRepository = bookRepository,
+					bookSearchRepository = bookSearchRepository,
 				)
 			}
 		).flow

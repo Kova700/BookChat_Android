@@ -8,31 +8,32 @@ import com.example.bookchat.data.request.RequestChangeBookStatus
 import com.example.bookchat.data.request.RequestRegisterBookShelfBook
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.RespondCheckInBookShelf
-import com.example.bookchat.data.response.ResponseBodyEmptyException
-import com.example.bookchat.data.response.ResponseGetBookSearch
 import com.example.bookchat.data.response.ResponseGetBookShelfBooks
-import com.example.bookchat.domain.repository.BookRepository
-import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.utils.SearchSortOption
 import javax.inject.Inject
 
-class BookRepositoryImpl @Inject constructor(
+class BookShelfRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi
-) : BookRepository {
+) : BookShelfRepository {
 
-	override suspend fun searchBooks(
-		keyword: String,
-		loadSize: Int,
-		page :Int
-	): ResponseGetBookSearch {
+	override suspend fun checkAlreadyInBookShelf(book: Book): RespondCheckInBookShelf? {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-		return bookChatApi.getBookSearchResult(
-			query = keyword,
-			size = loadSize.toString(),
-			page = page.toString()
-		)
+		val response = bookChatApi.checkAlreadyInBookShelf(book.isbn, book.publishAt)
+		when (response.code()) {
+			200, 404 -> {
+				return response.body()
+			}
+
+			else -> throw Exception(
+				createExceptionMessage(
+					response.code(),
+					response.errorBody()?.string()
+				)
+			)
+		}
 	}
 
 	override suspend fun registerBookShelfBook(requestRegisterBookShelfBook: RequestRegisterBookShelfBook) {
@@ -87,24 +88,6 @@ class BookRepositoryImpl @Inject constructor(
 		}
 	}
 
-	override suspend fun checkAlreadyInBookShelf(book: Book): RespondCheckInBookShelf? {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
-		val response = bookChatApi.checkAlreadyInBookShelf(book.isbn, book.publishAt)
-		when (response.code()) {
-			200, 404 -> {
-				return response.body()
-			}
-
-			else -> throw Exception(
-				createExceptionMessage(
-					response.code(),
-					response.errorBody()?.string()
-				)
-			)
-		}
-	}
-
 	override suspend fun getBookShelfBooks(
 		size: String,
 		page: String,
@@ -119,15 +102,11 @@ class BookRepositoryImpl @Inject constructor(
 		)
 	}
 
-	private fun isNetworkConnected(): Boolean {
-		return App.instance.isNetworkConnected()
-	}
-
 	private fun createExceptionMessage(responseCode: Int, responseErrorBody: String?): String {
 		return "responseCode : $responseCode , responseErrorBody : $responseErrorBody"
 	}
 
-	companion object {
-		private val SEARCH_BOOKS_ITEM_LOAD_SIZE = BookImgSizeManager.flexBoxBookSpanSize * 2
+	private fun isNetworkConnected(): Boolean {
+		return App.instance.isNetworkConnected()
 	}
 }

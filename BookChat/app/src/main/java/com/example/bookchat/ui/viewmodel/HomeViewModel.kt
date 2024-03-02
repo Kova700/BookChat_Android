@@ -7,12 +7,14 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.example.bookchat.data.paging.ReadingBookTapPagingSource
-import com.example.bookchat.domain.model.User
-import com.example.bookchat.domain.repository.BookRepository
-import com.example.bookchat.domain.repository.ChannelRepository
+import com.example.bookchat.data.repository.ChattingRepositoryFacade
+import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.ui.viewmodel.contract.HomeUiState
+import com.example.bookchat.ui.viewmodel.contract.HomeUiState.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -21,16 +23,18 @@ import javax.inject.Inject
 //TODO : 도서, 채팅 Room에서 가져오는 로직으로 수정
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-	private val bookRepository: BookRepository,
+	private val bookShelfRepository: BookShelfRepository,
 	private val clientRepository: ClientRepository,
-	private val channelRepository: ChannelRepository
+	private val chattingRepositoryFacade: ChattingRepositoryFacade
 ) : ViewModel() {
 
-	val cachedClient = MutableStateFlow<User>(User.Default)
+	private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.DEFAULT)
+	val uiState = _uiState.asStateFlow()
 
 	init {
 		getClientInfo()
-		getRemoteUserChatRoomList()
+		observeChannels()
+		getChannels()
 	}
 
 	//PagingSource로 가져오는게 아닌,
@@ -43,7 +47,7 @@ class HomeViewModel @Inject constructor(
 			),
 			pagingSourceFactory = {
 				ReadingBookTapPagingSource(
-					bookRepository = bookRepository
+					bookShelfRepository = bookShelfRepository
 				)
 			}
 		).flow
@@ -54,18 +58,48 @@ class HomeViewModel @Inject constructor(
 			}.cachedIn(viewModelScope)
 	}
 
-	val chatRoomFlow = channelRepository.getChannelsFlow()
+	private fun getReadingBooks() = viewModelScope.launch {
+		updateState { copy(bookUiState = UiState.LOADING) }
+//		runCatching { bookShelfRepository.getBookShelfBooks() }
+//			.onSuccess {
+//				updateState { copy(bookUiState = UiState.SUCCESS) }
+//			}
+//			.onFailure {
+//				handleError(it)
+//				updateState { copy(bookUiState = UiState.ERROR) }
+//			}
+	}
 
-	private fun getRemoteUserChatRoomList() = viewModelScope.launch {
-		channelRepository.getChannels()
+	private fun observeChannels() = viewModelScope.launch {
+		chattingRepositoryFacade.getChannelsFlow().collect { channels ->
+			updateState { copy(channels = channels.take(3)) }
+		}
+	}
+
+	private fun getChannels() = viewModelScope.launch {
+		updateState { copy(channelUiState = UiState.LOADING) }
+		runCatching { chattingRepositoryFacade.getChannels() }
+			.onSuccess {
+				updateState { copy(channelUiState = UiState.SUCCESS) }
+			}
+			.onFailure {
+				handleError(it)
+				updateState { copy(channelUiState = UiState.ERROR) }
+			}
 	}
 
 	private fun getClientInfo() = viewModelScope.launch {
 		runCatching { clientRepository.getClientProfile() }
-			.onSuccess { user -> cachedClient.update { user } }
+			.onSuccess { user -> updateState { copy(client = user) } }
 	}
 
-	companion object {
-		private const val MAIN_CHAT_ROOM_LIST_LOAD_SIZE = 3
+	private fun handleError(throwable: Throwable) {
+
+	}
+
+	private inline fun updateState(block: HomeUiState.() -> HomeUiState) {
+		_uiState.update {
+			_uiState.value.block()
+		}
 	}
 }

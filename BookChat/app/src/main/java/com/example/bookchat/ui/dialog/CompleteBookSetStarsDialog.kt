@@ -16,7 +16,7 @@ import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.request.RequestRegisterBookShelfBook
 import com.example.bookchat.databinding.DialogCompleteBookSetStarsBinding
-import com.example.bookchat.domain.repository.BookRepository
+import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.viewmodel.SearchTapBookDialogViewModel
 import com.example.bookchat.ui.viewmodel.SearchTapBookDialogViewModel.SearchTapDialogState
 import com.example.bookchat.utils.ReadingStatus
@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class CompleteBookSetStarsDialog @AssistedInject constructor(
-	private val bookRepository: BookRepository,
+	private val bookShelfRepository: BookShelfRepository,
 	@Assisted val book: Book
 ) : DialogFragment() {
 
@@ -69,7 +69,7 @@ class CompleteBookSetStarsDialog @AssistedInject constructor(
 	private fun requestRegisterCompleteBook() = lifecycleScope.launch {
 		val requestRegisterBookShelfBook =
 			RequestRegisterBookShelfBook(book, ReadingStatus.COMPLETE, starRating.value.toStarRating())
-		runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
+		runCatching { bookShelfRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
 			.onSuccess { registerCompleteBookSuccessCallBack() }
 			.onFailure { makeToast(R.string.complete_bookshelf_register_fail) }
 	}

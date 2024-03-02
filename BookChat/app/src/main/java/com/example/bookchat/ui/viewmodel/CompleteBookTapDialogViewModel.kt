@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.data.BookShelfDataItem
-import com.example.bookchat.domain.repository.BookRepository
+import com.example.bookchat.domain.repository.BookShelfRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class CompleteBookTapDialogViewModel @AssistedInject constructor(
-	private val bookRepository: BookRepository,
+	private val bookShelfRepository: BookShelfRepository,
 	@Assisted val bookShelfDataItem: BookShelfDataItem
 ) : ViewModel() {
 	private val _eventFlow = MutableSharedFlow<CompleteBookEvent>()

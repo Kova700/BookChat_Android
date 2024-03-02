@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfDataItem
-import com.example.bookchat.domain.repository.BookRepository
+import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.utils.ReadingStatus
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class PageInputDialogViewModel @AssistedInject constructor(
-	private val bookRepository: BookRepository,
+	private val bookShelfRepository: BookShelfRepository,
 	@Assisted val bookShelfDataItem: BookShelfDataItem
 ) : ViewModel() {
 
@@ -60,7 +60,7 @@ class PageInputDialogViewModel @AssistedInject constructor(
 
 	private fun registerReadingPage(newBookShelfDataItem: BookShelfDataItem) = viewModelScope.launch {
 		runCatching {
-			bookRepository.changeBookShelfBookStatus(
+			bookShelfRepository.changeBookShelfBookStatus(
 				newBookShelfDataItem.bookShelfItem,
 				ReadingStatus.READING
 			)

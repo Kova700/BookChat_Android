@@ -16,7 +16,7 @@ import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.data.paging.CompleteBookTapPagingSource
 import com.example.bookchat.data.paging.ReadingBookTapPagingSource
 import com.example.bookchat.data.paging.WishBookTapPagingSource
-import com.example.bookchat.domain.repository.BookRepository
+import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.utils.ReadingStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -30,7 +30,7 @@ import kotlin.math.max
 
 @HiltViewModel
 class BookShelfViewModel @Inject constructor(
-	private val bookRepository: BookRepository
+	private val bookShelfRepository: BookShelfRepository
 ) : ViewModel() {
 	private val _eventFlow = MutableSharedFlow<BookShelfEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
@@ -47,9 +47,11 @@ class BookShelfViewModel @Inject constructor(
 			pageSize = WISH_TAP_BOOKS_ITEM_LOAD_SIZE,
 			enablePlaceholders = false
 		),
-		pagingSourceFactory = { WishBookTapPagingSource(
-			bookRepository = bookRepository
-		) }
+		pagingSourceFactory = {
+			WishBookTapPagingSource(
+				bookShelfRepository = bookShelfRepository
+			)
+		}
 	).flow
 		.map { pagingData ->
 			isWishBookLoaded = true
@@ -69,9 +71,11 @@ class BookShelfViewModel @Inject constructor(
 				pageSize = READING_TAP_BOOKS_ITEM_LOAD_SIZE,
 				enablePlaceholders = false
 			),
-			pagingSourceFactory = { ReadingBookTapPagingSource(
-				bookRepository = bookRepository
-			) }
+			pagingSourceFactory = {
+				ReadingBookTapPagingSource(
+					bookShelfRepository = bookShelfRepository
+				)
+			}
 		).flow
 			.map { pagingData ->
 				isReadingBookLoaded = true
@@ -92,9 +96,11 @@ class BookShelfViewModel @Inject constructor(
 				pageSize = COMPLETE_TAP_BOOKS_ITEM_LOAD_SIZE,
 				enablePlaceholders = false
 			),
-			pagingSourceFactory = { CompleteBookTapPagingSource(
-				bookRepository = bookRepository
-			) }
+			pagingSourceFactory = {
+				CompleteBookTapPagingSource(
+					bookShelfRepository = bookShelfRepository
+				)
+			}
 		).flow
 			.map { pagingData ->
 				isCompleteBookLoaded = true
@@ -133,7 +139,7 @@ class BookShelfViewModel @Inject constructor(
 		removeWaitingEvent: PagingViewEvent.RemoveWaiting,
 		readingStatus: ReadingStatus
 	) = viewModelScope.launch {
-		runCatching { bookRepository.deleteBookShelfBook(bookShelfDataItem.bookShelfItem.bookShelfId) }
+		runCatching { bookShelfRepository.deleteBookShelfBook(bookShelfDataItem.bookShelfItem.bookShelfId) }
 			.onSuccess {
 				makeToast(R.string.bookshelf_delete_success)
 				addPagingViewEvent(removeEvent, readingStatus)

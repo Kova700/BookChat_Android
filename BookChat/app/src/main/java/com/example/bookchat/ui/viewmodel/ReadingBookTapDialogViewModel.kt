@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfDataItem
-import com.example.bookchat.domain.repository.BookRepository
+import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.utils.toStarRating
 import dagger.assisted.Assisted
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class ReadingBookTapDialogViewModel @AssistedInject constructor(
-	private val bookRepository: BookRepository,
+	private val bookShelfRepository: BookShelfRepository,
 	@Assisted val bookShelfDataItem: BookShelfDataItem
 ) : ViewModel() {
 	private val _eventFlow = MutableSharedFlow<ReadingBookEvent>()
@@ -28,7 +28,7 @@ class ReadingBookTapDialogViewModel @AssistedInject constructor(
 
 	fun changeToCompleteBook() = viewModelScope.launch {
 		val newItem = bookShelfDataItem.bookShelfItem.copy(star = starRating.value.toStarRating())
-		runCatching { bookRepository.changeBookShelfBookStatus(newItem, ReadingStatus.COMPLETE) }
+		runCatching { bookShelfRepository.changeBookShelfBookStatus(newItem, ReadingStatus.COMPLETE) }
 			.onSuccess {
 				makeToast(R.string.bookshelf_change_to_complete_success)
 				startEvent(ReadingBookEvent.MoveToCompleteBook)

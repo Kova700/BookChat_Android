@@ -15,7 +15,7 @@ import com.example.bookchat.data.repository.WholeChatRoomRepositoryImpl
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseGetBookSearch
 import com.example.bookchat.data.response.ResponseGetWholeChatRoomList
-import com.example.bookchat.domain.repository.BookRepository
+import com.example.bookchat.domain.repository.BookSearchRepository
 import com.example.bookchat.utils.ChatSearchFilter
 import com.example.bookchat.utils.DataStoreManager
 import com.example.bookchat.utils.SearchPurpose
@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 import java.io.Serializable
 
 class SearchViewModel @AssistedInject constructor(
-	private val bookRepository: BookRepository,
+	private val bookSearchRepository: BookSearchRepository,
 	private val wholeChatRoomRepository: WholeChatRoomRepositoryImpl,
 	@Assisted val searchPurpose: SearchPurpose
 ) : ViewModel() {
@@ -104,7 +104,7 @@ class SearchViewModel @AssistedInject constructor(
 	private fun simpleSearchBooks(keyword: String) = viewModelScope.launch {
 		bookResultState.value = SearchState.Loading
 		searchTapStatus.value = SearchTapStatus.Result
-		runCatching { bookRepository.searchBooks(keyword) }
+		runCatching { bookSearchRepository.searchBooks(keyword) }
 			.onSuccess { searchBooksSuccessCallBack(it, keyword) }
 			.onFailure { failHandler(it) }
 	}
@@ -126,9 +126,10 @@ class SearchViewModel @AssistedInject constructor(
 	private fun simpleSearchChatRoom(keyword: String) = viewModelScope.launch {
 		chatResultState.value = SearchState.Loading
 		searchTapStatus.value = SearchTapStatus.Result
-		runCatching { wholeChatRoomRepository.getWholeChatRoomList(
-			keyword = keyword,
-			chatSearchFilter = chatSearchFilter.value,
+		runCatching {
+			wholeChatRoomRepository.getWholeChatRoomList(
+				keyword = keyword,
+				chatSearchFilter = chatSearchFilter.value,
 			)
 		}
 			.onSuccess { searchChatRoomsSuccessCallBack(it, keyword) }

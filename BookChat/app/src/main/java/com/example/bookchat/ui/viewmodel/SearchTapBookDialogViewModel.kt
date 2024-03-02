@@ -9,7 +9,7 @@ import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.request.RequestRegisterBookShelfBook
 import com.example.bookchat.data.response.RespondCheckInBookShelf
-import com.example.bookchat.domain.repository.BookRepository
+import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.utils.ReadingStatus
 import com.example.bookchat.utils.RefreshManager
 import com.example.bookchat.utils.RefreshManager.BookShelfRefreshFlag
@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class SearchTapBookDialogViewModel @AssistedInject constructor(
-	private val bookRepository: BookRepository,
+	private val bookShelfRepository: BookShelfRepository,
 	@Assisted val book: Book
 ) : ViewModel() {
 	val stateFlow = MutableStateFlow<SearchTapDialogState>(SearchTapDialogState.Loading)
@@ -48,7 +48,7 @@ class SearchTapBookDialogViewModel @AssistedInject constructor(
 	}
 
 	private fun checkAlreadyInBookShelf() = viewModelScope.launch {
-		runCatching { bookRepository.checkAlreadyInBookShelf(book) }
+		runCatching { bookShelfRepository.checkAlreadyInBookShelf(book) }
 			.onSuccess { setDialogStateFromRespond(it) }
 	}
 
@@ -63,14 +63,14 @@ class SearchTapBookDialogViewModel @AssistedInject constructor(
 
 	private fun requestRegisterWishBook() = viewModelScope.launch {
 		val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(book, ReadingStatus.WISH)
-		runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
+		runCatching { bookShelfRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
 			.onSuccess { registerWishBookSuccessCallBack() }
 			.onFailure { makeToast(R.string.wish_bookshelf_register_fail) }
 	}
 
 	fun requestRegisterReadingBook() = viewModelScope.launch {
 		val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(book, ReadingStatus.READING)
-		runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
+		runCatching { bookShelfRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
 			.onSuccess { registerReadingBookSuccessCallBack() }
 			.onFailure { makeToast(R.string.reading_bookshelf_register_fail) }
 	}

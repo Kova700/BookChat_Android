@@ -5,12 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.MainBookItemDecoration
@@ -20,7 +18,7 @@ import com.example.bookchat.databinding.FragmentHomeBinding
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.ui.activity.ChannelActivity
 import com.example.bookchat.ui.adapter.home.MainBookAdapter
-import com.example.bookchat.ui.adapter.home.MainUserChatRoomListAdapter
+import com.example.bookchat.ui.adapter.userchatroomlist.ChannelListDataAdapter
 import com.example.bookchat.ui.viewmodel.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -35,7 +33,7 @@ class HomeFragment : Fragment() {
 	private val binding get() = _binding!!
 	private val homeViewModel: HomeViewModel by viewModels()
 	private lateinit var mainReadingBookAdapter: MainBookAdapter
-	private lateinit var mainUserChatRoomListAdapter: MainUserChatRoomListAdapter
+	private lateinit var channelListDataAdapter: ChannelListDataAdapter
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -52,14 +50,20 @@ class HomeFragment : Fragment() {
 		super.onViewCreated(view, savedInstanceState)
 		initAdapter()
 		initRecyclerView()
+		observeUiState()
 		observePagingReadingBookData()
-		observePagingChatRoomData()
-		observeReadingBookLoadStateFlow()
 	}
 
 	override fun onDestroyView() {
 		super.onDestroyView()
 		_binding = null
+	}
+
+	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
+		homeViewModel.uiState.collect { uiState ->
+			channelListDataAdapter.submitList(uiState.channels)
+			uiState.readingBooks
+		}
 	}
 
 	private fun initAdapter() {
@@ -83,15 +87,15 @@ class HomeFragment : Fragment() {
 	}
 
 	private fun initChatRoomAdapter() {
-		val chatRoomItemClickListener = object : MainUserChatRoomListAdapter.OnItemClickListener {
+		val chatRoomItemClickListener = object : ChannelListDataAdapter.OnItemClickListener {
 			override fun onItemClick(channel: Channel) {
 				val intent = Intent(requireContext(), ChannelActivity::class.java)
 				intent.putExtra(ChannelListFragment.EXTRA_CHAT_ROOM_ID, channel.roomId)
 				startActivity(intent)
 			}
 		}
-		mainUserChatRoomListAdapter = MainUserChatRoomListAdapter()
-		mainUserChatRoomListAdapter.setItemClickListener(chatRoomItemClickListener)
+		channelListDataAdapter = ChannelListDataAdapter()
+		channelListDataAdapter.setItemClickListener(chatRoomItemClickListener)
 	}
 
 	private fun initBookRcv() {
@@ -105,7 +109,7 @@ class HomeFragment : Fragment() {
 
 	private fun initChatRoomRcv() {
 		with(binding) {
-			chatRoomUserInRcv.adapter = mainUserChatRoomListAdapter
+			chatRoomUserInRcv.adapter = channelListDataAdapter
 			chatRoomUserInRcv.layoutManager =
 				LinearLayoutManager(requireContext())
 		}
@@ -117,21 +121,4 @@ class HomeFragment : Fragment() {
 		mainReadingBookAdapter.submitData(firstPage)
 	}
 
-	private fun observePagingChatRoomData() = lifecycleScope.launch {
-		homeViewModel.chatRoomFlow.collect { list ->
-			mainUserChatRoomListAdapter.submitList(list)
-			val isListEmpty = mainUserChatRoomListAdapter.itemCount == 0
-			binding.emptyChatRoomLayout.isVisible = isListEmpty
-		}
-	}
-
-	//메인에서 독서중 도서, 채팅방 목록 load시에 Paging이 필요하지 않음으로 그냥 ListAdapter로 수정
-	//매번 서버로부터 데이터 로드하고, 로컬에서는 캐시데이터를 보여주는 느낌으로
-	private fun observeReadingBookLoadStateFlow() = lifecycleScope.launch {
-		mainReadingBookAdapter.loadStateFlow.collect { loadState ->
-			val isListEmpty = loadState.refresh is LoadState.NotLoading &&
-							mainReadingBookAdapter.itemCount == 0
-			binding.emptyReadingBookLayout.isVisible = isListEmpty
-		}
-	}
 }

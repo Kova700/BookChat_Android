@@ -8,7 +8,7 @@ import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.BookShelfDataItem
 import com.example.bookchat.data.request.RequestRegisterBookShelfBook
-import com.example.bookchat.domain.repository.BookRepository
+import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.utils.ReadingStatus
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class WishBookTapDialogViewModel @AssistedInject constructor(
-	private val bookRepository: BookRepository,
+	private val bookShelfRepository: BookShelfRepository,
 	@Assisted val bookShelfDataItem: BookShelfDataItem
 ) : ViewModel() {
 	private val _eventFlow = MutableSharedFlow<WishBookEvent>()
@@ -39,7 +39,7 @@ class WishBookTapDialogViewModel @AssistedInject constructor(
 	}
 
 	private suspend fun requestRemoveWishBook() = viewModelScope.launch {
-		runCatching { bookRepository.deleteBookShelfBook(bookShelfDataItem.bookShelfItem.bookShelfId) }
+		runCatching { bookShelfRepository.deleteBookShelfBook(bookShelfDataItem.bookShelfItem.bookShelfId) }
 			.onSuccess {
 				makeToast(R.string.bookshelf_delete_wish_book)
 				startEvent(WishBookEvent.RemoveItem)
@@ -51,7 +51,7 @@ class WishBookTapDialogViewModel @AssistedInject constructor(
 	private suspend fun requestAddWishBook() = viewModelScope.launch {
 		val requestRegisterBookShelfBook =
 			RequestRegisterBookShelfBook(bookShelfDataItem.bookShelfItem.getBook(), ReadingStatus.WISH)
-		runCatching { bookRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
+		runCatching { bookShelfRepository.registerBookShelfBook(requestRegisterBookShelfBook) }
 			.onSuccess {
 				makeToast(R.string.wish_bookshelf_register_success)
 				startEvent(WishBookEvent.AddItem)
@@ -62,7 +62,7 @@ class WishBookTapDialogViewModel @AssistedInject constructor(
 
 	fun changeToReadingBook() = viewModelScope.launch {
 		runCatching {
-			bookRepository.changeBookShelfBookStatus(
+			bookShelfRepository.changeBookShelfBookStatus(
 				bookShelfDataItem.bookShelfItem,
 				ReadingStatus.READING
 			)

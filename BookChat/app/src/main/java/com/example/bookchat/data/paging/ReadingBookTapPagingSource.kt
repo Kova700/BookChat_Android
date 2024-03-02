@@ -6,14 +6,12 @@ import com.example.bookchat.App
 import com.example.bookchat.data.BookShelfItem
 import com.example.bookchat.data.response.BookShelfMeta
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
-import com.example.bookchat.data.response.ResponseBodyEmptyException
 import com.example.bookchat.data.response.ResponseGetBookShelfBooks
-import com.example.bookchat.domain.repository.BookRepository
+import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.utils.ReadingStatus
-import retrofit2.Response
 
 class ReadingBookTapPagingSource(
-	private val bookRepository: BookRepository
+	private val bookShelfRepository: BookShelfRepository
 ) : PagingSource<Int, Pair<BookShelfItem, Long>>() {
 	private lateinit var response: ResponseGetBookShelfBooks
 
@@ -22,7 +20,7 @@ class ReadingBookTapPagingSource(
 		val page = params.key ?: STARTING_PAGE_INDEX
 
 		return try {
-			response = bookRepository.getBookShelfBooks(
+			response = bookShelfRepository.getBookShelfBooks(
 				size = params.loadSize.toString(),
 				page = page.toString(),
 				readingStatus = ReadingStatus.READING

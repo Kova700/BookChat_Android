@@ -7,11 +7,11 @@ import com.example.bookchat.data.Book
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseGetBookSearch
 import com.example.bookchat.data.response.SearchingMeta
-import com.example.bookchat.domain.repository.BookRepository
+import com.example.bookchat.domain.repository.BookSearchRepository
 
 class SearchResultBookPagingSource(
 	private val searchKeyword: String,
-	private val bookRepository: BookRepository
+	private val bookSearchRepository: BookSearchRepository
 ) : PagingSource<Int, Book>() {
 	private lateinit var response: ResponseGetBookSearch
 
@@ -20,7 +20,7 @@ class SearchResultBookPagingSource(
 		val page = params.key ?: STARTING_PAGE_INDEX
 
 		try {
-			response = bookRepository.searchBooks(
+			response = bookSearchRepository.searchBooks(
 				keyword = searchKeyword,
 				loadSize = params.loadSize,
 				page = page,
