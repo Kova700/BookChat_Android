@@ -38,31 +38,12 @@ class BookShelfRepositoryImpl @Inject constructor(
 
 	override suspend fun registerBookShelfBook(requestRegisterBookShelfBook: RequestRegisterBookShelfBook) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-		val response = bookChatApi.registerBookShelfBook(requestRegisterBookShelfBook)
-		when (response.code()) {
-			200 -> {}
-			else -> throw Exception(
-				createExceptionMessage(
-					response.code(),
-					response.errorBody()?.string()
-				)
-			)
-		}
+		bookChatApi.registerBookShelfBook(requestRegisterBookShelfBook)
 	}
 
 	override suspend fun deleteBookShelfBook(bookId: Long) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
-		val response = bookChatApi.deleteBookShelfBook(bookId)
-		when (response.code()) {
-			200 -> {}
-			else -> throw Exception(
-				createExceptionMessage(
-					response.code(),
-					response.errorBody()?.string()
-				)
-			)
-		}
+		bookChatApi.deleteBookShelfBook(bookId)
 	}
 
 	override suspend fun changeBookShelfBookStatus(
@@ -76,16 +57,7 @@ class BookShelfRepositoryImpl @Inject constructor(
 			star = book.star,
 			pages = book.pages
 		)
-		val response = bookChatApi.changeBookShelfBookStatus(book.bookShelfId, requestBody)
-		when (response.code()) {
-			200 -> {}
-			else -> throw Exception(
-				createExceptionMessage(
-					response.code(),
-					response.errorBody()?.string()
-				)
-			)
-		}
+		bookChatApi.changeBookShelfBookStatus(book.bookShelfId, requestBody)
 	}
 
 	override suspend fun getBookShelfBooks(
