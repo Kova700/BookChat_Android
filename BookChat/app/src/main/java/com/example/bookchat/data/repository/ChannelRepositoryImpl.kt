@@ -15,6 +15,7 @@ import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -55,7 +56,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	override fun getChannelFlow(channelId: Long): Flow<Channel> {
 		return channels.map { channelList ->
 			channelList.firstOrNull { it.roomId == channelId }
-		}.filterNotNull()
+		}.filterNotNull().distinctUntilChanged()
 	}
 
 	private fun setChannels(newChannels: Map<Long, Channel>) {
