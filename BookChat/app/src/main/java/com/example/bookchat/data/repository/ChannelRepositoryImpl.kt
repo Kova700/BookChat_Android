@@ -54,9 +54,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	}
 
 	override fun getChannelFlow(channelId: Long): Flow<Channel> {
-		return channels.map { channelList ->
-			channelList.firstOrNull { it.roomId == channelId }
-		}.filterNotNull().distinctUntilChanged()
+		return mapChannels.map { it[channelId] }.filterNotNull().distinctUntilChanged()
 	}
 
 	private fun setChannels(newChannels: Map<Long, Channel>) {
@@ -129,6 +127,8 @@ class ChannelRepositoryImpl @Inject constructor(
 		return createdChannel
 	}
 
+	//개선 필요 POST로 생성 가능하고 바디로 채팅방 받을 수 있을 것 같음.
+	// PUT은 응답이 없음 REST API에 대해 스펙 좀 다시 알아볼 것
 	private fun getChannelFromHeader(
 		headers: Headers,
 		requestMakeChatRoom: RequestMakeChatRoom
