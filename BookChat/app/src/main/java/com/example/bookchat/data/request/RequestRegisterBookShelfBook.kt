@@ -1,15 +1,14 @@
 package com.example.bookchat.data.request
 
-import com.example.bookchat.data.Book
-import com.example.bookchat.utils.ReadingStatus
-import com.example.bookchat.utils.StarRating
+import com.example.bookchat.domain.model.BookShelfState
+import com.example.bookchat.domain.model.StarRating
 import com.google.gson.annotations.SerializedName
 
 class RequestRegisterBookShelfBook(
-    @SerializedName("bookRequest")
-    private val book: Book,
-    @SerializedName("readingStatus")
-    private val readingStatus :ReadingStatus,
-    @SerializedName("star")
-    private val star : StarRating? = null
+	@SerializedName("bookRequest")
+	private val bookRequest: BookRequest,
+	@SerializedName("readingStatus")
+	private val bookShelfState: BookShelfState,
+	@SerializedName("star")
+	private val star: StarRating? = null
 )

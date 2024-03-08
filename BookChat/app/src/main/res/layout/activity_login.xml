@@ -5,20 +5,20 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <import type="android.view.View"/>
-        <import type="com.example.bookchat.ui.viewmodel.LoginViewModel.LoginUiState"/>
+        <import type="com.example.bookchat.ui.login.LoginViewModel"/>
         <variable
             name="activity"
-            type="com.example.bookchat.ui.activity.LoginActivity" />
+            type="com.example.bookchat.ui.login.LoginActivity" />
         <variable
             name="viewmodel"
-            type="com.example.bookchat.ui.viewmodel.LoginViewModel" />
+            type="com.example.bookchat.ui.login.LoginViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/login_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.activity.LoginActivity">
+        tools:context=".ui.login.LoginActivity">
 
         <ImageView
             android:id="@+id/imageView2"

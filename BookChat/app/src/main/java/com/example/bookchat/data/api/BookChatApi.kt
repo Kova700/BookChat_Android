@@ -5,7 +5,7 @@ import com.example.bookchat.data.request.*
 import com.example.bookchat.data.response.*
 import com.example.bookchat.utils.BookSearchSortOption
 import com.example.bookchat.utils.BookSearchSortOption.ACCURACY
-import com.example.bookchat.utils.ReadingStatus
+import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.utils.SearchSortOption
 import com.example.bookchat.utils.SearchSortOption.ID_DESC
 import com.example.bookchat.utils.SearchSortOption.UPDATED_AT_DESC
@@ -62,10 +62,10 @@ interface BookChatApi {
 	): Response<Unit>
 
 	@GET("/v1/api/bookshelves")
-	suspend fun getBookShelfBooks(
-		@Query("size") size: String,
-		@Query("page") page: String,
-		@Query("readingStatus") readingStatus: ReadingStatus,
+	suspend fun getBookShelfItems(
+		@Query("size") size: Int,
+		@Query("page") page: Long,
+		@Query("readingStatus") bookShelfState: String,
 		@Query("sort") sort: SearchSortOption = UPDATED_AT_DESC
 	): ResponseGetBookShelfBooks
 
@@ -78,13 +78,13 @@ interface BookChatApi {
 	suspend fun changeBookShelfBookStatus(
 		@Path("bookId") bookId: Long,
 		@Body requestChangeBookStatus: RequestChangeBookStatus
-	): Response<Unit>
+	)
 
 	@GET("/v1/api/bookshelves/book")
 	suspend fun checkAlreadyInBookShelf(
 		@Query("isbn") isbn: String,
 		@Query("publishAt") publishAt: String,
-	): Response<RespondCheckInBookShelf>
+	): BookStateInBookShelfResponse
 
 	/**------------독후감------------*/
 

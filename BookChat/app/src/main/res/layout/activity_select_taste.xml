@@ -8,16 +8,16 @@
             type="com.example.bookchat.utils.ReadingTaste" />
         <variable
             name="activity"
-            type="com.example.bookchat.ui.activity.SelectTasteActivity" />
+            type="com.example.bookchat.ui.signup.SelectTasteActivity" />
         <variable
             name="viewModel"
-            type="com.example.bookchat.ui.viewmodel.SelectTasteViewModel" />
+            type="com.example.bookchat.ui.signup.SelectTasteViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/selectTasteLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.activity.SelectTasteActivity">
+        tools:context=".ui.signup.SelectTasteActivity">
 
         <Button
             android:id="@+id/startBookchat_btn"

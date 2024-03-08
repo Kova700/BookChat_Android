@@ -68,75 +68,75 @@
         android:theme="@style/Theme.BookChat"
         tools:targetApi="n">
         <activity
-            android:name=".ui.activity.ChannelActivity"
+            android:name=".ui.channel.ChannelActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.ChatRoomInfoActivity"
+            android:name=".ui.search.ChatRoomInfoActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.MakeChatRoomSelectBookActivity"
+            android:name=".ui.createchannel.MakeChatRoomSelectBookActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.MakeChatRoomActivity"
+            android:name=".ui.createchannel.MakeChatRoomActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.WishActivity"
+            android:name=".ui.mypage.WishActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.AppSettingActivity"
+            android:name=".ui.mypage.AppSettingActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.AccountSettingActivity"
+            android:name=".ui.mypage.AccountSettingActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.NoticeActivity"
+            android:name=".ui.mypage.NoticeActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.UserEditActivity"
+            android:name=".ui.mypage.UserEditActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.AgonyEditActivity"
+            android:name=".ui.agony.AgonyEditActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.AgonyRecordActivity"
+            android:name=".ui.agonyrecode.AgonyRecordActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.BookReportActivity"
+            android:name=".ui.bookreport.BookReportActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.AgonyActivity"
+            android:name=".ui.agony.AgonyActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.SearchTapResultDetailActivity"
+            android:name=".ui.search.SearchTapResultDetailActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.ImageCropActivity"
+            android:name=".ui.imagecrop.ImageCropActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.SelectTasteActivity"
+            android:name=".ui.signup.SelectTasteActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.SignUpActivity"
+            android:name=".ui.signup.SignUpActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.SplashActivity"
+            android:name=".ui.splash.SplashActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -146,14 +146,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activity.MainActivity"
+            android:name=".ui.MainActivity"
             android:configChanges="uiMode"
             android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".ui.activity.LoginActivity"
+            android:name=".ui.login.LoginActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">

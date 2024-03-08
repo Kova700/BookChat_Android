@@ -5,12 +5,12 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.ui.viewmodel.AgonyRecordViewModel" />
+            type="com.example.bookchat.ui.agonyrecode.AgonyRecordViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.activity.AgonyRecordActivity">
+        tools:context=".ui.agonyrecode.AgonyRecordActivity">
 
         <com.example.bookchat.ui.customview.AntiDupClickImageButton
             android:id="@+id/back_btn"

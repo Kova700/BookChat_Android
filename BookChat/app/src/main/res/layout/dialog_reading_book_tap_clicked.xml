@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.ui.viewmodel.ReadingBookTapDialogViewModel" />
+            type="com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialogViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/reading_dialog_layout"
@@ -39,7 +39,7 @@
 
                 <ImageView
                     android:id="@+id/bookImg"
-                    loadUrl="@{viewmodel.bookShelfDataItem.bookShelfItem.bookCoverImageUrl}"
+                    loadUrl="@{viewmodel.uiState.readingItem.book.bookCoverImageUrl}"
                     setBookImgSize="@{true}"
                     android:layout_width="@dimen/book_img_width_default"
                     android:layout_height="@dimen/book_img_height_default"
@@ -60,7 +60,7 @@
                 android:gravity="center"
                 android:marqueeRepeatLimit="marquee_forever"
                 android:singleLine="true"
-                android:text="@{viewmodel.bookShelfDataItem.bookShelfItem.title}"
+                android:text="@{viewmodel.uiState.readingItem.book.title}"
                 android:textColor="#222222"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="@+id/sub_background_reading"
@@ -79,7 +79,7 @@
                 android:gravity="center"
                 android:marqueeRepeatLimit="marquee_forever"
                 android:singleLine="true"
-                android:text="@{viewmodel.bookShelfDataItem.bookShelfItem.authors[0]}"
+                android:text="@{viewmodel.uiState.readingItem.book.authors[0]}"
                 android:textColor="#373737"
                 android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="@+id/sub_background_reading"
@@ -98,7 +98,7 @@
                 android:gravity="center"
                 android:marqueeRepeatLimit="marquee_forever"
                 android:singleLine="true"
-                android:text="@{viewmodel.bookShelfDataItem.bookShelfItem.publishAt}"
+                android:text="@{viewmodel.uiState.readingItem.book.publishAt}"
                 android:textColor="#373737"
                 android:textSize="10sp"
                 app:layout_constraintEnd_toEndOf="@+id/sub_background_reading"
@@ -136,7 +136,7 @@
             android:fontFamily="@font/notosanskr_regular"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:onClick="@{() -> viewmodel.openAgonizeActivity()}"
+            android:onClick="@{() -> viewmodel.onMoveToAgonyClick()}"
             android:stateListAnimator="@null"
             android:text="@string/agony_record"
             android:textColor="#5648FF"
@@ -161,7 +161,7 @@
             android:fontFamily="@font/notosanskr_regular"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:onClick="@{() -> viewmodel.changeToCompleteBook()}"
+            android:onClick="@{() -> viewmodel.onChangeToCompleteClick()}"
             android:stateListAnimator="@null"
             android:text="@string/complete_book"
             android:textColor="#FFFFFF"

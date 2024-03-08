@@ -5,7 +5,7 @@
     <data>
         <variable
             name="dialog"
-            type="com.example.bookchat.ui.dialog.AgonyRecordWarningDialog" />
+            type="com.example.bookchat.ui.agonyrecode.AgonyRecordWarningDialog" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:background="@drawable/view_round_white_not_padding"

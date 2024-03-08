@@ -7,7 +7,7 @@
         <import type="android.view.View"/>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.ui.viewmodel.ChannelViewModel" />
+            type="com.example.bookchat.ui.channel.ChannelViewModel" />
     </data>
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
@@ -19,7 +19,7 @@
             android:id="@+id/chat_main_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".ui.activity.ChannelActivity">
+            tools:context=".ui.channel.ChannelActivity">
 
             <com.example.bookchat.ui.customview.AntiDupClickImageButton
                 android:id="@+id/back_btn"

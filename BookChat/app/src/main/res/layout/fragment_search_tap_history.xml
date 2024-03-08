@@ -5,7 +5,7 @@
     <data>
             <variable
                 name="fragment"
-                type="com.example.bookchat.ui.fragment.SearchTapHistoryFragment" />
+                type="com.example.bookchat.ui.search.SearchTapHistoryFragment" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:paddingHorizontal="30dp"

@@ -4,7 +4,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.ui.viewmodel.MyPageViewModel" />
+            type="com.example.bookchat.ui.mypage.MyPageViewModel" />
         <variable
             name="buildConfig"
             type="com.example.bookchat.BuildConfig" />

@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class BookShelfMeta(
     @SerializedName("totalElements")
-    val totalElements: Long,
+    val totalElements: Int,
     @SerializedName("totalPages")
     val totalPages: Int,
     @SerializedName("pageSize")

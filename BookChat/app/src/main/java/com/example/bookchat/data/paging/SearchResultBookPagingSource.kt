@@ -3,17 +3,16 @@ package com.example.bookchat.data.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.bookchat.App
-import com.example.bookchat.data.Book
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
-import com.example.bookchat.data.response.ResponseGetBookSearch
 import com.example.bookchat.data.response.SearchingMeta
+import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.repository.BookSearchRepository
 
 class SearchResultBookPagingSource(
 	private val searchKeyword: String,
 	private val bookSearchRepository: BookSearchRepository
 ) : PagingSource<Int, Book>() {
-	private lateinit var response: ResponseGetBookSearch
+	private lateinit var response: List<Book>
 
 	override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Book> {
 		if (!isNetworkConnected()) return LoadResult.Error(NetworkIsNotConnectedException())
@@ -26,10 +25,15 @@ class SearchResultBookPagingSource(
 				page = page,
 			)
 
-			return getLoadResult(
-				data = response.bookResponses,
-				searchingMeta = response.searchingMeta,
-				nowPage = page
+//			return getLoadResult(
+//				data = response,
+//				searchingMeta = response.searchingMeta,
+//				nowPage = page
+//			)
+			return LoadResult.Page(
+				data = response,
+				prevKey = 0,
+				nextKey = 0
 			)
 
 		} catch (e: Exception) {
@@ -38,27 +42,28 @@ class SearchResultBookPagingSource(
 	}
 
 	override fun getRefreshKey(state: PagingState<Int, Book>): Int? {
-		return state.anchorPosition?.let { anchorPosition ->
-			state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
-				?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
-		}
+//		return state.anchorPosition?.let { anchorPosition ->
+//			state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
+//				?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
+//		}
+		return null
 	}
 
-	private fun getLoadResult(
-		data: List<Book>,
-		nowPage: Int,
-		searchingMeta: SearchingMeta
-	): LoadResult<Int, Book> {
-		return try {
-			LoadResult.Page(
-				data = data,
-				prevKey = if (nowPage == 1) null else nowPage - 1,
-				nextKey = getNextKey(nowPage, searchingMeta)
-			)
-		} catch (exception: Exception) {
-			LoadResult.Error(exception)
-		}
-	}
+//	private fun getLoadResult(
+//		data: List<NetWorkBook>,
+//		nowPage: Int,
+//		searchingMeta: SearchingMeta
+//	): LoadResult<Int, NetWorkBook> {
+//		return try {
+//			LoadResult.Page(
+//				data = data,
+//				prevKey = if (nowPage == 1) null else nowPage - 1,
+//				nextKey = getNextKey(nowPage, searchingMeta)
+//			)
+//		} catch (exception: Exception) {
+//			LoadResult.Error(exception)
+//		}
+//	}
 
 	private fun getNextKey(
 		nowPage: Int,

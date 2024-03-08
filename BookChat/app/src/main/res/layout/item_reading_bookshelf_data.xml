@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-            name="bookShelfItem"
-            type="com.example.bookchat.data.BookShelfItem" />
+            name="BookShelfListItem"
+            type="com.example.bookchat.ui.bookshelf.model.BookShelfListItem" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -57,7 +57,7 @@
                         android:layout_height="@dimen/book_img_height_default"
                         android:scaleType="fitXY"
                         setBookImgSize="@{true}"
-                        loadUrl="@{bookShelfItem.bookCoverImageUrl}"
+                        loadUrl="@{BookShelfListItem.book.bookCoverImageUrl}"
                         android:src="@drawable/empty_img"/>
                 </androidx.cardview.widget.CardView>
 
@@ -74,7 +74,7 @@
                     android:fontFamily="@font/notosanskr_bold"
                     android:marqueeRepeatLimit="marquee_forever"
                     android:singleLine="true"
-                    android:text="@{bookShelfItem.title}"
+                    android:text="@{BookShelfListItem.book.title}"
                     android:textColor="#222222"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -94,7 +94,7 @@
                     android:fontFamily="@font/notosanskr_regular"
                     android:marqueeRepeatLimit="marquee_forever"
                     android:singleLine="true"
-                    android:text="@{bookShelfItem.authors[0]}"
+                    android:text="@{BookShelfListItem.book.authors[0]}"
                     android:textColor="#373737"
                     android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -109,7 +109,7 @@
                     android:layout_marginTop="15dp"
                     android:elegantTextHeight="true"
                     android:fontFamily="@font/notosanskr_bold"
-                    android:text="@{String.valueOf(bookShelfItem.pages) + 'p'}"
+                    android:text="@{String.valueOf(BookShelfListItem.pages) + 'p'}"
                     android:textColor="#373737"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toStartOf="@+id/pageBtn"

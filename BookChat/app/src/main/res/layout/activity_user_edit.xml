@@ -5,15 +5,15 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.ui.viewmodel.UserEditViewModel" />
+            type="com.example.bookchat.ui.mypage.UserEditViewModel" />
         <variable
             name="activity"
-            type="com.example.bookchat.ui.activity.UserEditActivity" />
+            type="com.example.bookchat.ui.mypage.UserEditActivity" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.activity.UserEditActivity">
+        tools:context=".ui.mypage.UserEditActivity">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_top"

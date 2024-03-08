@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.ui.viewmodel.BookReportViewModel" />
+            type="com.example.bookchat.ui.bookreport.BookReportViewModel" />
     </data>
     <ScrollView
         android:id="@+id/bookReport_Layout"
@@ -111,7 +111,7 @@
                 app:layout_constraintTop_toTopOf="@+id/bookBackground_agonize">
 
                 <ImageView
-                    loadUrl="@{viewmodel.book.bookCoverImageUrl}"
+                    loadUrl="@{viewmodel.bookShelfItem.book.bookCoverImageUrl}"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
@@ -131,7 +131,7 @@
                 android:gravity="center"
                 android:marqueeRepeatLimit="marquee_forever"
                 android:singleLine="true"
-                android:text="@{viewmodel.book.title}"
+                android:text="@{viewmodel.bookShelfItem.book.title}"
                 android:textColor="#222222"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="@+id/bookCardView_agonize"
@@ -151,7 +151,7 @@
                 android:gravity="center"
                 android:marqueeRepeatLimit="marquee_forever"
                 android:singleLine="true"
-                android:text="@{viewmodel.book.authors[0]}"
+                android:text="@{viewmodel.bookShelfItem.book.authors[0]}"
                 android:textColor="#222222"
                 android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="@+id/textView31"
@@ -160,7 +160,7 @@
 
             <com.willy.ratingbar.ScaleRatingBar
                 android:id="@+id/scaleRatingBar"
-                android:rating="@{viewmodel.book.star.value}"
+                android:rating="@{viewmodel.bookShelfItem.star.value}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
