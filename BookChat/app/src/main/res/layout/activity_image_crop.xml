@@ -7,13 +7,13 @@
 
         <variable
             name="activity"
-            type="com.example.bookchat.ui.activity.ImageCropActivity" />
+            type="com.example.bookchat.ui.imagecrop.ImageCropActivity" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.activity.ImageCropActivity">
+        tools:context=".ui.imagecrop.ImageCropActivity">
 
         <View
             android:id="@+id/image_crop_header"

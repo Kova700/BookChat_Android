@@ -1,14 +1,14 @@
 package com.example.bookchat.data.request
 
-import com.example.bookchat.utils.ReadingStatus
-import com.example.bookchat.utils.StarRating
+import com.example.bookchat.domain.model.BookShelfState
+import com.example.bookchat.domain.model.StarRating
 import com.google.gson.annotations.SerializedName
 
 data class RequestChangeBookStatus(
-    @SerializedName("readingStatus")
-    private val readingStatus : ReadingStatus,
-    @SerializedName("star")
-    private val star :StarRating? = null,
-    @SerializedName("pages")
+	@SerializedName("readingStatus")
+    private val bookShelfState : BookShelfState,
+	@SerializedName("star")
+    private val star : StarRating? = null,
+	@SerializedName("pages")
     private val pages :Int? = null
 )

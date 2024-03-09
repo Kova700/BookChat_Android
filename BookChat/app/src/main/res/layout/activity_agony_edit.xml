@@ -5,12 +5,12 @@
     <data>
         <variable
             name="activity"
-            type="com.example.bookchat.ui.activity.AgonyEditActivity" />
+            type="com.example.bookchat.ui.agony.AgonyEditActivity" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.activity.AgonyEditActivity">
+        tools:context=".ui.agony.AgonyEditActivity">
 
         <com.example.bookchat.ui.customview.AntiDupClickImageButton
             android:id="@+id/antiDupClickImageButton6"

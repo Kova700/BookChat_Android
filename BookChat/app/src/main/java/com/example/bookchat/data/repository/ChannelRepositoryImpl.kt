@@ -15,7 +15,7 @@ import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -44,13 +44,7 @@ class ChannelRepositoryImpl @Inject constructor(
 				{ channel -> -channel.roomId })
 		)
 	}.onEach { cachedChannels = it }
-
 	private var cachedChannels: List<Channel> = emptyList()
-	private val currentChannelId = MutableStateFlow<Long?>(null)
-	private val currentChannel = channels.combine(currentChannelId) { channels, channelId ->
-		channels.firstOrNull { channel -> channel.roomId == channelId }
-	}.filterNotNull()
-
 	private var currentPage: Long? = null
 	private var isEndPage = false
 
@@ -60,8 +54,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	}
 
 	override fun getChannelFlow(channelId: Long): Flow<Channel> {
-		currentChannelId.value = channelId
-		return currentChannel
+		return mapChannels.map { it[channelId] }.filterNotNull().distinctUntilChanged()
 	}
 
 	private fun setChannels(newChannels: Map<Long, Channel>) {
@@ -134,6 +127,8 @@ class ChannelRepositoryImpl @Inject constructor(
 		return createdChannel
 	}
 
+	//개선 필요 POST로 생성 가능하고 바디로 채팅방 받을 수 있을 것 같음.
+	// PUT은 응답이 없음 REST API에 대해 스펙 좀 다시 알아볼 것
 	private fun getChannelFromHeader(
 		headers: Headers,
 		requestMakeChatRoom: RequestMakeChatRoom

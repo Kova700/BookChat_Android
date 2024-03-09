@@ -40,8 +40,8 @@ object BookImgSizeManager {
     val bookImgHeightPx =
         (DEFAULT_BOOK_IMG_HEIGHT_PX * scaleRate).toInt()
 
-    fun getFlexBoxDummyItemCount(totalItemCount: Long) =
-        (flexBoxBookSpanSize - (totalItemCount % flexBoxBookSpanSize).toInt()) % flexBoxBookSpanSize
+    fun getFlexBoxDummyItemCount(totalItemCount: Int) =
+        (flexBoxBookSpanSize - (totalItemCount % flexBoxBookSpanSize)) % flexBoxBookSpanSize
 
     fun getPxFromDp(dp: Int): Int =
         (dp * (displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).toInt()

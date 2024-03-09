@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.ui.viewmodel.HomeViewModel" />
+            type="com.example.bookchat.ui.home.HomeViewModel" />
     </data>
 
     <androidx.core.widget.NestedScrollView
@@ -59,7 +59,7 @@
                 android:elegantTextHeight="true"
                 android:fontFamily="@font/notosanskr_bold"
                 android:maxLines="1"
-                android:text="@{viewmodel.cachedClient.nickname + '님'}"
+                android:text="@{viewmodel.uiState.client.nickname + '님'}"
                 android:ellipsize="end"
                 android:textColor="#222222"
                 android:textSize="20sp"

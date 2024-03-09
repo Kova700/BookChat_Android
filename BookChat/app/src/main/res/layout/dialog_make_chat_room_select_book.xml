@@ -5,7 +5,7 @@
     <data>
         <variable
             name="dialog"
-            type="com.example.bookchat.ui.dialog.MakeChatRoomSelectBookDialog" />
+            type="com.example.bookchat.ui.createchannel.MakeChatRoomSelectBookDialog" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         setDialogSize="@{true}"

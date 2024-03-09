@@ -6,13 +6,13 @@
         <import type="android.view.View"/>
         <variable
             name="viewmodel"
-            type="com.example.bookchat.ui.viewmodel.MakeChatRoomViewModel" />
+            type="com.example.bookchat.ui.createchannel.MakeChatRoomViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/make_chat_room_screen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.activity.MakeChatRoomActivity">
+        tools:context=".ui.createchannel.MakeChatRoomActivity">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_start"

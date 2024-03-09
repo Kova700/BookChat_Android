@@ -2,7 +2,7 @@ package com.example.bookchat.data.repository
 
 import com.example.bookchat.App
 import com.example.bookchat.data.BookReport
-import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.data.api.BookChatApi
 import com.example.bookchat.data.request.RequestRegisterBookReport
 import com.example.bookchat.data.response.BookReportDoseNotExistException

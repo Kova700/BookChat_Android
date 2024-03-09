@@ -3,7 +3,8 @@ package com.example.bookchat.data.di
 import com.example.bookchat.data.repository.AgonyRecordRepositoryImpl
 import com.example.bookchat.data.repository.AgonyRepositoryImpl
 import com.example.bookchat.data.repository.BookReportRepositoryImpl
-import com.example.bookchat.data.repository.BookRepositoryImpl
+import com.example.bookchat.data.repository.BookSearchRepositoryImpl
+import com.example.bookchat.data.repository.BookShelfRepositoryImpl
 import com.example.bookchat.data.repository.ChannelRepositoryImpl
 import com.example.bookchat.data.repository.ChatRepositoryImpl
 import com.example.bookchat.data.repository.ChattingRepositoryFacade
@@ -13,7 +14,8 @@ import com.example.bookchat.data.repository.WholeChatRoomRepositoryImpl
 import com.example.bookchat.domain.repository.AgonyRecordRepository
 import com.example.bookchat.domain.repository.AgonyRepository
 import com.example.bookchat.domain.repository.BookReportRepository
-import com.example.bookchat.domain.repository.BookRepository
+import com.example.bookchat.domain.repository.BookSearchRepository
+import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
@@ -38,9 +40,15 @@ interface RepositoryModule {
 
 	@Binds
 	@Singleton
-	fun bindBookRepository(
-		repository: BookRepositoryImpl
-	): BookRepository
+	fun bindBookShelfRepository(
+		repository: BookShelfRepositoryImpl
+	): BookShelfRepository
+
+	@Binds
+	@Singleton
+	fun bindBookSearchRepository(
+		repository: BookSearchRepositoryImpl
+	): BookSearchRepository
 
 	@Binds
 	@Singleton

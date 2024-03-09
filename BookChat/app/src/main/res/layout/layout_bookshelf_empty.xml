@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
     <data>
-        <variable
-            name="viewmodel"
-            type="com.example.bookchat.ui.viewmodel.BookShelfViewModel" />
-        <import type="android.view.View"/>
+<!--        <variable-->
+<!--            name="viewmodel"-->
+<!--            type="com.example.bookchat.ui.bookshelf.BookShelfViewModel" />-->
+<!--        <import type="android.view.View"/>-->
         <variable
             name="visibilty"
             type="Integer" />

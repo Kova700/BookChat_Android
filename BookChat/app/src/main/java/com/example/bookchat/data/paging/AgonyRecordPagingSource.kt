@@ -5,7 +5,7 @@ import androidx.paging.PagingState
 import com.example.bookchat.App
 import com.example.bookchat.data.Agony
 import com.example.bookchat.data.AgonyRecord
-import com.example.bookchat.data.BookShelfItem
+import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.data.response.CursorMeta
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseGetAgonyRecord

@@ -6,7 +6,7 @@
     <data>
         <variable
             name="activity"
-            type="com.example.bookchat.ui.activity.ChatRoomInfoActivity" />
+            type="com.example.bookchat.ui.search.ChatRoomInfoActivity" />
         <variable
             name="chatRoomItem"
             type="com.example.bookchat.data.WholeChatRoomListItem" />
@@ -15,7 +15,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.activity.ChatRoomInfoActivity">
+        tools:context=".ui.search.ChatRoomInfoActivity">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_end"

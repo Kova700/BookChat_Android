@@ -5,7 +5,7 @@
     <data>
         <variable
             name="dialog"
-            type="com.example.bookchat.ui.dialog.BookReportWarningDialog" />
+            type="com.example.bookchat.ui.bookreport.BookReportWarningDialog" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:background="@drawable/view_round_white_not_padding"
