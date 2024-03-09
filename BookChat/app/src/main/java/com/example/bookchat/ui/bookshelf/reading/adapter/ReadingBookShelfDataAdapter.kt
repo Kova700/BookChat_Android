@@ -4,12 +4,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemReadingBookshelfDataBinding
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
-import com.example.bookchat.ui.bookshelf.wish.adapter.WishBookShelfDataAdapter.Companion.BOOK_SHELF_ITEM_COMPARATOR
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -46,6 +46,18 @@ class ReadingBookShelfDataAdapter @Inject constructor() :
 	}
 
 	override fun getItemViewType(position: Int): Int = R.layout.item_reading_bookshelf_data
+
+
+	companion object {
+		val BOOK_SHELF_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<BookShelfListItem>() {
+			override fun areItemsTheSame(oldItem: BookShelfListItem, newItem: BookShelfListItem) =
+				oldItem.bookShelfId == newItem.bookShelfId
+
+			override fun areContentsTheSame(oldItem: BookShelfListItem, newItem: BookShelfListItem) =
+				oldItem == newItem
+		}
+	}
+
 }
 
 class ReadingBookShelfDataViewHolder(

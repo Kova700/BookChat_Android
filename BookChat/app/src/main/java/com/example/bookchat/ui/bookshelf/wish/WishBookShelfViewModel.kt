@@ -2,16 +2,19 @@ package com.example.bookchat.ui.bookshelf.wish
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.bookshelf.wish.WishBookShelfUiState.UiState
+import com.example.bookchat.utils.BookImgSizeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,21 +32,14 @@ class WishBookShelfViewModel @Inject constructor(
 
 	init {
 		observeBookShelfItems()
-		observeBookShelfTotalItemCount()
 		getBookShelfItems()
 	}
 
 	private fun observeBookShelfItems() = viewModelScope.launch {
-		bookShelfRepository.getBookShelfFlow(BookShelfState.WISH).collect { items ->
-			updateState { copy(wishItems = items.toBookShelfListItem()) }
-		}
-	}
-
-	private fun observeBookShelfTotalItemCount() = viewModelScope.launch {
-		bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.WISH)
-			.collect { itemCount ->
-				updateState { copy(totalItemCount = itemCount) }
-			}
+		bookShelfRepository.getBookShelfFlow(BookShelfState.WISH).combine(
+			bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.WISH)
+		) { items, totalCount -> groupWishItems(items, totalCount) }
+			.collect { items -> updateState { copy(wishItems = items) } }
 	}
 
 	private fun getBookShelfItems() =
@@ -59,6 +55,18 @@ class WishBookShelfViewModel @Inject constructor(
 			uiState.value.uiState == UiState.LOADING
 		) return
 		getBookShelfItems()
+	}
+
+	private fun groupWishItems(
+		wishItems: List<BookShelfItem>,
+		totalItemCount: Int
+	): List<WishBookShelfItem> {
+		val groupedWishItems = mutableListOf<WishBookShelfItem>()
+		groupedWishItems.add(WishBookShelfItem.Header(totalItemCount))
+		groupedWishItems.addAll(wishItems.map { WishBookShelfItem.Item(it.toBookShelfListItem()) })
+		val dummyItemCount = BookImgSizeManager.getFlexBoxDummyItemCount(wishItems.size)
+		(0 until dummyItemCount).forEach { i -> groupedWishItems.add(WishBookShelfItem.Dummy(i)) }
+		return groupedWishItems
 	}
 
 	fun onItemClick(bookShelfListItem: BookShelfListItem) {

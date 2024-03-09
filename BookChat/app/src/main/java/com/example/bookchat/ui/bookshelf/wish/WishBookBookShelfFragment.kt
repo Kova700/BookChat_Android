@@ -10,19 +10,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentWishBookshelfBinding
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.ui.bookshelf.BookShelfViewModel
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
-import com.example.bookchat.ui.bookshelf.wish.adapter.WishBookShelfDataAdapter
-import com.example.bookchat.ui.bookshelf.wish.adapter.WishBookShelfDummyDataAdapter
-import com.example.bookchat.ui.bookshelf.wish.adapter.WishBookShelfHeaderAdapter
+import com.example.bookchat.ui.bookshelf.wish.adapter.WishBookShelfAdapter
 import com.example.bookchat.ui.bookshelf.wish.dialog.WishBookDialog
 import com.example.bookchat.ui.bookshelf.wish.dialog.WishBookDialog.Companion.EXTRA_WISH_BOOKSHELF_ITEM_ID
-import com.example.bookchat.utils.BookImgSizeManager
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -40,13 +36,7 @@ class WishBookBookShelfFragment : Fragment() {
 	private val bookShelfViewModel by activityViewModels<BookShelfViewModel>()
 
 	@Inject
-	lateinit var wishBookShelfHeaderAdapter: WishBookShelfHeaderAdapter
-
-	@Inject
-	lateinit var wishBookShelfDataAdapter: WishBookShelfDataAdapter
-
-	@Inject
-	lateinit var wishBookShelfDummyDataAdapter: WishBookShelfDummyDataAdapter
+	lateinit var wishBookShelfAdapter: WishBookShelfAdapter
 
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
@@ -78,22 +68,17 @@ class WishBookBookShelfFragment : Fragment() {
 
 	//TODO : List Empty UI 연결
 	//TODO : swipeRefreshLayoutComplete API 연결
-	//TODO : DummyItem없애고 GridLayout spanCount를 화면 사이즈로 계산해서 사용가능하게 수정
 	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
 		wishBookShelfViewModel.uiState.collect { uiState ->
-			wishBookShelfDataAdapter.submitList(uiState.wishItems)
-			wishBookShelfHeaderAdapter.totalItemCount = uiState.totalItemCount
-			wishBookShelfHeaderAdapter.notifyItemChanged(0)
-			wishBookShelfDummyDataAdapter.dummyItemCount =
-				BookImgSizeManager.getFlexBoxDummyItemCount(uiState.wishItems.size)
-			wishBookShelfDummyDataAdapter.notifyDataSetChanged()
+			wishBookShelfAdapter.submitList(uiState.wishItems)
 		}
 	}
 
 	private fun initAdapter() {
-		wishBookShelfDataAdapter.onItemClick = { itemPosition ->
+		wishBookShelfAdapter.onItemClick = { itemPosition ->
 			wishBookShelfViewModel.onItemClick(
-				wishBookShelfDataAdapter.currentList[itemPosition]
+				(wishBookShelfAdapter.currentList[itemPosition] as WishBookShelfItem.Item)
+					.bookShelfListItem
 			)
 		}
 	}
@@ -113,16 +98,8 @@ class WishBookBookShelfFragment : Fragment() {
 				)
 			}
 		}
-		val concatAdapterConfig =
-			ConcatAdapter.Config.Builder().apply { setIsolateViewTypes(false) }.build()
-		val concatAdapter = ConcatAdapter(
-			concatAdapterConfig,
-			wishBookShelfHeaderAdapter,
-			wishBookShelfDataAdapter,
-			wishBookShelfDummyDataAdapter
-		)
 		with(binding.wishBookRcv) {
-			adapter = concatAdapter
+			adapter = wishBookShelfAdapter
 			layoutManager = flexboxLayoutManager
 			addOnScrollListener(rcvScrollListener)
 		}
