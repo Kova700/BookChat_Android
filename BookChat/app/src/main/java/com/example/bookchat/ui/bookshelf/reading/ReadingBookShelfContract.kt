@@ -6,8 +6,7 @@ import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 
 data class ReadingBookShelfUiState(
 	val uiState: UiState,
-	val readingItems: List<BookShelfListItem>,
-	val totalItemCount :Int, //서버에 저장된 총 아이템 개수
+	val readingItems: List<ReadingBookShelfItem>,
 ) {
 
 	enum class UiState {
@@ -21,7 +20,6 @@ data class ReadingBookShelfUiState(
 		val DEFAULT = ReadingBookShelfUiState(
 			uiState = UiState.EMPTY,
 			readingItems = emptyList(),
-			totalItemCount = 0
 		)
 	}
 }
@@ -38,4 +36,22 @@ sealed class ReadingBookShelfEvent {
 	data class ChangeBookShelfTab(
 		val targetState: BookShelfState
 	) : ReadingBookShelfEvent()
+}
+
+sealed interface ReadingBookShelfItem {
+
+	fun getCategoryId(): Long {
+		return when (this) {
+			is Header -> HEADER_ITEM_STABLE_ID
+			is Item -> bookShelfListItem.bookShelfId
+		}
+	}
+
+	data class Header(val totalItemCount: Int) : ReadingBookShelfItem
+	data class Item(val bookShelfListItem: BookShelfListItem) : ReadingBookShelfItem
+
+	private companion object {
+		private const val HEADER_ITEM_STABLE_ID = -1L
+		private const val DUMMY_ITEM_STABLE_ID = -2L
+	}
 }

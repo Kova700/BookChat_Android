@@ -4,12 +4,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemReadingBookshelfDataBinding
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
+import com.example.bookchat.databinding.ItemReadingBookshelfHeaderBinding
+import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -17,56 +19,106 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ReadingBookShelfDataAdapter @Inject constructor() :
-	ListAdapter<BookShelfListItem, ReadingBookShelfDataViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
+	ListAdapter<ReadingBookShelfItem, ReadingBookViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
 
 	var onItemClick: ((Int) -> Unit)? = null
 	var onLongItemClick: ((Int, Boolean) -> Unit)? = null
 	var onPageInputBtnClick: ((Int) -> Unit)? = null
 	var onDeleteClick: ((Int) -> Unit)? = null
 
-	override fun onCreateViewHolder(
-		parent: ViewGroup,
-		viewType: Int
-	): ReadingBookShelfDataViewHolder {
-		val binding: ItemReadingBookshelfDataBinding = DataBindingUtil.inflate(
-			LayoutInflater.from(parent.context), R.layout.item_reading_bookshelf_data,
-			parent, false
-		)
-		return ReadingBookShelfDataViewHolder(
-			binding,
-			onItemClick,
-			onLongItemClick,
-			onPageInputBtnClick,
-			onDeleteClick
-		)
-	}
-
-	override fun onBindViewHolder(holder: ReadingBookShelfDataViewHolder, position: Int) {
-		holder.bind(getItem(position))
-	}
-
-	override fun getItemViewType(position: Int): Int = R.layout.item_reading_bookshelf_data
-
-
-	companion object {
-		val BOOK_SHELF_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<BookShelfListItem>() {
-			override fun areItemsTheSame(oldItem: BookShelfListItem, newItem: BookShelfListItem) =
-				oldItem.bookShelfId == newItem.bookShelfId
-
-			override fun areContentsTheSame(oldItem: BookShelfListItem, newItem: BookShelfListItem) =
-				oldItem == newItem
+	override fun getItemViewType(position: Int): Int {
+		return when (getItem(position)) {
+			is ReadingBookShelfItem.Header -> R.layout.item_reading_bookshelf_header
+			is ReadingBookShelfItem.Item -> R.layout.item_reading_bookshelf_data
 		}
 	}
 
+	override fun onCreateViewHolder(
+		parent: ViewGroup,
+		viewType: Int
+	): ReadingBookViewHolder {
+
+		when (viewType) {
+			R.layout.item_reading_bookshelf_header -> {
+				val binding: ItemReadingBookshelfHeaderBinding = DataBindingUtil.inflate(
+					LayoutInflater.from(parent.context), R.layout.item_reading_bookshelf_header,
+					parent, false
+				)
+				return ReadinBookHeaderViewHolder(binding)
+			}
+
+			else -> {
+				val binding: ItemReadingBookshelfDataBinding = DataBindingUtil.inflate(
+					LayoutInflater.from(parent.context), R.layout.item_reading_bookshelf_data,
+					parent, false
+				)
+				return ReadinBookItemViewHolder(
+					binding,
+					onItemClick,
+					onLongItemClick,
+					onPageInputBtnClick,
+					onDeleteClick
+				)
+			}
+		}
+
+	}
+
+	override fun onBindViewHolder(holder: ReadingBookViewHolder, position: Int) {
+		holder.bind(getItem(position))
+	}
+
+	companion object {
+		val BOOK_SHELF_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<ReadingBookShelfItem>() {
+			override fun areItemsTheSame(
+				oldItem: ReadingBookShelfItem,
+				newItem: ReadingBookShelfItem
+			): Boolean {
+				return oldItem.getCategoryId() == newItem.getCategoryId()
+			}
+
+			override fun areContentsTheSame(
+				oldItem: ReadingBookShelfItem,
+				newItem: ReadingBookShelfItem
+			): Boolean {
+				return when (oldItem) {
+					is ReadingBookShelfItem.Header -> {
+						newItem as ReadingBookShelfItem.Header
+						oldItem == newItem
+					}
+
+					is ReadingBookShelfItem.Item -> {
+						newItem as ReadingBookShelfItem.Item
+						oldItem == newItem
+					}
+				}
+
+			}
+		}
+	}
 }
 
-class ReadingBookShelfDataViewHolder(
+sealed class ReadingBookViewHolder(
+	binding: ViewDataBinding
+) : RecyclerView.ViewHolder(binding.root) {
+	abstract fun bind(readingBookShelfItem: ReadingBookShelfItem)
+}
+
+class ReadinBookHeaderViewHolder(
+	val binding: ItemReadingBookshelfHeaderBinding,
+) : ReadingBookViewHolder(binding) {
+	override fun bind(readingBookShelfItem: ReadingBookShelfItem) {
+		binding.totalItemCount = (readingBookShelfItem as ReadingBookShelfItem.Header).totalItemCount
+	}
+}
+
+class ReadinBookItemViewHolder(
 	private val binding: ItemReadingBookshelfDataBinding,
 	private val onItemClick: ((Int) -> Unit)?,
 	private val onLongItemClick: ((Int, Boolean) -> Unit)?,
 	private val onPageInputBtnClick: ((Int) -> Unit)?,
 	private val onDeleteClick: ((Int) -> Unit)?
-) : RecyclerView.ViewHolder(binding.root) {
+) : ReadingBookViewHolder(binding) {
 
 	init {
 		binding.swipeView.setOnClickListener {
@@ -84,7 +136,8 @@ class ReadingBookShelfDataViewHolder(
 		}
 	}
 
-	fun bind(bookShelfListItem: BookShelfListItem) {
+	override fun bind(readingBookShelfItem: ReadingBookShelfItem) {
+		val bookShelfListItem = (readingBookShelfItem as ReadingBookShelfItem.Item).bookShelfListItem
 		binding.bookShelfListItem = bookShelfListItem
 		setViewHolderSwipeState(binding.swipeView, bookShelfListItem.isSwiped)
 	}

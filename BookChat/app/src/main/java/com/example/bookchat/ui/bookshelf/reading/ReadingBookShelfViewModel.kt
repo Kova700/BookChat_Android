@@ -34,7 +34,6 @@ class ReadingBookShelfViewModel @Inject constructor(
 
 	init {
 		observeBookShelfItems()
-		observeBookShelfTotalItemCount()
 		getBookShelfItems()
 	}
 
@@ -44,14 +43,22 @@ class ReadingBookShelfViewModel @Inject constructor(
 				items.map {
 					it.toBookShelfListItem(isSwipedMap[it.bookShelfId] ?: false)
 				}
-			}.collect { newItems -> updateState { copy(readingItems = newItems) } }
+			}.combine(
+				bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.READING)
+			) { items, totalCount ->
+				groupReadingItems(items, totalCount)
+			}
+			.collect { newItems -> updateState { copy(readingItems = newItems) } }
 	}
 
-	private fun observeBookShelfTotalItemCount() = viewModelScope.launch {
-		bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.READING)
-			.collect { itemCount ->
-				updateState { copy(totalItemCount = itemCount) }
-			}
+	private fun groupReadingItems(
+		readingItems: List<BookShelfListItem>,
+		totalItemCount: Int
+	): List<ReadingBookShelfItem> {
+		val groupedWishItems = mutableListOf<ReadingBookShelfItem>()
+		groupedWishItems.add(ReadingBookShelfItem.Header(totalItemCount))
+		groupedWishItems.addAll(readingItems.map { ReadingBookShelfItem.Item(it) })
+		return groupedWishItems
 	}
 
 	private fun getBookShelfItems() = viewModelScope.launch {

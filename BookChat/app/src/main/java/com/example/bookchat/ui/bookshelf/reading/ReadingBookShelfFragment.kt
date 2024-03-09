@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
@@ -19,7 +18,6 @@ import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.ui.bookshelf.BookShelfViewModel
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.bookshelf.reading.adapter.ReadingBookShelfDataAdapter
-import com.example.bookchat.ui.bookshelf.reading.adapter.ReadingBookShelfHeaderAdapter
 import com.example.bookchat.ui.bookshelf.reading.dialog.PageInputBottomSheetDialog
 import com.example.bookchat.ui.bookshelf.reading.dialog.PageInputBottomSheetDialog.Companion.EXTRA_PAGE_INPUT_ITEM_ID
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog
@@ -35,9 +33,6 @@ class ReadingBookShelfFragment : Fragment() {
 	private val binding get() = _binding!!
 	private val readingBookShelfViewModel: ReadingBookShelfViewModel by viewModels()
 	private val bookShelfViewModel by activityViewModels<BookShelfViewModel>()
-
-	@Inject
-	lateinit var readingBookShelfHeaderAdapter: ReadingBookShelfHeaderAdapter
 
 	@Inject
 	lateinit var readingBookShelfDataAdapter: ReadingBookShelfDataAdapter
@@ -75,8 +70,6 @@ class ReadingBookShelfFragment : Fragment() {
 	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
 		readingBookShelfViewModel.uiState.collect { uiState ->
 			readingBookShelfDataAdapter.submitList(uiState.readingItems)
-			readingBookShelfHeaderAdapter.totalItemCount = uiState.totalItemCount
-			readingBookShelfHeaderAdapter.notifyItemChanged(0)
 		}
 	}
 
@@ -90,16 +83,8 @@ class ReadingBookShelfFragment : Fragment() {
 				)
 			}
 		}
-
-		val concatAdapterConfig =
-			ConcatAdapter.Config.Builder().apply { setIsolateViewTypes(false) }.build()
-		val concatAdapter = ConcatAdapter(
-			concatAdapterConfig,
-			readingBookShelfHeaderAdapter,
-			readingBookShelfDataAdapter
-		)
 		with(binding.readingBookRcv) {
-			adapter = concatAdapter
+			adapter = readingBookShelfDataAdapter
 			setHasFixedSize(true)
 			layoutManager = linearLayoutManager
 			addOnScrollListener(rcvScrollListener)
@@ -109,22 +94,26 @@ class ReadingBookShelfFragment : Fragment() {
 	private fun initAdapter() {
 		readingBookShelfDataAdapter.onItemClick = { itemPosition ->
 			readingBookShelfViewModel.onItemClick(
-				readingBookShelfDataAdapter.currentList[itemPosition]
+				(readingBookShelfDataAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item)
+					.bookShelfListItem
 			)
 		}
 		readingBookShelfDataAdapter.onLongItemClick = { itemPosition, isSwipe ->
 			readingBookShelfViewModel.onItemLongClick(
-				readingBookShelfDataAdapter.currentList[itemPosition], isSwipe
+				(readingBookShelfDataAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item)
+					.bookShelfListItem, isSwipe
 			)
 		}
 		readingBookShelfDataAdapter.onPageInputBtnClick = { itemPosition ->
 			readingBookShelfViewModel.onPageInputBtnClick(
-				readingBookShelfDataAdapter.currentList[itemPosition]
+				(readingBookShelfDataAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item)
+					.bookShelfListItem
 			)
 		}
 		readingBookShelfDataAdapter.onDeleteClick = { itemPosition ->
 			readingBookShelfViewModel.onItemDeleteClick(
-				readingBookShelfDataAdapter.currentList[itemPosition]
+				(readingBookShelfDataAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item)
+					.bookShelfListItem
 			)
 		}
 	}
