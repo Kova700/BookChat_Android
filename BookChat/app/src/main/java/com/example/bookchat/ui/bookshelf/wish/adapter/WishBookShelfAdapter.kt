@@ -33,7 +33,7 @@ class WishBookShelfAdapter @Inject constructor() :
 					LayoutInflater.from(parent.context), R.layout.item_wish_bookshelf_header,
 					parent, false
 				)
-				return WishBookViewHolder.WishBookHeaderViewHolder(binding)
+				return WishBookHeaderViewHolder(binding)
 			}
 
 			R.layout.item_wish_bookshelf_data -> {
@@ -41,7 +41,7 @@ class WishBookShelfAdapter @Inject constructor() :
 					LayoutInflater.from(parent.context), R.layout.item_wish_bookshelf_data,
 					parent, false
 				)
-				return WishBookViewHolder.WishBookItemViewHolder(binding, onItemClick)
+				return WishBookItemViewHolder(binding, onItemClick)
 			}
 
 			else -> {
@@ -49,7 +49,7 @@ class WishBookShelfAdapter @Inject constructor() :
 					LayoutInflater.from(parent.context), R.layout.item_flex_box_dummy,
 					parent, false
 				)
-				return WishBookViewHolder.WishBookDummyViewHolder(binding)
+				return WishBookDummyViewHolder(binding)
 			}
 		}
 
@@ -98,35 +98,34 @@ sealed class WishBookViewHolder(
 	binding: ViewDataBinding
 ) : RecyclerView.ViewHolder(binding.root) {
 	abstract fun bind(wishBookShelfItem: WishBookShelfItem)
+}
 
-	class WishBookHeaderViewHolder(
-		val binding: ItemWishBookshelfHeaderBinding,
-	) : WishBookViewHolder(binding) {
-		override fun bind(wishBookShelfItem: WishBookShelfItem) {
-			binding.totalItemCount = (wishBookShelfItem as WishBookShelfItem.Header).totalItemCount
+class WishBookHeaderViewHolder(
+	val binding: ItemWishBookshelfHeaderBinding,
+) : WishBookViewHolder(binding) {
+	override fun bind(wishBookShelfItem: WishBookShelfItem) {
+		binding.totalItemCount = (wishBookShelfItem as WishBookShelfItem.Header).totalItemCount
+	}
+}
+
+class WishBookItemViewHolder(
+	private val binding: ItemWishBookshelfDataBinding,
+	private val onItemClick: ((Int) -> Unit)?,
+) : WishBookViewHolder(binding) {
+
+	init {
+		binding.root.setOnClickListener {
+			onItemClick?.invoke(bindingAdapterPosition)
 		}
 	}
 
-	class WishBookItemViewHolder(
-		private val binding: ItemWishBookshelfDataBinding,
-		private val onItemClick: ((Int) -> Unit)?,
-	) : WishBookViewHolder(binding) {
-
-		init {
-			binding.root.setOnClickListener {
-				onItemClick?.invoke(bindingAdapterPosition)
-			}
-		}
-
-		override fun bind(wishBookShelfItem: WishBookShelfItem) {
-			binding.bookShelfListItem = (wishBookShelfItem as WishBookShelfItem.Item).bookShelfListItem
-		}
+	override fun bind(wishBookShelfItem: WishBookShelfItem) {
+		binding.bookShelfListItem = (wishBookShelfItem as WishBookShelfItem.Item).bookShelfListItem
 	}
+}
 
-	class WishBookDummyViewHolder(
-		val binding: ItemFlexBoxDummyBinding
-	) : WishBookViewHolder(binding) {
-		override fun bind(wishBookShelfItem: WishBookShelfItem) {}
-	}
-
+class WishBookDummyViewHolder(
+	val binding: ItemFlexBoxDummyBinding
+) : WishBookViewHolder(binding) {
+	override fun bind(wishBookShelfItem: WishBookShelfItem) {}
 }
