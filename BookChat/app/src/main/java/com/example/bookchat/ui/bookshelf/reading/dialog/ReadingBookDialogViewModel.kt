@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.domain.model.BookShelfState
+import com.example.bookchat.domain.model.toStarRating
 import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.bookshelf.mapper.toBookShelfItem
 import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
@@ -67,7 +68,10 @@ class ReadingBookDialogViewModel @Inject constructor(
 			runCatching {
 				bookShelfRepository.changeBookShelfBookStatus(
 					bookShelfItemId = bookShelfItem.bookShelfId,
-					newBookShelfItem = bookShelfItem.copy(state = newState).toBookShelfItem(),
+					newBookShelfItem = bookShelfItem.copy(
+						state = newState,
+						star = starRating.value.toStarRating()
+					).toBookShelfItem(),
 				)
 			}.onSuccess {
 				startEvent(
