@@ -44,7 +44,7 @@ class ReadingBookShelfDataAdapter @Inject constructor() :
 					LayoutInflater.from(parent.context), R.layout.item_reading_bookshelf_header,
 					parent, false
 				)
-				return ReadinBookHeaderViewHolder(binding)
+				return ReadingBookHeaderViewHolder(binding)
 			}
 
 			else -> {
@@ -52,7 +52,7 @@ class ReadingBookShelfDataAdapter @Inject constructor() :
 					LayoutInflater.from(parent.context), R.layout.item_reading_bookshelf_data,
 					parent, false
 				)
-				return ReadinBookItemViewHolder(
+				return ReadingBookItemViewHolder(
 					binding,
 					onItemClick,
 					onLongItemClick,
@@ -104,7 +104,7 @@ sealed class ReadingBookViewHolder(
 	abstract fun bind(readingBookShelfItem: ReadingBookShelfItem)
 }
 
-class ReadinBookHeaderViewHolder(
+class ReadingBookHeaderViewHolder(
 	val binding: ItemReadingBookshelfHeaderBinding,
 ) : ReadingBookViewHolder(binding) {
 	override fun bind(readingBookShelfItem: ReadingBookShelfItem) {
@@ -112,7 +112,7 @@ class ReadinBookHeaderViewHolder(
 	}
 }
 
-class ReadinBookItemViewHolder(
+class ReadingBookItemViewHolder(
 	private val binding: ItemReadingBookshelfDataBinding,
 	private val onItemClick: ((Int) -> Unit)?,
 	private val onLongItemClick: ((Int, Boolean) -> Unit)?,

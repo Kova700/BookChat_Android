@@ -9,13 +9,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentCompleteBookshelfBinding
 import com.example.bookchat.ui.bookshelf.complete.adapter.CompleteBookShelfDataAdapter
-import com.example.bookchat.ui.bookshelf.complete.adapter.CompleteBookShelfHeaderAdapter
 import com.example.bookchat.ui.bookshelf.complete.dialog.CompleteBookDialog
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,9 +26,6 @@ class CompleteBookShelfFragment : Fragment() {
 	private var _binding: FragmentCompleteBookshelfBinding? = null
 	private val binding get() = _binding!!
 	private val completeBookShelfViewModel: CompleteBookShelfViewModel by viewModels()
-
-	@Inject
-	lateinit var completeBookShelfHeaderAdapter: CompleteBookShelfHeaderAdapter
 
 	@Inject
 	lateinit var completeBookShelfDataAdapter: CompleteBookShelfDataAdapter
@@ -69,25 +64,26 @@ class CompleteBookShelfFragment : Fragment() {
 	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
 		completeBookShelfViewModel.uiState.collect { uiState ->
 			completeBookShelfDataAdapter.submitList(uiState.completeItems)
-			completeBookShelfHeaderAdapter.totalItemCount = uiState.totalItemCount
-			completeBookShelfHeaderAdapter.notifyItemChanged(0)
 		}
 	}
 
 	private fun initAdapter() {
 		completeBookShelfDataAdapter.onItemClick = { itemPosition ->
 			completeBookShelfViewModel.onItemClick(
-				completeBookShelfDataAdapter.currentList[itemPosition]
+				(completeBookShelfDataAdapter.currentList[itemPosition] as CompleteBookShelfItem.Item)
+					.bookShelfListItem
 			)
 		}
 		completeBookShelfDataAdapter.onLongItemClick = { itemPosition, isSwipe ->
 			completeBookShelfViewModel.onItemLongClick(
-				completeBookShelfDataAdapter.currentList[itemPosition], isSwipe
+				(completeBookShelfDataAdapter.currentList[itemPosition] as CompleteBookShelfItem.Item)
+					.bookShelfListItem, isSwipe
 			)
 		}
 		completeBookShelfDataAdapter.onDeleteClick = { itemPosition ->
 			completeBookShelfViewModel.onItemDeleteClick(
-				completeBookShelfDataAdapter.currentList[itemPosition]
+				(completeBookShelfDataAdapter.currentList[itemPosition] as CompleteBookShelfItem.Item)
+					.bookShelfListItem
 			)
 		}
 	}
@@ -102,16 +98,8 @@ class CompleteBookShelfFragment : Fragment() {
 				)
 			}
 		}
-
-		val concatAdapterConfig =
-			ConcatAdapter.Config.Builder().apply { setIsolateViewTypes(false) }.build()
-		val concatAdapter = ConcatAdapter(
-			concatAdapterConfig,
-			completeBookShelfHeaderAdapter,
-			completeBookShelfDataAdapter
-		)
 		with(binding.completeBookRcv) {
-			adapter = concatAdapter
+			adapter = completeBookShelfDataAdapter
 			setHasFixedSize(true)
 			layoutManager = linearLayoutManager
 			addOnScrollListener(rcvScrollListener)

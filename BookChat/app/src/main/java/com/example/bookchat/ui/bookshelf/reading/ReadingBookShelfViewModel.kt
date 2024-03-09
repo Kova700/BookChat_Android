@@ -45,9 +45,7 @@ class ReadingBookShelfViewModel @Inject constructor(
 				}
 			}.combine(
 				bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.READING)
-			) { items, totalCount ->
-				groupReadingItems(items, totalCount)
-			}
+			) { items, totalCount -> groupReadingItems(items, totalCount) }
 			.collect { newItems -> updateState { copy(readingItems = newItems) } }
 	}
 
