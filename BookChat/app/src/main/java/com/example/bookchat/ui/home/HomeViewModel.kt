@@ -41,7 +41,7 @@ class HomeViewModel @Inject constructor(
 
 	private fun observeReadingBookShelfItems() = viewModelScope.launch {
 		bookShelfRepository.getBookShelfFlow(BookShelfState.READING).collect { bookShelfItems ->
-			updateState { copy(readingBookShelfBooks = bookShelfItems.toBookShelfListItem()) }
+			updateState { copy(readingBookShelfBooks = bookShelfItems.take(3).toBookShelfListItem()) }
 		}
 	}
 
