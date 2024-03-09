@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentBookShelfBinding
@@ -17,26 +17,34 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class BookShelfFragment : Fragment() {
 
-	lateinit var binding: FragmentBookShelfBinding
-	lateinit var pagerAdapter: PagerFragmentStateAdapter
-	val bookShelfViewModel: BookShelfViewModel by viewModels()
+	private var _binding: FragmentBookShelfBinding? = null
+	private val binding get() = _binding!!
+	private val bookShelfViewModel by activityViewModels<BookShelfViewModel>()
+
+	private lateinit var pagerAdapter: PagerFragmentStateAdapter
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View? {
-		binding = DataBindingUtil.inflate(inflater, R.layout.fragment_book_shelf, container, false)
+		_binding = DataBindingUtil.inflate(inflater, R.layout.fragment_book_shelf, container, false)
 		pagerAdapter = PagerFragmentStateAdapter(this)
-		with(binding) {
-			lifecycleOwner = this@BookShelfFragment
-			viewPager.adapter = pagerAdapter
-		}
+		binding.lifecycleOwner = this.viewLifecycleOwner
+		binding.viewPager.adapter = pagerAdapter
+		return binding.root
+	}
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
 		initTapLayout()
 		inflateFirstTab(1)
 		observeEvent()
+	}
 
-		return binding.root
+	override fun onDestroyView() {
+		super.onDestroyView()
+		_binding = null
 	}
 
 	private fun inflateFirstTab(tabIndex: Int) {
