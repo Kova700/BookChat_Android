@@ -1,11 +1,10 @@
-package com.example.bookchat.data.api
+package com.example.bookchat.data.network
 
 import com.example.bookchat.data.*
 import com.example.bookchat.data.request.*
 import com.example.bookchat.data.response.*
 import com.example.bookchat.utils.BookSearchSortOption
 import com.example.bookchat.utils.BookSearchSortOption.ACCURACY
-import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.utils.SearchSortOption
 import com.example.bookchat.utils.SearchSortOption.ID_DESC
 import com.example.bookchat.utils.SearchSortOption.UPDATED_AT_DESC

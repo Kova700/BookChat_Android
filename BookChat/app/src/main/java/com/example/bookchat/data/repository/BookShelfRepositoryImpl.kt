@@ -1,7 +1,7 @@
 package com.example.bookchat.data.repository
 
 import com.example.bookchat.App
-import com.example.bookchat.data.api.BookChatApi
+import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.mapper.toBookRequest
 import com.example.bookchat.data.mapper.toBookShelfItem
 import com.example.bookchat.data.mapper.toBookStateInBookShelf

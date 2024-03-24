@@ -1,4 +1,4 @@
-package com.example.bookchat.data.api
+package com.example.bookchat.data.network
 
 import com.google.gson.annotations.SerializedName
 import retrofit2.Converter

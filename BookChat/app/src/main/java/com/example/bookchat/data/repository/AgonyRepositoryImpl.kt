@@ -3,7 +3,7 @@ package com.example.bookchat.data.repository
 import com.example.bookchat.App
 import com.example.bookchat.data.Agony
 import com.example.bookchat.data.AgonyDataItem
-import com.example.bookchat.data.api.BookChatApi
+import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.request.RequestMakeAgony
 import com.example.bookchat.data.request.RequestReviseAgony
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
@@ -11,7 +11,6 @@ import com.example.bookchat.data.response.ResponseGetAgony
 import com.example.bookchat.domain.repository.AgonyRepository
 import com.example.bookchat.utils.AgonyFolderHexColor
 import com.example.bookchat.utils.SearchSortOption
-import retrofit2.Response
 import javax.inject.Inject
 
 class AgonyRepositoryImpl @Inject constructor(

@@ -2,7 +2,7 @@ package com.example.bookchat.data.repository
 
 import com.example.bookchat.App
 import com.example.bookchat.data.UserSignUpDto
-import com.example.bookchat.data.api.BookChatApi
+import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.mapper.toUser
 import com.example.bookchat.data.request.RequestUserSignIn
 import com.example.bookchat.data.request.RequestUserSignUp

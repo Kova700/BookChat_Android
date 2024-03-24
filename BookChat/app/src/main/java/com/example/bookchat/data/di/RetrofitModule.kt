@@ -1,9 +1,9 @@
 package com.example.bookchat.data.di
 
 import com.example.bookchat.BuildConfig.DOMAIN
-import com.example.bookchat.data.api.AppInterceptor
-import com.example.bookchat.data.api.BookChatApi
-import com.example.bookchat.data.api.EnumConverterFactory
+import com.example.bookchat.data.network.AppInterceptor
+import com.example.bookchat.data.network.BookChatApi
+import com.example.bookchat.data.network.EnumConverterFactory
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides

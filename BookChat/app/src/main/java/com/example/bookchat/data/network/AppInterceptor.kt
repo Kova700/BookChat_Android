@@ -1,4 +1,4 @@
-package com.example.bookchat.data.api
+package com.example.bookchat.data.network
 
 import com.example.bookchat.BuildConfig.TOKEN_RENEWAL_URL
 import com.example.bookchat.data.Token
