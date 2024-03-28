@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
-        <import type="com.example.bookchat.utils.AgonyFolderHexColor"/>
+        <import type="com.example.bookchat.domain.model.AgonyFolderHexColor"/>
 
         <variable
             name="viewmodel"
@@ -18,14 +18,13 @@
         android:minHeight="400dp">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardView5"
+            android:id="@+id/make_agony_folder_cv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="70dp"
             android:layout_marginEnd="15dp"
             android:layout_marginBottom="60dp"
-            setBackgroundTintWithHexColor="@{viewmodel.selectedColor}"
             android:minHeight="260dp"
             app:cardCornerRadius="22dp"
             app:cardElevation="0dp"
@@ -44,13 +43,14 @@
             android:elegantTextHeight="true"
             android:focusable="true"
             android:fontFamily="@font/notosanskr_medium"
-            android:onClick="@{() -> viewmodel.clickRegisterBtn()}"
+            android:onClick="@{() -> viewmodel.onRegisterBtnClick()}"
             android:text="등록"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
+            android:id="@+id/agony_folder_title_et"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="15dp"
@@ -59,17 +59,16 @@
             android:layout_marginBottom="15dp"
             android:fontFamily="@font/notosanskr_regular"
             android:elegantTextHeight="true"
-            android:gravity="left"
-            setMakeAgonyTextColorWithFolderHexColor="@{viewmodel.selectedColor}"
+            android:gravity="start"
+            setMakeAgonyTextColorWithFolderHexColor="@{viewmodel.uiState.selectedColor}"
             android:hint="@string/agony_make_input_hint"
             android:maxLength="20"
-            android:text="@={viewmodel.agonyTitle}"
             android:textSize="14sp"
             android:background="@null"
             app:layout_constraintBottom_toTopOf="@+id/color_select_layout"
-            app:layout_constraintEnd_toEndOf="@+id/cardView5"
-            app:layout_constraintStart_toStartOf="@+id/cardView5"
-            app:layout_constraintTop_toTopOf="@+id/cardView5" />
+            app:layout_constraintEnd_toEndOf="@+id/make_agony_folder_cv"
+            app:layout_constraintStart_toStartOf="@+id/make_agony_folder_cv"
+            app:layout_constraintTop_toTopOf="@+id/make_agony_folder_cv" />
 
         <LinearLayout
             android:id="@+id/color_select_layout"
@@ -78,9 +77,9 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="20dp"
-            app:layout_constraintBottom_toBottomOf="@+id/cardView5"
-            app:layout_constraintEnd_toEndOf="@+id/cardView5"
-            app:layout_constraintStart_toStartOf="@+id/cardView5" >
+            app:layout_constraintBottom_toBottomOf="@+id/make_agony_folder_cv"
+            app:layout_constraintEnd_toEndOf="@+id/make_agony_folder_cv"
+            app:layout_constraintStart_toStartOf="@+id/make_agony_folder_cv" >
 
             <View
                 android:layout_width="0dp"
@@ -93,9 +92,8 @@
                 android:layout_height="30dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                setClickableWithAgonyFolderHexColor = "@{viewmodel.selectedColor == AgonyFolderHexColor.WHITE}"
-                android:checked="@{viewmodel.selectedColor == AgonyFolderHexColor.WHITE}"
-                android:onClick="@{() -> viewmodel.clickColorCircle(AgonyFolderHexColor.WHITE)}"
+                android:checked="@{viewmodel.uiState.selectedColor == AgonyFolderHexColor.WHITE}"
+                android:onClick="@{() -> viewmodel.onColorBtnClick(AgonyFolderHexColor.WHITE)}"
                 android:background="@drawable/selector_white_color_circle_btn"
                 android:textOff=""
                 android:textOn=""/>
@@ -111,9 +109,8 @@
                 android:layout_height="30dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                setClickableWithAgonyFolderHexColor = "@{viewmodel.selectedColor == AgonyFolderHexColor.BLACK}"
-                android:checked="@{viewmodel.selectedColor == AgonyFolderHexColor.BLACK}"
-                android:onClick="@{() -> viewmodel.clickColorCircle(AgonyFolderHexColor.BLACK)}"
+                android:checked="@{viewmodel.uiState.selectedColor == AgonyFolderHexColor.BLACK}"
+                android:onClick="@{() -> viewmodel.onColorBtnClick(AgonyFolderHexColor.BLACK)}"
                 android:background="@drawable/selector_black_color_circle_btn"
                 android:textOff=""
                 android:textOn=""/>
@@ -129,9 +126,8 @@
                 android:layout_height="30dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                setClickableWithAgonyFolderHexColor = "@{viewmodel.selectedColor == AgonyFolderHexColor.PURPLE}"
-                android:checked="@{viewmodel.selectedColor == AgonyFolderHexColor.PURPLE}"
-                android:onClick="@{() -> viewmodel.clickColorCircle(AgonyFolderHexColor.PURPLE)}"
+                android:checked="@{viewmodel.uiState.selectedColor == AgonyFolderHexColor.PURPLE}"
+                android:onClick="@{() -> viewmodel.onColorBtnClick(AgonyFolderHexColor.PURPLE)}"
                 android:background="@drawable/selector_purple_color_circle_btn"
                 android:textOff=""
                 android:textOn=""/>
@@ -147,9 +143,8 @@
                 android:layout_height="30dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                setClickableWithAgonyFolderHexColor = "@{viewmodel.selectedColor == AgonyFolderHexColor.MINT}"
-                android:checked="@{viewmodel.selectedColor == AgonyFolderHexColor.MINT}"
-                android:onClick="@{() -> viewmodel.clickColorCircle(AgonyFolderHexColor.MINT)}"
+                android:checked="@{viewmodel.uiState.selectedColor == AgonyFolderHexColor.MINT}"
+                android:onClick="@{() -> viewmodel.onColorBtnClick(AgonyFolderHexColor.MINT)}"
                 android:background="@drawable/selector_mint_color_circle_btn"
                 android:textOff=""
                 android:textOn=""/>
@@ -165,9 +160,8 @@
                 android:layout_height="30dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                setClickableWithAgonyFolderHexColor = "@{viewmodel.selectedColor == AgonyFolderHexColor.GREEN}"
-                android:checked="@{viewmodel.selectedColor == AgonyFolderHexColor.GREEN}"
-                android:onClick="@{() -> viewmodel.clickColorCircle(AgonyFolderHexColor.GREEN)}"
+                android:checked="@{viewmodel.uiState.selectedColor == AgonyFolderHexColor.GREEN}"
+                android:onClick="@{() -> viewmodel.onColorBtnClick(AgonyFolderHexColor.GREEN)}"
                 android:background="@drawable/selector_green_color_circle_btn"
                 android:textOff=""
                 android:textOn=""/>
@@ -183,9 +177,8 @@
                 android:layout_height="30dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                setClickableWithAgonyFolderHexColor = "@{viewmodel.selectedColor == AgonyFolderHexColor.YELLOW}"
-                android:checked="@{viewmodel.selectedColor == AgonyFolderHexColor.YELLOW}"
-                android:onClick="@{() -> viewmodel.clickColorCircle(AgonyFolderHexColor.YELLOW)}"
+                android:checked="@{viewmodel.uiState.selectedColor == AgonyFolderHexColor.YELLOW}"
+                android:onClick="@{() -> viewmodel.onColorBtnClick(AgonyFolderHexColor.YELLOW)}"
                 android:background="@drawable/selector_yellow_color_circle_btn"
                 android:textOff=""
                 android:textOn=""/>
@@ -201,9 +194,8 @@
                 android:layout_height="30dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                setClickableWithAgonyFolderHexColor = "@{viewmodel.selectedColor == AgonyFolderHexColor.ORANGE}"
-                android:checked="@{viewmodel.selectedColor == AgonyFolderHexColor.ORANGE}"
-                android:onClick="@{() -> viewmodel.clickColorCircle(AgonyFolderHexColor.ORANGE)}"
+                android:checked="@{viewmodel.uiState.selectedColor == AgonyFolderHexColor.ORANGE}"
+                android:onClick="@{() -> viewmodel.onColorBtnClick(AgonyFolderHexColor.ORANGE)}"
                 android:background="@drawable/selector_orange_color_circle_btn"
                 android:textOff=""
                 android:textOn=""/>

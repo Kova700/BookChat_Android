@@ -44,7 +44,7 @@ class CompleteBookDialogViewModel @Inject constructor(
 	}
 
 	fun onMoveToAgonyClick() {
-		startEvent(CompleteBookDialogEvent.MoveToAgony)
+		startEvent(CompleteBookDialogEvent.MoveToAgony(bookShelfListItemId))
 	}
 
 	private inline fun updateState(block: CompleteBookDialogUiState.() -> CompleteBookDialogUiState) {

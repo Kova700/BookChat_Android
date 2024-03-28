@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentHomeBinding
+import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.channel.ChannelActivity
 import com.example.bookchat.ui.channelList.ChannelListFragment
 import com.example.bookchat.ui.channelList.adpater.ChannelListDataAdapter
@@ -67,7 +69,15 @@ class HomeFragment : Fragment() {
 		homeViewModel.uiState.collect { uiState ->
 			mainReadingBookAdapter.submitList(uiState.readingBookShelfBooks)
 			channelListDataAdapter.submitList(uiState.channels)
+			setEmptyUiVisibility(uiState.readingBookShelfBooks, uiState.channels)
 		}
+	}
+
+	private fun setEmptyUiVisibility(bookItems: List<BookShelfListItem>, channels: List<Channel>) {
+		binding.emptyReadingBookLayout.visibility =
+			if (bookItems.isEmpty()) View.VISIBLE else View.INVISIBLE
+		binding.emptyChatRoomLayout.visibility =
+			if (channels.isEmpty()) View.VISIBLE else View.INVISIBLE
 	}
 
 	private fun initAdapter() {

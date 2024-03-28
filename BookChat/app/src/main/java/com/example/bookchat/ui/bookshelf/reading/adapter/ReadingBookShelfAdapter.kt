@@ -81,18 +81,7 @@ class ReadingBookShelfDataAdapter @Inject constructor() :
 				oldItem: ReadingBookShelfItem,
 				newItem: ReadingBookShelfItem
 			): Boolean {
-				return when (oldItem) {
-					is ReadingBookShelfItem.Header -> {
-						newItem as ReadingBookShelfItem.Header
-						oldItem == newItem
-					}
-
-					is ReadingBookShelfItem.Item -> {
-						newItem as ReadingBookShelfItem.Item
-						oldItem == newItem
-					}
-				}
-
+				return oldItem == newItem
 			}
 		}
 	}

@@ -16,14 +16,13 @@ data class HomeUiState(
 		SUCCESS,
 		LOADING,
 		ERROR,
-		EMPTY,
 	}
 
 	companion object {
 		val DEFAULT = HomeUiState(
 			client = User.Default,
-			bookUiState = UiState.EMPTY,
-			channelUiState = UiState.EMPTY,
+			bookUiState = UiState.SUCCESS,
+			channelUiState = UiState.SUCCESS,
 			readingBookShelfBooks = emptyList(),
 			channels = emptyList()
 		)

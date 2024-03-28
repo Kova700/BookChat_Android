@@ -1,196 +1,155 @@
 package com.example.bookchat.ui.agony
 
-import android.widget.Toast
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import androidx.paging.filter
-import androidx.paging.map
-import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.data.AgonyDataItem
-import com.example.bookchat.data.AgonyDataItemStatus
-import com.example.bookchat.domain.model.BookShelfItem
-import com.example.bookchat.data.paging.AgonyPagingSource
+import com.example.bookchat.domain.model.Agony
 import com.example.bookchat.domain.repository.AgonyRepository
 import com.example.bookchat.domain.repository.BookShelfRepository
-import com.example.bookchat.utils.SearchSortOption
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import com.example.bookchat.ui.agony.AgonyUiState.UiState
+import com.example.bookchat.ui.agony.mapper.toAgonyListItem
+import com.example.bookchat.ui.agony.model.AgonyListItem
+import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
+import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog
+import com.example.bookchat.utils.makeToast
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AgonyViewModel @AssistedInject constructor(
+@HiltViewModel
+class AgonyViewModel @Inject constructor(
 	private val agonyRepository: AgonyRepository,
 	private val bookShelfRepository: BookShelfRepository,
-	@Assisted val bookShelfItem: BookShelfItem
+	private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+	private val bookShelfListItemId =
+		savedStateHandle.get<Long>(ReadingBookDialog.EXTRA_AGONY_BOOKSHELF_ITEM_ID)!!
 
-	private val _eventFlow = MutableSharedFlow<AgonyUiEvent>()
+	private val _eventFlow = MutableSharedFlow<AgonyEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
 
-	val activityStateFlow = MutableStateFlow<AgonyActivityState>(AgonyActivityState.Default)
-	val agonyModificationEvents = MutableStateFlow<List<PagingViewEvent>>(emptyList())
+	private val _uiState = MutableStateFlow<AgonyUiState>(AgonyUiState.DEFAULT)
+	val uiState get() = _uiState.asStateFlow()
 
-	val agonyPagingData = Pager(
-		config = PagingConfig(
-			pageSize = AGONY_LOAD_SIZE,
-			enablePlaceholders = false
-		),
-		pagingSourceFactory = { AgonyPagingSource(
-			book = bookShelfItem,
-			sortOption = SearchSortOption.ID_DESC,
-			agonyRepository = agonyRepository
-		) }
-	).flow
-		.map { pagingData -> pagingData.map { agony -> agony.getAgonyDataItem() } }
-		.cachedIn(viewModelScope)
+	private val _isSelected = MutableStateFlow<Map<Long, Boolean>>(emptyMap()) //(agonyId, isSelected)
 
-	val agonyCombined by lazy {
-		agonyPagingData.combine(agonyModificationEvents) { pagingData, modifications ->
-			modifications.fold(pagingData) { acc, event -> applyEvents(acc, event) }
-		}.cachedIn(viewModelScope).asLiveData()
+	init {
+		getItem()
+		observeAgonies()
+		getAgonies()
 	}
 
-	private fun applyEvents(
-		paging: PagingData<AgonyDataItem>,
-		pagingViewEvent: PagingViewEvent
-	): PagingData<AgonyDataItem> {
-		return when (pagingViewEvent) {
-			is PagingViewEvent.ChangeAllItemStatusToEditing -> {
-				paging.map { agonyItem -> agonyItem.copy(status = AgonyDataItemStatus.Editing) }
-			}
-
-			is PagingViewEvent.ChangeItemStatusToSelected -> {
-				paging.map { agonyItem ->
-					if (pagingViewEvent.agonyItem != agonyItem) return@map agonyItem
-					return@map agonyItem.copy(status = AgonyDataItemStatus.Selected)
-				}
-			}
-
-			is PagingViewEvent.RemoveItem -> {
-				paging.filter { agonyItem -> pagingViewEvent.agonyItem.getId() != agonyItem.getId() }
-			}
-
-			is PagingViewEvent.ChangeItemTitle -> {
-				paging.map { agonyItem ->
-					if (pagingViewEvent.agonyItem != agonyItem) return@map agonyItem
-					return@map agonyItem.copy(agony = agonyItem.agony.copy(title = pagingViewEvent.newTitle))
-				}
-			}
-		}
+	private fun getItem() {
+		val item =
+			bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)?.toBookShelfListItem()
+		item?.let { updateState { copy(bookshelfItem = item) } }
 	}
 
-	fun onPagingViewEvent(pagingViewEvent: PagingViewEvent) {
-		if (agonyModificationEvents.value.contains(pagingViewEvent)) {
-			agonyModificationEvents.value -= pagingViewEvent
-			return
-		}
-		agonyModificationEvents.value += pagingViewEvent
+	private fun observeAgonies() = viewModelScope.launch {
+		agonyRepository.getAgoniesFlow().combine(_isSelected) { items, isSelectedMap ->
+			groupItems(items, isSelectedMap)
+		}.collect { newAgonies -> updateState { copy(agonies = newAgonies) } }
 	}
 
-	private fun getSelectedItemList(): List<AgonyDataItem> {
-		return agonyModificationEvents.value
-			.filterIsInstance<PagingViewEvent.ChangeItemStatusToSelected>()
-			.map { it.agonyItem }
-			.sortedBy { it.agony.agonyId }
+	private fun groupItems(
+		agonies: List<Agony>,
+		isSelectedMap: Map<Long, Boolean>
+	): List<AgonyListItem> {
+		val groupedItems = mutableListOf<AgonyListItem>()
+		groupedItems.add(AgonyListItem.Header(uiState.value.bookshelfItem))
+		groupedItems.add(AgonyListItem.FirstItem)
+		groupedItems.addAll(agonies.map { it.toAgonyListItem(isSelectedMap[it.agonyId] ?: false) })
+		return groupedItems
 	}
 
-	private fun changeItemStatusSelectedToRemoved() {
-		agonyModificationEvents.value = agonyModificationEvents.value
-			.map { pagingEvent ->
-				if (pagingEvent !is PagingViewEvent.ChangeItemStatusToSelected) pagingEvent
-				else PagingViewEvent.RemoveItem(pagingEvent.agonyItem)
-			}
+	private fun getAgonies() = viewModelScope.launch {
+		updateState { copy(uiState = UiState.LOADING) }
+		runCatching { agonyRepository.getAgonies(bookShelfListItemId) }
+			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
+			.onFailure { handleError(it) }
 	}
 
-	private fun deleteAgony() = viewModelScope.launch {
-		runCatching { agonyRepository.deleteAgony(bookShelfItem.bookShelfId, getSelectedItemList()) }
-			.onSuccess {
-				changeItemStatusSelectedToRemoved()
-				clickCancelBtn()
-			}
+	fun loadNextAgonies(lastVisibleItemPosition: Int) {
+		if (uiState.value.agonies.size - 1 > lastVisibleItemPosition ||
+			uiState.value.uiState == UiState.LOADING
+		) return
+		getAgonies()
+	}
+
+	private fun deleteAgonies() = viewModelScope.launch {
+		runCatching {
+			agonyRepository.deleteAgony(bookShelfListItemId, _isSelected.value.keys.toList())
+		}.onSuccess { clickEditCancelBtn() }
 			.onFailure { makeToast(R.string.agony_delete_fail) }
 	}
 
-	fun clickEditBtn() {
-		activityStateFlow.value = AgonyActivityState.Editing
-		onPagingViewEvent(PagingViewEvent.ChangeAllItemStatusToEditing)
+	fun onEditBtnClick() {
+		updateState { copy(uiState = UiState.EDITING) }
+		startEvent(AgonyEvent.ChangeItemViewMode)
 	}
 
 	fun clickDeleteBtn() {
-		deleteAgony()
+		deleteAgonies()
 	}
 
-	fun clickCancelBtn() {
-		activityStateFlow.value = AgonyActivityState.Default
-		onPagingViewEvent(PagingViewEvent.ChangeAllItemStatusToEditing)
+	fun clickEditCancelBtn() {
+		updateState { copy(uiState = UiState.SUCCESS) }
 		clearAllSelectedItem()
+		startEvent(AgonyEvent.ChangeItemViewMode)
 	}
 
 	private fun clearAllSelectedItem() {
-		agonyModificationEvents.value = agonyModificationEvents.value
-			.filter { it !is PagingViewEvent.ChangeItemStatusToSelected }
+		_isSelected.update { emptyMap() }
 	}
 
 	fun clickBackBtn() {
-		startEvent(AgonyUiEvent.MoveToBack)
+		startEvent(AgonyEvent.MoveToBack)
 	}
 
-	fun renewAgonyList() {
-		startEvent(AgonyUiEvent.RenewAgonyList)
+	fun onFirstItemClick() {
+		if (uiState.value.uiState == UiState.EDITING) return
+
+		startEvent(
+			AgonyEvent.OpenBottomSheetDialog(
+				bookshelfItemId = uiState.value.bookshelfItem.bookShelfId
+			)
+		)
 	}
 
-	private fun startEvent(event: AgonyUiEvent) = viewModelScope.launch {
+	fun onItemClick(itemPosition: Int) {
+		startEvent(
+			AgonyEvent.MoveToAgonyRecord(
+				bookshelfItemId = uiState.value.bookshelfItem.bookShelfId,
+				agonyListItemId = (uiState.value.agonies[itemPosition] as AgonyListItem.Item).agonyId
+			)
+		)
+	}
+
+	fun onItemSelect(itemPosition: Int) {
+		val agony = (uiState.value.agonies[itemPosition] as AgonyListItem.Item)
+		if (agony.isSelected) _isSelected.update { _isSelected.value - agony.agonyId }
+		else _isSelected.update { _isSelected.value + (agony.agonyId to true) }
+	}
+
+	private fun startEvent(event: AgonyEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
 	}
 
-	private fun makeToast(stringId: Int) {
-		Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
-	}
-
-	sealed class PagingViewEvent {
-		object ChangeAllItemStatusToEditing : PagingViewEvent()
-		data class ChangeItemStatusToSelected(val agonyItem: AgonyDataItem) : PagingViewEvent()
-		data class RemoveItem(val agonyItem: AgonyDataItem) : PagingViewEvent()
-		data class ChangeItemTitle(val agonyItem: AgonyDataItem, val newTitle: String) :
-			PagingViewEvent()
-	}
-
-	sealed class AgonyUiEvent {
-		object MoveToBack : AgonyUiEvent()
-		object RenewAgonyList : AgonyUiEvent()
-	}
-
-	sealed class AgonyActivityState {
-		object Default : AgonyActivityState()
-		object Editing : AgonyActivityState()
-	}
-
-	@dagger.assisted.AssistedFactory
-	interface AssistedFactory {
-		fun create(book: BookShelfItem): AgonyViewModel
-	}
-
-	companion object {
-		fun provideFactory(
-			assistedFactory: AssistedFactory,
-			book: BookShelfItem
-		): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-			override fun <T : ViewModel> create(modelClass: Class<T>): T {
-				return assistedFactory.create(book) as T
-			}
+	private inline fun updateState(block: AgonyUiState.() -> AgonyUiState) {
+		_uiState.update {
+			_uiState.value.block()
 		}
-
-		const val AGONY_LOAD_SIZE = 6
 	}
+
+	private fun handleError(throwable: Throwable) {
+		updateState { copy(uiState = UiState.ERROR) }
+	}
+
 }

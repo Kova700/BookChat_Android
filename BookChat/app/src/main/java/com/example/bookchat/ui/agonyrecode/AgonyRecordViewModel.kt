@@ -13,14 +13,13 @@ import androidx.paging.filter
 import androidx.paging.map
 import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.data.AgonyDataItem
 import com.example.bookchat.data.AgonyRecordDataItem
 import com.example.bookchat.data.AgonyRecordDataItemStatus
 import com.example.bookchat.data.AgonyRecordFirstItemStatus
 import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.data.paging.AgonyRecordPagingSource
 import com.example.bookchat.domain.repository.AgonyRecordRepository
-import com.example.bookchat.utils.SearchSortOption
+import com.example.bookchat.domain.model.SearchSortOption
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -32,11 +31,11 @@ import kotlinx.coroutines.launch
 
 class AgonyRecordViewModel @AssistedInject constructor(
 	private val agonyRecordRepository: AgonyRecordRepository,
-	@Assisted val agonyDataItem: AgonyDataItem,
+//	@Assisted val agonyListItem: AgonyListItem,
 	@Assisted val book: BookShelfItem
 ) : ViewModel() {
 	private val bookShelfId = book.bookShelfId
-	private val agonyId = agonyDataItem.agony.agonyId
+//	private val agonyId = agonyListItem.agony.agonyId
 
 	private val _eventFlow = MutableSharedFlow<AgonyRecordUiEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
@@ -49,29 +48,29 @@ class AgonyRecordViewModel @AssistedInject constructor(
 	val firstItemContent = MutableStateFlow<String>("")
 
 	val agonyRecordModificationEvents = MutableStateFlow<List<PagingViewEvent>>(emptyList())
-
-	private val agonyRecordPagingData = Pager(
-		config = PagingConfig(
-			pageSize = AGONY_RECORD_LOAD_SIZE,
-			enablePlaceholders = false
-		),
-		pagingSourceFactory = {
-			AgonyRecordPagingSource(
-				agony = agonyDataItem.agony,
-				book = book,
-				sortOption = SearchSortOption.ID_DESC,
-				agonyRecordRepository = agonyRecordRepository
-			)
-		}
-	).flow
-		.map { pagingData -> pagingData.map { agonyRecord -> agonyRecord.getAgonyRecordDataItem() } }
-		.cachedIn(viewModelScope)
-
-	val agonyRecordCombined by lazy {
-		agonyRecordPagingData.combine(agonyRecordModificationEvents) { pagingData, modifications ->
-			modifications.fold(pagingData) { acc, event -> applyEvents(acc, event) }
-		}.cachedIn(viewModelScope).asLiveData()
-	}
+//
+//	private val agonyRecordPagingData = Pager(
+//		config = PagingConfig(
+//			pageSize = AGONY_RECORD_LOAD_SIZE,
+//			enablePlaceholders = false
+//		),
+//		pagingSourceFactory = {
+//			AgonyRecordPagingSource(
+////				agony = agonyListItem.agony,
+//				book = book,
+//				sortOption = SearchSortOption.ID_DESC,
+//				agonyRecordRepository = agonyRecordRepository
+//			)
+//		}
+//	).flow
+//		.map { pagingData -> pagingData.map { agonyRecord -> agonyRecord.getAgonyRecordDataItem() } }
+//		.cachedIn(viewModelScope)
+//
+//	val agonyRecordCombined by lazy {
+//		agonyRecordPagingData.combine(agonyRecordModificationEvents) { pagingData, modifications ->
+//			modifications.fold(pagingData) { acc, event -> applyEvents(acc, event) }
+//		}.cachedIn(viewModelScope).asLiveData()
+//	}
 
 	private fun applyEvents(
 		paging: PagingData<AgonyRecordDataItem>,
@@ -102,20 +101,20 @@ class AgonyRecordViewModel @AssistedInject constructor(
 		agonyRecordModificationEvents.value =
 			agonyRecordModificationEvents.value.filter { it !is PagingViewEvent.ItemStatusChange }
 	}
-
-	private fun makeAgonyRecord(title: String, content: String) = viewModelScope.launch {
-		runCatching { agonyRecordRepository.makeAgonyRecord(bookShelfId, agonyId, title, content) }
-			.onSuccess {
-				clearFirstItemData()
-				renewFirstItemUi(AgonyRecordFirstItemStatus.Default)
-				startEvent(AgonyRecordUiEvent.RefreshDataItemAdapter)
-				setUiState(AgonyRecordUiState.Default)
-			}
-			.onFailure {
-				makeToast(R.string.agony_record_make_fail)
-				renewFirstItemUi(AgonyRecordFirstItemStatus.Editing)
-			}
-	}
+//
+//	private fun makeAgonyRecord(title: String, content: String) = viewModelScope.launch {
+//		runCatching { agonyRecordRepository.makeAgonyRecord(bookShelfId, agonyId, title, content) }
+//			.onSuccess {
+//				clearFirstItemData()
+//				renewFirstItemUi(AgonyRecordFirstItemStatus.Default)
+//				startEvent(AgonyRecordUiEvent.RefreshDataItemAdapter)
+//				setUiState(AgonyRecordUiState.Default)
+//			}
+//			.onFailure {
+//				makeToast(R.string.agony_record_make_fail)
+//				renewFirstItemUi(AgonyRecordFirstItemStatus.Editing)
+//			}
+//	}
 
 	fun reviseAgonyRecord(
 		agonyRecordItem: AgonyRecordDataItem,
@@ -123,9 +122,9 @@ class AgonyRecordViewModel @AssistedInject constructor(
 		newContent: String
 	) = viewModelScope.launch {
 		runCatching {
-			agonyRecordRepository.reviseAgonyRecord(
-				bookShelfId, agonyId, agonyRecordItem.getId(), newTitle, newContent
-			)
+//			agonyRecordRepository.reviseAgonyRecord(
+//				bookShelfId, agonyId, agonyRecordItem.getId(), newTitle, newContent
+//			)
 		}
 			.onSuccess {
 				removePagingViewEvent(PagingViewEvent.ItemStatusChange(agonyRecordItem.copy(status = AgonyRecordDataItemStatus.Loading)))
@@ -150,7 +149,7 @@ class AgonyRecordViewModel @AssistedInject constructor(
 
 	fun deleteAgonyRecord(agonyRecordItem: AgonyRecordDataItem) = viewModelScope.launch {
 		runCatching {
-			agonyRecordRepository.deleteAgonyRecord(bookShelfId, agonyId, agonyRecordItem.getId())
+//			agonyRecordRepository.deleteAgonyRecord(bookShelfId, agonyId, agonyRecordItem.getId())
 		}
 			.onSuccess {
 				addPagingViewEvent(PagingViewEvent.Remove(agonyRecordItem))
@@ -174,7 +173,7 @@ class AgonyRecordViewModel @AssistedInject constructor(
 			return
 		}
 		renewFirstItemUi(AgonyRecordFirstItemStatus.Loading)
-		makeAgonyRecord(firstItemTitle.value.trim(), firstItemContent.value.trim())
+//		makeAgonyRecord(firstItemTitle.value.trim(), firstItemContent.value.trim())
 	}
 
 	fun clickFolderBtn() {
@@ -245,26 +244,26 @@ class AgonyRecordViewModel @AssistedInject constructor(
 		object RenewFirstItemAdapter : AgonyRecordUiEvent()
 		object RefreshDataItemAdapter : AgonyRecordUiEvent()
 	}
-
-	@dagger.assisted.AssistedFactory
-	interface AssistedFactory {
-		fun create(
-			agonyDataItem: AgonyDataItem,
-			book: BookShelfItem
-		): AgonyRecordViewModel
-	}
-
-	companion object {
-		fun provideFactory(
-			assistedFactory: AssistedFactory,
-			agonyDataItem: AgonyDataItem,
-			book: BookShelfItem
-		): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-			override fun <T : ViewModel> create(modelClass: Class<T>): T {
-				return assistedFactory.create(agonyDataItem, book) as T
-			}
-		}
-
-		const val AGONY_RECORD_LOAD_SIZE = 4
-	}
+//
+//	@dagger.assisted.AssistedFactory
+//	interface AssistedFactory {
+//		fun create(
+//			agonyListItem: AgonyListItem,
+//			book: BookShelfItem
+//		): AgonyRecordViewModel
+//	}
+//
+//	companion object {
+//		fun provideFactory(
+//			assistedFactory: AssistedFactory,
+//			agonyListItem: AgonyListItem,
+//			book: BookShelfItem
+//		): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+//			override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//				return assistedFactory.create(agonyListItem, book) as T
+//			}
+//		}
+//
+//		const val AGONY_RECORD_LOAD_SIZE = 4
+//	}
 }

@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.bookshelf.complete.dialog
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -12,6 +13,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogCompleteBookTapClickedBinding
+import com.example.bookchat.ui.agony.AgonyActivity
+import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog.Companion.EXTRA_AGONY_BOOKSHELF_ITEM_ID
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -52,10 +55,10 @@ class CompleteBookDialog : DialogFragment() {
 		completeBookTapDialogViewModel.eventFlow.collect { event -> handleEvent(event) }
 	}
 
-	private fun moveToAgony() {
-//		val intent = Intent(requireContext(), AgonyActivity::class.java)
-//			.putExtra(ReadingBookDialog.EXTRA_AGONIZE_BOOK, bookShelfListItem)
-//		startActivity(intent)
+	private fun moveToAgony(bookShelfListItemId: Long) {
+		val intent = Intent(requireContext(), AgonyActivity::class.java)
+			.putExtra(EXTRA_AGONY_BOOKSHELF_ITEM_ID, bookShelfListItemId)
+		startActivity(intent)
 	}
 
 	private fun moveToBookReport() {
@@ -65,7 +68,7 @@ class CompleteBookDialog : DialogFragment() {
 	}
 
 	private fun handleEvent(event: CompleteBookDialogEvent) = when (event) {
-		is CompleteBookDialogEvent.MoveToAgony -> moveToAgony()
+		is CompleteBookDialogEvent.MoveToAgony -> moveToAgony(event.bookShelfListItemId)
 		is CompleteBookDialogEvent.MoveToBookReport -> moveToBookReport()
 	}
 

@@ -1,25 +1,25 @@
 package com.example.bookchat.domain.repository
 
-import com.example.bookchat.data.Agony
-import com.example.bookchat.data.AgonyDataItem
-import com.example.bookchat.data.response.ResponseGetAgony
-import com.example.bookchat.utils.AgonyFolderHexColor
-import com.example.bookchat.utils.SearchSortOption
-import retrofit2.Response
+import com.example.bookchat.domain.model.Agony
+import com.example.bookchat.domain.model.AgonyFolderHexColor
+import com.example.bookchat.domain.model.SearchSortOption
+import kotlinx.coroutines.flow.Flow
 
 interface AgonyRepository {
+
+	fun getAgoniesFlow(): Flow<List<Agony>>
+
+	suspend fun getAgonies(
+		bookShelfId: Long,
+		sort: SearchSortOption = SearchSortOption.ID_DESC,
+		size: Int = AGONY_LOAD_SIZE,
+	)
+
 	suspend fun makeAgony(
 		bookShelfId: Long,
 		title: String,
 		hexColorCode: AgonyFolderHexColor
 	)
-
-	suspend fun getAgony(
-		bookShelfId: Long,
-		size: Int,
-		sort: SearchSortOption,
-		postCursorId: Long?,
-	): ResponseGetAgony
 
 	suspend fun reviseAgony(
 		bookShelfId: Long,
@@ -29,7 +29,10 @@ interface AgonyRepository {
 
 	suspend fun deleteAgony(
 		bookShelfId: Long,
-		agonyDataList: List<AgonyDataItem>
+		agonyIds: List<Long>
 	)
 
+	companion object {
+		const val AGONY_LOAD_SIZE = 6
+	}
 }

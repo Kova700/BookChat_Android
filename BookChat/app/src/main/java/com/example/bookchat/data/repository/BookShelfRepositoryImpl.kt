@@ -1,10 +1,11 @@
 package com.example.bookchat.data.repository
 
 import com.example.bookchat.App
-import com.example.bookchat.data.api.BookChatApi
 import com.example.bookchat.data.mapper.toBookRequest
 import com.example.bookchat.data.mapper.toBookShelfItem
 import com.example.bookchat.data.mapper.toBookStateInBookShelf
+import com.example.bookchat.data.mapper.toNetwork
+import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.request.RequestChangeBookStatus
 import com.example.bookchat.data.request.RequestRegisterBookShelfBook
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
@@ -12,10 +13,10 @@ import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.model.BookStateInBookShelf
+import com.example.bookchat.domain.model.SearchSortOption
 import com.example.bookchat.domain.model.StarRating
 import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.domain.repository.BookShelfRepository.Companion.BOOKSHELF_ITEM_FIRST_PAGE
-import com.example.bookchat.utils.SearchSortOption
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -58,7 +59,7 @@ class BookShelfRepositoryImpl @Inject constructor(
 			size = size,
 			page = currentPages[bookShelfState] ?: BOOKSHELF_ITEM_FIRST_PAGE,
 			bookShelfState = bookShelfState.name,
-			sort = sort
+			sort = sort.toNetwork()
 		)
 
 		isEndPages[bookShelfState] = response.pageMeta.last

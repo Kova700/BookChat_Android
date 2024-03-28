@@ -12,12 +12,12 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.data.Agony
+import com.example.bookchat.domain.model.Agony
 import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.databinding.ActivityAgonyEditBinding
 import com.example.bookchat.domain.repository.AgonyRepository
 import com.example.bookchat.ui.signup.SignUpActivity
-import com.example.bookchat.ui.agony.AgonyActivity.Companion.EXTRA_AGONY
+import com.example.bookchat.ui.agony.AgonyActivity.Companion.EXTRA_AGONY_ID
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -62,8 +62,8 @@ class AgonyEditActivity : AppCompatActivity() {
 		}, SignUpActivity.KEYBOARD_DELAY_TIME)
 	}
 
-	private fun getAgony() = intent.getSerializableExtra(EXTRA_AGONY) as Agony
-	private fun getBook() = intent.getSerializableExtra(AgonyActivity.EXTRA_BOOK) as BookShelfItem
+	private fun getAgony() = intent.getSerializableExtra(EXTRA_AGONY_ID) as Agony
+	private fun getBook() = intent.getSerializableExtra(AgonyActivity.EXTRA_BOOKSHELF_ID) as BookShelfItem
 
 	fun clickConfirmBtn() {
 		if (oldAgony.title == agonyTitle.value) {

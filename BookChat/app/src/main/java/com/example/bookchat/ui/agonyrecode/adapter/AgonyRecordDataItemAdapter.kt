@@ -88,7 +88,7 @@ class AgonyRecordDataItemAdapter(private val agonyRecordViewModel: AgonyRecordVi
                             agonyRecordViewModel.setUiState(AgonyRecordUiState.Default)
                             return@setOnClickListener
                         }
-                        agonyRecordViewModel.reviseAgonyRecord(agonyRecordItem, newTitle!!, newContent!!)
+//                        agonyRecordViewModel.reviseAgonyRecord(agonyRecordItem, newTitle!!, newContent!!)
                     }
                 }
             }
