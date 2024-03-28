@@ -1,13 +1,11 @@
 package com.example.bookchat.data.network
 
 import com.example.bookchat.data.*
+import com.example.bookchat.data.model.SearchSortOptionNetwork
 import com.example.bookchat.data.request.*
 import com.example.bookchat.data.response.*
 import com.example.bookchat.utils.BookSearchSortOption
 import com.example.bookchat.utils.BookSearchSortOption.ACCURACY
-import com.example.bookchat.utils.SearchSortOption
-import com.example.bookchat.utils.SearchSortOption.ID_DESC
-import com.example.bookchat.utils.SearchSortOption.UPDATED_AT_DESC
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
@@ -65,7 +63,7 @@ interface BookChatApi {
 		@Query("size") size: Int,
 		@Query("page") page: Long,
 		@Query("readingStatus") bookShelfState: String,
-		@Query("sort") sort: SearchSortOption = UPDATED_AT_DESC
+		@Query("sort") sort: SearchSortOptionNetwork = SearchSortOptionNetwork.UPDATED_AT_DESC
 	): ResponseGetBookShelfBooks
 
 	@DELETE("/v1/api/bookshelves/{bookId}")
@@ -115,13 +113,13 @@ interface BookChatApi {
 	suspend fun makeAgony(
 		@Path("bookId") bookId: Long,
 		@Body requestMakeAgony: RequestMakeAgony
-	): Response<Unit>
+	)
 
 	@GET("/v1/api/bookshelves/{bookShelfId}/agonies")
 	suspend fun getAgony(
 		@Path("bookShelfId") bookShelfId: Long,
 		@Query("size") size: Int,
-		@Query("sort") sort: SearchSortOption,
+		@Query("sort") sort: SearchSortOptionNetwork,
 		@Query("postCursorId") postCursorId: Long?,
 	): ResponseGetAgony
 
@@ -129,14 +127,14 @@ interface BookChatApi {
 	suspend fun deleteAgony(
 		@Path("bookShelfId") bookShelfId: Long,
 		@Path("bookIdListString") bookIdListString: String,
-	): Response<Unit>
+	)
 
 	@PUT("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}")
 	suspend fun reviseAgony(
 		@Path("bookShelfId") bookShelfId: Long,
 		@Path("agonyId") agonyId: Long,
 		@Body requestReviseAgony: RequestReviseAgony
-	): Response<Unit>
+	)
 
 	/**------------고민 기록------------*/
 
@@ -153,7 +151,7 @@ interface BookChatApi {
 		@Path("agonyId") agonyId: Long,
 		@Query("postCursorId") postCursorId: Long?,
 		@Query("size") size: Int,
-		@Query("sort") sort: SearchSortOption
+		@Query("sort") sort: SearchSortOptionNetwork
 	): ResponseGetAgonyRecord
 
 	@DELETE("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
@@ -218,6 +216,6 @@ interface BookChatApi {
 		@Path("roomId") roomId: Long,
 		@Query("size") size: Int,
 		@Query("postCursorId") postCursorId: Long?,
-		@Query("sort") sort: SearchSortOption = ID_DESC,
+		@Query("sort") sort: SearchSortOptionNetwork = SearchSortOptionNetwork.ID_DESC,
 	): RespondGetChat
 }

@@ -1,22 +1,74 @@
 package com.example.bookchat.data.repository
 
 import com.example.bookchat.App
-import com.example.bookchat.data.Agony
-import com.example.bookchat.data.AgonyDataItem
+import com.example.bookchat.data.mapper.toAgony
+import com.example.bookchat.data.mapper.toNetWork
+import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.request.RequestMakeAgony
 import com.example.bookchat.data.request.RequestReviseAgony
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
-import com.example.bookchat.data.response.ResponseGetAgony
+import com.example.bookchat.domain.model.Agony
+import com.example.bookchat.domain.model.AgonyFolderHexColor
+import com.example.bookchat.domain.model.SearchSortOption
 import com.example.bookchat.domain.repository.AgonyRepository
-import com.example.bookchat.utils.AgonyFolderHexColor
-import com.example.bookchat.utils.SearchSortOption
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class AgonyRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi
 ) : AgonyRepository {
 
+	private val mapAgonies = MutableStateFlow<Map<Long, Agony>>(emptyMap()) //(agonyId, Agony)
+	private val agonies = mapAgonies.map {
+		it.values.toList().sortedByDescending { agony -> agony.agonyId }
+	}
+
+	private var cachedBookShelfItemId: Long = -1
+	private var currentPage: Long? = null
+	private var isEndPage = false
+
+	override fun getAgoniesFlow(): Flow<List<Agony>> {
+		return agonies
+	}
+
+	override suspend fun getAgonies(
+		bookShelfId: Long,
+		sort: SearchSortOption,
+		size: Int,
+	) {
+		if (cachedBookShelfItemId != bookShelfId) {
+			clearCachedData()
+		}
+
+		if (isEndPage) return
+		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
+
+		val response = bookChatApi.getAgony(
+			bookShelfId = bookShelfId,
+			size = size,
+			sort = sort.toNetwork(),
+			postCursorId = currentPage
+		)
+		cachedBookShelfItemId = bookShelfId
+		isEndPage = response.cursorMeta.last
+		currentPage = response.cursorMeta.nextCursorId
+
+		val newAgonies = response.agonyResponseList.toAgony()
+		mapAgonies.update { mapAgonies.value + newAgonies.associateBy { it.agonyId } }
+	}
+
+	private fun clearCachedData() {
+		mapAgonies.update { emptyMap() }
+		cachedBookShelfItemId = -1
+		currentPage = null
+		isEndPage = false
+	}
+
+	//TODO : 여기도 만들어진 Agony 객체 필요함
 	override suspend fun makeAgony(
 		bookShelfId: Long,
 		title: String,
@@ -24,37 +76,11 @@ class AgonyRepositoryImpl @Inject constructor(
 	) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-		val requestMakeAgony = RequestMakeAgony(title, hexColorCode)
-		val response = bookChatApi.makeAgony(bookShelfId, requestMakeAgony)
-		when (response.code()) {
-			200 -> {}
-			else -> throw Exception(
-				createExceptionMessage(
-					response.code(),
-					response.errorBody()?.string()
-				)
-			)
-		}
+		val requestMakeAgony = RequestMakeAgony(title, hexColorCode.toNetWork())
+		bookChatApi.makeAgony(bookShelfId, requestMakeAgony)
 	}
 
-	override suspend fun getAgony(
-		bookShelfId: Long,
-		size: Int,
-		sort: SearchSortOption,
-		postCursorId: Long?
-	): ResponseGetAgony {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
-		return bookChatApi.getAgony(
-			bookShelfId = bookShelfId,
-			size = size,
-			sort = sort,
-			postCursorId = postCursorId
-		)
-
-	}
-
-	//고민폴더 색상 변경 UI 추가되면 색상도 변경 가능하게 수정
+	//TODO : 색상도 변경 가능하게 UI 추가
 	override suspend fun reviseAgony(
 		bookShelfId: Long,
 		agony: Agony,
@@ -62,44 +88,24 @@ class AgonyRepositoryImpl @Inject constructor(
 	) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-		val requestReviseAgony = RequestReviseAgony(newTitle, agony.hexColorCode)
-		val response =
-			bookChatApi.reviseAgony(bookShelfId, agony.agonyId, requestReviseAgony)
-		when (response.code()) {
-			200 -> {}
-			else -> throw Exception(
-				createExceptionMessage(
-					response.code(),
-					response.errorBody()?.string()
-				)
-			)
-		}
+		val requestReviseAgony = RequestReviseAgony(newTitle, agony.hexColorCode.toNetWork())
+		bookChatApi.reviseAgony(bookShelfId, agony.agonyId, requestReviseAgony)
+		mapAgonies.update { mapAgonies.value + (agony.agonyId to agony.copy(title = newTitle)) }
 	}
 
 	override suspend fun deleteAgony(
 		bookShelfId: Long,
-		agonyDataList: List<AgonyDataItem>
+		agonyIds: List<Long>
 	) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-		val deleteIdListString = agonyDataList.map { it.agony.agonyId }.joinToString(",")
-		val response = bookChatApi.deleteAgony(bookShelfId, deleteIdListString)
-		when (response.code()) {
-			200 -> {}
-			else -> throw Exception(
-				createExceptionMessage(
-					response.code(),
-					response.errorBody()?.string()
-				)
-			)
-		}
+		val agonyIdsString = agonyIds.joinToString(",")
+		bookChatApi.deleteAgony(bookShelfId, agonyIdsString)
+		mapAgonies.update { mapAgonies.value - agonyIds.toSet() }
 	}
 
 	private fun isNetworkConnected(): Boolean {
 		return App.instance.isNetworkConnected()
 	}
 
-	private fun createExceptionMessage(responseCode: Int, responseErrorBody: String?): String {
-		return "responseCode : $responseCode , responseErrorBody : $responseErrorBody"
-	}
 }

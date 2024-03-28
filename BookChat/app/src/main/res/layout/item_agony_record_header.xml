@@ -4,7 +4,7 @@
     <data>
         <variable
             name="agony"
-            type="com.example.bookchat.data.Agony" />
+            type="com.example.bookchat.domain.model.Agony" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

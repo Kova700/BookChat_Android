@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.bookshelf.reading.dialog
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -13,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogReadingBookTapClickedBinding
 import com.example.bookchat.domain.model.BookShelfState
+import com.example.bookchat.ui.agony.AgonyActivity
 import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -55,10 +57,10 @@ class ReadingBookDialog : DialogFragment() {
 		readingBookDialogViewModel.eventFlow.collect { event -> handleEvent(event) }
 	}
 
-	private fun moveToAgony() {
-//		val intent = Intent(requireContext(), AgonyActivity::class.java)
-//			.putExtra(EXTRA_AGONIZE_BOOK, bookShelfListItem) //개선 필요
-//		startActivity(intent)
+	private fun moveToAgony(bookShelfListItemId: Long) {
+		val intent = Intent(requireContext(), AgonyActivity::class.java)
+			.putExtra(EXTRA_AGONY_BOOKSHELF_ITEM_ID, bookShelfListItemId)
+		startActivity(intent)
 	}
 
 	private fun moveToOtherTab(targetState: BookShelfState) {
@@ -67,12 +69,12 @@ class ReadingBookDialog : DialogFragment() {
 	}
 
 	private fun handleEvent(event: ReadingBookDialogEvent) = when (event) {
-		is ReadingBookDialogEvent.MoveToAgony -> moveToAgony()
+		is ReadingBookDialogEvent.MoveToAgony -> moveToAgony(event.bookShelfListItemId)
 		is ReadingBookDialogEvent.ChangeBookShelfTab -> moveToOtherTab(event.targetState)
 	}
 
 	companion object {
-		const val EXTRA_AGONIZE_BOOK = "EXTRA_AGONIZE_BOOK"
+		const val EXTRA_AGONY_BOOKSHELF_ITEM_ID = "EXTRA_AGONIZE_BOOK"
 		const val EXTRA_READING_BOOKSHELF_ITEM_ID = "EXTRA_READING_BOOKSHELF_ITEM_ID"
 	}
 }

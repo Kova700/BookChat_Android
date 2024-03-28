@@ -85,7 +85,7 @@ class ReadingBookDialogViewModel @Inject constructor(
 	}
 
 	fun onMoveToAgonyClick() {
-		startEvent(ReadingBookDialogEvent.MoveToAgony)
+		startEvent(ReadingBookDialogEvent.MoveToAgony(bookShelfListItemId))
 	}
 
 	private inline fun updateState(block: ReadingBookDialogUiState.() -> ReadingBookDialogUiState) {

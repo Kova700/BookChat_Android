@@ -92,7 +92,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		chatRepository.insertAllChats(chats)
 		val newChannels = response.channels.map { getChannelWithInfo(it.roomId) }
 		setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
-		return newChannels
+		return newChannels //반환 값에 이전값이 포함되지 않고 있음
 	}
 
 	//DB에 저장된 LastChat과, 기존에 저장되어있던 채널 정보들을 묶어서 반환 (like topPin..)

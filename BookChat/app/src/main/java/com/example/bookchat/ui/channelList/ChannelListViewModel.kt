@@ -39,10 +39,7 @@ class ChannelListViewModel @Inject constructor(
 		updateState { copy(uiState = UiState.LOADING) }
 		runCatching { chattingRepositoryFacade.getChannels() }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure {
-				handleError(it)
-				updateState { copy(uiState = UiState.ERROR) }
-			}
+			.onFailure { handleError(it) }
 	}
 
 	fun loadNextChannels(lastVisibleItemPosition: Int) {
@@ -65,7 +62,7 @@ class ChannelListViewModel @Inject constructor(
 	}
 
 	private fun handleError(throwable: Throwable) {
-
+		updateState { copy(uiState = UiState.ERROR) }
 	}
 
 	private inline fun updateState(block: ChannelListUiState.() -> ChannelListUiState) {

@@ -1,7 +1,7 @@
 package com.example.bookchat.domain.repository
 
 import com.example.bookchat.data.response.ResponseGetAgonyRecord
-import com.example.bookchat.utils.SearchSortOption
+import com.example.bookchat.domain.model.SearchSortOption
 
 interface AgonyRecordRepository {
 	suspend fun makeAgonyRecord(

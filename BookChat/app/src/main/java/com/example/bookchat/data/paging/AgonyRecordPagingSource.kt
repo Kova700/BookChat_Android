@@ -3,18 +3,18 @@ package com.example.bookchat.data.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.bookchat.App
-import com.example.bookchat.data.Agony
+import com.example.bookchat.domain.model.Agony
 import com.example.bookchat.data.AgonyRecord
 import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.data.response.CursorMeta
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseGetAgonyRecord
 import com.example.bookchat.domain.repository.AgonyRecordRepository
-import com.example.bookchat.utils.SearchSortOption
-import com.example.bookchat.utils.SearchSortOption.ID_ASC
-import com.example.bookchat.utils.SearchSortOption.ID_DESC
-import com.example.bookchat.utils.SearchSortOption.UPDATED_AT_ASC
-import com.example.bookchat.utils.SearchSortOption.UPDATED_AT_DESC
+import com.example.bookchat.domain.model.SearchSortOption
+import com.example.bookchat.domain.model.SearchSortOption.ID_ASC
+import com.example.bookchat.domain.model.SearchSortOption.ID_DESC
+import com.example.bookchat.domain.model.SearchSortOption.UPDATED_AT_ASC
+import com.example.bookchat.domain.model.SearchSortOption.UPDATED_AT_DESC
 
 class AgonyRecordPagingSource(
 	private val agony: Agony,

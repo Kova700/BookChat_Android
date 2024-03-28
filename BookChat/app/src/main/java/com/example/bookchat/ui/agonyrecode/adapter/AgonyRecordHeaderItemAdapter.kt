@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.data.Agony
+import com.example.bookchat.domain.model.Agony
 import com.example.bookchat.databinding.ItemAgonyRecordHeaderBinding
 
 class AgonyRecordHeaderItemAdapter(var agony : Agony) :

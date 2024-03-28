@@ -5,7 +5,7 @@ import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.model.BookStateInBookShelf
 import com.example.bookchat.domain.model.StarRating
-import com.example.bookchat.utils.SearchSortOption
+import com.example.bookchat.domain.model.SearchSortOption
 import kotlinx.coroutines.flow.Flow
 
 interface BookShelfRepository {

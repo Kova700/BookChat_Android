@@ -24,7 +24,7 @@ data class ReadingBookDialogUiState(
 }
 
 sealed class ReadingBookDialogEvent {
-	object MoveToAgony : ReadingBookDialogEvent()
+	data class MoveToAgony(val bookShelfListItemId: Long) : ReadingBookDialogEvent()
 	data class ChangeBookShelfTab(
 		val targetState: BookShelfState
 	) : ReadingBookDialogEvent()

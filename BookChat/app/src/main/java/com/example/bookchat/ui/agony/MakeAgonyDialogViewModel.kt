@@ -1,79 +1,85 @@
 package com.example.bookchat.ui.agony
 
-import android.widget.Toast
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.domain.model.BookShelfItem
+import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.domain.repository.AgonyRepository
-import com.example.bookchat.utils.AgonyFolderHexColor
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import com.example.bookchat.domain.repository.BookShelfRepository
+import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
+import com.example.bookchat.utils.makeToast
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MakeAgonyDialogViewModel @AssistedInject constructor(
+@HiltViewModel
+class MakeAgonyDialogViewModel @Inject constructor(
+	private val savedStateHandle: SavedStateHandle,
 	private val agonyRepository: AgonyRepository,
-	@Assisted val book: BookShelfItem
+	private val bookShelfRepository: BookShelfRepository,
 ) : ViewModel() {
+	private val bookShelfListItemId =
+		savedStateHandle.get<Long>(AgonyActivity.EXTRA_BOOKSHELF_ID)!!
 
 	private val _eventFlow = MutableSharedFlow<MakeAgonyUiEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
 
-	val selectedColor = MutableStateFlow<AgonyFolderHexColor>(AgonyFolderHexColor.WHITE)
-	val agonyTitle = MutableStateFlow<String>("")
+	private val _uiState = MutableStateFlow<MakeAgonyUiState>(MakeAgonyUiState.DEFAULT)
+	val uiState get() = _uiState.asStateFlow()
 
-	//글자 최대 길이 설정 + 글자 깨짐 + 간격 설정남음
-	fun clickColorCircle(color: AgonyFolderHexColor) {
-		selectedColor.value = color
+	init {
+		getItem()
 	}
 
-	fun clickRegisterBtn() {
-		if (agonyTitle.value.trim().isBlank()) {
+	private fun getItem() {
+		val item =
+			bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)?.toBookShelfListItem()
+		item?.let { updateState { copy(bookshelfItem = item) } }
+	}
+
+	fun onRegisterBtnClick() {
+		if (uiState.value.agonyTitle.isBlank()) {
 			makeToast(R.string.agony_make_empty)
 			return
 		}
-		registerAgony(agonyTitle.value.trim(), selectedColor.value)
+		registerAgony(uiState.value.agonyTitle, uiState.value.selectedColor)
+	}
+
+	fun onTitleChanged(newTitle: String) {
+		if (newTitle.length > 30) return
+		updateState { copy(agonyTitle = newTitle.trim()) }
+	}
+
+	fun onColorBtnClick(newColor: AgonyFolderHexColor) {
+		updateState { copy(selectedColor = newColor) }
 	}
 
 	private fun registerAgony(
 		title: String,
 		hexColorCode: AgonyFolderHexColor
 	) = viewModelScope.launch {
-		runCatching { agonyRepository.makeAgony(book.bookShelfId, title, hexColorCode) }
-			.onSuccess { startEvent(MakeAgonyUiEvent.RenewAgonyList) }
+		runCatching {
+			agonyRepository.makeAgony(
+				uiState.value.bookshelfItem.bookShelfId,
+				title,
+				hexColorCode
+			)
+		}
+			.onSuccess { startEvent(MakeAgonyUiEvent.MoveToBack) }
 			.onFailure { makeToast(R.string.agony_make_fail) }
+	}
+
+	private inline fun updateState(block: MakeAgonyUiState.() -> MakeAgonyUiState) {
+		_uiState.update { _uiState.value.block() }
 	}
 
 	private fun startEvent(event: MakeAgonyUiEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
-	}
-
-	sealed class MakeAgonyUiEvent {
-		object RenewAgonyList : MakeAgonyUiEvent()
-	}
-
-	@dagger.assisted.AssistedFactory
-	interface AssistedFactory {
-		fun create(book: BookShelfItem): MakeAgonyDialogViewModel
-	}
-
-	private fun makeToast(stringId: Int) {
-		Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
-	}
-
-	companion object {
-		fun provideFactory(
-			assistedFactory: AssistedFactory,
-			book: BookShelfItem
-		): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-			override fun <T : ViewModel> create(modelClass: Class<T>): T {
-				return assistedFactory.create(book) as T
-			}
-		}
 	}
 }
