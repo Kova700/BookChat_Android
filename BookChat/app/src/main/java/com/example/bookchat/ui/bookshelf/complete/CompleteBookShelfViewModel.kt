@@ -8,7 +8,6 @@ import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.bookshelf.complete.CompleteBookShelfUiState.UiState
 import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
-import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfItem
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -44,24 +43,27 @@ class CompleteBookShelfViewModel @Inject constructor(
 	}
 
 	private fun observeBookShelfItems() = viewModelScope.launch {
-		bookShelfRepository.getBookShelfFlow(BookShelfState.COMPLETE)
-			.combine(_isSwiped) { items, isSwipedMap ->
-				items.map {
+		combine(
+			bookShelfRepository.getBookShelfFlow(BookShelfState.COMPLETE),
+			_isSwiped,
+			bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.COMPLETE)
+		) { items, isSwipedMap, totalCount ->
+			groupCompleteItems(
+				listItems = items.map {
 					it.toBookShelfListItem(isSwipedMap[it.bookShelfId] ?: false)
-				}
-			}.combine(
-				bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.COMPLETE)
-			) { items, totalCount -> groupCompleteItems(items, totalCount) }
-			.collect { newItems -> updateState { copy(completeItems = newItems) } }
+				},
+				totalItemCount = totalCount
+			)
+		}.collect { newItems -> updateState { copy(completeItems = newItems) } }
 	}
 
 	private fun groupCompleteItems(
-		readingItems: List<BookShelfListItem>,
+		listItems: List<BookShelfListItem>,
 		totalItemCount: Int
 	): List<CompleteBookShelfItem> {
 		val groupedWishItems = mutableListOf<CompleteBookShelfItem>()
 		groupedWishItems.add(CompleteBookShelfItem.Header(totalItemCount))
-		groupedWishItems.addAll(readingItems.map { CompleteBookShelfItem.Item(it) })
+		groupedWishItems.addAll(listItems.map { CompleteBookShelfItem.Item(it) })
 		return groupedWishItems
 	}
 
