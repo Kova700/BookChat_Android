@@ -92,7 +92,7 @@ class AgonyViewModel @Inject constructor(
 
 	fun onEditBtnClick() {
 		updateState { copy(uiState = UiState.EDITING) }
-		startEvent(AgonyEvent.ChangeItemViewMode)
+		startEvent(AgonyEvent.RenewItemViewMode)
 	}
 
 	fun clickDeleteBtn() {
@@ -102,7 +102,7 @@ class AgonyViewModel @Inject constructor(
 	fun clickEditCancelBtn() {
 		updateState { copy(uiState = UiState.SUCCESS) }
 		clearAllSelectedItem()
-		startEvent(AgonyEvent.ChangeItemViewMode)
+		startEvent(AgonyEvent.RenewItemViewMode)
 	}
 
 	private fun clearAllSelectedItem() {
