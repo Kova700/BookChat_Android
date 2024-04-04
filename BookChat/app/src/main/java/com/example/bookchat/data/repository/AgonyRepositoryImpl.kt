@@ -35,6 +35,10 @@ class AgonyRepositoryImpl @Inject constructor(
 		return agonies
 	}
 
+	override fun getAgonyFlow(agonyId: Long): Flow<Agony> {
+		return agonies.map { agonyList -> agonyList.first { it.agonyId == agonyId } }
+	}
+
 	override suspend fun getAgonies(
 		bookShelfId: Long,
 		sort: SearchSortOption,
@@ -102,6 +106,10 @@ class AgonyRepositoryImpl @Inject constructor(
 		val agonyIdsString = agonyIds.joinToString(",")
 		bookChatApi.deleteAgony(bookShelfId, agonyIdsString)
 		mapAgonies.update { mapAgonies.value - agonyIds.toSet() }
+	}
+
+	override fun getCachedAgony(agonyId: Long): Agony? {
+		return mapAgonies.value[agonyId]
 	}
 
 	private fun isNetworkConnected(): Boolean {

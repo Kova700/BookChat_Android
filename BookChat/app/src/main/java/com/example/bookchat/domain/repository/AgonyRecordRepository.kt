@@ -1,9 +1,20 @@
 package com.example.bookchat.domain.repository
 
-import com.example.bookchat.data.response.ResponseGetAgonyRecord
+import com.example.bookchat.domain.model.AgonyRecord
 import com.example.bookchat.domain.model.SearchSortOption
+import kotlinx.coroutines.flow.Flow
 
 interface AgonyRecordRepository {
+
+	fun getAgonyRecordsFlow(): Flow<List<AgonyRecord>>
+
+	suspend fun getAgonyRecords(
+		bookShelfId: Long,
+		agonyId: Long,
+		size: Int = AGONY_RECORD_LOAD_SIZE,
+		sort: SearchSortOption = SearchSortOption.ID_DESC
+	)
+
 	suspend fun makeAgonyRecord(
 		bookShelfId: Long,
 		agonyId: Long,
@@ -11,18 +22,10 @@ interface AgonyRecordRepository {
 		content: String
 	)
 
-	suspend fun getAgonyRecord(
-		bookShelfId: Long,
-		agonyId: Long,
-		postCursorId: Long?,
-		size: Int,
-		sort: SearchSortOption
-	): ResponseGetAgonyRecord
-
 	suspend fun reviseAgonyRecord(
 		bookShelfId: Long,
 		agonyId: Long,
-		recordId: Long,
+		agonyRecord: AgonyRecord,
 		newTitle: String,
 		newContent: String
 	)
@@ -32,4 +35,8 @@ interface AgonyRecordRepository {
 		agonyId: Long,
 		recordId: Long
 	)
+
+	companion object {
+		const val AGONY_RECORD_LOAD_SIZE = 4
+	}
 }

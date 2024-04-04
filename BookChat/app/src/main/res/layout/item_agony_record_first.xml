@@ -2,10 +2,11 @@
 <layout xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
         <variable
-            name="viewmodel"
-            type="com.example.bookchat.ui.agonyrecode.AgonyRecordViewModel" />
+            name="firstItem"
+            type="com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem.FirstItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -15,19 +16,20 @@
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            setVisibiltyFirstItemInLoadingState ="@{viewmodel.firstItemState}"
-            app:layout_constraintBottom_toBottomOf="@+id/cardView4"
-            app:layout_constraintEnd_toEndOf="@+id/cardView4"
-            app:layout_constraintStart_toStartOf="@+id/cardView4"
-            app:layout_constraintTop_toTopOf="@+id/cardView4" />
+            setVisibilityInLoadingItemView ="@{firstItem.state}"
+            app:layout_constraintBottom_toBottomOf="@+id/agony_record_first_item_cv"
+            app:layout_constraintEnd_toEndOf="@+id/agony_record_first_item_cv"
+            app:layout_constraintStart_toStartOf="@+id/agony_record_first_item_cv"
+            app:layout_constraintTop_toTopOf="@+id/agony_record_first_item_cv" />
 
         <include
+            android:id="@+id/edit_layout"
             layout="@layout/item_agony_record_edit_first"
-            app:viewmodel="@{viewmodel}" />
+            app:firstItem="@{firstItem}" />
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardView4"
-            setVisibiltyFirstItemInDefaultState ="@{viewmodel.firstItemState}"
+            android:id="@+id/agony_record_first_item_cv"
+            setVisibilityInFirstItemView ="@{firstItem.state}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"

@@ -18,6 +18,7 @@ import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.UserDefaultProfileImageType
 import com.example.bookchat.ui.agony.AgonyUiState
+import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
 import com.example.bookchat.ui.bookreport.BookReportViewModel.BookReportStatus
 import com.example.bookchat.ui.login.LoginViewModel.LoginUiState
 import com.example.bookchat.utils.*
@@ -349,12 +350,12 @@ object DataBindingAdapter {
 
 	/**고민 기록 FirstItem Default State일 때 View Visibility 설정*/
 	@JvmStatic
-	@BindingAdapter("setVisibiltyFirstItemInDefaultState")
-	fun setVisibiltyInFirstItemView(
+	@BindingAdapter("setVisibilityInFirstItemView")
+	fun setVisibilityInFirstItemView(
 		view: View,
-		nowFirstItemStatus: AgonyRecordFirstItemStatus
+		itemState: AgonyRecordListItem.ItemState
 	) {
-		if (nowFirstItemStatus == AgonyRecordFirstItemStatus.Default) {
+		if (itemState is AgonyRecordListItem.ItemState.Success) {
 			view.visibility = View.VISIBLE
 			return
 		}
@@ -363,12 +364,12 @@ object DataBindingAdapter {
 
 	/**고민 기록 FirstItem Editing State일 때 View Visibility 설정*/
 	@JvmStatic
-	@BindingAdapter("setVisibiltyFirstItemInEditingState")
-	fun setVisibiltyInEditingItemView(
+	@BindingAdapter("setVisibilityInEditingItemView")
+	fun setVisibilityInEditingItemView(
 		view: View,
-		nowFirstItemStatus: AgonyRecordFirstItemStatus
+		itemState: AgonyRecordListItem.ItemState
 	) {
-		if (nowFirstItemStatus == AgonyRecordFirstItemStatus.Editing) {
+		if (itemState is AgonyRecordListItem.ItemState.Editing) {
 			view.visibility = View.VISIBLE
 			return
 		}
@@ -377,12 +378,12 @@ object DataBindingAdapter {
 
 	/**고민 기록 FirstItem Loading State일 때 View Visibility 설정*/
 	@JvmStatic
-	@BindingAdapter("setVisibiltyFirstItemInLoadingState")
-	fun setVisibiltyInLoadingItemView(
+	@BindingAdapter("setVisibilityInLoadingItemView")
+	fun setVisibilityInLoadingItemView(
 		view: View,
-		nowFirstItemStatus: AgonyRecordFirstItemStatus
+		itemState: AgonyRecordListItem.ItemState
 	) {
-		if (nowFirstItemStatus == AgonyRecordFirstItemStatus.Loading) {
+		if (itemState == AgonyRecordListItem.ItemState.Loading) {
 			view.visibility = View.VISIBLE
 			return
 		}
@@ -391,12 +392,12 @@ object DataBindingAdapter {
 
 	/**고민 기록 DataItem Default State일 때 View Visibility 설정*/
 	@JvmStatic
-	@BindingAdapter("setVisibiltyDataItemInDefaultState")
-	fun setVisibiltyDataItemInDefaultState(
+	@BindingAdapter("setVisibilityDataItemInDefaultState")
+	fun setVisibilityDataItemInDefaultState(
 		view: View,
-		nowFirstItemStatus: AgonyRecordDataItemStatus
+		itemState: AgonyRecordListItem.ItemState
 	) {
-		if (nowFirstItemStatus == AgonyRecordDataItemStatus.Default) {
+		if (itemState is AgonyRecordListItem.ItemState.Success) {
 			view.visibility = View.VISIBLE
 			return
 		}
@@ -405,12 +406,12 @@ object DataBindingAdapter {
 
 	/**고민 기록 DataItem Editing State일 때 View Visibility 설정*/
 	@JvmStatic
-	@BindingAdapter("setVisibiltyDataItemInEditingState")
-	fun setVisibiltyDataItemInEditingState(
+	@BindingAdapter("setVisibilityDataItemInEditingState")
+	fun setVisibilityDataItemInEditingState(
 		view: View,
-		nowFirstItemStatus: AgonyRecordDataItemStatus
+		itemState: AgonyRecordListItem.ItemState
 	) {
-		if (nowFirstItemStatus == AgonyRecordDataItemStatus.Editing) {
+		if (itemState is AgonyRecordListItem.ItemState.Editing) {
 			view.visibility = View.VISIBLE
 			return
 		}
@@ -419,19 +420,19 @@ object DataBindingAdapter {
 
 	/**고민 기록 DataItem Loading State일 때 View Visibility 설정*/
 	@JvmStatic
-	@BindingAdapter("setVisibiltyDataItemInLoadingState")
-	fun setVisibiltyDataItemInLoadingState(
+	@BindingAdapter("setVisibilityDataItemInLoadingState")
+	fun setVisibilityDataItemInLoadingState(
 		view: View,
-		nowFirstItemStatus: AgonyRecordDataItemStatus
+		itemState: AgonyRecordListItem.ItemState
 	) {
-		if (nowFirstItemStatus == AgonyRecordDataItemStatus.Loading) {
+		if (itemState == AgonyRecordListItem.ItemState.Loading) {
 			view.visibility = View.VISIBLE
 			return
 		}
 		view.visibility = View.INVISIBLE
 	}
 
-	/**Login페이지 Loading UI Visibility 설정*/
+	/**Login 페이지 Loading UI Visibility 설정*/
 	@JvmStatic
 	@BindingAdapter("setVisibilityLoadingUIInLogin")
 	fun setVisibilityLoadingUIInLogin(view: View, uiState: LoginUiState) {

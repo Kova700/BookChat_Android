@@ -4,23 +4,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-            name="agonyRecordDataItem"
-            type="com.example.bookchat.data.AgonyRecordDataItem" />
-        <variable
-            name="newTitle"
-            type="String" />
-        <variable
-            name="newContent"
-            type="String" />
+            name="record"
+            type="com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem.Item" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        setVisibiltyDataItemInEditingState ="@{agonyRecordDataItem.status}"
+        setVisibilityDataItemInEditingState ="@{record.state}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <EditText
-            android:id="@+id/et_agony_record_title"
+            android:id="@+id/agony_record_edit_title_et"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
@@ -30,29 +24,28 @@
             android:fontFamily="@font/notosanskr_regular"
             android:hint="@string/title"
             android:maxLength="20"
-            android:text="@={newTitle}"
             android:gravity="top"
             android:background="@null"
             android:textColor="#222222"
             android:textSize="12sp"
-            app:layout_constraintEnd_toStartOf="@+id/edit_cancel_btn"
+            app:layout_constraintEnd_toStartOf="@+id/agony_record_edit_cancel_btn"
             app:layout_constraintStart_toStartOf="@+id/cardView4"
             app:layout_constraintTop_toTopOf="@+id/cardView4" />
 
         <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/edit_cancel_btn"
+            android:id="@+id/agony_record_edit_cancel_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="15dp"
             android:background="?android:attr/selectableItemBackground"
             android:elevation="10dp"
             android:src="@drawable/x_icon_round_small"
-            app:layout_constraintBottom_toBottomOf="@+id/et_agony_record_title"
+            app:layout_constraintBottom_toBottomOf="@+id/agony_record_edit_title_et"
             app:layout_constraintEnd_toEndOf="@+id/cardView4"
-            app:layout_constraintTop_toTopOf="@+id/et_agony_record_title" />
+            app:layout_constraintTop_toTopOf="@+id/agony_record_edit_title_et" />
 
         <EditText
-            android:id="@+id/et_agony_record_content"
+            android:id="@+id/agony_record_edit_content_et"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="15dp"
@@ -66,16 +59,15 @@
             android:gravity="top"
             android:maxLength="100"
             android:hint="@string/content"
-            android:text="@={newContent}"
             android:textColor="#373737"
             android:textSize="12sp"
-            app:layout_constraintBottom_toTopOf="@+id/submit_btn"
+            app:layout_constraintBottom_toTopOf="@+id/agony_record_edit_finish_tv"
             app:layout_constraintEnd_toEndOf="@+id/cardView4"
             app:layout_constraintStart_toStartOf="@+id/cardView4"
-            app:layout_constraintTop_toBottomOf="@+id/et_agony_record_title" />
+            app:layout_constraintTop_toBottomOf="@+id/agony_record_edit_title_et" />
 
         <TextView
-            android:id="@+id/submit_btn"
+            android:id="@+id/agony_record_edit_finish_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="25dp"

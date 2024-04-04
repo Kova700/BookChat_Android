@@ -5,6 +5,15 @@ data class BookShelfItem(
 	val bookShelfId: Long,
 	val book: Book,
 	val pages: Int,
-	val star: StarRating?,
+	val star: StarRating? = null,
 	val state: BookShelfState,
-)
+) {
+	companion object {
+		val DEFAULT = BookShelfItem(
+			bookShelfId = 0L,
+			book = Book.DEFAULT,
+			pages = 0,
+			state = BookShelfState.WISH,
+		)
+	}
+}

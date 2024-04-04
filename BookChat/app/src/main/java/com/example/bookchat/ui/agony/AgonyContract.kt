@@ -27,7 +27,7 @@ data class AgonyUiState(
 
 sealed class AgonyEvent {
 	object MoveToBack : AgonyEvent()
-	object ChangeItemViewMode : AgonyEvent()
+	object RenewItemViewMode : AgonyEvent()
 	data class OpenBottomSheetDialog(val bookshelfItemId: Long) : AgonyEvent()
 
 	data class MoveToAgonyRecord(
