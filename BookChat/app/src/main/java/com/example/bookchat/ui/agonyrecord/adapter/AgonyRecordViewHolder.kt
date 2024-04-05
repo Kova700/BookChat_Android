@@ -1,7 +1,6 @@
 package com.example.bookchat.ui.agonyrecord.adapter
 
 import android.text.Editable
-import android.util.Log
 import android.view.View
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.ViewDataBinding
@@ -11,7 +10,6 @@ import com.example.bookchat.databinding.ItemAgonyRecordFirstBinding
 import com.example.bookchat.databinding.ItemAgonyRecordHeaderBinding
 import com.example.bookchat.ui.agonyrecord.AgonyRecordSwipeHelper
 import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
-import com.example.bookchat.utils.Constants.TAG
 
 sealed class AgonyRecordViewHolder(
 	binding: ViewDataBinding
@@ -122,7 +120,6 @@ class AgonyRecordItemViewHolder(
 			}
 
 			is AgonyRecordListItem.ItemState.Success -> {
-				Log.d(TAG, "AgonyRecordItemViewHolder: bind() - agonyRecordListItem : $agonyRecordListItem")
 				isSwiped = item.state.isSwiped
 				setViewHolderSwipeState(binding.swipeView, item.state.isSwiped)
 			}
@@ -147,8 +144,9 @@ class AgonyRecordItemViewHolder(
 			swipeableView.translationX = 0f
 			return
 		}
-		//왜 맨처음만 0이 나올까
-		swipeableView.translationX =
-			swipeableView.width.toFloat() * AgonyRecordSwipeHelper.SWIPE_VIEW_PERCENT
+		swipeableView.post {
+			swipeableView.translationX =
+				swipeableView.measuredWidth.toFloat() * AgonyRecordSwipeHelper.SWIPE_VIEW_PERCENT
+		}
 	}
 }
