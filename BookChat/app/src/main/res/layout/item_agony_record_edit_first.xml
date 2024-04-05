@@ -4,17 +4,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-            name="viewmodel"
-            type="com.example.bookchat.ui.agonyrecode.AgonyRecordViewModel" />
+            name="firstItem"
+            type="com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem.FirstItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        setVisibiltyFirstItemInEditingState ="@{viewmodel.firstItemState}"
+        setVisibilityInEditingItemView ="@{firstItem.state}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <EditText
-            android:id="@+id/editText3"
+            android:id="@+id/agony_record_first_item_title_et"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
@@ -24,30 +24,28 @@
             android:fontFamily="@font/notosanskr_regular"
             android:hint="@string/title"
             android:maxLength="20"
-            android:text="@={viewmodel.firstItemTitle}"
             android:gravity="top"
             android:background="@null"
             android:textColor="#222222"
             android:textSize="12sp"
-            app:layout_constraintEnd_toStartOf="@+id/antiDupClickImageButton5"
+            app:layout_constraintEnd_toStartOf="@+id/agony_record_first_item_edit_cancel_btn"
             app:layout_constraintStart_toStartOf="@+id/cardView4"
             app:layout_constraintTop_toTopOf="@+id/cardView4" />
 
         <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/antiDupClickImageButton5"
+            android:id="@+id/agony_record_first_item_edit_cancel_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="15dp"
-            android:onClick="@{() -> viewmodel.clickFirstItemXBtn()}"
             android:background="?android:attr/selectableItemBackground"
             android:elevation="10dp"
             android:src="@drawable/x_icon_round_small"
-            app:layout_constraintBottom_toBottomOf="@+id/editText3"
+            app:layout_constraintBottom_toBottomOf="@+id/agony_record_first_item_title_et"
             app:layout_constraintEnd_toEndOf="@+id/cardView4"
-            app:layout_constraintTop_toTopOf="@+id/editText3" />
+            app:layout_constraintTop_toTopOf="@+id/agony_record_first_item_title_et" />
 
         <EditText
-            android:id="@+id/editText4"
+            android:id="@+id/agony_record_first_item_content_et"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="15dp"
@@ -61,16 +59,15 @@
             android:gravity="top"
             android:maxLength="100"
             android:hint="@string/content"
-            android:text="@={viewmodel.firstItemContent}"
             android:textColor="#373737"
             android:textSize="12sp"
-            app:layout_constraintBottom_toTopOf="@+id/textView38"
+            app:layout_constraintBottom_toTopOf="@+id/agony_record_first_item_edit_submit_btn"
             app:layout_constraintEnd_toEndOf="@+id/cardView4"
             app:layout_constraintStart_toStartOf="@+id/cardView4"
-            app:layout_constraintTop_toBottomOf="@+id/editText3" />
+            app:layout_constraintTop_toBottomOf="@+id/agony_record_first_item_title_et" />
 
         <TextView
-            android:id="@+id/textView38"
+            android:id="@+id/agony_record_first_item_edit_submit_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="25dp"
@@ -79,7 +76,6 @@
             android:elegantTextHeight="true"
             android:elevation="2dp"
             android:fontFamily="@font/notosanskr_regular"
-            android:onClick="@{() -> viewmodel.clickFirstItemSubmitBtn()}"
             android:text="@string/make_confirm"
             android:textColor="#5648FF"
             android:clickable="true"

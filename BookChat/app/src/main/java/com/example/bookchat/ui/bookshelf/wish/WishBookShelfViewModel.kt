@@ -58,13 +58,13 @@ class WishBookShelfViewModel @Inject constructor(
 	}
 
 	private fun groupWishItems(
-		wishItems: List<BookShelfItem>,
+		listItems: List<BookShelfItem>,
 		totalItemCount: Int
 	): List<WishBookShelfItem> {
 		val groupedWishItems = mutableListOf<WishBookShelfItem>()
 		groupedWishItems.add(WishBookShelfItem.Header(totalItemCount))
-		groupedWishItems.addAll(wishItems.map { WishBookShelfItem.Item(it.toBookShelfListItem()) })
-		val dummyItemCount = BookImgSizeManager.getFlexBoxDummyItemCount(wishItems.size)
+		groupedWishItems.addAll(listItems.map { WishBookShelfItem.Item(it.toBookShelfListItem()) })
+		val dummyItemCount = BookImgSizeManager.getFlexBoxDummyItemCount(listItems.size)
 		(0 until dummyItemCount).forEach { i -> groupedWishItems.add(WishBookShelfItem.Dummy(i)) }
 		return groupedWishItems
 	}

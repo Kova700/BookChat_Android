@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface AgonyRepository {
 
 	fun getAgoniesFlow(): Flow<List<Agony>>
+	fun getAgonyFlow(agonyId: Long): Flow<Agony>
 
 	suspend fun getAgonies(
 		bookShelfId: Long,
@@ -32,7 +33,10 @@ interface AgonyRepository {
 		agonyIds: List<Long>
 	)
 
+	fun getCachedAgony(agonyId: Long): Agony?
+
 	companion object {
 		const val AGONY_LOAD_SIZE = 6
 	}
+
 }

@@ -16,27 +16,37 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
-    private val splashViewModel : SplashViewModel by viewModels()
+	private val splashViewModel: SplashViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		setContentView(R.layout.activity_splash)
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            observeUiEvent()
-        }, SPLASH_DURATION)
-    }
+		Handler(Looper.getMainLooper()).postDelayed({
+			observeUiEvent()
+		}, SPLASH_DURATION)
+	}
 
-    private fun observeUiEvent() = lifecycleScope.launch {
-        splashViewModel.eventFlow.collect { event -> handleEvent(event) }
-    }
+	private fun observeUiEvent() = lifecycleScope.launch {
+		splashViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
 
-    private fun handleEvent(event: SplashEvent) = when(event) {
-        is SplashEvent.MoveToMain -> { startActivity(Intent(this, MainActivity::class.java)); finish() }
-        is SplashEvent.MoveToLogin -> { startActivity(Intent(this, LoginActivity::class.java)); finish() }
-    }
+	private fun moveToMain() {
+		startActivity(Intent(this, MainActivity::class.java))
+		finish()
+	}
 
-    companion object{
-        const val SPLASH_DURATION = 1500L
-    }
+	private fun moveToLogin() {
+		startActivity(Intent(this, LoginActivity::class.java))
+		finish()
+	}
+
+	private fun handleEvent(event: SplashEvent) = when (event) {
+		is SplashEvent.MoveToMain -> moveToMain()
+		is SplashEvent.MoveToLogin -> moveToLogin()
+	}
+
+	companion object {
+		const val SPLASH_DURATION = 1500L
+	}
 }

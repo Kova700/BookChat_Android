@@ -2,12 +2,12 @@
 <layout>
     <data>
         <variable
-            name="agonyRecordDataItem"
-            type="com.example.bookchat.data.AgonyRecordDataItem" />
+            name="record"
+            type="com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem.Item" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        setVisibiltyDataItemInDefaultState ="@{agonyRecordDataItem.status}"
+        setVisibilityDataItemInDefaultState="@{record.state}"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

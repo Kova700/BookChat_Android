@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAgonyBinding
 import com.example.bookchat.ui.agony.adapter.AgonyAdapter
-import com.example.bookchat.ui.agonyrecode.AgonyRecordActivity
+import com.example.bookchat.ui.agonyrecord.AgonyRecordActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -104,7 +104,7 @@ class AgonyActivity : AppCompatActivity() {
 		}
 	}
 
-	private fun changeItemViewMode() {
+	private fun renewItemViewMode() {
 		agonyAdapter.notifyItemRangeChanged(1, agonyAdapter.itemCount - 1)
 	}
 
@@ -115,7 +115,7 @@ class AgonyActivity : AppCompatActivity() {
 				moveToAgonyRecord(event.bookshelfItemId, event.agonyListItemId)
 
 			is AgonyEvent.OpenBottomSheetDialog -> openBottomSheetDialog(event.bookshelfItemId)
-			is AgonyEvent.ChangeItemViewMode -> changeItemViewMode()
+			is AgonyEvent.RenewItemViewMode -> renewItemViewMode()
 		}
 	}
 

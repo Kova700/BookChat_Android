@@ -1,20 +1,75 @@
 package com.example.bookchat.data.repository
 
 import com.example.bookchat.App
+import com.example.bookchat.data.mapper.toAgonyRecord
 import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.request.RequestMakeAgonyRecord
 import com.example.bookchat.data.request.RequestReviseAgonyRecord
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
-import com.example.bookchat.data.response.ResponseGetAgonyRecord
+import com.example.bookchat.domain.model.AgonyRecord
 import com.example.bookchat.domain.model.SearchSortOption
 import com.example.bookchat.domain.repository.AgonyRecordRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class AgonyRecordRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi
 ) : AgonyRecordRepository {
 
+	private val mapAgonyRecords =
+		MutableStateFlow<Map<Long, AgonyRecord>>(emptyMap()) //(Id, AgonyRecord)
+	private val records = mapAgonyRecords.map {
+		it.values.toList().sortedByDescending { record -> record.recordId }
+	}
+
+	private var cachedAgonyId: Long = -1
+	private var currentPage: Long? = null
+	private var isEndPage = false
+
+	override fun getAgonyRecordsFlow(): Flow<List<AgonyRecord>> {
+		return records
+	}
+
+	override suspend fun getAgonyRecords(
+		bookShelfId: Long,
+		agonyId: Long,
+		size: Int,
+		sort: SearchSortOption
+	) {
+		if (cachedAgonyId != agonyId) {
+			clearCachedData()
+		}
+		if (isEndPage) return
+		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
+
+		val response = bookChatApi.getAgonyRecord(
+			bookShelfId = bookShelfId,
+			agonyId = agonyId,
+			postCursorId = currentPage,
+			size = size,
+			sort = sort.toNetwork()
+		)
+
+		cachedAgonyId = agonyId
+		isEndPage = response.cursorMeta.last
+		currentPage = response.cursorMeta.nextCursorId
+
+		val newRecords = response.agonyRecordResponseList.toAgonyRecord()
+		mapAgonyRecords.update { mapAgonyRecords.value + newRecords.associateBy { it.recordId } }
+	}
+
+	private fun clearCachedData() {
+		mapAgonyRecords.update { emptyMap() }
+		cachedAgonyId = -1
+		currentPage = null
+		isEndPage = false
+	}
+
+	//TODO : 생성된 객체 필요
 	override suspend fun makeAgonyRecord(
 		bookShelfId: Long,
 		agonyId: Long,
@@ -24,61 +79,32 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
 		val requestMakeAgonyRecord = RequestMakeAgonyRecord(title, content)
-		val response = bookChatApi.makeAgonyRecord(bookShelfId, agonyId, requestMakeAgonyRecord)
-		when (response.code()) {
-			200 -> {}
-			else -> throw Exception(
-				createExceptionMessage(
-					response.code(),
-					response.errorBody()?.string()
-				)
-			)
-		}
-	}
-
-	override suspend fun getAgonyRecord(
-		bookShelfId: Long,
-		agonyId: Long,
-		postCursorId: Long?,
-		size: Int,
-		sort: SearchSortOption
-	): ResponseGetAgonyRecord {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
-		return bookChatApi.getAgonyRecord(
-			bookShelfId = bookShelfId,
-			agonyId = agonyId,
-			postCursorId = postCursorId,
-			size = size,
-			sort = sort.toNetwork()
-		)
+		bookChatApi.makeAgonyRecord(bookShelfId, agonyId, requestMakeAgonyRecord)
 	}
 
 	override suspend fun reviseAgonyRecord(
 		bookShelfId: Long,
 		agonyId: Long,
-		recordId: Long,
+		agonyRecord: AgonyRecord,
 		newTitle: String,
 		newContent: String
 	) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
 		val requestReviseAgonyRecord = RequestReviseAgonyRecord(newTitle, newContent)
-		val response = bookChatApi.reviseAgonyRecord(
+		bookChatApi.reviseAgonyRecord(
 			bookShelfId,
 			agonyId,
-			recordId,
+			agonyRecord.recordId,
 			requestReviseAgonyRecord
 		)
-		when (response.code()) {
-			200 -> {}
-			else -> throw Exception(
-				createExceptionMessage(
-					response.code(),
-					response.errorBody()?.string()
-				)
-			)
-		}
+		val newRecord = AgonyRecord(
+			recordId = agonyRecord.recordId,
+			title = newTitle,
+			content = newContent,
+			createdAt = agonyRecord.createdAt
+		)
+		mapAgonyRecords.update { mapAgonyRecords.value + (agonyRecord.recordId to newRecord) }
 	}
 
 	override suspend fun deleteAgonyRecord(
@@ -88,23 +114,12 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 	) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-		val response = bookChatApi.deleteAgonyRecord(bookShelfId, agonyId, recordId)
-		when (response.code()) {
-			200 -> {}
-			else -> throw Exception(
-				createExceptionMessage(
-					response.code(),
-					response.errorBody()?.string()
-				)
-			)
-		}
+		bookChatApi.deleteAgonyRecord(bookShelfId, agonyId, recordId)
+		mapAgonyRecords.update { mapAgonyRecords.value - recordId }
 	}
 
 	private fun isNetworkConnected(): Boolean {
 		return App.instance.isNetworkConnected()
 	}
 
-	private fun createExceptionMessage(responseCode: Int, responseErrorBody: String?): String {
-		return "responseCode : $responseCode , responseErrorBody : $responseErrorBody"
-	}
 }

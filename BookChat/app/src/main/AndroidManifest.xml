@@ -108,7 +108,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.agonyrecode.AgonyRecordActivity"
+            android:name=".ui.agonyrecord.AgonyRecordActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
