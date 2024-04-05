@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemReadingBookshelfDataBinding
 import com.example.bookchat.databinding.ItemReadingBookshelfHeaderBinding
+import com.example.bookchat.ui.agonyrecord.AgonyRecordSwipeHelper
 import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -136,8 +137,10 @@ class ReadingBookItemViewHolder(
 			swipeableView.translationX = 0f
 			return
 		}
-		swipeableView.translationX =
-			swipeableView.width.toFloat() * SWIPE_VIEW_PERCENT
+		swipeableView.post {
+			swipeableView.translationX =
+				swipeableView.measuredWidth.toFloat() * AgonyRecordSwipeHelper.SWIPE_VIEW_PERCENT
+		}
 	}
 
 	private fun onLongItemClickWithAnimation(
