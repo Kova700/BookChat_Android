@@ -34,44 +34,32 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 		return records
 	}
 
-	private fun getDummyData() :List<AgonyRecord>{
-		return List(10000){ AgonyRecord.DEFAULT.copy(
-			recordId = it.toLong(),
-			title = "$it tasfqkfqjwnfkjqwnfj title",
-			content = "$it tasfqkfqjwnfkjqwnfj content",
-			createdAt = "$it 날짜"
-		)
-		}
-	}
-
 	override suspend fun getAgonyRecords(
 		bookShelfId: Long,
 		agonyId: Long,
 		size: Int,
 		sort: SearchSortOption
 	) {
-		mapAgonyRecords.update { mapAgonyRecords.value + getDummyData().associateBy { it.recordId } }
+		if (cachedAgonyId != agonyId) {
+			clearCachedData()
+		}
+		if (isEndPage) return
+		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-//		if (cachedAgonyId != agonyId) {
-//			clearCachedData()
-//		}
-//		if (isEndPage) return
-//		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-//
-//		val response = bookChatApi.getAgonyRecord(
-//			bookShelfId = bookShelfId,
-//			agonyId = agonyId,
-//			postCursorId = currentPage,
-//			size = size,
-//			sort = sort.toNetwork()
-//		)
-//
-//		cachedAgonyId = agonyId
-//		isEndPage = response.cursorMeta.last
-//		currentPage = response.cursorMeta.nextCursorId
-//
-//		val newRecords = response.agonyRecordResponseList.toAgonyRecord()
-//		mapAgonyRecords.update { mapAgonyRecords.value + newRecords.associateBy { it.recordId } }
+		val response = bookChatApi.getAgonyRecord(
+			bookShelfId = bookShelfId,
+			agonyId = agonyId,
+			postCursorId = currentPage,
+			size = size,
+			sort = sort.toNetwork()
+		)
+
+		cachedAgonyId = agonyId
+		isEndPage = response.cursorMeta.last
+		currentPage = response.cursorMeta.nextCursorId
+
+		val newRecords = response.agonyRecordResponseList.toAgonyRecord()
+		mapAgonyRecords.update { mapAgonyRecords.value + newRecords.associateBy { it.recordId } }
 	}
 
 	private fun clearCachedData() {
