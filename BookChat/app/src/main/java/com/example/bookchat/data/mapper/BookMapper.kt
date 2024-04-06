@@ -1,10 +1,10 @@
 package com.example.bookchat.data.mapper
 
 import com.example.bookchat.data.request.BookRequest
-import com.example.bookchat.data.response.BookResponse
+import com.example.bookchat.data.response.BookSearchResponse
 import com.example.bookchat.domain.model.Book
 
-fun BookResponse.toBook(): Book {
+fun BookSearchResponse.toBook(): Book {
 	return Book(
 		isbn = isbn,
 		title = title,
@@ -29,4 +29,4 @@ fun Book.toBookRequest(): BookRequest {
 	)
 }
 
-fun List<BookResponse>.toBook() = this.map { it.toBook() }
+fun List<BookSearchResponse>.toBook() = this.map { it.toBook() }
