@@ -3,9 +3,12 @@ package com.example.bookchat.data.mapper
 import com.example.bookchat.data.database.model.ChannelEntity
 import com.example.bookchat.data.database.model.combined.ChannelWithInfo
 import com.example.bookchat.data.response.ChannelResponse
+import com.example.bookchat.data.response.ChannelSearchResponse
 import com.example.bookchat.data.response.getLastChat
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
+import com.example.bookchat.domain.model.ChatStatus
+import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.domain.model.User
 
 fun ChannelResponse.toChannelEntity(): ChannelEntity {
@@ -95,6 +98,39 @@ fun ChannelWithInfo.toChannel(): Channel {
 		bookTitle = channelEntity.bookTitle,
 		bookAuthors = channelEntity.bookAuthors,
 		bookCoverImageUrl = channelEntity.bookCoverImageUrl,
+	)
+}
+
+fun ChannelSearchResponse.toChannel(): Channel {
+	return Channel(
+		roomId = roomId,
+		roomName = roomName,
+		roomSid = roomSid,
+		roomImageUri = roomImageUri,
+		roomMemberCount = roomMemberCount,
+		defaultRoomImageType = defaultRoomImageType,
+		roomTags = tags.split(" "),
+		roomCapacity = roomSize,
+		host = User(
+			id = hostId,
+			nickname = hostName,
+			profileImageUrl = hostProfileImageUri,
+			defaultProfileImageType = hostDefaultProfileImageType,
+		),
+		lastChat = lastChatId?.let {
+			Chat(
+				chatId = lastChatId,
+				chatRoomId = roomId,
+				message = lastChatMessage!!,
+				chatType = ChatType.UNKNOWN,
+				status = ChatStatus.SUCCESS,
+				dispatchTime = lastChatDispatchTime!!,
+				sender = lastChatSenderId?.let { id -> User.Default.copy(id = id) },
+			)
+		},
+		bookTitle = bookTitle,
+		bookAuthors = bookAuthors,
+		bookCoverImageUrl = bookCoverImageUri,
 	)
 }
 
