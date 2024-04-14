@@ -1,7 +1,6 @@
 package com.example.bookchat.data.repository
 
 import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.model.participants
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,7 +19,7 @@ class ChattingRepositoryFacade @Inject constructor(
 
 	override fun getChatsFlow(channelId: Long): Flow<List<Chat>> {
 		return getChannelFlow(channelId).flatMapLatest { channel ->
-			val participants = channel.participants().associateBy { it.id }
+			val participants = channel.participants.associateBy { it.id }
 			chatRepository.getChatsFlow(channelId).map { chats ->
 				chats.map { chat -> chat.copy(sender = participants[chat.sender?.id]) }
 			}

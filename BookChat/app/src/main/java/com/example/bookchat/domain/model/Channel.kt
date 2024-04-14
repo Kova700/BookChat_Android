@@ -19,6 +19,20 @@ data class Channel(
 	val bookAuthors: List<String>? = null,
 	val bookCoverImageUrl: String? = null,
 ) {
+	val participants
+		get() = mutableListOf<User>().apply {
+			host?.let { add(it) }
+			subHosts?.let { addAll(it) }
+			guests?.let { addAll(it) }
+		}.toList()
+
+	val participantIds
+		get() = mutableListOf<Long>().apply {
+			host?.id?.let { add(it) }
+			subHosts?.map { it.id }?.let { addAll(it) }
+			guests?.map { it.id }?.let { addAll(it) }
+		}.toList()
+
 	companion object {
 		val DEFAULT = Channel(
 			roomId = 0L,
@@ -29,18 +43,3 @@ data class Channel(
 		)
 	}
 }
-
-fun Channel.participants() =
-	mutableListOf<User>().apply {
-		host?.let { add(it) }
-		subHosts?.let { addAll(it) }
-		guests?.let { addAll(it) }
-	}.toList()
-
-fun Channel.participantIds() =
-	mutableListOf<Long>().apply {
-		host?.id?.let { add(it) }
-		subHosts?.map { it.id }?.let { addAll(it) }
-		guests?.map { it.id }?.let { addAll(it) }
-	}.toList()
-
