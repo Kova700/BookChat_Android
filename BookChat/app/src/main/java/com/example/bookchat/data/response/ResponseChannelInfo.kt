@@ -1,15 +1,17 @@
 package com.example.bookchat.data.response
 
+import com.example.bookchat.data.mapper.toUserDefaultProfileType
+import com.example.bookchat.data.model.UserDefaultProfileTypeNetwork
 import com.example.bookchat.domain.model.User
-import com.example.bookchat.domain.model.UserDefaultProfileImageType
 import com.google.gson.annotations.SerializedName
 
-// TODO : 채팅방 제목이 추가되어야함 (채팅방 제목 바뀌면 알 수가 없음)
-data class RespondChatRoomInfo(
+data class ResponseChannelInfo(
 	@SerializedName("roomSize")
 	val roomCapacity: Int,
 	@SerializedName("roomTags")
 	val roomTags: List<String>,
+	@SerializedName("roomName")
+	val roomName: String,
 	@SerializedName("bookTitle")
 	val bookTitle: String,
 	@SerializedName("bookCoverImageUrl")
@@ -17,24 +19,22 @@ data class RespondChatRoomInfo(
 	@SerializedName("bookAuthors")
 	val bookAuthors: List<String>,
 	@SerializedName("roomHost")
-	val roomHost: ChatRoomUser,
+	val roomHost: ChannelUser,
 	@SerializedName("roomSubHostList")
-	val roomSubHostList: List<ChatRoomUser>?,
+	val roomSubHostList: List<ChannelUser>?,
 	@SerializedName("roomGuestList")
-	val roomGuestList: List<ChatRoomUser>?
+	val roomGuestList: List<ChannelUser>?
 ) {
-	fun getParticipants(): List<User> {
-		return mutableListOf<User>().apply {
+	val participants
+		get() = mutableListOf<User>().apply {
 			add(roomHost.toUser())
-			roomSubHostList?.let { addAll(it.map(ChatRoomUser::toUser)) }
-			roomGuestList?.let { addAll(it.map(ChatRoomUser::toUser)) }
+			roomSubHostList?.let { addAll(it.map(ChannelUser::toUser)) }
+			roomGuestList?.let { addAll(it.map(ChannelUser::toUser)) }
 		}.toList()
-	}
 }
 
-
-//TODO : 개선 필요
-data class ChatRoomUser(
+//TODO : UserResponse와 프로퍼티명 통일하여 개선 필요
+data class ChannelUser(
 	@SerializedName("id")
 	val id: Long,
 	@SerializedName("nickname")
@@ -42,13 +42,13 @@ data class ChatRoomUser(
 	@SerializedName("profileImageUrl")
 	val profileImageUrl: String,
 	@SerializedName("defaultProfileImageType")
-	val defaultProfileImageType: UserDefaultProfileImageType
+	val defaultProfileImageType: UserDefaultProfileTypeNetwork
 ) {
 	fun toUser() =
 		User(
 			id = this.id,
 			nickname = this.nickname,
 			profileImageUrl = this.profileImageUrl,
-			defaultProfileImageType = this.defaultProfileImageType
+			defaultProfileImageType = this.defaultProfileImageType.toUserDefaultProfileType()
 		)
 }
