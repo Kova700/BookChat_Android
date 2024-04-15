@@ -8,7 +8,7 @@ data class Book(
 	var publishAt: String,
 	val bookCoverImageUrl: String
 ) {
-	val Book.authorsString: String
+	val authorsString: String
 		get() = authors.joinToString{""}
 
 	companion object {
