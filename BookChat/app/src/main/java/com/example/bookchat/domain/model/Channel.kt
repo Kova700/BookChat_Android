@@ -5,7 +5,7 @@ data class Channel(
 	val roomName: String,
 	val roomSid: String,
 	val roomMemberCount: Long,
-	val defaultRoomImageType: Int, //개선 필요
+	val defaultRoomImageType: ChannelDefaultImageType,
 	val notificationFlag: Boolean = true,
 	val topPinNum: Int = 0,
 	val roomImageUri: String? = null,
@@ -19,6 +19,12 @@ data class Channel(
 	val bookAuthors: List<String>? = null,
 	val bookCoverImageUrl: String? = null,
 ) {
+	val bookAuthorsString
+		get() = bookAuthors?.joinToString(",")
+
+	val tagsString
+		get() = roomTags?.joinToString(",")
+
 	val participants
 		get() = mutableListOf<User>().apply {
 			host?.let { add(it) }
@@ -39,7 +45,7 @@ data class Channel(
 			roomName = "",
 			roomSid = "",
 			roomMemberCount = 0,
-			defaultRoomImageType = 0
+			defaultRoomImageType = ChannelDefaultImageType.ONE
 		)
 	}
 }

@@ -1,6 +1,11 @@
 package com.example.bookchat.data.response
 
-import com.example.bookchat.domain.model.UserDefaultProfileImageType
+import com.example.bookchat.data.mapper.toUserDefaultProfileType
+import com.example.bookchat.data.model.ChannelDefaultImageTypeNetwork
+import com.example.bookchat.data.model.UserDefaultProfileTypeNetwork
+import com.example.bookchat.domain.model.Chat
+import com.example.bookchat.domain.model.ChatType
+import com.example.bookchat.domain.model.User
 import com.google.gson.annotations.SerializedName
 
 //TODO : tags 타입 List로 반환해서 받으면 좋을 듯
@@ -26,11 +31,11 @@ data class ChannelSearchResponse(
 	@SerializedName("hostName")
 	val hostName: String,
 	@SerializedName("hostDefaultProfileImageType")
-	val hostDefaultProfileImageType: UserDefaultProfileImageType,
+	val hostDefaultProfileImageType: UserDefaultProfileTypeNetwork,
 	@SerializedName("hostProfileImageUri")
 	val hostProfileImageUri: String,
 	@SerializedName("defaultRoomImageType")
-	val defaultRoomImageType: Int,
+	val defaultRoomImageType: ChannelDefaultImageTypeNetwork,
 	@SerializedName("tags")
 	val tags: String,
 	@SerializedName("roomImageUri")
@@ -43,4 +48,27 @@ data class ChannelSearchResponse(
 	val lastChatMessage: String? = null,
 	@SerializedName("lastChatDispatchTime")
 	val lastChatDispatchTime: String? = null
-)
+) {
+	val host
+		get() = User(
+			id = hostId,
+			nickname = hostName,
+			profileImageUrl = hostProfileImageUri,
+			defaultProfileImageType = hostDefaultProfileImageType.toUserDefaultProfileType(),
+		)
+
+	val lastChat
+		get() = lastChatId?.let {
+			Chat(
+				chatId = it,
+				chatRoomId = roomId,
+				message = lastChatMessage!!,
+				chatType = ChatType.UNKNOWN,
+				dispatchTime = lastChatDispatchTime!!,
+				sender = User.Default.copy(
+					id = lastChatSenderId!!
+				)
+			)
+		}
+
+}

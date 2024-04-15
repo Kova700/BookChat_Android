@@ -1,9 +1,12 @@
 package com.example.bookchat.data.response
 
+import com.example.bookchat.data.mapper.toUserDefaultProfileType
+import com.example.bookchat.data.model.ChannelDefaultImageTypeNetwork
+import com.example.bookchat.data.model.UserDefaultProfileTypeNetwork
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatType
+import com.example.bookchat.domain.model.User
 import com.google.gson.annotations.SerializedName
-import java.io.Serializable
 
 data class ChannelResponse(
 	@SerializedName("roomId")
@@ -15,24 +18,38 @@ data class ChannelResponse(
 	@SerializedName("roomMemberCount")
 	val roomMemberCount: Long,
 	@SerializedName("defaultRoomImageType")
-	val defaultRoomImageType: Int,
-	//추후 Chat타입으로 Sender 유저 정보,dispatchTime과 함께 한 번에 받을 수 있으면 수정 부탁
-	//TODO : 마지막 활성화 시간이 초기화 되거나 마지막 Chat을 받거나 되어야함
+	val defaultRoomImageType: ChannelDefaultImageTypeNetwork,
 	@SerializedName("lastChatId")
-	val lastChatId: Long,
+	val lastChatId: Long? = null,
 	@SerializedName("lastChatContent")
-	val lastChatContent: String,
+	val lastChatContent: String? = null,
+	@SerializedName("lastChatDispatchTime")
+	val lastChatDispatchTime: String? = null,
+	@SerializedName("senderId")
+	val senderId: Long? = null,
+	@SerializedName("senderNickname")
+	val senderNickname: String? = null,
+	@SerializedName("senderProfileImageUrl")
+	val senderProfileImageUrl: String? = null,
+	@SerializedName("senderDefaultProfileImageType")
+	val senderDefaultProfileImageType: UserDefaultProfileTypeNetwork? = null,
 	@SerializedName("roomImageUri")
 	val roomImageUri: String? = null,
-) : Serializable
-
-fun ChannelResponse.getLastChat(): Chat {
-	return Chat(
-		chatId = lastChatId,
-		chatRoomId = roomId,
-		message = lastChatContent,
-		chatType = ChatType.UNKNOWN,
-		dispatchTime = "", //개선 필요
-		sender = null
-	)
+) {
+	val lastChat
+		get() = lastChatId?.let {
+			Chat(
+				chatId = it,
+				chatRoomId = roomId,
+				message = lastChatContent!!,
+				chatType = ChatType.UNKNOWN,
+				dispatchTime = lastChatDispatchTime!!,
+				sender = User(
+					id = senderId!!,
+					nickname = senderNickname!!,
+					profileImageUrl = senderProfileImageUrl,
+					defaultProfileImageType = senderDefaultProfileImageType!!.toUserDefaultProfileType()
+				)
+			)
+		}
 }
