@@ -16,7 +16,7 @@ import com.example.bookchat.data.*
 import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
-import com.example.bookchat.domain.model.UserDefaultProfileImageType
+import com.example.bookchat.domain.model.UserDefaultProfileType
 import com.example.bookchat.ui.agony.AgonyUiState
 import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
 import com.example.bookchat.ui.bookreport.BookReportViewModel.BookReportStatus
@@ -67,18 +67,18 @@ object DataBindingAdapter {
 	fun loadUserProfile(
 		imageView: ImageView,
 		userProfileUrl: String?,
-		userDefaultProfileImageType: UserDefaultProfileImageType?
+		userDefaultProfileType: UserDefaultProfileType?
 	) {
 		if (!userProfileUrl?.trim().isNullOrBlank()) {
 			loadUrl(imageView, userProfileUrl)
 			return
 		}
-		inflateUserDefaultProfileImage(imageView, userDefaultProfileImageType)
+		inflateUserDefaultProfileImage(imageView, userDefaultProfileType)
 	}
 
 	private fun inflateUserDefaultProfileImage(
 		imageView: ImageView,
-		imageType: UserDefaultProfileImageType?
+		imageType: UserDefaultProfileType?
 	) {
 		Glide.with(imageView.context)
 			.load(getUserDefaultProfileImage(imageType))
@@ -88,15 +88,15 @@ object DataBindingAdapter {
 			.into(imageView)
 	}
 
-	private fun getUserDefaultProfileImage(imageType: UserDefaultProfileImageType?) =
+	private fun getUserDefaultProfileImage(imageType: UserDefaultProfileType?) =
 		when (imageType) {
 			null,
-			UserDefaultProfileImageType.ONE -> R.drawable.default_profile_img1
+			UserDefaultProfileType.ONE -> R.drawable.default_profile_img1
 
-			UserDefaultProfileImageType.TWO -> R.drawable.default_profile_img2
-			UserDefaultProfileImageType.THREE -> R.drawable.default_profile_img3
-			UserDefaultProfileImageType.FOUR -> R.drawable.default_profile_img4
-			UserDefaultProfileImageType.FIVE -> R.drawable.default_profile_img5
+			UserDefaultProfileType.TWO -> R.drawable.default_profile_img2
+			UserDefaultProfileType.THREE -> R.drawable.default_profile_img3
+			UserDefaultProfileType.FOUR -> R.drawable.default_profile_img4
+			UserDefaultProfileType.FIVE -> R.drawable.default_profile_img5
 		}
 
 	@JvmStatic
@@ -466,21 +466,6 @@ object DataBindingAdapter {
 		loadUrl(view, imgUrl)
 	}
 
-	/**SearchChatRoomItem 시간 Text 세팅*/
-	@JvmStatic
-	@BindingAdapter("getFormattedAbstractDateTimeText")
-	fun getFormattedAbstractDateTimeText(view: TextView, dateAndTimeString: String?) {
-		if (dateAndTimeString.isNullOrBlank()) return
-		view.text = DateManager.getFormattedAbstractDateTimeText(dateAndTimeString)
-	}
-
-	/**SearchChatRoomItem 태그 파싱*/
-	@JvmStatic
-	@BindingAdapter("parseHashTagText")
-	fun parseHashTagText(view: TextView, hashTagString: String) {
-		view.text = hashTagString.split(",").joinToString("  ") { "#$it" }
-	}
-
 	/**화면 크기에 맞는 도서 이미지 크기 세팅*/
 	@JvmStatic
 	@BindingAdapter("setBookImgSize")
@@ -535,19 +520,6 @@ object DataBindingAdapter {
 			layoutParams.width = sizeManager.chatRoomImgWidthPx
 			layoutParams.height = sizeManager.chatRoomImgHeightPx
 		}
-	}
-
-	/**독서취향 : 제출 버튼 색상 설정*/
-	@JvmStatic
-	@BindingAdapter("setSubmitTextColor")
-	fun setSubmitTextColor(textView: TextView, flag: Boolean) {
-		if (flag) {
-			textView.setTextColor(Color.parseColor("#000000"))
-			textView.isClickable = true
-			return
-		}
-		textView.setTextColor(Color.parseColor("#B5B7BB"))
-		textView.isClickable = false
 	}
 
 	/**Shimmer내부 GirdLayout 설정*/

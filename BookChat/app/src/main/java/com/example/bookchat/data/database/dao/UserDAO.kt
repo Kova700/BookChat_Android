@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.bookchat.data.database.model.UserEntity
-import com.example.bookchat.domain.model.UserDefaultProfileImageType
+import com.example.bookchat.domain.model.UserDefaultProfileType
 
 @Dao
 interface UserDAO {
@@ -41,7 +41,7 @@ interface UserDAO {
         id: Long,
         nickname: String,
         profileImageUrl: String?,
-        defaultProfileImageType: UserDefaultProfileImageType
+        defaultProfileImageType: UserDefaultProfileType
     )
 
     @Query(
