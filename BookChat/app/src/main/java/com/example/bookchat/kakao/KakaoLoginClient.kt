@@ -1,22 +1,24 @@
-package com.example.bookchat.oauth
+package com.example.bookchat.kakao
 
 import android.content.Context
 import android.util.Log
-import com.example.bookchat.data.IdToken
 import com.example.bookchat.data.response.KakaoLoginFailException
 import com.example.bookchat.data.response.KakaoLoginUserCancelException
+import com.example.bookchat.domain.model.IdToken
+import com.example.bookchat.domain.model.OAuth2Provider.KAKAO
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.DataStoreManager
-import com.example.bookchat.utils.OAuth2Provider.KAKAO
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.AuthError
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.suspendCancellableCoroutine
+import javax.inject.Inject
 import kotlin.coroutines.resume
 
-object KakaoSDK {
-	private val userApiClient by lazy { UserApiClient.instance }
+class KakaoLoginClient @Inject constructor(
+	private val userApiClient: UserApiClient
+) {
 
 	suspend fun kakaoLogin(context: Context) {
 		val isKakaoTalkLoginAvailable = userApiClient.isKakaoTalkLoginAvailable(context)

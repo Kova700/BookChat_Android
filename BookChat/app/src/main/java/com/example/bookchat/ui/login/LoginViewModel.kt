@@ -13,8 +13,8 @@ import com.example.bookchat.data.response.NeedToDeviceWarningException
 import com.example.bookchat.data.response.NeedToSignUpException
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.oauth.GoogleSDK
-import com.example.bookchat.oauth.KakaoSDK
+import com.example.bookchat.google.GoogleLoginSDK
+import com.example.bookchat.kakao.KakaoLoginClient
 import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,7 +25,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-	private val clientRepository: ClientRepository
+	private val clientRepository: ClientRepository,
+	private val kakaoLoginClient: KakaoLoginClient
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<LoginEvent>()
@@ -42,7 +43,7 @@ class LoginViewModel @Inject constructor(
 
 	fun startKakaoLogin(context: Context) = viewModelScope.launch {
 		Log.d(TAG, "LoginViewModel: startKakaoLogin() - called")
-		runCatching { KakaoSDK.kakaoLogin(context) }
+		runCatching { kakaoLoginClient.kakaoLogin(context) }
 			.onSuccess { bookchatLogin() }
 			.onFailure { failHandler(it) }
 			.also { setUiStateToDefault() }
@@ -70,7 +71,7 @@ class LoginViewModel @Inject constructor(
 	fun clickGoogleLoginBtn(context: Context, resultLauncher: ActivityResultLauncher<Intent>) {
 		if (!isUiStateDefault()) return
 		setUiStateToLoading()
-		resultLauncher.launch(GoogleSDK.getSignInIntent(context))
+		resultLauncher.launch(GoogleLoginSDK.getSignInIntent(context))
 	}
 
 	sealed class LoginEvent {
