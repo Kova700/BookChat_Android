@@ -1,4 +1,4 @@
-package com.example.bookchat.kakao
+package com.example.bookchat.oauth.kakao
 
 import com.kakao.sdk.user.UserApiClient
 import dagger.Module

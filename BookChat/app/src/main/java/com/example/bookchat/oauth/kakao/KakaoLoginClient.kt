@@ -1,4 +1,4 @@
-package com.example.bookchat.kakao
+package com.example.bookchat.oauth.kakao
 
 import android.content.Context
 import android.util.Log
@@ -7,7 +7,6 @@ import com.example.bookchat.data.response.KakaoLoginUserCancelException
 import com.example.bookchat.domain.model.IdToken
 import com.example.bookchat.domain.model.OAuth2Provider.KAKAO
 import com.example.bookchat.utils.Constants.TAG
-import com.example.bookchat.utils.DataStoreManager
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.AuthError
 import com.kakao.sdk.common.model.ClientError
@@ -18,39 +17,31 @@ import kotlin.coroutines.resume
 
 class KakaoLoginClient @Inject constructor(
 	private val userApiClient: UserApiClient
-) {
+){
 
-	suspend fun kakaoLogin(context: Context) {
-		val isKakaoTalkLoginAvailable = userApiClient.isKakaoTalkLoginAvailable(context)
-		if (isKakaoTalkLoginAvailable) {
-			kakaoLoginWithKakaoTalk(context); return
+	suspend fun login(context: Context): IdToken {
+		if (userApiClient.isKakaoTalkLoginAvailable(context)) {
+			return loginWithKakaoTalk(context)
 		}
-		kakaoLoginWithKakaoAccount(context)
+		return loginWithKakaoAccount(context)
 	}
 
-	private suspend fun kakaoLoginWithKakaoTalk(context: Context) {
-		suspendCancellableCoroutine<Result<OAuthToken>> { continuation ->
+	private suspend fun loginWithKakaoTalk(context: Context): IdToken {
+		val oAuthToken = suspendCancellableCoroutine<Result<OAuthToken>> { continuation ->
 			userApiClient.loginWithKakaoTalk(context) { token, error ->
 				continuation.resume(getTokenResult(token, error))
 			}
-		}.handelKakaoLoginResult(context)
+		}.getOrElse { kakaoLoginFailHandler(it) }
+		return IdToken("$ID_TOKEN_PREFIX ${oAuthToken.idToken}", KAKAO)
 	}
 
-	private suspend fun kakaoLoginWithKakaoAccount(context: Context) {
-		suspendCancellableCoroutine<Result<OAuthToken>> { continuation ->
+	private suspend fun loginWithKakaoAccount(context: Context): IdToken {
+		val oAuthToken = suspendCancellableCoroutine<Result<OAuthToken>> { continuation ->
 			userApiClient.loginWithKakaoAccount(context) { token, error ->
 				continuation.resume(getTokenResult(token, error))
 			}
-		}.handelKakaoLoginResult(context)
-	}
-
-	private suspend fun Result<OAuthToken>.handelKakaoLoginResult(context: Context) {
-		this.onSuccess { saveIdToken(it) }
-			.onFailure { kakaoLoginFailHandler(it, context) }
-	}
-
-	private fun saveIdToken(token: OAuthToken) {
-		DataStoreManager.saveIdToken(IdToken("Bearer ${token.idToken}", KAKAO))
+		}.getOrElse { kakaoLoginFailHandler(it) }
+		return IdToken("$ID_TOKEN_PREFIX ${oAuthToken.idToken}", KAKAO)
 	}
 
 	private fun getTokenResult(token: OAuthToken?, error: Throwable?): Result<OAuthToken> {
@@ -62,7 +53,7 @@ class KakaoLoginClient @Inject constructor(
 	}
 
 	//카카오 연결 로그아웃 (임시)
-	fun kakaoLogout() {
+	suspend fun logOut() {
 		userApiClient.logout { error ->
 			error?.let { Log.d(TAG, "KakaoSDK: logout() - 로그아웃 실패. SDK에서 토큰 삭제됨 error : ${error}") }
 				?: run { Log.d(TAG, "KakaoSDK: logout() - 로그아웃 성공. SDK에서 토큰 삭제됨") }
@@ -70,27 +61,23 @@ class KakaoLoginClient @Inject constructor(
 	}
 
 	//카카오 연결 탈퇴 (임시)
-	fun kakaoWithdraw() {
+	suspend fun withdraw() {
 		userApiClient.unlink { error ->
 			error?.let { Log.d(TAG, "KakaoSDK: unlink() - 연결 끊기 실패. SDK에서 토큰 삭제됨 error : ${error}") }
 				?: run { Log.d(TAG, "KakaoSDK: unlink() - 연결 끊기 성공. SDK에서 토큰 삭제됨") }
 		}
 	}
 
-	private suspend fun kakaoLoginFailHandler(throwable: Throwable, context: Context) {
+	private fun kakaoLoginFailHandler(throwable: Throwable): OAuthToken {
 		when (throwable) {
-			is AuthError -> {
-				kakaoLoginWithKakaoAccount(context)
-			}
-
-			is ClientError -> {
-				throw KakaoLoginUserCancelException(throwable.message)
-			}
-
-			else -> {
-				throw KakaoLoginFailException(throwable.message)
-			}
+			is AuthError -> throw throwable
+			is ClientError -> throw KakaoLoginUserCancelException(throwable.message)
+			else -> throw KakaoLoginFailException(throwable.message)
 		}
+	}
+
+	companion object {
+		private const val ID_TOKEN_PREFIX = "Bearer"
 	}
 
 }
