@@ -1,102 +1,93 @@
 package com.example.bookchat.data.network
 
 import com.example.bookchat.BuildConfig.TOKEN_RENEWAL_URL
+import com.example.bookchat.data.response.BadRequestException
 import com.example.bookchat.data.response.ForbiddenException
 import com.example.bookchat.data.response.TokenRenewalFailException
 import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.repository.ClientRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.runBlocking
-import okhttp3.*
+import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import java.io.IOException
 import javax.inject.Inject
 
 class AppInterceptor @Inject constructor(
-	private val clientRepository: ClientRepository
+	private val clientRepository: ClientRepository,
+	private val gson: Gson
 ) : Interceptor {
 
-	@Throws(IOException::class)
 	override fun intercept(
 		chain: Interceptor.Chain
 	): Response {
-		val bookChatToken = runBlocking { clientRepository.getBookChatToken() }
-		var response = requestWithAccessToken(chain, bookChatToken?.accessToken)
-
-		response = renewTokenOrPass(response, chain, bookChatToken)
+		val bookchatToken = runBlocking { clientRepository.getBookChatToken() }
+		var response = chain.requestWithAccessToken(bookchatToken)
 		if (response.isSuccessful) return response
 
-		val networkException = createException(response.code, null)
-		networkException?.let { throw it }
-
-		return response
-	}
-
-	private fun renewTokenOrPass(
-		response: Response,
-		chain: Interceptor.Chain,
-		bookChatToken: BookChatToken?
-	): Response {
-		if (!response.isTokenExpired()) return response
-
-		val newToken = renewToken(chain, bookChatToken?.refreshToken)
-		return requestWithAccessToken(chain, newToken.accessToken)
-	}
-
-	private fun renewToken(
-		chain: Interceptor.Chain,
-		refreshToken: String?
-	): BookChatToken {
-		val tokenRenewalResponse = requestTokenRenewal(chain, refreshToken)
-		if (!tokenRenewalResponse.isSuccessful) {
-			// TODO : 리프레시 토큰마저 만료되었음으로 새로 로그인 해야함
-			//  모든 작업 종료하고 로그인 페이지로 이동하게 수정
-			throw TokenRenewalFailException()
+		if (response.isTokenExpired()) {
+			val newToken = chain.renewToken(bookchatToken)
+			response = chain.requestWithAccessToken(newToken)
+			if (response.isSuccessful) return response
 		}
-		val token = parseResponseToToken(tokenRenewalResponse.body?.string())
-		runBlocking { clientRepository.saveBookChatToken(token) }
-		return token
+
+		throw response.getException()
 	}
 
-	private fun requestTokenRenewal(
-		chain: Interceptor.Chain,
-		refreshToken: String?
-	): Response {
-		val refreshTokenRequest =
-			makeNewRequest(getJsonRequestBody(refreshToken, CONTENT_TYPE_JSON), TOKEN_RENEWAL_URL)
-		return chain.proceed(refreshTokenRequest)
+	private fun Interceptor.Chain.renewToken(bookchatToken: BookChatToken?): BookChatToken {
+		val refreshToken = bookchatToken?.refreshToken
+		val requestWithRefreshToken =
+			getNewRequest(
+				requestBody = getJsonRequestBody(
+					content = refreshToken,
+					contentType = CONTENT_TYPE_JSON
+				),
+				requestUrl = TOKEN_RENEWAL_URL
+			)
+
+		val response = proceed(requestWithRefreshToken)
+
+		// TODO : 리프레시 토큰마저 만료되었음으로 새로 로그인 해야함
+		//  모든 작업 종료하고 로그인 페이지로 이동하게 수정
+		if (response.isSuccessful.not()) throw TokenRenewalFailException()
+
+		val newToken = response.parseToToken()
+		runBlocking { clientRepository.saveBookChatToken(newToken) }
+		return newToken
 	}
 
-	private fun requestWithAccessToken(chain: Interceptor.Chain, accessToken: String?): Response {
-		val tokenAddedRequest = chain.request()
-			.addHeader(AUTHORIZATION, accessToken ?: "")
-		return chain.proceed(tokenAddedRequest)
+	private fun Interceptor.Chain.requestWithAccessToken(bookChatToken: BookChatToken?): Response {
+		val accessToken = bookChatToken?.accessToken
+		val requestWithToken = request().addHeader(AUTHORIZATION, accessToken ?: "")
+		return proceed(requestWithToken)
 	}
 
-	//요청 하는 곳 마다 전부 예외처리 되어있는지 확인해보자.
-	//채팅 connect요청도 이거임(예외처리해야함)
-	private fun createException(
-		httpCode: Int,
-		errorResponseString: String?
-	): Exception? =
-		when (httpCode) {
-			400 -> null //BadRequestException(errorResponseString)
-			403 -> ForbiddenException(errorResponseString)
-			else -> null
+	//TODO :요청 하는 곳 마다 전부 예외처리 되어있는지 확인해보자.
+	// 채팅 connect요청도 이거임(예외처리해야함)
+	private fun Response.getException(): Exception {
+		return when (code) {
+			400 -> BadRequestException(message)
+			403 -> ForbiddenException(message)
+			else -> IOException(message)
 		}
+	}
 
 	private fun Request.addHeader(headerName: String, headerContent: String): Request {
-		return this.newBuilder()
+		return newBuilder()
 			.addHeader(headerName, headerContent)
 			.build()
 	}
 
-	private fun makeNewRequest(
+	private fun getNewRequest(
 		requestBody: RequestBody,
-		url: String
+		requestUrl: String
 	): Request {
 		return Request.Builder()
-			.url(url)
+			.url(requestUrl)
 			.post(requestBody)
 			.build()
 	}
@@ -109,13 +100,12 @@ class AppInterceptor @Inject constructor(
 		content: T,
 		contentType: String
 	): RequestBody {
-		val jsonString = Gson().toJson(content)
-		val requestBody = RequestBody.create(contentType.toMediaTypeOrNull(), jsonString)
-		return requestBody
+		val jsonString = gson.toJson(content)
+		return jsonString.toRequestBody(contentType.toMediaTypeOrNull())
 	}
 
-	private fun parseResponseToToken(response: String?): BookChatToken {
-		return Gson().fromJson(response, BookChatToken::class.java)
+	private fun Response.parseToToken(): BookChatToken {
+		return gson.fromJson(this.body.toString(), BookChatToken::class.java)
 	}
 
 	companion object {

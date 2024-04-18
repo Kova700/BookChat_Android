@@ -64,8 +64,11 @@ object RetrofitModule {
 
 	@Provides
 	@Singleton
-	fun provideAppInterceptor(clientRepository: ClientRepository): Interceptor {
-		return AppInterceptor(clientRepository)
+	fun provideAppInterceptor(
+		clientRepository: ClientRepository,
+		gson: Gson,
+	): Interceptor {
+		return AppInterceptor(clientRepository, gson)
 	}
 
 	@Provides
