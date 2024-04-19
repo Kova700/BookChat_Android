@@ -6,18 +6,21 @@ import com.example.bookchat.App
 import com.example.bookchat.data.database.dao.ChannelDAO
 import com.example.bookchat.data.mapper.toBookRequest
 import com.example.bookchat.data.mapper.toChannel
+import com.example.bookchat.data.mapper.toChannelDefaultImageTypeNetwork
 import com.example.bookchat.data.mapper.toChannelEntity
 import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.request.RequestMakeChatRoom
+import com.example.bookchat.data.request.RequestMakeChannel
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.ResponseChannelInfo
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.ChannelDefaultImageType
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.UserRepository
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.compressToByteArray
+import com.example.bookchat.utils.toMultiPartBody
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -25,9 +28,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
 //TODO : 채팅방 정보 조회 API 실패 시 재시도 로직 필요함 (채팅 전송 재시도 로직같은)
@@ -110,7 +110,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	override suspend fun makeChannel(
 		channelTitle: String,
 		channelSize: Int,
-		defaultRoomImageType: Int,
+		defaultRoomImageType: ChannelDefaultImageType,
 		channelTags: List<String>,
 		selectedBook: Book,
 		channelImage: Bitmap?
@@ -118,14 +118,19 @@ class ChannelRepositoryImpl @Inject constructor(
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
 		val response = bookChatApi.makeChannel(
-			requestMakeChatRoom = RequestMakeChatRoom(
+			requestMakeChannel = RequestMakeChannel(
 				roomName = channelTitle,
 				roomSize = channelSize,
-				defaultRoomImageType = defaultRoomImageType,
+				defaultRoomImageType = defaultRoomImageType.toChannelDefaultImageTypeNetwork(),
 				hashTags = channelTags,
 				bookRequest = selectedBook.toBookRequest()
 			),
-			chatRoomImage = getMultiPartBody(channelImage?.compressToByteArray())
+			chatRoomImage = channelImage?.compressToByteArray()?.toMultiPartBody(
+				contentType = CONTENT_TYPE_IMAGE_WEBP,
+				multipartName = IMAGE_MULTIPART_NAME,
+				fileName = IMAGE_FILE_NAME,
+				fileExtension = IMAGE_FILE_EXTENSION_WEBP
+			)
 		)
 
 		val createdChannelId = response.headers()["Location"]?.split("/")?.last()?.toLong()
@@ -135,19 +140,6 @@ class ChannelRepositoryImpl @Inject constructor(
 		channelDAO.upsertChannel(createdChannel.toChannelEntity())
 		setChannels(mapChannels.value + mapOf(Pair(createdChannel.roomId, createdChannel)))
 		return createdChannel
-	}
-
-	private fun getMultiPartBody(bitmapByteArray: ByteArray?): MultipartBody.Part? {
-		if (bitmapByteArray == null || bitmapByteArray.isEmpty()) return null
-
-		val imageRequestBody = bitmapByteArray.toRequestBody(
-			CONTENT_TYPE_IMAGE_WEBP.toMediaTypeOrNull(), 0, bitmapByteArray.size
-		)
-		return MultipartBody.Part.createFormData(
-			IMAGE_MULTIPART_NAME,
-			IMAGE_FILE_NAME + IMAGE_FILE_EXTENSION_WEBP,
-			imageRequestBody
-		)
 	}
 
 	// TODO : 이미 입장되어있는 채널에 입장 API 호출하면 응답코드 어떻게 넘어오는지 확인
