@@ -1,6 +1,5 @@
 package com.example.bookchat.data.repository
 
-import android.graphics.Bitmap
 import android.util.Log
 import com.example.bookchat.App
 import com.example.bookchat.data.database.dao.ChannelDAO
@@ -19,7 +18,6 @@ import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.UserRepository
 import com.example.bookchat.utils.Constants.TAG
-import com.example.bookchat.utils.compressToByteArray
 import com.example.bookchat.utils.toMultiPartBody
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -113,7 +111,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		defaultRoomImageType: ChannelDefaultImageType,
 		channelTags: List<String>,
 		selectedBook: Book,
-		channelImage: Bitmap?
+		channelImage: ByteArray?
 	): Channel {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
@@ -125,7 +123,7 @@ class ChannelRepositoryImpl @Inject constructor(
 				hashTags = channelTags,
 				bookRequest = selectedBook.toBookRequest()
 			),
-			chatRoomImage = channelImage?.compressToByteArray()?.toMultiPartBody(
+			chatRoomImage = channelImage?.toMultiPartBody(
 				contentType = CONTENT_TYPE_IMAGE_WEBP,
 				multipartName = IMAGE_MULTIPART_NAME,
 				fileName = IMAGE_FILE_NAME,
