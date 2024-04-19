@@ -1,16 +1,22 @@
 package com.example.bookchat.domain.repository
 
 import com.example.bookchat.domain.model.Book
+import com.example.bookchat.domain.model.BookSearchSortOption
 import com.example.bookchat.utils.BookImgSizeManager
+import kotlinx.coroutines.flow.Flow
 
 interface BookSearchRepository {
-	suspend fun searchBooks(
+	fun getBooksFLow(initFlag: Boolean = false): Flow<List<Book>>
+
+	suspend fun search(
 		keyword: String,
 		loadSize: Int = SEARCH_BOOKS_ITEM_LOAD_SIZE * 2,
-		page: Int = 1
-	): List<Book>
+		sort : BookSearchSortOption
+	)
+
+	fun getCachedBook(isbn: String): Book
 
 	companion object {
-		private val SEARCH_BOOKS_ITEM_LOAD_SIZE = BookImgSizeManager.flexBoxBookSpanSize * 2
+		val SEARCH_BOOKS_ITEM_LOAD_SIZE = BookImgSizeManager.flexBoxBookSpanSize * 2
 	}
 }
