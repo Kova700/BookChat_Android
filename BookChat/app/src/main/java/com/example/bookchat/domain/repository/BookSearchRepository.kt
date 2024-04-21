@@ -10,8 +10,8 @@ interface BookSearchRepository {
 
 	suspend fun search(
 		keyword: String,
-		loadSize: Int = SEARCH_BOOKS_ITEM_LOAD_SIZE * 2,
-		sort : BookSearchSortOption
+		sort: BookSearchSortOption = BookSearchSortOption.ACCURACY,
+		loadSize: Int = SEARCH_BOOKS_ITEM_LOAD_SIZE * 2
 	)
 
 	fun getCachedBook(isbn: String): Book
