@@ -12,12 +12,12 @@ import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.domain.repository.UserRepository
-import com.example.bookchat.utils.DataStoreManager
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.runBlocking
 import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.StompSession
 import org.hildan.krossbow.stomp.frame.FrameBody
@@ -247,10 +247,8 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	private fun getHeader(): Map<String, String> {
-		return mapOf(
-			AUTHORIZATION to
-							"${DataStoreManager.getBookChatTokenSync().getOrNull()?.accessToken}"
-		)
+		val bookchatToken = runBlocking { clientRepository.getBookChatToken() }
+		return mapOf(AUTHORIZATION to "${bookchatToken?.accessToken}")
 	}
 
 	companion object {
