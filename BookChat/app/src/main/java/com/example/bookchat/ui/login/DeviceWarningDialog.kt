@@ -16,7 +16,7 @@ class DeviceWarningDialog : DialogFragment() {
 
 	private var _binding: DialogDeviceWarningBinding? = null
 	private val binding get() = _binding!!
-	private val loginViewModel: LoginViewModel by viewModels({ requireParentFragment() })
+	private val loginViewModel: LoginViewModel by viewModels({ requireActivity() })
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -42,11 +42,11 @@ class DeviceWarningDialog : DialogFragment() {
 	}
 
 	fun onClickCancelBtn() {
-		this.dismiss()
+		dismiss()
 	}
 
 	fun onClickOkBtn() {
 		loginViewModel.onClickDeviceWarningOk()
-		this.dismiss()
+		dismiss()
 	}
 }
