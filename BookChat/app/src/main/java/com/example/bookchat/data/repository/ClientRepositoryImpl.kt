@@ -4,11 +4,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.bookchat.App
-import com.example.bookchat.data.UserSignUpDto
 import com.example.bookchat.data.datastore.clearData
 import com.example.bookchat.data.datastore.getDataFlow
 import com.example.bookchat.data.datastore.setData
 import com.example.bookchat.data.mapper.toBookChatToken
+import com.example.bookchat.data.mapper.toNetWork
 import com.example.bookchat.data.mapper.toOAuth2ProviderNetwork
 import com.example.bookchat.data.mapper.toUser
 import com.example.bookchat.data.network.BookChatApi
@@ -19,14 +19,14 @@ import com.example.bookchat.data.response.NeedToSignUpException
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.data.response.NickNameDuplicateException
 import com.example.bookchat.data.response.ResponseBodyEmptyException
-import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.model.IdToken
+import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.model.User
+import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.utils.DataStoreManager
+import com.example.bookchat.utils.toMultiPartBody
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.gson.Gson
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.IOException
@@ -37,18 +37,16 @@ import kotlin.coroutines.resume
 class ClientRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi,
 	private val dataStore: DataStore<Preferences>,
-	private val gson: Gson,
-) : ClientRepository {
-	//GoogleLoginRepository
-	//KakaoLoginRepository
-	private val bookChatTokenKey = stringPreferencesKey(BOOKCHAT_TOKEN_KEY)
-	private val fcmTokenKey = stringPreferencesKey(FCM_TOKEN_KEY)
+	private val bookChatTokenRepository: BookChatTokenRepository,
+) : ClientRepository,
+	BookChatTokenRepository by bookChatTokenRepository {
+
 	private val deviceUUIDKey = stringPreferencesKey(DEVICE_UUID_KEY)
 
 	private var cachedClient: User? = null
+	private var cachedIdToken: IdToken? = null
 
 	override suspend fun signIn(
-		idToken: IdToken,
 		approveChangingDevice: Boolean
 	) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
@@ -57,15 +55,14 @@ class ClientRepositoryImpl @Inject constructor(
 			fcmToken = getFCMToken().text,
 			deviceToken = getDeviceID(),
 			approveChangingDevice = approveChangingDevice,
-			oauth2Provider = idToken.oAuth2Provider.toOAuth2ProviderNetwork()
+			oauth2Provider = cachedIdToken!!.oAuth2Provider.toOAuth2ProviderNetwork()
 		)
-
-		val response = bookChatApi.signIn(idToken.token, requestUserSignIn)
+		val response = bookChatApi.signIn(cachedIdToken!!.token, requestUserSignIn)
 		when (response.code()) {
 			200 -> {
 				val token = response.body()
 				token?.let {
-					DataStoreManager.saveBookChatToken(token.toBookChatToken())
+					saveBookChatToken(token.toBookChatToken())
 					return
 				}
 				throw ResponseBodyEmptyException(response.errorBody()?.string())
@@ -82,19 +79,28 @@ class ClientRepositoryImpl @Inject constructor(
 		}
 	}
 
-	override suspend fun signUp(userSignUpDto: UserSignUpDto) {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
+	override suspend fun signUp(
+		nickname: String,
+		readingTastes: List<ReadingTaste>,
+		userProfile: ByteArray?
+	) {
+		if (isNetworkConnected().not()) throw NetworkIsNotConnectedException()
+		val idToken = cachedIdToken ?: throw IOException("IdToken does not exist.")
 
-		val idToken = DataStoreManager.getIdToken()
 		val requestUserSignUp = RequestUserSignUp(
 			oauth2Provider = idToken.oAuth2Provider.toOAuth2ProviderNetwork(),
-			nickname = userSignUpDto.nickname,
-			readingTastes = userSignUpDto.readingTastes
+			nickname = nickname,
+			readingTastes = readingTastes.map { it.toNetWork() },
+//			defaultProfileImageType = ???????이거도 그럼 처음부터 가져와야하는거아닌가?
 		)
-
 		bookChatApi.signUp(
 			idToken = idToken.token,
-			userProfileImage = userSignUpDto.userProfileImage,
+			userProfileImage = userProfile?.toMultiPartBody(
+				contentType = CONTENT_TYPE_IMAGE_WEBP,
+				multipartName = PROFILE_IMAGE_MULTIPART_NAME,
+				fileName = PROFILE_IMAGE_FILE_NAME,
+				fileExtension = PROFILE_IMAGE_FILE_EXTENSION
+			),
 			requestUserSignUp = requestUserSignUp
 		)
 	}
@@ -135,64 +141,38 @@ class ClientRepositoryImpl @Inject constructor(
 		}
 	}
 
-	override suspend fun renewFCMToken(token: String) {
+	override suspend fun renewFCMToken(fcmToken: FCMToken) {
+		if (isBookChatTokenExist().not()) return
 		//TODO : 매번 로그인 시에 호출하여 서버에 등록된 FCM 토큰 덮어쓰기
 		// 가장 최근 기기로 알람가게 구현
-
 	}
 
-	//TODO : 토큰 암호화 추가
-	override suspend fun getBookChatToken(): BookChatToken? {
-		val tokenString = dataStore.getDataFlow(bookChatTokenKey).firstOrNull()
-		if (tokenString.isNullOrBlank()) return null
-		return gson.fromJson(tokenString, BookChatToken::class.java)
-	}
-
-	//TODO : 없다면 API 호출해서 가져오기
 	private suspend fun getFCMToken(): FCMToken {
-		val cachedToken = dataStore.getDataFlow(fcmTokenKey).firstOrNull()
-		if (cachedToken != null) return FCMToken(cachedToken)
-
-		suspendCancellableCoroutine<Result<String>> { continuation ->
+		val fcmToken = suspendCancellableCoroutine<Result<String>> { continuation ->
 			FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-				if (task.isSuccessful.not()) throw IOException("Failed to retrieve FCMToken from Google servers.")
+				if (task.isSuccessful.not()) return@addOnCompleteListener
 				continuation.resume(Result.success(task.result))
 			}
-		}.onSuccess { token ->
-			val fcmToken = FCMToken(token)
-			saveFCMToken(fcmToken)
-			return fcmToken
-		}
-		throw IOException("Failed to retrieve FCMToken from Google servers.")
+		}.map { FCMToken(it) }.getOrElse { e -> throw e }
+		return fcmToken
 	}
 
 	private suspend fun getDeviceID(): String {
 		return dataStore.getDataFlow(deviceUUIDKey).firstOrNull() ?: getNewDeviceID()
 	}
 
-	override suspend fun saveBookChatToken(token: BookChatToken) {
-		val tokenString = gson.toJson(
-			token.copy(accessToken = "$BOOKCHAT_TOKEN_PREFIX ${token.accessToken}")
-		)
-		dataStore.setData(bookChatTokenKey, tokenString)
+	override fun getCachedIdToken(): IdToken {
+		return cachedIdToken!!
 	}
 
-	suspend fun saveFCMToken(fcmToken: FCMToken) {
-		dataStore.setData(fcmTokenKey, fcmToken.text)
+	override fun saveIdToken(token: IdToken) {
+		cachedIdToken = token
 	}
 
 	private suspend fun getNewDeviceID(): String {
 		val uuid = UUID.randomUUID().toString()
 		dataStore.setData(deviceUUIDKey, uuid)
 		return uuid
-	}
-
-	private suspend fun clearBookChatToken() {
-		dataStore.clearData(bookChatTokenKey)
-	}
-
-	private suspend fun clearFCMToken() {
-		dataStore.clearData(fcmTokenKey)
 	}
 
 	private suspend fun clearDeviceUUIDKey() {
@@ -208,10 +188,11 @@ class ClientRepositoryImpl @Inject constructor(
 	}
 
 	companion object {
-		private const val BOOKCHAT_TOKEN_PREFIX = "Bearer"
-		private const val BOOKCHAT_TOKEN_KEY = "BOOKCHAT_TOKEN_KEY"
-		private const val FCM_TOKEN_KEY = "FCM_TOKEN_KEY"
 		private const val DEVICE_UUID_KEY = "DEVICE_UUID_KEY"
+
+		const val CONTENT_TYPE_IMAGE_WEBP = "image/webp"
+		const val PROFILE_IMAGE_FILE_NAME = "profile_img"
+		const val PROFILE_IMAGE_FILE_EXTENSION = ".webp"
+		const val PROFILE_IMAGE_MULTIPART_NAME = "userProfileImage"
 	}
 }
-

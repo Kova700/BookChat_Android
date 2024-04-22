@@ -5,7 +5,7 @@ import com.example.bookchat.data.response.BadRequestException
 import com.example.bookchat.data.response.ForbiddenException
 import com.example.bookchat.data.response.TokenRenewalFailException
 import com.example.bookchat.domain.model.BookChatToken
-import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -14,18 +14,17 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
-import java.io.IOException
 import javax.inject.Inject
 
 class AppInterceptor @Inject constructor(
-	private val clientRepository: ClientRepository,
+	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val gson: Gson
 ) : Interceptor {
 
 	override fun intercept(
 		chain: Interceptor.Chain
 	): Response {
-		val bookchatToken = runBlocking { clientRepository.getBookChatToken() }
+		val bookchatToken = runBlocking { bookChatTokenRepository.getBookChatToken() }
 		var response = chain.requestWithAccessToken(bookchatToken)
 		if (response.isSuccessful) return response
 
@@ -35,7 +34,8 @@ class AppInterceptor @Inject constructor(
 			if (response.isSuccessful) return response
 		}
 
-		throw response.getException()
+		response.getException()?.let { throw it }
+		return response
 	}
 
 	private fun Interceptor.Chain.renewToken(bookchatToken: BookChatToken?): BookChatToken {
@@ -56,7 +56,7 @@ class AppInterceptor @Inject constructor(
 		if (response.isSuccessful.not()) throw TokenRenewalFailException()
 
 		val newToken = response.parseToToken()
-		runBlocking { clientRepository.saveBookChatToken(newToken) }
+		runBlocking { bookChatTokenRepository.saveBookChatToken(newToken) }
 		return newToken
 	}
 
@@ -68,11 +68,11 @@ class AppInterceptor @Inject constructor(
 
 	//TODO :요청 하는 곳 마다 전부 예외처리 되어있는지 확인해보자.
 	// 채팅 connect요청도 이거임(예외처리해야함)
-	private fun Response.getException(): Exception {
+	private fun Response.getException(): Exception? {
 		return when (code) {
 			400 -> BadRequestException(message)
 			403 -> ForbiddenException(message)
-			else -> IOException(message)
+			else -> null
 		}
 	}
 
@@ -105,7 +105,7 @@ class AppInterceptor @Inject constructor(
 	}
 
 	private fun Response.parseToToken(): BookChatToken {
-		return gson.fromJson(this.body.toString(), BookChatToken::class.java)
+		return gson.fromJson(body?.string(), BookChatToken::class.java)
 	}
 
 	companion object {

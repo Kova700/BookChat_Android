@@ -7,6 +7,7 @@ import com.example.bookchat.data.mapper.toChat
 import com.example.bookchat.data.request.RequestSendChat
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
+import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
@@ -32,6 +33,7 @@ class StompHandlerImpl @Inject constructor(
 	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
+	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val userRepository: UserRepository,
 	private val gson: Gson,
 ) : StompHandler {
@@ -247,7 +249,7 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	private fun getHeader(): Map<String, String> {
-		val bookchatToken = runBlocking { clientRepository.getBookChatToken() }
+		val bookchatToken = runBlocking { bookChatTokenRepository.getBookChatToken() }
 		return mapOf(AUTHORIZATION to "${bookchatToken?.accessToken}")
 	}
 
