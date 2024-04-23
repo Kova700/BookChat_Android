@@ -1,4 +1,4 @@
-package com.example.bookchat
+package com.example.bookchat.firebase
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -6,14 +6,15 @@ import android.app.NotificationManager
 import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.example.bookchat.R
 import com.example.bookchat.data.FCMBody
 import com.example.bookchat.data.FCMPushMessage
 import com.example.bookchat.data.PushType
 import com.example.bookchat.data.toChat
+import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.utils.DataStoreManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
@@ -39,10 +40,7 @@ class FCMService : FirebaseMessagingService() {
 
 	override fun onNewToken(token: String) {
 		super.onNewToken(token)
-		DataStoreManager.saveFCMTokenSync(token)
-		if (DataStoreManager.isAccessTokenExist().not()) return
-//		userRepository.renewFCMToken(token)
-
+		renewFCMToken(FCMToken(text = token))
 		//1.    로컬 DB에 FCM 토큰 저장
 		//2-1.  access 토큰을 가지고 있다면, 저장된 FCM 토큰 서버로 전송
 		//2-2.  없다면, 전송 x
@@ -63,6 +61,14 @@ class FCMService : FirebaseMessagingService() {
 		sendNotification(fcmPushMessage.body) //TODO : 유저ID로 유저 정보 가져와서 유저정보와 함께 띄우기
 	}
 
+	//TODO : WorkerManager로 백엔드 작업 위임
+	private fun renewFCMToken(fcmToken: FCMToken) {
+		CoroutineScope(Dispatchers.IO).launch {
+			clientRepository.renewFCMToken(fcmToken)
+		}
+	}
+
+	//TODO : WorkerManager로 백엔드 작업 위임
 	private fun insertNotificationData(fcmPushMessage: FCMPushMessage) {
 		CoroutineScope(Dispatchers.IO).launch {
 			val newChat = fcmPushMessage.body.toChat(clientRepository.getClientProfile().id)
