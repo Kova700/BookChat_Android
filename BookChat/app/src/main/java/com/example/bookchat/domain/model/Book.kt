@@ -9,7 +9,7 @@ data class Book(
 	val bookCoverImageUrl: String
 ) {
 	val authorsString: String
-		get() = authors.joinToString{""}
+		get() = authors.joinToString(", ")
 
 	companion object {
 		val DEFAULT = Book(
