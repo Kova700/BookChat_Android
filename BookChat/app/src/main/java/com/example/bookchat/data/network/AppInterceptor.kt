@@ -40,14 +40,13 @@ class AppInterceptor @Inject constructor(
 
 	private fun Interceptor.Chain.renewToken(bookchatToken: BookChatToken?): BookChatToken {
 		val refreshToken = bookchatToken?.refreshToken
-		val requestWithRefreshToken =
-			getNewRequest(
-				requestBody = getJsonRequestBody(
-					content = refreshToken,
-					contentType = CONTENT_TYPE_JSON
-				),
-				requestUrl = TOKEN_RENEWAL_URL
-			)
+		val requestWithRefreshToken = getNewRequest(
+			requestBody = getJsonRequestBody(
+				content = refreshToken,
+				contentType = CONTENT_TYPE_JSON
+			),
+			requestUrl = TOKEN_RENEWAL_URL
+		)
 
 		val response = proceed(requestWithRefreshToken)
 
@@ -105,10 +104,12 @@ class AppInterceptor @Inject constructor(
 	}
 
 	private fun Response.parseToToken(): BookChatToken {
-		return gson.fromJson(body?.string(), BookChatToken::class.java)
+		val token = gson.fromJson(body?.string(), BookChatToken::class.java)
+		return token.copy(accessToken = "$TOKEN_PREFIX ${token.accessToken}")
 	}
 
 	companion object {
+		private const val TOKEN_PREFIX = "Bearer"
 		private const val AUTHORIZATION = "Authorization"
 		private const val CONTENT_TYPE_JSON = "application/json; charset=utf-8"
 	}
