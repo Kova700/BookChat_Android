@@ -8,8 +8,8 @@ import com.example.bookchat.data.database.dao.TempMessageDAO
 import com.example.bookchat.data.repository.ChattingRepositoryFacade
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.repository.StompHandler
-import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_CHAT_ROOM_ID
 import com.example.bookchat.ui.channel.ChannelUiState.UiState
+import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_CHANNEL_ID
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 //TODO : 장문의 긴 채팅 길이 접기 구현해야함, 누르면 전체보기 가능하게
@@ -44,7 +43,7 @@ class ChannelViewModel @Inject constructor(
 	private val stompHandler: StompHandler,
 	private val chattingRepositoryFacade: ChattingRepositoryFacade,
 ) : ViewModel() {
-	private val channelId = savedStateHandle.get<Long>(EXTRA_CHAT_ROOM_ID)!!
+	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
 
 	private val _eventFlow = MutableSharedFlow<ChannelEvent>()
 	val eventFlow get() = _eventFlow
@@ -61,12 +60,16 @@ class ChannelViewModel @Inject constructor(
 
 	init {
 		observeChannel()
-		getChannel(channelId)
 		observeChats()
+		initUiState()
+		connectSocket()
+	}
+
+	private fun initUiState() {
+		getChannel(channelId)
 		getChats(channelId)
 		getTempSavedMessage()
 		clearTempSavedMessage()
-		connectSocket()
 	}
 
 	private fun observeChannel() = viewModelScope.launch {
@@ -90,14 +93,13 @@ class ChannelViewModel @Inject constructor(
 		if (existingLastChat?.chatId == null || newLastChat.chatId > existingLastChat.chatId) {
 			newChatNoticeFlow.update { newLastChat }
 		}
+
 	}
 
 	private fun getChats(channelId: Long) = viewModelScope.launch {
 		updateState { copy(uiState = UiState.LOADING) }
 		runCatching { chattingRepositoryFacade.getChats(channelId) }
-			.onSuccess {
-				updateState { copy(uiState = UiState.SUCCESS) }
-			}
+			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 			.onFailure {
 				handleError(it)
 				updateState { copy(uiState = UiState.ERROR) }
@@ -158,7 +160,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	// TODO : Distroy 될 때도 소켓 닫게 수정 (자동으로 보내지는지 확인)
-	fun finishActivity() {
+	private fun finish() {
 		disconnectSocket()
 		startEvent(ChannelEvent.MoveBack)
 	}
@@ -168,11 +170,15 @@ class ChannelViewModel @Inject constructor(
 			.onFailure { handleError(it) }
 	}
 
-	fun clickNewChatNotice() {
+	fun onClickBackBtn() {
+		finish()
+	}
+
+	fun onClickNewChatNotice() {
 		startEvent(ChannelEvent.ScrollNewChannelItem)
 	}
 
-	fun clickMenuBtn() {
+	fun onClickMenuBtn() {
 		startEvent(ChannelEvent.OpenOrCloseDrawer)
 	}
 
@@ -181,16 +187,12 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	//TODO : 예외처리 분기 추가해야함 (대부분이 현재 세션 연결 취소 후 다시 재연결 해야 함)
-	private suspend fun handleError(throwable: Throwable) {
-		withContext(Dispatchers.Main) {
-			when (throwable) {
+	private fun handleError(throwable: Throwable) {
+		when (throwable) {
 //            is MissingHeartBeatException -> {}
 //            is ConnectionException -> {}
 //            is LostReceiptException -> {}
-				else -> {
-					makeToast(R.string.error_network_error)
-				}
-			}
+			else -> makeToast(R.string.error_network_error)
 		}
 	}
 

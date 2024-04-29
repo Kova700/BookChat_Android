@@ -14,7 +14,6 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityChannelBinding
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.User
-import com.example.bookchat.domain.model.participants
 import com.example.bookchat.ui.channel.adapter.ChatDataItemAdapter
 import com.example.bookchat.ui.channel.adapter.chatdrawer.ChatRoomDrawerDataAdapter
 import com.example.bookchat.ui.channel.adapter.chatdrawer.ChatRoomDrawerHeaderAdapter
@@ -121,7 +120,7 @@ class ChannelActivity : AppCompatActivity() {
 
 	private fun setBackPressedDispatcher() {
 		onBackPressedDispatcher.addCallback {
-			channelViewModel.finishActivity()
+			channelViewModel.onClickBackBtn()
 		}
 	}
 
@@ -129,7 +128,7 @@ class ChannelActivity : AppCompatActivity() {
 		channelViewModel.uiStateFlow.collect { uiState ->
 			chatDataItemAdapter.submitList(uiState.chats)
 			uiState.channel?.let { updateDrawerHeader(it) }
-			uiState.channel?.participants()?.let { updateDrawerUserList(it) }
+			uiState.channel?.participants?.let { updateDrawerUserList(it) }
 		}
 	}
 
