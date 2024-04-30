@@ -5,16 +5,17 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.graphics.Color
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.bookchat.R
-import com.example.bookchat.data.FCMBody
 import com.example.bookchat.data.FCMPushMessage
 import com.example.bookchat.data.PushType
-import com.example.bookchat.data.toChat
+import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.utils.Constants.TAG
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
@@ -51,14 +52,26 @@ class FCMService : FirebaseMessagingService() {
 
 	override fun onMessageReceived(message: RemoteMessage) {
 		super.onMessageReceived(message)
+		Log.d(TAG, "FCMService: onMessageReceived() - message.data : ${message.data}")
+		handleMessage(message)
+	}
+
+	private fun handleMessage(message: RemoteMessage) {
 		val hashMap = gson.fromJson(message.data["body"], LinkedHashMap::class.java)
-		if (hashMap["pushType"] == PushType.LOGIN.toString()) {
-			//clientRepository.signOut() // TODO : 로그인 페이지로 이동 혹은 이동할 수 있는 Dialog 노출
-			return
+		when (hashMap["pushType"]) {
+			PushType.LOGIN.toString() -> {
+				//clientRepository.signOut() // TODO : 로그인 페이지로 이동 혹은 이동할 수 있는 Dialog 노출
+			}
+
+			PushType.CHAT.toString() -> {
+				val fcmPushMessage = gson.fromJson(message.data["body"], FCMPushMessage::class.java)
+				val chatId = fcmPushMessage.chatId
+				//TODO : API로 서버로부터 채팅 가져오기
+//				chatRepository
+//				insertNotificationData(fcmPushMessage)
+//				sendNotification(fcmPushMessage.body) //TODO : 유저ID로 유저 정보 가져와서 유저정보와 함께 띄우기
+			}
 		}
-		val fcmPushMessage = gson.fromJson(message.data["body"], FCMPushMessage::class.java)
-		insertNotificationData(fcmPushMessage)
-		sendNotification(fcmPushMessage.body) //TODO : 유저ID로 유저 정보 가져와서 유저정보와 함께 띄우기
 	}
 
 	//TODO : WorkerManager로 백엔드 작업 위임
@@ -69,15 +82,15 @@ class FCMService : FirebaseMessagingService() {
 	}
 
 	//TODO : WorkerManager로 백엔드 작업 위임
-	private fun insertNotificationData(fcmPushMessage: FCMPushMessage) {
-		CoroutineScope(Dispatchers.IO).launch {
-			val newChat = fcmPushMessage.body.toChat(clientRepository.getClientProfile().id)
-			chatRepository.insertChat(newChat)
-			channelRepository.updateLastChat(newChat.chatRoomId, newChat.chatId)
-		}
-	}
+//	private fun insertNotificationData(fcmPushMessage: FCMPushMessage) {
+//		CoroutineScope(Dispatchers.IO).launch {
+//			val newChat = fcmPushMessage.body.toChat(clientRepository.getClientProfile().id)
+//			chatRepository.insertChat(newChat)
+//			channelRepository.updateLastChat(newChat.chatRoomId, newChat.chatId)
+//		}
+//	}
 
-	private fun sendNotification(fcmBody: FCMBody) {
+	private fun sendNotification(chat: Chat) {
 		val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -93,22 +106,22 @@ class FCMService : FirebaseMessagingService() {
 			notificationManager.createNotificationChannel(notificationChannel)
 		}
 
-		notificationManager.notify(fcmBody.chatRoomId.toInt(), getChatNotification(fcmBody))
+		notificationManager.notify(chat.chatRoomId.toInt(), getChatNotification(chat))
 		notificationManager.notify(0, getGroupNotification())
 	}
 
-	private fun getChatNotification(fcmBody: FCMBody): Notification {
+	private fun getChatNotification(chat: Chat): Notification {
 		return NotificationCompat.Builder(this, channelId)
 			.setSmallIcon(R.mipmap.ic_bookchat_app_icon) //TODO : 유저 이미지로 수정
 			.setAutoCancel(true) // 클릭 시 알림이 삭제되도록 설정
 			.setGroup(KEY_BOOK_CHAT_GROUP)
 			.setWhen(System.currentTimeMillis()) //TODO : fcmBody.dispatchTime으로 수정
-			.setContentTitle(fcmBody.chatRoomId.toString()) //TODO : DB에서 채팅방명 가져오게 수정
-			.setContentText(fcmBody.message)
+			.setContentTitle(chat.chatRoomId.toString()) //TODO : DB에서 채팅방명 가져오게 수정
+			.setContentText(chat.message)
 			// 알림과 동시에 진동 설정(권한 필요)
 			.setDefaults(Notification.DEFAULT_VIBRATE)
 			.setStyle(
-				NotificationCompat.BigTextStyle().bigText(fcmBody.message)
+				NotificationCompat.BigTextStyle().bigText(chat.message)
 			).apply {
 				priority = NotificationCompat.PRIORITY_HIGH //다시 좀 찾아보기
 			}.build()
