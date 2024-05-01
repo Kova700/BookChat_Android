@@ -12,7 +12,7 @@ data class MakeChannelUiState(
 	val selectedBook: Book?
 ) {
 	val channelTagList
-		get() = channelTag.split(" ").filter { it.isNotBlank() }
+		get() = channelTag.trim().split(" ").filter { it.isNotBlank() }
 			.map { it.split("#") }.flatten().filter { it.isNotBlank() }
 
 	val isPossibleMakeChannel

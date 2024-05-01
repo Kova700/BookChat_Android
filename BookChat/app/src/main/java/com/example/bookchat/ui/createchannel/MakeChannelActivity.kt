@@ -15,7 +15,7 @@ import com.example.bookchat.databinding.ActivityMakeChannelBinding
 import com.example.bookchat.ui.channel.ChannelActivity
 import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_CHANNEL_ID
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
-import com.example.bookchat.ui.search.searchdetail.SearchResultDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
+import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
 import com.example.bookchat.utils.PermissionManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -34,7 +34,7 @@ class MakeChannelActivity : AppCompatActivity() {
 		binding.lifecycleOwner = this
 		observeUiState()
 		observeUiEvent()
-		initChannelTitleInputBar()
+		initView()
 	}
 
 	private val permissionsLauncher =
@@ -54,6 +54,17 @@ class MakeChannelActivity : AppCompatActivity() {
 		permissionsLauncher.launch(PermissionManager.getGalleryPermissions())
 	}
 
+	private fun initView() {
+		initChannelHashTagBar()
+		initChannelTitleInputBar()
+	}
+
+	private fun initChannelHashTagBar() {
+		binding.hashTagEt.addTextChangedListener { text: Editable? ->
+			makeChannelViewModel.onChangeHashTag(text.toString())
+		}
+	}
+
 	private fun initChannelTitleInputBar() {
 		binding.channelTitleEt.addTextChangedListener { text: Editable? ->
 			makeChannelViewModel.onChangeChannelTitle(text.toString())
@@ -70,6 +81,7 @@ class MakeChannelActivity : AppCompatActivity() {
 		with(binding.channelTitleEt) {
 			if (text.toString() == uiState.channelTitle) return
 			setText(uiState.channelTitle)
+			setSelection(uiState.channelTitle.length)
 		}
 	}
 
@@ -77,6 +89,7 @@ class MakeChannelActivity : AppCompatActivity() {
 		with(binding.hashTagEt) {
 			if (text.toString() == uiState.channelTag) return
 			setText(uiState.channelTag)
+			setSelection(uiState.channelTag.length)
 		}
 	}
 
@@ -85,7 +98,9 @@ class MakeChannelActivity : AppCompatActivity() {
 			if (uiState.isPossibleMakeChannel) {
 				setTextColor(Color.parseColor("#000000"))
 				isClickable = true
+				return
 			}
+
 			setTextColor(Color.parseColor("#B5B7BB"))
 			isClickable = false
 		}

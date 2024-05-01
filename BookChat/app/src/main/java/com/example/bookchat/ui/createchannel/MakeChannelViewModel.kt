@@ -33,7 +33,7 @@ class MakeChannelViewModel @Inject constructor(
 		updateState { copy(uiState = UiState.LOADING) }
 		runCatching {
 			channelRepository.makeChannel(
-				channelTitle = uiState.value.channelTitle,
+				channelTitle = uiState.value.channelTitle.trim(),
 				channelSize = DEFAULT_ROOM_SIZE,
 				defaultRoomImageType = uiState.value.defaultProfileImageType,
 				channelTags = uiState.value.channelTagList,
@@ -60,8 +60,12 @@ class MakeChannelViewModel @Inject constructor(
 		makeChannel()
 	}
 
+	fun onChangeHashTag(text: String?) {
+		text?.let { updateState { copy(channelTag = it) } }
+	}
+
 	fun onChangeChannelTitle(text: String?) {
-		text?.let { updateState { copy(channelTitle = it.trim()) } }
+		text?.let { updateState { copy(channelTitle = it) } }
 	}
 
 	fun onChangeChannelImg(byteArray: ByteArray) {
