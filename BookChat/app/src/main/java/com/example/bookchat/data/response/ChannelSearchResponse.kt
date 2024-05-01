@@ -58,16 +58,18 @@ data class ChannelSearchResponse(
 		)
 
 	val lastChat
-		get() = lastChatId?.let {
+		get() = lastChatId?.let { chatId ->
 			Chat(
-				chatId = it,
+				chatId = chatId,
 				chatRoomId = roomId,
 				message = lastChatMessage!!,
 				chatType = ChatType.UNKNOWN,
 				dispatchTime = lastChatDispatchTime!!,
-				sender = User.Default.copy(
-					id = lastChatSenderId!!
-				)
+				sender = lastChatSenderId?.let { senderId ->
+					User.Default.copy(
+						id = senderId
+					)
+				}
 			)
 		}
 
