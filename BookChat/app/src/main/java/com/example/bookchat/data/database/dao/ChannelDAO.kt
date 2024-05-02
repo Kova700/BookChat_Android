@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.bookchat.data.database.model.ChannelEntity
+import com.example.bookchat.domain.model.ChannelDefaultImageType
 
 @Dao
 interface ChannelDAO {
@@ -59,7 +60,7 @@ interface ChannelDAO {
 		roomName: String,
 		roomSid: String,
 		roomMemberCount: Long,
-		defaultRoomImageType: Int,
+		defaultRoomImageType: ChannelDefaultImageType,
 		roomImageUri: String?
 	)
 
@@ -76,6 +77,7 @@ interface ChannelDAO {
 	@Query(
 		"UPDATE Channel SET " +
 						"host_id = :hostId, " +
+						"room_name = :roomName, " +
 						"sub_host_ids = :subHostIds, " +
 						"guest_ids = :guestIds, " +
 						"book_title = :bookTitle, " +
@@ -87,6 +89,7 @@ interface ChannelDAO {
 	)
 	suspend fun updateDetailInfo(
 		roomId: Long,
+		roomName: String,
 		hostId: Long,
 		subHostIds: List<Long>?,
 		guestIds: List<Long>?,
@@ -96,6 +99,10 @@ interface ChannelDAO {
 		roomTags: List<String>,
 		roomCapacity: Int
 	)
+
+	suspend fun isExist(roomId: Long): Boolean {
+		return (getChannel(roomId) != null)
+	}
 
 	@Query(
 		"UPDATE Channel SET " +
