@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.channelList.adpater
+package com.example.bookchat.ui.home.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,30 +7,28 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.databinding.ItemChatRoomListDataBinding
+import com.example.bookchat.databinding.ItemHomeChannelItemBinding
 import com.example.bookchat.domain.model.Channel
 import javax.inject.Inject
 
-class ChannelListDataAdapter @Inject constructor() :
-	ListAdapter<Channel, ChatRoomItemViewHolder>(CHAT_ROOM_LIST_ITEM_COMPARATOR) {
+class HomeChannelAdapter @Inject constructor() :
+	ListAdapter<Channel, HomeChannelItemViewHolder>(CHANNEL_COMPARATOR) {
 	var onItemClick: ((Int) -> Unit)? = null
 
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatRoomItemViewHolder {
-		val binding: ItemChatRoomListDataBinding = DataBindingUtil.inflate(
-			LayoutInflater.from(parent.context), R.layout.item_chat_room_list_data,
-			parent, false
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeChannelItemViewHolder {
+		val binding: ItemHomeChannelItemBinding = DataBindingUtil.inflate(
+			LayoutInflater.from(parent.context),
+			R.layout.item_home_channel_item, parent, false
 		)
-		return ChatRoomItemViewHolder(binding, onItemClick)
+		return HomeChannelItemViewHolder(binding, onItemClick)
 	}
 
-	override fun onBindViewHolder(holder: ChatRoomItemViewHolder, position: Int) {
+	override fun onBindViewHolder(holder: HomeChannelItemViewHolder, position: Int) {
 		holder.bind(getItem(position))
 	}
 
-	override fun getItemViewType(position: Int): Int = R.layout.item_chat_room_list_data
-
 	companion object {
-		val CHAT_ROOM_LIST_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<Channel>() {
+		val CHANNEL_COMPARATOR = object : DiffUtil.ItemCallback<Channel>() {
 			override fun areItemsTheSame(oldItem: Channel, newItem: Channel) =
 				oldItem.roomId == newItem.roomId
 
@@ -40,8 +38,8 @@ class ChannelListDataAdapter @Inject constructor() :
 	}
 }
 
-class ChatRoomItemViewHolder(
-	private val binding: ItemChatRoomListDataBinding,
+class HomeChannelItemViewHolder(
+	private val binding: ItemHomeChannelItemBinding,
 	private val onItemClick: ((Int) -> Unit)?
 ) : RecyclerView.ViewHolder(binding.root) {
 

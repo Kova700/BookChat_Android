@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.home
+package com.example.bookchat.ui.home.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,19 +11,19 @@ import com.example.bookchat.databinding.ItemWishBookshelfDataBinding
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import javax.inject.Inject
 
-class MainBookAdapter @Inject constructor() :
-	ListAdapter<BookShelfListItem, MainBookItemViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
+class HomeBookAdapter @Inject constructor() :
+	ListAdapter<BookShelfListItem, HomeBookItemViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
 	var onItemClick: ((Int) -> Unit)? = null
 
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainBookItemViewHolder {
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeBookItemViewHolder {
 		val binding: ItemWishBookshelfDataBinding = DataBindingUtil.inflate(
 			LayoutInflater.from(parent.context), R.layout.item_wish_bookshelf_data,
 			parent, false
 		)
-		return MainBookItemViewHolder(binding, onItemClick)
+		return HomeBookItemViewHolder(binding, onItemClick)
 	}
 
-	override fun onBindViewHolder(holder: MainBookItemViewHolder, position: Int) {
+	override fun onBindViewHolder(holder: HomeBookItemViewHolder, position: Int) {
 		holder.bind(getItem(position))
 	}
 
@@ -38,7 +38,7 @@ class MainBookAdapter @Inject constructor() :
 	}
 }
 
-class MainBookItemViewHolder(
+class HomeBookItemViewHolder(
 	private val binding: ItemWishBookshelfDataBinding,
 	private val onItemClick: ((Int) -> Unit)?
 ) : RecyclerView.ViewHolder(binding.root) {
