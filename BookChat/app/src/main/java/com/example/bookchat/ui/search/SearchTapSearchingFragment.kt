@@ -12,7 +12,7 @@ import com.example.bookchat.databinding.FragmentSearchTapSearchingBinding
 /*TODO :관련 검색어 추가 예정*/
 class SearchTapSearchingFragment : Fragment() {
 	private var _binding: FragmentSearchTapSearchingBinding? = null
-	private val binding = _binding!!
+	private val binding get() = _binding!!
 
 	override fun onCreateView(
 		inflater: LayoutInflater,

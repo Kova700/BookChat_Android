@@ -5,11 +5,8 @@
     <data>
         <import type="android.view.View"/>
         <variable
-            name="activity"
-            type="com.example.bookchat.ui.search.SearchTapResultDetailActivity" />
-        <variable
             name="viewmodel"
-            type="com.example.bookchat.ui.search.SearchDetailViewModel" />
+            type="com.example.bookchat.ui.search.searchdetail.SearchDetailViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -22,7 +19,7 @@
             android:layout_marginStart="25dp"
             android:layout_marginTop="27dp"
             android:background="?android:selectableItemBackgroundBorderless"
-            android:onClick="@{() -> activity.clickBackBtn()}"
+            android:onClick="@{() -> viewmodel.onClickBackBtn()}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_back_btn" />
@@ -33,7 +30,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
             android:fontFamily="@font/notosanskr_bold"
-            android:text="@{viewmodel.getHeaderTitle()}"
             android:textColor="#222222"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="@+id/back_btn"
@@ -41,21 +37,10 @@
             app:layout_constraintTop_toTopOf="@+id/back_btn" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/search_result_detail_book_rcv"
+            android:id="@+id/search_result_rcv"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:visibility="@{viewmodel.isNecessaryDataFlagBook(viewmodel.necessaryDataFlag) ? View.VISIBLE :View.GONE}"
             android:layout_marginHorizontal="@dimen/flex_box_margin_horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/header_title" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/search_result_detail_chat_room_rcv"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="@{viewmodel.isNecessaryDataFlagChatRoom(viewmodel.necessaryDataFlag) ? View.VISIBLE :View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

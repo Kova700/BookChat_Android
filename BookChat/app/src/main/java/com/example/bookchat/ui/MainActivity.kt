@@ -4,17 +4,19 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityMainBinding
+import com.example.bookchat.domain.model.SearchPurpose
 import com.example.bookchat.ui.bookshelf.BookShelfFragment
 import com.example.bookchat.ui.channelList.ChannelListFragment
+import com.example.bookchat.ui.home.HomeFragment
 import com.example.bookchat.ui.mypage.MyPageFragment
 import com.example.bookchat.ui.search.SearchFragment
-import com.example.bookchat.ui.home.HomeFragment
-import com.example.bookchat.utils.SearchPurpose
+import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_SEARCH_PURPOSE
 import com.google.android.material.navigation.NavigationBarView
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,9 +24,14 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
 	private lateinit var binding: ActivityMainBinding
+	//TODO: Fragment관리 Navigation으로 변경
 	private val homeFragment by lazy { HomeFragment() }
 	private val bookShelfFragment by lazy { BookShelfFragment() }
-	private val searchFragment by lazy { SearchFragment(SearchPurpose.DefaultSearch) }
+	private val searchFragment by lazy {
+		SearchFragment().apply {
+			arguments = bundleOf(EXTRA_SEARCH_PURPOSE to SearchPurpose.SEARCH_BOTH)
+		}
+	}
 	private val channelListFragment by lazy { ChannelListFragment() }
 	private val myPageFragment by lazy { MyPageFragment() }
 
@@ -34,9 +41,7 @@ class MainActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-		with(binding) {
-			lifecycleOwner = this@MainActivity
-		}
+		binding.lifecycleOwner = this
 		//여기서  if (savedInstanceState != null) return  작업을 안해줘서 Fragment가 뷰가 다시 그려질 때,
 		//겹쳐서 보이는건가 (다크모드 변경 화면 전환 외에도 onCreate()가 다시 호출되는 경우는 있음으로 지역, 언어, 입력기기 변경 등)
 		setBottomNavigation()

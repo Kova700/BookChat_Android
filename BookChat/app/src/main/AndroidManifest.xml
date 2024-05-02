@@ -72,15 +72,15 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.search.ChatRoomInfoActivity"
+            android:name=".ui.search.channelInfo.ChannelInfoActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.createchannel.MakeChatRoomSelectBookActivity"
+            android:name=".ui.createchannel.MakeChannelSelectBookActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.createchannel.MakeChatRoomActivity"
+            android:name=".ui.createchannel.MakeChannelActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -120,7 +120,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.search.SearchTapResultDetailActivity"
+            android:name=".ui.search.searchdetail.SearchDetailActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -185,7 +185,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".FCMService"
+            android:name=".firebase.FCMService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

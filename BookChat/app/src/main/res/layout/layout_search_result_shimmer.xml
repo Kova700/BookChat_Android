@@ -1,149 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/shimmer_view_container_book_header"
-        setShimmerAnimation="@{viewmodel.isVisibleBookSkeleton(viewmodel.bookResultState)}"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
-        app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-        app:layout_constraintStart_toStartOf="@+id/guideline_start"
-        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/shimmerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:shimmer_auto_start="true">
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="75dp"
-            android:layout_height="28dp"
-            android:layout_gravity="start"
-            android:backgroundTint="#E6E6E6"
-            app:cardCornerRadius="5dp"
-            app:cardElevation="0dp" />
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_gravity="end"
-            android:backgroundTint="#E6E6E6"
-            app:cardCornerRadius="5dp"
-            app:cardElevation="0dp" />
-    </com.facebook.shimmer.ShimmerFrameLayout>
-
-    <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/shimmer_book_rcv"
-        setShimmerAnimation="@{viewmodel.isVisibleBookSkeleton(viewmodel.bookResultState)}"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="17dp"
-        app:layout_constraintEnd_toStartOf="@+id/guideline_end_book_rcv"
-        app:layout_constraintStart_toStartOf="@+id/guideline_start_book_rcv"
-        app:layout_constraintTop_toBottomOf="@+id/shimmer_view_container_book_header"
-        app:shimmer_auto_start="true">
-
-        <GridLayout
-            setShimmerGridLayout="@{true}"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:columnCount="3"
-            android:rowCount="2">
+            android:layout_height="match_parent">
 
-            <include layout="@layout/item_search_book_shimmer" />
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="30dp" />
 
-            <include layout="@layout/item_search_book_shimmer" />
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_end="30dp" />
 
-            <include layout="@layout/item_search_book_shimmer" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView13"
+                android:layout_width="75dp"
+                android:layout_height="28dp"
+                android:layout_gravity="start"
+                android:layout_marginTop="7dp"
+                android:backgroundTint="#E6E6E6"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="0dp"
+                app:layout_constraintStart_toStartOf="@+id/guideline_start"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <include layout="@layout/item_search_book_shimmer" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView14"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="end"
+                android:backgroundTint="#E6E6E6"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+                app:layout_constraintTop_toTopOf="@+id/cardView13" />
 
-            <include layout="@layout/item_search_book_shimmer" />
+            <GridLayout
+                android:id="@+id/shimmer_book_rcv_grid_layout"
+                setShimmerGridLayout="@{true}"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="17dp"
+                android:layout_marginStart="22.5dp"
+                android:layout_marginEnd="22.5dp"
+                android:columnCount="3"
+                android:rowCount="2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cardView13">
 
-            <include layout="@layout/item_search_book_shimmer" />
-        </GridLayout>
+                <include layout="@layout/item_search_book_shimmer" />
+
+                <include layout="@layout/item_search_book_shimmer" />
+
+                <include layout="@layout/item_search_book_shimmer" />
+
+                <include layout="@layout/item_search_book_shimmer" />
+
+                <include layout="@layout/item_search_book_shimmer" />
+
+                <include layout="@layout/item_search_book_shimmer" />
+            </GridLayout>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView16"
+                android:layout_width="75dp"
+                android:layout_height="28dp"
+                android:layout_gravity="start"
+                android:layout_marginTop="7dp"
+                android:backgroundTint="#E6E6E6"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="0dp"
+                app:layout_constraintStart_toStartOf="@+id/guideline_start"
+                app:layout_constraintTop_toBottomOf="@+id/shimmer_book_rcv_grid_layout" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="end"
+                android:backgroundTint="#E6E6E6"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+                app:layout_constraintTop_toTopOf="@+id/cardView16" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="17dp"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+                app:layout_constraintStart_toStartOf="@+id/guideline_start"
+                app:layout_constraintTop_toBottomOf="@+id/cardView16">
+
+                <include layout="@layout/item_search_channel_shimmer" />
+
+                <include layout="@layout/item_search_channel_shimmer" />
+
+                <include layout="@layout/item_search_channel_shimmer" />
+
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-<!--    <com.facebook.shimmer.ShimmerFrameLayout-->
-<!--        android:id="@+id/shimmer_view_container_channel_header"-->
-<!--        setShimmerAnimation="@{viewmodel.isVisibleChatRoomSkeleton(viewmodel.chatResultState)}"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="15dp"-->
-<!--        app:layout_constraintEnd_toStartOf="@+id/guideline_end"-->
-<!--        app:layout_constraintStart_toStartOf="@+id/guideline_start"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/book_rcv_barrier_bottom"-->
-<!--        app:shimmer_auto_start="true">-->
-
-<!--        <androidx.cardview.widget.CardView-->
-<!--            android:layout_width="75dp"-->
-<!--            android:layout_height="28dp"-->
-<!--            android:layout_gravity="start"-->
-<!--            android:backgroundTint="#E6E6E6"-->
-<!--            app:cardCornerRadius="5dp"-->
-<!--            app:cardElevation="0dp" />-->
-
-<!--        <androidx.cardview.widget.CardView-->
-<!--            android:layout_width="28dp"-->
-<!--            android:layout_height="28dp"-->
-<!--            android:layout_gravity="end"-->
-<!--            android:backgroundTint="#E6E6E6"-->
-<!--            app:cardCornerRadius="5dp"-->
-<!--            app:cardElevation="0dp" />-->
-<!--    </com.facebook.shimmer.ShimmerFrameLayout>-->
-
-<!--    <com.facebook.shimmer.ShimmerFrameLayout-->
-<!--        android:id="@+id/shimmer_channel_rcv"-->
-<!--        setShimmerAnimation="@{viewmodel.isVisibleChatRoomSkeleton(viewmodel.chatResultState)}"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="17dp"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/shimmer_view_container_channel_header"-->
-<!--        app:shimmer_auto_start="true">-->
-
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="vertical">-->
-
-<!--            <include layout="@layout/item_search_channel_shimmer" />-->
-
-<!--            <include layout="@layout/item_search_channel_shimmer" />-->
-
-<!--            <include layout="@layout/item_search_channel_shimmer" />-->
-
-<!--        </LinearLayout>-->
-
-<!--    </com.facebook.shimmer.ShimmerFrameLayout>-->
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="30dp" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_end"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_end="30dp" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_start_book_rcv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="-188dp" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_end_book_rcv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_end="@dimen/flex_box_margin_horizontal" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

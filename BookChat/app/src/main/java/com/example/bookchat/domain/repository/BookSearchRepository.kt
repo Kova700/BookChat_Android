@@ -12,7 +12,7 @@ interface BookSearchRepository {
 		keyword: String,
 		sort: BookSearchSortOption = BookSearchSortOption.ACCURACY,
 		loadSize: Int = SEARCH_BOOKS_ITEM_LOAD_SIZE * 2
-	)
+	): List<Book>
 
 	fun getCachedBook(isbn: String): Book
 

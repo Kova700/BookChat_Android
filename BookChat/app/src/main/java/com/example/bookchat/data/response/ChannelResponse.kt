@@ -44,12 +44,14 @@ data class ChannelResponse(
 				message = lastChatContent!!,
 				chatType = ChatType.UNKNOWN,
 				dispatchTime = lastChatDispatchTime!!,
-				sender = User(
-					id = senderId!!,
-					nickname = senderNickname!!,
-					profileImageUrl = senderProfileImageUrl,
-					defaultProfileImageType = senderDefaultProfileImageType!!.toUserDefaultProfileType()
-				)
+				sender = senderId?.let { id ->
+					User(
+						id = id,
+						nickname = senderNickname!!,
+						profileImageUrl = senderProfileImageUrl,
+						defaultProfileImageType = senderDefaultProfileImageType!!.toUserDefaultProfileType()
+					)
+				}
 			)
 		}
 }

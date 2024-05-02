@@ -140,7 +140,8 @@ class ChannelRepositoryImpl @Inject constructor(
 		return createdChannel
 	}
 
-	// TODO : 이미 입장되어있는 채널에 입장 API 호출하면 응답코드 어떻게 넘어오는지 확인
+	// TODO : 이미 입장되어있는 채널에 입장 API 호출하면 넘어오는 응답코드 따로 정의 후,
+	//  해당 코드 응답시, 예외 던지기
 	override suspend fun enter(channel: Channel) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 		val resultCode = bookChatApi.enterChatRoom(channel.roomId).code()
