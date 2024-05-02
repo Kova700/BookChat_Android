@@ -91,8 +91,8 @@ class ClientRepositoryImpl @Inject constructor(
 			oauth2Provider = idToken.oAuth2Provider.toOAuth2ProviderNetwork(),
 			nickname = nickname,
 			readingTastes = readingTastes.map { it.toNetWork() },
-//			defaultProfileImageType = ???????이거도 그럼 처음부터 가져와야하는거아닌가?
 		)
+
 		bookChatApi.signUp(
 			idToken = idToken.token,
 			userProfileImage = userProfile?.toMultiPartBody(

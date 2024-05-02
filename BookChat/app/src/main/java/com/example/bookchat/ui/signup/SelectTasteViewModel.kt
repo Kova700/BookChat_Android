@@ -1,95 +1,110 @@
 package com.example.bookchat.ui.signup
 
-import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.data.UserSignUpDto
+import com.example.bookchat.R
 import com.example.bookchat.data.response.ForbiddenException
 import com.example.bookchat.data.response.NetworkIsNotConnectedException
+import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.utils.Constants.TAG
-import com.example.bookchat.utils.ReadingTaste
+import com.example.bookchat.ui.signup.SignUpActivity.Companion.EXTRA_SIGNUP_USER_NICKNAME
+import com.example.bookchat.ui.signup.SignUpActivity.Companion.EXTRA_USER_PROFILE_BYTE_ARRAY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SelectTasteViewModel @Inject constructor(
+	private val savedStateHandle: SavedStateHandle,
 	private val clientRepository: ClientRepository
 ) : ViewModel() {
+	private val userNickname = savedStateHandle.get<String>(EXTRA_SIGNUP_USER_NICKNAME)!!
+	private val userProfile = savedStateHandle.get<ByteArray?>(EXTRA_USER_PROFILE_BYTE_ARRAY)!!
 
 	private val _eventFlow = MutableSharedFlow<SelectTasteEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
 
-	private val selectedTastes = ArrayList<ReadingTaste>()
+	private val _uiState = MutableStateFlow<SelectTasteState>(SelectTasteState.DEFAULT)
+	val uiState get() = _uiState.asStateFlow()
 
-	private val _isTastesEmpty = MutableStateFlow<Boolean>(true)
-	val isTastesEmpty = _isTastesEmpty.asStateFlow()
+	init {
+		initUiState()
+	}
 
-	val _signUpDto = MutableStateFlow<UserSignUpDto>(UserSignUpDto())
+	private fun initUiState() {
+		updateState {
+			copy(
+				nickname = userNickname,
+				userProfileImage = userProfile
+			)
+		}
+	}
 
-	fun signUp() = viewModelScope.launch {
-		_signUpDto.value.readingTastes = selectedTastes
-		runCatching { clientRepository.signUp(_signUpDto.value) }
-			.onSuccess { signIn() }
+	private fun signUp() = viewModelScope.launch {
+		runCatching {
+			clientRepository.signUp(
+				nickname = uiState.value.nickname,
+				readingTastes = uiState.value.readingTastes,
+				userProfile = uiState.value.userProfileImage
+			)
+		}.onSuccess { signIn() }
 			.onFailure { failHandler(it) }
 	}
 
 	private fun signIn() = viewModelScope.launch {
-		Log.d(TAG, "SelectTasteViewModel: signIn() - called")
 		runCatching { clientRepository.signIn() }
-			.onSuccess { requestUserInfo() }
+			.onSuccess { getClientProfile() }
 			.onFailure { failHandler(it) }
 	}
 
-	private fun requestUserInfo() = viewModelScope.launch {
-		Log.d(TAG, "LoginViewModel: requestUserInfo() - called")
+	private fun getClientProfile() = viewModelScope.launch {
 		runCatching { clientRepository.getClientProfile() }
 			.onSuccess { startEvent(SelectTasteEvent.MoveToMain) }
 			.onFailure { failHandler(it) }
 	}
 
-	fun clickTaste(pickedReadingTaste: ReadingTaste) {
-		if (selectedTastes.contains(pickedReadingTaste)) selectedTastes.remove(pickedReadingTaste)
-		else selectedTastes.add(pickedReadingTaste)
-		emptyCheck()
-		Log.d(TAG, "SelectTasteViewModel: clickTaste() - selectedTastes : $selectedTastes")
+	fun onClickSignUpBtn() {
+		signUp()
 	}
 
-	private fun emptyCheck() {
-		if (selectedTastes.isEmpty()) {
-			_isTastesEmpty.value = true
-			return
+	fun onClickTasteBtn(pickedReadingTaste: ReadingTaste) {
+		val existingList = uiState.value.readingTastes
+		updateState {
+			copy(
+				readingTastes =
+				if (existingList.contains(pickedReadingTaste)) (existingList - pickedReadingTaste)
+				else (existingList + pickedReadingTaste)
+			)
 		}
-		_isTastesEmpty.value = false
 	}
 
-	fun clickBackBtn() {
+	fun onClickBackBtn() {
 		startEvent(SelectTasteEvent.MoveToBack)
+	}
+
+	private inline fun updateState(block: SelectTasteState.() -> SelectTasteState) {
+		_uiState.update { _uiState.value.block() }
 	}
 
 	private fun startEvent(event: SelectTasteEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
 	}
 
-	sealed class SelectTasteEvent {
-		object MoveToMain : SelectTasteEvent()
-		object Forbidden : SelectTasteEvent()
-		object NetworkError : SelectTasteEvent()
-		object UnknownError : SelectTasteEvent()
-		object MoveToBack : SelectTasteEvent()
-	}
-
 	private fun failHandler(exception: Throwable) {
-		Log.d(TAG, "SelectTasteViewModel: failHandler() - called")
 		when (exception) {
-			is ForbiddenException -> startEvent(SelectTasteEvent.Forbidden)
-			is NetworkIsNotConnectedException -> startEvent(SelectTasteEvent.NetworkError)
-			else -> startEvent(SelectTasteEvent.UnknownError)
+			is ForbiddenException -> startEvent(SelectTasteEvent.ErrorEvent(R.string.login_forbidden_user))
+			is NetworkIsNotConnectedException -> startEvent(SelectTasteEvent.ErrorEvent(R.string.error_network))
+			else -> {
+				val errorMessage = exception.message
+				if (errorMessage.isNullOrBlank()) startEvent(SelectTasteEvent.ErrorEvent(R.string.error_else))
+				else startEvent(SelectTasteEvent.UnknownErrorEvent(errorMessage))
+			}
 		}
 	}
 }
