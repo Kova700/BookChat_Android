@@ -1,120 +1,116 @@
 package com.example.bookchat.data.network
 
 import com.example.bookchat.BuildConfig.TOKEN_RENEWAL_URL
-import com.example.bookchat.data.Token
+import com.example.bookchat.data.response.BadRequestException
 import com.example.bookchat.data.response.ForbiddenException
 import com.example.bookchat.data.response.TokenRenewalFailException
-import com.example.bookchat.utils.DataStoreManager
+import com.example.bookchat.domain.model.BookChatToken
+import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.google.gson.Gson
-import okhttp3.*
+import kotlinx.coroutines.runBlocking
+import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import java.io.IOException
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import javax.inject.Inject
 
-class AppInterceptor : Interceptor {
+class AppInterceptor @Inject constructor(
+	private val bookChatTokenRepository: BookChatTokenRepository,
+	private val gson: Gson
+) : Interceptor {
 
-    @Throws(IOException::class)
-    override fun intercept(
-        chain: Interceptor.Chain
-    ): Response {
-        val bookChatToken = DataStoreManager.getBookChatTokenSync().getOrNull()
-        var response = requestWithAccessToken(chain, bookChatToken?.accessToken)
+	override fun intercept(
+		chain: Interceptor.Chain
+	): Response {
+		val bookchatToken = runBlocking { bookChatTokenRepository.getBookChatToken() }
+		var response = chain.requestWithAccessToken(bookchatToken)
+		if (response.isSuccessful) return response
 
-        response = renewTokenOrPass(response, chain, bookChatToken)
-        if (response.isSuccessful) return response
+		if (response.isTokenExpired()) {
+			val newToken = chain.renewToken(bookchatToken)
+			response = chain.requestWithAccessToken(newToken)
+			if (response.isSuccessful) return response
+		}
 
-        val networkException = createException(response.code, null)
-        networkException?.let { throw it }
+		response.getException()?.let { throw it }
+		return response
+	}
 
-        return response
-    }
+	private fun Interceptor.Chain.renewToken(bookchatToken: BookChatToken?): BookChatToken {
+		val refreshToken = bookchatToken?.refreshToken
+		val requestWithRefreshToken = getNewRequest(
+			requestBody = getJsonRequestBody(
+				content = refreshToken,
+				contentType = CONTENT_TYPE_JSON
+			),
+			requestUrl = TOKEN_RENEWAL_URL
+		)
 
-    private fun renewTokenOrPass(
-        response: Response,
-        chain: Interceptor.Chain,
-        bookChatToken: Token?
-    ): Response {
-        if (!response.isTokenExpired()) return response
+		val response = proceed(requestWithRefreshToken)
 
-        val newToken = renewToken(chain, bookChatToken?.refreshToken)
-        return requestWithAccessToken(chain, newToken.accessToken)
-    }
+		// TODO : 리프레시 토큰마저 만료되었음으로 새로 로그인 해야함
+		//  모든 작업 종료하고 로그인 페이지로 이동하게 수정
+		if (response.isSuccessful.not()) throw TokenRenewalFailException()
 
-    private fun renewToken(
-        chain: Interceptor.Chain,
-        refreshToken: String?
-    ): Token {
-        val tokenRenewalResponse = requestTokenRenewal(chain, refreshToken)
-        if (!tokenRenewalResponse.isSuccessful) {
-            // TODO : 리프레시 토큰마저 만료되었음으로 새로 로그인 해야함
-            //  모든 작업 종료하고 로그인 페이지로 이동하게 수정
-            throw TokenRenewalFailException()
-        }
-        val token = parseResponseToToken(tokenRenewalResponse.body?.string())
-        DataStoreManager.saveBookChatTokenSync(token)
-        return token
-    }
+		val newToken = response.parseToToken()
+		runBlocking { bookChatTokenRepository.saveBookChatToken(newToken) }
+		return newToken
+	}
 
-    private fun requestTokenRenewal(
-        chain: Interceptor.Chain,
-        refreshToken: String?
-    ): Response {
-        val refreshTokenRequest =
-            makeNewRequest(getJsonRequestBody(refreshToken, CONTENT_TYPE_JSON), TOKEN_RENEWAL_URL)
-        return chain.proceed(refreshTokenRequest)
-    }
+	private fun Interceptor.Chain.requestWithAccessToken(bookChatToken: BookChatToken?): Response {
+		val accessToken = bookChatToken?.accessToken
+		val requestWithToken = request().addHeader(AUTHORIZATION, accessToken ?: "")
+		return proceed(requestWithToken)
+	}
 
-    private fun requestWithAccessToken(chain: Interceptor.Chain, accessToken: String?): Response {
-        val tokenAddedRequest = chain.request().addHeader(AUTHORIZATION, accessToken ?: "")
-        return chain.proceed(tokenAddedRequest)
-    }
+	//TODO :요청 하는 곳 마다 전부 예외처리 되어있는지 확인해보자.
+	// 채팅 connect요청도 이거임(예외처리해야함)
+	private fun Response.getException(): Exception? {
+		return when (code) {
+			400 -> BadRequestException(message)
+			403 -> ForbiddenException(message)
+			else -> null
+		}
+	}
 
-    //요청 하는 곳 마다 전부 예외처리 되어있는지 확인해보자.
-    //채팅 connect요청도 이거임(예외처리해야함)
-    private fun createException(
-        httpCode: Int,
-        errorResponseString: String?
-    ): Exception? =
-        when (httpCode) {
-            400 -> null //BadRequestException(errorResponseString)
-            403 -> ForbiddenException(errorResponseString)
-            else -> null
-        }
+	private fun Request.addHeader(headerName: String, headerContent: String): Request {
+		return newBuilder()
+			.addHeader(headerName, headerContent)
+			.build()
+	}
 
-    private fun Request.addHeader(headerName: String, headerContent: String): Request {
-        return this.newBuilder()
-            .addHeader(headerName, headerContent)
-            .build()
-    }
+	private fun getNewRequest(
+		requestBody: RequestBody,
+		requestUrl: String
+	): Request {
+		return Request.Builder()
+			.url(requestUrl)
+			.post(requestBody)
+			.build()
+	}
 
-    private fun makeNewRequest(
-        requestBody: RequestBody,
-        url: String
-    ): Request {
-        return Request.Builder()
-            .url(url)
-            .post(requestBody)
-            .build()
-    }
+	private fun Response.isTokenExpired(): Boolean {
+		return this.code == 401
+	}
 
-    private fun Response.isTokenExpired(): Boolean {
-        return this.code == 401
-    }
+	private fun <T> getJsonRequestBody(
+		content: T,
+		contentType: String
+	): RequestBody {
+		val jsonString = gson.toJson(content)
+		return jsonString.toRequestBody(contentType.toMediaTypeOrNull())
+	}
 
-    private fun <T> getJsonRequestBody(
-        content: T,
-        contentType: String
-    ): RequestBody {
-        val jsonString = Gson().toJson(content)
-        val requestBody = RequestBody.create(contentType.toMediaTypeOrNull(), jsonString)
-        return requestBody
-    }
+	private fun Response.parseToToken(): BookChatToken {
+		val token = gson.fromJson(body?.string(), BookChatToken::class.java)
+		return token.copy(accessToken = "$TOKEN_PREFIX ${token.accessToken}")
+	}
 
-    private fun parseResponseToToken(response: String?): Token {
-        return Gson().fromJson(response, Token::class.java)
-    }
-
-    companion object {
-        private const val AUTHORIZATION = "Authorization"
-        private const val CONTENT_TYPE_JSON = "application/json; charset=utf-8"
-    }
+	companion object {
+		private const val TOKEN_PREFIX = "Bearer"
+		private const val AUTHORIZATION = "Authorization"
+		private const val CONTENT_TYPE_JSON = "application/json; charset=utf-8"
+	}
 }

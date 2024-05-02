@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="channel"
+            type="com.example.bookchat.ui.channelList.model.ChannelListItem.ChannelItem" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
+            android:layout_marginVertical="10dp"
+            android:layout_marginStart="@dimen/default_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            app:cardCornerRadius="30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/bookImg"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:src="@drawable/loading_img"
+                channelDefaultImageType="@{channel.defaultRoomImageType}"
+                imgUrl="@{channel.roomImageUri}"
+                android:scaleType="fitXY" />
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/chat_room_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"
+            android:elegantTextHeight="true"
+            android:ellipsize="end"
+            android:fontFamily="@font/notosanskr_bold"
+            android:maxLines="1"
+            android:text="@{channel.roomName}"
+            android:textColor="#222222"
+            android:textSize="14sp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toStartOf="@+id/unchecked_chat_count_tv"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toEndOf="@+id/cardView"
+            app:layout_constraintTop_toTopOf="@+id/cardView" />
+
+        <TextView
+            android:id="@+id/unchecked_chat_count_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_bold"
+            android:text="999+"
+            android:textColor="#5648FF"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/chat_room_title_tv"
+            app:layout_constraintEnd_toStartOf="@+id/textView11"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/chat_room_title_tv"
+            app:layout_constraintTop_toTopOf="@+id/chat_room_title_tv" />
+
+        <TextView
+            android:id="@+id/textView11"
+            getFormattedDetailDateTimeText="@{channel.lastChat.dispatchTime}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/default_margin"
+            android:layout_marginTop="20dp"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:textColor="#222222"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/chat_content_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:elegantTextHeight="true"
+            android:ellipsize="end"
+            android:fontFamily="@font/notosanskr_regular"
+            android:maxLines="1"
+            android:text="@{channel.lastChat.message}"
+            android:textColor="#373737"
+            android:textSize="12sp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toStartOf="@+id/textView11"
+            app:layout_constraintStart_toStartOf="@+id/chat_room_title_tv"
+            app:layout_constraintTop_toBottomOf="@+id/chat_room_title_tv" />
+
+        <TextView
+            android:id="@+id/chat_member_count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:elegantTextHeight="true"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:fontFamily="@font/notosanskr_regular"
+            android:text="@{String.valueOf(channel.roomMemberCount) + @string/people_count_text}"
+            android:textColor="#373737"
+            android:textSize="10sp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toStartOf="@+id/textView11"
+            app:layout_constraintStart_toStartOf="@+id/chat_content_tv"
+            app:layout_constraintTop_toBottomOf="@+id/chat_content_tv" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface AgonyRepository {
 
-	fun getAgoniesFlow(): Flow<List<Agony>>
+	fun getAgoniesFlow(initFlag: Boolean = false): Flow<List<Agony>>
 	fun getAgonyFlow(agonyId: Long): Flow<Agony>
 
 	suspend fun getAgonies(

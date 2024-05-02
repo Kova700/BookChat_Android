@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <data>
-        <import type="android.view.View"/>
-        <import type="com.example.bookchat.ui.login.LoginViewModel"/>
-        <variable
-            name="activity"
-            type="com.example.bookchat.ui.login.LoginActivity" />
         <variable
             name="viewmodel"
             type="com.example.bookchat.ui.login.LoginViewModel" />
@@ -34,9 +29,9 @@
 
         <ProgressBar
             android:id="@+id/progressbar1"
+            setVisibilityLoadingUIInLogin="@{viewmodel.uiState.uiState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            setVisibilityLoadingUIInLogin="@{viewmodel.uiStateFlow}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -66,9 +61,9 @@
             android:backgroundTint="#FFFFFF"
             android:drawableLeft="@drawable/ic_google_icon"
             android:fontFamily="@font/notosanskr_medium"
-            android:text="@string/login_google_btn"
-            android:onClick="@{() -> activity.clickGoogleLoginBtn()}"
+            android:onClick="@{() -> viewmodel.onClickGoogleLoginBtn()}"
             android:stateListAnimator="@null"
+            android:text="@string/login_google_btn"
             android:textColor="#747474"
             android:textSize="16sp"
             app:iconPadding="-6dp"
@@ -90,9 +85,9 @@
             android:backgroundTint="#FEE500"
             android:drawableLeft="@drawable/ic_kakao_icon"
             android:fontFamily="@font/notosanskr_medium"
-            android:onClick="@{()->activity.clickKakaoLoginBtn()}"
-            android:text="@string/login_kakao_btn"
+            android:onClick="@{()->viewmodel.onClickKakaoLoginBtn()}"
             android:stateListAnimator="@null"
+            android:text="@string/login_kakao_btn"
             android:textColor="#392020"
             android:textSize="16sp"
             app:iconPadding="-10dp"

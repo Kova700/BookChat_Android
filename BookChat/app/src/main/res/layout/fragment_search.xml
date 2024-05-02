@@ -10,6 +10,7 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_test"
         android:background="#FFFFFF"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -21,8 +22,7 @@
             android:layout_marginStart="25dp"
             android:layout_marginTop="27dp"
             android:background="?android:selectableItemBackgroundBorderless"
-            android:onClick="@{() -> viewModel.clickBackBtn()}"
-            android:visibility="@{viewModel.isSearchTapDefault(viewModel.searchTapStatus) ? View.INVISIBLE : View.VISIBLE}"
+            android:onClick="@{() -> viewModel.onClickBackBtn()}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_back_btn" />
@@ -33,8 +33,7 @@
             android:layout_height="0dp"
             android:translationZ="30dp"
             android:background="#00000000"
-            android:onClick="@{() -> viewModel.clickSearchWindow()}"
-            android:visibility="@{viewModel.isSearchTapDefault(viewModel.searchTapStatus) ? View.VISIBLE : View.INVISIBLE}"
+            android:onClick="@{() -> viewModel.onClickSearchBar()}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/search_window"
@@ -59,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:background="?android:selectableItemBackgroundBorderless"
-            android:onClick="@{() -> viewModel.searchKeyword()}"
+            android:onClick="@{() -> viewModel.onClickSearchBtn()}"
             android:scaleType="fitXY"
             android:elevation="10dp"
             android:src="@drawable/ic_search_window_searcn_btn"
@@ -69,23 +68,20 @@
 
         <com.example.bookchat.ui.customview.BookChatEditText
             android:id="@+id/searchEditText"
-            setEnterListener="@{viewModel.keyboardEnterListener}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:paddingRight="60dp"
+            android:paddingEnd="60dp"
             android:background="@android:color/transparent"
             android:elevation="10dp"
             android:enabled="false"
             android:fontFamily="@font/notosanskr_regular"
             android:hint="@string/search_window_hint"
             android:inputType="text"
-            android:text="@={viewModel.searchKeyWord}"
             android:textColor="#222222"
             android:textColorHint="#B1B3B8"
             android:textCursorDrawable="@drawable/edittext_cursor"
             android:textSize="14sp"
-            app:addTextChangedListener="@{viewModel.editTextWatcher}"
             app:layout_constraintBottom_toBottomOf="@+id/search_btn"
             app:layout_constraintEnd_toStartOf="@+id/search_delete_btn"
             app:layout_constraintStart_toEndOf="@+id/search_btn"
@@ -98,9 +94,8 @@
             android:layout_marginEnd="27dp"
             android:background="#00ff0000"
             android:elevation="10dp"
-            android:onClick="@{() -> viewModel.clearSearchWindow()}"
+            android:onClick="@{() -> viewModel.onClickKeywordClearBtn()}"
             android:src="@drawable/ic_text_delete_btn"
-            android:visibility="@{viewModel.isSearchTapDefaultOrHistory(viewModel.searchTapStatus) ? View.INVISIBLE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@+id/search_window"
             app:layout_constraintEnd_toEndOf="@+id/search_window"
             app:layout_constraintTop_toTopOf="@+id/search_window" />

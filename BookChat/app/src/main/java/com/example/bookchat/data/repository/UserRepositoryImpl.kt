@@ -5,7 +5,6 @@ import com.example.bookchat.data.mapper.toUser
 import com.example.bookchat.data.mapper.toUserEntity
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.User
-import com.example.bookchat.domain.model.participantIds
 import com.example.bookchat.domain.repository.UserRepository
 import javax.inject.Inject
 
@@ -26,7 +25,7 @@ class UserRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun getChannelUsers(channel: Channel): List<User> {
-		return getUsers(channel.participantIds())
+		return getUsers(channel.participantIds)
 	}
 
 }

@@ -27,7 +27,7 @@ fun UserResponse.toUser(): User {
 		id = userId,
 		nickname = userNickname,
 		profileImageUrl = userProfileImageUri,
-		defaultProfileImageType = defaultProfileImageType
+		defaultProfileImageType = defaultProfileImageType.toUserDefaultProfileType()
 	)
 }
 
@@ -36,7 +36,7 @@ fun UserResponse.toUserEntity(): UserEntity {
 		id = userId,
 		nickname = userNickname,
 		profileImageUrl = userProfileImageUri,
-		defaultProfileImageType = defaultProfileImageType
+		defaultProfileImageType = defaultProfileImageType.toUserDefaultProfileType()
 	)
 }
 

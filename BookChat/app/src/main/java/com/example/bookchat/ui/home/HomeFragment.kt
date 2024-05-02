@@ -17,7 +17,8 @@ import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.channel.ChannelActivity
 import com.example.bookchat.ui.channelList.ChannelListFragment
-import com.example.bookchat.ui.channelList.adpater.ChannelListDataAdapter
+import com.example.bookchat.ui.home.adapter.HomeBookAdapter
+import com.example.bookchat.ui.home.adapter.HomeChannelAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,10 +33,10 @@ class HomeFragment : Fragment() {
 	private val homeViewModel: HomeViewModel by viewModels()
 
 	@Inject
-	lateinit var mainReadingBookAdapter: MainBookAdapter
+	lateinit var mainReadingBookAdapter: HomeBookAdapter
 
 	@Inject
-	lateinit var channelListDataAdapter: ChannelListDataAdapter
+	lateinit var homeChannelAdapter: HomeChannelAdapter
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -68,7 +69,7 @@ class HomeFragment : Fragment() {
 	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
 		homeViewModel.uiState.collect { uiState ->
 			mainReadingBookAdapter.submitList(uiState.readingBookShelfBooks)
-			channelListDataAdapter.submitList(uiState.channels)
+			homeChannelAdapter.submitList(uiState.channels)
 			setEmptyUiVisibility(uiState.readingBookShelfBooks, uiState.channels)
 		}
 	}
@@ -97,8 +98,8 @@ class HomeFragment : Fragment() {
 	}
 
 	private fun initChatRoomAdapter() {
-		channelListDataAdapter.onItemClick = { itemPosition ->
-			homeViewModel.onChannelItemClick(channelListDataAdapter.currentList[itemPosition].roomId)
+		homeChannelAdapter.onItemClick = { itemPosition ->
+			homeViewModel.onChannelItemClick(homeChannelAdapter.currentList[itemPosition].roomId)
 		}
 	}
 
@@ -113,7 +114,7 @@ class HomeFragment : Fragment() {
 
 	private fun initChatRoomRcv() {
 		with(binding.chatRoomUserInRcv) {
-			adapter = channelListDataAdapter
+			adapter = homeChannelAdapter
 			layoutManager = LinearLayoutManager(requireContext())
 		}
 	}
@@ -124,7 +125,7 @@ class HomeFragment : Fragment() {
 
 	private fun moveToChannel(channelId: Long) {
 		val intent = Intent(requireContext(), ChannelActivity::class.java)
-		intent.putExtra(ChannelListFragment.EXTRA_CHAT_ROOM_ID, channelId)
+		intent.putExtra(ChannelListFragment.EXTRA_CHANNEL_ID, channelId)
 		startActivity(intent)
 	}
 

@@ -41,10 +41,10 @@ class BookShelfRepositoryImpl @Inject constructor(
 
 	override fun getBookShelfFlow(bookShelfState: BookShelfState): Flow<List<BookShelfItem>> {
 		return mapBookShelfItems.map { items ->
-			items.values.toList().filter {
-				it.state == bookShelfState
+			items.values.toList()
+				.filter { it.state == bookShelfState }
 				//TODO :dispatchTime 같은 정렬 요소가 필요함
-			}.sortedWith(compareBy { bookshelfItem -> -bookshelfItem.bookShelfId })
+				.sortedWith(compareBy { bookshelfItem -> -bookshelfItem.bookShelfId })
 		}.distinctUntilChanged().filterNotNull()
 	}
 
@@ -96,7 +96,10 @@ class BookShelfRepositoryImpl @Inject constructor(
 			bookShelfState = bookShelfState,
 			star = starRating
 		)
-		bookChatApi.registerBookShelfBook(requestRegisterBookShelfBook)
+		///v1/api/bookshelves/86
+//		val response = bookChatApi.registerBookShelfBook(requestRegisterBookShelfBook)
+//		val createdItemID = response.headers()["Location"]?.split("/")?.last()?.toLong()
+
 		val newTotalCount = (totalItemCount.value[bookShelfState] ?: 0) + 1
 		totalItemCount.value = totalItemCount.value + (bookShelfState to newTotalCount)
 	}

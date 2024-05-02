@@ -9,15 +9,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentChatRoomListBinding
 import com.example.bookchat.ui.channel.ChannelActivity
-import com.example.bookchat.ui.createchannel.MakeChatRoomActivity
-import com.example.bookchat.ui.channelList.adpater.ChannelListDataAdapter
-import com.example.bookchat.ui.channelList.adpater.ChannelListHeaderAdapter
+import com.example.bookchat.ui.channelList.adpater.ChannelListAdapter
+import com.example.bookchat.ui.channelList.model.ChannelListItem
+import com.example.bookchat.ui.createchannel.MakeChannelActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,18 +29,16 @@ class ChannelListFragment : Fragment() {
 	private val channelListViewModel: ChannelListViewModel by viewModels()
 
 	@Inject
-	lateinit var channelListHeaderAdapter: ChannelListHeaderAdapter
-
-	@Inject
-	lateinit var channelListDataAdapter: ChannelListDataAdapter
+	lateinit var channelListAdapter: ChannelListAdapter
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View? {
-		_binding =
-			DataBindingUtil.inflate(inflater, R.layout.fragment_chat_room_list, container, false)
+		_binding = DataBindingUtil.inflate(
+			inflater, R.layout.fragment_chat_room_list, container, false
+		)
 		binding.lifecycleOwner = this.viewLifecycleOwner
 		binding.viewmodel = channelListViewModel
 		return binding.root
@@ -66,15 +63,17 @@ class ChannelListFragment : Fragment() {
 
 	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
 		channelListViewModel.uiStateFlow.collect { uiState ->
-			channelListDataAdapter.submitList(uiState.channels)
+			channelListAdapter.submitList(uiState.channelListItem)
 		}
 	}
 
 	private fun initAdapter() {
 		//TODO : long Click :채팅방 상단고정, 알림 끄기 설정 가능한 다이얼로그
 		//TODO : Swipe : 상단고정, 알림 끄기 UI 노출
-		channelListDataAdapter.onItemClick = { itemPosition ->
-			channelListViewModel.onChannelItemClick(channelListDataAdapter.currentList[itemPosition].roomId)
+		channelListAdapter.onItemClick = { itemPosition ->
+			channelListViewModel.onChannelItemClick(
+				(channelListAdapter.currentList[itemPosition] as ChannelListItem.ChannelItem).roomId
+			)
 		}
 	}
 
@@ -89,43 +88,38 @@ class ChannelListFragment : Fragment() {
 			}
 		}
 
-		with(binding) {
-			val concatAdapterConfig =
-				ConcatAdapter.Config.Builder().apply { setIsolateViewTypes(false) }.build() //setIsolateViewTypes 지정하지 않고, getViewType지정하지 않았을 때, 테스트 해보자
-			val concatAdapter = ConcatAdapter(
-				concatAdapterConfig,
-				channelListHeaderAdapter,
-				channelListDataAdapter
-			)
-			chatRcv.apply {
-				adapter = concatAdapter
-				setHasFixedSize(true)
-				layoutManager = linearLayoutManager
-				addOnScrollListener(rcvScrollListener)
-			}
+		with(binding.chatRcv) {
+			adapter = channelListAdapter
+			setHasFixedSize(true)
+			layoutManager = linearLayoutManager
+			addOnScrollListener(rcvScrollListener)
 		}
 	}
 
 	private fun moveToChannel(channelId: Long) {
 		val intent = Intent(requireContext(), ChannelActivity::class.java)
-		intent.putExtra(EXTRA_CHAT_ROOM_ID, channelId)
+		intent.putExtra(EXTRA_CHANNEL_ID, channelId)
 		startActivity(intent)
 	}
 
 	private fun moveToMakeChannel() {
-		val intent = Intent(requireContext(), MakeChatRoomActivity::class.java)
+		val intent = Intent(requireContext(), MakeChannelActivity::class.java)
 		startActivity(intent)
+	}
+
+	private fun moveToSearchChannelPage() {
+		//TODO : 검색 Fragment로 이동
 	}
 
 	private fun handleEvent(event: ChannelListUiEvent) {
 		when (event) {
 			is ChannelListUiEvent.MoveToMakeChannelPage -> moveToMakeChannel()
 			is ChannelListUiEvent.MoveToChannel -> moveToChannel(event.channelId)
-			is ChannelListUiEvent.MoveToSearchChannelPage -> {}
+			is ChannelListUiEvent.MoveToSearchChannelPage -> moveToSearchChannelPage()
 		}
 	}
 
 	companion object {
-		const val EXTRA_CHAT_ROOM_ID = "EXTRA_CHAT_ROOM_LIST_ITEM"
+		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
 	}
 }

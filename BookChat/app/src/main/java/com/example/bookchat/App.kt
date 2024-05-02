@@ -3,16 +3,13 @@ package com.example.bookchat
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.bookchat.BuildConfig.KAKAO_APP_KEY
-import com.example.bookchat.data.database.BookChatDB
 import com.example.bookchat.utils.NetworkManager
 import com.kakao.sdk.common.KakaoSdk
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class App : Application() {
-
 	private val networkManager by lazy { NetworkManager() }
-	val database: BookChatDB by lazy { BookChatDB.getDatabase(this) }
 
 	override fun onCreate() {
 		super.onCreate()

@@ -11,7 +11,7 @@ import com.example.bookchat.R
 import com.example.bookchat.data.response.NickNameDuplicateException
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.utils.NameCheckStatus
+import com.example.bookchat.domain.model.NameCheckStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

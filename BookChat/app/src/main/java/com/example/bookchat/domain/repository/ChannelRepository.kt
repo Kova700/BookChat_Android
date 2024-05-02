@@ -1,9 +1,9 @@
 package com.example.bookchat.domain.repository
 
-import com.example.bookchat.data.request.RequestMakeChatRoom
+import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.ChannelDefaultImageType
 import kotlinx.coroutines.flow.Flow
-import okhttp3.MultipartBody
 
 interface ChannelRepository {
 	fun getChannelsFlow(): Flow<List<Channel>>
@@ -16,16 +16,22 @@ interface ChannelRepository {
 	suspend fun getChannel(channelId: Long): Channel
 
 	suspend fun enter(channel: Channel)
+	suspend fun isAlreadyEntered(channelId: Long): Boolean
 	suspend fun leave(channelId: Long)
 	suspend fun updateMemberCount(channelId: Long, offset: Int)
 	suspend fun updateLastChat(channelId: Long, chatId: Long)
 
 	suspend fun makeChannel(
-		requestMakeChatRoom: RequestMakeChatRoom,
-		charRoomImage: MultipartBody.Part?
+		channelTitle: String,
+		channelSize: Int,
+		defaultRoomImageType: ChannelDefaultImageType,
+		channelTags: List<String>,
+		selectedBook: Book,
+		channelImage: ByteArray?
 	): Channel
 
 	companion object {
 		const val REMOTE_CHANNELS_LOAD_SIZE = 20
 	}
+
 }

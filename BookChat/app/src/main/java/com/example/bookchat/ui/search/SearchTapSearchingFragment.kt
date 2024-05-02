@@ -9,16 +9,27 @@ import androidx.fragment.app.Fragment
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentSearchTapSearchingBinding
 
-/*관련 검색어 추가 예정*/
+/*TODO :관련 검색어 추가 예정*/
 class SearchTapSearchingFragment : Fragment() {
-    private lateinit var binding : FragmentSearchTapSearchingBinding
+	private var _binding: FragmentSearchTapSearchingBinding? = null
+	private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search_tap_searching, container, false)
-        return binding.root
-    }
+	override fun onCreateView(
+		inflater: LayoutInflater,
+		container: ViewGroup?,
+		savedInstanceState: Bundle?
+	): View? {
+		_binding =
+			DataBindingUtil.inflate(inflater, R.layout.fragment_search_tap_searching, container, false)
+		return binding.root
+	}
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+	}
+
+	override fun onDestroyView() {
+		super.onDestroyView()
+		_binding = null
+	}
 }

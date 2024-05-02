@@ -1,10 +1,10 @@
 package com.example.bookchat.ui.channelList
 
-import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.ui.channelList.model.ChannelListItem
 
 data class ChannelListUiState(
 	val uiState: UiState,
-	val channels: List<Channel>,
+	val channelListItem: List<ChannelListItem>,
 ) {
 
 	enum class UiState {
@@ -17,7 +17,7 @@ data class ChannelListUiState(
 	companion object {
 		val DEFAULT = ChannelListUiState(
 			uiState = UiState.EMPTY,
-			channels = emptyList()
+			channelListItem = listOf(ChannelListItem.Header)
 		)
 	}
 }

@@ -1,6 +1,7 @@
 package com.example.bookchat.ui
 
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.view.View
@@ -14,15 +15,16 @@ import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.*
 import com.example.bookchat.domain.model.AgonyFolderHexColor
+import com.example.bookchat.domain.model.ChannelDefaultImageType
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
-import com.example.bookchat.domain.model.UserDefaultProfileImageType
+import com.example.bookchat.domain.model.NameCheckStatus
+import com.example.bookchat.domain.model.UserDefaultProfileType
 import com.example.bookchat.ui.agony.AgonyUiState
 import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
 import com.example.bookchat.ui.bookreport.BookReportViewModel.BookReportStatus
-import com.example.bookchat.ui.login.LoginViewModel.LoginUiState
+import com.example.bookchat.ui.login.LoginUiState
 import com.example.bookchat.utils.*
-import com.facebook.shimmer.ShimmerFrameLayout
 import java.util.*
 
 object DataBindingAdapter {
@@ -38,10 +40,23 @@ object DataBindingAdapter {
 	@JvmStatic
 	@BindingAdapter("loadUrl")
 	fun loadUrl(imageView: ImageView, url: String?) {
-		if (url == null || url.isEmpty()) return
+		if (url.isNullOrEmpty()) return
 
 		Glide.with(imageView.context)
 			.load(url)
+			.placeholder(R.drawable.loading_img)
+			.error(R.drawable.error_img)
+			.into(imageView)
+	}
+
+	/**이미지뷰 이미지 설정(Bitmap)*/
+	@JvmStatic
+	@BindingAdapter("loadBitmap")
+	fun loadBitmap(imageView: ImageView, bitmap: Bitmap?) {
+		if (bitmap == null) return
+
+		Glide.with(imageView.context)
+			.load(bitmap)
 			.placeholder(R.drawable.loading_img)
 			.error(R.drawable.error_img)
 			.into(imageView)
@@ -67,18 +82,18 @@ object DataBindingAdapter {
 	fun loadUserProfile(
 		imageView: ImageView,
 		userProfileUrl: String?,
-		userDefaultProfileImageType: UserDefaultProfileImageType?
+		userDefaultProfileType: UserDefaultProfileType?
 	) {
 		if (!userProfileUrl?.trim().isNullOrBlank()) {
 			loadUrl(imageView, userProfileUrl)
 			return
 		}
-		inflateUserDefaultProfileImage(imageView, userDefaultProfileImageType)
+		inflateUserDefaultProfileImage(imageView, userDefaultProfileType)
 	}
 
 	private fun inflateUserDefaultProfileImage(
 		imageView: ImageView,
-		imageType: UserDefaultProfileImageType?
+		imageType: UserDefaultProfileType?
 	) {
 		Glide.with(imageView.context)
 			.load(getUserDefaultProfileImage(imageType))
@@ -88,15 +103,15 @@ object DataBindingAdapter {
 			.into(imageView)
 	}
 
-	private fun getUserDefaultProfileImage(imageType: UserDefaultProfileImageType?) =
+	private fun getUserDefaultProfileImage(imageType: UserDefaultProfileType?) =
 		when (imageType) {
 			null,
-			UserDefaultProfileImageType.ONE -> R.drawable.default_profile_img1
+			UserDefaultProfileType.ONE -> R.drawable.default_profile_img1
 
-			UserDefaultProfileImageType.TWO -> R.drawable.default_profile_img2
-			UserDefaultProfileImageType.THREE -> R.drawable.default_profile_img3
-			UserDefaultProfileImageType.FOUR -> R.drawable.default_profile_img4
-			UserDefaultProfileImageType.FIVE -> R.drawable.default_profile_img5
+			UserDefaultProfileType.TWO -> R.drawable.default_profile_img2
+			UserDefaultProfileType.THREE -> R.drawable.default_profile_img3
+			UserDefaultProfileType.FOUR -> R.drawable.default_profile_img4
+			UserDefaultProfileType.FIVE -> R.drawable.default_profile_img5
 		}
 
 	@JvmStatic
@@ -107,13 +122,6 @@ object DataBindingAdapter {
 			return
 		}
 		textview.text = nickname
-	}
-
-	/** EditText 엔터이벤트 등록*/
-	@JvmStatic
-	@BindingAdapter("setEnterListener")
-	fun setEnterListener(editText: EditText, listener: TextView.OnEditorActionListener) {
-		editText.setOnEditorActionListener(listener)
 	}
 
 	/**독서취향 : 제출 버튼 색상 설정*/
@@ -435,8 +443,8 @@ object DataBindingAdapter {
 	/**Login 페이지 Loading UI Visibility 설정*/
 	@JvmStatic
 	@BindingAdapter("setVisibilityLoadingUIInLogin")
-	fun setVisibilityLoadingUIInLogin(view: View, uiState: LoginUiState) {
-		if (uiState == LoginUiState.Loading) {
+	fun setVisibilityLoadingUIInLogin(view: View, uiState: LoginUiState.UiState) {
+		if (uiState == LoginUiState.UiState.LOADING) {
 			view.visibility = View.VISIBLE
 			return
 		}
@@ -453,32 +461,17 @@ object DataBindingAdapter {
 
 	/**UserChatRoomListItem 채팅방 이미지 세팅*/
 	@JvmStatic
-	@BindingAdapter("defaultImgNum", "imgUrl", requireAll = false)
-	fun setChatListItemImg(
+	@BindingAdapter("channelDefaultImageType", "imgUrl", requireAll = false)
+	fun setChannelImg(
 		view: ImageView,
-		defaultImgNum: Int,
+		channelDefaultImageType: ChannelDefaultImageType,
 		imgUrl: String?
 	) {
 		if (imgUrl.isNullOrBlank()) {
-			setRandomChatRoomImg(view, defaultImgNum)
+			setRandomChannelImg(view, channelDefaultImageType)
 			return
 		}
 		loadUrl(view, imgUrl)
-	}
-
-	/**SearchChatRoomItem 시간 Text 세팅*/
-	@JvmStatic
-	@BindingAdapter("getFormattedAbstractDateTimeText")
-	fun getFormattedAbstractDateTimeText(view: TextView, dateAndTimeString: String?) {
-		if (dateAndTimeString.isNullOrBlank()) return
-		view.text = DateManager.getFormattedAbstractDateTimeText(dateAndTimeString)
-	}
-
-	/**SearchChatRoomItem 태그 파싱*/
-	@JvmStatic
-	@BindingAdapter("parseHashTagText")
-	fun parseHashTagText(view: TextView, hashTagString: String) {
-		view.text = hashTagString.split(",").joinToString("  ") { "#$it" }
 	}
 
 	/**화면 크기에 맞는 도서 이미지 크기 세팅*/
@@ -500,29 +493,29 @@ object DataBindingAdapter {
 
 	/** MakeChatRoom 채팅방 생성 기본 이미지 세팅*/
 	@JvmStatic
-	@BindingAdapter("defaultImgNum", "imgByteArray", requireAll = false)
-	fun setMakeChatRoomImg(
+	@BindingAdapter("channelDefaultImageType", "loadByteArray", requireAll = false)
+	fun setMakeChannelImg(
 		view: ImageView,
-		defaultImgNum: Int,
-		imgByteArray: ByteArray
+		channelDefaultImageType: ChannelDefaultImageType,
+		imgByteArray: ByteArray?
 	) {
-		if (imgByteArray.isEmpty()) {
-			setRandomChatRoomImg(view, defaultImgNum)
+		if (imgByteArray == null) {
+			setRandomChannelImg(view, channelDefaultImageType)
 			return
 		}
 		loadByteArray(view, imgByteArray)
 	}
 
 	@JvmStatic
-	fun setRandomChatRoomImg(view: ImageView, defaultImgNum: Int) {
-		when (defaultImgNum) {
-			1 -> view.setImageResource(R.drawable.default_chat_room_img1)
-			2 -> view.setImageResource(R.drawable.default_chat_room_img2)
-			3 -> view.setImageResource(R.drawable.default_chat_room_img3)
-			4 -> view.setImageResource(R.drawable.default_chat_room_img4)
-			5 -> view.setImageResource(R.drawable.default_chat_room_img5)
-			6 -> view.setImageResource(R.drawable.default_chat_room_img6)
-			7 -> view.setImageResource(R.drawable.default_chat_room_img7)
+	fun setRandomChannelImg(view: ImageView, channelDefaultImageType: ChannelDefaultImageType) {
+		when (channelDefaultImageType) {
+			ChannelDefaultImageType.ONE -> view.setImageResource(R.drawable.default_chat_room_img1)
+			ChannelDefaultImageType.TWO -> view.setImageResource(R.drawable.default_chat_room_img2)
+			ChannelDefaultImageType.THREE -> view.setImageResource(R.drawable.default_chat_room_img3)
+			ChannelDefaultImageType.FOUR -> view.setImageResource(R.drawable.default_chat_room_img4)
+			ChannelDefaultImageType.FIVE -> view.setImageResource(R.drawable.default_chat_room_img5)
+			ChannelDefaultImageType.SIX -> view.setImageResource(R.drawable.default_chat_room_img6)
+			ChannelDefaultImageType.SEVEN -> view.setImageResource(R.drawable.default_chat_room_img7)
 		}
 	}
 
@@ -537,36 +530,12 @@ object DataBindingAdapter {
 		}
 	}
 
-	/**독서취향 : 제출 버튼 색상 설정*/
-	@JvmStatic
-	@BindingAdapter("setSubmitTextColor")
-	fun setSubmitTextColor(textView: TextView, flag: Boolean) {
-		if (flag) {
-			textView.setTextColor(Color.parseColor("#000000"))
-			textView.isClickable = true
-			return
-		}
-		textView.setTextColor(Color.parseColor("#B5B7BB"))
-		textView.isClickable = false
-	}
-
 	/**Shimmer내부 GirdLayout 설정*/
 	@JvmStatic
 	@BindingAdapter("setShimmerGridLayout")
 	fun setShimmerGridLayout(gridLayout: GridLayout, bool: Boolean) {
 		gridLayout.columnCount = BookImgSizeManager.flexBoxBookSpanSize
 		gridLayout.rowCount = 2
-	}
-
-	/**Shimmer Animation Start/Stop 설정*/
-	@JvmStatic
-	@BindingAdapter("setShimmerAnimation")
-	fun setShimmerAnimation(
-		shimmerFrameLayout: ShimmerFrameLayout,
-		isVisible: Boolean
-	) {
-		if (isVisible) return
-		shimmerFrameLayout.stopShimmer()
 	}
 
 	/**Shimmer Animation Start/Stop 설정*/

@@ -4,8 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
             <variable
-                name="fragment"
-                type="com.example.bookchat.ui.search.SearchTapHistoryFragment" />
+                name="viewmodel"
+                type="com.example.bookchat.ui.search.SearchViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:paddingHorizontal="30dp"
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/notosanskr_bold"
             android:text="@string/all_delete"
-            android:onClick="@{() -> fragment.clearHistory()}"
+            android:onClick="@{() -> viewmodel.onClickHistoryClearBtn()}"
             android:textColor="#222222"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@+id/textView20"

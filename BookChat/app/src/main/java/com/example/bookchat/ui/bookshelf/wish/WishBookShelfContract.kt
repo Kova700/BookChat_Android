@@ -41,7 +41,7 @@ sealed interface WishBookShelfItem {
 		return when (this) {
 			is Header -> HEADER_ITEM_STABLE_ID
 			is Item -> bookShelfListItem.bookShelfId
-			is Dummy -> DUMMY_ITEM_STABLE_ID
+			is Dummy -> hashCode().toLong()
 		}
 	}
 

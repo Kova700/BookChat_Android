@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.databinding.ItemFlexBoxDummyBinding
+import com.example.bookchat.databinding.ItemSearchBookDummyBinding
 import com.example.bookchat.databinding.ItemWishBookshelfDataBinding
 import com.example.bookchat.databinding.ItemWishBookshelfHeaderBinding
 import com.example.bookchat.ui.bookshelf.wish.WishBookShelfItem
@@ -22,7 +22,7 @@ class WishBookShelfAdapter @Inject constructor() :
 		return when (getItem(position)) {
 			is WishBookShelfItem.Header -> R.layout.item_wish_bookshelf_header
 			is WishBookShelfItem.Item -> R.layout.item_wish_bookshelf_data
-			is WishBookShelfItem.Dummy -> R.layout.item_flex_box_dummy
+			is WishBookShelfItem.Dummy -> R.layout.item_search_book_dummy
 		}
 	}
 
@@ -45,8 +45,8 @@ class WishBookShelfAdapter @Inject constructor() :
 			}
 
 			else -> {
-				val binding: ItemFlexBoxDummyBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_flex_box_dummy,
+				val binding: ItemSearchBookDummyBinding = DataBindingUtil.inflate(
+					LayoutInflater.from(parent.context), R.layout.item_search_book_dummy,
 					parent, false
 				)
 				return WishBookDummyViewHolder(binding)
@@ -72,23 +72,7 @@ class WishBookShelfAdapter @Inject constructor() :
 				oldItem: WishBookShelfItem,
 				newItem: WishBookShelfItem
 			): Boolean {
-				return when (oldItem) {
-					is WishBookShelfItem.Header -> {
-						newItem as WishBookShelfItem.Header
-						oldItem == newItem
-					}
-
-					is WishBookShelfItem.Item -> {
-						newItem as WishBookShelfItem.Item
-						oldItem == newItem
-					}
-
-					is WishBookShelfItem.Dummy -> {
-						newItem as WishBookShelfItem.Dummy
-						oldItem == newItem
-					}
-				}
-
+				return oldItem == newItem
 			}
 		}
 	}
@@ -125,7 +109,7 @@ class WishBookItemViewHolder(
 }
 
 class WishBookDummyViewHolder(
-	val binding: ItemFlexBoxDummyBinding
+	val binding: ItemSearchBookDummyBinding
 ) : WishBookViewHolder(binding) {
 	override fun bind(wishBookShelfItem: WishBookShelfItem) {}
 }

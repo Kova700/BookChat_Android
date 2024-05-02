@@ -1,11 +1,11 @@
 package com.example.bookchat.data.network
 
 import com.example.bookchat.data.*
+import com.example.bookchat.data.model.BookSearchSortOptionNetWork
+import com.example.bookchat.data.model.BookSearchSortOptionNetWork.ACCURACY
 import com.example.bookchat.data.model.SearchSortOptionNetwork
 import com.example.bookchat.data.request.*
 import com.example.bookchat.data.response.*
-import com.example.bookchat.utils.BookSearchSortOption
-import com.example.bookchat.utils.BookSearchSortOption.ACCURACY
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
@@ -27,17 +27,17 @@ interface BookChatApi {
 		@Header("OIDC") idToken: String,
 		@Part userProfileImage: MultipartBody.Part? = null,
 		@Part("userSignUpRequest") requestUserSignUp: RequestUserSignUp
-	): Response<Unit>
+	)
 
 	@POST("/v1/api/users/signin")
 	suspend fun signIn(
 		@Header("OIDC") idToken: String,
 		@Body requestUserSignIn: RequestUserSignIn
-	): Response<Token>
+	): Response<BookChatTokenResponse>
 
 	@DELETE("/v1/api/users")
 	suspend fun withdraw(
-	): Response<Unit>
+	)
 
 	@GET("/v1/api/users/profile")
 	suspend fun getUserProfile(
@@ -48,9 +48,9 @@ interface BookChatApi {
 	@GET("/v1/api/books")
 	suspend fun getBookSearchResult(
 		@Query("query") query: String,
-		@Query("size") size: String,
-		@Query("page") page: String,
-		@Query("sort") sort: BookSearchSortOption = ACCURACY
+		@Query("size") size: Int,
+		@Query("page") page: Int,
+		@Query("sort") sort: BookSearchSortOptionNetWork = ACCURACY
 	): ResponseGetBookSearch
 
 	@POST("/v1/api/bookshelves")
@@ -179,8 +179,8 @@ interface BookChatApi {
 
 	@Multipart
 	@POST("/v1/api/chatrooms")
-	suspend fun makeChatRoom(
-		@Part("createChatRoomRequest") requestMakeChatRoom: RequestMakeChatRoom,
+	suspend fun makeChannel(
+		@Part("createChatRoomRequest") requestMakeChannel: RequestMakeChannel,
 		@Part chatRoomImage: MultipartBody.Part? = null
 	): Response<Unit>
 
@@ -195,19 +195,19 @@ interface BookChatApi {
 	): Response<Unit>
 
 	@GET("/v1/api/chatrooms")
-	suspend fun getWholeChatRoomList(
+	suspend fun getSearchedChannels(
 		@Query("postCursorId") postCursorId: Long?,
 		@Query("size") size: Int,
 		@Query("roomName") roomName: String?,
 		@Query("title") title: String?,
 		@Query("isbn") isbn: String?,
 		@Query("tags") tags: String?,
-	): ResponseGetWholeChatRoomList
+	): ResponseGetChannelSearch
 
 	@GET("/v1/api/chatrooms/{roomId}")
 	suspend fun getChatRoomInfo(
 		@Path("roomId") roomId: Long
-	): RespondChatRoomInfo
+	): ResponseChannelInfo
 
 	/**------------채팅내역------------*/
 

@@ -2,6 +2,7 @@ package com.example.bookchat.ui.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -11,14 +12,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-	private val clientRepository: ClientRepository
+	private val clientRepository: ClientRepository,
+	private val bookChatTokenRepository: BookChatTokenRepository
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<SplashEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
 
 	init {
-		requestUserInfo()
+		viewModelScope.launch {
+			if (isBookChatTokenExist()) requestUserInfo()
+			else startEvent(SplashEvent.MoveToLogin)
+		}
+	}
+
+	private suspend fun isBookChatTokenExist(): Boolean {
+		return runCatching { bookChatTokenRepository.isBookChatTokenExist() }
+			.getOrDefault(false)
 	}
 
 	private fun requestUserInfo() = viewModelScope.launch {

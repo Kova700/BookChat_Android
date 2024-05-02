@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewmodel"
+            type="com.example.bookchat.ui.search.channelInfo.ChannelInfoViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.search.channelInfo.ChannelInfoActivity">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="30dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="30dp" />
+
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
+            android:id="@+id/antiDupClickImageButton9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="25dp"
+            android:onClick="@{() -> viewmodel.onClickBackBtn()}"
+            android:background="?android:selectableItemBackground"
+            android:src="@drawable/back_btn_white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toTopOf="@+id/enter_chat_room_btn"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/antiDupClickImageButton9">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginTop="5dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    app:cardCornerRadius="@dimen/book_img_corner_radius"
+                    app:cardElevation="@dimen/book_img_elevation"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/bookImg"
+                        loadUrl="@{viewmodel.uiState.channel.bookCoverImageUrl}"
+                        setBookImgSize="@{true}"
+                        android:layout_width="@dimen/book_img_width_default"
+                        android:layout_height="@dimen/book_img_height_default"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/empty_img" />
+                </androidx.cardview.widget.CardView>
+
+                <TextView
+                    android:id="@+id/book_author_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="80dp"
+                    android:elegantTextHeight="true"
+                    android:fontFamily="@font/notosanskr_regular"
+                    android:text="@{viewmodel.uiState.channel.bookAuthorsString}"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/cardView2" />
+
+                <TextView
+                    android:id="@+id/book_title_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:elegantTextHeight="true"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/notosanskr_bold"
+                    android:text="@{viewmodel.uiState.channel.bookTitle}"
+                    android:textColor="#FFFFFF"
+                    android:textSize="30sp"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toStartOf="@+id/room_member_count"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/book_author_tv" />
+
+                <TextView
+                    android:id="@+id/room_member_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:elegantTextHeight="true"
+                    android:fontFamily="@font/notosanskr_regular"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintBottom_toBottomOf="@+id/book_title_tv"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/book_title_tv"
+                    app:layout_constraintTop_toTopOf="@+id/book_title_tv"
+                    app:layout_constraintVertical_bias="0.75" />
+
+                <TextView
+                    android:id="@+id/chat_room_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:elegantTextHeight="true"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/notosanskr_regular"
+                    android:text="@{viewmodel.uiState.channel.roomName}"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="@+id/book_title_tv"
+                    app:layout_constraintTop_toBottomOf="@+id/book_title_tv" />
+
+                <TextView
+                    android:id="@+id/chat_room_tags_tv"
+                    android:text="@{viewmodel.uiState.channel.tagsString}"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:elegantTextHeight="true"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/notosanskr_regular"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="@+id/book_title_tv"
+                    app:layout_constraintTop_toBottomOf="@+id/chat_room_title" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/host_profile_image_cv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    app:cardCornerRadius="13dp"
+                    app:layout_constraintStart_toStartOf="@+id/chat_room_tags_tv"
+                    app:layout_constraintTop_toBottomOf="@+id/chat_room_tags_tv">
+
+                    <ImageView
+                        userDefaultProfileImageType="@{viewmodel.uiState.channel.host.defaultProfileImageType}"
+                        userProfileUrl="@{viewmodel.uiState.channel.host.profileImageUrl}"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="#D9D9D9"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/loading_img" />
+                </androidx.cardview.widget.CardView>
+
+                <TextView
+                    android:id="@+id/chat_room_host_nick_name_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:elegantTextHeight="true"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/notosanskr_regular"
+                    android:maxLines="1"
+                    android:text="@{viewmodel.uiState.channel.host.nickname}"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/host_profile_image_cv"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/host_profile_image_cv"
+                    app:layout_constraintTop_toTopOf="@+id/host_profile_image_cv" />
+
+                <TextView
+                    android:id="@+id/chat_room_last_active_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="40dp"
+                    android:elegantTextHeight="true"
+                    android:fontFamily="@font/notosanskr_regular"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/host_profile_image_cv"
+                    app:layout_constraintTop_toBottomOf="@+id/host_profile_image_cv"
+                    app:layout_constraintVertical_bias="0.0" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <com.example.bookchat.ui.customview.AntiDupClickButton
+            android:id="@+id/enter_chat_room_btn"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginBottom="30dp"
+            android:backgroundTint="#5648FF"
+            android:elegantTextHeight="true"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:stateListAnimator="@null"
+            android:text="@string/enter"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="10dp"
+            android:onClick="@{() -> viewmodel.onClickEnterBtn()}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/chat_room_background_shadow"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#B3272727"
+            android:clickable="false"
+            android:elevation="-3dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/chat_room_background_iv"
+            channelDefaultImageType="@{viewmodel.uiState.channel.defaultRoomImageType}"
+            imgUrl="@{viewmodel.uiState.channel.roomImageUri}"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#B3272727"
+            android:clickable="false"
+            android:elevation="-5dp"
+            android:scaleType="fitXY"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

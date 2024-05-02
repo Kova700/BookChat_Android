@@ -7,17 +7,18 @@ import com.example.bookchat.data.mapper.toChat
 import com.example.bookchat.data.request.RequestSendChat
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
+import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.domain.repository.UserRepository
-import com.example.bookchat.utils.DataStoreManager
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.runBlocking
 import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.StompSession
 import org.hildan.krossbow.stomp.frame.FrameBody
@@ -32,6 +33,7 @@ class StompHandlerImpl @Inject constructor(
 	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
+	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val userRepository: UserRepository,
 	private val gson: Gson,
 ) : StompHandler {
@@ -247,10 +249,8 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	private fun getHeader(): Map<String, String> {
-		return mapOf(
-			AUTHORIZATION to
-							"${DataStoreManager.getBookChatTokenSync().getOrNull()?.accessToken}"
-		)
+		val bookchatToken = runBlocking { bookChatTokenRepository.getBookChatToken() }
+		return mapOf(AUTHORIZATION to "${bookchatToken?.accessToken}")
 	}
 
 	companion object {

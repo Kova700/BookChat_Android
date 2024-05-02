@@ -31,7 +31,8 @@ class AgonyRepositoryImpl @Inject constructor(
 	private var currentPage: Long? = null
 	private var isEndPage = false
 
-	override fun getAgoniesFlow(): Flow<List<Agony>> {
+	override fun getAgoniesFlow(initFlag: Boolean): Flow<List<Agony>> {
+		if (initFlag) clearCachedData()
 		return agonies
 	}
 

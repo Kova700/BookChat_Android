@@ -3,12 +3,16 @@ package com.example.bookchat.ui.channelList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.data.repository.ChattingRepositoryFacade
+import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.ui.channelList.ChannelListUiState.UiState
+import com.example.bookchat.ui.channelList.mapper.toChannelListItem
+import com.example.bookchat.ui.channelList.model.ChannelListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,9 +34,17 @@ class ChannelListViewModel @Inject constructor(
 	}
 
 	private fun observeChannels() = viewModelScope.launch {
-		chattingRepositoryFacade.getChannelsFlow().collect { newChannels ->
-			updateState { copy(channels = newChannels) }
-		}
+		chattingRepositoryFacade.getChannelsFlow().map { groupItems(it) }
+			.collect { newChannels -> updateState { copy(channelListItem = newChannels) } }
+	}
+
+	private fun groupItems(channels: List<Channel>): List<ChannelListItem> {
+		val groupedItems = mutableListOf<ChannelListItem>()
+		if (channels.isEmpty()) return groupedItems
+
+		groupedItems.add(ChannelListItem.Header)
+		groupedItems.addAll(channels.map { it.toChannelListItem() })
+		return groupedItems
 	}
 
 	private fun getChannels() = viewModelScope.launch {
@@ -43,7 +55,7 @@ class ChannelListViewModel @Inject constructor(
 	}
 
 	fun loadNextChannels(lastVisibleItemPosition: Int) {
-		if (uiStateFlow.value.channels.size - 1 > lastVisibleItemPosition ||
+		if (uiStateFlow.value.channelListItem.size - 1 > lastVisibleItemPosition ||
 			uiStateFlow.value.uiState == UiState.LOADING
 		) return
 		getChannels()

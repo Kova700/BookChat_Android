@@ -53,7 +53,7 @@ class AgonyViewModel @Inject constructor(
 	}
 
 	private fun observeAgonies() = viewModelScope.launch {
-		agonyRepository.getAgoniesFlow().combine(_isSelected) { items, isSelectedMap ->
+		agonyRepository.getAgoniesFlow(true).combine(_isSelected) { items, isSelectedMap ->
 			groupItems(items, isSelectedMap)
 		}.collect { newAgonies -> updateState { copy(agonies = newAgonies) } }
 	}

@@ -66,9 +66,7 @@ class HomeViewModel @Inject constructor(
 	private fun getChannels() = viewModelScope.launch {
 		updateState { copy(channelUiState = UiState.LOADING) }
 		runCatching { chattingRepositoryFacade.getChannels() }
-			.onSuccess {
-				updateState { copy(channelUiState = UiState.SUCCESS) }
-			}
+			.onSuccess { updateState { copy(channelUiState = UiState.SUCCESS) } }
 			.onFailure {
 				handleError(it)
 			}
@@ -96,8 +94,6 @@ class HomeViewModel @Inject constructor(
 	}
 
 	private inline fun updateState(block: HomeUiState.() -> HomeUiState) {
-		_uiState.update {
-			_uiState.value.block()
-		}
+		_uiState.update { _uiState.value.block() }
 	}
 }

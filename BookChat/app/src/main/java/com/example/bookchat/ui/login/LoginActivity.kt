@@ -9,97 +9,88 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityLoginBinding
-import com.example.bookchat.oauth.GoogleSDK
+import com.example.bookchat.oauth.google.GoogleLoginClient
+import com.example.bookchat.oauth.kakao.KakaoLoginClient
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.signup.SignUpActivity
-import com.example.bookchat.ui.login.LoginViewModel.LoginEvent
-import com.google.android.material.snackbar.Snackbar
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityLoginBinding
-    private val loginViewModel: LoginViewModel by viewModels()
+	private lateinit var binding: ActivityLoginBinding
+	private val loginViewModel: LoginViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
+	@Inject
+	lateinit var kakaoLoginClient: KakaoLoginClient
 
-        with(binding) {
-            lifecycleOwner = this@LoginActivity
-            activity = this@LoginActivity
-            viewmodel = loginViewModel
-        }
-        observeUiEvent()
-    }
+	@Inject
+	lateinit var googleLoginClient: GoogleLoginClient
 
-    private fun observeUiEvent() = lifecycleScope.launch {
-        loginViewModel.eventFlow.collect { event -> handleEvent(event) }
-    }
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
+		binding.lifecycleOwner = this
+		binding.viewmodel = loginViewModel
+		observeUiEvent()
+	}
 
-    fun clickKakaoLoginBtn() = loginViewModel.clickKakaoLoginBtn(this)
-    fun clickGoogleLoginBtn() =
-        loginViewModel.clickGoogleLoginBtn(this, googleLoginActivityResultLauncher)
+	private fun observeUiEvent() = lifecycleScope.launch {
+		loginViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
 
-    private val googleLoginActivityResultLauncher =
-        this.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            loginViewModel.setUiStateToDefault()
-            if (result.resultCode != RESULT_OK) return@registerForActivityResult
-            runCatching {
-                GoogleSDK.getSignedInAccountFromIntent(result.data)
-                loginViewModel.bookchatLogin()
-            }
-        }
+	private fun startKakaoLogin() = lifecycleScope.launch {
+		runCatching { kakaoLoginClient.login(this@LoginActivity) }
+			.onSuccess {
+				loginViewModel.onChangeIdToken(it)
+				loginViewModel.login()
+			}
+	}
 
-    private fun showSnackBar(textId: Int) {
-        Snackbar.make(binding.loginLayout, textId, Snackbar.LENGTH_SHORT).show()
-    }
+	private fun startGoogleLogin() = lifecycleScope.launch {
+		runCatching {
+			googleLoginClient.login(this@LoginActivity, googleLoginResultLauncher)
+		}
+	}
 
-    private fun moveToMain() {
-        startActivity(Intent(this, MainActivity::class.java))
-        finish()
-    }
+	private val googleLoginResultLauncher =
+		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+			if (result.resultCode != RESULT_OK) return@registerForActivityResult
+			val idToken = googleLoginClient.getIdTokenFromResultIntent(result.data)
+			loginViewModel.onChangeIdToken(idToken)
+			loginViewModel.login()
+		}
 
-    private fun moveToSignUp() {
-        startActivity(Intent(this, SignUpActivity::class.java))
-    }
+	private fun moveToMain() {
+		startActivity(Intent(this, MainActivity::class.java))
+		finish()
+	}
 
-    private fun showDeviceChangeWarning() {
-        val deviceWarningDialog = DeviceWarningDialog()
-        deviceWarningDialog.setOkClickListener(
-            object : DeviceWarningDialog.OnOkClickListener {
-                override fun onOkClick() {
-                    loginViewModel.bookchatLogin(true)
-                }
-            }
-        )
-        deviceWarningDialog.show(this.supportFragmentManager, DIALOG_TAG_DEVICE_WARNING)
-    }
+	private fun moveToSignUp() {
+		startActivity(Intent(this, SignUpActivity::class.java))
+		finish()
+	}
 
-    private fun handleEvent(event: LoginEvent) = when (event) {
-        is LoginEvent.MoveToMain -> moveToMain()
-        is LoginEvent.MoveToSignUp -> moveToSignUp()
-        is LoginEvent.ShowDeviceWarning -> showDeviceChangeWarning()
-        is LoginEvent.ForbiddenUser -> {
-            showSnackBar(R.string.login_forbidden_user)
-        }
+	private fun showDeviceChangeWarning() {
+		val deviceWarningDialog = DeviceWarningDialog()
+		deviceWarningDialog.show(supportFragmentManager, DIALOG_TAG_DEVICE_WARNING)
+	}
 
-        is LoginEvent.NetworkError -> {
-            showSnackBar(R.string.error_network)
-        }
+	private fun handleEvent(event: LoginEvent) {
+		when (event) {
+			is LoginEvent.MoveToMain -> moveToMain()
+			is LoginEvent.MoveToSignUp -> moveToSignUp()
+			is LoginEvent.ShowDeviceWarning -> showDeviceChangeWarning()
+			is LoginEvent.ErrorEvent -> binding.loginLayout.showSnackBar(event.stringId)
+			is LoginEvent.UnknownErrorEvent -> binding.loginLayout.showSnackBar(event.message)
+			is LoginEvent.StartKakaoLogin -> startKakaoLogin()
+			LoginEvent.StartGoogleLogin -> startGoogleLogin()
+		}
+	}
 
-        is LoginEvent.KakaoLoginFail -> {
-            showSnackBar(R.string.error_kakao_login)
-        }
-
-        is LoginEvent.UnknownError -> {
-            showSnackBar(R.string.error_else)
-        }
-    }
-
-    companion object {
-        private const val DIALOG_TAG_DEVICE_WARNING = "DIALOG_TAG_DEVICE_WARNING"
-    }
+	companion object {
+		private const val DIALOG_TAG_DEVICE_WARNING = "DIALOG_TAG_DEVICE_WARNING"
+	}
 }
