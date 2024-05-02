@@ -124,7 +124,7 @@ class HomeFragment : Fragment() {
 
 	private fun moveToChannel(channelId: Long) {
 		val intent = Intent(requireContext(), ChannelActivity::class.java)
-		intent.putExtra(ChannelListFragment.EXTRA_CHAT_ROOM_ID, channelId)
+		intent.putExtra(ChannelListFragment.EXTRA_CHANNEL_ID, channelId)
 		startActivity(intent)
 	}
 

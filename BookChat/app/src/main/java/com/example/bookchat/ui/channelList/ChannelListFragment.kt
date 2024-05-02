@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentChatRoomListBinding
 import com.example.bookchat.ui.channel.ChannelActivity
-import com.example.bookchat.ui.createchannel.MakeChatRoomActivity
 import com.example.bookchat.ui.channelList.adpater.ChannelListDataAdapter
 import com.example.bookchat.ui.channelList.adpater.ChannelListHeaderAdapter
+import com.example.bookchat.ui.createchannel.MakeChannelActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -91,7 +91,8 @@ class ChannelListFragment : Fragment() {
 
 		with(binding) {
 			val concatAdapterConfig =
-				ConcatAdapter.Config.Builder().apply { setIsolateViewTypes(false) }.build() //setIsolateViewTypes 지정하지 않고, getViewType지정하지 않았을 때, 테스트 해보자
+				ConcatAdapter.Config.Builder().apply { setIsolateViewTypes(false) }
+					.build() //setIsolateViewTypes 지정하지 않고, getViewType지정하지 않았을 때, 테스트 해보자
 			val concatAdapter = ConcatAdapter(
 				concatAdapterConfig,
 				channelListHeaderAdapter,
@@ -108,12 +109,12 @@ class ChannelListFragment : Fragment() {
 
 	private fun moveToChannel(channelId: Long) {
 		val intent = Intent(requireContext(), ChannelActivity::class.java)
-		intent.putExtra(EXTRA_CHAT_ROOM_ID, channelId)
+		intent.putExtra(EXTRA_CHANNEL_ID, channelId)
 		startActivity(intent)
 	}
 
 	private fun moveToMakeChannel() {
-		val intent = Intent(requireContext(), MakeChatRoomActivity::class.java)
+		val intent = Intent(requireContext(), MakeChannelActivity::class.java)
 		startActivity(intent)
 	}
 
@@ -126,6 +127,6 @@ class ChannelListFragment : Fragment() {
 	}
 
 	companion object {
-		const val EXTRA_CHAT_ROOM_ID = "EXTRA_CHAT_ROOM_LIST_ITEM"
+		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
 	}
 }
