@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.databinding.ItemFlexBoxDummyBinding
+import com.example.bookchat.databinding.ItemSearchBookDummyBinding
 import com.example.bookchat.databinding.ItemWishBookshelfDataBinding
 import com.example.bookchat.databinding.ItemWishBookshelfHeaderBinding
 import com.example.bookchat.ui.bookshelf.wish.WishBookShelfItem
@@ -45,7 +45,7 @@ class WishBookShelfAdapter @Inject constructor() :
 			}
 
 			else -> {
-				val binding: ItemFlexBoxDummyBinding = DataBindingUtil.inflate(
+				val binding: ItemSearchBookDummyBinding = DataBindingUtil.inflate(
 					LayoutInflater.from(parent.context), R.layout.item_search_book_dummy,
 					parent, false
 				)
@@ -109,7 +109,7 @@ class WishBookItemViewHolder(
 }
 
 class WishBookDummyViewHolder(
-	val binding: ItemFlexBoxDummyBinding
+	val binding: ItemSearchBookDummyBinding
 ) : WishBookViewHolder(binding) {
 	override fun bind(wishBookShelfItem: WishBookShelfItem) {}
 }
