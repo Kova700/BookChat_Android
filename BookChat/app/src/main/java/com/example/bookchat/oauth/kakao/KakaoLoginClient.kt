@@ -2,8 +2,8 @@ package com.example.bookchat.oauth.kakao
 
 import android.content.Context
 import android.util.Log
-import com.example.bookchat.data.response.KakaoLoginFailException
-import com.example.bookchat.data.response.KakaoLoginUserCancelException
+import com.example.bookchat.data.network.model.response.KakaoLoginFailException
+import com.example.bookchat.data.network.model.response.KakaoLoginUserCancelException
 import com.example.bookchat.domain.model.IdToken
 import com.example.bookchat.domain.model.OAuth2Provider.KAKAO
 import com.example.bookchat.utils.Constants.TAG
@@ -17,7 +17,7 @@ import kotlin.coroutines.resume
 
 class KakaoLoginClient @Inject constructor(
 	private val userApiClient: UserApiClient
-){
+) {
 
 	suspend fun login(context: Context): IdToken {
 		if (userApiClient.isKakaoTalkLoginAvailable(context)) {

@@ -8,10 +8,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.data.response.NickNameDuplicateException
+import com.example.bookchat.data.network.model.response.NickNameDuplicateException
+import com.example.bookchat.domain.model.NameCheckStatus
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.model.NameCheckStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

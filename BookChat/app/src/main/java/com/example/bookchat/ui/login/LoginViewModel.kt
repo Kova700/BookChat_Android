@@ -3,11 +3,11 @@ package com.example.bookchat.ui.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
-import com.example.bookchat.data.response.ForbiddenException
-import com.example.bookchat.data.response.KakaoLoginFailException
-import com.example.bookchat.data.response.NeedToDeviceWarningException
-import com.example.bookchat.data.response.NeedToSignUpException
-import com.example.bookchat.data.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.network.model.response.ForbiddenException
+import com.example.bookchat.data.network.model.response.KakaoLoginFailException
+import com.example.bookchat.data.network.model.response.NeedToDeviceWarningException
+import com.example.bookchat.data.network.model.response.NeedToSignUpException
+import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.IdToken
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.ui.login.LoginUiState.UiState

@@ -12,13 +12,11 @@ import com.example.bookchat.data.mapper.toNetWork
 import com.example.bookchat.data.mapper.toOAuth2ProviderNetwork
 import com.example.bookchat.data.mapper.toUser
 import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.request.RequestUserSignIn
-import com.example.bookchat.data.request.RequestUserSignUp
-import com.example.bookchat.data.response.NeedToDeviceWarningException
-import com.example.bookchat.data.response.NeedToSignUpException
-import com.example.bookchat.data.response.NetworkIsNotConnectedException
-import com.example.bookchat.data.response.NickNameDuplicateException
-import com.example.bookchat.data.response.ResponseBodyEmptyException
+import com.example.bookchat.data.network.model.response.NeedToDeviceWarningException
+import com.example.bookchat.data.network.model.response.NeedToSignUpException
+import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.network.model.response.NickNameDuplicateException
+import com.example.bookchat.data.network.model.response.ResponseBodyEmptyException
 import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.model.IdToken
 import com.example.bookchat.domain.model.ReadingTaste
@@ -51,7 +49,7 @@ class ClientRepositoryImpl @Inject constructor(
 	) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-		val requestUserSignIn = RequestUserSignIn(
+		val requestUserSignIn = com.example.bookchat.data.network.model.request.RequestUserSignIn(
 			fcmToken = getFCMToken().text,
 			deviceToken = getDeviceID(),
 			approveChangingDevice = approveChangingDevice,
@@ -87,7 +85,7 @@ class ClientRepositoryImpl @Inject constructor(
 		if (isNetworkConnected().not()) throw NetworkIsNotConnectedException()
 		val idToken = cachedIdToken ?: throw IOException("IdToken does not exist.")
 
-		val requestUserSignUp = RequestUserSignUp(
+		val requestUserSignUp = com.example.bookchat.data.network.model.request.RequestUserSignUp(
 			oauth2Provider = idToken.oAuth2Provider.toOAuth2ProviderNetwork(),
 			nickname = nickname,
 			readingTastes = readingTastes.map { it.toNetWork() },

@@ -8,9 +8,8 @@ import com.example.bookchat.data.mapper.toChannel
 import com.example.bookchat.data.mapper.toChannelDefaultImageTypeNetwork
 import com.example.bookchat.data.mapper.toChannelEntity
 import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.request.RequestMakeChannel
-import com.example.bookchat.data.response.NetworkIsNotConnectedException
-import com.example.bookchat.data.response.ResponseChannelInfo
+import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.network.model.response.ResponseChannelInfo
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelDefaultImageType
@@ -116,7 +115,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
 		val response = bookChatApi.makeChannel(
-			requestMakeChannel = RequestMakeChannel(
+			requestMakeChannel = com.example.bookchat.data.network.model.request.RequestMakeChannel(
 				roomName = channelTitle,
 				roomSize = channelSize,
 				defaultRoomImageType = defaultRoomImageType.toChannelDefaultImageTypeNetwork(),

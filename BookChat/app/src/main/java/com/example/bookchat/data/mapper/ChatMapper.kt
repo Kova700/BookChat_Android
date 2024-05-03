@@ -2,7 +2,7 @@ package com.example.bookchat.data.mapper
 
 import com.example.bookchat.data.database.model.ChatEntity
 import com.example.bookchat.data.database.model.combined.ChatWithUser
-import com.example.bookchat.data.response.ChatResponse
+import com.example.bookchat.data.network.model.response.ChatResponse
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.ChatType

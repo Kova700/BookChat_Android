@@ -2,12 +2,11 @@ package com.example.bookchat.data.repository
 
 import com.example.bookchat.App
 import com.example.bookchat.data.BookReport
-import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.request.RequestRegisterBookReport
-import com.example.bookchat.data.response.BookReportDoseNotExistException
-import com.example.bookchat.data.response.NetworkIsNotConnectedException
-import com.example.bookchat.data.response.ResponseBodyEmptyException
+import com.example.bookchat.data.network.model.response.BookReportDoseNotExistException
+import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.network.model.response.ResponseBodyEmptyException
+import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.repository.BookReportRepository
 import javax.inject.Inject
 
@@ -43,7 +42,10 @@ class BookReportRepositoryImpl @Inject constructor(
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
 		val requestRegisterBookReport =
-			RequestRegisterBookReport(bookReport.reportTitle, bookReport.reportContent)
+			com.example.bookchat.data.network.model.request.RequestRegisterBookReport(
+				bookReport.reportTitle,
+				bookReport.reportContent
+			)
 		val response = bookChatApi.registerBookReport(book.bookShelfId, requestRegisterBookReport)
 		when (response.code()) {
 			200 -> {}
@@ -78,7 +80,10 @@ class BookReportRepositoryImpl @Inject constructor(
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
 		val requestRegisterBookReport =
-			RequestRegisterBookReport(bookReport.reportTitle, bookReport.reportContent)
+			com.example.bookchat.data.network.model.request.RequestRegisterBookReport(
+				bookReport.reportTitle,
+				bookReport.reportContent
+			)
 		val response = bookChatApi.reviseBookReport(book.bookShelfId, requestRegisterBookReport)
 		when (response.code()) {
 			200 -> {}

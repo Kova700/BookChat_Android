@@ -4,9 +4,7 @@ import com.example.bookchat.App
 import com.example.bookchat.data.mapper.toAgonyRecord
 import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.request.RequestMakeAgonyRecord
-import com.example.bookchat.data.request.RequestReviseAgonyRecord
-import com.example.bookchat.data.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.AgonyRecord
 import com.example.bookchat.domain.model.SearchSortOption
 import com.example.bookchat.domain.repository.AgonyRecordRepository
@@ -78,7 +76,8 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 	) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-		val requestMakeAgonyRecord = RequestMakeAgonyRecord(title, content)
+		val requestMakeAgonyRecord =
+			com.example.bookchat.data.network.model.request.RequestMakeAgonyRecord(title, content)
 		bookChatApi.makeAgonyRecord(bookShelfId, agonyId, requestMakeAgonyRecord)
 	}
 
@@ -91,7 +90,8 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 	) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-		val requestReviseAgonyRecord = RequestReviseAgonyRecord(newTitle, newContent)
+		val requestReviseAgonyRecord =
+			com.example.bookchat.data.network.model.request.RequestReviseAgonyRecord(newTitle, newContent)
 		bookChatApi.reviseAgonyRecord(
 			bookShelfId,
 			agonyId,

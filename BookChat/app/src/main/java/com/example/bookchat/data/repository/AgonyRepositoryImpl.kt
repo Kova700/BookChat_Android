@@ -5,9 +5,7 @@ import com.example.bookchat.data.mapper.toAgony
 import com.example.bookchat.data.mapper.toNetWork
 import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.request.RequestMakeAgony
-import com.example.bookchat.data.request.RequestReviseAgony
-import com.example.bookchat.data.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.Agony
 import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.domain.model.SearchSortOption
@@ -81,7 +79,10 @@ class AgonyRepositoryImpl @Inject constructor(
 	) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-		val requestMakeAgony = RequestMakeAgony(title, hexColorCode.toNetWork())
+		val requestMakeAgony = com.example.bookchat.data.network.model.request.RequestMakeAgony(
+			title,
+			hexColorCode.toNetWork()
+		)
 		bookChatApi.makeAgony(bookShelfId, requestMakeAgony)
 	}
 
@@ -93,7 +94,10 @@ class AgonyRepositoryImpl @Inject constructor(
 	) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-		val requestReviseAgony = RequestReviseAgony(newTitle, agony.hexColorCode.toNetWork())
+		val requestReviseAgony = com.example.bookchat.data.network.model.request.RequestReviseAgony(
+			newTitle,
+			agony.hexColorCode.toNetWork()
+		)
 		bookChatApi.reviseAgony(bookShelfId, agony.agonyId, requestReviseAgony)
 		mapAgonies.update { mapAgonies.value + (agony.agonyId to agony.copy(title = newTitle)) }
 	}

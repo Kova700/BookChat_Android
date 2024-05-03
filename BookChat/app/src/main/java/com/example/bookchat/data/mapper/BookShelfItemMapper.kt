@@ -1,11 +1,11 @@
 package com.example.bookchat.data.mapper
 
-import com.example.bookchat.data.response.BookShelfItemResponse
+import com.example.bookchat.data.network.model.response.BookShelfItemResponse
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.model.BookShelfState
 
-fun BookShelfItemResponse.toBookShelfItem(
+fun com.example.bookchat.data.network.model.response.BookShelfItemResponse.toBookShelfItem(
 	state: BookShelfState
 ): BookShelfItem {
 	return BookShelfItem(

@@ -6,9 +6,7 @@ import com.example.bookchat.data.mapper.toBookShelfItem
 import com.example.bookchat.data.mapper.toBookStateInBookShelf
 import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.request.RequestChangeBookStatus
-import com.example.bookchat.data.request.RequestRegisterBookShelfBook
-import com.example.bookchat.data.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.model.BookShelfState
@@ -91,11 +89,12 @@ class BookShelfRepositoryImpl @Inject constructor(
 		starRating: StarRating?
 	) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-		val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(
-			bookRequest = book.toBookRequest(),
-			bookShelfState = bookShelfState,
-			star = starRating
-		)
+		val requestRegisterBookShelfBook =
+			com.example.bookchat.data.network.model.request.RequestRegisterBookShelfBook(
+				bookRequest = book.toBookRequest(),
+				bookShelfState = bookShelfState,
+				star = starRating
+			)
 		///v1/api/bookshelves/86
 //		val response = bookChatApi.registerBookShelfBook(requestRegisterBookShelfBook)
 //		val createdItemID = response.headers()["Location"]?.split("/")?.last()?.toLong()
@@ -123,7 +122,7 @@ class BookShelfRepositoryImpl @Inject constructor(
 	) {
 		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
-		val request = RequestChangeBookStatus(
+		val request = com.example.bookchat.data.network.model.request.RequestChangeBookStatus(
 			bookShelfState = newBookShelfItem.state,
 			star = newBookShelfItem.star,
 			pages = newBookShelfItem.pages

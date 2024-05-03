@@ -1,7 +1,7 @@
 package com.example.bookchat.data.mapper
 
 import com.example.bookchat.data.database.model.UserEntity
-import com.example.bookchat.data.response.UserResponse
+import com.example.bookchat.data.network.model.response.UserResponse
 import com.example.bookchat.domain.model.User
 
 fun User.toUserEntity(): UserEntity {

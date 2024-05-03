@@ -7,8 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.BookReport
+import com.example.bookchat.data.network.model.response.BookReportDoseNotExistException
 import com.example.bookchat.domain.model.BookShelfItem
-import com.example.bookchat.data.response.BookReportDoseNotExistException
 import com.example.bookchat.domain.repository.BookReportRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

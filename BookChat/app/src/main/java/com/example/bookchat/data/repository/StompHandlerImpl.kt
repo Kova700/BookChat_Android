@@ -4,7 +4,7 @@ import com.example.bookchat.BuildConfig
 import com.example.bookchat.data.MessageType
 import com.example.bookchat.data.SocketMessage
 import com.example.bookchat.data.mapper.toChat
-import com.example.bookchat.data.request.RequestSendChat
+import com.example.bookchat.data.network.model.request.RequestSendChat
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.repository.BookChatTokenRepository
@@ -73,7 +73,12 @@ class StompHandlerImpl @Inject constructor(
 			StompSendHeaders(
 				destination = "${SEND_MESSAGE_DESTINATION}$channelId",
 				customHeaders = getHeader()
-			), FrameBody.Text(gson.toJson(RequestSendChat(receiptId, message)))
+			), FrameBody.Text(gson.toJson(
+				com.example.bookchat.data.network.model.request.RequestSendChat(
+					receiptId,
+					message
+				)
+			))
 		)
 	}
 
