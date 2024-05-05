@@ -3,7 +3,6 @@ package com.example.bookchat.ui.search.dialog
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.model.toStarRating
@@ -51,10 +50,6 @@ class SearchBookDialogViewModel @Inject constructor(
 	}
 
 	private fun checkAlreadyInBookShelf() = viewModelScope.launch {
-		if (!isNetworkConnected()) {
-			makeToast(R.string.error_network)
-			return@launch
-		}
 		runCatching {
 			bookShelfRepository.checkAlreadyInBookShelf(
 				bookSearchRepository.getCachedBook(bookIsbn)
@@ -115,10 +110,6 @@ class SearchBookDialogViewModel @Inject constructor(
 	}
 
 	fun onClickWishToggleBtn() {
-		if (!isNetworkConnected()) {
-			makeToast(R.string.error_network)
-			return
-		}
 		if (isAlreadyInWishBookShelf(uiState.value.uiState)) return
 		registerWishBook()
 	}
@@ -145,10 +136,6 @@ class SearchBookDialogViewModel @Inject constructor(
 
 	private fun startUiEvent(event: SearchTapDialogEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
-	}
-
-	private fun isNetworkConnected(): Boolean {
-		return App.instance.isNetworkConnected()
 	}
 
 }

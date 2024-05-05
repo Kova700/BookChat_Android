@@ -36,7 +36,7 @@ import javax.inject.Inject
 //TODO : 채팅방 정보 조회 실패 시 예외 처리
 //TODO : 소켓 연결 성공 /실패 상관 없이 끝나면 채팅방 채팅 내역 조회
 //TODO : 공지 채팅 유저명 연결
-
+//TODO : Network 연결 상태 Flow로 실시간 알림 받는 환경 구성
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,

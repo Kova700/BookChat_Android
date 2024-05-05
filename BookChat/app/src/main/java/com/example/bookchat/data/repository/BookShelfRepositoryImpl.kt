@@ -1,12 +1,11 @@
 package com.example.bookchat.data.repository
 
-import com.example.bookchat.App
 import com.example.bookchat.data.mapper.toBookRequest
 import com.example.bookchat.data.mapper.toBookShelfItem
 import com.example.bookchat.data.mapper.toBookStateInBookShelf
 import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.network.model.request.RequestRegisterBookShelfBook
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.model.BookShelfState
@@ -88,9 +87,8 @@ class BookShelfRepositoryImpl @Inject constructor(
 		bookShelfState: BookShelfState,
 		starRating: StarRating?
 	) {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 		val requestRegisterBookShelfBook =
-			com.example.bookchat.data.network.model.request.RequestRegisterBookShelfBook(
+			RequestRegisterBookShelfBook(
 				bookRequest = book.toBookRequest(),
 				bookShelfState = bookShelfState,
 				star = starRating
@@ -107,8 +105,6 @@ class BookShelfRepositoryImpl @Inject constructor(
 		bookShelfItemId: Long,
 		bookShelfState: BookShelfState
 	) {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
 		bookChatApi.deleteBookShelfBook(bookShelfItemId)
 
 		mapBookShelfItems.update { mapBookShelfItems.value - bookShelfItemId }
@@ -120,8 +116,6 @@ class BookShelfRepositoryImpl @Inject constructor(
 		bookShelfItemId: Long,
 		newBookShelfItem: BookShelfItem,
 	) {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
 		val request = com.example.bookchat.data.network.model.request.RequestChangeBookStatus(
 			bookShelfState = newBookShelfItem.state,
 			star = newBookShelfItem.star,
@@ -142,12 +136,7 @@ class BookShelfRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun checkAlreadyInBookShelf(book: Book): BookStateInBookShelf {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 		return bookChatApi.checkAlreadyInBookShelf(book.isbn, book.publishAt)
 			.toBookStateInBookShelf()
-	}
-
-	private fun isNetworkConnected(): Boolean {
-		return App.instance.isNetworkConnected()
 	}
 }

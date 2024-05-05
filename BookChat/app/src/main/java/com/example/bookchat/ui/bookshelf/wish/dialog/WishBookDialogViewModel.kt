@@ -3,7 +3,6 @@ package com.example.bookchat.ui.bookshelf.wish.dialog
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.repository.BookShelfRepository
@@ -46,11 +45,6 @@ class WishBookDialogViewModel @Inject constructor(
 	}
 
 	fun onHeartToggleClick() {
-		if (!isNetworkConnected()) {
-			makeToast(R.string.error_network)
-			return
-		}
-
 		if (uiState.value.isToggleChecked) {
 			onItemDeleteClick()
 			updateState { copy(isToggleChecked = false) }
@@ -139,9 +133,5 @@ class WishBookDialogViewModel @Inject constructor(
 
 	private fun startEvent(event: WishBookDialogEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
-	}
-
-	private fun isNetworkConnected(): Boolean {
-		return App.instance.isNetworkConnected()
 	}
 }

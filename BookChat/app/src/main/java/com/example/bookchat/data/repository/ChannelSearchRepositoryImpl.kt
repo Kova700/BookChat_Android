@@ -1,10 +1,8 @@
 package com.example.bookchat.data.repository
 
-import com.example.bookchat.App
 import com.example.bookchat.data.mapper.toChannel
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.request.RequestGetSearchedChannels
-import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.SearchFilter
 import com.example.bookchat.domain.model.SearchFilter.BOOK_ISBN
@@ -46,7 +44,6 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 			clearCachedData()
 		}
 		if (isEndPage) return channels.firstOrNull() ?: emptyList()
-		if (isNetworkConnected().not()) throw NetworkIsNotConnectedException()
 
 		val requestGetSearchedChannels = getRequestGetSearchedChannels(
 			keyword = keyword,
@@ -92,9 +89,5 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 			BOOK_ISBN -> RequestGetSearchedChannels(isbn = keyword)
 			ROOM_TAGS -> RequestGetSearchedChannels(tags = keyword)
 		}
-	}
-
-	private fun isNetworkConnected(): Boolean {
-		return App.instance.isNetworkConnected()
 	}
 }

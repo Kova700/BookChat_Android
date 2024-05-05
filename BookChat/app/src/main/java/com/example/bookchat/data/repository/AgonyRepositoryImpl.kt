@@ -1,11 +1,9 @@
 package com.example.bookchat.data.repository
 
-import com.example.bookchat.App
 import com.example.bookchat.data.mapper.toAgony
 import com.example.bookchat.data.mapper.toNetWork
 import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.Agony
 import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.domain.model.SearchSortOption
@@ -48,7 +46,6 @@ class AgonyRepositoryImpl @Inject constructor(
 		}
 
 		if (isEndPage) return
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 
 		val response = bookChatApi.getAgony(
 			bookShelfId = bookShelfId,
@@ -77,8 +74,6 @@ class AgonyRepositoryImpl @Inject constructor(
 		title: String,
 		hexColorCode: AgonyFolderHexColor
 	) {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
 		val requestMakeAgony = com.example.bookchat.data.network.model.request.RequestMakeAgony(
 			title,
 			hexColorCode.toNetWork()
@@ -92,8 +87,6 @@ class AgonyRepositoryImpl @Inject constructor(
 		agony: Agony,
 		newTitle: String
 	) {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
 		val requestReviseAgony = com.example.bookchat.data.network.model.request.RequestReviseAgony(
 			newTitle,
 			agony.hexColorCode.toNetWork()
@@ -106,8 +99,6 @@ class AgonyRepositoryImpl @Inject constructor(
 		bookShelfId: Long,
 		agonyIds: List<Long>
 	) {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
 		val agonyIdsString = agonyIds.joinToString(",")
 		bookChatApi.deleteAgony(bookShelfId, agonyIdsString)
 		mapAgonies.update { mapAgonies.value - agonyIds.toSet() }
@@ -115,10 +106,6 @@ class AgonyRepositoryImpl @Inject constructor(
 
 	override fun getCachedAgony(agonyId: Long): Agony? {
 		return mapAgonies.value[agonyId]
-	}
-
-	private fun isNetworkConnected(): Boolean {
-		return App.instance.isNetworkConnected()
 	}
 
 }
