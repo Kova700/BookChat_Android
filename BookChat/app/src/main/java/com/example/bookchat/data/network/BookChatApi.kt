@@ -99,13 +99,13 @@ interface BookChatApi {
 	@DELETE("/v1/api/bookshelves/{bookShelfId}/report")
 	suspend fun deleteBookReport(
 		@Path("bookShelfId") bookShelfId: Long,
-	): Response<Unit>
+	)
 
 	@PUT("/v1/api/bookshelves/{bookShelfId}/report")
 	suspend fun reviseBookReport(
 		@Path("bookShelfId") bookShelfId: Long,
 		@Body requestRegisterBookReport: RequestRegisterBookReport
-	): Response<Unit>
+	)
 
 	/**------------고민 ------------*/
 
