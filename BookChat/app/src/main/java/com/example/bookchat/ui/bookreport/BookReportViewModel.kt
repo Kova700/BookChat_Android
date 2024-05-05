@@ -1,15 +1,14 @@
 package com.example.bookchat.ui.bookreport
 
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.BookReport
 import com.example.bookchat.data.network.model.response.BookReportDoseNotExistException
 import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.repository.BookReportRepository
+import com.example.bookchat.utils.makeToast
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -160,10 +159,6 @@ class BookReportViewModel @AssistedInject constructor(
 
 	private fun startEvent(event: BookReportUIEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
-	}
-
-	private fun makeToast(stirngId: Int) {
-		Toast.makeText(App.instance.applicationContext, stirngId, Toast.LENGTH_SHORT).show()
 	}
 
 	private fun failHandler(exception: Throwable) {

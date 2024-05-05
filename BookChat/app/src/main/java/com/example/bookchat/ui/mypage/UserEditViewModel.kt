@@ -3,15 +3,14 @@ package com.example.bookchat.ui.mypage
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.network.model.response.NickNameDuplicateException
 import com.example.bookchat.domain.model.NameCheckStatus
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -161,9 +160,5 @@ class UserEditViewModel @Inject constructor(
 
 			else -> startEvent(UserEditUiEvent.UnknownError)
 		}
-	}
-
-	private fun makeToast(stringId: Int) {
-		Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
 	}
 }

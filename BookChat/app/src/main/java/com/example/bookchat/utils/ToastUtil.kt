@@ -6,3 +6,7 @@ import com.example.bookchat.App
 fun makeToast(stringId: Int) {
 	Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
 }
+
+fun makeToast(text: String) {
+	Toast.makeText(App.instance.applicationContext, text, Toast.LENGTH_SHORT).show()
+}
