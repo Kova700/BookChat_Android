@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.search
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,6 +21,7 @@ import com.example.bookchat.ui.search.mapper.toChannelItem
 import com.example.bookchat.ui.search.model.SearchResultItem
 import com.example.bookchat.ui.search.model.SearchTarget
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -100,7 +102,10 @@ class SearchViewModel @Inject constructor(
 				groupedItems.add(SearchResultItem.BookEmpty)
 			} else {
 				val defaultSize = bookImgSizeManager.flexBoxBookSpanSize * 2
+				Log.d(TAG, "SearchViewModel: addBookItems() - books.size : ${books.size}")
+				Log.d(TAG, "SearchViewModel: addBookItems() - defaultSize : $defaultSize")
 				val exposureItemCount = if (books.size > defaultSize) defaultSize else books.size
+				Log.d(TAG, "SearchViewModel: addBookItems() - exposureItemCount : $exposureItemCount")
 				groupedItems.addAll(books.take(exposureItemCount).map { it.toBookItem() })
 
 				val dummyItemCount = bookImgSizeManager.getFlexBoxDummyItemCount(exposureItemCount)
@@ -154,7 +159,7 @@ class SearchViewModel @Inject constructor(
 		runCatching {
 			val books = bookSearchRepository.search(
 				keyword = searchKeyword.trim(),
-				loadSize = bookImgSizeManager.flexBoxBookSpanSize
+				loadSize = bookImgSizeManager.flexBoxBookSpanSize * 6
 			)
 			val channels = channelSearchRepository.search(
 				keyword = searchKeyword.trim(),
@@ -170,7 +175,7 @@ class SearchViewModel @Inject constructor(
 		runCatching {
 			bookSearchRepository.search(
 				keyword = searchKeyword.trim(),
-				loadSize = bookImgSizeManager.flexBoxBookSpanSize
+				loadSize = bookImgSizeManager.flexBoxBookSpanSize * 6
 			)
 		}
 			.onSuccess { books -> searchSuccessCallBack(books.isEmpty()) }

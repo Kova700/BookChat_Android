@@ -114,7 +114,7 @@ class SearchDetailViewModel @Inject constructor(
 		runCatching {
 			bookSearchRepository.search(
 				keyword = searchKeyword,
-				loadSize = bookImgSizeManager.flexBoxBookSpanSize
+				loadSize = bookImgSizeManager.flexBoxBookSpanSize * 6
 			)
 		}
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
