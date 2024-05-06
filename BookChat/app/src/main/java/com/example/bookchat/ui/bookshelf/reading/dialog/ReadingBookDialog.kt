@@ -37,7 +37,7 @@ class ReadingBookDialog : DialogFragment() {
 	): View? {
 		_binding =
 			DataBindingUtil.inflate(inflater, R.layout.dialog_reading_book_tap_clicked, container, false)
-		binding.lifecycleOwner = this.viewLifecycleOwner
+		binding.lifecycleOwner = viewLifecycleOwner
 		binding.viewmodel = readingBookDialogViewModel
 		return binding.root
 	}
@@ -45,7 +45,9 @@ class ReadingBookDialog : DialogFragment() {
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+		observeUiState()
 		observeUiEvent()
+		initViewState()
 	}
 
 	override fun onDestroyView() {
@@ -53,8 +55,26 @@ class ReadingBookDialog : DialogFragment() {
 		_binding = null
 	}
 
+	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
+		readingBookDialogViewModel.uiState.collect { state ->
+			setViewState(state)
+		}
+	}
+
 	private fun observeUiEvent() = viewLifecycleOwner.lifecycleScope.launch {
 		readingBookDialogViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun initViewState() {
+		binding.readingBookRatingBar.setOnRatingChangeListener { ratingBar, rating, fromUser ->
+			readingBookDialogViewModel.onChangeStarRating(rating)
+		}
+	}
+
+	private fun setViewState(state: ReadingBookDialogUiState) {
+		if (binding.readingBookRatingBar.rating != state.starRating) {
+			binding.readingBookRatingBar.rating = state.starRating
+		}
 	}
 
 	private fun moveToAgony(bookShelfListItemId: Long) {

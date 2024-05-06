@@ -37,8 +37,6 @@ class ReadingBookDialogViewModel @Inject constructor(
 		MutableStateFlow<ReadingBookDialogUiState>(ReadingBookDialogUiState.DEFAULT)
 	val uiState = _uiState.asStateFlow()
 
-	var starRating = MutableStateFlow<Float>(0.0F)
-
 	init {
 		getItem()
 	}
@@ -49,8 +47,12 @@ class ReadingBookDialogViewModel @Inject constructor(
 		item?.let { updateState { copy(readingItem = item) } }
 	}
 
+	fun onChangeStarRating(rating: Float) {
+		updateState { copy(starRating = rating) }
+	}
+
 	fun onChangeToCompleteClick() {
-		if (starRating.value <= 0) return
+		if (uiState.value.starRating <= 0) return
 		onChangeStateClick(BookShelfState.COMPLETE)
 	}
 
@@ -70,7 +72,7 @@ class ReadingBookDialogViewModel @Inject constructor(
 					bookShelfItemId = bookShelfItem.bookShelfId,
 					newBookShelfItem = bookShelfItem.copy(
 						state = newState,
-						star = starRating.value.toStarRating()
+						star = uiState.value.starRating.toStarRating()
 					).toBookShelfItem(),
 				)
 			}.onSuccess {

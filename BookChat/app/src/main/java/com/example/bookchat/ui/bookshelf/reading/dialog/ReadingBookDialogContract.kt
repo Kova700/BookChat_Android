@@ -6,6 +6,7 @@ import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 data class ReadingBookDialogUiState(
 	val uiState: UiState,
 	val readingItem: BookShelfListItem,
+	val starRating: Float,
 ) {
 
 	enum class UiState {
@@ -19,6 +20,7 @@ data class ReadingBookDialogUiState(
 		val DEFAULT = ReadingBookDialogUiState(
 			uiState = UiState.EMPTY,
 			readingItem = BookShelfListItem.DEFAULT,
+			starRating = 0.0f
 		)
 	}
 }
