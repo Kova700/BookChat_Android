@@ -4,7 +4,7 @@ import android.util.DisplayMetrics
 import com.example.bookchat.App
 import com.example.bookchat.R
 
-class MakeChatRoomImgSizeManager {
+object MakeChannelImgSizeManager {
     private val contextResources = App.instance.applicationContext.resources
     private val displayMetrics: DisplayMetrics = contextResources.displayMetrics
     private val deviceWidthPx: Int = displayMetrics.widthPixels

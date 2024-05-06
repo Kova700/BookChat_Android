@@ -7,7 +7,6 @@ import com.example.bookchat.R
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChannelSearchRepository
 import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_CLICKED_CHANNEL_ID
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,7 +49,7 @@ class ChannelInfoViewModel @Inject constructor(
 			.onSuccess { startEvent(ChannelInfoEvent.MoveToChannel(uiState.value.channel.roomId)) }
 			.onFailure {
 				failHandler(it)
-				makeToast(R.string.enter_chat_room_fail)
+				startEvent(ChannelInfoEvent.MakeToast(R.string.enter_chat_room_fail))
 			}
 	}
 

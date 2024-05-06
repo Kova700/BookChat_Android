@@ -14,6 +14,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogWishBookTapClickedBinding
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.ui.bookshelf.wish.WishBookShelfViewModel
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -62,6 +63,7 @@ class WishBookDialog : DialogFragment() {
 
 	private fun handleEvent(event: WishBookDialogEvent) = when (event) {
 		is WishBookDialogEvent.ChangeBookShelfTab -> moveToOtherTab(event.targetState)
+		is WishBookDialogEvent.MakeToast -> makeToast(event.stringId)
 	}
 
 	companion object {

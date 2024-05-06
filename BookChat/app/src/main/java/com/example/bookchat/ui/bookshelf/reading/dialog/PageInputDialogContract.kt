@@ -24,4 +24,7 @@ data class PageInputDialogUiState(
 
 sealed class PageInputDialogEvent {
 	object CloseDialog : PageInputDialogEvent()
+	data class MakeToast(
+		val stringId: Int
+	) : PageInputDialogEvent()
 }

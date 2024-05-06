@@ -17,8 +17,10 @@ import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.channel.adapter.ChatDataItemAdapter
 import com.example.bookchat.ui.channel.adapter.chatdrawer.ChatRoomDrawerDataAdapter
 import com.example.bookchat.ui.channel.adapter.chatdrawer.ChatRoomDrawerHeaderAdapter
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChannelActivity : AppCompatActivity() {
@@ -28,6 +30,9 @@ class ChannelActivity : AppCompatActivity() {
 	private lateinit var chatRoomDrawerHeaderAdapter: ChatRoomDrawerHeaderAdapter
 	private lateinit var chatRoomDrawerDataAdapter: ChatRoomDrawerDataAdapter
 	private val channelViewModel by viewModels<ChannelViewModel>()
+
+	@Inject
+	lateinit var chatItemDecoration: ChatItemDecoration
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -94,7 +99,7 @@ class ChannelActivity : AppCompatActivity() {
 		binding.chattingRcv.apply {
 			adapter = chatDataItemAdapter
 			setHasFixedSize(true)
-			addItemDecoration(ChatItemDecoration())
+			addItemDecoration(chatItemDecoration)
 			layoutManager = linearLayoutManager
 			addOnScrollListener(rcvScrollListener)
 		}
@@ -151,6 +156,7 @@ class ChannelActivity : AppCompatActivity() {
 			ChannelEvent.CaptureChannel -> {}
 			ChannelEvent.ScrollNewChannelItem -> scrollNewChatItem()
 			ChannelEvent.OpenOrCloseDrawer -> openOrCloseDrawer()
+			is ChannelEvent.MakeToast -> makeToast(event.stringId)
 		}
 	}
 

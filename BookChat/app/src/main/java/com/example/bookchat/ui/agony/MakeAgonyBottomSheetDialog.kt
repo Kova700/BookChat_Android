@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogMakeAgonyBottomSheetBinding
+import com.example.bookchat.utils.makeToast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -73,6 +74,7 @@ class MakeAgonyBottomSheetDialog : BottomSheetDialogFragment() {
 	private fun handleEvent(event: MakeAgonyUiEvent) {
 		when (event) {
 			is MakeAgonyUiEvent.MoveToBack -> this.dismiss()
+			is MakeAgonyUiEvent.MakeToast -> makeToast(event.stringId)
 		}
 	}
 }

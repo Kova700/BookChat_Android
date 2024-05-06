@@ -27,4 +27,9 @@ data class MakeAgonyUiState(
 
 sealed class MakeAgonyUiEvent {
 	object MoveToBack : MakeAgonyUiEvent()
+
+	data class MakeToast(
+		val stringId: Int
+	) : MakeAgonyUiEvent()
+
 }

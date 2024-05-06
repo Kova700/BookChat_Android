@@ -34,4 +34,9 @@ sealed class AgonyEvent {
 		val bookshelfItemId: Long,
 		val agonyListItemId: Long
 	) : AgonyEvent()
+
+	data class MakeToast(
+		val stringId: Int
+	) : AgonyEvent()
+
 }

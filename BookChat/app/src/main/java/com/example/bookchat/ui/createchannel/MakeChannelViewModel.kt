@@ -7,7 +7,6 @@ import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.repository.BookSearchRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.ui.createchannel.MakeChannelUiState.UiState
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,16 +39,18 @@ class MakeChannelViewModel @Inject constructor(
 				selectedBook = uiState.value.selectedBook!!,
 				channelImage = uiState.value.channelProfileImage
 			)
-		}.onSuccess { channel ->
-			updateState { copy(uiState = UiState.SUCCESS) }
-			enterChannel(channel)
-		}.onFailure { makeToast(R.string.make_chat_room_fail) }
+		}
+			.onSuccess { channel ->
+				updateState { copy(uiState = UiState.SUCCESS) }
+				enterChannel(channel)
+			}
+			.onFailure { startEvent(MakeChannelEvent.MakeToast(R.string.make_chat_room_fail)) }
 	}
 
 	private fun enterChannel(channel: Channel) = viewModelScope.launch {
 		runCatching { channelRepository.enter(channel) }
 			.onSuccess { startEvent(MakeChannelEvent.MoveToChannel(channel.roomId)) }
-			.onFailure { makeToast(R.string.enter_chat_room_fail) }
+			.onFailure { startEvent(MakeChannelEvent.MakeToast(R.string.enter_chat_room_fail)) }
 	}
 
 	fun onClickFinishBtn() {

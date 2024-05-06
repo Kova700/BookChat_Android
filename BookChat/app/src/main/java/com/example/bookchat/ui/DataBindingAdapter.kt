@@ -149,22 +149,22 @@ object DataBindingAdapter {
 
 			NameCheckStatus.IsShort -> {
 				textView.setTextColor(Color.parseColor("#FF004D"))
-				textView.text = App.instance.resources.getString(R.string.name_check_status_short)
+				textView.text = textView.context.resources.getString(R.string.name_check_status_short)
 			}
 
 			NameCheckStatus.IsDuplicate -> {
 				textView.setTextColor(Color.parseColor("#FF004D"))
-				textView.text = App.instance.resources.getString(R.string.name_check_status_duplicate)
+				textView.text = textView.context.resources.getString(R.string.name_check_status_duplicate)
 			}
 
 			NameCheckStatus.IsSpecialCharInText -> {
 				textView.setTextColor(Color.parseColor("#FF004D"))
-				textView.text = App.instance.resources.getString(R.string.name_check_status_special_char)
+				textView.text = textView.context.resources.getString(R.string.name_check_status_special_char)
 			}
 
 			NameCheckStatus.IsPerfect -> {
 				textView.setTextColor(Color.parseColor("#5648FF"))
-				textView.text = App.instance.resources.getString(R.string.name_check_status_perfect)
+				textView.text = textView.context.resources.getString(R.string.name_check_status_perfect)
 			}
 		}
 	}
@@ -177,7 +177,7 @@ object DataBindingAdapter {
 		when (nameCheckStatus) {
 			NameCheckStatus.Default -> {
 				view.background = ResourcesCompat.getDrawable(
-					App.instance.resources,
+					view.resources,
 					R.drawable.nickname_input_back_white,
 					null
 				)
@@ -187,7 +187,7 @@ object DataBindingAdapter {
 			NameCheckStatus.IsDuplicate,
 			NameCheckStatus.IsSpecialCharInText -> {
 				view.background = ResourcesCompat.getDrawable(
-					App.instance.resources,
+					view.resources,
 					R.drawable.nickname_input_back_red,
 					null
 				)
@@ -195,7 +195,7 @@ object DataBindingAdapter {
 
 			NameCheckStatus.IsPerfect -> {
 				view.background = ResourcesCompat.getDrawable(
-					App.instance.resources,
+					view.context.resources,
 					R.drawable.nickname_input_back_blue,
 					null
 				)
@@ -273,12 +273,12 @@ object DataBindingAdapter {
 		when (isSelected) {
 			false -> {
 				view.backgroundTintList =
-					ColorStateList.valueOf(ContextCompat.getColor(App.instance, R.color.agony_color_white))
+					ColorStateList.valueOf(ContextCompat.getColor(view.context, R.color.agony_color_white))
 			}
 
 			true -> {
 				view.backgroundTintList =
-					ColorStateList.valueOf(ContextCompat.getColor(App.instance, R.color.agony_color_selected))
+					ColorStateList.valueOf(ContextCompat.getColor(view.context, R.color.agony_color_selected))
 			}
 		}
 	}
@@ -523,10 +523,9 @@ object DataBindingAdapter {
 	@JvmStatic
 	@BindingAdapter("setMakeChatRoomImgSize")
 	fun setMakeChatRoomImgSize(view: ImageView, bool: Boolean) {
-		val sizeManager = MakeChatRoomImgSizeManager()
 		with(view) {
-			layoutParams.width = sizeManager.chatRoomImgWidthPx
-			layoutParams.height = sizeManager.chatRoomImgHeightPx
+			layoutParams.width = MakeChannelImgSizeManager.chatRoomImgWidthPx
+			layoutParams.height = MakeChannelImgSizeManager.chatRoomImgHeightPx
 		}
 	}
 

@@ -20,7 +20,6 @@ import com.example.bookchat.ui.search.mapper.toChannelItem
 import com.example.bookchat.ui.search.model.SearchResultItem
 import com.example.bookchat.ui.search.model.SearchTarget
 import com.example.bookchat.utils.BookImgSizeManager
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -213,7 +212,7 @@ class SearchViewModel @Inject constructor(
 	fun onClickSearchBtn() = viewModelScope.launch {
 		val keyword = uiState.value.searchKeyword.trim()
 		if (keyword.isBlank()) {
-			makeToast(R.string.search_book_keyword_empty)
+			startEvent(SearchEvent.MakeToast(R.string.search_book_keyword_empty))
 			return@launch
 		}
 		searchHistoryRepository.addHistory(keyword)
@@ -292,9 +291,9 @@ class SearchViewModel @Inject constructor(
 		updateState { copy(searchResultState = SearchResultState.Error) }
 		when (exception) {
 			is NetworkIsNotConnectedException ->
-				makeToast(R.string.error_network)
+				startEvent(SearchEvent.MakeToast(R.string.error_network))
 
-			else -> makeToast(R.string.error_else)
+			else -> startEvent(SearchEvent.MakeToast(R.string.error_else))
 		}
 	}
 

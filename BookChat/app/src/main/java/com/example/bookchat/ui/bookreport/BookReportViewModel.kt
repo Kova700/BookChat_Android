@@ -8,7 +8,6 @@ import com.example.bookchat.data.BookReport
 import com.example.bookchat.data.network.model.response.BookReportDoseNotExistException
 import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.repository.BookReportRepository
-import com.example.bookchat.utils.makeToast
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -73,7 +72,7 @@ class BookReportViewModel @AssistedInject constructor(
 			}
 			.onFailure {
 				bookReportStatus.value = BookReportStatus.InputData
-				makeToast(R.string.book_report_make_fail)
+				startEvent(BookReportUIEvent.MakeToast(R.string.book_report_make_fail))
 			}
 	}
 
@@ -81,12 +80,12 @@ class BookReportViewModel @AssistedInject constructor(
 		bookReportStatus.value = BookReportStatus.Loading
 		runCatching { bookReportRepository.deleteBookReport(bookShelfItem) }
 			.onSuccess {
-				makeToast(R.string.book_report_delete_success)
+				startEvent(BookReportUIEvent.MakeToast(R.string.book_report_delete_success))
 				startEvent(BookReportUIEvent.MoveToBack)
 			}
 			.onFailure {
 				bookReportStatus.value = BookReportStatus.ShowData
-				makeToast(R.string.book_report_delete_fail)
+				startEvent(BookReportUIEvent.MakeToast(R.string.book_report_delete_fail))
 			}
 	}
 
@@ -99,13 +98,13 @@ class BookReportViewModel @AssistedInject constructor(
 			}
 			.onFailure {
 				bookReportStatus.value = BookReportStatus.ReviseData
-				makeToast(R.string.book_report_revise_fail)
+				startEvent(BookReportUIEvent.MakeToast(R.string.book_report_revise_fail))
 			}
 	}
 
 	fun clickRegisterBtn() {
 		if (isBookReportEmpty()) {
-			makeToast(R.string.title_content_empty)
+			startEvent(BookReportUIEvent.MakeToast(R.string.title_content_empty))
 			return
 		}
 
@@ -184,6 +183,9 @@ class BookReportViewModel @AssistedInject constructor(
 		object MoveToBack : BookReportUIEvent()
 		object UnknownError : BookReportUIEvent()
 		object ShowDeleteWarningDialog : BookReportUIEvent()
+		data class MakeToast(
+			val stringId: Int
+		) : BookReportUIEvent()
 	}
 
 	companion object {

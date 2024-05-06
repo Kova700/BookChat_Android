@@ -16,6 +16,7 @@ import com.example.bookchat.databinding.DialogReadingBookTapClickedBinding
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.ui.agony.AgonyActivity
 import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfViewModel
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -91,6 +92,7 @@ class ReadingBookDialog : DialogFragment() {
 	private fun handleEvent(event: ReadingBookDialogEvent) = when (event) {
 		is ReadingBookDialogEvent.MoveToAgony -> moveToAgony(event.bookShelfListItemId)
 		is ReadingBookDialogEvent.ChangeBookShelfTab -> moveToOtherTab(event.targetState)
+		is ReadingBookDialogEvent.MakeToast -> makeToast(event.stringId)
 	}
 
 	companion object {

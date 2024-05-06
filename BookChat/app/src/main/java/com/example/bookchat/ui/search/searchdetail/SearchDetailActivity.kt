@@ -19,6 +19,7 @@ import com.example.bookchat.ui.search.channelInfo.ChannelInfoActivity
 import com.example.bookchat.ui.search.dialog.SearchBookDialog
 import com.example.bookchat.ui.search.model.SearchResultItem
 import com.example.bookchat.ui.search.model.SearchTarget
+import com.example.bookchat.utils.makeToast
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -139,6 +140,7 @@ class SearchDetailActivity : AppCompatActivity() {
 
 			is SearchDetailEvent.MoveToSearchBookDialog -> moveToSearchTapBookDialog(event.book)
 			SearchDetailEvent.MoveToBack -> finish()
+			is SearchDetailEvent.MakeToast -> makeToast(event.stringId)
 		}
 	}
 

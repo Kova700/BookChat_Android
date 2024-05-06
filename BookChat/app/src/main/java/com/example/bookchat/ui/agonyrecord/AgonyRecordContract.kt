@@ -31,4 +31,8 @@ sealed class AgonyRecordEvent {
 
 	object ShowEditCancelWarning : AgonyRecordEvent()
 	object OpenChattingScrapDialog : AgonyRecordEvent()
+
+	data class MakeToast(
+		val stringId: Int
+	) : AgonyRecordEvent()
 }

@@ -11,7 +11,6 @@ import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.bookshelf.wish.dialog.WishBookDialog.Companion.EXTRA_WISH_BOOKSHELF_ITEM_ID
 import com.example.bookchat.ui.bookshelf.wish.dialog.WishBookDialogUiState.UiState
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -85,7 +84,8 @@ class WishBookDialogViewModel @Inject constructor(
 					book = bookShelfListItem.book,
 					bookShelfState = BookShelfState.WISH,
 				)
-			}.onFailure { makeToast(R.string.wish_bookshelf_register_fail) }
+			}
+				.onFailure { startEvent(WishBookDialogEvent.MakeToast(R.string.wish_bookshelf_register_fail)) }
 				.also { updateState { copy(uiState = UiState.SUCCESS) } }
 		}
 	}
@@ -98,7 +98,8 @@ class WishBookDialogViewModel @Inject constructor(
 					bookShelfListItem.bookShelfId,
 					BookShelfState.WISH
 				)
-			}.onFailure { makeToast(R.string.bookshelf_delete_fail) }
+			}
+				.onFailure { startEvent(WishBookDialogEvent.MakeToast(R.string.bookshelf_delete_fail)) }
 				.also { updateState { copy(uiState = UiState.SUCCESS) } }
 		}
 	}
@@ -120,7 +121,8 @@ class WishBookDialogViewModel @Inject constructor(
 						targetState = newState
 					)
 				)
-			}.onFailure { makeToast(R.string.bookshelf_state_change_fail) }
+			}
+				.onFailure { startEvent(WishBookDialogEvent.MakeToast(R.string.bookshelf_state_change_fail)) }
 				.also { updateState { copy(uiState = UiState.SUCCESS) } }
 		}
 	}

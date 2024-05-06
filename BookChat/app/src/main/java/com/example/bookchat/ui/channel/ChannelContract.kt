@@ -7,7 +7,7 @@ import com.example.bookchat.domain.model.Chat
 data class ChannelUiState(
 	val inputtedMessage: String,
 	val channel: Channel?,
-	val uiState : UiState,
+	val uiState: UiState,
 	val chats: List<Chat>,
 ) {
 
@@ -33,4 +33,8 @@ sealed class ChannelEvent {
 	object CaptureChannel : ChannelEvent()
 	object ScrollNewChannelItem : ChannelEvent()
 	object OpenOrCloseDrawer : ChannelEvent()
+	data class MakeToast(
+		val stringId: Int
+	) : ChannelEvent()
+
 }

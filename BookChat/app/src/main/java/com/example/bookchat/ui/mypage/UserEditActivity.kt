@@ -70,8 +70,8 @@ class UserEditActivity : AppCompatActivity() {
 
 	private fun handleUiEvent(event: UserEditUiEvent) = when (event) {
 		is UserEditUiEvent.Finish -> finish()
-		else -> makeToast(R.string.error_else)
-
+		is UserEditUiEvent.MakeToast -> makeToast(event.stringId)
+		UserEditUiEvent.UnknownError -> makeToast(R.string.error_else)
 	}
 
 }

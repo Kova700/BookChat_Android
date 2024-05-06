@@ -12,7 +12,6 @@ import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog.Companion.EXTRA_READING_BOOKSHELF_ITEM_ID
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialogUiState.UiState
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -81,7 +80,9 @@ class ReadingBookDialogViewModel @Inject constructor(
 						targetState = newState
 					)
 				)
-			}.onFailure { makeToast(R.string.bookshelf_state_change_fail) }
+			}.onFailure {
+				startEvent(ReadingBookDialogEvent.MakeToast(R.string.bookshelf_state_change_fail))
+			}
 				.also { updateState { copy(uiState = UiState.SUCCESS) } }
 		}
 	}

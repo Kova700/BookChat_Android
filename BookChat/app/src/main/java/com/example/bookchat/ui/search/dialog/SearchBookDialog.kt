@@ -16,6 +16,7 @@ import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogSta
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState.AlreadyInBookShelf
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState.Default
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState.Loading
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -85,6 +86,7 @@ class SearchBookDialog : DialogFragment() {
 
 	private fun handleEvent(event: SearchTapDialogEvent) = when (event) {
 		is SearchTapDialogEvent.MoveToStarSetDialog -> moveToStarSetDialog()
+		is SearchTapDialogEvent.MakeToast -> makeToast(event.stringId)
 	}
 
 	companion object {

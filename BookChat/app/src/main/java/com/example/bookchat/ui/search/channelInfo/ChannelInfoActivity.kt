@@ -11,6 +11,7 @@ import com.example.bookchat.databinding.ActivityChannelInfoBinding
 import com.example.bookchat.ui.channel.ChannelActivity
 import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_CHANNEL_ID
 import com.example.bookchat.utils.DateManager
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -65,6 +66,7 @@ class ChannelInfoActivity : AppCompatActivity() {
 		when (event) {
 			is ChannelInfoEvent.MoveToBack -> finish()
 			is ChannelInfoEvent.MoveToChannel -> moveToChannel(event.channelId)
+			is ChannelInfoEvent.MakeToast -> makeToast(event.stringId)
 		}
 	}
 

@@ -26,4 +26,7 @@ data class SearchDialogUiState(
 
 sealed class SearchTapDialogEvent {
 	object MoveToStarSetDialog : SearchTapDialogEvent()
+	data class MakeToast(
+		val stringId: Int
+	) : SearchTapDialogEvent()
 }

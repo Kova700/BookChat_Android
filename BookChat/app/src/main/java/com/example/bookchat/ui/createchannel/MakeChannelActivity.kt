@@ -17,6 +17,7 @@ import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_C
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
 import com.example.bookchat.utils.PermissionManager
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -147,5 +148,6 @@ class MakeChannelActivity : AppCompatActivity() {
 		is MakeChannelEvent.MoveToBookSelect -> moveToBookSelect()
 		is MakeChannelEvent.OpenGallery -> startImageEdit()
 		is MakeChannelEvent.MoveToChannel -> moveToChannel(event.channelId)
+		is MakeChannelEvent.MakeToast -> makeToast(event.stringId)
 	}
 }

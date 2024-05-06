@@ -2,8 +2,8 @@ package com.example.bookchat.ui.mypage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bookchat.R
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -31,10 +31,9 @@ class AccountSettingViewModel @Inject constructor(
 	private fun requestWithdraw() = viewModelScope.launch {
 		runCatching { clientRepository.withdraw() }
 			.onSuccess {
-				makeToast("회원이 탈퇴되었습니다(임시)")
+				startEvent(AccountSettingUiEvent.MakeToast(R.string.withdraw_success))
 				startEvent(AccountSettingUiEvent.MoveToLoginPage)
 			}
-			.onFailure { makeToast("회원이 탈퇴 실패 (임시)") }
 	}
 
 	private fun startEvent(event: AccountSettingUiEvent) = viewModelScope.launch {
@@ -43,5 +42,8 @@ class AccountSettingViewModel @Inject constructor(
 
 	sealed class AccountSettingUiEvent {
 		object MoveToLoginPage : AccountSettingUiEvent()
+		data class MakeToast(
+			val stringId: Int
+		) : AccountSettingUiEvent()
 	}
 }

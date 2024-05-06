@@ -22,7 +22,6 @@ import com.example.bookchat.ui.search.model.SearchResultItem
 import com.example.bookchat.ui.search.model.SearchTarget
 import com.example.bookchat.ui.search.searchdetail.SearchDetailUiState.UiState
 import com.example.bookchat.utils.BookImgSizeManager
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -164,8 +163,11 @@ class SearchDetailViewModel @Inject constructor(
 	private fun failHandler(exception: Throwable) {
 		updateState { copy(uiState = UiState.ERROR) }
 		when (exception) {
-			is NetworkIsNotConnectedException -> makeToast(R.string.error_network)
-			else -> makeToast(R.string.error_else)
+			is NetworkIsNotConnectedException ->
+				startEvent(SearchDetailEvent.MakeToast(R.string.error_network))
+
+			else ->
+				startEvent(SearchDetailEvent.MakeToast(R.string.error_else))
 		}
 	}
 

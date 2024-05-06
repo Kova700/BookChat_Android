@@ -8,7 +8,6 @@ import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.domain.repository.AgonyRepository
 import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,7 +44,7 @@ class MakeAgonyDialogViewModel @Inject constructor(
 
 	fun onRegisterBtnClick() {
 		if (uiState.value.agonyTitle.isBlank()) {
-			makeToast(R.string.agony_make_empty)
+			startEvent(MakeAgonyUiEvent.MakeToast(R.string.agony_make_empty))
 			return
 		}
 		registerAgony(uiState.value.agonyTitle, uiState.value.selectedColor)
@@ -72,7 +71,9 @@ class MakeAgonyDialogViewModel @Inject constructor(
 			)
 		}
 			.onSuccess { startEvent(MakeAgonyUiEvent.MoveToBack) }
-			.onFailure { makeToast(R.string.agony_make_fail) }
+			.onFailure {
+				startEvent(MakeAgonyUiEvent.MakeToast(R.string.agony_make_fail))
+			}
 	}
 
 	private inline fun updateState(block: MakeAgonyUiState.() -> MakeAgonyUiState) {
