@@ -37,6 +37,7 @@ class SearchDetailViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val bookSearchRepository: BookSearchRepository,
 	private val channelSearchRepository: ChannelSearchRepository,
+	private val bookImgSizeManager: BookImgSizeManager
 ) : ViewModel() {
 	private val searchKeyword = savedStateHandle.get<String>(EXTRA_SEARCH_KEYWORD)!!
 	private val searchTarget = savedStateHandle.get<SearchTarget>(EXTRA_SEARCH_TARGET)!!
@@ -90,7 +91,7 @@ class SearchDetailViewModel @Inject constructor(
 	private fun groupBookItems(books: List<Book>): List<SearchResultItem> {
 		val groupedItems = mutableListOf<SearchResultItem>()
 		groupedItems.addAll(books.map { it.toBookItem() })
-		val dummyItemCount = BookImgSizeManager.getFlexBoxDummyItemCount(books.size)
+		val dummyItemCount = bookImgSizeManager.getFlexBoxDummyItemCount(books.size)
 		(0 until dummyItemCount).forEach { i -> groupedItems.add(SearchResultItem.BookDummy(i)) }
 		return groupedItems
 	}
@@ -110,7 +111,12 @@ class SearchDetailViewModel @Inject constructor(
 	}
 
 	private fun searchBooks() = viewModelScope.launch {
-		runCatching { bookSearchRepository.search(searchKeyword) }
+		runCatching {
+			bookSearchRepository.search(
+				keyword = searchKeyword,
+				loadSize = bookImgSizeManager.flexBoxBookSpanSize
+			)
+		}
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 			.onFailure { failHandler(it) }
 	}

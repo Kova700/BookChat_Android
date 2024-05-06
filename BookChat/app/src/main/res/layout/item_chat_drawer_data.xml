@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
+
         <variable
-            name="user"
-            type="com.example.bookchat.domain.model.User" />
+            name="userItem"
+            type="com.example.bookchat.ui.channel.model.drawer.ChannelDrawerItem.UserItem" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -39,8 +42,8 @@
 
             <ImageView
                 android:id="@+id/bookImg"
-                userDefaultProfileImageType="@{user.defaultProfileImageType}"
-                userProfileUrl="@{user.profileImageUrl}"
+                userDefaultProfileImageType="@{userItem.defaultProfileImageType}"
+                userProfileUrl="@{userItem.profileImageUrl}"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:scaleType="fitXY"
@@ -52,10 +55,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_regular"
-            android:text="@{user.nickname}"
-            android:maxLines="1"
             android:ellipsize="end"
+            android:fontFamily="@font/notosanskr_regular"
+            android:maxLines="1"
+            android:text="@{userItem.nickname}"
             android:textColor="#4D4D4D"
             android:textSize="12sp"
             app:layout_constrainedWidth="true"

@@ -13,6 +13,7 @@ import com.example.bookchat.databinding.FragmentSearchTapResultBinding
 import com.example.bookchat.ui.search.SearchUiState.SearchResultState
 import com.example.bookchat.ui.search.adapter.SearchItemAdapter
 import com.example.bookchat.ui.search.model.SearchResultItem
+import com.example.bookchat.utils.BookImgSizeManager
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -32,6 +33,9 @@ class SearchTapResultFragment : Fragment() {
 
 	private val searchViewModel by viewModels<SearchViewModel>({ requireParentFragment() })
 
+	@Inject
+	lateinit var bookImgSizeManager: BookImgSizeManager
+
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
@@ -50,6 +54,7 @@ class SearchTapResultFragment : Fragment() {
 		super.onViewCreated(view, savedInstanceState)
 		initAdapter()
 		initRcv()
+		initViewState()
 		observeUiState()
 	}
 
@@ -62,6 +67,29 @@ class SearchTapResultFragment : Fragment() {
 		searchViewModel.uiState.collect { uiState ->
 			setViewVisibility(uiState)
 			searchItemAdapter.submitList(uiState.searchResults)
+		}
+	}
+
+	private fun initViewState() {
+		initShimmerGridLayout()
+		initShimmerBook()
+	}
+
+	private fun initShimmerGridLayout() {
+		with(binding.resultShimmerLayout.shimmerBookRcvGridLayout) {
+			columnCount = bookImgSizeManager.flexBoxBookSpanSize
+			rowCount = 2
+		}
+	}
+
+	private fun initShimmerBook() {
+		with(binding.resultShimmerLayout) {
+			bookImgSizeManager.setBookImgSize(shimmerBook1.bookImg)
+			bookImgSizeManager.setBookImgSize(shimmerBook2.bookImg)
+			bookImgSizeManager.setBookImgSize(shimmerBook3.bookImg)
+			bookImgSizeManager.setBookImgSize(shimmerBook4.bookImg)
+			bookImgSizeManager.setBookImgSize(shimmerBook5.bookImg)
+			bookImgSizeManager.setBookImgSize(shimmerBook6.bookImg)
 		}
 	}
 

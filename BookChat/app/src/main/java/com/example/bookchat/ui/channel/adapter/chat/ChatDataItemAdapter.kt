@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.channel.adapter
+package com.example.bookchat.ui.channel.adapter.chat
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -15,8 +15,9 @@ import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.utils.DateManager
+import javax.inject.Inject
 
-class ChatDataItemAdapter :
+class ChatDataItemAdapter @Inject constructor() :
 	ListAdapter<Chat, RecyclerView.ViewHolder>(CHAT_ITEM_COMPARATOR) {
 
 	inner class MineChatViewHolder(val binding: ItemChattingMineBinding) :

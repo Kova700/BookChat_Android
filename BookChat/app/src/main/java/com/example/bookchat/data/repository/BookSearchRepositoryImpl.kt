@@ -32,8 +32,8 @@ class BookSearchRepositoryImpl @Inject constructor(
 
 	override suspend fun search(
 		keyword: String,
-		sort: BookSearchSortOption,
 		loadSize: Int,
+		sort: BookSearchSortOption,
 	): List<Book> {
 		if (cachedSearchKeyword != keyword) {
 			clearCachedData()
@@ -48,7 +48,7 @@ class BookSearchRepositoryImpl @Inject constructor(
 		)
 		cachedSearchKeyword = keyword
 		isEndPage = response.searchingMeta.isEnd
-		currentPage += BookSearchRepository.SEARCH_BOOKS_ITEM_LOAD_SIZE
+		currentPage += loadSize
 
 		val newBooks = response.bookSearchResponse.map { it.toBook() }
 		mapBooks.update { mapBooks.value + newBooks.associateBy { it.isbn } }

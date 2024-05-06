@@ -10,6 +10,7 @@ import com.example.bookchat.databinding.ItemSearchChannelDataBinding
 import com.example.bookchat.databinding.ItemSearchChannelEmptyBinding
 import com.example.bookchat.databinding.ItemSearchChannelHeaderBinding
 import com.example.bookchat.ui.search.model.SearchResultItem
+import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DateManager
 
 sealed class SearchItemViewHolder(
@@ -39,12 +40,14 @@ class BookEmptyViewHolder(
 
 class BookItemViewHolder(
 	private val binding: ItemSearchBookDataBinding,
+	private val bookImgSizeManager: BookImgSizeManager,
 	private val onItemClick: ((Int) -> Unit)?
 ) : SearchItemViewHolder(binding) {
 	init {
 		binding.root.setOnClickListener {
 			onItemClick?.invoke(absoluteAdapterPosition)
 		}
+		bookImgSizeManager.setBookImgSize(binding.bookImg)
 	}
 
 	override fun bind(searchResultItem: SearchResultItem) {
@@ -54,8 +57,13 @@ class BookItemViewHolder(
 }
 
 class BookDummyViewHolder(
-	val binding: ItemSearchBookDummyBinding
+	private val binding: ItemSearchBookDummyBinding,
+	private val bookImgSizeManager: BookImgSizeManager,
 ) : SearchItemViewHolder(binding) {
+	init {
+		bookImgSizeManager.setBookImgSize(binding.flexBoxDummyBookLayout)
+	}
+
 	override fun bind(searchResultItem: SearchResultItem) {}
 }
 

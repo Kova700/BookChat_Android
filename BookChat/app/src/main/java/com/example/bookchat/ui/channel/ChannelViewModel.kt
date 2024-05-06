@@ -9,6 +9,7 @@ import com.example.bookchat.data.repository.ChattingRepositoryFacade
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.ui.channel.ChannelUiState.UiState
+import com.example.bookchat.ui.channel.mapper.toDrawerItems
 import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_CHANNEL_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -74,7 +75,7 @@ class ChannelViewModel @Inject constructor(
 
 	private fun observeChannel() = viewModelScope.launch {
 		chattingRepositoryFacade.getChannelFlow(channelId).collect { channel ->
-			updateState { copy(channel = channel) }
+			updateState { copy(drawerItems = channel.toDrawerItems()) }
 		}
 	}
 

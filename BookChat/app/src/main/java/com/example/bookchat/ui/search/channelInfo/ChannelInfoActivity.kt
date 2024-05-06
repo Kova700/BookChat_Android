@@ -10,16 +10,21 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityChannelInfoBinding
 import com.example.bookchat.ui.channel.ChannelActivity
 import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_CHANNEL_ID
+import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DateManager
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChannelInfoActivity : AppCompatActivity() {
 
 	private lateinit var binding: ActivityChannelInfoBinding
 	private val channelInfoViewModel by viewModels<ChannelInfoViewModel>()
+
+	@Inject
+	lateinit var bookImgSizeManager: BookImgSizeManager
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -28,6 +33,7 @@ class ChannelInfoActivity : AppCompatActivity() {
 		binding.viewmodel = channelInfoViewModel
 		observeUiState()
 		observeUiEvent()
+		initViewState()
 	}
 
 	private fun observeUiState() = lifecycleScope.launch {
@@ -38,6 +44,10 @@ class ChannelInfoActivity : AppCompatActivity() {
 
 	private fun observeUiEvent() = lifecycleScope.launch {
 		channelInfoViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun initViewState() {
+		bookImgSizeManager.setBookImgSize(binding.bookImg)
 	}
 
 	private fun setViewState(state: ChannelInfoUiState) {

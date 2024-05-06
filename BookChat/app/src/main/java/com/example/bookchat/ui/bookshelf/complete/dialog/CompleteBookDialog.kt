@@ -15,8 +15,10 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogCompleteBookTapClickedBinding
 import com.example.bookchat.ui.agony.AgonyActivity
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog.Companion.EXTRA_AGONY_BOOKSHELF_ITEM_ID
+import com.example.bookchat.utils.BookImgSizeManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CompleteBookDialog : DialogFragment() {
@@ -26,11 +28,14 @@ class CompleteBookDialog : DialogFragment() {
 
 	private val completeBookTapDialogViewModel: CompleteBookDialogViewModel by viewModels()
 
+	@Inject
+	lateinit var bookImgSizeManager: BookImgSizeManager
+
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedInstanceState: Bundle?
-	): View? {
+	): View {
 		_binding = DataBindingUtil.inflate(
 			inflater, R.layout.dialog_complete_book_tap_clicked,
 			container, false
@@ -44,6 +49,7 @@ class CompleteBookDialog : DialogFragment() {
 		super.onViewCreated(view, savedInstanceState)
 		dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 		observeUiEvent()
+		initViewState()
 	}
 
 	override fun onDestroyView() {
@@ -53,6 +59,10 @@ class CompleteBookDialog : DialogFragment() {
 
 	private fun observeUiEvent() = viewLifecycleOwner.lifecycleScope.launch {
 		completeBookTapDialogViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun initViewState() {
+		bookImgSizeManager.setBookImgSize(binding.bookImg)
 	}
 
 	private fun moveToAgony(bookShelfListItemId: Long) {

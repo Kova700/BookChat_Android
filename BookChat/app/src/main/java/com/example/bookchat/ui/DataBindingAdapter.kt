@@ -11,7 +11,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
 import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
-import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.*
 import com.example.bookchat.domain.model.AgonyFolderHexColor
@@ -159,7 +158,8 @@ object DataBindingAdapter {
 
 			NameCheckStatus.IsSpecialCharInText -> {
 				textView.setTextColor(Color.parseColor("#FF004D"))
-				textView.text = textView.context.resources.getString(R.string.name_check_status_special_char)
+				textView.text =
+					textView.context.resources.getString(R.string.name_check_status_special_char)
 			}
 
 			NameCheckStatus.IsPerfect -> {
@@ -474,16 +474,6 @@ object DataBindingAdapter {
 		loadUrl(view, imgUrl)
 	}
 
-	/**화면 크기에 맞는 도서 이미지 크기 세팅*/
-	@JvmStatic
-	@BindingAdapter("setBookImgSize")
-	fun setBookImgSize(view: View, bool: Boolean) {
-		with(view) {
-			layoutParams.width = BookImgSizeManager.bookImgWidthPx
-			layoutParams.height = BookImgSizeManager.bookImgHeightPx
-		}
-	}
-
 	/**화면 크기에 맞는 Dialog 크기 세팅*/
 	@JvmStatic
 	@BindingAdapter("setDialogSize")
@@ -527,14 +517,6 @@ object DataBindingAdapter {
 			layoutParams.width = MakeChannelImgSizeManager.chatRoomImgWidthPx
 			layoutParams.height = MakeChannelImgSizeManager.chatRoomImgHeightPx
 		}
-	}
-
-	/**Shimmer내부 GirdLayout 설정*/
-	@JvmStatic
-	@BindingAdapter("setShimmerGridLayout")
-	fun setShimmerGridLayout(gridLayout: GridLayout, bool: Boolean) {
-		gridLayout.columnCount = BookImgSizeManager.flexBoxBookSpanSize
-		gridLayout.rowCount = 2
 	}
 
 	/**Shimmer Animation Start/Stop 설정*/

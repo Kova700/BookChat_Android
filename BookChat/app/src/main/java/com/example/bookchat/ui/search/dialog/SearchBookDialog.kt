@@ -16,9 +16,11 @@ import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogSta
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState.AlreadyInBookShelf
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState.Default
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState.Loading
+import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchBookDialog : DialogFragment() {
@@ -27,6 +29,9 @@ class SearchBookDialog : DialogFragment() {
 	private val binding get() = _binding!!
 
 	private val searchBookDialogViewModel: SearchBookDialogViewModel by viewModels()
+
+	@Inject
+	lateinit var bookImgSizeManager: BookImgSizeManager
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -45,6 +50,7 @@ class SearchBookDialog : DialogFragment() {
 		dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 		observeUiState()
 		observeEvent()
+		initViewState()
 	}
 
 	override fun onDestroyView() {
@@ -60,6 +66,10 @@ class SearchBookDialog : DialogFragment() {
 
 	private fun observeEvent() = viewLifecycleOwner.lifecycleScope.launch {
 		searchBookDialogViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun initViewState() {
+		bookImgSizeManager.setBookImgSize(binding.bookImg)
 	}
 
 	private fun setViewVisibility(uiState: SearchDialogState) {

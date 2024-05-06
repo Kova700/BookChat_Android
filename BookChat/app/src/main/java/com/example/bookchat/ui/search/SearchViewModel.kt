@@ -39,6 +39,7 @@ class SearchViewModel @Inject constructor(
 	private val bookSearchRepository: BookSearchRepository,
 	private val channelSearchRepository: ChannelSearchRepository,
 	private val searchHistoryRepository: SearchHistoryRepository,
+	private val bookImgSizeManager: BookImgSizeManager
 ) : ViewModel() {
 	private val searchPurpose = savedStateHandle.get<SearchPurpose>(EXTRA_SEARCH_PURPOSE)!!
 
@@ -98,11 +99,11 @@ class SearchViewModel @Inject constructor(
 			if (books.isNullOrEmpty()) {
 				groupedItems.add(SearchResultItem.BookEmpty)
 			} else {
-				val defaultSize = BookImgSizeManager.flexBoxBookSpanSize * 2
+				val defaultSize = bookImgSizeManager.flexBoxBookSpanSize * 2
 				val exposureItemCount = if (books.size > defaultSize) defaultSize else books.size
 				groupedItems.addAll(books.take(exposureItemCount).map { it.toBookItem() })
 
-				val dummyItemCount = BookImgSizeManager.getFlexBoxDummyItemCount(exposureItemCount)
+				val dummyItemCount = bookImgSizeManager.getFlexBoxDummyItemCount(exposureItemCount)
 				(0 until dummyItemCount).forEach { i -> groupedItems.add(SearchResultItem.BookDummy(i)) }
 			}
 		}
@@ -149,11 +150,14 @@ class SearchViewModel @Inject constructor(
 		}
 	}
 
-	private fun searchBooksAndChannels(keyword: String) = viewModelScope.launch {
+	private fun searchBooksAndChannels(searchKeyword: String) = viewModelScope.launch {
 		runCatching {
-			val books = bookSearchRepository.search(keyword.trim())
+			val books = bookSearchRepository.search(
+				keyword = searchKeyword.trim(),
+				loadSize = bookImgSizeManager.flexBoxBookSpanSize
+			)
 			val channels = channelSearchRepository.search(
-				keyword = keyword.trim(),
+				keyword = searchKeyword.trim(),
 				searchFilter = uiState.value.searchFilter,
 			)
 			books.isEmpty() && channels.isEmpty()
@@ -162,8 +166,13 @@ class SearchViewModel @Inject constructor(
 			.onFailure { failHandler(it) }
 	}
 
-	private fun searchBooks(keyword: String) = viewModelScope.launch {
-		runCatching { bookSearchRepository.search(keyword.trim()) }
+	private fun searchBooks(searchKeyword: String) = viewModelScope.launch {
+		runCatching {
+			bookSearchRepository.search(
+				keyword = searchKeyword.trim(),
+				loadSize = bookImgSizeManager.flexBoxBookSpanSize
+			)
+		}
 			.onSuccess { books -> searchSuccessCallBack(books.isEmpty()) }
 			.onFailure { failHandler(it) }
 	}
