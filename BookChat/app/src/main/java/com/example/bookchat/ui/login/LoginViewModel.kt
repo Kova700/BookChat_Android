@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.login
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
@@ -11,6 +12,7 @@ import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedExc
 import com.example.bookchat.domain.model.IdToken
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.ui.login.LoginUiState.UiState
+import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,14 +55,10 @@ class LoginViewModel @Inject constructor(
 	}
 
 	fun onClickKakaoLoginBtn() {
-		if (uiState.value.uiState != UiState.SUCCESS) return
-		updateState { copy(uiState = UiState.LOADING) }
 		startEvent(LoginEvent.StartKakaoLogin)
 	}
 
 	fun onClickGoogleLoginBtn() {
-		if (uiState.value.uiState != UiState.SUCCESS) return
-		updateState { copy(uiState = UiState.LOADING) }
 		startEvent(LoginEvent.StartGoogleLogin)
 	}
 
@@ -78,6 +76,7 @@ class LoginViewModel @Inject constructor(
 
 	private fun failHandler(exception: Throwable) {
 		updateState { copy(uiState = UiState.SUCCESS) }
+		Log.d(TAG, "LoginViewModel: failHandler() - exception : $exception")
 		when (exception) {
 			is NeedToSignUpException -> startEvent(LoginEvent.MoveToSignUp)
 			is NeedToDeviceWarningException -> startEvent(LoginEvent.ShowDeviceWarning)

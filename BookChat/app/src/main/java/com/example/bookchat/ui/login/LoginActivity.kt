@@ -47,17 +47,19 @@ class LoginActivity : AppCompatActivity() {
 				loginViewModel.onChangeIdToken(it)
 				loginViewModel.login()
 			}
+			.onFailure { handleEvent(LoginEvent.UnknownErrorEvent("Kakao 로그인을 실패했습니다.")) }
 	}
 
 	private fun startGoogleLogin() = lifecycleScope.launch {
-		runCatching {
-			googleLoginClient.login(this@LoginActivity, googleLoginResultLauncher)
-		}
+		googleLoginClient.login(this@LoginActivity, googleLoginResultLauncher)
 	}
 
 	private val googleLoginResultLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-			if (result.resultCode != RESULT_OK) return@registerForActivityResult
+			if (result.resultCode != RESULT_OK) {
+				handleEvent(LoginEvent.UnknownErrorEvent("Google 로그인을 실패했습니다."))
+				return@registerForActivityResult
+			}
 			val idToken = googleLoginClient.getIdTokenFromResultIntent(result.data)
 			loginViewModel.onChangeIdToken(idToken)
 			loginViewModel.login()
