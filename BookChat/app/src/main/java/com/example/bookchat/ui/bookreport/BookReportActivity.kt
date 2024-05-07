@@ -1,32 +1,29 @@
 package com.example.bookchat.ui.bookreport
 
 import android.os.Bundle
+import android.text.Editable
+import android.util.Log
+import android.view.View
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityBookReportBinding
-import com.example.bookchat.domain.model.BookShelfItem
-import com.example.bookchat.ui.bookreport.BookReportViewModel.BookReportUIEvent
-import com.example.bookchat.ui.bookshelf.complete.dialog.CompleteBookDialog.Companion.EXTRA_BOOKREPORT_BOOK
+import com.example.bookchat.ui.bookreport.BookReportUiState.UiState
+import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class BookReportActivity : AppCompatActivity() {
 
-	@Inject
-	lateinit var bookReportViewModelFactory: BookReportViewModel.AssistedFactory
-
 	private lateinit var binding: ActivityBookReportBinding
-	private val bookReportViewModel: BookReportViewModel by viewModels {
-		BookReportViewModel.provideFactory(bookReportViewModelFactory, getBook())
-	}
+	private val bookReportViewModel by viewModels<BookReportViewModel>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -34,51 +31,85 @@ class BookReportActivity : AppCompatActivity() {
 		binding.lifecycleOwner = this
 		binding.viewmodel = bookReportViewModel
 		setBackPressedDispatcher()
-		observeBookReportEvent()
+		observeUiState()
+		observeUiEvent()
+		initViewState()
 	}
 
-	override fun onDestroy() {
-		bookReportViewModel.initCachedData()
-		super.onDestroy()
-	}
-
-	private fun observeBookReportEvent() = lifecycleScope.launch {
-		bookReportViewModel.eventFlow.collect { event -> handleEvent(event) }
-	}
-
-	private fun handleEvent(event: BookReportUIEvent) {
-		when (event) {
-			is BookReportUIEvent.MoveToBack -> onBackPressedDispatcher.onBackPressed()
-			is BookReportUIEvent.UnknownError -> binding.bookReportLayout.showSnackBar(R.string.error_else)
-			is BookReportUIEvent.ShowDeleteWarningDialog -> showWarningDialog()
-			is BookReportUIEvent.MakeToast -> makeToast(event.stringId)
+	private fun observeUiState() = lifecycleScope.launch {
+		bookReportViewModel.uiState.collect { state ->
+			Log.d(TAG, "BookReportActivity: observeUiState() - state :$state")
+			setViewState(state)
+			setViewVisibility(state)
 		}
 	}
 
-	private fun getBook(): BookShelfItem {
-		return intent.getSerializableExtra(EXTRA_BOOKREPORT_BOOK) as BookShelfItem
+	private fun observeUiEvent() = lifecycleScope.launch {
+		bookReportViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun initViewState() {
+		binding.bookReportTitleEt.addTextChangedListener { text: Editable? ->
+			text.let { bookReportViewModel.onChangeTitle(it.toString()) }
+		}
+		binding.bookReportContentEt.addTextChangedListener { text: Editable? ->
+			text.let { bookReportViewModel.onChangeContent(it.toString()) }
+		}
+	}
+
+	private fun setViewState(uiState: BookReportUiState) {
+		with(binding.bookReportTitleEt) {
+			if (uiState.enteredTitle != text.toString()) {
+				setText(uiState.enteredTitle)
+				setSelection(uiState.enteredTitle.length)
+			}
+		}
+		with(binding.bookReportContentEt) {
+			if (uiState.enteredContent != text.toString()) {
+				setText(uiState.enteredContent)
+				setSelection(uiState.enteredContent.length)
+			}
+		}
+	}
+
+	private fun setViewVisibility(uiState: BookReportUiState) {
+		binding.editStateGroup.visibility =
+			if (uiState.uiState == UiState.REVISE || uiState.uiState == UiState.EMPTY) View.VISIBLE else View.INVISIBLE
+		binding.successStateGroup.visibility =
+			if (uiState.uiState == UiState.SUCCESS) View.VISIBLE else View.INVISIBLE
+		binding.bookReportLoading.visibility =
+			if (uiState.uiState == UiState.LOADING) View.VISIBLE else View.INVISIBLE
+	}
+
+	private fun showWarningDialog(
+		warningTextStringId: Int,
+		onOkClick: () -> Unit
+	) {
+		val dialog = BookReportWarningDialog(
+			warningTextStringId = warningTextStringId,
+			onOkClick = onOkClick
+		)
+		dialog.show(supportFragmentManager, DIALOG_TAG_WARNING_BOOK_REPORT)
+	}
+
+	private fun handleEvent(event: BookReportEvent) {
+		when (event) {
+			is BookReportEvent.MoveBack -> finish()
+			is BookReportEvent.ShowDeleteWarningDialog -> showWarningDialog(
+				warningTextStringId = event.stringId,
+				onOkClick = event.onOkClick
+			)
+
+			is BookReportEvent.MakeToast -> makeToast(event.stringId)
+			is BookReportEvent.ErrorEvent -> binding.bookReportLayout.showSnackBar(event.stringId)
+			is BookReportEvent.UnknownErrorEvent -> binding.bookReportLayout.showSnackBar(event.message)
+		}
 	}
 
 	private fun setBackPressedDispatcher() {
 		onBackPressedDispatcher.addCallback {
-			if (!bookReportViewModel.isEditingStatus()) {
-				bookReportViewModel.initCachedData()
-				finish()
-				return@addCallback
-			}
-
-			if (bookReportViewModel.isNotChangedReport() || bookReportViewModel.isBookReportEmpty()) {
-				bookReportViewModel.initCachedData()
-				finish()
-				return@addCallback
-			}
-			showWarningDialog()
+			bookReportViewModel.onClickBackBtn()
 		}
-	}
-
-	private fun showWarningDialog() {
-		val dialog = BookReportWarningDialog()
-		dialog.show(this@BookReportActivity.supportFragmentManager, DIALOG_TAG_WARNING_BOOK_REPORT)
 	}
 
 	companion object {

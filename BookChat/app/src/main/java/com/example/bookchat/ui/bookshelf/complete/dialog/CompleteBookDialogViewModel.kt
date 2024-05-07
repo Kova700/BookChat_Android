@@ -20,7 +20,7 @@ class CompleteBookDialogViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val bookShelfRepository: BookShelfRepository,
 ) : ViewModel() {
-	private val bookShelfListItemId = savedStateHandle.get<Long>(EXTRA_COMPLETE_BOOKSHELF_ITEM_ID)!!
+	private val bookShelfItemId = savedStateHandle.get<Long>(EXTRA_COMPLETE_BOOKSHELF_ITEM_ID)!!
 
 	private val _eventFlow = MutableSharedFlow<CompleteBookDialogEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
@@ -30,21 +30,25 @@ class CompleteBookDialogViewModel @Inject constructor(
 	val uiState = _uiState.asStateFlow()
 
 	init {
-		getItem()
+		initUiState()
 	}
 
-	private fun getItem() {
+	private fun initUiState() {
+		getBookShelfItem()
+	}
+
+	private fun getBookShelfItem() {
 		val item =
-			bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)?.toBookShelfListItem()
+			bookShelfRepository.getCachedBookShelfItem(bookShelfItemId)?.toBookShelfListItem()
 		item?.let { updateState { copy(completeItem = item) } }
 	}
 
 	fun onMoveToBookReportClick() {
-		startEvent(CompleteBookDialogEvent.MoveToBookReport)
+		startEvent(CompleteBookDialogEvent.MoveToBookReport(bookShelfItemId))
 	}
 
 	fun onMoveToAgonyClick() {
-		startEvent(CompleteBookDialogEvent.MoveToAgony(bookShelfListItemId))
+		startEvent(CompleteBookDialogEvent.MoveToAgony(bookShelfItemId))
 	}
 
 	private inline fun updateState(block: CompleteBookDialogUiState.() -> CompleteBookDialogUiState) {

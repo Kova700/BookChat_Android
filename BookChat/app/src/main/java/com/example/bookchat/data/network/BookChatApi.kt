@@ -88,13 +88,13 @@ interface BookChatApi {
 	@GET("/v1/api/bookshelves/{bookShelfId}/report")
 	suspend fun getBookReport(
 		@Path("bookShelfId") bookShelfId: Long,
-	): Response<BookReport>
+	): Response<BookReportResponse>
 
 	@POST("/v1/api/bookshelves/{bookShelfId}/report")
 	suspend fun registerBookReport(
 		@Path("bookShelfId") bookShelfId: Long,
 		@Body requestRegisterBookReport: RequestRegisterBookReport
-	): Response<Unit>
+	)
 
 	@DELETE("/v1/api/bookshelves/{bookShelfId}/report")
 	suspend fun deleteBookReport(
@@ -105,7 +105,7 @@ interface BookChatApi {
 	suspend fun reviseBookReport(
 		@Path("bookShelfId") bookShelfId: Long,
 		@Body requestRegisterBookReport: RequestRegisterBookReport
-	)
+	): Response<Unit>
 
 	/**------------고민 ------------*/
 

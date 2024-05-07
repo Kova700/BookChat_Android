@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogCompleteBookTapClickedBinding
 import com.example.bookchat.ui.agony.AgonyActivity
+import com.example.bookchat.ui.bookreport.BookReportActivity
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog.Companion.EXTRA_AGONY_BOOKSHELF_ITEM_ID
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager
@@ -70,25 +71,25 @@ class CompleteBookDialog : DialogFragment() {
 		dialogSizeManager.setDialogSize(binding.completeDialogLayout)
 	}
 
-	private fun moveToAgony(bookShelfListItemId: Long) {
+	private fun moveToAgony(bookShelfItemId: Long) {
 		val intent = Intent(requireContext(), AgonyActivity::class.java)
-			.putExtra(EXTRA_AGONY_BOOKSHELF_ITEM_ID, bookShelfListItemId)
+			.putExtra(EXTRA_AGONY_BOOKSHELF_ITEM_ID, bookShelfItemId)
 		startActivity(intent)
 	}
 
-	private fun moveToBookReport() {
-//		val intent = Intent(requireContext(), BookReportActivity::class.java)
-//			.putExtra(EXTRA_BOOKREPORT_BOOK, bookShelfListItem)
-//		startActivity(intent)
+	private fun moveToBookReport(bookShelfItemId: Long) {
+		val intent = Intent(requireContext(), BookReportActivity::class.java)
+			.putExtra(EXTRA_BOOKREPORT_BOOKSHELF_ITEM_ID, bookShelfItemId)
+		startActivity(intent)
 	}
 
 	private fun handleEvent(event: CompleteBookDialogEvent) = when (event) {
-		is CompleteBookDialogEvent.MoveToAgony -> moveToAgony(event.bookShelfListItemId)
-		is CompleteBookDialogEvent.MoveToBookReport -> moveToBookReport()
+		is CompleteBookDialogEvent.MoveToAgony -> moveToAgony(event.bookShelfItemId)
+		is CompleteBookDialogEvent.MoveToBookReport -> moveToBookReport(event.bookShelfItemId)
 	}
 
 	companion object {
-		const val EXTRA_BOOKREPORT_BOOK = "EXTRA_BOOKREPORT_BOOK"
+		const val EXTRA_BOOKREPORT_BOOKSHELF_ITEM_ID = "EXTRA_BOOKREPORT_BOOKSHELF_ITEM_ID"
 		const val EXTRA_COMPLETE_BOOKSHELF_ITEM_ID = "EXTRA_WISH_BOOKSHELF_ITEM_ID"
 	}
 }

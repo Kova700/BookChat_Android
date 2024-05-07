@@ -21,7 +21,6 @@ import com.example.bookchat.domain.model.NameCheckStatus
 import com.example.bookchat.domain.model.UserDefaultProfileType
 import com.example.bookchat.ui.agony.AgonyUiState
 import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
-import com.example.bookchat.ui.bookreport.BookReportViewModel.BookReportStatus
 import com.example.bookchat.ui.login.LoginUiState
 import com.example.bookchat.utils.*
 import java.util.*
@@ -201,33 +200,6 @@ object DataBindingAdapter {
 				)
 			}
 		}
-	}
-
-	@JvmStatic
-	@BindingAdapter("setLoadingVisibilityInBookReport")
-	fun setLoadingVisibilityInBookReport(view: View, status: BookReportStatus) {
-		view.visibility = if (status == BookReportStatus.Loading) View.VISIBLE else View.INVISIBLE
-	}
-
-	@JvmStatic
-	@BindingAdapter("setInputLayoutVisibilityInBookReport")
-	fun setInputLayoutVisibilityInBookReport(view: View, status: BookReportStatus) {
-		when (status) {
-			BookReportStatus.InputData,
-			BookReportStatus.ReviseData -> {
-				view.visibility = View.VISIBLE
-			}
-
-			else -> {
-				view.visibility = View.INVISIBLE
-			}
-		}
-	}
-
-	@JvmStatic
-	@BindingAdapter("setShowDataLayoutVisibilityInBookReport")
-	fun setShowDataLayoutVisibilityInBookReport(view: View, status: BookReportStatus) {
-		view.visibility = if (status == BookReportStatus.ShowData) View.VISIBLE else View.INVISIBLE
 	}
 
 	/**고민 폴더 색상 설정(HexColor)*/

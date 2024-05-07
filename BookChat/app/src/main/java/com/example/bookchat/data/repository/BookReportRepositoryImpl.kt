@@ -1,11 +1,11 @@
 package com.example.bookchat.data.repository
 
-import com.example.bookchat.data.BookReport
+import com.example.bookchat.data.mapper.toBookReport
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.request.RequestRegisterBookReport
 import com.example.bookchat.data.network.model.response.BookReportDoseNotExistException
 import com.example.bookchat.data.network.model.response.ResponseBodyEmptyException
-import com.example.bookchat.domain.model.BookShelfItem
+import com.example.bookchat.domain.model.BookReport
 import com.example.bookchat.domain.repository.BookReportRepository
 import javax.inject.Inject
 
@@ -13,12 +13,12 @@ class BookReportRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi
 ) : BookReportRepository {
 
-	override suspend fun getBookReport(book: BookShelfItem): BookReport {
-		val response = bookChatApi.getBookReport(book.bookShelfId)
+	override suspend fun getBookReport(bookShelfId: Long): BookReport {
+		val response = bookChatApi.getBookReport(bookShelfId)
 		when (response.code()) {
 			200 -> {
 				val bookReportResult = response.body()
-				bookReportResult?.let { return bookReportResult }
+				bookReportResult?.let { return bookReportResult.toBookReport() }
 				throw ResponseBodyEmptyException(response.errorBody()?.string())
 			}
 
@@ -33,32 +33,51 @@ class BookReportRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun registerBookReport(
-		book: BookShelfItem,
-		bookReport: BookReport
-	) {
+		bookShelfId: Long,
+		reportTitle: String,
+		reportContent: String,
+		reportCreatedAt: String,
+	): BookReport {
+
 		bookChatApi.registerBookReport(
-			bookShelfId = book.bookShelfId,
+			bookShelfId = bookShelfId,
 			requestRegisterBookReport = RequestRegisterBookReport(
-				bookReport.reportTitle,
-				bookReport.reportContent
+				title = reportTitle,
+				content = reportContent
 			)
 		)
+
+		return BookReport(
+			reportTitle = reportTitle,
+			reportContent = reportContent,
+			reportCreatedAt = reportCreatedAt,
+		)
+
 	}
 
-	override suspend fun deleteBookReport(book: BookShelfItem) {
-		bookChatApi.deleteBookReport(book.bookShelfId)
+	override suspend fun deleteBookReport(bookShelfId: Long) {
+		bookChatApi.deleteBookReport(bookShelfId)
 	}
 
 	override suspend fun reviseBookReport(
-		book: BookShelfItem,
-		bookReport: BookReport
-	) {
+		bookShelfId: Long,
+		reportTitle: String,
+		reportContent: String,
+		reportCreatedAt: String,
+	): BookReport {
+
 		bookChatApi.reviseBookReport(
-			bookShelfId = book.bookShelfId,
+			bookShelfId = bookShelfId,
 			requestRegisterBookReport = RequestRegisterBookReport(
-				bookReport.reportTitle,
-				bookReport.reportContent
+				title = reportTitle,
+				content = reportContent
 			)
+		)
+
+		return BookReport(
+			reportTitle = reportTitle,
+			reportContent = reportContent,
+			reportCreatedAt = reportCreatedAt,
 		)
 	}
 

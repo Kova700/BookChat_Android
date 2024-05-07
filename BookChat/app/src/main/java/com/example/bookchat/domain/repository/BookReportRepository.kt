@@ -1,17 +1,21 @@
 package com.example.bookchat.domain.repository
 
-import com.example.bookchat.data.BookReport
-import com.example.bookchat.domain.model.BookShelfItem
+import com.example.bookchat.domain.model.BookReport
 
 interface BookReportRepository {
-	suspend fun getBookReport(book: BookShelfItem): BookReport
+	suspend fun getBookReport(bookShelfId: Long): BookReport
 	suspend fun registerBookReport(
-		book: BookShelfItem,
-		bookReport: BookReport
-	)
-	suspend fun deleteBookReport(book: BookShelfItem)
+		bookShelfId: Long,
+		reportTitle: String,
+		reportContent: String,
+		reportCreatedAt: String,
+	): BookReport
+
+	suspend fun deleteBookReport(bookShelfId: Long)
 	suspend fun reviseBookReport(
-		book: BookShelfItem,
-		bookReport: BookReport
-	)
+		bookShelfId: Long,
+		reportTitle: String,
+		reportContent: String,
+		reportCreatedAt: String,
+	): BookReport
 }
