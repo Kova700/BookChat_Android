@@ -10,7 +10,6 @@ import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.agony.AgonyUiState.UiState
 import com.example.bookchat.ui.agony.mapper.toAgonyListItem
 import com.example.bookchat.ui.agony.model.AgonyListItem
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -47,7 +46,7 @@ class AgonyViewModel @Inject constructor(
 
 	private fun getItem() {
 		val item =
-			bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)?.toBookShelfListItem()
+			bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)
 		item?.let { updateState { copy(bookshelfItem = item) } }
 	}
 

@@ -16,7 +16,7 @@ class AgonyHeaderItemViewHolder(
 	private val binding: ItemAgonyHeaderBinding
 ) : AgonyViewHolder(binding) {
 	override fun bind(agonyListItem: AgonyListItem) {
-		binding.bookShelfItem = (agonyListItem as AgonyListItem.Header).bookShelfListItem
+		binding.bookShelfItem = (agonyListItem as AgonyListItem.Header).bookShelfItem
 	}
 }
 

@@ -1,11 +1,11 @@
 package com.example.bookchat.ui.agony
 
+import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.ui.agony.model.AgonyListItem
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 
 data class AgonyUiState(
 	val uiState: UiState,
-	val bookshelfItem: BookShelfListItem,
+	val bookshelfItem: BookShelfItem,
 	val agonies: List<AgonyListItem>
 ) {
 	enum class UiState {
@@ -19,7 +19,7 @@ data class AgonyUiState(
 	companion object {
 		val DEFAULT = AgonyUiState(
 			uiState = UiState.LOADING,
-			bookshelfItem = BookShelfListItem.DEFAULT,
+			bookshelfItem = BookShelfItem.DEFAULT,
 			agonies = emptyList()
 		)
 	}
