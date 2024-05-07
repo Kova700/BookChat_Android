@@ -16,6 +16,7 @@ import com.example.bookchat.databinding.DialogCompleteBookTapClickedBinding
 import com.example.bookchat.ui.agony.AgonyActivity
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog.Companion.EXTRA_AGONY_BOOKSHELF_ITEM_ID
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.DialogSizeManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,6 +31,9 @@ class CompleteBookDialog : DialogFragment() {
 
 	@Inject
 	lateinit var bookImgSizeManager: BookImgSizeManager
+
+	@Inject
+	lateinit var dialogSizeManager: DialogSizeManager
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -63,6 +67,7 @@ class CompleteBookDialog : DialogFragment() {
 
 	private fun initViewState() {
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
+		dialogSizeManager.setDialogSize(binding.completeDialogLayout)
 	}
 
 	private fun moveToAgony(bookShelfListItemId: Long) {

@@ -12,6 +12,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogMakeChannelSelectBookBinding
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.DialogSizeManager
 import javax.inject.Inject
 
 class MakeChannelBookSelectDialog(
@@ -24,6 +25,9 @@ class MakeChannelBookSelectDialog(
 
 	@Inject
 	lateinit var bookImgSizeManager: BookImgSizeManager
+
+	@Inject
+	lateinit var dialogSizeManager: DialogSizeManager
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -51,6 +55,7 @@ class MakeChannelBookSelectDialog(
 
 	private fun initViewState() {
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
+		dialogSizeManager.setDialogSize(binding.makeChannelSelectBookDialogLayout)
 	}
 
 	fun onClickMakeChannel() {

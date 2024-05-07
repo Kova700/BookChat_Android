@@ -17,6 +17,7 @@ import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogSta
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState.Default
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState.Loading
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.DialogSizeManager
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -32,6 +33,9 @@ class SearchBookDialog : DialogFragment() {
 
 	@Inject
 	lateinit var bookImgSizeManager: BookImgSizeManager
+
+	@Inject
+	lateinit var dialogSizeManager: DialogSizeManager
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -70,6 +74,7 @@ class SearchBookDialog : DialogFragment() {
 
 	private fun initViewState() {
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
+		dialogSizeManager.setDialogSize(binding.dialogLayout)
 	}
 
 	private fun setViewVisibility(uiState: SearchDialogState) {

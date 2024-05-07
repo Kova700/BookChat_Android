@@ -13,7 +13,6 @@
         android:id="@+id/dialog_layout"
         android:paddingHorizontal="25dp"
         android:paddingVertical="30dp"
-        setDialogSize="@{true}"
         android:background="@drawable/view_round_white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

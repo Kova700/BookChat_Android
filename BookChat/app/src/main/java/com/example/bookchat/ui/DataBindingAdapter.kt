@@ -474,13 +474,6 @@ object DataBindingAdapter {
 		loadUrl(view, imgUrl)
 	}
 
-	/**화면 크기에 맞는 Dialog 크기 세팅*/
-	@JvmStatic
-	@BindingAdapter("setDialogSize")
-	fun setDialogSize(view: View, bool: Boolean) {
-		view.layoutParams.width = DialogSizeManager.dialogWidthPx
-	}
-
 	/** MakeChatRoom 채팅방 생성 기본 이미지 세팅*/
 	@JvmStatic
 	@BindingAdapter("channelDefaultImageType", "loadByteArray", requireAll = false)

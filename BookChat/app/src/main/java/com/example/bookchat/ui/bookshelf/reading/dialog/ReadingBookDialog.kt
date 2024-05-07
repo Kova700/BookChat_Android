@@ -17,6 +17,7 @@ import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.ui.agony.AgonyActivity
 import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfViewModel
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.DialogSizeManager
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -35,6 +36,9 @@ class ReadingBookDialog : DialogFragment() {
 
 	@Inject
 	lateinit var bookImgSizeManager: BookImgSizeManager
+
+	@Inject
+	lateinit var dialogSizeManager: DialogSizeManager
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -76,6 +80,7 @@ class ReadingBookDialog : DialogFragment() {
 			readingBookDialogViewModel.onChangeStarRating(rating)
 		}
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
+		dialogSizeManager.setDialogSize(binding.readingDialogLayout)
 	}
 
 	private fun setViewState(state: ReadingBookDialogUiState) {
