@@ -106,7 +106,7 @@ class SearchFragment : Fragment() {
 	private fun setSearchBarState(uiState: SearchUiState) {
 		with(binding.searchEditText) {
 			if (uiState.searchKeyword != text.toString()) {
-				setText(searchViewModel.uiState.value.searchKeyword)
+				setText(uiState.searchKeyword)
 				setSelection(uiState.searchKeyword.length)
 			}
 		}
