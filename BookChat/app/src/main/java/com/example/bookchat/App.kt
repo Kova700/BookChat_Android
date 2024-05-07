@@ -12,7 +12,6 @@ class App : Application() {
 	override fun onCreate() {
 		super.onCreate()
 		AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-		instance = this
 		initKakaoSdk()
 	}
 
@@ -21,10 +20,5 @@ class App : Application() {
 			context = this,
 			appKey = KAKAO_APP_KEY
 		)
-	}
-
-	companion object {
-		lateinit var instance: App
-			private set
 	}
 }

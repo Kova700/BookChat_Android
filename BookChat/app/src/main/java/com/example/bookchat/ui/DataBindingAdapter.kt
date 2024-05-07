@@ -502,16 +502,6 @@ object DataBindingAdapter {
 		}
 	}
 
-	/** MakeChatRoom 화면 크기에 맞는 채팅방 이미지 크기 세팅*/
-	@JvmStatic
-	@BindingAdapter("setMakeChatRoomImgSize")
-	fun setMakeChatRoomImgSize(view: ImageView, bool: Boolean) {
-		with(view) {
-			layoutParams.width = MakeChannelImgSizeManager.chatRoomImgWidthPx
-			layoutParams.height = MakeChannelImgSizeManager.chatRoomImgHeightPx
-		}
-	}
-
 	/**Shimmer Animation Start/Stop 설정*/
 	@JvmStatic
 	@BindingAdapter("setChatInputEtFocusChangeListener")

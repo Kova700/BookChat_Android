@@ -84,11 +84,10 @@
             app:layout_constraintTop_toBottomOf="@+id/textView30">
 
             <ImageView
-                android:id="@+id/chat_room_img"
+                android:id="@+id/channel_img"
                 android:layout_width="@dimen/make_chat_room_img_width_default"
                 android:layout_height="@dimen/make_chat_room_img_height_default"
                 android:scaleType="fitXY"
-                setMakeChatRoomImgSize="@{true}"
                 channelDefaultImageType="@{viewmodel.uiState.defaultProfileImageType}"
                 loadByteArray="@{viewmodel.uiState.channelProfileImage}"
                 android:src="@drawable/default_chat_room_img1" />
