@@ -1,16 +1,19 @@
 package com.example.bookchat.data.repository
 
-import com.example.bookchat.data.network.BookChatApi
+import android.util.Log
 import com.example.bookchat.data.database.dao.ChatDAO
 import com.example.bookchat.data.mapper.toChat
 import com.example.bookchat.data.mapper.toChatEntity
+import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.utils.Constants.TAG
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class ChatRepositoryImpl @Inject constructor(
@@ -24,7 +27,7 @@ class ChatRepositoryImpl @Inject constructor(
 		//ORDER BY status, chat_id DESC
 		it.values.toList()
 			.sortedWith(
-				compareBy({ chat -> chat.status }, { chat -> -chat.chatId })
+				compareBy({ chat -> chat.status }, { chat -> chat.chatId.unaryMinus() })
 			)
 	}.onEach { cachedChats = it }
 
@@ -33,7 +36,11 @@ class ChatRepositoryImpl @Inject constructor(
 	private var currentPage: Long? = null
 	private var isEndPage = false
 
-	override fun getChatsFlow(channelId: Long): Flow<List<Chat>> {
+	override fun getChatsFlow(
+		initFlag: Boolean,
+		channelId: Long
+	): Flow<List<Chat>> {
+		if (initFlag) clearCachedData()
 		return sortedChats
 	}
 
@@ -42,13 +49,11 @@ class ChatRepositoryImpl @Inject constructor(
 		size: Int
 	): List<Chat> {
 		if (cachedChannelId != channelId) {
-			isEndPage = false
-			currentPage = null
-			mapChats.value = emptyMap()
+			clearCachedData()
 		}
 		if (isEndPage) return cachedChats
 
-		val response = bookChatApi.getChat(
+		val response = bookChatApi.getChats(
 			roomId = channelId,
 			postCursorId = currentPage,
 			size = size
@@ -70,6 +75,14 @@ class ChatRepositoryImpl @Inject constructor(
 
 	override suspend fun getChat(chatId: Long): Chat? {
 		return chatDAO.getChat(chatId)?.toChat()
+	}
+
+	override suspend fun getChatForFCM(chatId: Long): Chat {
+		Log.d(TAG, "ChatRepositoryImpl: getChatForFCM() - called")
+		val chat = bookChatApi.getChatForFCM(chatId).toChat(clientRepository.getClientProfile().id)
+		insertChat(chat)
+		Log.d(TAG, "ChatRepositoryImpl: getChatForFCM() - chat : $chat")
+		return chat
 	}
 
 	override suspend fun insertChat(chat: Chat) {
@@ -100,6 +113,14 @@ class ChatRepositoryImpl @Inject constructor(
 		chatDAO.updateWaitingChat(newChatId, dispatchTime, status, targetChatId)
 		val newChat = chatDAO.getChat(newChatId)?.toChat() ?: return
 		mapChats.emit(mapChats.value - (targetChatId) + (newChatId to newChat))
+	}
+
+	private fun clearCachedData() {
+		mapChats.update { emptyMap() }
+		cachedChats = emptyList()
+		cachedChannelId = null
+		currentPage = null
+		isEndPage = false
 	}
 
 }

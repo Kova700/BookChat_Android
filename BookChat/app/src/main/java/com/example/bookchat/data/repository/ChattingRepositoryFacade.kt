@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 //TODO : 상태 clear 함수 필요
+//TODO : 레이어 구분 필요
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChattingRepositoryFacade @Inject constructor(
 	private val chatRepository: ChatRepository,
@@ -17,10 +18,16 @@ class ChattingRepositoryFacade @Inject constructor(
 ) : ChatRepository by chatRepository,
 	ChannelRepository by channelRepository {
 
-	override fun getChatsFlow(channelId: Long): Flow<List<Chat>> {
+	override fun getChatsFlow(
+		initFlag: Boolean,
+		channelId: Long,
+	): Flow<List<Chat>> {
 		return getChannelFlow(channelId).flatMapLatest { channel ->
 			val participants = channel.participants.associateBy { it.id }
-			chatRepository.getChatsFlow(channelId).map { chats ->
+			chatRepository.getChatsFlow(
+				initFlag = initFlag,
+				channelId = channelId
+			).map { chats ->
 				chats.map { chat -> chat.copy(sender = participants[chat.sender?.id]) }
 			}
 		}

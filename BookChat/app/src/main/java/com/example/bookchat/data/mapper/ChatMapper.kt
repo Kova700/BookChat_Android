@@ -3,6 +3,7 @@ package com.example.bookchat.data.mapper
 import com.example.bookchat.data.database.model.ChatEntity
 import com.example.bookchat.data.database.model.combined.ChatWithUser
 import com.example.bookchat.data.network.model.response.ChatResponse
+import com.example.bookchat.data.network.model.response.ChatResponseForFCM
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.ChatType
@@ -61,6 +62,20 @@ fun ChatEntity.toChat(): Chat {
 				id = it
 			)
 		}
+	)
+}
+
+fun ChatResponseForFCM.toChat(myUserId: Long): Chat {
+	return Chat(
+		chatId = chatId,
+		chatRoomId = channelId,
+		chatType = getChatType(
+			senderId = sender.id,
+			myUserId = myUserId
+		),
+		message = message,
+		dispatchTime = dispatchTime,
+		sender = sender
 	)
 }
 

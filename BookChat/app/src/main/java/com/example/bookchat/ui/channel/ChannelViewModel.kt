@@ -79,7 +79,10 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun observeChats() = viewModelScope.launch {
-		chattingRepositoryFacade.getChatsFlow(channelId).collect { chats ->
+		chattingRepositoryFacade.getChatsFlow(
+			initFlag = true,
+			channelId = channelId
+		).collect { chats ->
 			updateNewChatNotice(chats)
 			updateState { copy(chats = chats) }
 		}

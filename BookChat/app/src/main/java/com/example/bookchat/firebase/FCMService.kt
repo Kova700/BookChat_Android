@@ -9,11 +9,10 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.bookchat.R
 import com.example.bookchat.data.network.model.response.FCMPushMessage
-import com.example.bookchat.domain.model.PushType
+import com.example.bookchat.data.repository.ChattingRepositoryFacade
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.FCMToken
-import com.example.bookchat.domain.repository.ChannelRepository
-import com.example.bookchat.domain.repository.ChatRepository
+import com.example.bookchat.domain.model.PushType
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.utils.Constants.TAG
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -34,10 +33,7 @@ class FCMService : FirebaseMessagingService() {
 	lateinit var clientRepository: ClientRepository
 
 	@Inject
-	lateinit var chatRepository: ChatRepository
-
-	@Inject
-	lateinit var channelRepository: ChannelRepository
+	lateinit var chattingRepositoryFacade: ChattingRepositoryFacade
 
 	override fun onNewToken(token: String) {
 		super.onNewToken(token)
@@ -50,46 +46,48 @@ class FCMService : FirebaseMessagingService() {
 		//      혹은 전송 실패시 Flag 기록하고 앱 켤 때마다 확인 후 True라면 API 호출 되게 최적화 가능
 	}
 
-	override fun onMessageReceived(message: RemoteMessage) {
-		super.onMessageReceived(message)
-		Log.d(TAG, "FCMService: onMessageReceived() - message.data : ${message.data}")
-		handleMessage(message)
-	}
-
-	private fun handleMessage(message: RemoteMessage) {
-		val hashMap = gson.fromJson(message.data["body"], LinkedHashMap::class.java)
-		when (hashMap["pushType"]) {
-			PushType.LOGIN.toString() -> {
-				//clientRepository.signOut() // TODO : 로그인 페이지로 이동 혹은 이동할 수 있는 Dialog 노출
-			}
-
-			PushType.CHAT.toString() -> {
-				val fcmPushMessage = gson.fromJson(message.data["body"], FCMPushMessage::class.java)
-				val chatId = fcmPushMessage.chatId
-				//TODO : API로 서버로부터 채팅 가져오기
-//				chatRepository
-//				insertNotificationData(fcmPushMessage)
-//				sendNotification(fcmPushMessage.body) //TODO : 유저ID로 유저 정보 가져와서 유저정보와 함께 띄우기
-			}
-		}
-	}
-
-	//TODO : WorkerManager로 백엔드 작업 위임
+	//TODO : WorkerManager로 백엔드 작업 위임 (예외처리까지 같이)
 	private fun renewFCMToken(fcmToken: FCMToken) {
 		CoroutineScope(Dispatchers.IO).launch {
 			clientRepository.renewFCMToken(fcmToken)
 		}
 	}
 
-	//TODO : WorkerManager로 백엔드 작업 위임
-//	private fun insertNotificationData(fcmPushMessage: FCMPushMessage) {
-//		CoroutineScope(Dispatchers.IO).launch {
-//			val newChat = fcmPushMessage.body.toChat(clientRepository.getClientProfile().id)
-//			chatRepository.insertChat(newChat)
-//			channelRepository.updateLastChat(newChat.chatRoomId, newChat.chatId)
-//		}
-//	}
+	//TODO : 내가 보낸 메세지도 FCM 오는지 체크하고 말해주기
+	override fun onMessageReceived(message: RemoteMessage) {
+		super.onMessageReceived(message)
+		Log.d(TAG, "FCMService: onMessageReceived() - message.data : ${message.data}")
+		//FCMService: onMessageReceived() - message.data : {body={"pushType":"CHAT","body":1485}, title=Book Chat}
+		handleMessage(message)
+	}
 
+	private fun handleMessage(message: RemoteMessage) {
+		val hashMap = gson.fromJson(message.data["body"], LinkedHashMap::class.java)
+		when (hashMap["pushType"]) {
+			PushType.LOGIN.toString() -> handleLogoutMassage()
+			PushType.CHAT.toString() ->
+				handleChatMessage(gson.fromJson(message.data["body"], FCMPushMessage::class.java))
+		}
+	}
+
+	// TODO : 로그인 페이지로 이동 혹은 이동할 수 있는 Dialog 노출
+	private fun handleLogoutMassage() {
+		//clientRepository.signOut()
+	}
+
+	//TODO : WorkerManager로 백엔드 작업 위임 (예외처리까지 같이)
+	private fun handleChatMessage(fcmPushMessage: FCMPushMessage) {
+		CoroutineScope(Dispatchers.IO).launch {
+			val chat = chattingRepositoryFacade.getChatForFCM(fcmPushMessage.chatId)
+
+			if (chattingRepositoryFacade.isAlreadyEntered(chat.chatRoomId).not()) {
+				chattingRepositoryFacade.getChannelForFCM(chat)
+			}
+			sendNotification(chat)
+		}
+	}
+
+	//TODO : 유저정보와 함께 띄우기
 	private fun sendNotification(chat: Chat) {
 		val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
