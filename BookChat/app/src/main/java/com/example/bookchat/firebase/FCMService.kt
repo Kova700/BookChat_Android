@@ -9,7 +9,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.bookchat.R
 import com.example.bookchat.data.FCMPushMessage
-import com.example.bookchat.data.PushType
+import com.example.bookchat.domain.model.PushType
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.repository.ChannelRepository
