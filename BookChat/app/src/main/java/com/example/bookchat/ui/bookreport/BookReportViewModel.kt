@@ -61,6 +61,7 @@ class BookReportViewModel @Inject constructor(
 			.onFailure { failHandler(it) }
 	}
 
+	//TODO : 장문인 경우 BadRequestException 에러 해결 필요
 	private fun registerBookReport() = viewModelScope.launch {
 		updateState { copy(uiState = UiState.LOADING) }
 		runCatching {
@@ -85,6 +86,7 @@ class BookReportViewModel @Inject constructor(
 			}
 	}
 
+	//TODO : 장문인 경우 BadRequestException 에러 해결 필요
 	private fun reviseBookReport() = viewModelScope.launch {
 		updateState { copy(uiState = UiState.LOADING) }
 		runCatching {

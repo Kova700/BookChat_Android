@@ -2,7 +2,6 @@ package com.example.bookchat.ui.bookreport
 
 import android.os.Bundle
 import android.text.Editable
-import android.util.Log
 import android.view.View
 import androidx.activity.addCallback
 import androidx.activity.viewModels
@@ -13,16 +12,21 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityBookReportBinding
 import com.example.bookchat.ui.bookreport.BookReportUiState.UiState
-import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class BookReportActivity : AppCompatActivity() {
 
 	private lateinit var binding: ActivityBookReportBinding
+
+	@Inject
+	lateinit var bookImgSizeManager: BookImgSizeManager
+
 	private val bookReportViewModel by viewModels<BookReportViewModel>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +42,6 @@ class BookReportActivity : AppCompatActivity() {
 
 	private fun observeUiState() = lifecycleScope.launch {
 		bookReportViewModel.uiState.collect { state ->
-			Log.d(TAG, "BookReportActivity: observeUiState() - state :$state")
 			setViewState(state)
 			setViewVisibility(state)
 		}
@@ -49,22 +52,23 @@ class BookReportActivity : AppCompatActivity() {
 	}
 
 	private fun initViewState() {
-		binding.bookReportTitleEt.addTextChangedListener { text: Editable? ->
+		binding.bookReportEditLayout.bookReportTitleEt.addTextChangedListener { text: Editable? ->
 			text.let { bookReportViewModel.onChangeTitle(it.toString()) }
 		}
-		binding.bookReportContentEt.addTextChangedListener { text: Editable? ->
+		binding.bookReportEditLayout.bookReportContentEt.addTextChangedListener { text: Editable? ->
 			text.let { bookReportViewModel.onChangeContent(it.toString()) }
 		}
+		bookImgSizeManager.setBookImgSize(binding.bookImg)
 	}
 
 	private fun setViewState(uiState: BookReportUiState) {
-		with(binding.bookReportTitleEt) {
+		with(binding.bookReportEditLayout.bookReportTitleEt) {
 			if (uiState.enteredTitle != text.toString()) {
 				setText(uiState.enteredTitle)
 				setSelection(uiState.enteredTitle.length)
 			}
 		}
-		with(binding.bookReportContentEt) {
+		with(binding.bookReportEditLayout.bookReportContentEt) {
 			if (uiState.enteredContent != text.toString()) {
 				setText(uiState.enteredContent)
 				setSelection(uiState.enteredContent.length)
