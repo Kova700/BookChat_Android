@@ -1,10 +1,8 @@
 package com.example.bookchat.data.repository
 
-import com.example.bookchat.App
 import com.example.bookchat.data.mapper.toBook
 import com.example.bookchat.data.mapper.toNetWork
 import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.BookSearchSortOption
 import com.example.bookchat.domain.repository.BookSearchRepository
@@ -34,14 +32,13 @@ class BookSearchRepositoryImpl @Inject constructor(
 
 	override suspend fun search(
 		keyword: String,
-		sort: BookSearchSortOption,
 		loadSize: Int,
+		sort: BookSearchSortOption,
 	): List<Book> {
 		if (cachedSearchKeyword != keyword) {
 			clearCachedData()
 		}
 		if (isEndPage) return books.firstOrNull() ?: emptyList()
-		if (isNetworkConnected().not()) throw NetworkIsNotConnectedException()
 
 		val response = bookChatApi.getBookSearchResult(
 			query = keyword,
@@ -51,7 +48,7 @@ class BookSearchRepositoryImpl @Inject constructor(
 		)
 		cachedSearchKeyword = keyword
 		isEndPage = response.searchingMeta.isEnd
-		currentPage += BookSearchRepository.SEARCH_BOOKS_ITEM_LOAD_SIZE
+		currentPage += loadSize
 
 		val newBooks = response.bookSearchResponse.map { it.toBook() }
 		mapBooks.update { mapBooks.value + newBooks.associateBy { it.isbn } }
@@ -67,9 +64,5 @@ class BookSearchRepositoryImpl @Inject constructor(
 		cachedSearchKeyword = ""
 		currentPage = 1
 		isEndPage = false
-	}
-
-	private fun isNetworkConnected(): Boolean {
-		return App.instance.isNetworkConnected()
 	}
 }

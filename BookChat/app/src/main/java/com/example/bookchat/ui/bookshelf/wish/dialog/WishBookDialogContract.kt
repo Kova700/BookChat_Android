@@ -29,4 +29,8 @@ sealed class WishBookDialogEvent {
 	data class ChangeBookShelfTab(
 		val targetState: BookShelfState
 	) : WishBookDialogEvent()
+
+	data class MakeToast(
+		val stringId: Int
+	) : WishBookDialogEvent()
 }

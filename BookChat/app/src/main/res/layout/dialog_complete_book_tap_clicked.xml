@@ -12,7 +12,6 @@
         android:paddingHorizontal="@dimen/bookshelf_dialog_white_padding_horizontal"
         android:paddingTop="@dimen/bookshelf_dialog_white_padding_top"
         android:paddingBottom="@dimen/bookshelf_dialog_white_padding_bottom"
-        setDialogSize="@{true}"
         android:background="@drawable/view_round_white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -40,7 +39,6 @@
                 <ImageView
                     android:id="@+id/bookImg"
                     loadUrl="@{viewmodel.uiState.completeItem.book.bookCoverImageUrl}"
-                    setBookImgSize="@{true}"
                     android:layout_width="@dimen/book_img_width_default"
                     android:layout_height="@dimen/book_img_height_default"
                     android:scaleType="fitXY"

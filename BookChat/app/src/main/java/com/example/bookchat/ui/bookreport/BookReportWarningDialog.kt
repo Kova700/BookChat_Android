@@ -8,51 +8,53 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogBookReportWarningBinding
-import com.example.bookchat.ui.bookreport.BookReportViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class BookReportWarningDialog : DialogFragment() {
+class BookReportWarningDialog(
+	private val warningTextStringId: Int,
+	private val onOkClick: () -> Unit
+) : DialogFragment() {
 
-    private lateinit var binding: DialogBookReportWarningBinding
-    private val bookReportViewModel: BookReportViewModel by viewModels({ requireActivity() })
+	private var _binding: DialogBookReportWarningBinding? = null
+	private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.dialog_book_report_warning, container, false)
-        binding.dialog = this
-        binding.lifecycleOwner = this
-        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        setWarningText()
+	override fun onCreateView(
+		inflater: LayoutInflater,
+		container: ViewGroup?,
+		savedInstanceState: Bundle?
+	): View {
+		_binding = DataBindingUtil.inflate(
+			inflater, R.layout.dialog_book_report_warning, container, false
+		)
+		binding.dialog = this
+		binding.lifecycleOwner = this
+		return binding.root
+	}
 
-        return binding.root
-    }
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+		initViewState()
+	}
 
-    private fun setWarningText(){
-        if (bookReportViewModel.isEditingStatus()){
-            binding.warningTextView.setText(R.string.book_report_writing_cancel_warning)
-            return
-        }
-        binding.warningTextView.setText(R.string.book_report_delete_warning)
-    }
+	override fun onDestroyView() {
+		super.onDestroyView()
+		_binding = null
+	}
 
-    fun clickCancelBtn(){
-        this.dismiss()
-    }
+	private fun initViewState() {
+		binding.warningTextView.setText(warningTextStringId)
+	}
 
-    fun clickOkBtn(){
-        if (bookReportViewModel.isEditingStatus()){
-            this.dismiss()
-            bookReportViewModel.bookReportStatus.value = BookReportViewModel.BookReportStatus.Loading
-            bookReportViewModel.clickBackBtn()
-            return
-        }
-        bookReportViewModel.deleteBookReport()
-    }
+	fun onClickCancelBtn() {
+		dismiss()
+	}
+
+	fun onClickOkBtn() {
+		onOkClick.invoke()
+		dismiss()
+	}
 }

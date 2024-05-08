@@ -1,8 +1,13 @@
 package com.example.bookchat.utils
 
+import android.app.Activity
 import android.widget.Toast
-import com.example.bookchat.App
+import androidx.fragment.app.Fragment
 
-fun makeToast(stringId: Int) {
-	Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
+fun Activity.makeToast(stringId: Int) {
+	Toast.makeText(this, stringId, Toast.LENGTH_SHORT).show()
+}
+
+fun Fragment.makeToast(stringId: Int) {
+	Toast.makeText(requireContext(), stringId, Toast.LENGTH_SHORT).show()
 }

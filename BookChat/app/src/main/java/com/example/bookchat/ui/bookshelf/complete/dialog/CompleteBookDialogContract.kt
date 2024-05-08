@@ -23,6 +23,11 @@ data class CompleteBookDialogUiState(
 }
 
 sealed class CompleteBookDialogEvent {
-	data class MoveToAgony(val bookShelfListItemId: Long) : CompleteBookDialogEvent()
-	object MoveToBookReport : CompleteBookDialogEvent()
+	data class MoveToAgony(
+		val bookShelfItemId: Long
+	) : CompleteBookDialogEvent()
+
+	data class MoveToBookReport(
+		val bookShelfItemId: Long
+	) : CompleteBookDialogEvent()
 }

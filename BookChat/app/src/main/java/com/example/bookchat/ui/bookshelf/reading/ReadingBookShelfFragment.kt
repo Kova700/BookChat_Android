@@ -22,6 +22,7 @@ import com.example.bookchat.ui.bookshelf.reading.dialog.PageInputBottomSheetDial
 import com.example.bookchat.ui.bookshelf.reading.dialog.PageInputBottomSheetDialog.Companion.EXTRA_PAGE_INPUT_ITEM_ID
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog.Companion.EXTRA_READING_BOOKSHELF_ITEM_ID
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -144,6 +145,8 @@ class ReadingBookShelfFragment : Fragment() {
 
 			is ReadingBookShelfEvent.ChangeBookShelfTab ->
 				changeBookShelfTab(bookShelfState = event.targetState)
+
+			is ReadingBookShelfEvent.MakeToast -> makeToast(event.stringId)
 		}
 	}
 

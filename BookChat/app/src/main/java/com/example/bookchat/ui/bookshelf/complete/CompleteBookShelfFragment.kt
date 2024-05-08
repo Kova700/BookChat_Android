@@ -16,6 +16,7 @@ import com.example.bookchat.databinding.FragmentCompleteBookshelfBinding
 import com.example.bookchat.ui.bookshelf.complete.adapter.CompleteBookShelfDataAdapter
 import com.example.bookchat.ui.bookshelf.complete.dialog.CompleteBookDialog
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -119,6 +120,8 @@ class CompleteBookShelfFragment : Fragment() {
 		when (event) {
 			is CompleteBookShelfEvent.MoveToCompleteBookDialog ->
 				moveToCompleteBookDialog(event.bookShelfListItem)
+
+			is CompleteBookShelfEvent.MakeToast -> makeToast(event.stringId)
 		}
 	}
 

@@ -9,10 +9,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemWishBookshelfDataBinding
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
+import com.example.bookchat.utils.BookImgSizeManager
 import javax.inject.Inject
 
-class HomeBookAdapter @Inject constructor() :
-	ListAdapter<BookShelfListItem, HomeBookItemViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
+class HomeBookAdapter @Inject constructor(
+	private val bookImgSizeManager: BookImgSizeManager
+) : ListAdapter<BookShelfListItem, HomeBookItemViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
 	var onItemClick: ((Int) -> Unit)? = null
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeBookItemViewHolder {
@@ -20,7 +22,7 @@ class HomeBookAdapter @Inject constructor() :
 			LayoutInflater.from(parent.context), R.layout.item_wish_bookshelf_data,
 			parent, false
 		)
-		return HomeBookItemViewHolder(binding, onItemClick)
+		return HomeBookItemViewHolder(binding, bookImgSizeManager, onItemClick)
 	}
 
 	override fun onBindViewHolder(holder: HomeBookItemViewHolder, position: Int) {
@@ -40,6 +42,7 @@ class HomeBookAdapter @Inject constructor() :
 
 class HomeBookItemViewHolder(
 	private val binding: ItemWishBookshelfDataBinding,
+	private val bookImgSizeManager: BookImgSizeManager,
 	private val onItemClick: ((Int) -> Unit)?
 ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -47,6 +50,7 @@ class HomeBookItemViewHolder(
 		binding.root.setOnClickListener {
 			onItemClick?.invoke(absoluteAdapterPosition)
 		}
+		bookImgSizeManager.setBookImgSize(binding.bookImg)
 	}
 
 	fun bind(bookShelfListItem: BookShelfListItem) {

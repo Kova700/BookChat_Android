@@ -1,7 +1,7 @@
 package com.example.bookchat.ui.agony.model
 
 import com.example.bookchat.domain.model.AgonyFolderHexColor
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
+import com.example.bookchat.domain.model.BookShelfItem
 
 sealed interface AgonyListItem {
 	fun getCategoryId(): Long {
@@ -12,7 +12,7 @@ sealed interface AgonyListItem {
 		}
 	}
 
-	data class Header(val bookShelfListItem: BookShelfListItem) : AgonyListItem
+	data class Header(val bookShelfItem: BookShelfItem) : AgonyListItem
 	object FirstItem : AgonyListItem
 	data class Item(
 		val agonyId: Long,

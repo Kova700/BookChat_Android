@@ -49,4 +49,8 @@ sealed class SearchDetailEvent {
 	data class MoveToChannelInfo(
 		val channelId: Long
 	) : SearchDetailEvent()
+
+	data class MakeToast(
+		val stringId: Int
+	) : SearchDetailEvent()
 }

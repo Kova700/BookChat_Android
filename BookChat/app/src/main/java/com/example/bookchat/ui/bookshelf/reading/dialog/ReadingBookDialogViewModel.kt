@@ -12,7 +12,6 @@ import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog.Companion.EXTRA_READING_BOOKSHELF_ITEM_ID
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialogUiState.UiState
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,8 +36,6 @@ class ReadingBookDialogViewModel @Inject constructor(
 		MutableStateFlow<ReadingBookDialogUiState>(ReadingBookDialogUiState.DEFAULT)
 	val uiState = _uiState.asStateFlow()
 
-	var starRating = MutableStateFlow<Float>(0.0F)
-
 	init {
 		getItem()
 	}
@@ -49,8 +46,12 @@ class ReadingBookDialogViewModel @Inject constructor(
 		item?.let { updateState { copy(readingItem = item) } }
 	}
 
+	fun onChangeStarRating(rating: Float) {
+		updateState { copy(starRating = rating) }
+	}
+
 	fun onChangeToCompleteClick() {
-		if (starRating.value <= 0) return
+		if (uiState.value.starRating <= 0) return
 		onChangeStateClick(BookShelfState.COMPLETE)
 	}
 
@@ -70,7 +71,7 @@ class ReadingBookDialogViewModel @Inject constructor(
 					bookShelfItemId = bookShelfItem.bookShelfId,
 					newBookShelfItem = bookShelfItem.copy(
 						state = newState,
-						star = starRating.value.toStarRating()
+						star = uiState.value.starRating.toStarRating()
 					).toBookShelfItem(),
 				)
 			}.onSuccess {
@@ -79,7 +80,9 @@ class ReadingBookDialogViewModel @Inject constructor(
 						targetState = newState
 					)
 				)
-			}.onFailure { makeToast(R.string.bookshelf_state_change_fail) }
+			}.onFailure {
+				startEvent(ReadingBookDialogEvent.MakeToast(R.string.bookshelf_state_change_fail))
+			}
 				.also { updateState { copy(uiState = UiState.SUCCESS) } }
 		}
 	}

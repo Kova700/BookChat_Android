@@ -3,9 +3,9 @@ package com.example.bookchat.ui.signup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
-import com.example.bookchat.data.response.ForbiddenException
-import com.example.bookchat.data.response.NetworkIsNotConnectedException
-import com.example.bookchat.data.response.NickNameDuplicateException
+import com.example.bookchat.data.network.model.response.ForbiddenException
+import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.network.model.response.NickNameDuplicateException
 import com.example.bookchat.domain.model.NameCheckStatus
 import com.example.bookchat.domain.repository.ClientRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -121,7 +121,6 @@ class SignUpViewModel @Inject constructor(
 		when (exception) {
 			is ForbiddenException -> startEvent(SignUpEvent.ErrorEvent(R.string.login_forbidden_user))
 			is NetworkIsNotConnectedException -> startEvent(SignUpEvent.ErrorEvent(R.string.error_network))
-
 			is NickNameDuplicateException -> onDuplicateNickname()
 			else -> {
 				val errorMessage = exception.message

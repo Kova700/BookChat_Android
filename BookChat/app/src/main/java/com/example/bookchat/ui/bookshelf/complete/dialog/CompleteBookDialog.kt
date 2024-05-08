@@ -14,9 +14,13 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogCompleteBookTapClickedBinding
 import com.example.bookchat.ui.agony.AgonyActivity
+import com.example.bookchat.ui.bookreport.BookReportActivity
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog.Companion.EXTRA_AGONY_BOOKSHELF_ITEM_ID
+import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.DialogSizeManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CompleteBookDialog : DialogFragment() {
@@ -26,11 +30,17 @@ class CompleteBookDialog : DialogFragment() {
 
 	private val completeBookTapDialogViewModel: CompleteBookDialogViewModel by viewModels()
 
+	@Inject
+	lateinit var bookImgSizeManager: BookImgSizeManager
+
+	@Inject
+	lateinit var dialogSizeManager: DialogSizeManager
+
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedInstanceState: Bundle?
-	): View? {
+	): View {
 		_binding = DataBindingUtil.inflate(
 			inflater, R.layout.dialog_complete_book_tap_clicked,
 			container, false
@@ -44,6 +54,7 @@ class CompleteBookDialog : DialogFragment() {
 		super.onViewCreated(view, savedInstanceState)
 		dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 		observeUiEvent()
+		initViewState()
 	}
 
 	override fun onDestroyView() {
@@ -55,25 +66,30 @@ class CompleteBookDialog : DialogFragment() {
 		completeBookTapDialogViewModel.eventFlow.collect { event -> handleEvent(event) }
 	}
 
-	private fun moveToAgony(bookShelfListItemId: Long) {
+	private fun initViewState() {
+		bookImgSizeManager.setBookImgSize(binding.bookImg)
+		dialogSizeManager.setDialogSize(binding.completeDialogLayout)
+	}
+
+	private fun moveToAgony(bookShelfItemId: Long) {
 		val intent = Intent(requireContext(), AgonyActivity::class.java)
-			.putExtra(EXTRA_AGONY_BOOKSHELF_ITEM_ID, bookShelfListItemId)
+			.putExtra(EXTRA_AGONY_BOOKSHELF_ITEM_ID, bookShelfItemId)
 		startActivity(intent)
 	}
 
-	private fun moveToBookReport() {
-//		val intent = Intent(requireContext(), BookReportActivity::class.java)
-//			.putExtra(EXTRA_BOOKREPORT_BOOK, bookShelfListItem)
-//		startActivity(intent)
+	private fun moveToBookReport(bookShelfItemId: Long) {
+		val intent = Intent(requireContext(), BookReportActivity::class.java)
+			.putExtra(EXTRA_BOOKREPORT_BOOKSHELF_ITEM_ID, bookShelfItemId)
+		startActivity(intent)
 	}
 
 	private fun handleEvent(event: CompleteBookDialogEvent) = when (event) {
-		is CompleteBookDialogEvent.MoveToAgony -> moveToAgony(event.bookShelfListItemId)
-		is CompleteBookDialogEvent.MoveToBookReport -> moveToBookReport()
+		is CompleteBookDialogEvent.MoveToAgony -> moveToAgony(event.bookShelfItemId)
+		is CompleteBookDialogEvent.MoveToBookReport -> moveToBookReport(event.bookShelfItemId)
 	}
 
 	companion object {
-		const val EXTRA_BOOKREPORT_BOOK = "EXTRA_BOOKREPORT_BOOK"
+		const val EXTRA_BOOKREPORT_BOOKSHELF_ITEM_ID = "EXTRA_BOOKREPORT_BOOKSHELF_ITEM_ID"
 		const val EXTRA_COMPLETE_BOOKSHELF_ITEM_ID = "EXTRA_WISH_BOOKSHELF_ITEM_ID"
 	}
 }

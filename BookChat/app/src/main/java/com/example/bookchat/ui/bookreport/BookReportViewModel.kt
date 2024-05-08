@@ -1,205 +1,222 @@
 package com.example.bookchat.ui.bookreport
 
-import android.widget.Toast
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.data.BookReport
-import com.example.bookchat.domain.model.BookShelfItem
-import com.example.bookchat.data.response.BookReportDoseNotExistException
+import com.example.bookchat.data.network.model.response.BookReportDoseNotExistException
 import com.example.bookchat.domain.repository.BookReportRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import com.example.bookchat.domain.repository.BookShelfRepository
+import com.example.bookchat.ui.bookreport.BookReportUiState.UiState
+import com.example.bookchat.ui.bookshelf.complete.dialog.CompleteBookDialog.Companion.EXTRA_BOOKREPORT_BOOKSHELF_ITEM_ID
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class BookReportViewModel @AssistedInject constructor(
+//TODO : 추후 Room 사용
+@HiltViewModel
+class BookReportViewModel @Inject constructor(
+	private val savedStateHandle: SavedStateHandle,
+	private val bookShelfRepository: BookShelfRepository,
 	private val bookReportRepository: BookReportRepository,
-	@Assisted val bookShelfItem: BookShelfItem
 ) : ViewModel() {
-	private val _eventFlow = MutableSharedFlow<BookReportUIEvent>()
+	private val bookShelfItemId = savedStateHandle.get<Long>(EXTRA_BOOKREPORT_BOOKSHELF_ITEM_ID)!!
+
+	private val _uiState = MutableStateFlow<BookReportUiState>(BookReportUiState.DEFAULT)
+	val uiState = _uiState.asStateFlow()
+
+	private val _eventFlow = MutableSharedFlow<BookReportEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
 
-	val bookReportStatus = MutableStateFlow<BookReportStatus>(BookReportStatus.Loading)
-
-	val reportTitle = MutableStateFlow<String?>(null)
-	val reportContent = MutableStateFlow<String?>(null)
-	val reportCreatedAt = MutableStateFlow<String?>(null)
-
-	var cachedTitle: String? = null
-	var cachedContent: String? = null
-
 	init {
-		//Room사용해서 로컬에 데이터 있으면 가져오고
-		//로컬에 데이터 없으면 호출해서 가져옴
-		getBookReport()
-		//넘겨받은 값이 없으면 입력창 노출하고
-		//넘겨받은 값이 있으면 데이터 노출
+		initUiState()
 	}
 
-	//서버에서 가져옴
-	//추후 UseCase 구분해서 로컬부터 우선적으로 가져오게 구현
+	private fun initUiState() {
+		getBookShelfItem()
+		getBookReport()
+	}
+
+	private fun getBookShelfItem() = viewModelScope.launch {
+		val item = bookShelfRepository.getCachedBookShelfItem(bookShelfItemId)
+		item?.let { updateState { copy(bookshelfItem = item) } }
+	}
+
 	private fun getBookReport() = viewModelScope.launch {
-		bookReportStatus.value = BookReportStatus.Loading
-		runCatching { bookReportRepository.getBookReport(bookShelfItem) }
+		updateState { copy(uiState = UiState.LOADING) }
+		runCatching { bookReportRepository.getBookReport(bookShelfItemId) }
 			.onSuccess { bookReport ->
-				bindReport(bookReport)
-				cacheReport(bookReport)
-				bookReportStatus.value = BookReportStatus.ShowData
+				updateState {
+					copy(
+						uiState = UiState.SUCCESS,
+						existingBookReport = bookReport
+					)
+				}
 			}
 			.onFailure { failHandler(it) }
 	}
 
-	private fun bindReport(bookReport: BookReport) {
-		reportTitle.value = bookReport.reportTitle
-		reportContent.value = bookReport.reportContent
-		reportCreatedAt.value = bookReport.reportCreatedAt
-	}
-
-	private fun cacheReport(bookReport: BookReport) {
-		cachedTitle = bookReport.reportTitle
-		cachedContent = bookReport.reportContent
-	}
-
-	private fun registerBookReport(bookReport: BookReport) = viewModelScope.launch {
-		bookReportStatus.value = BookReportStatus.Loading
-		runCatching { bookReportRepository.registerBookReport(bookShelfItem, bookReport) }
-			.onSuccess {
-				cacheReport(bookReport)
-				bookReportStatus.value = BookReportStatus.ShowData
+	//TODO : 장문인 경우 BadRequestException 에러 해결 필요
+	private fun registerBookReport() = viewModelScope.launch {
+		updateState { copy(uiState = UiState.LOADING) }
+		runCatching {
+			bookReportRepository.registerBookReport(
+				bookShelfId = bookShelfItemId,
+				reportTitle = uiState.value.enteredTitle,
+				reportContent = uiState.value.enteredContent,
+				reportCreatedAt = uiState.value.existingBookReport.reportCreatedAt,
+			)
+		}
+			.onSuccess { bookReport ->
+				updateState {
+					copy(
+						uiState = UiState.SUCCESS,
+						existingBookReport = bookReport
+					)
+				}
 			}
 			.onFailure {
-				bookReportStatus.value = BookReportStatus.InputData
-				makeToast(R.string.book_report_make_fail)
+				updateState { copy(uiState = UiState.EMPTY) }
+				startEvent(BookReportEvent.MakeToast(R.string.book_report_make_fail))
 			}
 	}
 
-	fun deleteBookReport() = viewModelScope.launch {
-		bookReportStatus.value = BookReportStatus.Loading
-		runCatching { bookReportRepository.deleteBookReport(bookShelfItem) }
-			.onSuccess {
-				makeToast(R.string.book_report_delete_success)
-				startEvent(BookReportUIEvent.MoveToBack)
+	//TODO : 장문인 경우 BadRequestException 에러 해결 필요
+	private fun reviseBookReport() = viewModelScope.launch {
+		updateState { copy(uiState = UiState.LOADING) }
+		runCatching {
+			bookReportRepository.reviseBookReport(
+				bookShelfId = bookShelfItemId,
+				reportTitle = uiState.value.enteredTitle,
+				reportContent = uiState.value.enteredContent,
+				reportCreatedAt = uiState.value.existingBookReport.reportCreatedAt,
+			)
+		}
+			.onSuccess { bookReport ->
+				updateState {
+					copy(
+						uiState = UiState.SUCCESS,
+						existingBookReport = bookReport
+					)
+				}
 			}
 			.onFailure {
-				bookReportStatus.value = BookReportStatus.ShowData
-				makeToast(R.string.book_report_delete_fail)
+				updateState { copy(uiState = UiState.REVISE) }
+				startEvent(BookReportEvent.MakeToast(R.string.book_report_revise_fail))
 			}
 	}
 
-	private fun reviseBookReport(bookReport: BookReport) = viewModelScope.launch {
-		bookReportStatus.value = BookReportStatus.Loading
-		runCatching { bookReportRepository.reviseBookReport(bookShelfItem, bookReport) }
+	private fun deleteBookReport() = viewModelScope.launch {
+		updateState { copy(uiState = UiState.LOADING) }
+		runCatching { bookReportRepository.deleteBookReport(bookShelfItemId) }
 			.onSuccess {
-				cacheReport(bookReport)
-				bookReportStatus.value = BookReportStatus.ShowData
+				startEvent(BookReportEvent.MakeToast(R.string.book_report_delete_success))
+				startEvent(BookReportEvent.MoveBack)
 			}
 			.onFailure {
-				bookReportStatus.value = BookReportStatus.ReviseData
-				makeToast(R.string.book_report_revise_fail)
+				updateState { copy(uiState = UiState.SUCCESS) }
+				startEvent(BookReportEvent.MakeToast(R.string.book_report_delete_fail))
 			}
 	}
 
-	fun clickRegisterBtn() {
-		if (isBookReportEmpty()) {
-			makeToast(R.string.title_content_empty)
+	fun onClickRegisterBtn() {
+		if (isEnteredTextEmpty()) {
+			startEvent(BookReportEvent.MakeToast(R.string.title_content_empty))
 			return
 		}
 
-		when (bookReportStatus.value) {
-			BookReportStatus.InputData -> {
-				registerBookReport(BookReport(reportTitle.value!!, reportContent.value!!))
-			}
-
-			BookReportStatus.ReviseData -> {
+		when (uiState.value.uiState) {
+			UiState.EMPTY -> registerBookReport()
+			UiState.REVISE -> {
 				if (isNotChangedReport()) {
-					bookReportStatus.value = BookReportStatus.ShowData
+					updateState { copy(uiState = UiState.SUCCESS) }
 					return
 				}
-				reviseBookReport(BookReport(reportTitle.value!!, reportContent.value!!))
+				reviseBookReport()
 			}
 
 			else -> {}
 		}
 	}
 
-	fun isBookReportEmpty(): Boolean {
-		return reportTitle.value.isNullOrEmpty() || reportContent.value.isNullOrEmpty()
+	fun onChangeTitle(text: String) {
+		updateState { copy(enteredTitle = text.trim()) }
 	}
 
-	fun isNotChangedReport(): Boolean {
-		return (cachedTitle == reportTitle.value?.trim()) &&
-						(cachedContent == reportContent.value?.trim())
+	fun onChangeContent(text: String) {
+		updateState { copy(enteredContent = text.trim()) }
 	}
 
-	fun clickReviseBtn() {
-		bookReportStatus.value = BookReportStatus.ReviseData
+	private fun isEnteredTextEmpty(): Boolean {
+		return uiState.value.enteredTitle.isEmpty() ||
+						uiState.value.enteredContent.isEmpty()
 	}
 
-	fun clickDeleteBtn() {
-		startEvent(BookReportUIEvent.ShowDeleteWarningDialog)
+	private fun isEditState(): Boolean {
+		return uiState.value.uiState == UiState.EMPTY ||
+						uiState.value.uiState == UiState.REVISE
 	}
 
-	fun clickBackBtn() {
-		startEvent(BookReportUIEvent.MoveToBack)
+	private fun isNotChangedReport(): Boolean {
+		return (uiState.value.enteredTitle == uiState.value.existingBookReport.reportTitle) &&
+						(uiState.value.enteredContent == uiState.value.existingBookReport.reportContent)
 	}
 
-	fun isEditingStatus(): Boolean {
-		return (bookReportStatus.value == BookReportStatus.InputData) ||
-						(bookReportStatus.value == BookReportStatus.ReviseData)
+	fun onClickReviseBtn() {
+		updateState {
+			copy(
+				uiState = UiState.REVISE,
+				enteredTitle = existingBookReport.reportTitle,
+				enteredContent = existingBookReport.reportContent,
+			)
+		}
 	}
 
-	fun initCachedData() {
-		cachedTitle = null
-		cachedContent = null
+	fun onClickDeleteBtn() {
+		startEvent(BookReportEvent.ShowDeleteWarningDialog(
+			stringId = R.string.book_report_delete_warning,
+			onOkClick = { deleteBookReport() }
+		))
 	}
 
-	private fun startEvent(event: BookReportUIEvent) = viewModelScope.launch {
+	fun onClickBackBtn() {
+		if (isEditState().not()) {
+			startEvent(BookReportEvent.MoveBack)
+			return
+		}
+
+		if (isNotChangedReport() || isEnteredTextEmpty()) {
+			startEvent(BookReportEvent.MoveBack)
+			return
+		}
+
+		startEvent(BookReportEvent.ShowDeleteWarningDialog(
+			stringId = R.string.book_report_writing_cancel_warning,
+			onOkClick = { startEvent(BookReportEvent.MoveBack) }
+		))
+	}
+
+	private fun startEvent(event: BookReportEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
 	}
 
-	private fun makeToast(stirngId: Int) {
-		Toast.makeText(App.instance.applicationContext, stirngId, Toast.LENGTH_SHORT).show()
+	private inline fun updateState(block: BookReportUiState.() -> BookReportUiState) {
+		_uiState.update { _uiState.value.block() }
 	}
 
 	private fun failHandler(exception: Throwable) {
 		when (exception) {
-			is BookReportDoseNotExistException -> bookReportStatus.value = BookReportStatus.InputData
-			else -> startEvent(BookReportUIEvent.UnknownError)
-		}
-	}
-
-	@dagger.assisted.AssistedFactory
-	interface AssistedFactory {
-		fun create(book: BookShelfItem): BookReportViewModel
-	}
-
-	sealed class BookReportStatus {
-		object Loading : BookReportStatus()
-		object ShowData : BookReportStatus() //데이터 노출
-		object InputData : BookReportStatus() //입력창 노출 (호출 API 구분을 위해 Input , Revise 구분)
-		object ReviseData : BookReportStatus() //입력창 노출 (호출 API 구분을 위해 Input , Revise 구분)
-	}
-
-	sealed class BookReportUIEvent {
-		object MoveToBack : BookReportUIEvent()
-		object UnknownError : BookReportUIEvent()
-		object ShowDeleteWarningDialog : BookReportUIEvent()
-	}
-
-	companion object {
-		fun provideFactory(
-			assistedFactory: AssistedFactory,
-			book: BookShelfItem
-		): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-			override fun <T : ViewModel> create(modelClass: Class<T>): T {
-				return assistedFactory.create(book) as T
+			is BookReportDoseNotExistException -> updateState { copy(uiState = UiState.EMPTY) }
+			else -> {
+				val errorMessage = exception.message
+				if (errorMessage.isNullOrBlank()) startEvent(BookReportEvent.ErrorEvent(R.string.error_else))
+				else startEvent(BookReportEvent.UnknownErrorEvent(errorMessage))
 			}
 		}
 	}
-
 }

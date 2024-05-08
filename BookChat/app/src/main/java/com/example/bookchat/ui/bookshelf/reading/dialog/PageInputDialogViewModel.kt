@@ -8,7 +8,6 @@ import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.bookshelf.mapper.toBookShelfItem
 import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import com.example.bookchat.ui.bookshelf.reading.dialog.PageInputBottomSheetDialog.Companion.EXTRA_PAGE_INPUT_ITEM_ID
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,7 +54,7 @@ class PageInputDialogViewModel @Inject constructor(
 				newBookShelfItem = newBookShelfListItem.toBookShelfItem()
 			)
 		}.onSuccess { startEvent(PageInputDialogEvent.CloseDialog) }
-			.onFailure { makeToast(R.string.bookshelf_page_input_fail) }
+			.onFailure { startEvent(PageInputDialogEvent.MakeToast(R.string.bookshelf_page_input_fail)) }
 	}
 
 	fun onClickSubmit() {

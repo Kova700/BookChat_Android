@@ -21,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WishBookShelfViewModel @Inject constructor(
-	private val bookShelfRepository: BookShelfRepository
+	private val bookShelfRepository: BookShelfRepository,
+	private val bookImgSizeManager: BookImgSizeManager
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<WishBookShelfEvent>()
@@ -64,7 +65,7 @@ class WishBookShelfViewModel @Inject constructor(
 		val groupedWishItems = mutableListOf<WishBookShelfItem>()
 		groupedWishItems.add(WishBookShelfItem.Header(totalItemCount))
 		groupedWishItems.addAll(listItems.map { WishBookShelfItem.Item(it.toBookShelfListItem()) })
-		val dummyItemCount = BookImgSizeManager.getFlexBoxDummyItemCount(listItems.size)
+		val dummyItemCount = bookImgSizeManager.getFlexBoxDummyItemCount(listItems.size)
 		(0 until dummyItemCount).forEach { i -> groupedWishItems.add(WishBookShelfItem.Dummy(i)) }
 		return groupedWishItems
 	}

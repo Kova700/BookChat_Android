@@ -13,14 +13,16 @@ import com.example.bookchat.databinding.ItemReadingBookshelfDataBinding
 import com.example.bookchat.databinding.ItemReadingBookshelfHeaderBinding
 import com.example.bookchat.ui.agonyrecord.AgonyRecordSwipeHelper
 import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfItem
+import com.example.bookchat.utils.BookImgSizeManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ReadingBookShelfDataAdapter @Inject constructor() :
-	ListAdapter<ReadingBookShelfItem, ReadingBookViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
+class ReadingBookShelfDataAdapter @Inject constructor(
+	private val bookImgSizeManager: BookImgSizeManager
+) : ListAdapter<ReadingBookShelfItem, ReadingBookViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
 
 	var onItemClick: ((Int) -> Unit)? = null
 	var onLongItemClick: ((Int, Boolean) -> Unit)? = null
@@ -55,6 +57,7 @@ class ReadingBookShelfDataAdapter @Inject constructor() :
 				)
 				return ReadingBookItemViewHolder(
 					binding,
+					bookImgSizeManager,
 					onItemClick,
 					onLongItemClick,
 					onPageInputBtnClick,
@@ -104,6 +107,7 @@ class ReadingBookHeaderViewHolder(
 
 class ReadingBookItemViewHolder(
 	private val binding: ItemReadingBookshelfDataBinding,
+	private val bookImgSizeManager: BookImgSizeManager,
 	private val onItemClick: ((Int) -> Unit)?,
 	private val onLongItemClick: ((Int, Boolean) -> Unit)?,
 	private val onPageInputBtnClick: ((Int) -> Unit)?,
@@ -124,6 +128,7 @@ class ReadingBookItemViewHolder(
 		binding.swipeBackground.setOnClickListener {
 			onDeleteClick?.invoke(bindingAdapterPosition)
 		}
+		bookImgSizeManager.setBookImgSize(binding.bookImg)
 	}
 
 	override fun bind(readingBookShelfItem: ReadingBookShelfItem) {

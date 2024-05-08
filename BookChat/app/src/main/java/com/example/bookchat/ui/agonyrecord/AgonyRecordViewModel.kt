@@ -16,7 +16,6 @@ import com.example.bookchat.ui.agonyrecord.mapper.toAgonyRecordListItem
 import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
 import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem.Companion.FIRST_ITEM_STABLE_ID
 import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem.ItemState
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -107,7 +106,7 @@ class AgonyRecordViewModel @Inject constructor(
 			updateFirstItemState(ItemState.Success())
 			updateState { copy(isEditing = false) }
 		}.onFailure {
-			makeToast(R.string.agony_record_make_fail)
+			startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_make_fail))
 			updateFirstItemState(
 				ItemState.Editing(
 					titleBeingEdited = title,
@@ -132,11 +131,13 @@ class AgonyRecordViewModel @Inject constructor(
 				newTitle = newTitle,
 				newContent = newContent
 			)
-		}.onSuccess {
-			_itemState.update { _itemState.value + (recordItem.recordId to ItemState.Success()) }
-			updateState { copy(isEditing = false) }
-			makeToast(R.string.agony_record_revise_success)
-		}.onFailure { makeToast(R.string.agony_record_revise_fail) }
+		}
+			.onSuccess {
+				_itemState.update { _itemState.value + (recordItem.recordId to ItemState.Success()) }
+				updateState { copy(isEditing = false) }
+				startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_revise_success))
+			}
+			.onFailure { startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_revise_fail)) }
 	}
 
 	private fun deleteAgonyRecord(
@@ -148,10 +149,12 @@ class AgonyRecordViewModel @Inject constructor(
 				agonyId = agonyId,
 				recordId = recordItem.recordId
 			)
-		}.onSuccess {
-			_itemState.update { _itemState.value - recordItem.recordId }
-			makeToast(R.string.agony_record_delete_success)
-		}.onFailure { makeToast(R.string.agony_record_delete_fail) }
+		}
+			.onSuccess {
+				_itemState.update { _itemState.value - recordItem.recordId }
+				startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_delete_success))
+			}
+			.onFailure { startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_delete_fail)) }
 	}
 
 	fun onItemClick(recordItem: AgonyRecordListItem.Item) {
@@ -190,7 +193,7 @@ class AgonyRecordViewModel @Inject constructor(
 		val contentWithSpacesRemoved = itemState.contentBeingEdited.trim()
 
 		if (titleWithSpacesRemoved.isBlank() || contentWithSpacesRemoved.isBlank()) {
-			makeToast(R.string.title_content_empty)
+			startEvent(AgonyRecordEvent.MakeToast(R.string.title_content_empty))
 			return
 		}
 
@@ -235,7 +238,7 @@ class AgonyRecordViewModel @Inject constructor(
 		val contentWithSpacesRemoved = recordItem.state.contentBeingEdited.trim()
 
 		if (titleWithSpacesRemoved.isBlank() || contentWithSpacesRemoved.isBlank()) {
-			makeToast(R.string.title_content_empty)
+			startEvent(AgonyRecordEvent.MakeToast(R.string.title_content_empty))
 			return
 		}
 

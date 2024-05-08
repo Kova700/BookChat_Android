@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
-import com.example.bookchat.data.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.SearchPurpose
@@ -20,7 +20,6 @@ import com.example.bookchat.ui.search.mapper.toChannelItem
 import com.example.bookchat.ui.search.model.SearchResultItem
 import com.example.bookchat.ui.search.model.SearchTarget
 import com.example.bookchat.utils.BookImgSizeManager
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -40,6 +39,7 @@ class SearchViewModel @Inject constructor(
 	private val bookSearchRepository: BookSearchRepository,
 	private val channelSearchRepository: ChannelSearchRepository,
 	private val searchHistoryRepository: SearchHistoryRepository,
+	private val bookImgSizeManager: BookImgSizeManager
 ) : ViewModel() {
 	private val searchPurpose = savedStateHandle.get<SearchPurpose>(EXTRA_SEARCH_PURPOSE)!!
 
@@ -99,11 +99,11 @@ class SearchViewModel @Inject constructor(
 			if (books.isNullOrEmpty()) {
 				groupedItems.add(SearchResultItem.BookEmpty)
 			} else {
-				val defaultSize = BookImgSizeManager.flexBoxBookSpanSize * 2
+				val defaultSize = bookImgSizeManager.flexBoxBookSpanSize * 2
 				val exposureItemCount = if (books.size > defaultSize) defaultSize else books.size
 				groupedItems.addAll(books.take(exposureItemCount).map { it.toBookItem() })
 
-				val dummyItemCount = BookImgSizeManager.getFlexBoxDummyItemCount(exposureItemCount)
+				val dummyItemCount = bookImgSizeManager.getFlexBoxDummyItemCount(exposureItemCount)
 				(0 until dummyItemCount).forEach { i -> groupedItems.add(SearchResultItem.BookDummy(i)) }
 			}
 		}
@@ -150,11 +150,14 @@ class SearchViewModel @Inject constructor(
 		}
 	}
 
-	private fun searchBooksAndChannels(keyword: String) = viewModelScope.launch {
+	private fun searchBooksAndChannels(searchKeyword: String) = viewModelScope.launch {
 		runCatching {
-			val books = bookSearchRepository.search(keyword.trim())
+			val books = bookSearchRepository.search(
+				keyword = searchKeyword.trim(),
+				loadSize = bookImgSizeManager.flexBoxBookSpanSize * 6
+			)
 			val channels = channelSearchRepository.search(
-				keyword = keyword.trim(),
+				keyword = searchKeyword.trim(),
 				searchFilter = uiState.value.searchFilter,
 			)
 			books.isEmpty() && channels.isEmpty()
@@ -163,8 +166,13 @@ class SearchViewModel @Inject constructor(
 			.onFailure { failHandler(it) }
 	}
 
-	private fun searchBooks(keyword: String) = viewModelScope.launch {
-		runCatching { bookSearchRepository.search(keyword.trim()) }
+	private fun searchBooks(searchKeyword: String) = viewModelScope.launch {
+		runCatching {
+			bookSearchRepository.search(
+				keyword = searchKeyword.trim(),
+				loadSize = bookImgSizeManager.flexBoxBookSpanSize * 6
+			)
+		}
 			.onSuccess { books -> searchSuccessCallBack(books.isEmpty()) }
 			.onFailure { failHandler(it) }
 	}
@@ -213,7 +221,7 @@ class SearchViewModel @Inject constructor(
 	fun onClickSearchBtn() = viewModelScope.launch {
 		val keyword = uiState.value.searchKeyword.trim()
 		if (keyword.isBlank()) {
-			makeToast(R.string.search_book_keyword_empty)
+			startEvent(SearchEvent.MakeToast(R.string.search_book_keyword_empty))
 			return@launch
 		}
 		searchHistoryRepository.addHistory(keyword)
@@ -292,9 +300,9 @@ class SearchViewModel @Inject constructor(
 		updateState { copy(searchResultState = SearchResultState.Error) }
 		when (exception) {
 			is NetworkIsNotConnectedException ->
-				makeToast(R.string.error_network)
+				startEvent(SearchEvent.MakeToast(R.string.error_network))
 
-			else -> makeToast(R.string.error_else)
+			else -> startEvent(SearchEvent.MakeToast(R.string.error_else))
 		}
 	}
 

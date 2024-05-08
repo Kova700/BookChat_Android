@@ -1,9 +1,9 @@
 package com.example.bookchat.data.mapper
 
-import com.example.bookchat.data.response.AgonyRecordResponse
+import com.example.bookchat.data.network.model.response.AgonyRecordResponse
 import com.example.bookchat.domain.model.AgonyRecord
 
-fun AgonyRecordResponse.toAgonyRecord(): AgonyRecord {
+fun com.example.bookchat.data.network.model.response.AgonyRecordResponse.toAgonyRecord(): AgonyRecord {
 	return AgonyRecord(
 		recordId = agonyRecordId,
 		title = agonyRecordTitle,
@@ -12,5 +12,5 @@ fun AgonyRecordResponse.toAgonyRecord(): AgonyRecord {
 	)
 }
 
-fun List<AgonyRecordResponse>.toAgonyRecord() =
+fun List<com.example.bookchat.data.network.model.response.AgonyRecordResponse>.toAgonyRecord() =
 	this.map { it.toAgonyRecord() }

@@ -12,10 +12,12 @@ import com.example.bookchat.databinding.ItemSearchBookDummyBinding
 import com.example.bookchat.databinding.ItemWishBookshelfDataBinding
 import com.example.bookchat.databinding.ItemWishBookshelfHeaderBinding
 import com.example.bookchat.ui.bookshelf.wish.WishBookShelfItem
+import com.example.bookchat.utils.BookImgSizeManager
 import javax.inject.Inject
 
-class WishBookShelfAdapter @Inject constructor() :
-	ListAdapter<WishBookShelfItem, WishBookViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
+class WishBookShelfAdapter @Inject constructor(
+	private val bookImgSizeManager: BookImgSizeManager
+) : ListAdapter<WishBookShelfItem, WishBookViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
 	var onItemClick: ((Int) -> Unit)? = null
 
 	override fun getItemViewType(position: Int): Int {
@@ -41,7 +43,7 @@ class WishBookShelfAdapter @Inject constructor() :
 					LayoutInflater.from(parent.context), R.layout.item_wish_bookshelf_data,
 					parent, false
 				)
-				return WishBookItemViewHolder(binding, onItemClick)
+				return WishBookItemViewHolder(binding, bookImgSizeManager, onItemClick)
 			}
 
 			else -> {
@@ -49,7 +51,7 @@ class WishBookShelfAdapter @Inject constructor() :
 					LayoutInflater.from(parent.context), R.layout.item_search_book_dummy,
 					parent, false
 				)
-				return WishBookDummyViewHolder(binding)
+				return WishBookDummyViewHolder(binding, bookImgSizeManager)
 			}
 		}
 
@@ -94,6 +96,7 @@ class WishBookHeaderViewHolder(
 
 class WishBookItemViewHolder(
 	private val binding: ItemWishBookshelfDataBinding,
+	private val bookImgSizeManager: BookImgSizeManager,
 	private val onItemClick: ((Int) -> Unit)?,
 ) : WishBookViewHolder(binding) {
 
@@ -101,6 +104,7 @@ class WishBookItemViewHolder(
 		binding.root.setOnClickListener {
 			onItemClick?.invoke(bindingAdapterPosition)
 		}
+		bookImgSizeManager.setBookImgSize(binding.bookImg)
 	}
 
 	override fun bind(wishBookShelfItem: WishBookShelfItem) {
@@ -109,7 +113,12 @@ class WishBookItemViewHolder(
 }
 
 class WishBookDummyViewHolder(
-	val binding: ItemSearchBookDummyBinding
+	private val binding: ItemSearchBookDummyBinding,
+	private val bookImgSizeManager: BookImgSizeManager,
 ) : WishBookViewHolder(binding) {
+	init {
+		bookImgSizeManager.setBookImgSize(binding.flexBoxDummyBookLayout)
+	}
+
 	override fun bind(wishBookShelfItem: WishBookShelfItem) {}
 }

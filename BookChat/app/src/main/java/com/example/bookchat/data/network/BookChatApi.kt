@@ -1,11 +1,11 @@
 package com.example.bookchat.data.network
 
 import com.example.bookchat.data.*
-import com.example.bookchat.data.model.BookSearchSortOptionNetWork
-import com.example.bookchat.data.model.BookSearchSortOptionNetWork.ACCURACY
-import com.example.bookchat.data.model.SearchSortOptionNetwork
-import com.example.bookchat.data.request.*
-import com.example.bookchat.data.response.*
+import com.example.bookchat.data.network.model.BookSearchSortOptionNetWork
+import com.example.bookchat.data.network.model.BookSearchSortOptionNetWork.ACCURACY
+import com.example.bookchat.data.network.model.SearchSortOptionNetwork
+import com.example.bookchat.data.network.model.request.*
+import com.example.bookchat.data.network.model.response.*
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
@@ -88,18 +88,18 @@ interface BookChatApi {
 	@GET("/v1/api/bookshelves/{bookShelfId}/report")
 	suspend fun getBookReport(
 		@Path("bookShelfId") bookShelfId: Long,
-	): Response<BookReport>
+	): Response<BookReportResponse>
 
 	@POST("/v1/api/bookshelves/{bookShelfId}/report")
 	suspend fun registerBookReport(
 		@Path("bookShelfId") bookShelfId: Long,
 		@Body requestRegisterBookReport: RequestRegisterBookReport
-	): Response<Unit>
+	)
 
 	@DELETE("/v1/api/bookshelves/{bookShelfId}/report")
 	suspend fun deleteBookReport(
 		@Path("bookShelfId") bookShelfId: Long,
-	): Response<Unit>
+	)
 
 	@PUT("/v1/api/bookshelves/{bookShelfId}/report")
 	suspend fun reviseBookReport(

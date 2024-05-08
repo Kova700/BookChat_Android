@@ -7,35 +7,37 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityChannelBinding
-import com.example.bookchat.domain.model.Channel
-import com.example.bookchat.domain.model.User
-import com.example.bookchat.ui.channel.adapter.ChatDataItemAdapter
-import com.example.bookchat.ui.channel.adapter.chatdrawer.ChatRoomDrawerDataAdapter
-import com.example.bookchat.ui.channel.adapter.chatdrawer.ChatRoomDrawerHeaderAdapter
+import com.example.bookchat.ui.channel.adapter.chat.ChatDataItemAdapter
+import com.example.bookchat.ui.channel.adapter.drawer.ChannelDrawerAdapter
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChannelActivity : AppCompatActivity() {
 
 	private lateinit var binding: ActivityChannelBinding
-	private lateinit var chatDataItemAdapter: ChatDataItemAdapter
-	private lateinit var chatRoomDrawerHeaderAdapter: ChatRoomDrawerHeaderAdapter
-	private lateinit var chatRoomDrawerDataAdapter: ChatRoomDrawerDataAdapter
 	private val channelViewModel by viewModels<ChannelViewModel>()
+
+	@Inject
+	lateinit var chatDataItemAdapter: ChatDataItemAdapter
+
+	@Inject
+	lateinit var channelDrawerAdapter: ChannelDrawerAdapter
+
+	@Inject
+	lateinit var chatItemDecoration: ChatItemDecoration
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_channel)
-		with(binding) {
-			lifecycleOwner = this@ChannelActivity
-			viewmodel = channelViewModel
-		}
+		binding.lifecycleOwner = this@ChannelActivity
+		binding.viewmodel = channelViewModel
 		setBackPressedDispatcher()
 		initAdapter()
 		initRcv()
@@ -43,11 +45,24 @@ class ChannelActivity : AppCompatActivity() {
 		observeEvent()
 	}
 
+	override fun onStop() {
+		channelViewModel.saveTempSavedMessage()
+		super.onStop()
+	}
+
+	private fun observeUiState() = lifecycleScope.launch {
+		channelViewModel.uiStateFlow.collect { uiState ->
+			chatDataItemAdapter.submitList(uiState.chats)
+			channelDrawerAdapter.submitList(uiState.drawerItems)
+		}
+	}
+
+	private fun observeEvent() = lifecycleScope.launch {
+		channelViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
 	private fun initAdapter() {
-		chatDataItemAdapter = ChatDataItemAdapter()
-			.apply { registerAdapterDataObserver(adapterDataObserver) }
-		chatRoomDrawerHeaderAdapter = ChatRoomDrawerHeaderAdapter()
-		chatRoomDrawerDataAdapter = ChatRoomDrawerDataAdapter()
+		chatDataItemAdapter.registerAdapterDataObserver(adapterDataObserver)
 	}
 
 	private val adapterDataObserver = object : RecyclerView.AdapterDataObserver() {
@@ -94,18 +109,13 @@ class ChannelActivity : AppCompatActivity() {
 		binding.chattingRcv.apply {
 			adapter = chatDataItemAdapter
 			setHasFixedSize(true)
-			addItemDecoration(ChatItemDecoration())
+			addItemDecoration(chatItemDecoration)
 			layoutManager = linearLayoutManager
 			addOnScrollListener(rcvScrollListener)
 		}
 
 		binding.chatDrawerLayout.chatroomDrawerRcv.apply {
-			val concatAdapterConfig =
-				ConcatAdapter.Config.Builder().apply { setIsolateViewTypes(false) }.build()
-			val concatAdapter = ConcatAdapter(
-				concatAdapterConfig, chatRoomDrawerHeaderAdapter, chatRoomDrawerDataAdapter
-			)
-			adapter = concatAdapter
+			adapter = channelDrawerAdapter
 			layoutManager = LinearLayoutManager(this@ChannelActivity)
 			setHasFixedSize(true)
 		}
@@ -124,33 +134,13 @@ class ChannelActivity : AppCompatActivity() {
 		}
 	}
 
-	private fun observeUiState() = lifecycleScope.launch {
-		channelViewModel.uiStateFlow.collect { uiState ->
-			chatDataItemAdapter.submitList(uiState.chats)
-			uiState.channel?.let { updateDrawerHeader(it) }
-			uiState.channel?.participants?.let { updateDrawerUserList(it) }
-		}
-	}
-
-	private fun observeEvent() = lifecycleScope.launch {
-		channelViewModel.eventFlow.collect { event -> handleEvent(event) }
-	}
-
-	private fun updateDrawerHeader(channel: Channel) {
-		chatRoomDrawerHeaderAdapter.channel = channel
-		chatRoomDrawerHeaderAdapter.notifyItemChanged(0)
-	}
-
-	private fun updateDrawerUserList(users: List<User>) {
-		chatRoomDrawerDataAdapter.submitList(users)
-	}
-
 	private fun handleEvent(event: ChannelEvent) {
 		when (event) {
 			ChannelEvent.MoveBack -> finish()
 			ChannelEvent.CaptureChannel -> {}
 			ChannelEvent.ScrollNewChannelItem -> scrollNewChatItem()
 			ChannelEvent.OpenOrCloseDrawer -> openOrCloseDrawer()
+			is ChannelEvent.MakeToast -> makeToast(event.stringId)
 		}
 	}
 
@@ -161,10 +151,5 @@ class ChannelActivity : AppCompatActivity() {
 			return
 		}
 		drawerLayout.openDrawer(GravityCompat.END)
-	}
-
-	override fun onStop() {
-		channelViewModel.saveTempSavedMessage()
-		super.onStop()
 	}
 }

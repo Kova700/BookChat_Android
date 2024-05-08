@@ -1,29 +1,29 @@
 package com.example.bookchat.data.mapper
 
-import com.example.bookchat.data.model.ChannelDefaultImageTypeNetwork
+import com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork
 import com.example.bookchat.domain.model.ChannelDefaultImageType
 
 
-fun ChannelDefaultImageTypeNetwork.toChannelDefaultImageType(): ChannelDefaultImageType {
+fun com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork.toChannelDefaultImageType(): ChannelDefaultImageType {
 	return when (this) {
-		ChannelDefaultImageTypeNetwork.ONE -> ChannelDefaultImageType.ONE
-		ChannelDefaultImageTypeNetwork.TWO -> ChannelDefaultImageType.TWO
-		ChannelDefaultImageTypeNetwork.THREE -> ChannelDefaultImageType.THREE
-		ChannelDefaultImageTypeNetwork.FOUR -> ChannelDefaultImageType.FOUR
-		ChannelDefaultImageTypeNetwork.FIVE -> ChannelDefaultImageType.FIVE
-		ChannelDefaultImageTypeNetwork.SIX -> ChannelDefaultImageType.SIX
-		ChannelDefaultImageTypeNetwork.SEVEN -> ChannelDefaultImageType.SEVEN
+		com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork.ONE -> ChannelDefaultImageType.ONE
+		com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork.TWO -> ChannelDefaultImageType.TWO
+		com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork.THREE -> ChannelDefaultImageType.THREE
+		com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork.FOUR -> ChannelDefaultImageType.FOUR
+		com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork.FIVE -> ChannelDefaultImageType.FIVE
+		com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork.SIX -> ChannelDefaultImageType.SIX
+		com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork.SEVEN -> ChannelDefaultImageType.SEVEN
 	}
 }
 
-fun ChannelDefaultImageType.toChannelDefaultImageTypeNetwork(): ChannelDefaultImageTypeNetwork {
+fun ChannelDefaultImageType.toChannelDefaultImageTypeNetwork(): com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork {
 	return when (this) {
-		ChannelDefaultImageType.ONE -> ChannelDefaultImageTypeNetwork.ONE
-		ChannelDefaultImageType.TWO -> ChannelDefaultImageTypeNetwork.TWO
-		ChannelDefaultImageType.THREE -> ChannelDefaultImageTypeNetwork.THREE
-		ChannelDefaultImageType.FOUR -> ChannelDefaultImageTypeNetwork.FOUR
-		ChannelDefaultImageType.FIVE -> ChannelDefaultImageTypeNetwork.FIVE
-		ChannelDefaultImageType.SIX -> ChannelDefaultImageTypeNetwork.SIX
-		ChannelDefaultImageType.SEVEN -> ChannelDefaultImageTypeNetwork.SEVEN
+		ChannelDefaultImageType.ONE -> com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork.ONE
+		ChannelDefaultImageType.TWO -> com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork.TWO
+		ChannelDefaultImageType.THREE -> com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork.THREE
+		ChannelDefaultImageType.FOUR -> com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork.FOUR
+		ChannelDefaultImageType.FIVE -> com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork.FIVE
+		ChannelDefaultImageType.SIX -> com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork.SIX
+		ChannelDefaultImageType.SEVEN -> com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork.SEVEN
 	}
 }

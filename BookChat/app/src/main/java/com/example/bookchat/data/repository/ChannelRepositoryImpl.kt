@@ -1,16 +1,13 @@
 package com.example.bookchat.data.repository
 
 import android.util.Log
-import com.example.bookchat.App
 import com.example.bookchat.data.database.dao.ChannelDAO
 import com.example.bookchat.data.mapper.toBookRequest
 import com.example.bookchat.data.mapper.toChannel
 import com.example.bookchat.data.mapper.toChannelDefaultImageTypeNetwork
 import com.example.bookchat.data.mapper.toChannelEntity
 import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.request.RequestMakeChannel
-import com.example.bookchat.data.response.NetworkIsNotConnectedException
-import com.example.bookchat.data.response.ResponseChannelInfo
+import com.example.bookchat.data.network.model.response.ResponseChannelInfo
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelDefaultImageType
@@ -66,7 +63,6 @@ class ChannelRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun getChannel(channelId: Long): Channel {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 		getChannelInfo(channelId)
 		val updatedChannel = getChannelWithInfo(channelId)
 		setChannels(mapChannels.value + (channelId to updatedChannel))
@@ -76,7 +72,6 @@ class ChannelRepositoryImpl @Inject constructor(
 	//Channel 세부 정보는 채팅방 들어 가면 getChannel에 의해 갱신될 예정
 	override suspend fun getChannels(loadSize: Int): List<Channel> {
 		if (isEndPage) return cachedChannels
-		if (isNetworkConnected().not()) throw NetworkIsNotConnectedException()
 
 		val response = bookChatApi.getChannels(
 			postCursorId = currentPage,
@@ -113,10 +108,8 @@ class ChannelRepositoryImpl @Inject constructor(
 		selectedBook: Book,
 		channelImage: ByteArray?
 	): Channel {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
 		val response = bookChatApi.makeChannel(
-			requestMakeChannel = RequestMakeChannel(
+			requestMakeChannel = com.example.bookchat.data.network.model.request.RequestMakeChannel(
 				roomName = channelTitle,
 				roomSize = channelSize,
 				defaultRoomImageType = defaultRoomImageType.toChannelDefaultImageTypeNetwork(),
@@ -143,7 +136,6 @@ class ChannelRepositoryImpl @Inject constructor(
 	// TODO : 이미 입장되어있는 채널에 입장 API 호출하면 넘어오는 응답코드 따로 정의 후,
 	//  해당 코드 응답시, 예외 던지기
 	override suspend fun enter(channel: Channel) {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 		val resultCode = bookChatApi.enterChatRoom(channel.roomId).code()
 		Log.d(TAG, "ChannelRepositoryImpl: enter() - resultCode : $resultCode")
 
@@ -158,14 +150,12 @@ class ChannelRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun leave(channelId: Long) {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 		bookChatApi.leaveChatRoom(channelId)
 		channelDAO.delete(channelId)
 		setChannels(mapChannels.value - channelId)
 	}
 
 	private suspend fun getChannelInfo(roomId: Long) {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 		val response = bookChatApi.getChatRoomInfo(roomId)
 		saveParticipantsDataInLocalDB(response)
 		saveChannelInfoInLocalDB(roomId, response)
@@ -205,10 +195,6 @@ class ChannelRepositoryImpl @Inject constructor(
 			roomTags = channelInfo.roomTags,
 			roomCapacity = channelInfo.roomCapacity,
 		)
-	}
-
-	private fun isNetworkConnected(): Boolean {
-		return App.instance.isNetworkConnected()
 	}
 
 	companion object {

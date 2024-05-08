@@ -11,7 +11,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
 import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
-import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.data.*
 import com.example.bookchat.domain.model.AgonyFolderHexColor
@@ -22,7 +21,6 @@ import com.example.bookchat.domain.model.NameCheckStatus
 import com.example.bookchat.domain.model.UserDefaultProfileType
 import com.example.bookchat.ui.agony.AgonyUiState
 import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
-import com.example.bookchat.ui.bookreport.BookReportViewModel.BookReportStatus
 import com.example.bookchat.ui.login.LoginUiState
 import com.example.bookchat.utils.*
 import java.util.*
@@ -149,22 +147,23 @@ object DataBindingAdapter {
 
 			NameCheckStatus.IsShort -> {
 				textView.setTextColor(Color.parseColor("#FF004D"))
-				textView.text = App.instance.resources.getString(R.string.name_check_status_short)
+				textView.text = textView.context.resources.getString(R.string.name_check_status_short)
 			}
 
 			NameCheckStatus.IsDuplicate -> {
 				textView.setTextColor(Color.parseColor("#FF004D"))
-				textView.text = App.instance.resources.getString(R.string.name_check_status_duplicate)
+				textView.text = textView.context.resources.getString(R.string.name_check_status_duplicate)
 			}
 
 			NameCheckStatus.IsSpecialCharInText -> {
 				textView.setTextColor(Color.parseColor("#FF004D"))
-				textView.text = App.instance.resources.getString(R.string.name_check_status_special_char)
+				textView.text =
+					textView.context.resources.getString(R.string.name_check_status_special_char)
 			}
 
 			NameCheckStatus.IsPerfect -> {
 				textView.setTextColor(Color.parseColor("#5648FF"))
-				textView.text = App.instance.resources.getString(R.string.name_check_status_perfect)
+				textView.text = textView.context.resources.getString(R.string.name_check_status_perfect)
 			}
 		}
 	}
@@ -177,7 +176,7 @@ object DataBindingAdapter {
 		when (nameCheckStatus) {
 			NameCheckStatus.Default -> {
 				view.background = ResourcesCompat.getDrawable(
-					App.instance.resources,
+					view.resources,
 					R.drawable.nickname_input_back_white,
 					null
 				)
@@ -187,7 +186,7 @@ object DataBindingAdapter {
 			NameCheckStatus.IsDuplicate,
 			NameCheckStatus.IsSpecialCharInText -> {
 				view.background = ResourcesCompat.getDrawable(
-					App.instance.resources,
+					view.resources,
 					R.drawable.nickname_input_back_red,
 					null
 				)
@@ -195,39 +194,12 @@ object DataBindingAdapter {
 
 			NameCheckStatus.IsPerfect -> {
 				view.background = ResourcesCompat.getDrawable(
-					App.instance.resources,
+					view.context.resources,
 					R.drawable.nickname_input_back_blue,
 					null
 				)
 			}
 		}
-	}
-
-	@JvmStatic
-	@BindingAdapter("setLoadingVisibilityInBookReport")
-	fun setLoadingVisibilityInBookReport(view: View, status: BookReportStatus) {
-		view.visibility = if (status == BookReportStatus.Loading) View.VISIBLE else View.INVISIBLE
-	}
-
-	@JvmStatic
-	@BindingAdapter("setInputLayoutVisibilityInBookReport")
-	fun setInputLayoutVisibilityInBookReport(view: View, status: BookReportStatus) {
-		when (status) {
-			BookReportStatus.InputData,
-			BookReportStatus.ReviseData -> {
-				view.visibility = View.VISIBLE
-			}
-
-			else -> {
-				view.visibility = View.INVISIBLE
-			}
-		}
-	}
-
-	@JvmStatic
-	@BindingAdapter("setShowDataLayoutVisibilityInBookReport")
-	fun setShowDataLayoutVisibilityInBookReport(view: View, status: BookReportStatus) {
-		view.visibility = if (status == BookReportStatus.ShowData) View.VISIBLE else View.INVISIBLE
 	}
 
 	/**고민 폴더 색상 설정(HexColor)*/
@@ -273,12 +245,12 @@ object DataBindingAdapter {
 		when (isSelected) {
 			false -> {
 				view.backgroundTintList =
-					ColorStateList.valueOf(ContextCompat.getColor(App.instance, R.color.agony_color_white))
+					ColorStateList.valueOf(ContextCompat.getColor(view.context, R.color.agony_color_white))
 			}
 
 			true -> {
 				view.backgroundTintList =
-					ColorStateList.valueOf(ContextCompat.getColor(App.instance, R.color.agony_color_selected))
+					ColorStateList.valueOf(ContextCompat.getColor(view.context, R.color.agony_color_selected))
 			}
 		}
 	}
@@ -474,23 +446,6 @@ object DataBindingAdapter {
 		loadUrl(view, imgUrl)
 	}
 
-	/**화면 크기에 맞는 도서 이미지 크기 세팅*/
-	@JvmStatic
-	@BindingAdapter("setBookImgSize")
-	fun setBookImgSize(view: View, bool: Boolean) {
-		with(view) {
-			layoutParams.width = BookImgSizeManager.bookImgWidthPx
-			layoutParams.height = BookImgSizeManager.bookImgHeightPx
-		}
-	}
-
-	/**화면 크기에 맞는 Dialog 크기 세팅*/
-	@JvmStatic
-	@BindingAdapter("setDialogSize")
-	fun setDialogSize(view: View, bool: Boolean) {
-		view.layoutParams.width = DialogSizeManager.dialogWidthPx
-	}
-
 	/** MakeChatRoom 채팅방 생성 기본 이미지 세팅*/
 	@JvmStatic
 	@BindingAdapter("channelDefaultImageType", "loadByteArray", requireAll = false)
@@ -517,25 +472,6 @@ object DataBindingAdapter {
 			ChannelDefaultImageType.SIX -> view.setImageResource(R.drawable.default_chat_room_img6)
 			ChannelDefaultImageType.SEVEN -> view.setImageResource(R.drawable.default_chat_room_img7)
 		}
-	}
-
-	/** MakeChatRoom 화면 크기에 맞는 채팅방 이미지 크기 세팅*/
-	@JvmStatic
-	@BindingAdapter("setMakeChatRoomImgSize")
-	fun setMakeChatRoomImgSize(view: ImageView, bool: Boolean) {
-		val sizeManager = MakeChatRoomImgSizeManager()
-		with(view) {
-			layoutParams.width = sizeManager.chatRoomImgWidthPx
-			layoutParams.height = sizeManager.chatRoomImgHeightPx
-		}
-	}
-
-	/**Shimmer내부 GirdLayout 설정*/
-	@JvmStatic
-	@BindingAdapter("setShimmerGridLayout")
-	fun setShimmerGridLayout(gridLayout: GridLayout, bool: Boolean) {
-		gridLayout.columnCount = BookImgSizeManager.flexBoxBookSpanSize
-		gridLayout.rowCount = 2
 	}
 
 	/**Shimmer Animation Start/Stop 설정*/

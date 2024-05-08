@@ -2,8 +2,8 @@ package com.example.bookchat.data.mapper
 
 import com.example.bookchat.data.database.model.ChannelEntity
 import com.example.bookchat.data.database.model.combined.ChannelWithInfo
-import com.example.bookchat.data.response.ChannelResponse
-import com.example.bookchat.data.response.ChannelSearchResponse
+import com.example.bookchat.data.network.model.response.ChannelResponse
+import com.example.bookchat.data.network.model.response.ChannelSearchResponse
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.User
@@ -116,5 +116,7 @@ fun ChannelSearchResponse.toChannel(): Channel {
 	)
 }
 
-fun List<ChannelResponse>.toChannelEntity() = this.map { it.toChannelEntity() }
+fun List<ChannelResponse>.toChannelEntity() =
+	this.map { it.toChannelEntity() }
+
 fun List<ChannelEntity>.toChannel() = this.map { it.toChannel() }

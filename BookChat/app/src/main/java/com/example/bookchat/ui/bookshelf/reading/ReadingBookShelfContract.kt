@@ -36,6 +36,11 @@ sealed class ReadingBookShelfEvent {
 	data class ChangeBookShelfTab(
 		val targetState: BookShelfState
 	) : ReadingBookShelfEvent()
+
+	data class MakeToast(
+		val stringId: Int
+	) : ReadingBookShelfEvent()
+
 }
 
 sealed interface ReadingBookShelfItem {

@@ -3,7 +3,6 @@ package com.example.bookchat.ui.search.dialog
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.App
 import com.example.bookchat.R
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.model.toStarRating
@@ -12,7 +11,6 @@ import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_SEARCHED_BOOK_ITEM_ID
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState.AlreadyInBookShelf
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,10 +49,6 @@ class SearchBookDialogViewModel @Inject constructor(
 	}
 
 	private fun checkAlreadyInBookShelf() = viewModelScope.launch {
-		if (!isNetworkConnected()) {
-			makeToast(R.string.error_network)
-			return@launch
-		}
 		runCatching {
 			bookShelfRepository.checkAlreadyInBookShelf(
 				bookSearchRepository.getCachedBook(bookIsbn)
@@ -72,10 +66,10 @@ class SearchBookDialogViewModel @Inject constructor(
 			)
 		}
 			.onSuccess {
-				makeToast(R.string.wish_bookshelf_register_success)
+				startEvent(SearchTapDialogEvent.MakeToast(R.string.wish_bookshelf_register_success))
 				updateState { copy(uiState = AlreadyInBookShelf(BookShelfState.WISH)) }
 			}
-			.onFailure { makeToast(R.string.wish_bookshelf_register_fail) }
+			.onFailure { startEvent(SearchTapDialogEvent.MakeToast(R.string.wish_bookshelf_register_fail)) }
 	}
 
 	private fun registerReadingBook() = viewModelScope.launch {
@@ -86,10 +80,10 @@ class SearchBookDialogViewModel @Inject constructor(
 			)
 		}
 			.onSuccess {
-				makeToast(R.string.reading_bookshelf_register_success)
+				startEvent(SearchTapDialogEvent.MakeToast(R.string.reading_bookshelf_register_success))
 				updateState { copy(uiState = AlreadyInBookShelf(BookShelfState.READING)) }
 			}
-			.onFailure { makeToast(R.string.reading_bookshelf_register_fail) }
+			.onFailure { startEvent(SearchTapDialogEvent.MakeToast(R.string.reading_bookshelf_register_fail)) }
 	}
 
 	private fun registerCompleteBook() = viewModelScope.launch {
@@ -101,10 +95,10 @@ class SearchBookDialogViewModel @Inject constructor(
 			)
 		}
 			.onSuccess {
-				makeToast(R.string.complete_bookshelf_register_success)
+				startEvent(SearchTapDialogEvent.MakeToast(R.string.complete_bookshelf_register_success))
 				updateState { copy(uiState = AlreadyInBookShelf(BookShelfState.COMPLETE)) }
 			}
-			.onFailure { makeToast(R.string.complete_bookshelf_register_fail) }
+			.onFailure { startEvent(SearchTapDialogEvent.MakeToast(R.string.complete_bookshelf_register_fail)) }
 	}
 
 	private fun isAlreadyInWishBookShelf(state: SearchDialogState) =
@@ -115,10 +109,6 @@ class SearchBookDialogViewModel @Inject constructor(
 	}
 
 	fun onClickWishToggleBtn() {
-		if (!isNetworkConnected()) {
-			makeToast(R.string.error_network)
-			return
-		}
 		if (isAlreadyInWishBookShelf(uiState.value.uiState)) return
 		registerWishBook()
 	}
@@ -128,12 +118,12 @@ class SearchBookDialogViewModel @Inject constructor(
 	}
 
 	fun onClickCompleteBtn() {
-		startUiEvent(SearchTapDialogEvent.MoveToStarSetDialog)
+		startEvent(SearchTapDialogEvent.MoveToStarSetDialog)
 	}
 
 	fun onClickCompleteOkBtn() {
 		if (uiState.value.starRating == 0F) {
-			makeToast(R.string.complete_bookshelf_star_set_empty)
+			startEvent(SearchTapDialogEvent.MakeToast(R.string.complete_bookshelf_star_set_empty))
 			return
 		}
 		registerCompleteBook()
@@ -143,12 +133,8 @@ class SearchBookDialogViewModel @Inject constructor(
 		_uiState.update { _uiState.value.block() }
 	}
 
-	private fun startUiEvent(event: SearchTapDialogEvent) = viewModelScope.launch {
+	private fun startEvent(event: SearchTapDialogEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
-	}
-
-	private fun isNetworkConnected(): Boolean {
-		return App.instance.isNetworkConnected()
 	}
 
 }

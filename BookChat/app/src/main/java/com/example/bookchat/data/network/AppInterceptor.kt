@@ -1,9 +1,9 @@
 package com.example.bookchat.data.network
 
 import com.example.bookchat.BuildConfig.TOKEN_RENEWAL_URL
-import com.example.bookchat.data.response.BadRequestException
-import com.example.bookchat.data.response.ForbiddenException
-import com.example.bookchat.data.response.TokenRenewalFailException
+import com.example.bookchat.data.network.model.response.BadRequestException
+import com.example.bookchat.data.network.model.response.ForbiddenException
+import com.example.bookchat.data.network.model.response.TokenRenewalFailException
 import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.google.gson.Gson

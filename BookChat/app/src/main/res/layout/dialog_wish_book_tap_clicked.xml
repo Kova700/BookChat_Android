@@ -10,7 +10,6 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/wish_dialog_layout"
-        setDialogSize="@{true}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/view_round_white"
@@ -41,7 +40,6 @@
                 <ImageView
                     android:id="@+id/bookImg"
                     loadUrl="@{viewmodel.uiState.wishItem.book.bookCoverImageUrl}"
-                    setBookImgSize="@{true}"
                     android:layout_width="@dimen/book_img_width_default"
                     android:layout_height="@dimen/book_img_height_default"
                     android:scaleType="fitXY"

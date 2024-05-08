@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-            name="channel"
-            type="com.example.bookchat.domain.model.Channel" />
+            name="headerItem"
+            type="com.example.bookchat.ui.channel.model.drawer.ChannelDrawerItem.Header" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -60,8 +60,7 @@
 
             <ImageView
                 android:id="@+id/bookImg"
-                loadUrl="@{channel.bookCoverImageUrl}"
-                setBookImgSize="@{true}"
+                loadUrl="@{headerItem.bookCoverImageUrl}"
                 android:layout_width="@dimen/book_img_width_default"
                 android:layout_height="@dimen/book_img_height_default"
                 android:scaleType="fitXY"
@@ -77,7 +76,7 @@
             android:ellipsize="end"
             android:fontFamily="@font/notosanskr_bold"
             android:gravity="center"
-            android:text="@{channel.bookTitle}"
+            android:text="@{headerItem.bookTitle}"
             android:textColor="#4D4D4D"
             android:textSize="12sp"
             app:layout_constrainedWidth="true"
@@ -95,7 +94,7 @@
             android:ellipsize="end"
             android:fontFamily="@font/notosanskr_regular"
             android:gravity="center"
-            android:text="@{channel.bookAuthors[0]}"
+            android:text="@{headerItem.bookAuthors[0]}"
             android:textColor="#A4A4A6"
             android:textSize="10sp"
             app:layout_constrainedWidth="true"
@@ -133,7 +132,7 @@
             android:layout_marginTop="5dp"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"
-            android:text="@{channel.roomName}"
+            android:text="@{headerItem.roomName}"
             android:textColor="#4D4D4D"
             android:textSize="12sp"
             app:layout_constrainedWidth="true"

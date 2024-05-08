@@ -3,7 +3,6 @@ package com.example.bookchat.data.repository
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.example.bookchat.App
 import com.example.bookchat.data.datastore.clearData
 import com.example.bookchat.data.datastore.getDataFlow
 import com.example.bookchat.data.datastore.setData
@@ -12,13 +11,11 @@ import com.example.bookchat.data.mapper.toNetWork
 import com.example.bookchat.data.mapper.toOAuth2ProviderNetwork
 import com.example.bookchat.data.mapper.toUser
 import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.request.RequestUserSignIn
-import com.example.bookchat.data.request.RequestUserSignUp
-import com.example.bookchat.data.response.NeedToDeviceWarningException
-import com.example.bookchat.data.response.NeedToSignUpException
-import com.example.bookchat.data.response.NetworkIsNotConnectedException
-import com.example.bookchat.data.response.NickNameDuplicateException
-import com.example.bookchat.data.response.ResponseBodyEmptyException
+import com.example.bookchat.data.network.model.request.RequestUserSignIn
+import com.example.bookchat.data.network.model.response.NeedToDeviceWarningException
+import com.example.bookchat.data.network.model.response.NeedToSignUpException
+import com.example.bookchat.data.network.model.response.NickNameDuplicateException
+import com.example.bookchat.data.network.model.response.ResponseBodyEmptyException
 import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.model.IdToken
 import com.example.bookchat.domain.model.ReadingTaste
@@ -49,8 +46,6 @@ class ClientRepositoryImpl @Inject constructor(
 	override suspend fun signIn(
 		approveChangingDevice: Boolean
 	) {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
 		val requestUserSignIn = RequestUserSignIn(
 			fcmToken = getFCMToken().text,
 			deviceToken = getDeviceID(),
@@ -84,10 +79,9 @@ class ClientRepositoryImpl @Inject constructor(
 		readingTastes: List<ReadingTaste>,
 		userProfile: ByteArray?
 	) {
-		if (isNetworkConnected().not()) throw NetworkIsNotConnectedException()
 		val idToken = cachedIdToken ?: throw IOException("IdToken does not exist.")
 
-		val requestUserSignUp = RequestUserSignUp(
+		val requestUserSignUp = com.example.bookchat.data.network.model.request.RequestUserSignUp(
 			oauth2Provider = idToken.oAuth2Provider.toOAuth2ProviderNetwork(),
 			nickname = nickname,
 			readingTastes = readingTastes.map { it.toNetWork() },
@@ -115,19 +109,15 @@ class ClientRepositoryImpl @Inject constructor(
 
 	//TODO :회원 탈퇴 후 재가입 가능 기간 정책 결정해야함
 	override suspend fun withdraw() {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 		bookChatApi.withdraw()
 	}
 
 	override suspend fun getClientProfile(): User {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
 		cachedClient?.let { return it }
 		return bookChatApi.getUserProfile().toUser().also { cachedClient = it }
 	}
 
 	override suspend fun checkForDuplicateUserName(nickName: String) {
-		if (!isNetworkConnected()) throw NetworkIsNotConnectedException()
-
 		val response = bookChatApi.requestNameDuplicateCheck(nickName)
 		when (response.code()) {
 			200 -> {}
@@ -181,10 +171,6 @@ class ClientRepositoryImpl @Inject constructor(
 
 	private fun createExceptionMessage(responseCode: Int, responseErrorBody: String?): String {
 		return "responseCode : $responseCode , responseErrorBody : $responseErrorBody"
-	}
-
-	private fun isNetworkConnected(): Boolean {
-		return App.instance.isNetworkConnected()
 	}
 
 	companion object {

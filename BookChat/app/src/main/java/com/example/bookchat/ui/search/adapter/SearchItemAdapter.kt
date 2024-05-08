@@ -14,10 +14,12 @@ import com.example.bookchat.databinding.ItemSearchChannelDataBinding
 import com.example.bookchat.databinding.ItemSearchChannelEmptyBinding
 import com.example.bookchat.databinding.ItemSearchChannelHeaderBinding
 import com.example.bookchat.ui.search.model.SearchResultItem
+import com.example.bookchat.utils.BookImgSizeManager
 import javax.inject.Inject
 
-class SearchItemAdapter @Inject constructor() :
-	ListAdapter<SearchResultItem, SearchItemViewHolder>(SEARCH_ITEM_COMPARATOR) {
+class SearchItemAdapter @Inject constructor(
+	private val bookImgSizeManager: BookImgSizeManager
+) : ListAdapter<SearchResultItem, SearchItemViewHolder>(SEARCH_ITEM_COMPARATOR) {
 
 	var onBookHeaderBtnClick: (() -> Unit)? = null
 	var onBookItemClick: ((Int) -> Unit)? = null
@@ -59,7 +61,7 @@ class SearchItemAdapter @Inject constructor() :
 					LayoutInflater.from(parent.context), R.layout.item_search_book_data,
 					parent, false
 				)
-				return BookItemViewHolder(binding, onBookItemClick)
+				return BookItemViewHolder(binding, bookImgSizeManager, onBookItemClick)
 			}
 
 			R.layout.item_search_book_dummy -> {
@@ -67,7 +69,7 @@ class SearchItemAdapter @Inject constructor() :
 					LayoutInflater.from(parent.context), R.layout.item_search_book_dummy,
 					parent, false
 				)
-				return BookDummyViewHolder(binding)
+				return BookDummyViewHolder(binding, bookImgSizeManager)
 			}
 
 			R.layout.item_search_channel_header -> {

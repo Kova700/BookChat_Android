@@ -16,9 +16,12 @@ import com.example.bookchat.ui.channel.ChannelActivity
 import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_CHANNEL_ID
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
+import com.example.bookchat.utils.MakeChannelImgSizeManager
 import com.example.bookchat.utils.PermissionManager
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MakeChannelActivity : AppCompatActivity() {
@@ -26,6 +29,9 @@ class MakeChannelActivity : AppCompatActivity() {
 	private lateinit var binding: ActivityMakeChannelBinding
 
 	private val makeChannelViewModel: MakeChannelViewModel by viewModels()
+
+	@Inject
+	lateinit var makeChannelImgSizeManager: MakeChannelImgSizeManager
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -57,6 +63,7 @@ class MakeChannelActivity : AppCompatActivity() {
 	private fun initView() {
 		initChannelHashTagBar()
 		initChannelTitleInputBar()
+		makeChannelImgSizeManager.setMakeChannelImgSize(binding.channelImg)
 	}
 
 	private fun initChannelHashTagBar() {
@@ -147,5 +154,6 @@ class MakeChannelActivity : AppCompatActivity() {
 		is MakeChannelEvent.MoveToBookSelect -> moveToBookSelect()
 		is MakeChannelEvent.OpenGallery -> startImageEdit()
 		is MakeChannelEvent.MoveToChannel -> moveToChannel(event.channelId)
+		is MakeChannelEvent.MakeToast -> makeToast(event.stringId)
 	}
 }

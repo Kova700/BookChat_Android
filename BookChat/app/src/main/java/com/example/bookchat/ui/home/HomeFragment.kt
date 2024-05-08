@@ -38,6 +38,9 @@ class HomeFragment : Fragment() {
 	@Inject
 	lateinit var homeChannelAdapter: HomeChannelAdapter
 
+	@Inject
+	lateinit var mainBookItemDecoration: MainBookItemDecoration
+
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
@@ -106,7 +109,7 @@ class HomeFragment : Fragment() {
 	private fun initBookRcv() {
 		with(binding.readingBookRcvMain) {
 			adapter = mainReadingBookAdapter
-			addItemDecoration(MainBookItemDecoration())
+			addItemDecoration(mainBookItemDecoration)
 			layoutManager =
 				LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 		}

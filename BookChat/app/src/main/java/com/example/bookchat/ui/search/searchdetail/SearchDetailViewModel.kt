@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
-import com.example.bookchat.data.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.SearchFilter
@@ -22,7 +22,6 @@ import com.example.bookchat.ui.search.model.SearchResultItem
 import com.example.bookchat.ui.search.model.SearchTarget
 import com.example.bookchat.ui.search.searchdetail.SearchDetailUiState.UiState
 import com.example.bookchat.utils.BookImgSizeManager
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +37,7 @@ class SearchDetailViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val bookSearchRepository: BookSearchRepository,
 	private val channelSearchRepository: ChannelSearchRepository,
+	private val bookImgSizeManager: BookImgSizeManager
 ) : ViewModel() {
 	private val searchKeyword = savedStateHandle.get<String>(EXTRA_SEARCH_KEYWORD)!!
 	private val searchTarget = savedStateHandle.get<SearchTarget>(EXTRA_SEARCH_TARGET)!!
@@ -91,7 +91,7 @@ class SearchDetailViewModel @Inject constructor(
 	private fun groupBookItems(books: List<Book>): List<SearchResultItem> {
 		val groupedItems = mutableListOf<SearchResultItem>()
 		groupedItems.addAll(books.map { it.toBookItem() })
-		val dummyItemCount = BookImgSizeManager.getFlexBoxDummyItemCount(books.size)
+		val dummyItemCount = bookImgSizeManager.getFlexBoxDummyItemCount(books.size)
 		(0 until dummyItemCount).forEach { i -> groupedItems.add(SearchResultItem.BookDummy(i)) }
 		return groupedItems
 	}
@@ -111,7 +111,12 @@ class SearchDetailViewModel @Inject constructor(
 	}
 
 	private fun searchBooks() = viewModelScope.launch {
-		runCatching { bookSearchRepository.search(searchKeyword) }
+		runCatching {
+			bookSearchRepository.search(
+				keyword = searchKeyword,
+				loadSize = bookImgSizeManager.flexBoxBookSpanSize * 6
+			)
+		}
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 			.onFailure { failHandler(it) }
 	}
@@ -164,8 +169,11 @@ class SearchDetailViewModel @Inject constructor(
 	private fun failHandler(exception: Throwable) {
 		updateState { copy(uiState = UiState.ERROR) }
 		when (exception) {
-			is NetworkIsNotConnectedException -> makeToast(R.string.error_network)
-			else -> makeToast(R.string.error_else)
+			is NetworkIsNotConnectedException ->
+				startEvent(SearchDetailEvent.MakeToast(R.string.error_network))
+
+			else ->
+				startEvent(SearchDetailEvent.MakeToast(R.string.error_else))
 		}
 	}
 

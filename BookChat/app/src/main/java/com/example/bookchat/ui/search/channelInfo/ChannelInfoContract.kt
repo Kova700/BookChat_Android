@@ -23,5 +23,11 @@ data class ChannelInfoUiState(
 
 sealed class ChannelInfoEvent {
 	object MoveToBack : ChannelInfoEvent()
-	data class MoveToChannel(val channelId: Long) : ChannelInfoEvent()
+	data class MoveToChannel(
+		val channelId: Long
+	) : ChannelInfoEvent()
+
+	data class MakeToast(
+		val stringId: Int
+	) : ChannelInfoEvent()
 }

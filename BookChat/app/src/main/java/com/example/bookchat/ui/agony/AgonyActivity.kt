@@ -13,6 +13,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAgonyBinding
 import com.example.bookchat.ui.agony.adapter.AgonyAdapter
 import com.example.bookchat.ui.agonyrecord.AgonyRecordActivity
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -116,6 +117,7 @@ class AgonyActivity : AppCompatActivity() {
 
 			is AgonyEvent.OpenBottomSheetDialog -> openBottomSheetDialog(event.bookshelfItemId)
 			is AgonyEvent.RenewItemViewMode -> renewItemViewMode()
+			is AgonyEvent.MakeToast -> makeToast(event.stringId)
 		}
 	}
 

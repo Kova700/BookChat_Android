@@ -11,13 +11,23 @@ import androidx.fragment.app.DialogFragment
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogMakeChannelSelectBookBinding
 import com.example.bookchat.domain.model.Book
+import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.DialogSizeManager
+import javax.inject.Inject
 
 class MakeChannelBookSelectDialog(
 	private val onClickMakeChannel: () -> Unit,
 	val selectedBook: Book,
 ) : DialogFragment() {
+
 	private var _binding: DialogMakeChannelSelectBookBinding? = null
 	private val binding get() = _binding!!
+
+	@Inject
+	lateinit var bookImgSizeManager: BookImgSizeManager
+
+	@Inject
+	lateinit var dialogSizeManager: DialogSizeManager
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -35,11 +45,17 @@ class MakeChannelBookSelectDialog(
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+		initViewState()
 	}
 
 	override fun onDestroyView() {
 		super.onDestroyView()
 		_binding = null
+	}
+
+	private fun initViewState() {
+		bookImgSizeManager.setBookImgSize(binding.bookImg)
+		dialogSizeManager.setDialogSize(binding.makeChannelSelectBookDialogLayout)
 	}
 
 	fun onClickMakeChannel() {

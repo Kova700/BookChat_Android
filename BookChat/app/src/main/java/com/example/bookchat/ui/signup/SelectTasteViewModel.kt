@@ -4,8 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
-import com.example.bookchat.data.response.ForbiddenException
-import com.example.bookchat.data.response.NetworkIsNotConnectedException
+import com.example.bookchat.data.network.model.response.ForbiddenException
+import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.ui.signup.SignUpActivity.Companion.EXTRA_SIGNUP_USER_NICKNAME

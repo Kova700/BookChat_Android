@@ -8,7 +8,6 @@ import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.bookshelf.complete.CompleteBookShelfUiState.UiState
 import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -89,7 +88,7 @@ class CompleteBookShelfViewModel @Inject constructor(
 					bookShelfListItem.bookShelfId,
 					BookShelfState.COMPLETE
 				)
-			}.onFailure { makeToast(R.string.bookshelf_delete_fail) }
+			}.onFailure { startEvent(CompleteBookShelfEvent.MakeToast(R.string.bookshelf_delete_fail)) }
 		}
 
 	fun onItemClick(bookShelfListItem: BookShelfListItem) {

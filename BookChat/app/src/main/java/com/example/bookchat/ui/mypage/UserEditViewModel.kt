@@ -3,15 +3,13 @@ package com.example.bookchat.ui.mypage
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.App
 import com.example.bookchat.R
-import com.example.bookchat.data.response.NickNameDuplicateException
+import com.example.bookchat.data.network.model.response.NickNameDuplicateException
+import com.example.bookchat.domain.model.NameCheckStatus
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.model.NameCheckStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -86,7 +84,7 @@ class UserEditViewModel @Inject constructor(
 		when {
 			haveNewNickName() && !haveNewProfile() -> {
 				if (nameCheckStatus.value != NameCheckStatus.IsPerfect) {
-					makeToast(R.string.my_page_profile_need_name_dup_check)
+					startEvent(UserEditUiEvent.MakeToast(R.string.my_page_profile_need_name_dup_check))
 					return
 				}
 				//기존 User객체에 새로운 NickName담아서 변경 API호출
@@ -100,7 +98,7 @@ class UserEditViewModel @Inject constructor(
 
 			haveNewNickName() && haveNewProfile() -> {
 				if (nameCheckStatus.value != NameCheckStatus.IsPerfect) {
-					makeToast(R.string.my_page_profile_need_name_dup_check)
+					startEvent(UserEditUiEvent.MakeToast(R.string.my_page_profile_need_name_dup_check))
 					return
 				}
 				//기존 User객체에 닉네임 , 이미지 담아서 변경 API호출
@@ -117,8 +115,8 @@ class UserEditViewModel @Inject constructor(
 	/*이미지 ByteArray로 전달해야함*/
 	private fun requestReviseUserProfile() = viewModelScope.launch {
 		runCatching { }
-			.onSuccess { makeToast(R.string.my_page_profile_edit_success) }
-			.onFailure { makeToast(R.string.my_page_profile_edit_fail) }
+			.onSuccess { startEvent(UserEditUiEvent.MakeToast(R.string.my_page_profile_edit_success)) }
+			.onFailure { startEvent(UserEditUiEvent.MakeToast(R.string.my_page_profile_edit_fail)) }
 			.also { startEvent(UserEditUiEvent.Finish) }
 	}
 
@@ -150,6 +148,9 @@ class UserEditViewModel @Inject constructor(
 	sealed class UserEditUiEvent {
 		object Finish : UserEditUiEvent()
 		object UnknownError : UserEditUiEvent()
+		data class MakeToast(
+			val stringId: Int
+		) : UserEditUiEvent()
 	}
 
 	private fun failHandler(exception: Throwable) {
@@ -161,9 +162,5 @@ class UserEditViewModel @Inject constructor(
 
 			else -> startEvent(UserEditUiEvent.UnknownError)
 		}
-	}
-
-	private fun makeToast(stringId: Int) {
-		Toast.makeText(App.instance.applicationContext, stringId, Toast.LENGTH_SHORT).show()
 	}
 }

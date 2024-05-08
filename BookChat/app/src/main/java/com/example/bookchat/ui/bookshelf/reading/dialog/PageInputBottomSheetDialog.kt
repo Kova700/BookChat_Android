@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogPageInputBottomSheetBinding
+import com.example.bookchat.utils.makeToast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -48,9 +49,8 @@ class PageInputBottomSheetDialog : BottomSheetDialogFragment() {
 	}
 
 	private fun handleEvent(event: PageInputDialogEvent) = when (event) {
-		is PageInputDialogEvent.CloseDialog -> {
-			this.dismiss()
-		}
+		is PageInputDialogEvent.CloseDialog -> dismiss()
+		is PageInputDialogEvent.MakeToast -> makeToast(event.stringId)
 	}
 
 	companion object {

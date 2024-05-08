@@ -16,8 +16,12 @@ import com.example.bookchat.databinding.DialogReadingBookTapClickedBinding
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.ui.agony.AgonyActivity
 import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfViewModel
+import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.DialogSizeManager
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ReadingBookDialog : DialogFragment() {
@@ -30,6 +34,12 @@ class ReadingBookDialog : DialogFragment() {
 		requireParentFragment()
 	})
 
+	@Inject
+	lateinit var bookImgSizeManager: BookImgSizeManager
+
+	@Inject
+	lateinit var dialogSizeManager: DialogSizeManager
+
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
@@ -37,7 +47,7 @@ class ReadingBookDialog : DialogFragment() {
 	): View? {
 		_binding =
 			DataBindingUtil.inflate(inflater, R.layout.dialog_reading_book_tap_clicked, container, false)
-		binding.lifecycleOwner = this.viewLifecycleOwner
+		binding.lifecycleOwner = viewLifecycleOwner
 		binding.viewmodel = readingBookDialogViewModel
 		return binding.root
 	}
@@ -45,7 +55,9 @@ class ReadingBookDialog : DialogFragment() {
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+		observeUiState()
 		observeUiEvent()
+		initViewState()
 	}
 
 	override fun onDestroyView() {
@@ -53,8 +65,28 @@ class ReadingBookDialog : DialogFragment() {
 		_binding = null
 	}
 
+	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
+		readingBookDialogViewModel.uiState.collect { state ->
+			setViewState(state)
+		}
+	}
+
 	private fun observeUiEvent() = viewLifecycleOwner.lifecycleScope.launch {
 		readingBookDialogViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun initViewState() {
+		binding.readingBookRatingBar.setOnRatingChangeListener { ratingBar, rating, fromUser ->
+			readingBookDialogViewModel.onChangeStarRating(rating)
+		}
+		bookImgSizeManager.setBookImgSize(binding.bookImg)
+		dialogSizeManager.setDialogSize(binding.readingDialogLayout)
+	}
+
+	private fun setViewState(state: ReadingBookDialogUiState) {
+		if (binding.readingBookRatingBar.rating != state.starRating) {
+			binding.readingBookRatingBar.rating = state.starRating
+		}
 	}
 
 	private fun moveToAgony(bookShelfListItemId: Long) {
@@ -71,6 +103,7 @@ class ReadingBookDialog : DialogFragment() {
 	private fun handleEvent(event: ReadingBookDialogEvent) = when (event) {
 		is ReadingBookDialogEvent.MoveToAgony -> moveToAgony(event.bookShelfListItemId)
 		is ReadingBookDialogEvent.ChangeBookShelfTab -> moveToOtherTab(event.targetState)
+		is ReadingBookDialogEvent.MakeToast -> makeToast(event.stringId)
 	}
 
 	companion object {

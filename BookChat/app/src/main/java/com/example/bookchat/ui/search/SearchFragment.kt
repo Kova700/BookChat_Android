@@ -32,6 +32,7 @@ import com.example.bookchat.ui.search.dialog.SearchBookDialog
 import com.example.bookchat.ui.search.model.SearchTarget
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -105,7 +106,7 @@ class SearchFragment : Fragment() {
 	private fun setSearchBarState(uiState: SearchUiState) {
 		with(binding.searchEditText) {
 			if (uiState.searchKeyword != text.toString()) {
-				setText(searchViewModel.uiState.value.searchKeyword)
+				setText(uiState.searchKeyword)
 				setSelection(uiState.searchKeyword.length)
 			}
 		}
@@ -318,6 +319,7 @@ class SearchFragment : Fragment() {
 				moveToMakeChannelSelectBookDialog(event.book)
 
 			is SearchEvent.MoveToChannelInfo -> moveToChannelInfo(event.channelId)
+			is SearchEvent.MakeToast -> makeToast(event.stringId)
 		}
 	}
 

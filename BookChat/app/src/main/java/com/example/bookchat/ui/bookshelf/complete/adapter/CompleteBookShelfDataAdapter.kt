@@ -14,14 +14,16 @@ import com.example.bookchat.databinding.ItemCompleteBookshelfHeaderBinding
 import com.example.bookchat.ui.agonyrecord.AgonyRecordSwipeHelper
 import com.example.bookchat.ui.bookshelf.complete.CompleteBookShelfItem
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
+import com.example.bookchat.utils.BookImgSizeManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class CompleteBookShelfDataAdapter @Inject constructor() :
-	ListAdapter<CompleteBookShelfItem, CompleteBookViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
+class CompleteBookShelfDataAdapter @Inject constructor(
+	private val bookImgSizeManager: BookImgSizeManager
+) : ListAdapter<CompleteBookShelfItem, CompleteBookViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
 	var onItemClick: ((Int) -> Unit)? = null
 	var onLongItemClick: ((Int, Boolean) -> Unit)? = null
 	var onDeleteClick: ((Int) -> Unit)? = null
@@ -48,7 +50,13 @@ class CompleteBookShelfDataAdapter @Inject constructor() :
 					LayoutInflater.from(parent.context), R.layout.item_complete_bookshelf_data,
 					parent, false
 				)
-				return CompleteBookItemViewHolder(binding, onItemClick, onLongItemClick, onDeleteClick)
+				return CompleteBookItemViewHolder(
+					binding,
+					bookImgSizeManager,
+					onItemClick,
+					onLongItemClick,
+					onDeleteClick
+				)
 			}
 		}
 	}
@@ -104,6 +112,7 @@ class CompleteBookHeaderViewHolder(
 
 class CompleteBookItemViewHolder(
 	private val binding: ItemCompleteBookshelfDataBinding,
+	private val bookImgSizeManager: BookImgSizeManager,
 	private val onItemClick: ((Int) -> Unit)?,
 	private val onLongItemClick: ((Int, Boolean) -> Unit)?,
 	private val onDeleteClick: ((Int) -> Unit)?
@@ -120,6 +129,7 @@ class CompleteBookItemViewHolder(
 		binding.swipeBackground.setOnClickListener {
 			onDeleteClick?.invoke(bindingAdapterPosition)
 		}
+		bookImgSizeManager.setBookImgSize(binding.bookImg)
 	}
 
 	fun bind(bookShelfListItem: BookShelfListItem) {

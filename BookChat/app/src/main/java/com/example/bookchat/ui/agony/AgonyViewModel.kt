@@ -10,9 +10,7 @@ import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.agony.AgonyUiState.UiState
 import com.example.bookchat.ui.agony.mapper.toAgonyListItem
 import com.example.bookchat.ui.agony.model.AgonyListItem
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,7 +46,7 @@ class AgonyViewModel @Inject constructor(
 
 	private fun getItem() {
 		val item =
-			bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)?.toBookShelfListItem()
+			bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)
 		item?.let { updateState { copy(bookshelfItem = item) } }
 	}
 
@@ -86,8 +84,9 @@ class AgonyViewModel @Inject constructor(
 	private fun deleteAgonies() = viewModelScope.launch {
 		runCatching {
 			agonyRepository.deleteAgony(bookShelfListItemId, _isSelected.value.keys.toList())
-		}.onSuccess { clickEditCancelBtn() }
-			.onFailure { makeToast(R.string.agony_delete_fail) }
+		}
+			.onSuccess { clickEditCancelBtn() }
+			.onFailure { startEvent(AgonyEvent.MakeToast(R.string.agony_delete_fail)) }
 	}
 
 	fun onEditBtnClick() {
@@ -143,9 +142,7 @@ class AgonyViewModel @Inject constructor(
 	}
 
 	private inline fun updateState(block: AgonyUiState.() -> AgonyUiState) {
-		_uiState.update {
-			_uiState.value.block()
-		}
+		_uiState.update { _uiState.value.block() }
 	}
 
 	private fun handleError(throwable: Throwable) {
