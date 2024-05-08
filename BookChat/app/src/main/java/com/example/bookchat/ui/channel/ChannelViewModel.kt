@@ -16,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -143,9 +142,7 @@ class ChannelViewModel @Inject constructor(
 		stompHandler.connectSocket(
 			channelSId = uiStateFlow.value.channel?.roomSid ?: return@launch,
 			channelId = channelId
-		).catch { handleError(it) }.collect {
-
-		}
+		)
 	}
 
 	fun sendMessage() {

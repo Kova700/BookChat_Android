@@ -1,33 +1,35 @@
 package com.example.bookchat.data.mapper
 
-import com.example.bookchat.data.SocketMessage
 import com.example.bookchat.data.database.model.ChatEntity
+import com.example.bookchat.data.network.model.response.CommonMessage
+import com.example.bookchat.data.network.model.response.NotificationMessage
+import com.example.bookchat.data.network.model.response.SocketMessage
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.domain.model.User
 
 fun SocketMessage.toChatEntity(chatRoomId: Long, myUserId: Long): ChatEntity {
 	return when (this) {
-		is SocketMessage.CommonMessage ->
+		is CommonMessage ->
 			ChatEntity(
-				chatId = this.chatId,
+				chatId = chatId,
 				chatRoomId = chatRoomId,
-				senderId = this.senderId,
-				message = this.message,
+				senderId = senderId,
+				message = message,
 				chatType = getChatType(
 					senderId = senderId,
 					myUserId = myUserId
 				),
-				dispatchTime = this.dispatchTime,
+				dispatchTime = dispatchTime,
 			)
 
-		is SocketMessage.NotificationMessage ->
+		is NotificationMessage ->
 			ChatEntity(
-				chatId = this.chatId,
+				chatId = chatId,
 				chatRoomId = chatRoomId,
 				senderId = null,
-				dispatchTime = this.dispatchTime,
-				message = this.message,
+				dispatchTime = dispatchTime,
+				message = message,
 				chatType = getChatType(
 					senderId = null,
 					myUserId = myUserId
@@ -37,30 +39,30 @@ fun SocketMessage.toChatEntity(chatRoomId: Long, myUserId: Long): ChatEntity {
 }
 
 fun SocketMessage.toChat(
-	chatRoomId: Long,
+	channelId: Long,
 	myUserId: Long,
 	sender: User? = null,
 ): Chat {
 	return when (this) {
-		is SocketMessage.CommonMessage ->
+		is CommonMessage ->
 			Chat(
-				chatId = this.chatId,
-				chatRoomId = chatRoomId,
-				message = this.message,
+				chatId = chatId,
+				chatRoomId = channelId,
+				message = message,
 				chatType = getChatType(
 					senderId = senderId,
 					myUserId = myUserId
 				),
-				dispatchTime = this.dispatchTime,
+				dispatchTime = dispatchTime,
 				sender = sender,
 			)
 
-		is SocketMessage.NotificationMessage ->
+		is NotificationMessage ->
 			Chat(
-				chatId = this.chatId,
-				chatRoomId = chatRoomId,
-				dispatchTime = this.dispatchTime,
-				message = this.message,
+				chatId = chatId,
+				chatRoomId = channelId,
+				dispatchTime = dispatchTime,
+				message = message,
 				chatType = ChatType.Notice,
 				sender = null, //유저 정보 가져오기
 			)
