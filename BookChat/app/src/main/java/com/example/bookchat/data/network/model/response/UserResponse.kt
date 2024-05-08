@@ -11,5 +11,5 @@ data class UserResponse(
 	@SerializedName("userProfileImageUri")
 	val userProfileImageUri: String?,
 	@SerializedName("defaultProfileImageType")
-	val defaultProfileImageType: com.example.bookchat.data.network.model.UserDefaultProfileTypeNetwork,
+	val defaultProfileImageType: UserDefaultProfileTypeNetwork,
 )
