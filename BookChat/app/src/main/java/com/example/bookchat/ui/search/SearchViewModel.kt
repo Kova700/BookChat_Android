@@ -41,7 +41,8 @@ class SearchViewModel @Inject constructor(
 	private val searchHistoryRepository: SearchHistoryRepository,
 	private val bookImgSizeManager: BookImgSizeManager
 ) : ViewModel() {
-	private val searchPurpose = savedStateHandle.get<SearchPurpose>(EXTRA_SEARCH_PURPOSE)!!
+	private val searchPurpose =
+		savedStateHandle.get<SearchPurpose>(EXTRA_SEARCH_PURPOSE) ?: SearchPurpose.SEARCH_BOTH
 
 	private val _eventFlow = MutableSharedFlow<SearchEvent>()
 	val eventFlow get() = _eventFlow.asSharedFlow()

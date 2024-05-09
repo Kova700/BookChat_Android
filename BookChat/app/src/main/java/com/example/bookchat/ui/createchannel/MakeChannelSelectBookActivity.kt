@@ -20,6 +20,7 @@ class MakeChannelSelectBookActivity : AppCompatActivity() {
 	//TODO : Navigation 사용으로 수정
 	private val searchFragment by lazy {
 		SearchFragment().apply {
+			//여기서 searchFragment로 이동할 때, Extra Flag 날려야함
 			arguments = bundleOf(EXTRA_SEARCH_PURPOSE to SearchPurpose.MAKE_CHANNEL)
 		}
 	}
