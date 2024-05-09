@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
-import com.example.bookchat.databinding.FragmentBookShelfBinding
+import com.example.bookchat.databinding.FragmentBookshelfBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class BookShelfFragment : Fragment() {
 
-	private var _binding: FragmentBookShelfBinding? = null
+	private var _binding: FragmentBookshelfBinding? = null
 	private val binding get() = _binding!!
 	private val bookShelfViewModel by activityViewModels<BookShelfViewModel>()
 
@@ -28,7 +28,7 @@ class BookShelfFragment : Fragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View? {
-		_binding = DataBindingUtil.inflate(inflater, R.layout.fragment_book_shelf, container, false)
+		_binding = DataBindingUtil.inflate(inflater, R.layout.fragment_bookshelf, container, false)
 		pagerAdapter = PagerFragmentStateAdapter(this)
 		binding.lifecycleOwner = this.viewLifecycleOwner
 		binding.viewPager.adapter = pagerAdapter
