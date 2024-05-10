@@ -277,7 +277,7 @@
                     android:background="?android:selectableItemBackgroundBorderless"
                     android:src="@drawable/chat_send_btn"
                     android:visibility="@{viewmodel.inputtedMessage.blank ? View.INVISIBLE : View.VISIBLE}"
-                    android:onClick="@{() -> viewmodel.sendMessage()}"
+                    android:onClick="@{() -> viewmodel.onClickSendMessage()}"
                     app:layout_constraintStart_toEndOf="@+id/guideline_end_chat_input_layout"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
