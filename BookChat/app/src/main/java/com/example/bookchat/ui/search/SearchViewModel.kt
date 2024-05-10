@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @HiltViewModel
 class SearchViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
@@ -41,6 +40,7 @@ class SearchViewModel @Inject constructor(
 	private val searchHistoryRepository: SearchHistoryRepository,
 	private val bookImgSizeManager: BookImgSizeManager
 ) : ViewModel() {
+
 	private val searchPurpose =
 		savedStateHandle.get<SearchPurpose>(EXTRA_SEARCH_PURPOSE) ?: SearchPurpose.SEARCH_BOTH
 
@@ -140,6 +140,7 @@ class SearchViewModel @Inject constructor(
 	private fun search(keyword: String) = viewModelScope.launch {
 		updateState {
 			copy(
+				searchKeyword = keyword,
 				searchTapState = SearchTapState.Result,
 				searchResultState = SearchResultState.Loading
 			)
@@ -204,8 +205,8 @@ class SearchViewModel @Inject constructor(
 		}
 	}
 
-	fun onSearchBarTextChange(text: String?) {
-		if (text.isNullOrBlank()) return
+	fun onSearchBarTextChange(text: String) {
+		if (uiState.value.searchKeyword == text) return
 
 		updateState {
 			copy(
@@ -231,9 +232,8 @@ class SearchViewModel @Inject constructor(
 
 	fun onClickSearchHistory(position: Int) = viewModelScope.launch {
 		val keyword = uiState.value.searchHistory[position]
-		searchHistoryRepository.moveHistoryAtTheTop(position)
-		updateState { copy(searchKeyword = keyword) }
 		search(keyword)
+		searchHistoryRepository.moveHistoryAtTheTop(position)
 	}
 
 	fun onClickSearchHistoryDeleteBtn(position: Int) = viewModelScope.launch {
