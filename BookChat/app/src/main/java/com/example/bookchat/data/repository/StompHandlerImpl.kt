@@ -2,10 +2,10 @@ package com.example.bookchat.data.repository
 
 import com.example.bookchat.BuildConfig
 import com.example.bookchat.data.mapper.toChat
+import com.example.bookchat.data.network.model.request.RequestSendChat
 import com.example.bookchat.data.network.model.response.CommonMessage
 import com.example.bookchat.data.network.model.response.MessageType
 import com.example.bookchat.data.network.model.response.NotificationMessage
-import com.example.bookchat.data.network.model.request.RequestSendChat
 import com.example.bookchat.data.network.model.response.SocketMessage
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
@@ -23,13 +23,11 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.StompSession
-import org.hildan.krossbow.stomp.frame.FrameBody
-import org.hildan.krossbow.stomp.headers.StompSendHeaders
-import org.hildan.krossbow.stomp.headers.StompSubscribeHeaders
+import org.hildan.krossbow.stomp.sendText
+import org.hildan.krossbow.stomp.subscribe
 import javax.inject.Inject
 
 // TODO :SEND를 제외한 모든 Frame에 Receipt받게 헤더 수정 필요함
-// TOOD : 헤더에 토큰 제거
 class StompHandlerImpl @Inject constructor(
 	private val stompClient: StompClient,
 	private val channelRepository: ChannelRepository,
@@ -42,9 +40,9 @@ class StompHandlerImpl @Inject constructor(
 
 	private lateinit var stompSession: StompSession
 
-	override suspend fun connectSocket(channelSId: String, channelId: Long) {
+	override suspend fun connectSocket(channelSId: String, channelId: Long): Flow<SocketMessage> {
 		stompSession = getStompSession()
-		subscribeChatTopic(
+		return subscribeChatTopic(
 			stompSession = stompSession,
 			channelSId = channelSId,
 			channelId = channelId
@@ -62,7 +60,6 @@ class StompHandlerImpl @Inject constructor(
 		stompSession.disconnect()
 	}
 
-	//이렇게 보내면 토큰 자동 갱신은 어케 하누?
 	override suspend fun sendMessage(
 		channelId: Long,
 		message: String
@@ -71,33 +68,25 @@ class StompHandlerImpl @Inject constructor(
 			channelId = channelId,
 			message = message
 		)
-		stompSession.send(
-			StompSendHeaders(
-				destination = "${SEND_MESSAGE_DESTINATION}$channelId",
-				customHeaders = getHeader()
-			), FrameBody.Text(
-				gson.toJson(
-					RequestSendChat(
-						receiptId = receiptId,
-						message = message
-					)
+		stompSession.sendText(
+			destination = "${SEND_MESSAGE_DESTINATION}$channelId",
+			body = gson.toJson(
+				RequestSendChat(
+					receiptId = receiptId,
+					message = message
 				)
 			)
 		)
 	}
 
-	//이렇게 보내면 토큰 자동 갱신은 어케 하누?
 	private suspend fun subscribeChatTopic(
 		stompSession: StompSession,
 		channelSId: String,
 		channelId: Long
 	): Flow<SocketMessage> {
-		return stompSession.subscribe(
-			StompSubscribeHeaders(
-				destination = "${SUBSCRIBE_CHANNEL_DESTINATION}$channelSId",
-				customHeaders = getHeader()
-			)
-		).map { it.bodyAsText.parseToSocketMessage() }
+		return stompSession
+			.subscribe("${SUBSCRIBE_CHANNEL_DESTINATION}$channelSId")
+			.map { it.bodyAsText.parseToSocketMessage() }
 			.onEach { socketMessage ->
 				handleSocketMessage(
 					socketMessage = socketMessage,
@@ -262,6 +251,5 @@ class StompHandlerImpl @Inject constructor(
 		private const val AUTHORIZATION = "Authorization"
 		private const val SEND_MESSAGE_DESTINATION = "/subscriptions/send/chatrooms/"
 		private const val SUBSCRIBE_CHANNEL_DESTINATION = "/topic/"
-		private const val LOCAL_DATA_CHAT_LOAD_SIZE = 25
 	}
 }
