@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentSearchTapResultBinding
@@ -31,7 +31,7 @@ class SearchTapResultFragment : Fragment() {
 	@Inject
 	lateinit var searchItemAdapter: SearchItemAdapter
 
-	private val searchViewModel by viewModels<SearchViewModel>({ requireParentFragment() })
+	private val searchViewModel by activityViewModels<SearchViewModel>()
 
 	@Inject
 	lateinit var bookImgSizeManager: BookImgSizeManager

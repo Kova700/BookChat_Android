@@ -1,10 +1,12 @@
 package com.example.bookchat.data.repository
 
 import com.example.bookchat.BuildConfig
-import com.example.bookchat.data.MessageType
-import com.example.bookchat.data.SocketMessage
 import com.example.bookchat.data.mapper.toChat
+import com.example.bookchat.data.network.model.response.CommonMessage
+import com.example.bookchat.data.network.model.response.MessageType
+import com.example.bookchat.data.network.model.response.NotificationMessage
 import com.example.bookchat.data.network.model.request.RequestSendChat
+import com.example.bookchat.data.network.model.response.SocketMessage
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.repository.BookChatTokenRepository
@@ -27,7 +29,7 @@ import org.hildan.krossbow.stomp.headers.StompSubscribeHeaders
 import javax.inject.Inject
 
 // TODO :SEND를 제외한 모든 Frame에 Receipt받게 헤더 수정 필요함
-
+// TOOD : 헤더에 토큰 제거
 class StompHandlerImpl @Inject constructor(
 	private val stompClient: StompClient,
 	private val channelRepository: ChannelRepository,
@@ -40,9 +42,9 @@ class StompHandlerImpl @Inject constructor(
 
 	private lateinit var stompSession: StompSession
 
-	override suspend fun connectSocket(channelSId: String, channelId: Long): Flow<SocketMessage> {
+	override suspend fun connectSocket(channelSId: String, channelId: Long) {
 		stompSession = getStompSession()
-		return subscribeChatTopic(
+		subscribeChatTopic(
 			stompSession = stompSession,
 			channelSId = channelSId,
 			channelId = channelId
@@ -73,12 +75,14 @@ class StompHandlerImpl @Inject constructor(
 			StompSendHeaders(
 				destination = "${SEND_MESSAGE_DESTINATION}$channelId",
 				customHeaders = getHeader()
-			), FrameBody.Text(gson.toJson(
-				com.example.bookchat.data.network.model.request.RequestSendChat(
-					receiptId,
-					message
+			), FrameBody.Text(
+				gson.toJson(
+					RequestSendChat(
+						receiptId = receiptId,
+						message = message
+					)
 				)
-			))
+			)
 		)
 	}
 
@@ -107,31 +111,27 @@ class StompHandlerImpl @Inject constructor(
 		channelId: Long
 	) {
 		when (socketMessage) {
-			is SocketMessage.CommonMessage -> {
-				handleCommonMessage(
-					socketMessage = socketMessage,
-					channelId = channelId
-				)
-			}
+			is CommonMessage -> handleCommonMessage(
+				socketMessage = socketMessage,
+				channelId = channelId
+			)
 
-			is SocketMessage.NotificationMessage -> {
-				handleNoticeMessage(
-					socketMessage = socketMessage,
-					channelId = channelId
-				)
-			}
+			is NotificationMessage -> handleNoticeMessage(
+				socketMessage = socketMessage,
+				channelId = channelId
+			)
 		}
 	}
 
 	private suspend fun handleCommonMessage(
-		socketMessage: SocketMessage.CommonMessage,
+		socketMessage: CommonMessage,
 		channelId: Long
 	) {
 		val myUserId = clientRepository.getClientProfile().id
 		val receiptId = socketMessage.receiptId
 
 		val chat = socketMessage.toChat(
-			chatRoomId = channelId,
+			channelId = channelId,
 			myUserId = myUserId,
 			sender = userRepository.getUser(socketMessage.senderId)
 		)
@@ -147,12 +147,12 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	private suspend fun handleNoticeMessage(
-		socketMessage: SocketMessage.NotificationMessage,
+		socketMessage: NotificationMessage,
 		channelId: Long
 	) {
 		val myUserId = clientRepository.getClientProfile().id
 		val chat = socketMessage.toChat(
-			chatRoomId = channelId,
+			channelId = channelId,
 			myUserId = myUserId
 		)
 		// TODO :Target에 대한 DB수정 작업해야함
@@ -246,9 +246,9 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	private fun String.parseToSocketMessage(): SocketMessage {
-		runCatching { gson.fromJson(this, SocketMessage.CommonMessage::class.java) }
+		runCatching { gson.fromJson(this, CommonMessage::class.java) }
 			.onSuccess { return it }
-		runCatching { gson.fromJson(this, SocketMessage.NotificationMessage::class.java) }
+		runCatching { gson.fromJson(this, NotificationMessage::class.java) }
 			.onSuccess { return it }
 		throw JsonSyntaxException("Json cannot be deserialized to SocketMessage")
 	}

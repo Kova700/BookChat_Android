@@ -3,6 +3,7 @@ package com.example.bookchat.domain.repository
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelDefaultImageType
+import com.example.bookchat.domain.model.Chat
 import kotlinx.coroutines.flow.Flow
 
 interface ChannelRepository {
@@ -14,6 +15,7 @@ interface ChannelRepository {
 	): List<Channel>
 
 	suspend fun getChannel(channelId: Long): Channel
+	suspend fun getChannelForFCM(lastChat: Chat): Channel
 
 	suspend fun enter(channel: Channel)
 	suspend fun isAlreadyEntered(channelId: Long): Boolean

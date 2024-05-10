@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
@@ -22,7 +22,7 @@ class SearchTapHistoryFragment : Fragment() {
 	private var _binding: FragmentSearchTapHistoryBinding? = null
 	private val binding get() = _binding!!
 
-	private val searchViewModel by viewModels<SearchViewModel>({ requireParentFragment() })
+	private val searchViewModel by activityViewModels<SearchViewModel>()
 
 	@Inject
 	lateinit var searchHistoryAdapter: SearchHistoryAdapter

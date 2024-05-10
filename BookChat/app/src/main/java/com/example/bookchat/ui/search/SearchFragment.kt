@@ -16,9 +16,10 @@ import androidx.core.os.bundleOf
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentSearchBinding
 import com.example.bookchat.domain.model.Book
@@ -42,17 +43,13 @@ class SearchFragment : Fragment() {
 	private var _binding: FragmentSearchBinding? = null
 	private val binding get() = _binding!!
 
-	private val searchViewModel by viewModels<SearchViewModel>()
+	private val searchViewModel by activityViewModels<SearchViewModel>()
+
+	private lateinit var navHostFragment: NavHostFragment
 
 	private val imm by lazy {
 		requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 	}
-
-	//TODO : Navigation으로 수정
-	private val defaultTapFragment by lazy { SearchTapDefaultFragment() }
-	private val historyTapFragment by lazy { SearchTapHistoryFragment() }
-	private val searchingTapFragment by lazy { SearchTapSearchingFragment() }
-	private val resultTapFragment by lazy { SearchTapResultFragment() }
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -69,6 +66,7 @@ class SearchFragment : Fragment() {
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
+		initNavHost()
 		observeUiState()
 		observeEvent()
 		initSearchBar()
@@ -91,15 +89,24 @@ class SearchFragment : Fragment() {
 		searchViewModel.eventFlow.collect { event -> handleEvent(event) }
 	}
 
+	private fun initNavHost() {
+		navHostFragment =
+			childFragmentManager.findFragmentById(R.id.container_search) as NavHostFragment
+	}
+
 	private fun initSearchBar() {
 		with(binding.searchEditText) {
 			addTextChangedListener { text: Editable? ->
-				searchViewModel.onSearchBarTextChange(text?.toString())
+				val keyword = text?.toString() ?: return@addTextChangedListener
+				searchViewModel.onSearchBarTextChange(keyword)
 			}
 			setOnEditorActionListener { _, _, _ ->
 				searchViewModel.onClickSearchBtn()
 				false
 			}
+		}
+		if (searchViewModel.uiState.value.searchTapState !is SearchTapState.Default) {
+			foldSearchWindowAnimation()
 		}
 	}
 
@@ -123,32 +130,39 @@ class SearchFragment : Fragment() {
 	}
 
 	private fun isSearchTapDefault(searchTapState: SearchTapState) =
-		searchTapState == SearchTapState.Default
+		searchTapState is SearchTapState.Default
 
 	private fun isSearchTapDefaultOrHistory(searchTapState: SearchTapState) =
-		(searchTapState == SearchTapState.Default) || (searchTapState == SearchTapState.History)
+		(searchTapState is SearchTapState.Default) || (searchTapState is SearchTapState.History)
 
-	private fun handleFragment(searchTapState: SearchTapState) =
+	private fun handleFragment(searchTapState: SearchTapState) {
+		val currentDestinationId = navHostFragment.findNavController().currentDestination?.id
+		if (searchTapState.fragmentId == currentDestinationId) return
+
+		if (currentDestinationId != null) {
+			navHostFragment.findNavController().popBackStack(currentDestinationId, true)
+		}
 		when (searchTapState) {
 			is SearchTapState.Default -> {
-				closeSearchWindowAnimation()
-				replaceFragment(defaultTapFragment, FRAGMENT_TAG_DEFAULT, false)
+				expandSearchWindowAnimation()
+				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
 			}
 
 			is SearchTapState.History -> {
-				openSearchWindowAnimation() //TODO : 검색기록 누르면 다시 작동되는 상황이 생김
-				replaceFragment(historyTapFragment, FRAGMENT_TAG_HISTORY, true)
+				foldSearchWindowAnimation()
+				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
 			}
 
 			is SearchTapState.Searching -> {
-				replaceFragment(searchingTapFragment, FRAGMENT_TAG_SEARCHING, true)
+				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
 			}
 
 			is SearchTapState.Result -> {
 				closeKeyboard()
-				replaceFragment(resultTapFragment, FRAGMENT_TAG_RESULT, true)
+				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
 			}
 		}
+	}
 
 	private val detailActivityLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -174,24 +188,8 @@ class SearchFragment : Fragment() {
 		detailActivityLauncher.launch(intent)
 	}
 
-	private fun replaceFragment(newFragment: Fragment, tag: String, backStackFlag: Boolean) {
-		childFragmentManager.popBackStack(
-			SEARCH_TAP_FRAGMENT_FLAG,
-			FragmentManager.POP_BACK_STACK_INCLUSIVE
-		)
-		val childFragmentTransaction = childFragmentManager.beginTransaction()
-		with(childFragmentTransaction) {
-			setReorderingAllowed(true)
-			replace(R.id.searchPage_layout, newFragment, tag)
-			if (backStackFlag) addToBackStack(SEARCH_TAP_FRAGMENT_FLAG)
-			commit()
-		}
-
-	}
-
 	/* 애니메이션 처리 전부 MotionLayout으로 마이그레이션 예정 */
-	private fun openSearchWindowAnimation() {
-
+	private fun foldSearchWindowAnimation() {
 		val windowAnimator = AnimatorInflater.loadAnimator(
 			requireContext(),
 			R.animator.clicked_searchwindow_animator
@@ -230,8 +228,7 @@ class SearchFragment : Fragment() {
 	}
 
 	/* 애니메이션 처리 전부 MotionLayout으로 마이그레이션 예정 */
-	private fun closeSearchWindowAnimation() {
-
+	private fun expandSearchWindowAnimation() {
 		val windowAnimator = AnimatorInflater.loadAnimator(
 			requireContext(),
 			R.animator.unclicked_searchwindow_animator
@@ -324,15 +321,10 @@ class SearchFragment : Fragment() {
 	}
 
 	companion object {
-		const val FRAGMENT_TAG_DEFAULT = "Default"
-		const val FRAGMENT_TAG_HISTORY = "History"
-		const val FRAGMENT_TAG_SEARCHING = "Searching"
-		const val FRAGMENT_TAG_RESULT = "Result"
 		const val EXTRA_SEARCH_KEYWORD = "EXTRA_SEARCH_KEYWORD"
 		const val EXTRA_SEARCH_PURPOSE = "EXTRA_SEARCH_PURPOSE"
 		const val EXTRA_SEARCH_TARGET = "EXTRA_NECESSARY_DATA"
 		const val EXTRA_SEARCH_FILTER = "EXTRA_CHAT_SEARCH_FILTER"
-		const val SEARCH_TAP_FRAGMENT_FLAG = "SEARCH_TAP_FRAGMENT_FLAG"
 
 		const val EXTRA_SEARCHED_BOOK_ITEM_ID = "EXTRA_SEARCHED_BOOK_ITEM_ID"
 		const val DIALOG_TAG_SEARCH_BOOK = "DIALOG_TAG_SEARCH_BOOK"

@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.search
 
+import com.example.bookchat.R
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.SearchFilter
 import com.example.bookchat.domain.model.SearchPurpose
@@ -16,11 +17,22 @@ data class SearchUiState(
 	val searchHistory: List<String>
 ) {
 
-	sealed class SearchTapState {
-		object Default : SearchTapState()
-		object History : SearchTapState()
-		object Searching : SearchTapState()
-		object Result : SearchTapState()
+	sealed class SearchTapState(open val fragmentId: Int) {
+		data class Default(
+			override val fragmentId: Int = R.id.searchTapDefaultFragment
+		) : SearchTapState(fragmentId)
+
+		data class History(
+			override val fragmentId: Int = R.id.searchTapHistoryFragment
+		) : SearchTapState(fragmentId)
+
+		data class Searching(
+			override val fragmentId: Int = R.id.searchTapSearchingFragment
+		) : SearchTapState(fragmentId)
+
+		data class Result(
+			override val fragmentId: Int = R.id.searchTapResultFragment
+		) : SearchTapState(fragmentId)
 	}
 
 	sealed class SearchResultState {
@@ -32,7 +44,7 @@ data class SearchUiState(
 
 	companion object {
 		val DEFAULT = SearchUiState(
-			searchTapState = SearchTapState.Default,
+			searchTapState = SearchTapState.Default(),
 			searchPurpose = SearchPurpose.SEARCH_BOTH,
 			searchFilter = SearchFilter.BOOK_TITLE,
 			searchKeyword = "",

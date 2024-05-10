@@ -11,6 +11,7 @@ import com.example.bookchat.data.network.model.response.ResponseChannelInfo
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelDefaultImageType
+import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.UserRepository
@@ -45,11 +46,11 @@ class ChannelRepositoryImpl @Inject constructor(
 				{ channel -> -channel.roomId })
 		)
 	}.onEach { cachedChannels = it }
+
 	private var cachedChannels: List<Channel> = emptyList()
 	private var currentPage: Long? = null
 	private var isEndPage = false
 
-	//TODO : 상태 clear 함수 필요
 	override fun getChannelsFlow(): Flow<List<Channel>> {
 		return channels
 	}
@@ -67,6 +68,14 @@ class ChannelRepositoryImpl @Inject constructor(
 		val updatedChannel = getChannelWithInfo(channelId)
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 		return updatedChannel
+	}
+
+	override suspend fun getChannelForFCM(lastChat: Chat): Channel {
+		Log.d(TAG, "ChannelRepositoryImpl: getChannelForFCM() - called")
+		val channel = bookChatApi.getChannelForFCM(lastChat.chatRoomId).toChannel(lastChat)
+		channelDAO.upsertChannel(channel.toChannelEntity()) //lastChat에 대한 정보가 없이 저장되는데 괜찮나..?
+		Log.d(TAG, "ChannelRepositoryImpl: getChannelForFCM() - channel : $channel")
+		return channel
 	}
 
 	//Channel 세부 정보는 채팅방 들어 가면 getChannel에 의해 갱신될 예정
@@ -91,7 +100,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	//DB에 저장된 LastChat과, 기존에 저장되어있던 채널 정보들을 묶어서 반환 (like topPin..)
 	private suspend fun getChannelWithInfo(channelId: Long): Channel {
 		val channel =
-			channelDAO.getChannel(channelId)?.toChannel() ?: Channel.DEFAULT.copy(roomId = channelId)
+			channelDAO.getChannel(channelId)?.toChannel() ?: Channel.DEFAULT.copy(roomId = channelId) //이거 이렇게 해도 되나..? RoomSId 없으면 에러 터질텐데..?
 		return channel.copy(
 			lastChat = channel.lastChat?.chatId?.let { chatRepository.getChat(it) },
 			host = channel.host?.id?.let { userRepository.getUser(it) },
@@ -195,6 +204,13 @@ class ChannelRepositoryImpl @Inject constructor(
 			roomTags = channelInfo.roomTags,
 			roomCapacity = channelInfo.roomCapacity,
 		)
+	}
+
+	private fun clearCachedData() {
+		mapChannels.update { emptyMap() }
+		cachedChannels = emptyList()
+		currentPage = null
+		isEndPage = false
 	}
 
 	companion object {

@@ -212,10 +212,20 @@ interface BookChatApi {
 	/**------------채팅내역------------*/
 
 	@GET("/v1/api/chatrooms/{roomId}/chats")
-	suspend fun getChat(
+	suspend fun getChats(
 		@Path("roomId") roomId: Long,
 		@Query("size") size: Int,
 		@Query("postCursorId") postCursorId: Long?,
 		@Query("sort") sort: SearchSortOptionNetwork = SearchSortOptionNetwork.ID_DESC,
-	): RespondGetChat
+	): RespondGetChats
+
+	@GET("/v1/api/chats/{chatId}")
+	suspend fun getChatForFCM(
+		@Path("chatId") chatId: Long
+	): ChatResponseForFCM
+
+	@GET("/v1/api/users/chatrooms/{channelId}")
+	suspend fun getChannelForFCM(
+		@Path("channelId") channelId: Long
+	): ChannelResponseForFCM
 }

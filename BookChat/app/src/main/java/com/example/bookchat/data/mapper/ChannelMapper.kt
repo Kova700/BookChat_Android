@@ -3,6 +3,7 @@ package com.example.bookchat.data.mapper
 import com.example.bookchat.data.database.model.ChannelEntity
 import com.example.bookchat.data.database.model.combined.ChannelWithInfo
 import com.example.bookchat.data.network.model.response.ChannelResponse
+import com.example.bookchat.data.network.model.response.ChannelResponseForFCM
 import com.example.bookchat.data.network.model.response.ChannelSearchResponse
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
@@ -113,6 +114,18 @@ fun ChannelSearchResponse.toChannel(): Channel {
 		bookTitle = bookTitle,
 		bookAuthors = bookAuthors,
 		bookCoverImageUrl = bookCoverImageUri,
+	)
+}
+
+fun ChannelResponseForFCM.toChannel(lastChat: Chat): Channel {
+	return Channel(
+		roomId = roomId,
+		roomName = roomName,
+		roomSid = roomSid,
+		roomMemberCount = roomMemberCount,
+		defaultRoomImageType = defaultRoomImageType.toChannelDefaultImageType(),
+		roomImageUri = roomImageUri,
+		lastChat = lastChat
 	)
 }
 

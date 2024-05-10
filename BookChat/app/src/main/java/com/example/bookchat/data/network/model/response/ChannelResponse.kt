@@ -18,7 +18,7 @@ data class ChannelResponse(
 	@SerializedName("roomMemberCount")
 	val roomMemberCount: Long,
 	@SerializedName("defaultRoomImageType")
-	val defaultRoomImageType: com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork,
+	val defaultRoomImageType: ChannelDefaultImageTypeNetwork,
 	@SerializedName("lastChatId")
 	val lastChatId: Long? = null,
 	@SerializedName("lastChatContent")
@@ -32,7 +32,7 @@ data class ChannelResponse(
 	@SerializedName("senderProfileImageUrl")
 	val senderProfileImageUrl: String? = null,
 	@SerializedName("senderDefaultProfileImageType")
-	val senderDefaultProfileImageType: com.example.bookchat.data.network.model.UserDefaultProfileTypeNetwork? = null,
+	val senderDefaultProfileImageType: UserDefaultProfileTypeNetwork? = null,
 	@SerializedName("roomImageUri")
 	val roomImageUri: String? = null,
 ) {

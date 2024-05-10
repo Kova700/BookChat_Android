@@ -4,7 +4,10 @@ import com.example.bookchat.domain.model.Chat
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
-	fun getChatsFlow(channelId :Long): Flow<List<Chat>>
+	fun getChatsFlow(
+		initFlag: Boolean = false,
+		channelId: Long
+	): Flow<List<Chat>>
 
 	suspend fun getChats(
 		channelId: Long,
@@ -32,4 +35,5 @@ interface ChatRepository {
 	}
 
 	suspend fun getChat(chatId: Long): Chat?
+	suspend fun getChatForFCM(chatId: Long): Chat
 }

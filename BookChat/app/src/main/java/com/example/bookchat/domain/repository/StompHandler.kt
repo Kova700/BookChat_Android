@@ -1,11 +1,8 @@
 package com.example.bookchat.domain.repository
 
-import com.example.bookchat.data.SocketMessage
-import kotlinx.coroutines.flow.Flow
-
 interface StompHandler {
 
-	suspend fun connectSocket(channelSId: String, channelId: Long): Flow<SocketMessage>
+	suspend fun connectSocket(channelSId: String, channelId: Long)
 	suspend fun disconnectSocket()
 
 	suspend fun sendMessage(

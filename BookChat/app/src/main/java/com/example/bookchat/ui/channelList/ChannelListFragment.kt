@@ -12,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.databinding.FragmentChatRoomListBinding
+import com.example.bookchat.databinding.FragmentChannelListBinding
 import com.example.bookchat.ui.channel.ChannelActivity
 import com.example.bookchat.ui.channelList.adpater.ChannelListAdapter
 import com.example.bookchat.ui.channelList.model.ChannelListItem
@@ -24,7 +24,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ChannelListFragment : Fragment() {
 
-	private var _binding: FragmentChatRoomListBinding? = null
+	private var _binding: FragmentChannelListBinding? = null
 	private val binding get() = _binding!!
 	private val channelListViewModel: ChannelListViewModel by viewModels()
 
@@ -35,9 +35,9 @@ class ChannelListFragment : Fragment() {
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedInstanceState: Bundle?
-	): View? {
+	): View {
 		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.fragment_chat_room_list, container, false
+			inflater, R.layout.fragment_channel_list, container, false
 		)
 		binding.lifecycleOwner = this.viewLifecycleOwner
 		binding.viewmodel = channelListViewModel
