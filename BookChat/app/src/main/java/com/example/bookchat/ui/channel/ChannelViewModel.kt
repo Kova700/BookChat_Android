@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.data.database.dao.TempMessageDAO
 import com.example.bookchat.data.repository.ChattingRepositoryFacade
+import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.ui.channel.ChannelUiState.UiState
@@ -16,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -62,7 +64,6 @@ class ChannelViewModel @Inject constructor(
 		observeChannel()
 		observeChats()
 		initUiState()
-		connectSocket()
 	}
 
 	private fun initUiState() {
@@ -111,8 +112,9 @@ class ChannelViewModel @Inject constructor(
 
 	private fun getChannel(channelId: Long) = viewModelScope.launch {
 		runCatching { chattingRepositoryFacade.getChannel(channelId) }
-			.onSuccess {
+			.onSuccess { channel ->
 				updateState { copy(uiState = UiState.SUCCESS) }
+				connectSocket(channel)
 			}
 			.onFailure {
 				handleError(it)
@@ -141,14 +143,14 @@ class ChannelViewModel @Inject constructor(
 		tempMessageDAO.setTempSavedMessage(channelId, "")
 	}
 
-	private fun connectSocket() = viewModelScope.launch(Dispatchers.IO) {
+	private fun connectSocket(channel: Channel) = viewModelScope.launch(Dispatchers.IO) {
 		stompHandler.connectSocket(
-			channelSId = uiStateFlow.value.channel?.roomSid ?: return@launch,
-			channelId = channelId
-		)
+			channelSId = channel.roomSid,
+			channelId = channel.roomId
+		).catch { handleError(it) }.collect {}
 	}
 
-	fun sendMessage() {
+	private fun sendMessage() {
 		if (inputtedMessage.value.isBlank()) return
 
 		val message = inputtedMessage.value
@@ -169,6 +171,10 @@ class ChannelViewModel @Inject constructor(
 	private fun disconnectSocket() = viewModelScope.launch {
 		runCatching { stompHandler.disconnectSocket() }
 			.onFailure { handleError(it) }
+	}
+
+	fun onClickSendMessage() {
+		sendMessage()
 	}
 
 	fun onClickBackBtn() {
