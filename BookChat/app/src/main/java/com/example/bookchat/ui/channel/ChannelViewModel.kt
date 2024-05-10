@@ -50,10 +50,8 @@ class ChannelViewModel @Inject constructor(
 	private val _eventFlow = MutableSharedFlow<ChannelEvent>()
 	val eventFlow get() = _eventFlow
 
-	private val _uiStateFlow = MutableStateFlow<ChannelUiState>(ChannelUiState.DEFAULT)
-	val uiStateFlow = _uiStateFlow.asStateFlow()
-
-	val inputtedMessage = MutableStateFlow("")
+	private val _uiState = MutableStateFlow<ChannelUiState>(ChannelUiState.DEFAULT)
+	val uiState = _uiState.asStateFlow()
 
 	//아래 안보고 있을 때, 채팅들어오면 데이터 마지막 채팅 Notice 보여주는 방식으로 수정
 	var newChatNoticeFlow = MutableStateFlow<Chat?>(null)
@@ -93,7 +91,7 @@ class ChannelViewModel @Inject constructor(
 		if (isFirstItemOnScreen) return
 
 		val newLastChat = newChats.firstOrNull() ?: return
-		val existingLastChat = uiStateFlow.value.chats.firstOrNull()
+		val existingLastChat = uiState.value.chats.firstOrNull()
 		if (existingLastChat?.chatId == null || newLastChat.chatId > existingLastChat.chatId) {
 			newChatNoticeFlow.update { newLastChat }
 		}
@@ -123,18 +121,18 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	fun loadNextChats(lastVisibleItemPosition: Int) {
-		if (uiStateFlow.value.chats.size - 1 > lastVisibleItemPosition ||
-			uiStateFlow.value.uiState == UiState.LOADING
+		if (uiState.value.chats.size - 1 > lastVisibleItemPosition ||
+			uiState.value.uiState == UiState.LOADING
 		) return
 		getChats(channelId)
 	}
 
 	private fun getTempSavedMessage() = viewModelScope.launch {
-		inputtedMessage.value = tempMessageDAO.getTempMessage(channelId)?.message ?: ""
+		updateState { copy(enteredMessage = tempMessageDAO.getTempMessage(channelId)?.message ?: "") }
 	}
 
 	fun saveTempSavedMessage() = viewModelScope.launch {
-		val tempMessage = inputtedMessage.value
+		val tempMessage = uiState.value.enteredMessage
 		if (tempMessage.isBlank()) return@launch
 		tempMessageDAO.insertOrUpdateTempMessage(channelId, tempMessage)
 	}
@@ -151,11 +149,11 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun sendMessage() {
-		if (inputtedMessage.value.isBlank()) return
+		if (uiState.value.enteredMessage.isBlank()) return
 
-		val message = inputtedMessage.value
+		val message = uiState.value.enteredMessage
 		viewModelScope.launch(Dispatchers.IO) {
-			inputtedMessage.update { "" }
+			updateState { copy(enteredMessage = "") }
 			scrollForcedFlag = true
 			runCatching { stompHandler.sendMessage(channelId, message) }
 				.onFailure { handleError(it) }
@@ -171,6 +169,10 @@ class ChannelViewModel @Inject constructor(
 	private fun disconnectSocket() = viewModelScope.launch {
 		runCatching { stompHandler.disconnectSocket() }
 			.onFailure { handleError(it) }
+	}
+
+	fun onChangeEnteredMessage(text: String) {
+		updateState { copy(enteredMessage = text) }
 	}
 
 	fun onClickSendMessage() {
@@ -206,6 +208,6 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private inline fun updateState(block: ChannelUiState.() -> ChannelUiState) {
-		_uiStateFlow.update { _uiStateFlow.value.block() }
+		_uiState.update { _uiState.value.block() }
 	}
 }

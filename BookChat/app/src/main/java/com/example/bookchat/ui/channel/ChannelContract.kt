@@ -7,7 +7,7 @@ import com.example.bookchat.ui.channel.model.drawer.ChannelDrawerItem
 
 data class ChannelUiState(
 	val uiState: UiState,
-	val inputtedMessage: String,
+	val enteredMessage: String,
 	val channel: Channel?,
 	val drawerItems: List<ChannelDrawerItem>,
 	val chats: List<Chat>,
@@ -22,7 +22,7 @@ data class ChannelUiState(
 
 	companion object {
 		val DEFAULT = ChannelUiState(
-			inputtedMessage = "",
+			enteredMessage = "",
 			channel = null,
 			uiState = UiState.EMPTY,
 			drawerItems = listOf(ChannelDrawerItem.Header.DEFAULT),

@@ -5,6 +5,7 @@ import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -41,6 +42,7 @@ class ChannelActivity : AppCompatActivity() {
 		setBackPressedDispatcher()
 		initAdapter()
 		initRcv()
+		initViewState()
 		observeUiState()
 		observeEvent()
 	}
@@ -51,14 +53,38 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun observeUiState() = lifecycleScope.launch {
-		channelViewModel.uiStateFlow.collect { uiState ->
+		channelViewModel.uiState.collect { uiState ->
 			chatDataItemAdapter.submitList(uiState.chats)
 			channelDrawerAdapter.submitList(uiState.drawerItems)
+			setMessageBarState(uiState)
 		}
 	}
 
 	private fun observeEvent() = lifecycleScope.launch {
 		channelViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun initViewState() {
+		with(binding.chatInputEt) {
+			addTextChangedListener { text ->
+				val message = text?.toString() ?: return@addTextChangedListener
+				channelViewModel.onChangeEnteredMessage(message)
+			}
+			setOnEditorActionListener { _, _, _ ->
+				channelViewModel.onClickSendMessage()
+				false
+			}
+		}
+
+	}
+
+	private fun setMessageBarState(uiState: ChannelUiState) {
+		with(binding.chatInputEt) {
+			if (uiState.enteredMessage != text.toString()) {
+				setText(uiState.enteredMessage)
+				setSelection(uiState.enteredMessage.length)
+			}
+		}
 	}
 
 	private fun initAdapter() {
