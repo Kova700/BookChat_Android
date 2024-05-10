@@ -105,6 +105,9 @@ class SearchFragment : Fragment() {
 				false
 			}
 		}
+		if (searchViewModel.uiState.value.searchTapState !is SearchTapState.Default) {
+			foldSearchWindowAnimation()
+		}
 	}
 
 	private fun setSearchBarState(uiState: SearchUiState) {
@@ -127,30 +130,36 @@ class SearchFragment : Fragment() {
 	}
 
 	private fun isSearchTapDefault(searchTapState: SearchTapState) =
-		searchTapState == SearchTapState.Default
+		searchTapState is SearchTapState.Default
 
 	private fun isSearchTapDefaultOrHistory(searchTapState: SearchTapState) =
-		(searchTapState == SearchTapState.Default) || (searchTapState == SearchTapState.History)
+		(searchTapState is SearchTapState.Default) || (searchTapState is SearchTapState.History)
 
 	private fun handleFragment(searchTapState: SearchTapState) {
+		val currentDestinationId = navHostFragment.findNavController().currentDestination?.id
+		if (searchTapState.fragmentId == currentDestinationId) return
+
+		if (currentDestinationId != null) {
+			navHostFragment.findNavController().popBackStack(currentDestinationId, true)
+		}
 		when (searchTapState) {
 			is SearchTapState.Default -> {
 				expandSearchWindowAnimation()
-				navHostFragment.findNavController().navigate(R.id.searchTapDefaultFragment)
+				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
 			}
 
 			is SearchTapState.History -> {
 				foldSearchWindowAnimation()
-				navHostFragment.findNavController().navigate(R.id.searchTapHistoryFragment)
+				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
 			}
 
 			is SearchTapState.Searching -> {
-				navHostFragment.findNavController().navigate(R.id.searchTapSearchingFragment)
+				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
 			}
 
 			is SearchTapState.Result -> {
 				closeKeyboard()
-				navHostFragment.findNavController().navigate(R.id.searchTapResultFragment)
+				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
 			}
 		}
 	}

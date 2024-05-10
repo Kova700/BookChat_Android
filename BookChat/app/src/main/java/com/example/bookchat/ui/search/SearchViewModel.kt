@@ -141,7 +141,7 @@ class SearchViewModel @Inject constructor(
 		updateState {
 			copy(
 				searchKeyword = keyword,
-				searchTapState = SearchTapState.Result,
+				searchTapState = SearchTapState.Result(),
 				searchResultState = SearchResultState.Loading
 			)
 		}
@@ -200,7 +200,7 @@ class SearchViewModel @Inject constructor(
 		updateState {
 			copy(
 				searchKeyword = "",
-				searchTapState = SearchTapState.Default
+				searchTapState = SearchTapState.Default()
 			)
 		}
 	}
@@ -211,13 +211,13 @@ class SearchViewModel @Inject constructor(
 		updateState {
 			copy(
 				searchKeyword = text,
-				searchTapState = SearchTapState.Searching
+				searchTapState = SearchTapState.Searching()
 			)
 		}
 	}
 
 	fun onClickSearchBar() {
-		updateState { copy(searchTapState = SearchTapState.History) }
+		updateState { copy(searchTapState = SearchTapState.History()) }
 	}
 
 	fun onClickSearchBtn() = viewModelScope.launch {
