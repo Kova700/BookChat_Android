@@ -31,7 +31,7 @@ interface ChatRepository {
 	suspend fun insertAllChats(chats: List<Chat>)
 
 	companion object {
-		const val CHAT_LOAD_SIZE = 30
+		const val CHAT_LOAD_SIZE = 50
 	}
 
 	suspend fun getChat(chatId: Long): Chat?
