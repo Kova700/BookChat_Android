@@ -99,7 +99,7 @@ class SelectTasteViewModel @Inject constructor(
 	private fun failHandler(exception: Throwable) {
 		when (exception) {
 			is ForbiddenException -> startEvent(SelectTasteEvent.ErrorEvent(R.string.login_forbidden_user))
-			is NetworkIsNotConnectedException -> startEvent(SelectTasteEvent.ErrorEvent(R.string.error_network))
+			is NetworkIsNotConnectedException -> startEvent(SelectTasteEvent.ErrorEvent(R.string.error_network_not_connected))
 			else -> {
 				val errorMessage = exception.message
 				if (errorMessage.isNullOrBlank()) startEvent(SelectTasteEvent.ErrorEvent(R.string.error_else))

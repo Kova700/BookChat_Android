@@ -120,7 +120,7 @@ class SignUpViewModel @Inject constructor(
 	private fun failHandler(exception: Throwable) {
 		when (exception) {
 			is ForbiddenException -> startEvent(SignUpEvent.ErrorEvent(R.string.login_forbidden_user))
-			is NetworkIsNotConnectedException -> startEvent(SignUpEvent.ErrorEvent(R.string.error_network))
+			is NetworkIsNotConnectedException -> startEvent(SignUpEvent.ErrorEvent(R.string.error_network_not_connected))
 			is NickNameDuplicateException -> onDuplicateNickname()
 			else -> {
 				val errorMessage = exception.message

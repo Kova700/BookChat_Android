@@ -301,7 +301,7 @@ class SearchViewModel @Inject constructor(
 		updateState { copy(searchResultState = SearchResultState.Error) }
 		when (exception) {
 			is NetworkIsNotConnectedException ->
-				startEvent(SearchEvent.MakeToast(R.string.error_network))
+				startEvent(SearchEvent.MakeToast(R.string.error_network_not_connected))
 
 			else -> startEvent(SearchEvent.MakeToast(R.string.error_else))
 		}
