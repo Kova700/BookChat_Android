@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,7 +26,7 @@ class ChannelListFragment : Fragment() {
 
 	private var _binding: FragmentChannelListBinding? = null
 	private val binding get() = _binding!!
-	private val channelListViewModel: ChannelListViewModel by viewModels()
+	private val channelListViewModel by activityViewModels<ChannelListViewModel>()
 
 	@Inject
 	lateinit var channelListAdapter: ChannelListAdapter
