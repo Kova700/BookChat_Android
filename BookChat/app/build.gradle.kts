@@ -100,8 +100,9 @@ dependencies {
 	//Facebook.Shimmer
 	implementation("com.facebook.shimmer:shimmer:0.5.0")
 	//krossbow-stomp
-	implementation("org.hildan.krossbow:krossbow-stomp-core:5.1.0")
-	implementation("org.hildan.krossbow:krossbow-websocket-okhttp:5.1.0")
+	implementation("org.hildan.krossbow:krossbow-stomp-core:7.0.0")
+	implementation("org.hildan.krossbow:krossbow-websocket-builtin:7.0.0")
+	implementation("org.hildan.krossbow:krossbow-websocket-okhttp:7.0.0")
 	//OkHttp
 	implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
 	implementation("com.squareup.okhttp3:okhttp")
