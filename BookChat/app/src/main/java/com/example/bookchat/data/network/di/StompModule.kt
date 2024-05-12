@@ -11,10 +11,11 @@ import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.config.HeartBeat
 import org.hildan.krossbow.stomp.frame.StompFrame
 import org.hildan.krossbow.stomp.instrumentation.KrossbowInstrumentation
+import org.hildan.krossbow.websocket.WebSocketClient
 import org.hildan.krossbow.websocket.WebSocketFrame
 import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
+import org.hildan.krossbow.websocket.reconnection.withAutoReconnect
 import javax.inject.Singleton
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @Module
@@ -23,14 +24,23 @@ object StompModule {
 
 	@Provides
 	@Singleton
-	fun provideStompClient(
+	fun provideWebSocketClient(
 		okHttpClient: OkHttpClient,
+	): WebSocketClient {
+		return OkHttpWebSocketClient(okHttpClient)
+			.withAutoReconnect()
+	}
+
+	@Provides
+	@Singleton
+	fun provideStompClient(
+		webSocketClient: WebSocketClient,
 	): StompClient {
 		return StompClient(
-			webSocketClient = OkHttpWebSocketClient(okHttpClient),
+			webSocketClient = webSocketClient,
 			configure = {
 				autoReceipt = true
-				receiptTimeout = 10.minutes
+				receiptTimeout = 10.seconds
 				heartBeat = HeartBeat(
 					minSendPeriod = 15.seconds,
 					expectedPeriod = 15.seconds
