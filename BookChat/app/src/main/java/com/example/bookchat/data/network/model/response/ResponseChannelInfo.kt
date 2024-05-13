@@ -42,7 +42,7 @@ data class ChannelUser(
 	@SerializedName("profileImageUrl")
 	val profileImageUrl: String,
 	@SerializedName("defaultProfileImageType")
-	val defaultProfileImageType: com.example.bookchat.data.network.model.UserDefaultProfileTypeNetwork
+	val defaultProfileImageType: UserDefaultProfileTypeNetwork
 ) {
 	fun toUser() =
 		User(
