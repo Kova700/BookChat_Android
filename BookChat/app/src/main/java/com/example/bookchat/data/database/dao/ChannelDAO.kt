@@ -24,7 +24,7 @@ interface ChannelDAO {
 	suspend fun getChannel(channelId: Long): ChannelEntity?
 
 	@Insert(onConflict = OnConflictStrategy.IGNORE)
-	suspend fun insertIfNotPresent(chatRoom: ChannelEntity): Long
+	suspend fun insertIfNotPresent(channel: ChannelEntity): Long
 
 	suspend fun upsertAllChannels(channels: List<ChannelEntity>) {
 		for (channel in channels) {
@@ -32,18 +32,25 @@ interface ChannelDAO {
 		}
 	}
 
-	suspend fun upsertChannel(chatRoom: ChannelEntity) {
-		val id = insertIfNotPresent(chatRoom)
+	suspend fun upsertChannel(channel: ChannelEntity) {
+		val id = insertIfNotPresent(channel)
 		if (id != -1L) return
 
 		updateForInsert(
-			roomId = chatRoom.roomId,
-			roomName = chatRoom.roomName,
-			roomSid = chatRoom.roomSid,
-			roomMemberCount = chatRoom.roomMemberCount,
-			defaultRoomImageType = chatRoom.defaultRoomImageType,
-			roomImageUri = chatRoom.roomImageUri
+			roomId = channel.roomId,
+			roomName = channel.roomName,
+			roomSid = channel.roomSid,
+			roomMemberCount = channel.roomMemberCount,
+			defaultRoomImageType = channel.defaultRoomImageType,
+			roomImageUri = channel.roomImageUri
 		)
+
+		if (channel.lastChatId != null) {
+			updateLastChat(
+				channelId = channel.roomId,
+				lastChatId = channel.lastChatId
+			)
+		}
 	}
 
 	@Query(
@@ -67,10 +74,10 @@ interface ChannelDAO {
 	@Query(
 		"UPDATE Channel SET " +
 						"last_chat_id = :lastChatId " +
-						"WHERE room_id = :roomId"
+						"WHERE room_id = :channelId"
 	)
 	suspend fun updateLastChat(
-		roomId: Long,
+		channelId: Long,
 		lastChatId: Long
 	)
 
@@ -87,6 +94,7 @@ interface ChannelDAO {
 						"room_capacity = :roomCapacity " +
 						"WHERE room_id = :roomId"
 	)
+
 	suspend fun updateDetailInfo(
 		roomId: Long,
 		roomName: String,
@@ -100,21 +108,21 @@ interface ChannelDAO {
 		roomCapacity: Int
 	)
 
-	suspend fun isExist(roomId: Long): Boolean {
-		return (getChannel(roomId) != null)
+	suspend fun isExist(channelId: Long): Boolean {
+		return (getChannel(channelId) != null)
 	}
 
 	@Query(
 		"UPDATE Channel SET " +
 						"room_member_count = room_member_count + :offset " +
-						"WHERE room_id = :roomId"
+						"WHERE room_id = :channelId"
 	)
 	suspend fun updateMemberCount(
-		roomId: Long, offset: Int
+		channelId: Long, offset: Int
 	)
 
-	@Query("DELETE from Channel WHERE room_id = :roomId")
-	suspend fun delete(roomId: Long)
+	@Query("DELETE from Channel WHERE room_id = :channelId")
+	suspend fun delete(channelId: Long)
 
 	@Query("SELECT MAX(top_pin_num) FROM Channel")
 	suspend fun getMaxPinNum(): Int?
