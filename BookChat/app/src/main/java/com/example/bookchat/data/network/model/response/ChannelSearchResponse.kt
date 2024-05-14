@@ -31,11 +31,11 @@ data class ChannelSearchResponse(
 	@SerializedName("hostName")
 	val hostName: String,
 	@SerializedName("hostDefaultProfileImageType")
-	val hostDefaultProfileImageType: com.example.bookchat.data.network.model.UserDefaultProfileTypeNetwork,
+	val hostDefaultProfileImageType: UserDefaultProfileTypeNetwork,
 	@SerializedName("hostProfileImageUri")
 	val hostProfileImageUri: String,
 	@SerializedName("defaultRoomImageType")
-	val defaultRoomImageType: com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork,
+	val defaultRoomImageType: ChannelDefaultImageTypeNetwork,
 	@SerializedName("tags")
 	val tags: String,
 	@SerializedName("roomImageUri")
