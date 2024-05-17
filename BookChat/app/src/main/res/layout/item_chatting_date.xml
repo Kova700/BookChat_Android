@@ -3,19 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <variable
-            name="chat"
-            type="com.example.bookchat.domain.model.Chat" />
-        <variable
-            name="isSameDate"
-            type="Boolean" />
+            name="dateString"
+            type="String" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        setDateChatVisibility="@{isSameDate}"
-        android:paddingVertical="10dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingVertical="10dp">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_start"
@@ -38,8 +35,8 @@
             android:background="@drawable/chat_notice_background"
             android:paddingHorizontal="15dp"
             android:paddingVertical="5dp"
+            android:text="@{dateString}"
             android:textColor="#4D4D4D"
-            getDateKoreanString ="@{chat}"
             android:textSize="10sp"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="parent"

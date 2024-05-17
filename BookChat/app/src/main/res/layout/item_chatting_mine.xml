@@ -1,108 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
-        <import type="android.view.View"/>
 
         <variable
             name="chat"
-            type="com.example.bookchat.domain.model.Chat" />
-        <variable
-            name="isSameDate"
-            type="Boolean" />
+            type="com.example.bookchat.ui.channel.model.chat.ChatItem.MyChat" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <include
-            android:id="@+id/date_layout"
-            layout="@layout/item_chatting_date"
-            app:chat = "@{chat}"
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.30" />
+
+        <ImageView
+            android:id="@+id/chat_send_img"
+            setChatSendImgVisibility="@{chat.status}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/chat_wait_img"
             android:visibility="gone"
-            app:isSameDate = "@{isSameDate}"/>
+            app:layout_constraintBottom_toTopOf="@+id/chatting_time_tv"
+            app:layout_constraintEnd_toEndOf="@+id/chatting_time_tv" />
+
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
+            android:id="@+id/chat_send_fail_btn"
+            setChatFailBtnVisibility="@{chat.status}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:src="@drawable/chat_send_fail_btn"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/chatting_layout" />
+
+        <TextView
+            android:id="@+id/chatting_time_tv"
+            getFormattedTimeText="@{chat.dispatchTime}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:textColor="#303030"
+            android:textSize="10sp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/chatting_layout"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+            android:id="@+id/chatting_layout"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/date_layout">
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_start"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.30" />
-
-            <ImageView
-                android:id="@+id/chat_send_img"
-                setChatSendImgVisibility="@{chat.status}"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/chat_wait_img"
-                android:visibility="gone"
-                app:layout_constraintBottom_toTopOf="@+id/chatting_time_tv"
-                app:layout_constraintEnd_toEndOf="@+id/chatting_time_tv" />
-
-            <com.example.bookchat.ui.customview.AntiDupClickImageButton
-                android:id="@+id/chat_send_fail_btn"
-                setChatFailBtnVisibility="@{chat.status}"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:background="?android:selectableItemBackgroundBorderless"
-                android:src="@drawable/chat_send_fail_btn"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/chatting_layout" />
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/chat_bubble_blue"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="6dp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/chatting_time_tv"
-                getFormattedTimeText="@{chat.dispatchTime}"
+                android:id="@+id/chat_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
                 android:elegantTextHeight="true"
                 android:fontFamily="@font/notosanskr_regular"
+                android:text="@{chat.message}"
                 android:textColor="#303030"
-                android:textSize="10sp"
-                app:layout_constrainedWidth="true"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/chatting_layout"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/chatting_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:background="@drawable/chat_bubble_blue"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="6dp"
-                app:layout_constrainedWidth="true"
+                android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="@+id/guideline_start"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:id="@+id/chat_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:elegantTextHeight="true"
-                    android:fontFamily="@font/notosanskr_regular"
-                    android:text="@{chat.message}"
-                    android:textColor="#303030"
-                    android:textSize="12sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
