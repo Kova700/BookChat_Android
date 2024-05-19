@@ -7,6 +7,8 @@ sealed interface SocketMessage
 data class CommonMessage(
 	@SerializedName("chatId")
 	val chatId: Long,
+	@SerializedName("chatRoomId")
+	val channelId: Long,
 	@SerializedName("senderId")
 	val senderId: Long,
 	@SerializedName("receiptId")
@@ -15,35 +17,38 @@ data class CommonMessage(
 	val message: String,
 	@SerializedName("dispatchTime")
 	val dispatchTime: String,
-	@SerializedName("messageType")
-	val messageType: MessageType
 ) : SocketMessage
 
+//TODO : 채팅방별 소켓이 아닌 로그인 시 소켓 연결해서 메세지 관리하려면
+// NotificationMessage에도 ChatRoomId(ChannelId) 추가되어야함
 data class NotificationMessage(
-	@SerializedName("targetId")
-	val targetId: Long,
 	@SerializedName("chatId")
 	val chatId: Long,
+	@SerializedName("targetId")
+	val targetUserId: Long,
 	@SerializedName("message")
 	val message: String,
 	@SerializedName("dispatchTime")
 	val dispatchTime: String,
-	@SerializedName("messageType")
-	val messageType: MessageType
+	@SerializedName("notificationMessageType")
+	val notificationMessageType: NotificationMessageType
 ) : SocketMessage
 
-//TODO : CHAT은 어차피 CommonMessage로 구분이 되니까 필요 없어보임
-// + CommonMessage에도 MessageType 필드가 필요없어보임
-// 또한 MessageType -> NoticeMessageType느낌으로 사용
-// ENTER, EXIT에도 NOTICE를 앞에 붙이거나, 아예 전부 뺴거나,
-// 채팅방 터지는경우(방장 나가는경우)에 대한 Notice도 필요함
-// NOTICE_ENTER
-// NOTICE_USER_EXIT
-// NOTICE_HOST_EXIT
-enum class MessageType {
-	CHAT,
-	ENTER,
-	EXIT,
+//NOTICE_ENTER로 누가 들어왔는지 공지는 띄울 수 있으나
+//들어온 유저의 정보가 없어서
+//들어온 유저의 정보를 알수 없음으로 띄우고 있음
+//NOTICE_ENTER라면 들어온 유저 정보가 필요함
+//일단은 userID로 유저 정보 가져오는 API를 호출하기로 했음
+//아래 4가지
+//val id: Long,
+//	val nickname: String,
+//	val profileImageUrl: String?,
+//	val defaultProfileImageType: UserDefaultProfileType
+
+enum class NotificationMessageType {
+	NOTICE_ENTER,
+	NOTICE_EXIT,
+	NOTICE_HOST_EXIT,
 	NOTICE_HOST_DELEGATE,
 	NOTICE_KICK,
 	NOTICE_SUB_HOST_DISMISS,
