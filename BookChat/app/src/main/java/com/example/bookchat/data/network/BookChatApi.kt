@@ -185,12 +185,12 @@ interface BookChatApi {
 	): Response<Unit>
 
 	@POST("/v1/api/enter/chatrooms/{roomId}")
-	suspend fun enterChatRoom(
+	suspend fun enterChannel(
 		@Path("roomId") roomId: Long
 	): Response<Unit>
 
 	@DELETE("/v1/api/leave/chatrooms/{roomId}")
-	suspend fun leaveChatRoom(
+	suspend fun leaveChannel(
 		@Path("roomId") roomId: Long
 	): Response<Unit>
 
@@ -205,7 +205,7 @@ interface BookChatApi {
 	): ResponseGetChannelSearch
 
 	@GET("/v1/api/chatrooms/{roomId}")
-	suspend fun getChatRoomInfo(
+	suspend fun getChannelInfo(
 		@Path("roomId") roomId: Long
 	): ResponseChannelInfo
 
@@ -220,12 +220,17 @@ interface BookChatApi {
 	): RespondGetChats
 
 	@GET("/v1/api/chats/{chatId}")
-	suspend fun getChatForFCM(
+	suspend fun getChat(
 		@Path("chatId") chatId: Long
-	): ChatResponseForFCM
+	): RespondGetChat
 
-	@GET("/v1/api/users/chatrooms/{channelId}")
-	suspend fun getChannelForFCM(
-		@Path("channelId") channelId: Long
-	): ChannelResponseForFCM
+	@GET("/v1/api/users/chatrooms/{roomId}")
+	suspend fun getChannel(
+		@Path("roomId") channelId: Long
+	): ChannelSingleSearchResponse
+
+	@GET("/v1/api/members/{memberId}")
+	suspend fun getUser(
+		@Path("memberId") memberId: Long
+	) :UserResponse
 }

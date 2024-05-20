@@ -14,10 +14,10 @@ interface UserDAO {
     suspend fun insertIgnore(user: UserEntity): Long
 
     suspend fun upsertAllUsers(users: List<UserEntity>) {
-        for (user in users) insertOrUpdateUser(user)
+        for (user in users) upsertUser(user)
     }
 
-    suspend fun insertOrUpdateUser(user: UserEntity) {
+    suspend fun upsertUser(user: UserEntity) {
         val id = insertIgnore(user)
         if (id != -1L) return
 
@@ -27,7 +27,6 @@ interface UserDAO {
             profileImageUrl = user.profileImageUrl,
             defaultProfileImageType = user.defaultProfileImageType
         )
-
     }
 
     @Query(
@@ -46,13 +45,7 @@ interface UserDAO {
 
     @Query(
         "SELECT * FROM User " +
-                "WHERE id IN (:userIdList)"
-    )
-    suspend fun getUserList(userIdList: List<Long>): List<UserEntity>
-
-    @Query(
-        "SELECT * FROM User " +
                 "WHERE id = :userId"
     )
-    suspend fun getUser(userId: Long): UserEntity
+    suspend fun getUser(userId: Long): UserEntity?
 }
