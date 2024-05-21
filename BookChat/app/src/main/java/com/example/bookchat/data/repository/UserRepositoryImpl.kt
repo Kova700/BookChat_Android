@@ -15,10 +15,14 @@ class UserRepositoryImpl @Inject constructor(
 
 	/** 로컬에 있는 유저 우선적으로 쿼리 */
 	override suspend fun getUser(userId: Long): User {
-		return userDao.getUser(userId)?.toUser()
-			?: bookChatApi.getUser(userId).toUser().also {
-				userDao.upsertUser(it.toUserEntity())
-			}
+		val offlineData = userDao.getUser(userId)?.toUser()
+		if (offlineData != null) return offlineData
+
+		val response = runCatching { bookChatApi.getUser(userId).toUser() }
+		if (response.isFailure) return User.Default.copy(nickname = "알 수 없음") // 탈퇴한 유저 혹은 잘못된 요청
+
+		userDao.upsertUser(response.getOrThrow().toUserEntity())
+		return response.getOrThrow()
 	}
 
 	override suspend fun upsertAllUsers(users: List<User>) {
