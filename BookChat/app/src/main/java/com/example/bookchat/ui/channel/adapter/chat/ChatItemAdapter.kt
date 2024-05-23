@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemChattingDateBinding
+import com.example.bookchat.databinding.ItemChattingLastReadNoticeBinding
 import com.example.bookchat.databinding.ItemChattingMineBinding
 import com.example.bookchat.databinding.ItemChattingNoticeBinding
 import com.example.bookchat.databinding.ItemChattingOtherBinding
@@ -16,8 +17,12 @@ import javax.inject.Inject
 
 class ChatItemAdapter @Inject constructor() :
 	ListAdapter<ChatItem, ChatItemViewHolder>(CHAT_ITEM_COMPARATOR) {
-
 	lateinit var onClickUserProfile: (User) -> Unit
+
+	val focusedIndex
+		get() = currentList.indexOfFirst { chatItem ->
+			(chatItem is ChatItem.Message) && chatItem.isFocused
+		}
 
 	override fun getItemViewType(position: Int): Int {
 		return when (getItem(position)) {
@@ -25,6 +30,7 @@ class ChatItemAdapter @Inject constructor() :
 			is ChatItem.AnotherUser -> R.layout.item_chatting_other
 			is ChatItem.DateSeparator -> R.layout.item_chatting_date
 			is ChatItem.Notification -> R.layout.item_chatting_notice
+			is ChatItem.LastReadChatNotice -> R.layout.item_chatting_last_read_notice
 		}
 	}
 
@@ -67,6 +73,15 @@ class ChatItemAdapter @Inject constructor() :
 					parent, false
 				)
 				return DateSeparatorViewHolder(binding)
+			}
+
+			R.layout.item_chatting_last_read_notice -> {
+				val binding: ItemChattingLastReadNoticeBinding = DataBindingUtil.inflate(
+					LayoutInflater.from(parent.context),
+					R.layout.item_chatting_last_read_notice,
+					parent, false
+				)
+				return LastReadNoticeViewHolder(binding)
 			}
 
 			else -> throw RuntimeException("Received unknown ViewHolderType")

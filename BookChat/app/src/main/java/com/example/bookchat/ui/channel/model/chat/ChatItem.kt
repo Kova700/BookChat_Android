@@ -6,36 +6,45 @@ import com.example.bookchat.domain.model.User
 sealed interface ChatItem {
 	fun getCategoryId(): Long {
 		return when (this) {
-			is MyChat -> chatId
-			is AnotherUser -> chatId
-			is Notification -> chatId
+			is Message -> chatId
 			is DateSeparator -> date.hashCode().toLong()
+			is LastReadChatNotice -> hashCode().toLong()
 		}
 	}
 
+	sealed class Message(
+		open val chatId: Long,
+		open val isFocused: Boolean
+	) : ChatItem
+
 	data class MyChat(
-		val chatId: Long,
+		override val chatId: Long,
 		val chatRoomId: Long,
 		val message: String,
 		val status: ChatStatus = ChatStatus.SUCCESS,
 		val dispatchTime: String,
-		val sender: User?
-	) : ChatItem
+		val sender: User?,
+		override val isFocused: Boolean
+	) : Message(chatId, isFocused)
 
 	data class AnotherUser(
-		val chatId: Long,
+		override val chatId: Long,
 		val chatRoomId: Long,
 		val message: String,
 		val dispatchTime: String,
-		val sender: User?
-	) : ChatItem
+		val sender: User?,
+		override val isFocused: Boolean
+	) : Message(chatId, isFocused)
 
 	data class Notification(
-		val chatId: Long,
+		override val chatId: Long,
 		val chatRoomId: Long,
 		val message: String,
 		val dispatchTime: String,
-	) : ChatItem
+		override val isFocused: Boolean
+	) : Message(chatId, isFocused)
+
+	object LastReadChatNotice : ChatItem
 
 	data class DateSeparator(
 		val date: String,

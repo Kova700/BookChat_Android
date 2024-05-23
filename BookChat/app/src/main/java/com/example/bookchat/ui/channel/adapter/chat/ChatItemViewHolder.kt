@@ -2,8 +2,8 @@ package com.example.bookchat.ui.channel.adapter.chat
 
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookchat.databinding.EmptyLayoutBinding
 import com.example.bookchat.databinding.ItemChattingDateBinding
+import com.example.bookchat.databinding.ItemChattingLastReadNoticeBinding
 import com.example.bookchat.databinding.ItemChattingMineBinding
 import com.example.bookchat.databinding.ItemChattingNoticeBinding
 import com.example.bookchat.databinding.ItemChattingOtherBinding
@@ -49,9 +49,10 @@ class DateSeparatorViewHolder(
 		val item = chatItem as ChatItem.DateSeparator
 		binding.dateString = item.date
 	}
-
 }
 
-//TODO : 리팩토링해서 제거
-class EmptyViewHolder(val binding: EmptyLayoutBinding) :
-	RecyclerView.ViewHolder(binding.root)
+class LastReadNoticeViewHolder(
+	val binding: ItemChattingLastReadNoticeBinding
+) : ChatItemViewHolder(binding) {
+	override fun bind(chatItem: ChatItem) {}
+}
