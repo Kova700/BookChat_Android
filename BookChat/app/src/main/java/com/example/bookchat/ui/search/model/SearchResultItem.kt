@@ -35,7 +35,7 @@ sealed interface SearchResultItem {
 		val roomId: Long,
 		val roomName: String,
 		val roomSid: String,
-		val roomMemberCount: Long,
+		val roomMemberCount: Int,
 		val defaultRoomImageType: ChannelDefaultImageType,
 		val notificationFlag: Boolean = true,
 		val topPinNum: Int = 0,
