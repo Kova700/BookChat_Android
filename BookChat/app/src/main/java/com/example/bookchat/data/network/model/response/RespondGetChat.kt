@@ -3,7 +3,7 @@ package com.example.bookchat.data.network.model.response
 import com.example.bookchat.domain.model.User
 import com.google.gson.annotations.SerializedName
 
-data class ChatResponseForFCM(
+data class RespondGetChat(
 	@SerializedName("chatId")
 	val chatId: Long,
 	@SerializedName("chatRoomId")
