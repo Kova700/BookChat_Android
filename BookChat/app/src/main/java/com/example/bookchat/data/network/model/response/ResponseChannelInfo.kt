@@ -2,6 +2,7 @@ package com.example.bookchat.data.network.model.response
 
 import com.example.bookchat.data.mapper.toUserDefaultProfileType
 import com.example.bookchat.data.network.model.UserDefaultProfileTypeNetwork
+import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.User
 import com.google.gson.annotations.SerializedName
 
@@ -23,7 +24,11 @@ data class ResponseChannelInfo(
 	@SerializedName("roomSubHostList")
 	val roomSubHostList: List<ChannelUser>?,
 	@SerializedName("roomGuestList")
-	val roomGuestList: List<ChannelUser>?
+	val roomGuestList: List<ChannelUser>?,
+	@SerializedName("isBanned")
+	val isBanned :Boolean,
+	@SerializedName("isExploded")
+	val isExploded :Boolean
 ) {
 	val participants
 		get() = mutableListOf<User>().apply {
@@ -31,6 +36,24 @@ data class ResponseChannelInfo(
 			roomSubHostList?.let { addAll(it.map(ChannelUser::toUser)) }
 			roomGuestList?.let { addAll(it.map(ChannelUser::toUser)) }
 		}.toList()
+
+	val participantIds
+		get() = mutableListOf<Long>().apply {
+			add(roomHost.id)
+			roomSubHostList?.let { user -> addAll(user.map(ChannelUser::id)) }
+			roomGuestList?.let { user -> addAll(user.map(ChannelUser::id)) }
+		}.toList()
+
+	val participantAuthorities
+		get() = mutableMapOf<Long, ChannelMemberAuthority>().apply {
+			this[roomHost.id] = ChannelMemberAuthority.HOST
+			roomSubHostList?.let { list ->
+				list.map { user -> this[user.id] = ChannelMemberAuthority.SUB_HOST }
+			}
+			roomGuestList?.let { list ->
+				list.map { user -> this[user.id] = ChannelMemberAuthority.GUEST }
+			}
+		}
 }
 
 //TODO : UserResponse와 프로퍼티명 통일하여 개선 필요
