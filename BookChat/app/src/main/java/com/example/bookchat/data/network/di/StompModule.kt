@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
 import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.config.HeartBeat
@@ -16,6 +17,7 @@ import org.hildan.krossbow.websocket.WebSocketFrame
 import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
 import org.hildan.krossbow.websocket.reconnection.withAutoReconnect
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @Module
@@ -24,11 +26,11 @@ object StompModule {
 
 	@Provides
 	@Singleton
+	/** withAutoReconnect : 소켓 재연결만 반영되고 재구독 기능은 아직 개발되지 않음으로 사용 X*/
 	fun provideWebSocketClient(
 		okHttpClient: OkHttpClient,
 	): WebSocketClient {
 		return OkHttpWebSocketClient(okHttpClient)
-			.withAutoReconnect()
 	}
 
 	@Provides
@@ -42,13 +44,13 @@ object StompModule {
 				autoReceipt = true
 				receiptTimeout = 10.seconds
 				heartBeat = HeartBeat(
-					minSendPeriod = 15.seconds,
-					expectedPeriod = 15.seconds
+					minSendPeriod = 10.seconds,
+					expectedPeriod = 10.seconds
 				)
-				instrumentation = debugInstrumentation
+				defaultSessionCoroutineContext = Dispatchers.IO
+//				instrumentation = debugInstrumentation
 			})
 	}
-	//TODO :직렬화 로직 추가 가능한지 확인
 
 	private val debugInstrumentation = object : KrossbowInstrumentation {
 		override suspend fun onWebSocketFrameReceived(frame: WebSocketFrame) {
