@@ -4,6 +4,7 @@
     <string name="error_network_not_connected">네트워크가 연결되어 있지 않습니다.\n네트워크를 연결해주세요.</string>
     <string name="error_network_error">네트워크가 불안정합니다.\n잠시 후 다시 시도해주세요.</string>
     <string name="error_kakao_login">카카오 로그인에 문제가 발생하였습니다. 잠시 후 다시 시도해 주세요.</string>
+    <string name="error_socket_connect">서버와의 연결을 실패했습니다. 잠시 후 다시 시도해주세요.</string>
     <string name="error_else">일시적인 현상이거나 네트워크 문제일 수 있으니,\n잠시 후 다시 시도해 주세요.\n계속해서 문제가 발생하는 경우 문의를 부탁드립니다.</string>
 
     <!--permission-->
