@@ -3,7 +3,7 @@ package com.example.bookchat.data.mapper
 import com.example.bookchat.data.database.model.ChatEntity
 import com.example.bookchat.data.database.model.combined.ChatWithUser
 import com.example.bookchat.data.network.model.response.ChatResponse
-import com.example.bookchat.data.network.model.response.ChatResponseForFCM
+import com.example.bookchat.data.network.model.response.RespondGetChat
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.ChatType
@@ -11,7 +11,7 @@ import com.example.bookchat.domain.model.User
 
 fun ChatResponse.toChatEntity(
 	chatRoomId: Long,
-	myUserId: Long
+	clientId: Long
 ): ChatEntity {
 
 	return ChatEntity(
@@ -22,14 +22,14 @@ fun ChatResponse.toChatEntity(
 		message = this.message,
 		chatType = getChatType(
 			senderId = senderId,
-			myUserId = myUserId
+			clientId = clientId
 		)
 	)
 }
 
 fun ChatResponse.toChat(
 	chatRoomId: Long,
-	myUserId: Long
+	clientId: Long
 ): Chat {
 
 	return Chat(
@@ -39,7 +39,7 @@ fun ChatResponse.toChat(
 		message = this.message,
 		chatType = getChatType(
 			senderId = senderId,
-			myUserId = myUserId
+			clientId = clientId
 		),
 		sender = senderId?.let {
 			User.Default.copy(
@@ -65,13 +65,13 @@ fun ChatEntity.toChat(): Chat {
 	)
 }
 
-fun ChatResponseForFCM.toChat(myUserId: Long): Chat {
+fun RespondGetChat.toChat(clientId: Long): Chat {
 	return Chat(
 		chatId = chatId,
 		chatRoomId = channelId,
 		chatType = getChatType(
 			senderId = sender.id,
-			myUserId = myUserId
+			clientId = clientId
 		),
 		message = message,
 		dispatchTime = dispatchTime,
@@ -105,10 +105,10 @@ fun Chat.toChatEntity(): ChatEntity {
 
 fun getChatType(
 	senderId: Long?,
-	myUserId: Long
+	clientId: Long
 ): ChatType {
 	return when (senderId) {
-		myUserId -> ChatType.Mine
+		clientId -> ChatType.Mine
 		null -> ChatType.Notice
 		else -> ChatType.Other
 	}
@@ -116,11 +116,11 @@ fun getChatType(
 
 fun List<ChatResponse>.toChatEntity(
 	chatRoomId: Long,
-	myUserId: Long
+	clientId: Long
 ) = this.map {
 	it.toChatEntity(
 		chatRoomId = chatRoomId,
-		myUserId = myUserId
+		clientId = clientId
 	)
 }
 
