@@ -16,6 +16,7 @@ import com.example.bookchat.data.network.model.response.NeedToDeviceWarningExcep
 import com.example.bookchat.data.network.model.response.NeedToSignUpException
 import com.example.bookchat.data.network.model.response.NickNameDuplicateException
 import com.example.bookchat.data.network.model.response.ResponseBodyEmptyException
+import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.model.IdToken
 import com.example.bookchat.domain.model.ReadingTaste
@@ -31,13 +32,13 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.resume
 
+//TODO : BookChatToken, FCMToken , DeviceUUID Repository 구분필요
+//TODO : 로그아웃, 회원탈퇴 때문에 Repository전부 주입으로 여기로 들어와야할듯?
 class ClientRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi,
 	private val dataStore: DataStore<Preferences>,
 	private val bookChatTokenRepository: BookChatTokenRepository,
-) : ClientRepository,
-	BookChatTokenRepository by bookChatTokenRepository {
-
+) : ClientRepository {
 	private val deviceUUIDKey = stringPreferencesKey(DEVICE_UUID_KEY)
 
 	private var cachedClient: User? = null
@@ -57,7 +58,7 @@ class ClientRepositoryImpl @Inject constructor(
 			200 -> {
 				val token = response.body()
 				token?.let {
-					saveBookChatToken(token.toBookChatToken())
+					bookChatTokenRepository.saveBookChatToken(token.toBookChatToken())
 					return
 				}
 				throw ResponseBodyEmptyException(response.errorBody()?.string())
@@ -99,11 +100,18 @@ class ClientRepositoryImpl @Inject constructor(
 		)
 	}
 
+	override suspend fun renewBookChatToken(): BookChatToken? {
+		val refreshToken = bookChatTokenRepository.getBookChatToken()?.refreshToken ?: return null
+		val newToken = bookChatApi.renewBookChatToken(refreshToken).toBookChatToken()
+		bookChatTokenRepository.saveBookChatToken(newToken)
+		return newToken
+	}
+
 	override suspend fun signOut(needAServer: Boolean) {
 		if (needAServer) {
 			//Server FCM토큰 삭제 or logout API 호출
 		}
-		clearBookChatToken()
+		bookChatTokenRepository.clearBookChatToken()
 		//로컬에 FCM 토큰, 북챗 토큰, Room, DataStore 초기화
 	}
 
@@ -132,7 +140,7 @@ class ClientRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun renewFCMToken(fcmToken: FCMToken) {
-		if (isBookChatTokenExist().not()) return
+		if (bookChatTokenRepository.isBookChatTokenExist().not()) return
 		//TODO : 매번 로그인 시에 호출하여 서버에 등록된 FCM 토큰 덮어쓰기
 		// 가장 최근 기기로 알람가게 구현
 	}

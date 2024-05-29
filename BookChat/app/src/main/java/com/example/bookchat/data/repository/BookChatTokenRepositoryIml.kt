@@ -6,8 +6,6 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.bookchat.data.datastore.clearData
 import com.example.bookchat.data.datastore.getDataFlow
 import com.example.bookchat.data.datastore.setData
-import com.example.bookchat.data.mapper.toBookChatToken
-import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.google.gson.Gson
@@ -15,7 +13,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 class BookChatTokenRepositoryIml @Inject constructor(
-	private val bookchatApi: BookChatApi,
 	private val dataStore: DataStore<Preferences>,
 	private val gson: Gson,
 ) : BookChatTokenRepository {
@@ -30,12 +27,6 @@ class BookChatTokenRepositoryIml @Inject constructor(
 
 	override suspend fun saveBookChatToken(token: BookChatToken) {
 		dataStore.setData(bookChatTokenKey, gson.toJson(token))
-	}
-
-	override suspend fun renewBookChatToken(): BookChatToken? {
-		return getBookChatToken()?.refreshToken
-			?.let { bookchatApi.renewBookChatToken(it) }?.toBookChatToken()
-			.also { bookchatToken -> bookchatToken?.let { saveBookChatToken(it) } }
 	}
 
 	override suspend fun isBookChatTokenExist(): Boolean {

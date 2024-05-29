@@ -1,5 +1,6 @@
 package com.example.bookchat.domain.repository
 
+import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.model.IdToken
 import com.example.bookchat.domain.model.ReadingTaste
@@ -9,6 +10,7 @@ interface ClientRepository {
 	suspend fun signIn(
 		approveChangingDevice: Boolean = false
 	)
+	suspend fun renewBookChatToken(): BookChatToken?
 
 	suspend fun signUp(
 		nickname: String,
