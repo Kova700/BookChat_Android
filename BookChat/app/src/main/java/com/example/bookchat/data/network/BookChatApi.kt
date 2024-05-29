@@ -35,9 +35,13 @@ interface BookChatApi {
 		@Body requestUserSignIn: RequestUserSignIn
 	): Response<BookChatTokenResponse>
 
+	@POST("/v1/api/auth/token")
+	suspend fun renewBookChatToken(
+		@Body refreshToken: String
+	): BookChatTokenResponse
+
 	@DELETE("/v1/api/users")
-	suspend fun withdraw(
-	)
+	suspend fun withdraw()
 
 	@GET("/v1/api/users/profile")
 	suspend fun getUserProfile(
@@ -232,5 +236,5 @@ interface BookChatApi {
 	@GET("/v1/api/members/{memberId}")
 	suspend fun getUser(
 		@Path("memberId") memberId: Long
-	) :UserResponse
+	): UserResponse
 }
