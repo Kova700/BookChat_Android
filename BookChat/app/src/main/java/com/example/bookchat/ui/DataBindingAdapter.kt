@@ -447,7 +447,7 @@ object DataBindingAdapter {
 
 	/** MakeChatRoom 채팅방 생성 기본 이미지 세팅*/
 	@JvmStatic
-	@BindingAdapter("channelDefaultImageType", "loadByteArray", requireAll = false)
+	@BindingAdapter("channelDefaultImageType", "loadChannelImageByteArray", requireAll = false)
 	fun setMakeChannelImg(
 		view: ImageView,
 		channelDefaultImageType: ChannelDefaultImageType,
