@@ -48,7 +48,7 @@ class MakeChannelViewModel @Inject constructor(
 	}
 
 	private fun enterChannel(channel: Channel) = viewModelScope.launch {
-		runCatching { channelRepository.enter(channel) }
+		runCatching { channelRepository.enterChannel(channel) }
 			.onSuccess { startEvent(MakeChannelEvent.MoveToChannel(channel.roomId)) }
 			.onFailure { startEvent(MakeChannelEvent.MakeToast(R.string.enter_chat_room_fail)) }
 	}
