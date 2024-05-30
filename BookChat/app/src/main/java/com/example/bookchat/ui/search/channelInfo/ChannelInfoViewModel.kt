@@ -44,8 +44,14 @@ class ChannelInfoViewModel @Inject constructor(
 	}
 
 	//TODO : 이미 입장되어있는 채팅방이더라도 200이 넘어와서 따로, 예외처리 하지 않았음
+	// isEntered 반영하면 됨
 	private fun enterChannel() = viewModelScope.launch {
-		runCatching { channelRepository.enter(uiState.value.channel) }
+		if (channelRepository.isChannelAlreadyEntered(uiState.value.channel.roomId)) {
+			startEvent(ChannelInfoEvent.MoveToChannel(uiState.value.channel.roomId))
+			return@launch
+		}
+
+		runCatching { channelRepository.enterChannel(uiState.value.channel) }
 			.onSuccess { startEvent(ChannelInfoEvent.MoveToChannel(uiState.value.channel.roomId)) }
 			.onFailure {
 				failHandler(it)
@@ -53,12 +59,8 @@ class ChannelInfoViewModel @Inject constructor(
 			}
 	}
 
-	fun onClickEnterBtn() = viewModelScope.launch {
-		if (channelRepository.isAlreadyEntered(uiState.value.channel.roomId).not()) {
-			enterChannel()
-			return@launch
-		}
-		startEvent(ChannelInfoEvent.MoveToChannel(uiState.value.channel.roomId))
+	fun onClickEnterBtn() {
+		enterChannel()
 	}
 
 	fun onClickBackBtn() {
