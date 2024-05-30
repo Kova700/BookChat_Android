@@ -1,10 +1,10 @@
 package com.example.bookchat.data.network.model.response
 
+import com.example.bookchat.data.mapper.getChatType
 import com.example.bookchat.data.mapper.toUserDefaultProfileType
 import com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork
 import com.example.bookchat.data.network.model.UserDefaultProfileTypeNetwork
 import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.domain.model.User
 import com.google.gson.annotations.SerializedName
 
@@ -23,7 +23,7 @@ data class ChannelSearchResponse(
 	@SerializedName("bookCoverImageUri")
 	val bookCoverImageUri: String,
 	@SerializedName("roomMemberCount")
-	val roomMemberCount: Long,
+	val roomMemberCount: Int,
 	@SerializedName("roomSize")
 	val roomSize: Int,
 	@SerializedName("hostId")
@@ -47,7 +47,11 @@ data class ChannelSearchResponse(
 	@SerializedName("lastChatMessage")
 	val lastChatMessage: String? = null,
 	@SerializedName("lastChatDispatchTime")
-	val lastChatDispatchTime: String? = null
+	val lastChatDispatchTime: String? = null,
+	@SerializedName("isEntered")
+	val isEntered :Boolean, //TODO : Channel말고 isEntered 필드 반영하는 새로운 data class만들어야할듯?
+	@SerializedName("isBanned")
+	val isBanned :Boolean
 ) {
 	val host
 		get() = User(
@@ -57,20 +61,23 @@ data class ChannelSearchResponse(
 			defaultProfileImageType = hostDefaultProfileImageType.toUserDefaultProfileType(),
 		)
 
-	val lastChat
-		get() = lastChatId?.let { chatId ->
-			Chat(
-				chatId = chatId,
-				chatRoomId = roomId,
-				message = lastChatMessage!!,
-				chatType = ChatType.UNKNOWN,
-				dispatchTime = lastChatDispatchTime!!,
-				sender = lastChatSenderId?.let { senderId ->
-					User.Default.copy(
-						id = senderId
-					)
-				}
-			)
-		}
+	suspend fun getLastChat(
+		clientId: Long,
+		getUser: suspend (Long) -> User
+	): Chat? {
+		if (lastChatId == null) return null
+
+		return Chat(
+			chatId = lastChatId,
+			chatRoomId = roomId,
+			message = lastChatMessage!!,
+			chatType = getChatType(
+				senderId = lastChatSenderId,
+				clientId = clientId
+			),
+			dispatchTime = lastChatDispatchTime!!,
+			sender = lastChatSenderId?.let { getUser(it) }
+		)
+	}
 
 }
