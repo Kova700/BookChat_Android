@@ -2,8 +2,8 @@ package com.example.bookchat.ui.channelList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.data.repository.ChattingRepositoryFacade
 import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.ui.channelList.ChannelListUiState.UiState
 import com.example.bookchat.ui.channelList.mapper.toChannelListItem
 import com.example.bookchat.ui.channelList.model.ChannelListItem
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChannelListViewModel @Inject constructor(
-	private val chattingRepositoryFacade: ChattingRepositoryFacade
+	private val channelRepository: ChannelRepository
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<ChannelListUiEvent>()
@@ -30,14 +30,15 @@ class ChannelListViewModel @Inject constructor(
 
 	init {
 		observeChannels()
-		getChannels()
+		getChannels() //TODO : 인터넷 끊겨있다가 인터넷 연결되면 매번 다시 호출 Trigger
 	}
 
 	private fun observeChannels() = viewModelScope.launch {
-		chattingRepositoryFacade.getChannelsFlow().map { groupItems(it) }
+		channelRepository.getChannelsFlow().map { groupItems(it) }
 			.collect { newChannels -> updateState { copy(channelListItem = newChannels) } }
 	}
 
+	//TODO : Mapper로 이전
 	private fun groupItems(channels: List<Channel>): List<ChannelListItem> {
 		val groupedItems = mutableListOf<ChannelListItem>()
 		if (channels.isEmpty()) return groupedItems
@@ -49,7 +50,7 @@ class ChannelListViewModel @Inject constructor(
 
 	private fun getChannels() = viewModelScope.launch {
 		updateState { copy(uiState = UiState.LOADING) }
-		runCatching { chattingRepositoryFacade.getChannels() }
+		runCatching { channelRepository.getChannels() }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 			.onFailure { handleError(it) }
 	}
