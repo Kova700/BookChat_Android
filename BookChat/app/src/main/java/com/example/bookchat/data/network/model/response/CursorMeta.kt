@@ -16,5 +16,5 @@ data class CursorMeta(
     @SerializedName("first")
     val first :Boolean,
     @SerializedName("nextCursorId")
-    val nextCursorId :Long
+    val nextCursorId :Long?
 )
