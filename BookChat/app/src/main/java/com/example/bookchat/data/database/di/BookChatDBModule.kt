@@ -8,8 +8,8 @@ import com.example.bookchat.data.database.dao.ChatDAO
 import com.example.bookchat.data.database.dao.TempMessageDAO
 import com.example.bookchat.data.database.dao.UserDAO
 import com.example.bookchat.data.database.typeconverter.LongListTypeConverter
+import com.example.bookchat.data.database.typeconverter.ParticipantAuthoritiesTypeConverter
 import com.example.bookchat.data.database.typeconverter.StringListTypeConverter
-import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,10 +28,12 @@ object BookChatDBModule {
 		@ApplicationContext context: Context,
 		stringListTypeConverter: StringListTypeConverter,
 		longListTypeConverter: LongListTypeConverter,
+		participantAuthoritiesTypeConverter: ParticipantAuthoritiesTypeConverter,
 	): BookChatDB {
 		return Room.databaseBuilder(context, BookChatDB::class.java, DB_NAME)
 			.addTypeConverter(stringListTypeConverter)
 			.addTypeConverter(longListTypeConverter)
+			.addTypeConverter(participantAuthoritiesTypeConverter)
 			.build()
 	}
 
@@ -57,18 +59,6 @@ object BookChatDBModule {
 	@Singleton
 	fun provideTempMessageDAO(bookChatDB: BookChatDB): TempMessageDAO {
 		return bookChatDB.tempMessageDAO()
-	}
-
-	@Provides
-	@Singleton
-	fun provideStringListTypeConverter(gson: Gson): StringListTypeConverter {
-		return StringListTypeConverter(gson)
-	}
-
-	@Provides
-	@Singleton
-	fun provideLongListTypeConverter(gson: Gson): LongListTypeConverter {
-		return LongListTypeConverter(gson)
 	}
 
 }

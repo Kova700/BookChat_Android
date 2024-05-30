@@ -57,6 +57,7 @@
             app:layout_constraintStart_toEndOf="@+id/cardView"
             app:layout_constraintTop_toTopOf="@+id/cardView" />
 
+        <!--BackEnd 정비 후, 구현 예정-->
         <TextView
             android:id="@+id/unchecked_chat_count_tv"
             android:layout_width="wrap_content"
@@ -65,7 +66,6 @@
             android:layout_marginEnd="20dp"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_bold"
-            android:text="999+"
             android:textColor="#5648FF"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@+id/chat_room_title_tv"

@@ -1,7 +1,7 @@
 package com.example.bookchat.ui.channelList.model
 
-import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelDefaultImageType
+import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.User
 
@@ -19,10 +19,14 @@ sealed interface ChannelListItem {
 		val roomId: Long,
 		val roomName: String,
 		val roomSid: String,
-		val roomMemberCount: Long,
+		val roomMemberCount: Int,
 		val defaultRoomImageType: ChannelDefaultImageType,
 		val notificationFlag: Boolean = true,
 		val topPinNum: Int = 0,
+		val isExploded: Boolean = false,
+		val isBanned: Boolean = false,
+		val participants: List<User>? = null,
+		val participantAuthorities: Map<Long, ChannelMemberAuthority>? = null,
 		val roomImageUri: String? = null,
 		val lastChat: Chat? = null,
 		val host: User? = null,
@@ -34,28 +38,9 @@ sealed interface ChannelListItem {
 		val bookAuthors: List<String>? = null,
 		val bookCoverImageUrl: String? = null,
 	) : ChannelListItem {
-		val bookAuthorsString
-			get() = bookAuthors?.joinToString(",")
-
-		val tagsString
-			get() = roomTags?.joinToString(",")
-
-		val participants
-			get() = mutableListOf<User>().apply {
-				host?.let { add(it) }
-				subHosts?.let { addAll(it) }
-				guests?.let { addAll(it) }
-			}.toList()
-
-		val participantIds
-			get() = mutableListOf<Long>().apply {
-				host?.id?.let { add(it) }
-				subHosts?.map { it.id }?.let { addAll(it) }
-				guests?.map { it.id }?.let { addAll(it) }
-			}.toList()
 
 		companion object {
-			val DEFAULT = Channel(
+			val DEFAULT = ChannelItem(
 				roomId = 0L,
 				roomName = "",
 				roomSid = "",

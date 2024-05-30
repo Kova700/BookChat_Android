@@ -32,6 +32,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//TODO: 페이징 결과가 이상함
+// (이전 코드에서는 계속 페이징 되는데 현재 코드는 페이징이 더 이상 이어지지 않음)
+//  페이징 size 키워보는거 추천
 @HiltViewModel
 class SearchDetailViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
@@ -170,7 +173,7 @@ class SearchDetailViewModel @Inject constructor(
 		updateState { copy(uiState = UiState.ERROR) }
 		when (exception) {
 			is NetworkIsNotConnectedException ->
-				startEvent(SearchDetailEvent.MakeToast(R.string.error_network))
+				startEvent(SearchDetailEvent.MakeToast(R.string.error_network_not_connected))
 
 			else ->
 				startEvent(SearchDetailEvent.MakeToast(R.string.error_else))

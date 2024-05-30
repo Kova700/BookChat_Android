@@ -81,7 +81,7 @@ class LoginViewModel @Inject constructor(
 			is NeedToSignUpException -> startEvent(LoginEvent.MoveToSignUp)
 			is NeedToDeviceWarningException -> startEvent(LoginEvent.ShowDeviceWarning)
 			is ForbiddenException -> startEvent(LoginEvent.ErrorEvent(R.string.login_forbidden_user))
-			is NetworkIsNotConnectedException -> startEvent(LoginEvent.ErrorEvent(R.string.error_network))
+			is NetworkIsNotConnectedException -> startEvent(LoginEvent.ErrorEvent(R.string.error_network_not_connected))
 			is KakaoLoginFailException -> startEvent(LoginEvent.ErrorEvent(R.string.error_kakao_login))
 			else -> {
 				val errorMessage = exception.message

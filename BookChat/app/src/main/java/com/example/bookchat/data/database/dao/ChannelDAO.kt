@@ -4,18 +4,24 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.bookchat.data.database.model.CHANNEL_ENTITY_TABLE_NAME
 import com.example.bookchat.data.database.model.ChannelEntity
 import com.example.bookchat.domain.model.ChannelDefaultImageType
+import com.example.bookchat.domain.model.ChannelMemberAuthority
 
 @Dao
 interface ChannelDAO {
 
 	@Query(
 		"SELECT * FROM Channel " +
-						"WHERE room_id IN (:channelIds) " +
-						"ORDER BY top_pin_num DESC, last_chat_id DESC, room_id DESC"
+						"WHERE room_id > :baseId " +
+						"ORDER BY top_pin_num DESC, " +
+						"last_chat_id IS NULL DESC, " +
+						"last_chat_id DESC, " +
+						"room_id DESC " +
+						"LIMIT :loadSize"
 	)
-	suspend fun getChannels(channelIds: List<Long>): List<ChannelEntity>
+	suspend fun getChannels(loadSize: Int, baseId :Long?): List<ChannelEntity>
 
 	@Query(
 		"SELECT * FROM Channel " +
@@ -24,7 +30,7 @@ interface ChannelDAO {
 	suspend fun getChannel(channelId: Long): ChannelEntity?
 
 	@Insert(onConflict = OnConflictStrategy.IGNORE)
-	suspend fun insertIfNotPresent(chatRoom: ChannelEntity): Long
+	suspend fun insertIfNotPresent(channel: ChannelEntity): Long
 
 	suspend fun upsertAllChannels(channels: List<ChannelEntity>) {
 		for (channel in channels) {
@@ -32,18 +38,25 @@ interface ChannelDAO {
 		}
 	}
 
-	suspend fun upsertChannel(chatRoom: ChannelEntity) {
-		val id = insertIfNotPresent(chatRoom)
+	suspend fun upsertChannel(channel: ChannelEntity) {
+		val id = insertIfNotPresent(channel)
 		if (id != -1L) return
 
 		updateForInsert(
-			roomId = chatRoom.roomId,
-			roomName = chatRoom.roomName,
-			roomSid = chatRoom.roomSid,
-			roomMemberCount = chatRoom.roomMemberCount,
-			defaultRoomImageType = chatRoom.defaultRoomImageType,
-			roomImageUri = chatRoom.roomImageUri
+			roomId = channel.roomId,
+			roomName = channel.roomName,
+			roomSid = channel.roomSid,
+			roomMemberCount = channel.roomMemberCount,
+			defaultRoomImageType = channel.defaultRoomImageType,
+			roomImageUri = channel.roomImageUri
 		)
+
+		if (channel.lastChatId != null) {
+			updateLastChat(
+				channelId = channel.roomId,
+				lastChatId = channel.lastChatId
+			)
+		}
 	}
 
 	@Query(
@@ -59,63 +72,129 @@ interface ChannelDAO {
 		roomId: Long,
 		roomName: String,
 		roomSid: String,
-		roomMemberCount: Long,
+		roomMemberCount: Int,
 		defaultRoomImageType: ChannelDefaultImageType,
 		roomImageUri: String?
 	)
 
 	@Query(
 		"UPDATE Channel SET " +
+						"last_read_chat_id = :lastReadChatId " +
+						"WHERE room_id = :channelId"
+	)
+	suspend fun updateLastReadChat(
+		channelId: Long,
+		lastReadChatId: Long
+	)
+
+	@Query(
+		"UPDATE Channel SET " +
 						"last_chat_id = :lastChatId " +
-						"WHERE room_id = :roomId"
+						"WHERE room_id = :channelId"
 	)
 	suspend fun updateLastChat(
-		roomId: Long,
+		channelId: Long,
 		lastChatId: Long
 	)
 
 	@Query(
 		"UPDATE Channel SET " +
-						"host_id = :hostId, " +
+						"participant_ids = :participantIds, " +
+						"room_member_count = :roomMemberCount, " +
+						"participant_authorities = :participantAuthorities " +
+						"WHERE room_id = :channelId"
+	)
+	suspend fun updateChannelMember(
+		channelId: Long,
+		participantIds: List<Long>?,
+		roomMemberCount: Int,
+		participantAuthorities: Map<Long, ChannelMemberAuthority>?
+	)
+
+	@Query(
+		"UPDATE Channel SET " +
+						"participant_authorities = :participantAuthorities " +
+						"WHERE room_id = :channelId"
+	)
+	suspend fun updateChannelMemberAuthorities(
+		channelId: Long,
+		participantAuthorities: Map<Long, ChannelMemberAuthority>?
+	)
+
+	@Query(
+		"UPDATE Channel SET " +
+						"host_id = :targetUserId, " +
+						"participant_authorities = :participantAuthorities " +
+						"WHERE room_id = :channelId"
+	)
+	suspend fun updateChannelHost(
+		channelId: Long,
+		targetUserId: Long,
+		participantAuthorities: Map<Long, ChannelMemberAuthority>?
+	)
+
+	@Query(
+		"UPDATE Channel SET " +
 						"room_name = :roomName, " +
-						"sub_host_ids = :subHostIds, " +
-						"guest_ids = :guestIds, " +
+						"participant_ids = :participantIds," +
+						"participant_authorities = :participantAuthorities," +
 						"book_title = :bookTitle, " +
 						"book_authors = :bookAuthors, " +
 						"book_cover_image_url = :bookCoverImageUrl, " +
 						"room_tags = :roomTags, " +
-						"room_capacity = :roomCapacity " +
+						"room_capacity = :roomCapacity, " +
+						"is_exploded = :isExploded, " +
+						"is_banned = :isBanned " +
 						"WHERE room_id = :roomId"
 	)
 	suspend fun updateDetailInfo(
 		roomId: Long,
 		roomName: String,
-		hostId: Long,
-		subHostIds: List<Long>?,
-		guestIds: List<Long>?,
+		participantIds: List<Long>?,
+		participantAuthorities: Map<Long, ChannelMemberAuthority>?,
 		bookTitle: String,
 		bookAuthors: List<String>,
 		bookCoverImageUrl: String,
 		roomTags: List<String>,
-		roomCapacity: Int
+		roomCapacity: Int,
+		isBanned: Boolean,
+		isExploded: Boolean
 	)
 
-	suspend fun isExist(roomId: Long): Boolean {
-		return (getChannel(roomId) != null)
+	suspend fun isExist(channelId: Long): Boolean {
+		return (getChannel(channelId) != null)
 	}
+
+	@Query("DELETE from Channel WHERE room_id = :channelId")
+	suspend fun delete(channelId: Long)
 
 	@Query(
 		"UPDATE Channel SET " +
-						"room_member_count = room_member_count + :offset " +
-						"WHERE room_id = :roomId"
+						"participant_ids = :participantIds, " +
+						"room_member_count = :roomMemberCount, " +
+						"participant_authorities = :participantAuthorities, " +
+						"is_banned = :isBanned " +
+						"WHERE room_id = :channelId"
 	)
-	suspend fun updateMemberCount(
-		roomId: Long, offset: Int
+	suspend fun banChannelMember(
+		channelId: Long,
+		participantIds: List<Long>?,
+		roomMemberCount: Int,
+		participantAuthorities: Map<Long, ChannelMemberAuthority>?,
+		isBanned: Boolean
 	)
 
-	@Query("DELETE from Channel WHERE room_id = :roomId")
-	suspend fun delete(roomId: Long)
+	@Query(
+		"UPDATE Channel SET " +
+						"is_exploded = :isExplosion " +
+						"WHERE room_id = :channelId"
+	)
+	/** 방장이 채팅방을 나가서 채팅방이 터진 상황*/
+	suspend fun explosion(channelId: Long, isExplosion: Boolean = true)
 
 	@Query("SELECT MAX(top_pin_num) FROM Channel")
 	suspend fun getMaxPinNum(): Int?
+
+	@Query("DELETE FROM $CHANNEL_ENTITY_TABLE_NAME")
+	suspend fun deleteAll()
 }

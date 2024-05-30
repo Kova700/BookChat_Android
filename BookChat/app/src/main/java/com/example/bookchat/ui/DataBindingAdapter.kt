@@ -15,7 +15,6 @@ import com.example.bookchat.R
 import com.example.bookchat.data.*
 import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.domain.model.ChannelDefaultImageType
-import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.NameCheckStatus
 import com.example.bookchat.domain.model.UserDefaultProfileType
@@ -489,6 +488,7 @@ object DataBindingAdapter {
 		}
 	}
 
+	// TODO : 여기부터
 	/**ChatItem 시간 Text 세팅*/
 	@JvmStatic
 	@BindingAdapter("getFormattedTimeText")
@@ -502,7 +502,9 @@ object DataBindingAdapter {
 	@BindingAdapter("setChatSendImgVisibility")
 	fun setChatSendImgVisibility(view: View, chatStatus: ChatStatus?) {
 		view.visibility = when (chatStatus) {
-			ChatStatus.LOADING -> View.VISIBLE
+			ChatStatus.LOADING,
+			ChatStatus.RETRY_REQUIRED -> View.VISIBLE
+
 			else -> View.GONE
 		}
 	}
@@ -513,32 +515,13 @@ object DataBindingAdapter {
 	fun setChatFailBtnVisibility(view: View, chatStatus: ChatStatus?) {
 		view.visibility = when (chatStatus) {
 			ChatStatus.FAILURE -> View.VISIBLE
+			//TODO : 이거만 보일게 아니라 전송시간 가려야함
+			//TODO : 취소, 재전송 버튼 OnClickListener연결하려면 View 분리해서 사용해야함 (지금 덩어리 하나로 묶였음)
 			else -> View.GONE
 		}
 	}
 
-	/**다른 사람의 새로운 채팅 바텀 공지 Visibility 세팅*/
-	@JvmStatic
-	@BindingAdapter("setNewOtherChatNoticeVisibility")
-	fun setNewOtherChatNoticeVisibility(view: View, chat: Chat?) {
-		view.visibility = if (chat == null) View.GONE else View.VISIBLE
-	}
-
-	/**채팅 날짜 표시 텍스트 세팅*/
-	@JvmStatic
-	@BindingAdapter("getDateKoreanString")
-	fun getDateKoreanString(textView: TextView, chat: Chat) {
-		val dispatchTime = chat.dispatchTime
-		if (dispatchTime.isBlank()) return
-		textView.text = DateManager.getDateKoreanString(dispatchTime)
-	}
-
-	/**채팅 날짜 Visibility 세팅*/
-	@JvmStatic
-	@BindingAdapter("setDateChatVisibility")
-	fun setDateChatVisibility(view: View, bool: Boolean?) {
-		view.visibility = if (bool == false) View.VISIBLE else View.GONE
-	}
+	//TODO : 여기까지 전부 MyChatViewholder가서 설정하자
 
 	/**DrawerLayout 스와이프 off 세팅*/
 	@JvmStatic

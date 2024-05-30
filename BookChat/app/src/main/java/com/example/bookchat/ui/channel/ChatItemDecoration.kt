@@ -24,9 +24,9 @@ class ChatItemDecoration @Inject constructor(
 	) {
 		super.getItemOffsets(outRect, view, parent, state)
 		val position = parent.getChildAdapterPosition(view)
-		val itemViewType = parent.adapter?.getItemViewType(position)
+		if (position == RecyclerView.NO_POSITION) return
 
-		when (itemViewType) {
+		when (parent.adapter?.getItemViewType(position)) {
 			R.layout.item_chatting_mine,
 			R.layout.item_chatting_other -> {
 				outRect.bottom = getPxFromDp(USER_CHAT_BOTTOM_OFFSET_DP)

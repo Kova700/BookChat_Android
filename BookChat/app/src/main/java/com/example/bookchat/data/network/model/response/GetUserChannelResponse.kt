@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class GetUserChannelResponse(
 	@SerializedName("userChatRoomResponseList")
-    val channels :List<com.example.bookchat.data.network.model.response.ChannelResponse>,
+	val channels: List<ChannelResponse>,
 	@SerializedName("cursorMeta")
-    val cursorMeta : CursorMeta
+	val cursorMeta: CursorMeta
 )

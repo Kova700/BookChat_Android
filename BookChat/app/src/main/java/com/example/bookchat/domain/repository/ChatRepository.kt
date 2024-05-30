@@ -1,7 +1,9 @@
 package com.example.bookchat.domain.repository
 
 import com.example.bookchat.domain.model.Chat
+import com.example.bookchat.domain.model.ChatStatus
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface ChatRepository {
 	fun getChatsFlow(
@@ -9,16 +11,44 @@ interface ChatRepository {
 		channelId: Long
 	): Flow<List<Chat>>
 
-	suspend fun getChats(
+	suspend fun getOlderChats(
 		channelId: Long,
-		size: Int = CHAT_LOAD_SIZE
+		size: Int = CHAT_DEFAULT_LOAD_SIZE
+	)
+
+	suspend fun getChatsAroundId(
+		channelId: Long,
+		baseChatId: Long,
+		size: Int = CHAT_DEFAULT_LOAD_SIZE
+	)
+
+	suspend fun getNewerChats(
+		channelId: Long,
+		size: Int = CHAT_DEFAULT_LOAD_SIZE
+	)
+
+	suspend fun getNewestChats(
+		channelId: Long,
+		size: Int = CHAT_DEFAULT_LOAD_SIZE,
+		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS
+	): List<Chat>
+
+	suspend fun getOfflineNewestChats(
+		channelId: Long,
+		size: Int = CHAT_DEFAULT_LOAD_SIZE
+	)
+
+	suspend fun syncChats(
+		channelId: Long,
+		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS
 	): List<Chat>
 
 	suspend fun insertChat(chat: Chat)
 	suspend fun insertWaitingChat(
-		roomId: Long,
+		channelId: Long,
 		message: String,
-		myUserId: Long
+		clientId: Long,
+		chatStatus: ChatStatus
 	): Long
 
 	suspend fun updateWaitingChat(
@@ -30,10 +60,15 @@ interface ChatRepository {
 
 	suspend fun insertAllChats(chats: List<Chat>)
 
+	suspend fun getChat(chatId: Long): Chat
+	suspend fun clear()
+
+	fun getOlderChatIsEndFlow(): StateFlow<Boolean>
+	fun getNewerChatIsEndFlow(): StateFlow<Boolean>
+
 	companion object {
-		const val CHAT_LOAD_SIZE = 30
+		const val CHAT_DEFAULT_LOAD_SIZE = 30
+		private const val DEFAULT_RETRY_MAX_ATTEMPTS = 5
 	}
 
-	suspend fun getChat(chatId: Long): Chat?
-	suspend fun getChatForFCM(chatId: Long): Chat
 }

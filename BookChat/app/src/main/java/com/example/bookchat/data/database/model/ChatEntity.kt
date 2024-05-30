@@ -2,18 +2,17 @@ package com.example.bookchat.data.database.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.ChatType
 
 @Entity(
-	tableName = "Chat", foreignKeys = [ForeignKey(
-		entity = ChannelEntity::class,
-		parentColumns = arrayOf("room_id"),
-		childColumns = arrayOf("chat_room_id"),
-		onDelete = ForeignKey.CASCADE,
-	)]
+	tableName = CHAT_ENTITY_TABLE_NAME,
+	indices = [
+		Index(value = ["chat_room_id"]),
+		Index(value = ["status"]),
+	],
 )
 data class ChatEntity(
 	@PrimaryKey
@@ -25,3 +24,5 @@ data class ChatEntity(
 	@ColumnInfo(name = "chat_type") val chatType: ChatType,
 	@ColumnInfo(name = "status") val status: Int = ChatStatus.SUCCESS.code,
 )
+
+const val CHAT_ENTITY_TABLE_NAME = "Chat"

@@ -10,6 +10,8 @@ import com.example.bookchat.domain.model.SearchFilter.BOOK_TITLE
 import com.example.bookchat.domain.model.SearchFilter.ROOM_NAME
 import com.example.bookchat.domain.model.SearchFilter.ROOM_TAGS
 import com.example.bookchat.domain.repository.ChannelSearchRepository
+import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -21,6 +23,8 @@ import javax.inject.Inject
 
 class ChannelSearchRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi,
+	private val clientRepository: ClientRepository,
+	private val userRepository: UserRepository
 ) : ChannelSearchRepository {
 
 	private val mapChannels = MutableStateFlow<Map<Long, Channel>>(emptyMap())//(channelId, Channel)
@@ -35,6 +39,7 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 		return channels
 	}
 
+	//TODO : Channel말고 isEntered 필드 반영하는 새로운 data class만들어야할듯?
 	override suspend fun search(
 		keyword: String,
 		searchFilter: SearchFilter,
@@ -63,7 +68,13 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 		isEndPage = response.cursorMeta.last
 		currentPage = response.cursorMeta.nextCursorId
 
-		val newChannels = response.channels.map { it.toChannel() }
+		val newChannels = response.channels
+			.map {
+				it.toChannel(
+					clientId = clientRepository.getClientProfile().id,
+					getUser = { userId -> userRepository.getUser(userId) }
+				)
+			}
 		mapChannels.update { mapChannels.value + newChannels.associateBy { it.roomId } }
 		return channels.first()
 	}

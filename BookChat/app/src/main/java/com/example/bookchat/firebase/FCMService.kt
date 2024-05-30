@@ -8,11 +8,13 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.bookchat.R
-import com.example.bookchat.data.network.model.response.FCMPushMessage
-import com.example.bookchat.data.repository.ChattingRepositoryFacade
+import com.example.bookchat.data.network.model.response.FcmMessage
+import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.model.PushType
+import com.example.bookchat.domain.repository.ChannelRepository
+import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.utils.Constants.TAG
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -25,7 +27,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class FCMService : FirebaseMessagingService() {
+class
+FCMService : FirebaseMessagingService() {
 	@Inject
 	lateinit var gson: Gson
 
@@ -33,7 +36,10 @@ class FCMService : FirebaseMessagingService() {
 	lateinit var clientRepository: ClientRepository
 
 	@Inject
-	lateinit var chattingRepositoryFacade: ChattingRepositoryFacade
+	lateinit var channelRepository: ChannelRepository
+
+	@Inject
+	lateinit var chatRepository: ChatRepository
 
 	override fun onNewToken(token: String) {
 		super.onNewToken(token)
@@ -53,7 +59,8 @@ class FCMService : FirebaseMessagingService() {
 		}
 	}
 
-	//TODO : 내가 보낸 메세지도 FCM 오는지 체크하고 말해주기
+	//NotificationHandler따로 만들어서 사용하길 권장
+	//TODO : 내가 보낸 메세지도 FCM 오는지 체크하고 말해주기 (오고 있음)
 	override fun onMessageReceived(message: RemoteMessage) {
 		super.onMessageReceived(message)
 		Log.d(TAG, "FCMService: onMessageReceived() - message.data : ${message.data}")
@@ -62,11 +69,12 @@ class FCMService : FirebaseMessagingService() {
 	}
 
 	private fun handleMessage(message: RemoteMessage) {
-		val hashMap = gson.fromJson(message.data["body"], LinkedHashMap::class.java)
+		val messageBody = message.data["body"]
+		val hashMap = gson.fromJson(messageBody, LinkedHashMap::class.java)
 		when (hashMap["pushType"]) {
 			PushType.LOGIN.toString() -> handleLogoutMassage()
 			PushType.CHAT.toString() ->
-				handleChatMessage(gson.fromJson(message.data["body"], FCMPushMessage::class.java))
+				handleChatMessage(gson.fromJson(messageBody, FcmMessage::class.java))
 		}
 	}
 
@@ -76,24 +84,27 @@ class FCMService : FirebaseMessagingService() {
 	}
 
 	//TODO : WorkerManager로 백엔드 작업 위임 (예외처리까지 같이)
-	private fun handleChatMessage(fcmPushMessage: FCMPushMessage) {
+	//TODO : 혹시 가능하다면 senderId도...?
+	private fun handleChatMessage(fcmMessage: FcmMessage) {
+		val fcmMessageBody = fcmMessage.body
 		CoroutineScope(Dispatchers.IO).launch {
-			val chat = chattingRepositoryFacade.getChatForFCM(fcmPushMessage.chatId)
+			val channel = channelRepository.getChannel(fcmMessageBody.channelId)
+			val chat = chatRepository.getChat(fcmMessageBody.chatId)
 
-			if (chattingRepositoryFacade.isAlreadyEntered(chat.chatRoomId).not()) {
-				chattingRepositoryFacade.getChannelForFCM(chat)
-			}
-			sendNotification(chat)
+			if (chat.sender?.id == clientRepository.getClientProfile().id) return@launch
+			channelRepository.updateChannelLastChatIfValid(chat.chatRoomId, chat.chatId)
+			sendNotification(chat, channel)
 		}
 	}
 
 	//TODO : 유저정보와 함께 띄우기
-	private fun sendNotification(chat: Chat) {
+	//TODO : 카톡같은 Notification 모양 참고해서 구현
+	private fun sendNotification(chat: Chat, channel: Channel) {
 		val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			val importance = NotificationManager.IMPORTANCE_HIGH
-			val notificationChannel = NotificationChannel(channelId, channelName, importance)
+			val notificationChannel = NotificationChannel(channel.roomId.toString(), channelName, importance)
 			notificationChannel.description = channelDescription
 
 			// 채널에 대한 각종 설정(불빛, 진동 등) (추후 다시 세팅)
@@ -104,17 +115,17 @@ class FCMService : FirebaseMessagingService() {
 			notificationManager.createNotificationChannel(notificationChannel)
 		}
 
-		notificationManager.notify(chat.chatRoomId.toInt(), getChatNotification(chat))
-		notificationManager.notify(0, getGroupNotification())
+		notificationManager.notify(chat.chatRoomId.toInt(), getChatNotification(chat, channel))
+		notificationManager.notify(0, getGroupNotification(channel))
 	}
 
-	private fun getChatNotification(chat: Chat): Notification {
-		return NotificationCompat.Builder(this, channelId)
+	private fun getChatNotification(chat: Chat, channel: Channel): Notification {
+		return NotificationCompat.Builder(this, chat.chatId.toString())
 			.setSmallIcon(R.mipmap.ic_bookchat_app_icon) //TODO : 유저 이미지로 수정
 			.setAutoCancel(true) // 클릭 시 알림이 삭제되도록 설정
 			.setGroup(KEY_BOOK_CHAT_GROUP)
-			.setWhen(System.currentTimeMillis()) //TODO : fcmBody.dispatchTime으로 수정
-			.setContentTitle(chat.chatRoomId.toString()) //TODO : DB에서 채팅방명 가져오게 수정
+			.setWhen(System.currentTimeMillis()) //TODO : chat.dispatchTime으로 수정
+			.setContentTitle(channel.roomName)
 			.setContentText(chat.message)
 			// 알림과 동시에 진동 설정(권한 필요)
 			.setDefaults(Notification.DEFAULT_VIBRATE)
@@ -125,8 +136,8 @@ class FCMService : FirebaseMessagingService() {
 			}.build()
 	}
 
-	private fun getGroupNotification(): Notification {
-		return NotificationCompat.Builder(this, channelId)
+	private fun getGroupNotification(channel: Channel): Notification {
+		return NotificationCompat.Builder(this, channel.roomId.toString())
 			.setSmallIcon(R.mipmap.ic_bookchat_app_icon)
 			.setAutoCancel(true)
 			.setOnlyAlertOnce(true)
@@ -139,7 +150,6 @@ class FCMService : FirebaseMessagingService() {
 
 	companion object {
 		private const val KEY_BOOK_CHAT_GROUP = "KEY_BOOK_CHAT_GROUP"
-		private const val channelId = "channelId"
 		private const val channelName = "BookChatNotificationChannel"
 		private const val channelDescription = "북챗 푸시 알림 채널"
 	}

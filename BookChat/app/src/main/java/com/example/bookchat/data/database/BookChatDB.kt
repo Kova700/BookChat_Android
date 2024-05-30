@@ -12,6 +12,7 @@ import com.example.bookchat.data.database.model.ChatEntity
 import com.example.bookchat.data.database.model.TempMessageEntity
 import com.example.bookchat.data.database.model.UserEntity
 import com.example.bookchat.data.database.typeconverter.LongListTypeConverter
+import com.example.bookchat.data.database.typeconverter.ParticipantAuthoritiesTypeConverter
 import com.example.bookchat.data.database.typeconverter.StringListTypeConverter
 
 @Database(
@@ -22,7 +23,13 @@ import com.example.bookchat.data.database.typeconverter.StringListTypeConverter
 	version = 1,
 	exportSchema = false
 )
-@TypeConverters(value = [StringListTypeConverter::class, LongListTypeConverter::class])
+@TypeConverters(
+	value = [
+		StringListTypeConverter::class,
+		LongListTypeConverter::class,
+		ParticipantAuthoritiesTypeConverter::class,
+	]
+)
 abstract class BookChatDB : RoomDatabase() {
 	abstract fun chatDAO(): ChatDAO
 	abstract fun channelDAO(): ChannelDAO

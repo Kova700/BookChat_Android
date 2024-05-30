@@ -7,52 +7,53 @@ import com.example.bookchat.data.mapper.toChannel
 import com.example.bookchat.data.mapper.toChannelDefaultImageTypeNetwork
 import com.example.bookchat.data.mapper.toChannelEntity
 import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.network.model.response.ResponseChannelInfo
+import com.example.bookchat.data.network.model.request.RequestMakeChannel
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelDefaultImageType
-import com.example.bookchat.domain.model.Chat
+import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
+import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.UserRepository
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.toMultiPartBody
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
+import kotlin.math.pow
+import kotlin.time.Duration.Companion.seconds
 
 //TODO : 채팅방 정보 조회 API 실패 시 재시도 로직 필요함 (채팅 전송 재시도 로직같은)
-//TODO : 채팅방 사전에 전부 로드해오는 로직 추가필요 ( FCM 통해 받은 채팅 저장 하기 위해서  OR FCM 통해 받은 채팅의 채팅방 정보 보여주기 위해)
-//TODO : 채널 ID, 메세지 ID를 FCM을 통해 받고 추가 정보를 API로 요청 후 Noti를 띄우는 방식하면 전부 가져오지 않아도 됨
 class ChannelRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi,
 	private val channelDAO: ChannelDAO,
 	private val userRepository: UserRepository,
+	private val clientRepository: ClientRepository,
 	private val chatRepository: ChatRepository
 ) : ChannelRepository {
 
 	private val mapChannels = MutableStateFlow<Map<Long, Channel>>(emptyMap())//(channelId, Channel)
-	private val channels = mapChannels.map {
-		//ORDER BY top_pin_num DESC, last_chat_id DESC, room_id DESC
-		it.values.toList().sortedWith(
-			compareBy(
-				{ channel -> -channel.topPinNum },
-				{ channel -> channel.lastChat?.chatId?.unaryMinus() },
-				{ channel -> -channel.roomId })
-		)
-	}.onEach { cachedChannels = it }
+	private val sortedChannels = mapChannels.map { it.values }
+		.map { channels ->
+			//ORDER BY top_pin_num DESC, last_chat_id IS NULL DESC, last_chat_id DESC, room_id DESC
+			channels.sortedWith(
+				compareBy<Channel> { channel -> -channel.topPinNum }
+					.then(nullsFirst(compareBy { channel -> channel.lastChat?.chatId?.unaryMinus() }))
+					.thenBy { channel -> -channel.roomId }
+			)
+		}
 
-	private var cachedChannels: List<Channel> = emptyList()
 	private var currentPage: Long? = null
 	private var isEndPage = false
 
 	override fun getChannelsFlow(): Flow<List<Channel>> {
-		return channels
+		return sortedChannels
 	}
 
 	override fun getChannelFlow(channelId: Long): Flow<Channel> {
@@ -63,50 +64,47 @@ class ChannelRepositoryImpl @Inject constructor(
 		mapChannels.update { newChannels }
 	}
 
+	/** 로컬에 있는 채널 우선적으로 쿼리
+	 * (API를 통해 받아온 Channel에는 LastChat을 비롯한 detail정보가 없음) */
 	override suspend fun getChannel(channelId: Long): Channel {
-		getChannelInfo(channelId)
-		val updatedChannel = getChannelWithInfo(channelId)
-		setChannels(mapChannels.value + (channelId to updatedChannel))
-		return updatedChannel
-	}
+		val channel = mapChannels.value[channelId]
+			?: getOfflineChannel(channelId)
+			?: getOnlineChannel(channelId)
 
-	override suspend fun getChannelForFCM(lastChat: Chat): Channel {
-		Log.d(TAG, "ChannelRepositoryImpl: getChannelForFCM() - called")
-		val channel = bookChatApi.getChannelForFCM(lastChat.chatRoomId).toChannel(lastChat)
-		channelDAO.upsertChannel(channel.toChannelEntity()) //lastChat에 대한 정보가 없이 저장되는데 괜찮나..?
-		Log.d(TAG, "ChannelRepositoryImpl: getChannelForFCM() - channel : $channel")
+		setChannels(mapChannels.value + (channelId to channel))
 		return channel
 	}
 
-	//Channel 세부 정보는 채팅방 들어 가면 getChannel에 의해 갱신될 예정
-	override suspend fun getChannels(loadSize: Int): List<Channel> {
-		if (isEndPage) return cachedChannels
-
-		val response = bookChatApi.getChannels(
-			postCursorId = currentPage,
-			size = loadSize
-		)
-		isEndPage = response.cursorMeta.last
-		currentPage = response.cursorMeta.nextCursorId
-
-		channelDAO.upsertAllChannels(response.channels.toChannelEntity())
-		val chats = response.channels.mapNotNull { it.lastChat }
-		chatRepository.insertAllChats(chats)
-		val newChannels = response.channels.map { getChannelWithInfo(it.roomId) }
-		setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
-		return newChannels //반환 값에 이전값이 포함되지 않고 있음
+	private suspend fun getOfflineChannel(channelId: Long): Channel? {
+		return channelDAO.getChannel(channelId)?.toChannel(
+			getChat = { chatId -> chatRepository.getChat(chatId) },
+			getUser = { userId -> userRepository.getUser(userId) })
 	}
 
-	//DB에 저장된 LastChat과, 기존에 저장되어있던 채널 정보들을 묶어서 반환 (like topPin..)
-	private suspend fun getChannelWithInfo(channelId: Long): Channel {
-		val channel =
-			channelDAO.getChannel(channelId)?.toChannel() ?: Channel.DEFAULT.copy(roomId = channelId) //이거 이렇게 해도 되나..? RoomSId 없으면 에러 터질텐데..?
-		return channel.copy(
-			lastChat = channel.lastChat?.chatId?.let { chatRepository.getChat(it) },
-			host = channel.host?.id?.let { userRepository.getUser(it) },
-			subHosts = channel.subHosts?.map { user -> userRepository.getUser(user.id) },
-			guests = channel.guests?.map { user -> userRepository.getUser(user.id) }
+	/** LastChat을 비롯한 Channel detail 정보가 없음 */
+	private suspend fun getOnlineChannel(channelId: Long): Channel {
+		return bookChatApi.getChannel(channelId).toChannel()
+			.also { channelDAO.upsertChannel(it.toChannelEntity()) }
+	}
+
+	override suspend fun getChannelInfo(channelId: Long) {
+		val channelInfo = bookChatApi.getChannelInfo(channelId)
+		userRepository.upsertAllUsers(channelInfo.participants)
+
+		channelDAO.updateDetailInfo(
+			roomId = channelId,
+			roomName = channelInfo.roomName,
+			participantIds = channelInfo.participantIds,
+			participantAuthorities = channelInfo.participantAuthorities,
+			bookTitle = channelInfo.bookTitle,
+			bookAuthors = channelInfo.bookAuthors,
+			bookCoverImageUrl = channelInfo.bookCoverImageUrl,
+			roomTags = channelInfo.roomTags,
+			roomCapacity = channelInfo.roomCapacity,
+			isBanned = channelInfo.isBanned,
+			isExploded = channelInfo.isExploded
 		)
+		setChannels(mapChannels.value + (channelId to getChannelWithUpdatedData(channelId)))
 	}
 
 	override suspend fun makeChannel(
@@ -118,7 +116,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		channelImage: ByteArray?
 	): Channel {
 		val response = bookChatApi.makeChannel(
-			requestMakeChannel = com.example.bookchat.data.network.model.request.RequestMakeChannel(
+			requestMakeChannel = RequestMakeChannel(
 				roomName = channelTitle,
 				roomSize = channelSize,
 				defaultRoomImageType = defaultRoomImageType.toChannelDefaultImageTypeNetwork(),
@@ -135,82 +133,245 @@ class ChannelRepositoryImpl @Inject constructor(
 
 		val createdChannelId = response.headers()["Location"]?.split("/")?.last()?.toLong()
 			?: throw Exception("ChannelId does not exist in Http header.")
-
-		val createdChannel = getChannel(createdChannelId)
-		channelDAO.upsertChannel(createdChannel.toChannelEntity())
-		setChannels(mapChannels.value + mapOf(Pair(createdChannel.roomId, createdChannel)))
-		return createdChannel
+		return getChannel(createdChannelId)
 	}
 
-	// TODO : 이미 입장되어있는 채널에 입장 API 호출하면 넘어오는 응답코드 따로 정의 후,
+	/** DB에 갱신된 LastChat, Participants와 기존에 존재하던
+	 * 채널 부가 정보들을 반영해서 반환 (ex : topPin, roomTags, ..) */
+	private suspend fun getChannelWithUpdatedData(channelId: Long): Channel {
+		val channel = getOfflineChannel(channelId) ?: getOnlineChannel(channelId)
+		return channel.copy(
+			lastChat = channel.lastChat?.chatId?.let { chatRepository.getChat(it) },
+			host = channel.host?.id?.let { userRepository.getUser(it) },
+			participants = channel.participantIds?.map { userRepository.getUser(it) },
+		)
+	}
+
+	// TODO : 이미 퇴장되어있는 채널에 퇴장 API 호출하면 넘어오는 응답코드 따로 정의 후,
 	//  해당 코드 응답시, 예외 던지기
-	override suspend fun enter(channel: Channel) {
-		val resultCode = bookChatApi.enterChatRoom(channel.roomId).code()
-		Log.d(TAG, "ChannelRepositoryImpl: enter() - resultCode : $resultCode")
-
-		val newChannel = channel.toChannelEntity()
-			.copy(lastChatId = Long.MAX_VALUE)
-		channelDAO.upsertChannel(newChannel)
-		setChannels(mapChannels.value + mapOf(Pair(channel.roomId, channel)))
-	}
-
-	override suspend fun isAlreadyEntered(channelId: Long): Boolean {
-		return channelDAO.isExist(channelId)
-	}
-
-	override suspend fun leave(channelId: Long) {
-		bookChatApi.leaveChatRoom(channelId)
+	override suspend fun leaveChannel(channelId: Long) {
+		val resultCode = bookChatApi.leaveChannel(channelId).code()
+		Log.d(TAG, "ChannelClientRepositoryImpl: leaveChannel() - resultCode : $resultCode")
 		channelDAO.delete(channelId)
 		setChannels(mapChannels.value - channelId)
 	}
 
-	private suspend fun getChannelInfo(roomId: Long) {
-		val response = bookChatApi.getChatRoomInfo(roomId)
-		saveParticipantsDataInLocalDB(response)
-		saveChannelInfoInLocalDB(roomId, response)
+	override suspend fun leaveChannelMember(channelId: Long, targetUserId: Long) {
+		val channel = getChannel(channelId)
+		val newParticipants = channel.participants?.filter { it.id != targetUserId }
+		val newParticipantAuthorities = channel.participantAuthorities?.minus(targetUserId)
+
+		val newChannel = channel.copy(
+			participants = newParticipants,
+			roomMemberCount = newParticipants?.size ?: 0,
+			participantAuthorities = newParticipantAuthorities
+		)
+		channelDAO.updateChannelMember(
+			channelId = channelId,
+			participantIds = newParticipants?.map { it.id },
+			roomMemberCount = newParticipants?.size ?: 0,
+			participantAuthorities = newParticipantAuthorities
+		)
+		setChannels(mapChannels.value + mapOf(channelId to newChannel))
 	}
 
-	override suspend fun updateMemberCount(channelId: Long, offset: Int) {
-		channelDAO.updateMemberCount(channelId, offset)
+	override suspend fun leaveChannelHost(channelId: Long) {
+		val channel = getChannel(channelId)
+		val newChannel = channel.copy(isExploded = true)
+		channelDAO.explosion(channelId)
+		setChannels(mapChannels.value + mapOf(channelId to newChannel))
 	}
 
-	override suspend fun updateLastChat(channelId: Long, chatId: Long) {
-		val existingLastChatId = channelDAO.getChannel(channelId)?.toChannel()?.lastChat?.chatId
+	// TODO : 이미 입장되어있는 채널에 입장 API 호출하면 넘어오는 응답코드 따로 정의 후,
+	//  해당 코드 응답시, 예외 던지기 (isEntered반영하면 수정가능)
+	override suspend fun enterChannel(channel: Channel) {
+		val resultCode = bookChatApi.enterChannel(channel.roomId).code()
+		Log.d(TAG, "ChannelRepositoryImpl: enter() - resultCode : $resultCode")
+		channelDAO.upsertChannel(channel.toChannelEntity())
+		setChannels(mapChannels.value + mapOf(channel.roomId to channel))
+	}
+
+	override suspend fun enterChannelMember(channelId: Long, targetUserId: Long) {
+		val channel = getChannel(channelId)
+		val newUser = userRepository.getUser(targetUserId)
+		val newParticipants = channel.participants?.plus(newUser)
+		val newParticipantAuthorities = channel.participantAuthorities
+			?.plus(targetUserId to ChannelMemberAuthority.GUEST)
+
+		val newChannel = channel.copy(
+			participants = newParticipants,
+			roomMemberCount = newParticipants?.size ?: 0,
+			participantAuthorities = newParticipantAuthorities
+		)
+		channelDAO.updateChannelMember(
+			channelId = channelId,
+			participantIds = newParticipants?.map { it.id },
+			roomMemberCount = newParticipants?.size ?: 0,
+			participantAuthorities = newParticipantAuthorities
+		)
+		setChannels(mapChannels.value + mapOf(channelId to newChannel))
+	}
+
+	override suspend fun banChannelMember(channelId: Long, targetUserId: Long) {
+		val channel = getChannel(channelId)
+		val clientId = clientRepository.getClientProfile().id
+
+		val newParticipants = channel.participants?.filter { it.id != targetUserId }
+		val newParticipantAuthorities = channel.participantAuthorities?.minus(targetUserId)
+		val newChannel = channel.copy(
+			participants = newParticipants,
+			roomMemberCount = newParticipants?.size ?: 0,
+			participantAuthorities = newParticipantAuthorities,
+			isBanned = clientId == targetUserId
+		)
+		channelDAO.banChannelMember(
+			channelId = channelId,
+			participantIds = newParticipants?.map { it.id },
+			roomMemberCount = newParticipants?.size ?: 0,
+			participantAuthorities = newParticipantAuthorities,
+			isBanned = clientId == targetUserId
+		)
+		setChannels(mapChannels.value + mapOf(channelId to newChannel))
+	}
+
+	override suspend fun updateChannelMemberAuthority(
+		channelId: Long,
+		targetUserId: Long,
+		channelMemberAuthority: ChannelMemberAuthority
+	) {
+		val channel = getChannel(channelId)
+		val newParticipantAuthorities = channel.participantAuthorities
+			?.plus(targetUserId to channelMemberAuthority)
+		val newChannel = channel.copy(
+			participantAuthorities = newParticipantAuthorities
+		)
+
+		channelDAO.updateChannelMemberAuthorities(
+			channelId = channelId,
+			participantAuthorities = newParticipantAuthorities
+		)
+		setChannels(mapChannels.value + mapOf(channelId to newChannel))
+	}
+
+	override suspend fun updateChannelHost(channelId: Long, targetUserId: Long) {
+		val channel = getChannel(channelId)
+		val previousHostId = channel.host?.id!!
+		val newParticipantAuthorities = channel.participantAuthorities
+			?.plus(previousHostId to ChannelMemberAuthority.GUEST)
+			?.plus(targetUserId to ChannelMemberAuthority.HOST)
+		val newChannel = channel.copy(
+			host = userRepository.getUser(targetUserId),
+			participantAuthorities = newParticipantAuthorities
+		)
+
+		channelDAO.updateChannelHost(
+			channelId = channelId,
+			targetUserId = targetUserId,
+			participantAuthorities = newParticipantAuthorities
+		)
+		setChannels(mapChannels.value + mapOf(channelId to newChannel))
+	}
+
+	override suspend fun updateLastReadChatIdIfValid(channelId: Long, chatId: Long) {
+		val channel = channelDAO.getChannel(channelId) //왜 DB부터 볼까 인메모리 데이터 안봐?
+		val existingLastReadChatId = channel?.lastReadChatId
+		if (existingLastReadChatId != null && existingLastReadChatId >= chatId) return
+
+		channelDAO.updateLastReadChat(
+			channelId = channelId,
+			lastReadChatId = chatId
+		)
+		val newChannel = getChannelWithUpdatedData(channelId)
+		setChannels(mapChannels.value + mapOf(channelId to newChannel))
+	}
+
+	//TODO : 서버측에서 lastChatID가 가장 높은 순으로 쿼리되게 혹은 쿼리 옵션을 주게 수정 대기
+	//TODO : 해당 함수 인터넷 끊겨있다 연결 trigger발생 시 page :0 부터 재호출
+	/** 지수백오프 getChannels 요청 */
+	/** 서버에 있는 채널 우선적으로 쿼리 */
+	/** Channel 세부 정보는 채팅방 들어 가면 getChannelInfo에 의해 갱신될 예정 */
+	override suspend fun getChannels(
+		loadSize: Int,
+		maxAttempts: Int
+	) {
+		if (isEndPage) return
+
+		for (attempt in 0 until maxAttempts) {
+			Log.d(TAG, "ChannelRepositoryImpl: getChannels() - attempt : $attempt")
+
+			runCatching {
+				bookChatApi.getChannels(
+					postCursorId = currentPage,
+					size = loadSize
+				)
+			}.onSuccess { response ->
+				channelDAO.upsertAllChannels(response.channels.toChannelEntity())
+				val chats = response.channels
+					.mapNotNull {
+						it.getLastChat(
+							clientId = clientRepository.getClientProfile().id
+						)
+					}
+				isEndPage = response.cursorMeta.last
+				currentPage = response.cursorMeta.nextCursorId
+				chatRepository.insertAllChats(chats)
+				val newChannels = response.channels.map { getChannelWithUpdatedData(it.roomId) }
+				setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
+				return
+			}
+			delay((DEFAULT_RETRY_ATTEMPT_DELAY_TIME * (1.5).pow(attempt)))
+		}
+
+		/**조회 실패시 오프라인 모드로 전환*/
+		setChannels(
+			mapChannels.value + getOfflineChannels(
+				loadSize,
+				currentPage
+			).associateBy { it.roomId })
+	}
+
+	private suspend fun getOfflineChannels(
+		loadSize: Int,
+		baseId: Long?
+	): List<Channel> {
+		return channelDAO.getChannels(loadSize, baseId ?: 0)
+			.map {
+				it.toChannel(
+					getChat = { chatId -> chatRepository.getChat(chatId) },
+					getUser = { userId -> userRepository.getUser(userId) }
+				)
+			}
+	}
+
+	override suspend fun updateChannelLastChatIfValid(channelId: Long, chatId: Long) {
+		val existingLastChatId = channelDAO.getChannel(channelId)?.lastChatId //왜 DB부터 볼까 인메모리 데이터 안봐?
 		if (existingLastChatId != null && chatId <= existingLastChatId) return
 
 		channelDAO.updateLastChat(
-			roomId = channelId,
+			channelId = channelId,
 			lastChatId = chatId,
 		)
 
-		val updatedChannel = getChannelWithInfo(channelId)
+		val updatedChannel = getChannelWithUpdatedData(channelId)
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
-	private suspend fun saveParticipantsDataInLocalDB(chatRoomInfo: ResponseChannelInfo) {
-		userRepository.upsertAllUsers(chatRoomInfo.participants)
-	}
-
-	private suspend fun saveChannelInfoInLocalDB(roomId: Long, channelInfo: ResponseChannelInfo) {
-		channelDAO.updateDetailInfo(
-			roomId = roomId,
-			hostId = channelInfo.roomHost.id,
-			roomName = channelInfo.roomName,
-			subHostIds = channelInfo.roomSubHostList?.map { it.id },
-			guestIds = channelInfo.roomGuestList?.map { it.id },
-			bookTitle = channelInfo.bookTitle,
-			bookAuthors = channelInfo.bookAuthors,
-			bookCoverImageUrl = channelInfo.bookCoverImageUrl,
-			roomTags = channelInfo.roomTags,
-			roomCapacity = channelInfo.roomCapacity,
-		)
+	//TODO : 데이터를 load해놓지 않았다면 크게 유의미한 함수는 아님
+	// (API로 수정하거나 Channel객체를 받을 때 참가유무를 가지고 있는상태로 수정되어야함)
+	override suspend fun isChannelAlreadyEntered(channelId: Long): Boolean {
+		return channelDAO.isExist(channelId)
 	}
 
 	private fun clearCachedData() {
 		mapChannels.update { emptyMap() }
-		cachedChannels = emptyList()
 		currentPage = null
 		isEndPage = false
+	}
+
+	/** 로그아웃 + 회원탈퇴시에 모든 repository 일괄 호출 */
+	override suspend fun clear() {
+		clearCachedData()
+		channelDAO.deleteAll()
 	}
 
 	companion object {
@@ -218,6 +379,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		private const val IMAGE_FILE_NAME = "profile_img"
 		private const val IMAGE_FILE_EXTENSION_WEBP = ".webp"
 		private const val IMAGE_MULTIPART_NAME = "chatRoomImage"
+		private val DEFAULT_RETRY_ATTEMPT_DELAY_TIME = 1.seconds
 	}
 
 }

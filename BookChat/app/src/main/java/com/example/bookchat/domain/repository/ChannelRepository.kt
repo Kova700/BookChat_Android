@@ -3,7 +3,7 @@ package com.example.bookchat.domain.repository
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelDefaultImageType
-import com.example.bookchat.domain.model.Chat
+import com.example.bookchat.domain.model.ChannelMemberAuthority
 import kotlinx.coroutines.flow.Flow
 
 interface ChannelRepository {
@@ -12,16 +12,11 @@ interface ChannelRepository {
 
 	suspend fun getChannels(
 		loadSize: Int = REMOTE_CHANNELS_LOAD_SIZE,
-	): List<Channel>
+		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS
+	)
 
 	suspend fun getChannel(channelId: Long): Channel
-	suspend fun getChannelForFCM(lastChat: Chat): Channel
-
-	suspend fun enter(channel: Channel)
-	suspend fun isAlreadyEntered(channelId: Long): Boolean
-	suspend fun leave(channelId: Long)
-	suspend fun updateMemberCount(channelId: Long, offset: Int)
-	suspend fun updateLastChat(channelId: Long, chatId: Long)
+	suspend fun getChannelInfo(channelId: Long)
 
 	suspend fun makeChannel(
 		channelTitle: String,
@@ -32,8 +27,50 @@ interface ChannelRepository {
 		channelImage: ByteArray?
 	): Channel
 
+	suspend fun leaveChannel(channelId: Long)
+	suspend fun leaveChannelMember(
+		channelId: Long,
+		targetUserId: Long
+	)
+
+	suspend fun leaveChannelHost(
+		channelId: Long
+	)
+
+	suspend fun enterChannel(channel: Channel)
+	suspend fun enterChannelMember(
+		channelId: Long,
+		targetUserId: Long
+	)
+
+	suspend fun banChannelMember(
+		channelId: Long,
+		targetUserId: Long
+	)
+
+	suspend fun updateChannelMemberAuthority(
+		channelId: Long,
+		targetUserId: Long,
+		channelMemberAuthority: ChannelMemberAuthority
+	)
+
+	suspend fun updateChannelHost(
+		channelId: Long,
+		targetUserId: Long,
+	)
+
+	suspend fun updateLastReadChatIdIfValid(
+		channelId: Long,
+		chatId: Long
+	)
+
+	suspend fun updateChannelLastChatIfValid(channelId: Long, chatId: Long)
+	suspend fun isChannelAlreadyEntered(channelId: Long): Boolean
+
 	companion object {
-		const val REMOTE_CHANNELS_LOAD_SIZE = 20
+		private const val REMOTE_CHANNELS_LOAD_SIZE = 15
+		private const val DEFAULT_RETRY_MAX_ATTEMPTS = 5
 	}
 
+	suspend fun clear()
 }

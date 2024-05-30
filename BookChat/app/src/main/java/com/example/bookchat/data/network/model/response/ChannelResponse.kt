@@ -1,10 +1,10 @@
 package com.example.bookchat.data.network.model.response
 
+import com.example.bookchat.data.mapper.getChatType
 import com.example.bookchat.data.mapper.toUserDefaultProfileType
 import com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork
 import com.example.bookchat.data.network.model.UserDefaultProfileTypeNetwork
 import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.domain.model.User
 import com.google.gson.annotations.SerializedName
 
@@ -16,7 +16,7 @@ data class ChannelResponse(
 	@SerializedName("roomSid")
 	val roomSid: String,
 	@SerializedName("roomMemberCount")
-	val roomMemberCount: Long,
+	val roomMemberCount: Int,
 	@SerializedName("defaultRoomImageType")
 	val defaultRoomImageType: ChannelDefaultImageTypeNetwork,
 	@SerializedName("lastChatId")
@@ -36,22 +36,26 @@ data class ChannelResponse(
 	@SerializedName("roomImageUri")
 	val roomImageUri: String? = null,
 ) {
-	val lastChat
-		get() = lastChatId?.let {
-			Chat(
-				chatId = it,
-				chatRoomId = roomId,
-				message = lastChatContent!!,
-				chatType = ChatType.UNKNOWN,
-				dispatchTime = lastChatDispatchTime!!,
-				sender = senderId?.let { id ->
-					User(
-						id = id,
-						nickname = senderNickname!!,
-						profileImageUrl = senderProfileImageUrl,
-						defaultProfileImageType = senderDefaultProfileImageType!!.toUserDefaultProfileType()
-					)
-				}
-			)
-		}
+
+	fun getLastChat(clientId: Long): Chat? {
+		if (lastChatId == null) return null
+		return Chat(
+			chatId = lastChatId,
+			chatRoomId = roomId,
+			message = lastChatContent!!,
+			chatType = getChatType(
+				senderId = senderId,
+				clientId = clientId
+			),
+			dispatchTime = lastChatDispatchTime!!,
+			sender = senderId?.let { id ->
+				User(
+					id = id,
+					nickname = senderNickname!!,
+					profileImageUrl = senderProfileImageUrl,
+					defaultProfileImageType = senderDefaultProfileImageType!!.toUserDefaultProfileType()
+				)
+			}
+		)
+	}
 }

@@ -8,7 +8,7 @@ import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.domain.model.User
 
-fun SocketMessage.toChatEntity(chatRoomId: Long, myUserId: Long): ChatEntity {
+fun SocketMessage.toChatEntity(chatRoomId: Long, clientId: Long): ChatEntity {
 	return when (this) {
 		is CommonMessage ->
 			ChatEntity(
@@ -18,7 +18,7 @@ fun SocketMessage.toChatEntity(chatRoomId: Long, myUserId: Long): ChatEntity {
 				message = message,
 				chatType = getChatType(
 					senderId = senderId,
-					myUserId = myUserId
+					clientId = clientId
 				),
 				dispatchTime = dispatchTime,
 			)
@@ -32,7 +32,7 @@ fun SocketMessage.toChatEntity(chatRoomId: Long, myUserId: Long): ChatEntity {
 				message = message,
 				chatType = getChatType(
 					senderId = null,
-					myUserId = myUserId
+					clientId = clientId
 				),
 			)
 	}
@@ -40,7 +40,7 @@ fun SocketMessage.toChatEntity(chatRoomId: Long, myUserId: Long): ChatEntity {
 
 fun SocketMessage.toChat(
 	channelId: Long,
-	myUserId: Long,
+	clientId: Long,
 	sender: User? = null,
 ): Chat {
 	return when (this) {
@@ -51,7 +51,7 @@ fun SocketMessage.toChat(
 				message = message,
 				chatType = getChatType(
 					senderId = senderId,
-					myUserId = myUserId
+					clientId = clientId
 				),
 				dispatchTime = dispatchTime,
 				sender = sender,
@@ -64,7 +64,7 @@ fun SocketMessage.toChat(
 				dispatchTime = dispatchTime,
 				message = message,
 				chatType = ChatType.Notice,
-				sender = null, //유저 정보 가져오기
+				sender = null,
 			)
 	}
 }
