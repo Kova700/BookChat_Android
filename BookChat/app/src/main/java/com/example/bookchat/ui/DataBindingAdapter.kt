@@ -488,6 +488,7 @@ object DataBindingAdapter {
 		}
 	}
 
+	// TODO : 여기부터
 	/**ChatItem 시간 Text 세팅*/
 	@JvmStatic
 	@BindingAdapter("getFormattedTimeText")
@@ -501,7 +502,9 @@ object DataBindingAdapter {
 	@BindingAdapter("setChatSendImgVisibility")
 	fun setChatSendImgVisibility(view: View, chatStatus: ChatStatus?) {
 		view.visibility = when (chatStatus) {
-			ChatStatus.LOADING -> View.VISIBLE
+			ChatStatus.LOADING,
+			ChatStatus.RETRY_REQUIRED -> View.VISIBLE
+
 			else -> View.GONE
 		}
 	}
@@ -512,9 +515,13 @@ object DataBindingAdapter {
 	fun setChatFailBtnVisibility(view: View, chatStatus: ChatStatus?) {
 		view.visibility = when (chatStatus) {
 			ChatStatus.FAILURE -> View.VISIBLE
+			//TODO : 이거만 보일게 아니라 전송시간 가려야함
+			//TODO : 취소, 재전송 버튼 OnClickListener연결하려면 View 분리해서 사용해야함 (지금 덩어리 하나로 묶였음)
 			else -> View.GONE
 		}
 	}
+
+	//TODO : 여기까지 전부 MyChatViewholder가서 설정하자
 
 	/**DrawerLayout 스와이프 off 세팅*/
 	@JvmStatic
