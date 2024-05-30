@@ -1,33 +1,54 @@
 package com.example.bookchat.data.repository
 
+import android.util.Log
 import com.example.bookchat.BuildConfig
 import com.example.bookchat.data.mapper.toChat
 import com.example.bookchat.data.network.model.request.RequestSendChat
 import com.example.bookchat.data.network.model.response.CommonMessage
-import com.example.bookchat.data.network.model.response.MessageType
 import com.example.bookchat.data.network.model.response.NotificationMessage
+import com.example.bookchat.data.network.model.response.NotificationMessageType
 import com.example.bookchat.data.network.model.response.SocketMessage
+import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
+import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.utils.Constants.TAG
 import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import org.hildan.krossbow.stomp.ConnectionException
+import org.hildan.krossbow.stomp.LostReceiptException
+import org.hildan.krossbow.stomp.MissingHeartBeatException
+import org.hildan.krossbow.stomp.SessionDisconnectedException
 import org.hildan.krossbow.stomp.StompClient
+import org.hildan.krossbow.stomp.StompErrorFrameReceived
 import org.hildan.krossbow.stomp.StompSession
+import org.hildan.krossbow.stomp.WebSocketClosedUnexpectedly
 import org.hildan.krossbow.stomp.sendText
 import org.hildan.krossbow.stomp.subscribe
+import org.hildan.krossbow.websocket.WebSocketException
 import javax.inject.Inject
+import kotlin.math.pow
+import kotlin.time.Duration.Companion.seconds
 
-// TODO :SEND를 제외한 모든 Frame에 Receipt받게 헤더 수정 필요함
+//TODO : Socket은 채팅방과 관계없이 연결해두고, 채팅방을 복수로 subscribe하는것도 방법 중 하나일 듯
+
+//TODO : 최종적으로 채팅 무식하게 계속 쳐보고 실패한 채팅도 재전송되고, 소켓 끊기면 재연결 되고, 예외터져도 앱이 안죽는지 Check
+//      홈 나갔다와도 리커넥션 잘 되는지 동기화는 잘 되는지
 class StompHandlerImpl @Inject constructor(
 	private val stompClient: StompClient,
 	private val channelRepository: ChannelRepository,
@@ -39,60 +60,130 @@ class StompHandlerImpl @Inject constructor(
 ) : StompHandler {
 
 	private lateinit var stompSession: StompSession
+	private val _socketState = MutableStateFlow<SocketState>(SocketState.DISCONNECTED)
 
-	override suspend fun connectSocket(channelSId: String, channelId: Long): Flow<SocketMessage> {
-		stompSession = getStompSession()
-		return subscribeChatTopic(
-			stompSession = stompSession,
-			channelSId = channelSId,
-			channelId = channelId
-		)
+	private val mutex = Mutex()
+
+	override fun getSocketStateFlow(): StateFlow<SocketState> {
+		return _socketState.asStateFlow()
 	}
 
-	private suspend fun getStompSession(): StompSession {
-		return stompClient.connect(
-			url = BuildConfig.STOMP_CONNECTION_URL,
-			customStompConnectHeaders = getHeader()
-		)
+	/** 실패 시 지수백오프 커넥션 요청*/
+	override suspend fun connectSocket(
+		channel: Channel,
+		maxAttempts: Int
+	) {
+		mutex.withLock {
+			if (_socketState.value == SocketState.CONNECTING
+				|| _socketState.value == SocketState.CONNECTED
+			) return
+			_socketState.emit(SocketState.CONNECTING)
+		}
+
+		var haveTriedRenewingToken = false
+		for (attempt in 0 until maxAttempts) {
+			Log.d(TAG, "StompHandlerImpl: connectSocket() - attempt : $attempt")
+
+			runCatching {
+				stompClient.connect(
+					url = BuildConfig.STOMP_CONNECTION_URL,
+					customStompConnectHeaders = getHeader()
+				)
+			}.onSuccess {
+				stompSession = it
+				subscribeChannel(channel, maxAttempts)
+				return
+			}.onFailure { throwable ->
+				if ((throwable is ConnectionException) && haveTriedRenewingToken.not()) {
+					runCatching { clientRepository.renewBookChatToken() }
+						.onSuccess { haveTriedRenewingToken = true }
+				}
+				Log.d(TAG, "StompHandlerImpl: connectSocket().onFailure() - throwable :$throwable")
+			}
+			delay((DEFAULT_CONNECTION_ATTEMPT_DELAY_TIME * (1.5).pow(attempt)))
+		}
+		_socketState.emit(SocketState.FAILURE)
+	}
+
+	/** LostReceiptException으로 실패 시에만 지수백오프 구독 요청 */
+	/** + 현재 라이브러리 사정상 소켓연결 여부를 확인할 수 없음으로 구독이 끊기면 disconnect 요청 */
+	private suspend fun subscribeChannel(
+		channel: Channel,
+		maxAttempts: Int
+	) {
+		for (attempt in 0 until maxAttempts) {
+			Log.d(TAG, "StompHandlerImpl: subscribeChannel() - attempt : $attempt")
+
+			runCatching {
+				stompSession.subscribe("${SUBSCRIBE_CHANNEL_DESTINATION}${channel.roomSid}")
+			}.onSuccess { messagesFlow ->
+				_socketState.emit(SocketState.CONNECTED)
+				messagesFlow
+					.catch { handleSocketError("subscribeChannel", it) }
+					.map { it.bodyAsText.parseToSocketMessage() }
+					.collect { socketMessage ->
+						handleSocketMessage(
+							socketMessage = socketMessage,
+							channelId = channel.roomId
+						)
+					}
+				disconnectSocket()
+				return
+			}.onFailure { throwable ->
+				if (throwable !is LostReceiptException) {
+					_socketState.emit(SocketState.FAILURE)
+					return
+				}
+			}
+			/** Recipt 수신 대기 시간이 있음으로 Delay Time 불필요*/
+		}
+		_socketState.emit(SocketState.FAILURE)
 	}
 
 	override suspend fun disconnectSocket() {
-		stompSession.disconnect()
+		_socketState.emit(SocketState.DISCONNECTED)
+		Log.d(TAG, "StompHandlerImpl: disconnectSocket() - called")
+		runCatching { stompSession.disconnect() }
+			.onFailure { handleSocketError("disconnectSocket", it) }
 	}
 
+	/** 백엔드측의 receipt 헤더가 사라지는 오류가 있어서 임시로 LostReceiptException 무시
+	 * (+ 전송실패 시 재전송 로직이 있기때문에 따로 예외처리 X) */
 	override suspend fun sendMessage(
 		channelId: Long,
 		message: String
 	) {
+		Log.d(
+			TAG,
+			"StompHandlerImpl: sendMessage() - message: $message , _socketState : ${_socketState.value}"
+		)
+		if (_socketState.value != SocketState.CONNECTED) {
+			Log.d(TAG, "StompHandlerImpl: sendMessage() - SocketState.DISCONNECTED : 실패로 삽입")
+			insertWaitingChat(
+				channelId = channelId,
+				message = message,
+				chatStatus = ChatStatus.RETRY_REQUIRED
+			)
+			return
+		}
+
 		val receiptId = insertWaitingChat(
 			channelId = channelId,
-			message = message
+			message = message,
+			chatStatus = ChatStatus.LOADING
 		)
-		stompSession.sendText(
-			destination = "${SEND_MESSAGE_DESTINATION}$channelId",
-			body = gson.toJson(
-				RequestSendChat(
-					receiptId = receiptId,
-					message = message
+
+		runCatching {
+			stompSession.sendText(
+				destination = "${SEND_MESSAGE_DESTINATION}$channelId",
+				body = gson.toJson(
+					RequestSendChat(
+						receiptId = receiptId,
+						message = message
+					)
 				)
 			)
-		)
-	}
-
-	private suspend fun subscribeChatTopic(
-		stompSession: StompSession,
-		channelSId: String,
-		channelId: Long
-	): Flow<SocketMessage> {
-		return stompSession
-			.subscribe("${SUBSCRIBE_CHANNEL_DESTINATION}$channelSId")
-			.map { it.bodyAsText.parseToSocketMessage() }
-			.onEach { socketMessage ->
-				handleSocketMessage(
-					socketMessage = socketMessage,
-					channelId = channelId
-				)
-			}
+		}
 	}
 
 	private suspend fun handleSocketMessage(
@@ -116,22 +207,23 @@ class StompHandlerImpl @Inject constructor(
 		socketMessage: CommonMessage,
 		channelId: Long
 	) {
-		val myUserId = clientRepository.getClientProfile().id
+		Log.d(TAG, "StompHandlerImpl: handleCommonMessage() - ${socketMessage.message}")
+		val clientId = clientRepository.getClientProfile().id
 		val receiptId = socketMessage.receiptId
 
 		val chat = socketMessage.toChat(
 			channelId = channelId,
-			myUserId = myUserId,
+			clientId = clientId,
 			sender = userRepository.getUser(socketMessage.senderId)
 		)
 
-		if (socketMessage.senderId != myUserId) {
-			insertNewChat(chat)
+		if (socketMessage.senderId == clientId) {
+			updateWaitingChatToSuccess(chat, receiptId)
 			updateChannelLastChat(chat)
 			return
 		}
 
-		updateWaitingChatToSuccess(chat, receiptId)
+		insertNewChat(chat)
 		updateChannelLastChat(chat)
 	}
 
@@ -139,86 +231,92 @@ class StompHandlerImpl @Inject constructor(
 		socketMessage: NotificationMessage,
 		channelId: Long
 	) {
-		val myUserId = clientRepository.getClientProfile().id
+		val clientId = clientRepository.getClientProfile().id
 		val chat = socketMessage.toChat(
 			channelId = channelId,
-			myUserId = myUserId
+			clientId = clientId
 		)
-		// TODO :Target에 대한 DB수정 작업해야함
-		val noticeTarget = socketMessage.targetId
 
-		//TODO : ++ ㅁㅁ님이 입장하셨습니다.
-		// ㅁㅁ님이 퇴장하셨습니다.
-		// 같이 공지채팅에서 유저이름을 언급하는 경우
-		// 실제 닉네임이 아니라 UserId로 주는게 더 좋아보임
-		// 문제는 없나..?
-		// 메모장에서 언급했던 오래 전 채팅에서 보이는 유저 정보가
-		// 최신 정보임을 보장하지 못하는 내용 (그 사람이 현재 채팅방에 없다면)
-		// 닉네임, 프로필 사진 등
-		// 하지만 카톡도 이렇게 보이는 현상이 있음
-		// 이거 결론 짓고, 전달하면 될 듯
-
-		when (socketMessage.messageType) {
-			//TODO : 채팅방 터짐(방장 나감)도 추가해야함 + Notice이름 좀 바꾸자.
-			MessageType.CHAT -> Unit
-			MessageType.ENTER -> {
-				//TODO : 채팅방 정보 조회를 다시하거나 (당첨)
-				// Enter NOTICE 속에 유저 정보(채팅방 정보조회의 유저 객체처럼)가
-				// 있어야할 것같음 [Id, nickname, profileUrl, defaultImageType]
-
-				//TODO : ㅁㅁ님이 입장 하셨습니다.
-				// 이것도 일반 텍스트가 아닌, UserID님이 입장하셨습니다로 보내고
-				// 이걸 클라이언트가 해당 유저 정보를 가지고 있는 값으로 누구님이 입장하셨습니다로 변경하는게 좋을 듯
-				channelRepository.updateMemberCount(channelId, 1)
+		when (socketMessage.notificationMessageType) {
+			NotificationMessageType.NOTICE_ENTER -> {
+				channelRepository.enterChannelMember(
+					channelId = channelId,
+					targetUserId = socketMessage.targetUserId
+				)
 			}
 
-			MessageType.EXIT -> {
-				//TODO : 채팅방 퇴장 시에 서버에서 넣어주는 채팅 ㅁㅁ님이 퇴장 하셨습니다.
-				// 이걸 일반 텍스트가 아닌, UserId님이 퇴장하셨습니다로 보내고
-				// 이걸 클라이언트가 해당 유저 정보를 가지고 있는 값으로 누구님이 퇴장하셨습니다로 변경하는게 좋을 듯
-
-				//TODO : 만약 방장이 나갔다면 채팅방 삭제 후 공지 띄우고 채팅 입력 막아야함.
-				// 채팅방 인원 수 감소
-				channelRepository.updateMemberCount(channelId, -1)
+			NotificationMessageType.NOTICE_EXIT -> {
+				channelRepository.leaveChannelMember(
+					channelId = channelId,
+					targetUserId = socketMessage.targetUserId
+				)
 			}
 
-			MessageType.NOTICE_KICK -> {
-				//채팅방 인원 수 감소
-				channelRepository.updateMemberCount(channelId, -1)
+			NotificationMessageType.NOTICE_HOST_EXIT -> {
+				//TODO : 방장이 채팅방을 나간 시점에 소켓에 연결되어있지 않던 사람은?
+				// 이걸 위해서 FCM으로 채팅방이 isExploded 되었다는 이벤트 + 채팅방 정보 조회 시점에 채팅방의 isExploded 유무 상태를 같이 주는 게 좋을 듯
+				// (서버에서는 Exploded된 채팅방을 특정 유예기간 동안만 데이터를 가지고 있다가 기간이 지나면 스케줄러가 Exploded 상태의 채팅방을 삭제하는 방향으로 하면 좋을 듯)
+				// 전체 채팅방 검색 시에는 Exploded된 채팅방은 필터해서 주거나 상태 또한 같이 주거나해서 enter 시도 시에 적절한 UI를 보일 수 있게 구현
+				// + isBanned도 같은 맥락으로 추가되어야 할듯 혹은 Banned된 유저 목록을 주거나
+				channelRepository.leaveChannelHost(channelId)
 			}
 
-			MessageType.NOTICE_HOST_DELEGATE -> {
-				//방장 변경
+			NotificationMessageType.NOTICE_KICK -> {
+				channelRepository.banChannelMember(
+					channelId = channelId,
+					targetUserId = socketMessage.targetUserId
+				)
 			}
 
-			MessageType.NOTICE_SUB_HOST_DISMISS -> {
-				//Target 부방장 해임
+			NotificationMessageType.NOTICE_HOST_DELEGATE -> {
+				channelRepository.updateChannelHost(
+					channelId = channelId,
+					targetUserId = socketMessage.targetUserId,
+				)
 			}
 
-			MessageType.NOTICE_SUB_HOST_DELEGATE -> {
-				//Target 부방장 위임
+			NotificationMessageType.NOTICE_SUB_HOST_DELEGATE -> {
+				channelRepository.updateChannelMemberAuthority(
+					channelId = channelId,
+					targetUserId = socketMessage.targetUserId,
+					channelMemberAuthority = ChannelMemberAuthority.SUB_HOST,
+				)
 			}
+
+			NotificationMessageType.NOTICE_SUB_HOST_DISMISS -> {
+				channelRepository.updateChannelMemberAuthority(
+					channelId = channelId,
+					targetUserId = socketMessage.targetUserId,
+					channelMemberAuthority = ChannelMemberAuthority.GUEST,
+				)
+			}
+
 		}
-
-		//TODO : 터질 확률이 높음
-		// 유저채팅이 아니고, 프로필도 없고, defaultImageType도 없음으로로
-		// if (!isFirstItemOnScreen) newOtherChatNoticeFlow.value = chatEntity
 		insertNewChat(chat)
 		updateChannelLastChat(chat)
 	}
 
 	private suspend fun insertNewChat(chat: Chat) {
+		Log.d(TAG, "StompHandlerImpl: insertNewChat() - chat : ${chat.message}")
 		chatRepository.insertChat(chat)
 	}
 
-	private suspend fun insertWaitingChat(channelId: Long, message: String): Long {
-		val myUserId = clientRepository.getClientProfile().id
+	private suspend fun insertWaitingChat(
+		channelId: Long,
+		message: String,
+		chatStatus: ChatStatus
+	): Long {
+		val clientId = clientRepository.getClientProfile().id
 		return chatRepository.insertWaitingChat(
-			roomId = channelId, message = message, myUserId = myUserId
+			channelId = channelId,
+			message = message,
+			clientId = clientId,
+			chatStatus = chatStatus
 		)
 	}
 
 	private suspend fun updateWaitingChatToSuccess(chat: Chat, receiptId: Long) {
+		Log.d(TAG, "StompHandlerImpl: updateWaitingChatToSuccess() - chat: ${chat.message}")
 		chatRepository.updateWaitingChat(
 			targetChatId = receiptId,
 			newChatId = chat.chatId,
@@ -228,28 +326,72 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	private suspend fun updateChannelLastChat(chat: Chat) {
-		channelRepository.updateLastChat(
+		Log.d(TAG, "StompHandlerImpl: updateChannelLastChat() - ${chat.message}")
+		channelRepository.updateChannelLastChatIfValid(
 			channelId = chat.chatRoomId,
 			chatId = chat.chatId
 		)
 	}
 
-	private fun String.parseToSocketMessage(): SocketMessage {
-		runCatching { gson.fromJson(this, CommonMessage::class.java) }
-			.onSuccess { return it }
-		runCatching { gson.fromJson(this, NotificationMessage::class.java) }
-			.onSuccess { return it }
-		throw JsonSyntaxException("Json cannot be deserialized to SocketMessage")
-	}
-
 	private fun getHeader(): Map<String, String> {
 		val bookchatToken = runBlocking { bookChatTokenRepository.getBookChatToken() }
 		return mapOf(AUTHORIZATION to "${bookchatToken?.accessToken}")
+			.also {
+				Log.d(
+					TAG,
+					"StompHandlerImpl: getHeader() - accessToken : ${bookchatToken?.accessToken}"
+				)
+			}
+	}
+
+	private fun String.parseToSocketMessage(): SocketMessage {
+		val hashMap = gson.fromJson(this, LinkedHashMap::class.java)
+		if (hashMap["senderId"] != null) {
+			return gson.fromJson(this, CommonMessage::class.java)
+		}
+		return gson.fromJson(this, NotificationMessage::class.java)
+	}
+
+	private suspend fun handleSocketError(caller: String, throwable: Throwable) {
+		Log.d(TAG, "StompHandlerImpl: handleSocketError(caller :$caller) - throwable :$throwable")
+		when (throwable) {
+
+			/** 일부 소비자가 더 많은 프레임을 기대하는 동안 STOMP 프레임 Flow가 Complete되면 예외가 발생합니다.
+			 * ex : RECEIPT 프레임을 기다리는 동안 STOMP 프레임 흐름이 예기치 않게 완료 */
+			is SessionDisconnectedException -> Unit
+
+			/** STOMP ERROR 프레임이 수신되면 예외가 발생합니다. 일반적으로 구독 채널을 통해 발생합니다.
+			 * 브로커와의 연결이 끊겼을 때, 메세지를 보내는등의 어떤 행위를 하면 발생 (Connection to broker closed.)
+			 * (소켓은 연결되었지만 구독되지않았을 때 터짐 == 자동으로 닫힘)*/
+			is StompErrorFrameReceived -> Unit
+
+			/** 기본 웹소켓 연결이 부적절한 시간에 닫힐 때 발생하는 예외입니다.
+			 * (unsubscribe를 하지 않은 상태에서 disconnect 호출이 된 순간 거의 발생
+			 * (자의적으로 끊기는 경우 발생되어 재연결 불필요)) */
+			is WebSocketClosedUnexpectedly -> Unit
+
+			/** 예상되는 Socket HeartBeat이 서버 측으로부터 수신되지 않으면 예외가 발생합니다.
+			 * (소켓이 타의적으로 끊기는 경우 발생) */
+			is MissingHeartBeatException -> _socketState.emit(SocketState.NEED_RECONNECTION)
+
+			/** WebSocketException: 웹 소켓 수준에서 문제가 발생한 경우 발생하는 예외입니다. + 인터넷 연결을 끊어도 발생
+			 * 자식 : WebSocketConnectionException  : websocket 연결 + STOMP 연결에 시간이 너무 오래 걸리는 경우 예외가 발생합니다. (+인터넷 꺼놓고 Connect 요청시에 발생)
+			 * 자식 : WebSocketConnectionClosedException  : 핸드셰이크 중에 서버가 예기치 않게 연결을 닫았을 때 발생하는 예외입니다.
+			 * */
+			is WebSocketException -> _socketState.emit(SocketState.NEED_RECONNECTION)
+
+			/** 최초 connection시, stompSession가 연결되어있지 않을 떄, disconnect호출되면 발생 */
+			is UninitializedPropertyAccessException -> Unit
+
+			else -> Unit
+		}
 	}
 
 	companion object {
 		private const val AUTHORIZATION = "Authorization"
 		private const val SEND_MESSAGE_DESTINATION = "/subscriptions/send/chatrooms/"
 		private const val SUBSCRIBE_CHANNEL_DESTINATION = "/topic/"
+		private val DEFAULT_CONNECTION_ATTEMPT_DELAY_TIME = 1.seconds
 	}
+
 }

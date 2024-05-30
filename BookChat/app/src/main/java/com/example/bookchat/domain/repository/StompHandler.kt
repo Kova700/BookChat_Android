@@ -1,16 +1,25 @@
 package com.example.bookchat.domain.repository
 
-import com.example.bookchat.data.network.model.response.SocketMessage
-import kotlinx.coroutines.flow.Flow
+import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.SocketState
+import kotlinx.coroutines.flow.StateFlow
 
 interface StompHandler {
+	fun getSocketStateFlow(): StateFlow<SocketState>
 
-	suspend fun connectSocket(channelSId: String, channelId: Long): Flow<SocketMessage>
+	suspend fun connectSocket(
+		channel: Channel,
+		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS
+	)
+
 	suspend fun disconnectSocket()
-
 	suspend fun sendMessage(
 		channelId: Long,
 		message: String
 	)
 
+	companion object {
+		private const val DEFAULT_RETRY_MAX_ATTEMPTS = 5
+
+	}
 }

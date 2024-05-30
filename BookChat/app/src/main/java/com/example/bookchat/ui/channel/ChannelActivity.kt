@@ -1,6 +1,7 @@
 package com.example.bookchat.ui.channel
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -12,12 +13,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityChannelBinding
-import com.example.bookchat.ui.channel.adapter.chat.ChatDataItemAdapter
+import com.example.bookchat.domain.model.Chat
+import com.example.bookchat.domain.model.SocketState
+import com.example.bookchat.domain.model.User
+import com.example.bookchat.ui.channel.adapter.chat.ChatItemAdapter
 import com.example.bookchat.ui.channel.adapter.drawer.ChannelDrawerAdapter
+import com.example.bookchat.ui.channel.model.chat.ChatItem
+import com.example.bookchat.utils.isOnListBottom
+import com.example.bookchat.utils.isOnListTop
+import com.example.bookchat.utils.isVisiblePosition
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class ChannelActivity : AppCompatActivity() {
@@ -26,7 +35,7 @@ class ChannelActivity : AppCompatActivity() {
 	private val channelViewModel by viewModels<ChannelViewModel>()
 
 	@Inject
-	lateinit var chatDataItemAdapter: ChatDataItemAdapter
+	lateinit var chatItemAdapter: ChatItemAdapter
 
 	@Inject
 	lateinit var channelDrawerAdapter: ChannelDrawerAdapter
@@ -34,33 +43,41 @@ class ChannelActivity : AppCompatActivity() {
 	@Inject
 	lateinit var chatItemDecoration: ChatItemDecoration
 
+	private lateinit var linearLayoutManager: LinearLayoutManager
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_channel)
-		binding.lifecycleOwner = this@ChannelActivity
+		binding.lifecycleOwner = this
 		binding.viewmodel = channelViewModel
 		setBackPressedDispatcher()
+		initLayoutManager()
 		initAdapter()
 		initRcv()
 		initViewState()
 		observeUiState()
-		observeEvent()
+		observeUiEvent()
+	}
+
+	override fun onStart() {
+		super.onStart()
+		channelViewModel.onStartScreen()
 	}
 
 	override fun onStop() {
-		channelViewModel.saveTempSavedMessage()
 		super.onStop()
+		channelViewModel.onStopScreen()
 	}
 
 	private fun observeUiState() = lifecycleScope.launch {
 		channelViewModel.uiState.collect { uiState ->
-			chatDataItemAdapter.submitList(uiState.chats)
+			chatItemAdapter.submitList(uiState.chats)
 			channelDrawerAdapter.submitList(uiState.drawerItems)
-			setMessageBarState(uiState)
+			setViewState(uiState)
 		}
 	}
 
-	private fun observeEvent() = lifecycleScope.launch {
+	private fun observeUiEvent() = lifecycleScope.launch {
 		channelViewModel.eventFlow.collect { event -> handleEvent(event) }
 	}
 
@@ -70,12 +87,20 @@ class ChannelActivity : AppCompatActivity() {
 				val message = text?.toString() ?: return@addTextChangedListener
 				channelViewModel.onChangeEnteredMessage(message)
 			}
-			setOnEditorActionListener { _, _, _ ->
-				channelViewModel.onClickSendMessage()
-				false
-			}
 		}
+	}
 
+	private fun setViewState(uiState: ChannelUiState) {
+		setMessageBarState(uiState)
+		setNewChatNoticeState(uiState)
+		setSocketConnectionUiState(uiState)
+	}
+
+	private fun setSocketConnectionUiState(uiState: ChannelUiState) {
+		//TODO : 이 상태에 맞게 유저에게 소켓 연결 상태 UI 제공 (상단에 소켓연결상태)
+		//  연결되면 카톡처럼 상단에 "연결되었습니다" 3초정도 보여주고 사라짐(GONE)
+		//  연결 끊기면 "오프라인 상태입니다" 회색 배경 계속 보여주기
+		uiState.socketState
 	}
 
 	private fun setMessageBarState(uiState: ChannelUiState) {
@@ -87,53 +112,68 @@ class ChannelActivity : AppCompatActivity() {
 		}
 	}
 
+	private fun setNewChatNoticeState(uiState: ChannelUiState) {
+		binding.newChatNoticeLayout.layout.visibility =
+			if (uiState.newChatNotice != null) View.VISIBLE else View.INVISIBLE
+	}
+
+	private fun initLayoutManager() {
+		linearLayoutManager = LinearLayoutManager(this)
+		linearLayoutManager.reverseLayout = true
+	}
+
 	private fun initAdapter() {
-		chatDataItemAdapter.registerAdapterDataObserver(adapterDataObserver)
+		chatItemAdapter.onClickUserProfile = (::moveToUserProfile)
+		chatItemAdapter.registerAdapterDataObserver(adapterDataObserver)
 	}
 
 	private val adapterDataObserver = object : RecyclerView.AdapterDataObserver() {
 		override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-			onNewChatInsertedCallBack()
+			super.onItemRangeInserted(positionStart, itemCount)
+			scrollToLastReadNoticeIfExists()
+			if (itemCount <= 2) scrollToBottomIfOnBottom()
+			removeNewChatNoticeIfAppearsOnScreen()
+			removeLastReadNoticeScrollFlagIfAppearsOnScreen()
 		}
 	}
 
-	private fun onNewChatInsertedCallBack() {
-		if (channelViewModel.scrollForcedFlag) {
-			scrollNewChatItem()
-			channelViewModel.scrollForcedFlag = false
-			return
-		}
-
-		if (channelViewModel.isFirstItemOnScreen) {
-			scrollNewChatItem()
-		}
+	private fun scrollToLastReadNoticeIfExists() {
+		val lastReadChatNoticeIndex = chatItemAdapter.lastReadChatNoticeIndex
+		if (isPossibleScrollToLastReadNotice(lastReadChatNoticeIndex).not()) return
+		scrollToPosition(lastReadChatNoticeIndex)
 	}
 
-	private fun scrollNewChatItem() {
-		binding.chattingRcv.scrollToPosition(0)
+	private fun isPossibleScrollToLastReadNotice(lastReadChatNoticeIndex: Int): Boolean {
+		return chatItemAdapter.currentList.isNotEmpty()
+						&& (channelViewModel.uiState.value.socketState == SocketState.CONNECTED)
+						&& (lastReadChatNoticeIndex != -1 &&
+						channelViewModel.uiState.value.needToScrollToLastReadChat)
+	}
+
+	/** 새로운 채팅이 들어오는 경우 스크롤 position이 고정되는 현상이 있어서 아래로 스크롤 */
+	private fun scrollToBottomIfOnBottom() {
+		if (channelViewModel.uiState.value.isNewerChatFullyLoaded.not()
+			|| linearLayoutManager.isOnListBottom().not()
+		) return
+		scrollToBottom()
 	}
 
 	private fun initRcv() {
-		val linearLayoutManager =
-			LinearLayoutManager(this@ChannelActivity).apply { reverseLayout = true }
-
-		// TODO : 스크롤 위로 올리면 아래로 스크롤 내릴 수 있는 버튼 보이기
 		val rcvScrollListener = object : RecyclerView.OnScrollListener() {
 			override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
 				super.onScrolled(recyclerView, dx, dy)
-				channelViewModel.loadNextChats(
-					linearLayoutManager.findLastVisibleItemPosition()
-				)
-				val isFirstItemOnScreen = isFistItemOnScreen(recyclerView)
-				channelViewModel.isFirstItemOnScreen = isFirstItemOnScreen
-				if (isFirstItemOnScreen) {
-					channelViewModel.newChatNoticeFlow.value = null
+				removeNewChatNoticeIfAppearsOnScreen()
+				removeLastReadNoticeScrollFlagIfAppearsOnScreen()
+				channelViewModel.onChangeStateOfLookingAtBottom(linearLayoutManager.isOnListBottom())
+				when {
+					linearLayoutManager.isOnListTop() -> channelViewModel.onReachedTopChat()
+					linearLayoutManager.isOnListBottom() -> channelViewModel.onReachedBottomChat()
 				}
 			}
 		}
 
 		binding.chattingRcv.apply {
-			adapter = chatDataItemAdapter
+			adapter = chatItemAdapter
 			setHasFixedSize(true)
 			addItemDecoration(chatItemDecoration)
 			layoutManager = linearLayoutManager
@@ -147,11 +187,23 @@ class ChannelActivity : AppCompatActivity() {
 		}
 	}
 
-	private fun isFistItemOnScreen(recyclerView: RecyclerView): Boolean {
-		val lm = recyclerView.layoutManager as LinearLayoutManager
-		val firstVisiblePosition: Int = lm.findFirstVisibleItemPosition()
-		val lastVisiblePosition: Int = lm.findLastVisibleItemPosition()
-		return 0 in firstVisiblePosition..lastVisiblePosition
+	private fun removeNewChatNoticeIfAppearsOnScreen() {
+		val newestChatNotMineIndex = chatItemAdapter.newestChatNotMineIndex
+		if (linearLayoutManager.isVisiblePosition(newestChatNotMineIndex).not()) return
+		val item = chatItemAdapter.currentList[newestChatNotMineIndex] as ChatItem.Message
+		channelViewModel.onReadNewestChatNotMineInList(item)
+	}
+
+	private fun removeLastReadNoticeScrollFlagIfAppearsOnScreen() {
+		val lastReadChatNoticeIndex = chatItemAdapter.lastReadChatNoticeIndex
+		if (linearLayoutManager.isVisiblePosition(lastReadChatNoticeIndex).not()) return
+		channelViewModel.onReadLastReadNotice()
+	}
+
+	private fun moveToUserProfile(user: User) {
+//		val intent = Intent(this, Activity::class.java)
+//			.putExtra(EXTRA_USER_ID, userId)
+//		startActivity(intent)
 	}
 
 	private fun setBackPressedDispatcher() {
@@ -160,13 +212,48 @@ class ChannelActivity : AppCompatActivity() {
 		}
 	}
 
+	private fun scrollToPosition(position: Int) {
+		val offset = binding.chattingRcv.height / 2
+		linearLayoutManager.scrollToPositionWithOffset(position, offset)
+	}
+
+	private fun scrollToBottom() {
+		if (isPossibleScrollToBottom().not()) return
+		binding.chattingRcv.scrollToPosition(0)
+	}
+
+	private fun isPossibleScrollToBottom(): Boolean {
+		return chatItemAdapter.currentList.isNotEmpty()
+						&& channelViewModel.uiState.value.isNewerChatFullyLoaded
+	}
+
+	/** 현재 로드된 채팅 기준으로 가장 최신 채팅이 화면상에 보이지 않는다면 무조건 notice
+	 * 지금 보고있는 화면상 가장 상단의 채팅이 newestChatNotFailedIndex보다 인덱스가 낮은 경우는
+	 * FailedChat으로 화면이 가득찬 경우로 인지하고 띄우지 않음 */
+	private fun checkIfNewChatNoticeIsRequired(channelLastChat: Chat) {
+		val newestChatNotFailedIndex = chatItemAdapter.newestChatNotFailedIndex
+		val lvip = linearLayoutManager.findLastVisibleItemPosition()
+
+		if (channelViewModel.uiState.value.isNewerChatFullyLoaded.not()){
+			channelViewModel.onNeedNewChatNotice(channelLastChat)
+			return
+		}
+
+		if (linearLayoutManager.isVisiblePosition(newestChatNotFailedIndex)
+			|| (lvip <= newestChatNotFailedIndex)
+		) return
+
+		channelViewModel.onNeedNewChatNotice(channelLastChat)
+	}
+
 	private fun handleEvent(event: ChannelEvent) {
 		when (event) {
 			ChannelEvent.MoveBack -> finish()
 			ChannelEvent.CaptureChannel -> {}
-			ChannelEvent.ScrollNewChannelItem -> scrollNewChatItem()
 			ChannelEvent.OpenOrCloseDrawer -> openOrCloseDrawer()
+			ChannelEvent.ScrollToBottom -> scrollToBottom()
 			is ChannelEvent.MakeToast -> makeToast(event.stringId)
+			is ChannelEvent.NewChatOccurEvent -> checkIfNewChatNoticeIsRequired(event.chat)
 		}
 	}
 

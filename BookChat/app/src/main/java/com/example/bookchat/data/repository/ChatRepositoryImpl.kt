@@ -1,40 +1,54 @@
 package com.example.bookchat.data.repository
 
-import android.util.Log
 import com.example.bookchat.data.database.dao.ChatDAO
 import com.example.bookchat.data.mapper.toChat
 import com.example.bookchat.data.mapper.toChatEntity
 import com.example.bookchat.data.network.BookChatApi
+import com.example.bookchat.data.network.model.SearchSortOptionNetwork
 import com.example.bookchat.domain.model.Chat
+import com.example.bookchat.domain.model.ChatStatus
+import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.domain.repository.UserRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
+import kotlin.math.pow
+import kotlin.time.Duration.Companion.seconds
 
 class ChatRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi,
 	private val chatDAO: ChatDAO,
 	private val clientRepository: ClientRepository,
+	private val userRepository: UserRepository,
 ) : ChatRepository {
+	private val mapChats =
+		MutableStateFlow<Map<Long, Chat>>(emptyMap()) //(chatId, Chat)
+	private val sortedChats = mapChats.map { it.values }
+		.map { chats -> chats.map { it.attachUser() } }
+		.map { chats ->
+			//ORDER BY status ASC, chat_id DESC
+			chats.sortedWith(
+				compareBy(
+					{ chat -> chat.status.code },
+					{ chat -> chat.chatId.unaryMinus() }
+				))
+		}
 
-	private val mapChats = MutableStateFlow<Map<Long, Chat>>(emptyMap()) //(chatId, Chat)
-	private val sortedChats = mapChats.map {
-		//ORDER BY status, chat_id DESC
-		it.values.toList()
-			.sortedWith(
-				compareBy({ chat -> chat.status }, { chat -> chat.chatId.unaryMinus() })
-			)
-	}.onEach { cachedChats = it }
-
-	private var cachedChats: List<Chat> = emptyList()
 	private var cachedChannelId: Long? = null
-	private var currentPage: Long? = null
-	private var isEndPage = false
+
+	private var currentOlderChatPage: Long? = null
+	private var currentNewerChatPage: Long? = null
+
+	private val _isOlderChatFullyLoaded = MutableStateFlow<Boolean>(false)
+	private val _isNewerChatFullyLoaded = MutableStateFlow<Boolean>(true)
 
 	override fun getChatsFlow(
 		initFlag: Boolean,
@@ -44,63 +58,265 @@ class ChatRepositoryImpl @Inject constructor(
 		return sortedChats
 	}
 
-	override suspend fun getChats(
+	override fun getOlderChatIsEndFlow(): StateFlow<Boolean> {
+		_isOlderChatFullyLoaded.value = false
+		return _isOlderChatFullyLoaded.asStateFlow()
+	}
+
+	override fun getNewerChatIsEndFlow(): StateFlow<Boolean> {
+		_isNewerChatFullyLoaded.value = true
+		return _isNewerChatFullyLoaded.asStateFlow()
+	}
+
+	/** 소켓이 끊긴 사이 발생한 채팅들을 서버와 동기화하기 위해서 호출
+	 * 2번 getNewerChats 호출 후, 남은 채팅이 더있다면
+	 * 더 이상 호출하지 않고, channelLastChat만 갱신하여 유저에게 새로운 채팅이 있음을 알림 */
+	override suspend fun syncChats(
 		channelId: Long,
-		size: Int
+		maxAttempts: Int
 	): List<Chat> {
-		if (cachedChannelId != channelId) {
-			clearCachedData()
+		_isNewerChatFullyLoaded.value = false
+
+		var isFinishGetNewerChats = false
+		for (attempt in 0 until maxAttempts) {
+
+			if (isFinishGetNewerChats.not()) {
+				for (i in 0 until 2) {
+					runCatching { getNewerChats(channelId) }
+					if (_isNewerChatFullyLoaded.value) return sortedChats.firstOrNull() ?: emptyList()
+				}
+				isFinishGetNewerChats = true
+			}
+
+			runCatching {
+				bookChatApi.getChats(
+					roomId = channelId,
+					postCursorId = null,
+					size = ChatRepository.CHAT_DEFAULT_LOAD_SIZE,
+					sort = SearchSortOptionNetwork.ID_DESC,
+				)
+			}.onSuccess { response ->
+				val newChats = response.chatResponseList
+					.map {
+						it.toChat(
+							chatRoomId = channelId,
+							clientId = clientRepository.getClientProfile().id
+						)
+					}
+				cachedChannelId = channelId
+				_isNewerChatFullyLoaded.value = response.cursorMeta.last
+				currentNewerChatPage =
+					if (newChats.isEmpty()) currentNewerChatPage else response.cursorMeta.nextCursorId
+				chatDAO.insertChats(newChats.toChatEntity())
+				if (_isNewerChatFullyLoaded.value) setChats(mapChats.value + newChats.associateBy { it.chatId })
+				return newChats
+			}
+
 		}
-		if (isEndPage) return cachedChats
+		return emptyList()
+	}
+
+	/** 서버에 있는 채팅 우선적으로 쿼리 (지수백오프 getNewestChats 요청 */
+	override suspend fun getNewestChats(
+		channelId: Long,
+		size: Int,
+		maxAttempts: Int
+	): List<Chat> {
+		for (attempt in 0 until maxAttempts) {
+
+			runCatching {
+				bookChatApi.getChats(
+					roomId = channelId,
+					postCursorId = null,
+					size = size,
+					sort = SearchSortOptionNetwork.ID_DESC,
+				)
+			}.onSuccess { response ->
+				val newChats = response.chatResponseList
+					.map {
+						it.toChat(
+							chatRoomId = channelId,
+							clientId = clientRepository.getClientProfile().id
+						)
+					}
+
+				clearCachedData()
+				_isOlderChatFullyLoaded.value = newChats.size < size
+				_isNewerChatFullyLoaded.value = true
+				cachedChannelId = channelId
+				currentOlderChatPage = newChats.lastOrNull()?.chatId
+				currentNewerChatPage = newChats.firstOrNull()?.chatId
+				insertAllChats(newChats + getFailedChats(channelId))
+				return newChats
+			}
+			delay((DEFAULT_RETRY_ATTEMPT_DELAY_TIME * (1.5).pow(attempt)))
+		}
+		return emptyList() //TODO : 실패하면 실패했다고 알리는게 좋지않나? FirstChat 이랑 ScrollBottom한테
+	}
+
+	override suspend fun getOfflineNewestChats(
+		channelId: Long,
+		size: Int,
+	) {
+		clearCachedData()
+		val offlineNewestChats = chatDAO.getNewestChats(
+			channelId = channelId,
+			size = size
+		).map { it.toChat() }
+		setChats(mapChats.value + offlineNewestChats.associateBy { it.chatId })
+		cachedChannelId = channelId
+	}
+
+	//TODO : 추후 WorkManager로 ChatStatus.RETRY_REQUIRED인 채팅들 retry로직 앱 단위로 추가
+	private suspend fun getFailedChats(channelId: Long): List<Chat> {
+		return chatDAO.getChannelsFailedChats(channelId)
+			.map { it.copy(status = ChatStatus.FAILURE.code).toChat() }
+	}
+
+	/** 서버에 있는 채팅 우선적으로 쿼리 + API 실패시 로컬데이터 호출X (채팅 연속성을 보장하지못함)*/
+	override suspend fun getChatsAroundId(channelId: Long, baseChatId: Long, size: Int) {
 
 		val response = bookChatApi.getChats(
 			roomId = channelId,
-			postCursorId = currentPage,
-			size = size
+			postCursorId = baseChatId - 1,
+			size = size,
+			sort = SearchSortOptionNetwork.ID_ASC,
 		)
-
-		cachedChannelId = channelId
-		isEndPage = response.cursorMeta.last
-		currentPage = response.cursorMeta.nextCursorId
 
 		val newChats = response.chatResponseList.map {
 			it.toChat(
 				chatRoomId = channelId,
-				myUserId = clientRepository.getClientProfile().id
+				clientId = clientRepository.getClientProfile().id
 			)
 		}
-		insertAllChats(newChats)
-		return newChats
+
+		clearCachedData()
+		cachedChannelId = channelId
+		_isOlderChatFullyLoaded.value = false
+		_isNewerChatFullyLoaded.value = response.cursorMeta.last
+		currentOlderChatPage = baseChatId
+		currentNewerChatPage =
+			if (newChats.isEmpty()) currentNewerChatPage else response.cursorMeta.nextCursorId
+
+		if (_isNewerChatFullyLoaded.value.not()) {
+			chatDAO.insertChats(newChats.toChatEntity())
+			setChats(mapChats.value + newChats.associateBy { it.chatId })
+			return
+		}
+		insertAllChats(newChats + getFailedChats(channelId))
 	}
 
-	override suspend fun getChat(chatId: Long): Chat? {
+	/** 서버에 있는 채팅 우선적으로 쿼리 + API 실패시 로컬데이터 호출X (채팅 연속성을 보장하지못함)*/
+	override suspend fun getNewerChats(channelId: Long, size: Int) {
+		if (_isNewerChatFullyLoaded.value) return
+
+		val response = bookChatApi.getChats(
+			roomId = channelId,
+			postCursorId = currentNewerChatPage,
+			size = size,
+			sort = SearchSortOptionNetwork.ID_ASC,
+		)
+		val newChats = response.chatResponseList.map {
+			it.toChat(
+				chatRoomId = channelId,
+				clientId = clientRepository.getClientProfile().id
+			)
+		}
+
+		cachedChannelId = channelId
+		_isNewerChatFullyLoaded.value = response.cursorMeta.last
+		currentNewerChatPage =
+			if (newChats.isEmpty()) currentNewerChatPage else response.cursorMeta.nextCursorId
+
+		/** getNewestChats로 초기화된 경우 삽입 무시 */
+		if (currentNewerChatPage == null) return
+
+		chatDAO.insertChats(newChats.toChatEntity())
+		setChats(mapChats.value + newChats.associateBy { it.chatId })
+		return
+	}
+
+	/** 서버에 있는 채팅 우선적으로 쿼리 + API 실패시 로컬데이터 호출X (채팅 연속성을 보장하지못함)*/
+	override suspend fun getOlderChats(channelId: Long, size: Int) {
+		if (_isOlderChatFullyLoaded.value) return
+
+		val response = bookChatApi.getChats(
+			roomId = channelId,
+			postCursorId = currentOlderChatPage,
+			size = size,
+			sort = SearchSortOptionNetwork.ID_DESC,
+		)
+
+		val newChats = response.chatResponseList.map {
+			it.toChat(
+				chatRoomId = channelId,
+				clientId = clientRepository.getClientProfile().id
+			)
+		}
+
+		cachedChannelId = channelId
+		_isOlderChatFullyLoaded.value = response.cursorMeta.last
+		currentOlderChatPage =
+			if (newChats.isEmpty()) currentNewerChatPage else response.cursorMeta.nextCursorId
+
+		/** getNewestChats로 초기화된 경우 삽입 무시 */
+		if (currentOlderChatPage == null) return
+
+		chatDAO.insertChats(newChats.toChatEntity())
+		setChats(mapChats.value + newChats.associateBy { it.chatId })
+	}
+
+	/** 로컬에 있는 채팅 우선적으로 쿼리 */
+	override suspend fun getChat(chatId: Long): Chat {
+		val chat = mapChats.value[chatId]
+			?: getOfflineChat(chatId)
+			?: getOnlineChat(chatId)
+		return chat.attachUser()
+	}
+
+	private suspend fun getOfflineChat(chatId: Long): Chat? {
 		return chatDAO.getChat(chatId)?.toChat()
 	}
 
-	override suspend fun getChatForFCM(chatId: Long): Chat {
-		Log.d(TAG, "ChatRepositoryImpl: getChatForFCM() - called")
-		val chat = bookChatApi.getChatForFCM(chatId).toChat(clientRepository.getClientProfile().id)
-		insertChat(chat)
-		Log.d(TAG, "ChatRepositoryImpl: getChatForFCM() - chat : $chat")
-		return chat
+	private suspend fun getOnlineChat(chatId: Long): Chat {
+		return bookChatApi.getChat(chatId)
+			.toChat(clientId = clientRepository.getClientProfile().id)
+			.also { insertChat(it) }
 	}
 
 	override suspend fun insertChat(chat: Chat) {
 		val chatId = chatDAO.insertChat(chat.toChatEntity())
-		if (chat.chatRoomId != cachedChannelId) return
+		if (chat.chatRoomId != cachedChannelId || _isNewerChatFullyLoaded.value.not()) return
 		val newMapChats = mapChats.value + (chatId to chat)
-		mapChats.emit(newMapChats)
+		setChats(newMapChats)
+	}
+
+	private fun setChats(newChats: Map<Long, Chat>) {
+		mapChats.update { newChats }
 	}
 
 	override suspend fun insertAllChats(chats: List<Chat>) {
-		chatDAO.insertAllChat(chats.toChatEntity())
-		mapChats.emit(mapChats.value + chats.associateBy { it.chatId })
+		chatDAO.insertChats(chats.toChatEntity())
+		if (_isNewerChatFullyLoaded.value.not()) return
+		setChats(mapChats.value + chats.associateBy { it.chatId })
 	}
 
-	override suspend fun insertWaitingChat(roomId: Long, message: String, myUserId: Long): Long {
-		val chatId = chatDAO.insertWaitingChat(roomId, message, myUserId)
+	override suspend fun insertWaitingChat(
+		channelId: Long,
+		message: String,
+		clientId: Long,
+		chatStatus: ChatStatus
+	): Long {
+		val chatId = chatDAO.insertWaitingChat(
+			channelId = channelId,
+			message = message,
+			clientId = clientId,
+			chatStatus = chatStatus
+		)
+		if (channelId != cachedChannelId || _isNewerChatFullyLoaded.value.not()) return chatId
+
 		val newChat = chatDAO.getChat(chatId)?.toChat() ?: return chatId
-		mapChats.emit(mapChats.value + (chatId to newChat))
+		setChats(mapChats.value + (chatId to newChat))
 		return chatId
 	}
 
@@ -112,15 +328,44 @@ class ChatRepositoryImpl @Inject constructor(
 	) {
 		chatDAO.updateWaitingChat(newChatId, dispatchTime, status, targetChatId)
 		val newChat = chatDAO.getChat(newChatId)?.toChat() ?: return
-		mapChats.emit(mapChats.value - (targetChatId) + (newChatId to newChat))
+		setChats(mapChats.value - (targetChatId) + (newChatId to newChat))
 	}
 
 	private fun clearCachedData() {
 		mapChats.update { emptyMap() }
-		cachedChats = emptyList()
 		cachedChannelId = null
-		currentPage = null
-		isEndPage = false
+
+		currentOlderChatPage = null
+		currentNewerChatPage = null
+		_isOlderChatFullyLoaded.value = false
+		_isNewerChatFullyLoaded.value = true
 	}
 
+	/** 로그아웃 + 회원탈퇴시에 모든 repository 일괄 호출 */
+	override suspend fun clear() {
+		clearCachedData()
+		chatDAO.deleteAll()
+	}
+
+	private suspend fun Chat.attachUser(): Chat {
+		val sender = sender?.id?.let { userRepository.getUser(it) }
+		val message =
+			if (chatType != ChatType.Notice) this.message
+			else {
+				if (message.contains("#").not()) this.message
+				else {
+					val noticeTextList = message.split("#")
+					val targetUserId = noticeTextList[1].toLong()
+					userRepository.getUser(targetUserId).nickname + noticeTextList.lastOrNull()
+				}
+			}
+		return copy(
+			sender = sender,
+			message = message
+		)
+	}
+
+	companion object {
+		private val DEFAULT_RETRY_ATTEMPT_DELAY_TIME = 1.seconds
+	}
 }

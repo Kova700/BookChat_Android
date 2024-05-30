@@ -11,6 +11,7 @@ import com.example.bookchat.databinding.ItemChattingLastReadNoticeBinding
 import com.example.bookchat.databinding.ItemChattingMineBinding
 import com.example.bookchat.databinding.ItemChattingNoticeBinding
 import com.example.bookchat.databinding.ItemChattingOtherBinding
+import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.channel.model.chat.ChatItem
 import javax.inject.Inject
@@ -19,9 +20,21 @@ class ChatItemAdapter @Inject constructor() :
 	ListAdapter<ChatItem, ChatItemViewHolder>(CHAT_ITEM_COMPARATOR) {
 	lateinit var onClickUserProfile: (User) -> Unit
 
-	val focusedIndex
+	val lastReadChatNoticeIndex
 		get() = currentList.indexOfFirst { chatItem ->
-			(chatItem is ChatItem.Message) && chatItem.isFocused
+			(chatItem is ChatItem.LastReadChatNotice)
+		}
+
+	val newestChatNotFailedIndex
+		get() = currentList.indexOfFirst { chatItem ->
+			chatItem is ChatItem.AnotherUser ||
+							chatItem is ChatItem.Notification ||
+							((chatItem is ChatItem.MyChat) && chatItem.status == ChatStatus.SUCCESS)
+		}
+
+	val newestChatNotMineIndex
+		get() = currentList.indexOfFirst { chatItem ->
+			(chatItem is ChatItem.AnotherUser) || (chatItem is ChatItem.Notification)
 		}
 
 	override fun getItemViewType(position: Int): Int {

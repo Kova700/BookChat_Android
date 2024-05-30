@@ -14,18 +14,16 @@ sealed interface ChatItem {
 
 	sealed class Message(
 		open val chatId: Long,
-		open val isFocused: Boolean
 	) : ChatItem
 
 	data class MyChat(
 		override val chatId: Long,
 		val chatRoomId: Long,
 		val message: String,
-		val status: ChatStatus = ChatStatus.SUCCESS,
+		val status: ChatStatus,
 		val dispatchTime: String,
 		val sender: User?,
-		override val isFocused: Boolean
-	) : Message(chatId, isFocused)
+	) : Message(chatId)
 
 	data class AnotherUser(
 		override val chatId: Long,
@@ -33,16 +31,14 @@ sealed interface ChatItem {
 		val message: String,
 		val dispatchTime: String,
 		val sender: User?,
-		override val isFocused: Boolean
-	) : Message(chatId, isFocused)
+	) : Message(chatId)
 
 	data class Notification(
 		override val chatId: Long,
 		val chatRoomId: Long,
 		val message: String,
 		val dispatchTime: String,
-		override val isFocused: Boolean
-	) : Message(chatId, isFocused)
+	) : Message(chatId)
 
 	object LastReadChatNotice : ChatItem
 
