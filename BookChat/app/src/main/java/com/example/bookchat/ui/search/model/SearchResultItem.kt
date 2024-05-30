@@ -1,6 +1,7 @@
 package com.example.bookchat.ui.search.model
 
 import com.example.bookchat.domain.model.ChannelDefaultImageType
+import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.User
 
@@ -42,8 +43,8 @@ sealed interface SearchResultItem {
 		val roomImageUri: String? = null,
 		val lastChat: Chat? = null,
 		val host: User? = null,
-		val subHosts: List<User>? = null,
-		val guests: List<User>? = null,
+		val participants: List<User>? = null,
+		val participantAuthorities: Map<Long, ChannelMemberAuthority>? = null,
 		val tagsString: String? = null,
 		val roomCapacity: Int? = null,
 		val bookTitle: String? = null,
