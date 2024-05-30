@@ -24,22 +24,27 @@ class AgonyFirstItemViewHolder(
 	private val binding: ItemAgonyFirstBinding,
 	private val onFirstItemClick: (() -> Unit)?,
 ) : AgonyViewHolder(binding) {
-	override fun bind(agonyListItem: AgonyListItem) {
+	init {
 		binding.root.setOnClickListener {
 			onFirstItemClick?.invoke()
 		}
 	}
+
+	override fun bind(agonyListItem: AgonyListItem) {}
 }
 
 class AgonyDataItemViewHolder(
 	private val binding: ItemAgonyDataBinding,
 	private val onItemClick: ((Int) -> Unit)?
 ) : AgonyViewHolder(binding) {
-	override fun bind(agonyListItem: AgonyListItem) {
-		binding.agonyListItem = (agonyListItem as AgonyListItem.Item)
+	init {
 		binding.root.setOnClickListener {
 			onItemClick?.invoke(absoluteAdapterPosition)
 		}
+	}
+
+	override fun bind(agonyListItem: AgonyListItem) {
+		binding.agonyListItem = (agonyListItem as AgonyListItem.Item)
 	}
 }
 
@@ -47,11 +52,14 @@ class AgonyDataEditingItemViewHolder(
 	private val binding: ItemAgonyDataEditingBinding,
 	private val onItemSelect: ((Int) -> Unit)?,
 ) : AgonyViewHolder(binding) {
-	override fun bind(agonyListItem: AgonyListItem) {
-		val item = (agonyListItem as AgonyListItem.Item)
-		binding.agonyListItem = item
+	init {
 		binding.root.setOnClickListener {
 			onItemSelect?.invoke(absoluteAdapterPosition)
 		}
+	}
+
+	override fun bind(agonyListItem: AgonyListItem) {
+		val item = (agonyListItem as AgonyListItem.Item)
+		binding.agonyListItem = item
 	}
 }
