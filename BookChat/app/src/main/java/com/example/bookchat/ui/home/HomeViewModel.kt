@@ -2,9 +2,9 @@ package com.example.bookchat.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.data.repository.ChattingRepositoryFacade
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.repository.BookShelfRepository
+import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import com.example.bookchat.ui.home.HomeUiState.UiState
@@ -22,7 +22,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
 	private val bookShelfRepository: BookShelfRepository,
 	private val clientRepository: ClientRepository,
-	private val chattingRepositoryFacade: ChattingRepositoryFacade
+	private val channelRepository: ChannelRepository,
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<HomeUiEvent>()
@@ -58,14 +58,14 @@ class HomeViewModel @Inject constructor(
 	}
 
 	private fun observeChannels() = viewModelScope.launch {
-		chattingRepositoryFacade.getChannelsFlow().collect { channels ->
+		channelRepository.getChannelsFlow().collect { channels ->
 			updateState { copy(channels = channels.take(3)) }
 		}
 	}
 
 	private fun getChannels() = viewModelScope.launch {
 		updateState { copy(channelUiState = UiState.LOADING) }
-		runCatching { chattingRepositoryFacade.getChannels() }
+		runCatching { channelRepository.getChannels() }
 			.onSuccess { updateState { copy(channelUiState = UiState.SUCCESS) } }
 			.onFailure {
 				handleError(it)
