@@ -26,7 +26,8 @@ class BookChatTokenRepositoryIml @Inject constructor(
 	}
 
 	override suspend fun saveBookChatToken(token: BookChatToken) {
-		dataStore.setData(bookChatTokenKey, gson.toJson(token))
+		val tokenWithPrefix = token.copy(accessToken = "$TOKEN_PREFIX ${token.accessToken}")
+		dataStore.setData(bookChatTokenKey, gson.toJson(tokenWithPrefix))
 	}
 
 	override suspend fun isBookChatTokenExist(): Boolean {
@@ -38,6 +39,7 @@ class BookChatTokenRepositoryIml @Inject constructor(
 	}
 
 	companion object {
+		private const val TOKEN_PREFIX = "Bearer"
 		private const val BOOKCHAT_TOKEN_KEY = "BOOKCHAT_TOKEN_KEY"
 	}
 }

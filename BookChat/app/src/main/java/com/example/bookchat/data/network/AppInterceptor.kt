@@ -104,12 +104,10 @@ class AppInterceptor @Inject constructor(
 	}
 
 	private fun Response.parseToToken(): BookChatToken {
-		val token = gson.fromJson(body?.string(), BookChatToken::class.java)
-		return token.copy(accessToken = "$TOKEN_PREFIX ${token.accessToken}")
+		return gson.fromJson(body?.string(), BookChatToken::class.java)
 	}
 
 	companion object {
-		private const val TOKEN_PREFIX = "Bearer"
 		private const val AUTHORIZATION = "Authorization"
 		private const val CONTENT_TYPE_JSON = "application/json; charset=utf-8"
 	}
