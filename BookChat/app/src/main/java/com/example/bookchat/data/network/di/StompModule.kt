@@ -15,9 +15,7 @@ import org.hildan.krossbow.stomp.instrumentation.KrossbowInstrumentation
 import org.hildan.krossbow.websocket.WebSocketClient
 import org.hildan.krossbow.websocket.WebSocketFrame
 import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
-import org.hildan.krossbow.websocket.reconnection.withAutoReconnect
 import javax.inject.Singleton
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @Module
@@ -26,7 +24,7 @@ object StompModule {
 
 	@Provides
 	@Singleton
-	/** withAutoReconnect : 소켓 재연결만 반영되고 재구독 기능은 아직 개발되지 않음으로 사용 X*/
+					/** withAutoReconnect : 소켓 재연결만 반영되고 재구독 기능은 아직 개발되지 않음으로 사용 X*/
 	fun provideWebSocketClient(
 		okHttpClient: OkHttpClient,
 	): WebSocketClient {
