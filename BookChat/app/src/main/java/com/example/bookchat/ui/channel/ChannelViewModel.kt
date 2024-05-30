@@ -211,6 +211,7 @@ class ChannelViewModel @Inject constructor(
 
 	/** 스크롤 해야할 채팅이 getNewestChats 결과에 포함되어있다면 getChatsAroundId는 호출하지 않음 */
 	private fun getFirstChats() = viewModelScope.launch {
+		Log.d(TAG, "ChannelViewModel: getFirstChats() - called")
 		val newestChats = getNewestChats().await() ?: emptyList()
 		if (uiState.value.needToScrollToLastReadChat.not()) return@launch
 		val originalLastReadChatId = uiState.value.originalLastReadChatId ?: return@launch
@@ -219,7 +220,7 @@ class ChannelViewModel @Inject constructor(
 		if (shouldCallGetChatsAroundId) getChatsAroundId(originalLastReadChatId)
 	}
 
-	private fun getNewestChats() = viewModelScope.async {
+	private fun getNewestChats(shouldBottomScroll: Boolean = false) = viewModelScope.async {
 		if (uiState.value.uiState == UiState.LOADING) return@async null
 		updateState { copy(uiState = UiState.LOADING) }
 		runCatching { chatRepository.getNewestChats(channelId) }
@@ -230,7 +231,7 @@ class ChannelViewModel @Inject constructor(
 						newChatNotice = null
 					)
 				}
-				startEvent(ChannelEvent.ScrollToBottom)
+				if (shouldBottomScroll) startEvent(ChannelEvent.ScrollToBottom)
 			}.onFailure { handleError(it) } //TODO : api 실패 알림
 			.getOrNull()
 	}
@@ -370,14 +371,12 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun scrollToBottom() {
-		val flag = uiState.value.isNewerChatFullyLoaded
-
 		if (uiState.value.isNewerChatFullyLoaded) {
 			startEvent(ChannelEvent.ScrollToBottom)
 			return
 		}
 
-		getNewestChats()
+		getNewestChats(true)
 	}
 
 	private fun getTempSavedMessage(channelId: Long) = viewModelScope.launch {
