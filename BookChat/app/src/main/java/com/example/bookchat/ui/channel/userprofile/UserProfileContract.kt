@@ -4,7 +4,6 @@ import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.User
 
-//유저 강퇴당하고나서 해당 유저 눌렀을 때 다른 UI이어야할듯
 data class UserProfileUiState(
 	val uiState: UiState,
 	val channel: Channel,
