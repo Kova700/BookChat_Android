@@ -71,7 +71,7 @@
             android:name=".ui.channel.userprofile.UserProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.channel.ChannelActivity"
+            android:name=".ui.channel.chatting.ChannelActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

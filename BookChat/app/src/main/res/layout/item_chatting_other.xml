@@ -6,7 +6,7 @@
 
         <variable
             name="chat"
-            type="com.example.bookchat.ui.channel.model.chat.ChatItem.AnotherUser" />
+            type="com.example.bookchat.ui.channel.chatting.model.ChatItem.AnotherUser" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

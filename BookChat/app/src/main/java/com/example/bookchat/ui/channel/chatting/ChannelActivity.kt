@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.channel
+package com.example.bookchat.ui.channel.chatting
 
 import android.content.Intent
 import android.os.Bundle
@@ -17,11 +17,11 @@ import com.example.bookchat.databinding.ActivityChannelBinding
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
-import com.example.bookchat.ui.channel.adapter.chat.ChatItemAdapter
-import com.example.bookchat.ui.channel.adapter.drawer.ChannelDrawerAdapter
-import com.example.bookchat.ui.channel.mapper.drawer.toUser
-import com.example.bookchat.ui.channel.model.chat.ChatItem
-import com.example.bookchat.ui.channel.model.drawer.ChannelDrawerItem
+import com.example.bookchat.ui.channel.chatting.adapter.ChatItemAdapter
+import com.example.bookchat.ui.channel.drawer.adapter.ChannelDrawerAdapter
+import com.example.bookchat.ui.channel.drawer.mapper.toUser
+import com.example.bookchat.ui.channel.chatting.model.ChatItem
+import com.example.bookchat.ui.channel.drawer.model.ChannelDrawerItem
 import com.example.bookchat.ui.channel.userprofile.UserProfileActivity
 import com.example.bookchat.utils.isOnListBottom
 import com.example.bookchat.utils.isOnListTop

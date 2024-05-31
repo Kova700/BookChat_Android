@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.channel
+package com.example.bookchat.ui.channel.chatting
 
 import android.content.Context
 import android.graphics.Rect

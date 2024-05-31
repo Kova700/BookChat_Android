@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.channel.adapter.chat
+package com.example.bookchat.ui.channel.chatting.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -12,7 +12,7 @@ import com.example.bookchat.databinding.ItemChattingMineBinding
 import com.example.bookchat.databinding.ItemChattingNoticeBinding
 import com.example.bookchat.databinding.ItemChattingOtherBinding
 import com.example.bookchat.domain.model.ChatStatus
-import com.example.bookchat.ui.channel.model.chat.ChatItem
+import com.example.bookchat.ui.channel.chatting.model.ChatItem
 import javax.inject.Inject
 
 class ChatItemAdapter @Inject constructor() :

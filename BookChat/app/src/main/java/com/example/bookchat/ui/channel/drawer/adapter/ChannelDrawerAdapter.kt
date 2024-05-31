@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.channel.adapter.drawer
+package com.example.bookchat.ui.channel.drawer.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemChatDrawerDataBinding
 import com.example.bookchat.databinding.ItemChatDrawerHeaderBinding
-import com.example.bookchat.ui.channel.model.drawer.ChannelDrawerItem
+import com.example.bookchat.ui.channel.drawer.model.ChannelDrawerItem
 import com.example.bookchat.utils.BookImgSizeManager
 import javax.inject.Inject
 

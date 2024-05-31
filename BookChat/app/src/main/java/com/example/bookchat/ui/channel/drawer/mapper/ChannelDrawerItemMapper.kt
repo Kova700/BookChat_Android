@@ -1,9 +1,9 @@
-package com.example.bookchat.ui.channel.mapper.drawer
+package com.example.bookchat.ui.channel.drawer.mapper
 
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.User
-import com.example.bookchat.ui.channel.model.drawer.ChannelDrawerItem
+import com.example.bookchat.ui.channel.drawer.model.ChannelDrawerItem
 
 fun Channel.toDrawerItems(client: User): List<ChannelDrawerItem> {
 	val items = mutableListOf<ChannelDrawerItem>()

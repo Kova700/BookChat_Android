@@ -9,7 +9,7 @@
 
         <variable
             name="viewmodel"
-            type="com.example.bookchat.ui.channel.ChannelViewModel" />
+            type="com.example.bookchat.ui.channel.chatting.ChannelViewModel" />
     </data>
 
     <androidx.drawerlayout.widget.DrawerLayout
@@ -22,7 +22,7 @@
             android:id="@+id/chat_main_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".ui.channel.ChannelActivity">
+            tools:context=".ui.channel.chatting.ChannelActivity">
 
             <com.example.bookchat.ui.customview.AntiDupClickImageButton
                 android:id="@+id/back_btn"

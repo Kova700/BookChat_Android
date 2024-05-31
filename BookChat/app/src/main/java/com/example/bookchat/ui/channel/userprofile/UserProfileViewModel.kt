@@ -7,8 +7,8 @@ import com.example.bookchat.R
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.UserRepository
-import com.example.bookchat.ui.channel.ChannelActivity.Companion.EXTRA_CHANNEL_ID
-import com.example.bookchat.ui.channel.ChannelActivity.Companion.EXTRA_USER_ID
+import com.example.bookchat.ui.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
+import com.example.bookchat.ui.channel.chatting.ChannelActivity.Companion.EXTRA_USER_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

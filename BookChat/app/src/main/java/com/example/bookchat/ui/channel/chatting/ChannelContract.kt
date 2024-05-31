@@ -1,12 +1,12 @@
-package com.example.bookchat.ui.channel
+package com.example.bookchat.ui.channel.chatting
 
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
-import com.example.bookchat.ui.channel.model.chat.ChatItem
-import com.example.bookchat.ui.channel.model.drawer.ChannelDrawerItem
+import com.example.bookchat.ui.channel.chatting.model.ChatItem
+import com.example.bookchat.ui.channel.drawer.model.ChannelDrawerItem
 
 data class ChannelUiState(
 	val uiState: UiState,              //UI 구분 필요 (메인 로딩 프로그래스바 필요)

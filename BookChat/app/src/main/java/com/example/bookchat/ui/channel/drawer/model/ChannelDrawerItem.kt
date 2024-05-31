@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.channel.model.drawer
+package com.example.bookchat.ui.channel.drawer.model
 
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.UserDefaultProfileType

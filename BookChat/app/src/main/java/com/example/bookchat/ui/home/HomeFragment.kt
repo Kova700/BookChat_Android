@@ -15,7 +15,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentHomeBinding
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
-import com.example.bookchat.ui.channel.ChannelActivity
+import com.example.bookchat.ui.channel.chatting.ChannelActivity
 import com.example.bookchat.ui.channelList.ChannelListFragment
 import com.example.bookchat.ui.home.adapter.HomeBookAdapter
 import com.example.bookchat.ui.home.adapter.HomeChannelAdapter

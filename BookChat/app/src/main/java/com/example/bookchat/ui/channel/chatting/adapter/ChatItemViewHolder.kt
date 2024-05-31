@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.channel.adapter.chat
+package com.example.bookchat.ui.channel.chatting.adapter
 
 import android.view.View
 import androidx.databinding.ViewDataBinding
@@ -8,7 +8,7 @@ import com.example.bookchat.databinding.ItemChattingLastReadNoticeBinding
 import com.example.bookchat.databinding.ItemChattingMineBinding
 import com.example.bookchat.databinding.ItemChattingNoticeBinding
 import com.example.bookchat.databinding.ItemChattingOtherBinding
-import com.example.bookchat.ui.channel.model.chat.ChatItem
+import com.example.bookchat.ui.channel.chatting.model.ChatItem
 
 sealed class ChatItemViewHolder(
 	binding: ViewDataBinding,

@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentChannelListBinding
-import com.example.bookchat.ui.channel.ChannelActivity
+import com.example.bookchat.ui.channel.chatting.ChannelActivity
 import com.example.bookchat.ui.channelList.adpater.ChannelListAdapter
 import com.example.bookchat.ui.channelList.model.ChannelListItem
 import com.example.bookchat.ui.createchannel.MakeChannelActivity

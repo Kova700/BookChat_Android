@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.channel.model.chat
+package com.example.bookchat.ui.channel.chatting.model
 
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.ChatStatus

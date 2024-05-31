@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.channel
+package com.example.bookchat.ui.channel.chatting
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
@@ -17,11 +17,11 @@ import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.domain.usecase.GetChatsFlowUseCase
 import com.example.bookchat.domain.usecase.SyncChannelChatsUseCase
-import com.example.bookchat.ui.channel.ChannelUiState.LoadState
-import com.example.bookchat.ui.channel.ChannelUiState.UiState
-import com.example.bookchat.ui.channel.mapper.chat.toChatItems
-import com.example.bookchat.ui.channel.mapper.drawer.toDrawerItems
-import com.example.bookchat.ui.channel.model.chat.ChatItem
+import com.example.bookchat.ui.channel.chatting.ChannelUiState.LoadState
+import com.example.bookchat.ui.channel.chatting.ChannelUiState.UiState
+import com.example.bookchat.ui.channel.chatting.mapper.toChatItems
+import com.example.bookchat.ui.channel.drawer.mapper.toDrawerItems
+import com.example.bookchat.ui.channel.chatting.model.ChatItem
 import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_CHANNEL_ID
 import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel

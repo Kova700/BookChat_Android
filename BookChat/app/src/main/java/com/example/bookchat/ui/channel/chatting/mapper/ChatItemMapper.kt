@@ -1,11 +1,11 @@
-package com.example.bookchat.ui.channel.mapper.chat
+package com.example.bookchat.ui.channel.chatting.mapper
 
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.ChatType
-import com.example.bookchat.ui.channel.model.chat.ChatItem
+import com.example.bookchat.ui.channel.chatting.model.ChatItem
 import com.example.bookchat.utils.DateManager
 
 fun List<Chat>.toChatItems(
