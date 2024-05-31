@@ -53,6 +53,12 @@ class UserProfileViewModel @Inject constructor(
 	}
 
 	private fun banUser() = viewModelScope.launch {
+		if ((uiState.value.isClientAdmin
+							&& uiState.value.isTargetUserHost.not()
+							&& uiState.value.isTargetUserExistInChannel
+							&& (uiState.value.targetUser.id != uiState.value.client.id)).not()
+		) return@launch
+
 		runCatching {
 			channelRepository.banChannelMember(
 				channelId = channelId,
