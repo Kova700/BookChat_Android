@@ -233,8 +233,8 @@ interface BookChatApi {
 		@Path("roomId") channelId: Long
 	): ChannelSingleSearchResponse
 
-	@GET("/v1/api/members/{memberId}")
+	@GET("/v1/api/members")
 	suspend fun getUser(
-		@Path("memberId") memberId: Long
+		@Query("memberId") memberId: Long
 	): UserResponse
 }
