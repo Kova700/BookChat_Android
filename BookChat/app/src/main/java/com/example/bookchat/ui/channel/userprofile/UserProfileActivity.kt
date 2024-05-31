@@ -40,7 +40,11 @@ class UserProfileActivity : AppCompatActivity() {
 
 	private fun setViewState(uiState: UserProfileUiState) {
 		binding.adminsCanSeeGroup.visibility =
-			if (uiState.isClientAdmin && uiState.isTargetUserExistInChannel) View.VISIBLE else View.GONE
+			if (uiState.isClientAdmin
+				&& uiState.isTargetUserExistInChannel
+				&& (uiState.targetUser.id != uiState.client.id)
+			) View.VISIBLE else View.GONE
+
 		binding.hostCrown.visibility =
 			if (uiState.isTargetUserHost) View.VISIBLE else View.GONE
 		binding.subHostCrown.visibility =
