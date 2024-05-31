@@ -3,6 +3,7 @@ package com.example.bookchat.ui.channel
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.SocketState
+import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.channel.model.chat.ChatItem
 import com.example.bookchat.ui.channel.model.drawer.ChannelDrawerItem
 
@@ -68,6 +69,7 @@ data class ChannelUiState(
 
 sealed class ChannelEvent {
 	object MoveBack : ChannelEvent()
+	data class MoveUserProfile(val user: User) : ChannelEvent()
 	object CaptureChannel : ChannelEvent()
 	object ScrollToBottom : ChannelEvent()
 	object OpenOrCloseDrawer : ChannelEvent()

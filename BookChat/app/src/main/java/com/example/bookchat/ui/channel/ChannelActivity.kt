@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.channel
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -19,6 +20,7 @@ import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.channel.adapter.chat.ChatItemAdapter
 import com.example.bookchat.ui.channel.adapter.drawer.ChannelDrawerAdapter
 import com.example.bookchat.ui.channel.model.chat.ChatItem
+import com.example.bookchat.ui.channel.userprofile.UserProfileActivity
 import com.example.bookchat.utils.isOnListBottom
 import com.example.bookchat.utils.isOnListTop
 import com.example.bookchat.utils.isVisiblePosition
@@ -123,7 +125,10 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun initAdapter() {
-		chatItemAdapter.onClickUserProfile = (::moveToUserProfile)
+		chatItemAdapter.onClickUserProfile = { itemPosition ->
+			val user = (chatItemAdapter.currentList[itemPosition] as ChatItem.AnotherUser).sender!!
+			channelViewModel.onClickUserProfile(user)
+		}
 		chatItemAdapter.registerAdapterDataObserver(adapterDataObserver)
 	}
 
@@ -201,9 +206,11 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun moveToUserProfile(user: User) {
-//		val intent = Intent(this, Activity::class.java)
-//			.putExtra(EXTRA_USER_ID, userId)
-//		startActivity(intent)
+		val channelId = channelViewModel.uiState.value.channel?.roomId ?: return
+		val intent = Intent(this, UserProfileActivity::class.java)
+			.putExtra(EXTRA_USER_ID, user.id)
+			.putExtra(EXTRA_CHANNEL_ID, channelId)
+		startActivity(intent)
 	}
 
 	private fun setBackPressedDispatcher() {
@@ -234,7 +241,7 @@ class ChannelActivity : AppCompatActivity() {
 		val newestChatNotFailedIndex = chatItemAdapter.newestChatNotFailedIndex
 		val lvip = linearLayoutManager.findLastVisibleItemPosition()
 
-		if (channelViewModel.uiState.value.isNewerChatFullyLoaded.not()){
+		if (channelViewModel.uiState.value.isNewerChatFullyLoaded.not()) {
 			channelViewModel.onNeedNewChatNotice(channelLastChat)
 			return
 		}
@@ -252,6 +259,7 @@ class ChannelActivity : AppCompatActivity() {
 			ChannelEvent.CaptureChannel -> {}
 			ChannelEvent.OpenOrCloseDrawer -> openOrCloseDrawer()
 			ChannelEvent.ScrollToBottom -> scrollToBottom()
+			is ChannelEvent.MoveUserProfile -> moveToUserProfile(event.user)
 			is ChannelEvent.MakeToast -> makeToast(event.stringId)
 			is ChannelEvent.NewChatOccurEvent -> checkIfNewChatNoticeIsRequired(event.chat)
 		}
@@ -264,5 +272,10 @@ class ChannelActivity : AppCompatActivity() {
 			return
 		}
 		drawerLayout.openDrawer(GravityCompat.END)
+	}
+
+	companion object {
+		const val EXTRA_USER_ID = "EXTRA_USER_ID"
+		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
 	}
 }

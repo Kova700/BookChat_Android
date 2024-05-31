@@ -68,6 +68,9 @@
         android:theme="@style/Theme.BookChat"
         tools:targetApi="n">
         <activity
+            android:name=".ui.channel.userprofile.UserProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.channel.ChannelActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
@@ -184,6 +187,7 @@
                     android:scheme="kakao${KAKAO_APP_KEY}" />
             </intent-filter>
         </activity>
+
         <service
             android:name=".firebase.FCMService"
             android:exported="false">

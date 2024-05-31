@@ -35,7 +35,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	private val channelDAO: ChannelDAO,
 	private val userRepository: UserRepository,
 	private val clientRepository: ClientRepository,
-	private val chatRepository: ChatRepository
+	private val chatRepository: ChatRepository,
 ) : ChannelRepository {
 
 	private val mapChannels = MutableStateFlow<Map<Long, Channel>>(emptyMap())//(channelId, Channel)
@@ -113,7 +113,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		defaultRoomImageType: ChannelDefaultImageType,
 		channelTags: List<String>,
 		selectedBook: Book,
-		channelImage: ByteArray?
+		channelImage: ByteArray?,
 	): Channel {
 		val response = bookChatApi.makeChannel(
 			requestMakeChannel = RequestMakeChannel(
@@ -212,9 +212,20 @@ class ChannelRepositoryImpl @Inject constructor(
 		setChannels(mapChannels.value + mapOf(channelId to newChannel))
 	}
 
-	override suspend fun banChannelMember(channelId: Long, targetUserId: Long) {
+	override suspend fun banChannelMember(
+		channelId: Long,
+		targetUserId: Long,
+		needServer: Boolean,
+	) {
 		val channel = getChannel(channelId)
 		val clientId = clientRepository.getClientProfile().id
+
+		if (needServer) {
+			bookChatApi.banChannelMember(
+				channelId = channel.roomId,
+				userId = targetUserId,
+			)
+		}
 
 		val newParticipants = channel.participants?.filter { it.id != targetUserId }
 		val newParticipantAuthorities = channel.participantAuthorities?.minus(targetUserId)
@@ -237,7 +248,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	override suspend fun updateChannelMemberAuthority(
 		channelId: Long,
 		targetUserId: Long,
-		channelMemberAuthority: ChannelMemberAuthority
+		channelMemberAuthority: ChannelMemberAuthority,
 	) {
 		val channel = getChannel(channelId)
 		val newParticipantAuthorities = channel.participantAuthorities
@@ -292,7 +303,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	/** Channel 세부 정보는 채팅방 들어 가면 getChannelInfo에 의해 갱신될 예정 */
 	override suspend fun getChannels(
 		loadSize: Int,
-		maxAttempts: Int
+		maxAttempts: Int,
 	) {
 		if (isEndPage) return
 
@@ -332,7 +343,7 @@ class ChannelRepositoryImpl @Inject constructor(
 
 	private suspend fun getOfflineChannels(
 		loadSize: Int,
-		baseId: Long?
+		baseId: Long?,
 	): List<Channel> {
 		return channelDAO.getChannels(loadSize, baseId ?: 0)
 			.map {

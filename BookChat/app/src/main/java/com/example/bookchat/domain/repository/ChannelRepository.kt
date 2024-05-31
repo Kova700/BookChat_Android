@@ -45,7 +45,8 @@ interface ChannelRepository {
 
 	suspend fun banChannelMember(
 		channelId: Long,
-		targetUserId: Long
+		targetUserId: Long,
+		needServer :Boolean = false
 	)
 
 	suspend fun updateChannelMemberAuthority(

@@ -10,6 +10,7 @@ import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.domain.model.SocketState
+import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.StompHandler
@@ -445,6 +446,10 @@ class ChannelViewModel @Inject constructor(
 
 	fun onClickMenuBtn() {
 		startEvent(ChannelEvent.OpenOrCloseDrawer)
+	}
+
+	fun onClickUserProfile(user: User) {
+		startEvent(ChannelEvent.MoveUserProfile(user))
 	}
 
 	private fun startEvent(event: ChannelEvent) = viewModelScope.launch {

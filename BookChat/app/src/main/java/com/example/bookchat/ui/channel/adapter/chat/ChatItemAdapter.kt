@@ -12,13 +12,12 @@ import com.example.bookchat.databinding.ItemChattingMineBinding
 import com.example.bookchat.databinding.ItemChattingNoticeBinding
 import com.example.bookchat.databinding.ItemChattingOtherBinding
 import com.example.bookchat.domain.model.ChatStatus
-import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.channel.model.chat.ChatItem
 import javax.inject.Inject
 
 class ChatItemAdapter @Inject constructor() :
 	ListAdapter<ChatItem, ChatItemViewHolder>(CHAT_ITEM_COMPARATOR) {
-	lateinit var onClickUserProfile: (User) -> Unit
+	var onClickUserProfile: ((Int) -> Unit)? = null
 
 	val lastReadChatNoticeIndex
 		get() = currentList.indexOfFirst { chatItem ->
@@ -67,7 +66,7 @@ class ChatItemAdapter @Inject constructor() :
 					R.layout.item_chatting_other,
 					parent, false
 				)
-				return AnotherUserChatViewHolder(binding)
+				return AnotherUserChatViewHolder(binding, onClickUserProfile)
 			}
 
 			R.layout.item_chatting_notice -> {

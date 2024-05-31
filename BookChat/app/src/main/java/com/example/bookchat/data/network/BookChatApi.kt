@@ -18,7 +18,7 @@ interface BookChatApi {
 
 	@GET("/v1/api/users/profile/nickname")
 	suspend fun requestNameDuplicateCheck(
-		@Query("nickname") nickname: String
+		@Query("nickname") nickname: String,
 	): Response<Unit>
 
 	@Multipart
@@ -26,18 +26,18 @@ interface BookChatApi {
 	suspend fun signUp(
 		@Header("OIDC") idToken: String,
 		@Part userProfileImage: MultipartBody.Part? = null,
-		@Part("userSignUpRequest") requestUserSignUp: RequestUserSignUp
+		@Part("userSignUpRequest") requestUserSignUp: RequestUserSignUp,
 	)
 
 	@POST("/v1/api/users/signin")
 	suspend fun signIn(
 		@Header("OIDC") idToken: String,
-		@Body requestUserSignIn: RequestUserSignIn
+		@Body requestUserSignIn: RequestUserSignIn,
 	): Response<BookChatTokenResponse>
 
 	@POST("/v1/api/auth/token")
 	suspend fun renewBookChatToken(
-		@Body refreshToken: String
+		@Body refreshToken: String,
 	): BookChatTokenResponse
 
 	@DELETE("/v1/api/users")
@@ -54,12 +54,12 @@ interface BookChatApi {
 		@Query("query") query: String,
 		@Query("size") size: Int,
 		@Query("page") page: Int,
-		@Query("sort") sort: BookSearchSortOptionNetWork = ACCURACY
+		@Query("sort") sort: BookSearchSortOptionNetWork = ACCURACY,
 	): ResponseGetBookSearch
 
 	@POST("/v1/api/bookshelves")
 	suspend fun registerBookShelfBook(
-		@Body requestRegisterBookShelfBook: RequestRegisterBookShelfBook
+		@Body requestRegisterBookShelfBook: RequestRegisterBookShelfBook,
 	): Response<Unit>
 
 	@GET("/v1/api/bookshelves")
@@ -67,18 +67,18 @@ interface BookChatApi {
 		@Query("size") size: Int,
 		@Query("page") page: Long,
 		@Query("readingStatus") bookShelfState: String,
-		@Query("sort") sort: SearchSortOptionNetwork = SearchSortOptionNetwork.UPDATED_AT_DESC
+		@Query("sort") sort: SearchSortOptionNetwork = SearchSortOptionNetwork.UPDATED_AT_DESC,
 	): ResponseGetBookShelfBooks
 
 	@DELETE("/v1/api/bookshelves/{bookId}")
 	suspend fun deleteBookShelfBook(
-		@Path("bookId") bookId: Long
+		@Path("bookId") bookId: Long,
 	): Response<Unit>
 
 	@PUT("/v1/api/bookshelves/{bookId}")
 	suspend fun changeBookShelfBookStatus(
 		@Path("bookId") bookId: Long,
-		@Body requestChangeBookStatus: RequestChangeBookStatus
+		@Body requestChangeBookStatus: RequestChangeBookStatus,
 	)
 
 	@GET("/v1/api/bookshelves/book")
@@ -97,7 +97,7 @@ interface BookChatApi {
 	@POST("/v1/api/bookshelves/{bookShelfId}/report")
 	suspend fun registerBookReport(
 		@Path("bookShelfId") bookShelfId: Long,
-		@Body requestRegisterBookReport: RequestRegisterBookReport
+		@Body requestRegisterBookReport: RequestRegisterBookReport,
 	)
 
 	@DELETE("/v1/api/bookshelves/{bookShelfId}/report")
@@ -108,7 +108,7 @@ interface BookChatApi {
 	@PUT("/v1/api/bookshelves/{bookShelfId}/report")
 	suspend fun reviseBookReport(
 		@Path("bookShelfId") bookShelfId: Long,
-		@Body requestRegisterBookReport: RequestRegisterBookReport
+		@Body requestRegisterBookReport: RequestRegisterBookReport,
 	): Response<Unit>
 
 	/**------------고민 ------------*/
@@ -116,7 +116,7 @@ interface BookChatApi {
 	@POST("/v1/api/bookshelves/{bookId}/agonies")
 	suspend fun makeAgony(
 		@Path("bookId") bookId: Long,
-		@Body requestMakeAgony: RequestMakeAgony
+		@Body requestMakeAgony: RequestMakeAgony,
 	)
 
 	@GET("/v1/api/bookshelves/{bookShelfId}/agonies")
@@ -137,7 +137,7 @@ interface BookChatApi {
 	suspend fun reviseAgony(
 		@Path("bookShelfId") bookShelfId: Long,
 		@Path("agonyId") agonyId: Long,
-		@Body requestReviseAgony: RequestReviseAgony
+		@Body requestReviseAgony: RequestReviseAgony,
 	)
 
 	/**------------고민 기록------------*/
@@ -146,7 +146,7 @@ interface BookChatApi {
 	suspend fun makeAgonyRecord(
 		@Path("bookShelfId") bookShelfId: Long,
 		@Path("agonyId") agonyId: Long,
-		@Body requestMakeAgonyRecord: RequestMakeAgonyRecord
+		@Body requestMakeAgonyRecord: RequestMakeAgonyRecord,
 	): Response<Unit>
 
 	@GET("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records")
@@ -155,14 +155,14 @@ interface BookChatApi {
 		@Path("agonyId") agonyId: Long,
 		@Query("postCursorId") postCursorId: Long?,
 		@Query("size") size: Int,
-		@Query("sort") sort: SearchSortOptionNetwork
+		@Query("sort") sort: SearchSortOptionNetwork,
 	): ResponseGetAgonyRecord
 
 	@DELETE("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
 	suspend fun deleteAgonyRecord(
 		@Path("bookShelfId") bookShelfId: Long,
 		@Path("agonyId") agonyId: Long,
-		@Path("recordId") recordId: Long
+		@Path("recordId") recordId: Long,
 	): Response<Unit>
 
 	@PUT("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
@@ -170,7 +170,7 @@ interface BookChatApi {
 		@Path("bookShelfId") bookShelfId: Long,
 		@Path("agonyId") agonyId: Long,
 		@Path("recordId") recordId: Long,
-		@Body requestReviseAgonyRecord: RequestReviseAgonyRecord
+		@Body requestReviseAgonyRecord: RequestReviseAgonyRecord,
 	): Response<Unit>
 
 	/**------------채팅방------------*/
@@ -185,17 +185,17 @@ interface BookChatApi {
 	@POST("/v1/api/chatrooms")
 	suspend fun makeChannel(
 		@Part("createChatRoomRequest") requestMakeChannel: RequestMakeChannel,
-		@Part chatRoomImage: MultipartBody.Part? = null
+		@Part chatRoomImage: MultipartBody.Part? = null,
 	): Response<Unit>
 
 	@POST("/v1/api/enter/chatrooms/{roomId}")
 	suspend fun enterChannel(
-		@Path("roomId") roomId: Long
+		@Path("roomId") roomId: Long,
 	): Response<Unit>
 
 	@DELETE("/v1/api/leave/chatrooms/{roomId}")
 	suspend fun leaveChannel(
-		@Path("roomId") roomId: Long
+		@Path("roomId") roomId: Long,
 	): Response<Unit>
 
 	@GET("/v1/api/chatrooms")
@@ -210,7 +210,7 @@ interface BookChatApi {
 
 	@GET("/v1/api/chatrooms/{roomId}")
 	suspend fun getChannelInfo(
-		@Path("roomId") roomId: Long
+		@Path("roomId") roomId: Long,
 	): ResponseChannelInfo
 
 	/**------------채팅내역------------*/
@@ -225,16 +225,22 @@ interface BookChatApi {
 
 	@GET("/v1/api/chats/{chatId}")
 	suspend fun getChat(
-		@Path("chatId") chatId: Long
+		@Path("chatId") chatId: Long,
 	): RespondGetChat
 
 	@GET("/v1/api/users/chatrooms/{roomId}")
 	suspend fun getChannel(
-		@Path("roomId") channelId: Long
+		@Path("roomId") channelId: Long,
 	): ChannelSingleSearchResponse
 
 	@GET("/v1/api/members")
 	suspend fun getUser(
-		@Query("memberId") memberId: Long
+		@Query("memberId") memberId: Long,
 	): UserResponse
+
+	@DELETE("/v1/api/chatrooms/{roomId}/participants/{userId}")
+	suspend fun banChannelMember(
+		@Path("roomId") channelId: Long,
+		@Path("userId") userId: Long,
+	)
 }
