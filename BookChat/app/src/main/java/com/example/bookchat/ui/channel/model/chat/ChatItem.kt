@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.channel.model.chat
 
+import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.User
 
@@ -31,7 +32,14 @@ sealed interface ChatItem {
 		val message: String,
 		val dispatchTime: String,
 		val sender: User?,
-	) : Message(chatId)
+		val authority: ChannelMemberAuthority,
+	) : Message(chatId) {
+		val isTargetUserHost
+			get() = authority == ChannelMemberAuthority.HOST
+
+		val isTargetUserSubHost
+			get() = authority == ChannelMemberAuthority.SUB_HOST
+	}
 
 	data class Notification(
 		override val chatId: Long,

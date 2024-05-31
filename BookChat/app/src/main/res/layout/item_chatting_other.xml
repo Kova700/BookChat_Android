@@ -22,11 +22,11 @@
             app:layout_constraintGuide_percent="0.80" />
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/user_profile_cardview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/user_profile_cv"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_marginStart="20dp"
-            app:cardCornerRadius="13dp"
+            app:cardCornerRadius="15dp"
             app:cardElevation="0dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -35,11 +35,29 @@
                 android:id="@+id/user_profile_iv"
                 userDefaultProfileImageType="@{chat.sender.defaultProfileImageType}"
                 userProfileUrl="@{chat.sender.profileImageUrl}"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:scaleType="fitXY"
                 android:src="@drawable/loading_img" />
         </androidx.cardview.widget.CardView>
+
+        <ImageView
+            android:id="@+id/host_crown"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:src="@drawable/host_crown"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/user_profile_cv"
+            app:layout_constraintEnd_toEndOf="@+id/user_profile_cv" />
+
+        <ImageView
+            android:id="@+id/sub_host_crown"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:src="@drawable/sub_host_crown"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/user_profile_cv"
+            app:layout_constraintEnd_toEndOf="@+id/user_profile_cv" />
 
         <TextView
             android:id="@+id/uesr_nickname_tv"
@@ -56,7 +74,7 @@
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/user_profile_cardview"
+            app:layout_constraintStart_toEndOf="@+id/user_profile_cv"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -87,7 +105,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/user_profile_cardview"
+            app:layout_constraintStart_toEndOf="@+id/user_profile_cv"
             app:layout_constraintTop_toBottomOf="@+id/uesr_nickname_tv">
 
             <TextView

@@ -158,6 +158,7 @@ class ChannelViewModel @Inject constructor(
 			channelId = channelId
 		).map { chats ->
 			chats.toChatItems(
+				channel = uiState.value.channel,
 				focusTargetId = uiState.value.originalLastReadChatId,
 				isVisibleLastReadChatNotice = uiState.value.isVisibleLastReadChatNotice
 			)

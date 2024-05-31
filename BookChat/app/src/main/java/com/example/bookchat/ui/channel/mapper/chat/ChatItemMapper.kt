@@ -1,13 +1,15 @@
 package com.example.bookchat.ui.channel.mapper.chat
 
+import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.ui.channel.model.chat.ChatItem
 import com.example.bookchat.utils.DateManager
 
-//TODO : User -> Participant로 변경하고 거기에 유저의 채팅방 권한 넣기
 fun List<Chat>.toChatItems(
+	channel: Channel?,
 	focusTargetId: Long?,
 	isVisibleLastReadChatNotice: Boolean
 ): List<ChatItem> {
@@ -41,6 +43,8 @@ fun List<Chat>.toChatItems(
 					message = chat.message,
 					dispatchTime = chat.dispatchTime,
 					sender = chat.sender,
+					authority = channel?.participantAuthorities?.get(chat.sender?.id)
+						?: ChannelMemberAuthority.GUEST,
 				)
 			)
 
