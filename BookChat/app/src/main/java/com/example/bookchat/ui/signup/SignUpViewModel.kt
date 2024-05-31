@@ -40,6 +40,13 @@ class SignUpViewModel @Inject constructor(
 			return false
 		}
 
+		// TODO : 특수문자 경고 안뜸
+		// 글자 입력할때마다 사진 깜빡깜빡 거림
+		// 북챗 시작하기 누르면 바로 시작안하고 예외 뜨고 다시 한번 더 누르면 검증함
+		//독서 취향 누르고 시작하기 누르면 토큰은 넘어오는데 사용자를 확일 할 수없습니다 아래에 스낵바 뜸
+		//{"errorCode":"4040100","message":"사용자를 찾을 수 없습니다."}
+		// 다시 시작하기 누르면 그냥 에러 던짐
+
 		val regex =
 			"^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ\\u318D\\u119E\\u11A2\\u2022\\u2025a\\u00B7\\uFE55\\uFF1A]+$"
 		val pattern = Pattern.compile(regex)
