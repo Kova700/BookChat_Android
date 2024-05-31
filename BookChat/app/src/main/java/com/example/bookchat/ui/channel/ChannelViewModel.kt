@@ -13,6 +13,7 @@ import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
+import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.domain.usecase.GetChatsFlowUseCase
 import com.example.bookchat.domain.usecase.SyncChannelChatsUseCase
@@ -67,6 +68,7 @@ class ChannelViewModel @Inject constructor(
 	private val syncChannelChatsUseCase: SyncChannelChatsUseCase,
 	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository,
+	private val clientRepository: ClientRepository,
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
 
@@ -98,6 +100,7 @@ class ChannelViewModel @Inject constructor(
 		updateState {
 			copy(
 				channel = originalChannel,
+				client = clientRepository.getClientProfile(),
 				originalLastReadChatId = originalChannel.lastReadChatId,
 				isVisibleLastReadChatNotice = shouldLastReadChatScroll,
 				needToScrollToLastReadChat = shouldLastReadChatScroll,
@@ -124,7 +127,7 @@ class ChannelViewModel @Inject constructor(
 			updateState {
 				copy(
 					channel = channel,
-					drawerItems = channel.toDrawerItems() //TODO : 방장 부방장 권한 반영해야함
+					drawerItems = channel.toDrawerItems(client)
 				)
 			}
 		}
@@ -446,6 +449,14 @@ class ChannelViewModel @Inject constructor(
 
 	fun onClickMenuBtn() {
 		startEvent(ChannelEvent.OpenOrCloseDrawer)
+	}
+
+	fun onClickChannelExitBtn() {
+
+	}
+
+	fun onClickChannelSettingBtn() {
+		startEvent(ChannelEvent.MoveChannelSetting)
 	}
 
 	fun onClickUserProfile(user: User) {

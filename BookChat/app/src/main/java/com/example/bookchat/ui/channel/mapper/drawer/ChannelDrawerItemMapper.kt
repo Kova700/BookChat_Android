@@ -1,9 +1,11 @@
 package com.example.bookchat.ui.channel.mapper.drawer
 
 import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.ChannelMemberAuthority
+import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.channel.model.drawer.ChannelDrawerItem
 
-fun Channel.toDrawerItems(): List<ChannelDrawerItem> {
+fun Channel.toDrawerItems(client: User): List<ChannelDrawerItem> {
 	val items = mutableListOf<ChannelDrawerItem>()
 	items.add(
 		ChannelDrawerItem.Header(
@@ -13,6 +15,7 @@ fun Channel.toDrawerItems(): List<ChannelDrawerItem> {
 			bookAuthors = bookAuthors
 		)
 	)
+
 	participants?.let { users ->
 		items.addAll(
 			users.map { user ->
@@ -20,9 +23,25 @@ fun Channel.toDrawerItems(): List<ChannelDrawerItem> {
 					id = user.id,
 					nickname = user.nickname,
 					profileImageUrl = user.profileImageUrl,
-					defaultProfileImageType = user.defaultProfileImageType
+					defaultProfileImageType = user.defaultProfileImageType,
+					authority = participantAuthorities?.get(user.id) ?: ChannelMemberAuthority.GUEST,
+					isClientItem = user.id == client.id
 				)
 			})
 	}
-	return items
+
+	return items.sortedWith(compareBy {
+		when (it) {
+			is ChannelDrawerItem.Header -> 0
+			is ChannelDrawerItem.UserItem -> when (it.isClientItem) {
+				true -> 1
+				false -> when (it.authority) {
+					ChannelMemberAuthority.HOST -> 2
+					ChannelMemberAuthority.SUB_HOST -> 3
+					ChannelMemberAuthority.GUEST -> 4
+				}
+			}
+		}
+	})
+
 }

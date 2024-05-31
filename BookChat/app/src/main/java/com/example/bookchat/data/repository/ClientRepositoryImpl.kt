@@ -120,6 +120,8 @@ class ClientRepositoryImpl @Inject constructor(
 		bookChatApi.withdraw()
 	}
 
+	//이거 호출하는 애들 전부다 예외처리 되어있는지 확인
+	//getUser getChat이것들도 전부 그냥 호출만 하는건지 예외터지면 앱 죽는지 확인
 	override suspend fun getClientProfile(): User {
 		cachedClient?.let { return it }
 		return bookChatApi.getUserProfile().toUser().also { cachedClient = it }

@@ -90,6 +90,10 @@ class ChannelActivity : AppCompatActivity() {
 				channelViewModel.onChangeEnteredMessage(message)
 			}
 		}
+		with(binding.chatDrawerLayout.channelSettingBtn) {
+			visibility = if (channelViewModel.uiState.value.isClientHost) View.VISIBLE else View.GONE
+		}
+
 	}
 
 	private fun setViewState(uiState: ChannelUiState) {
@@ -213,6 +217,11 @@ class ChannelActivity : AppCompatActivity() {
 		startActivity(intent)
 	}
 
+	private fun moveChannelSetting() {
+//		val intent = Intent(this, Activity::class.java)
+//		startActivity(intent)
+	}
+
 	private fun setBackPressedDispatcher() {
 		onBackPressedDispatcher.addCallback {
 			channelViewModel.onClickBackBtn()
@@ -262,6 +271,7 @@ class ChannelActivity : AppCompatActivity() {
 			is ChannelEvent.MoveUserProfile -> moveToUserProfile(event.user)
 			is ChannelEvent.MakeToast -> makeToast(event.stringId)
 			is ChannelEvent.NewChatOccurEvent -> checkIfNewChatNoticeIsRequired(event.chat)
+			ChannelEvent.MoveChannelSetting -> moveChannelSetting()
 		}
 	}
 

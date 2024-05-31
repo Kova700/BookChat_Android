@@ -1,6 +1,7 @@
 package com.example.bookchat.ui.channel
 
 import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
@@ -11,6 +12,7 @@ data class ChannelUiState(
 	val uiState: UiState,              //UI 구분 필요 (메인 로딩 프로그래스바 필요)
 	val enteredMessage: String,
 	val channel: Channel?,
+	val client: User,
 	val drawerItems: List<ChannelDrawerItem>,
 	val chats: List<ChatItem>,
 	val newChatNotice: Chat?,
@@ -34,6 +36,13 @@ data class ChannelUiState(
 						&& isNewerChatFullyLoaded.not()
 						&& socketState == SocketState.CONNECTED
 
+	private val clientAuthority
+		get() = channel?.participantAuthorities?.get(client.id)
+			?: ChannelMemberAuthority.GUEST
+
+	val isClientHost
+		get() = clientAuthority == ChannelMemberAuthority.HOST
+
 	enum class UiState {
 		SUCCESS,
 		LOADING,
@@ -50,6 +59,7 @@ data class ChannelUiState(
 		val DEFAULT = ChannelUiState(
 			enteredMessage = "",
 			channel = null,
+			client = User.Default,
 			uiState = UiState.SUCCESS,
 			drawerItems = listOf(ChannelDrawerItem.Header.DEFAULT),
 			chats = emptyList(),
@@ -69,16 +79,17 @@ data class ChannelUiState(
 
 sealed class ChannelEvent {
 	object MoveBack : ChannelEvent()
+	object MoveChannelSetting : ChannelEvent()
 	data class MoveUserProfile(val user: User) : ChannelEvent()
 	object CaptureChannel : ChannelEvent()
 	object ScrollToBottom : ChannelEvent()
 	object OpenOrCloseDrawer : ChannelEvent()
 
 	data class NewChatOccurEvent(
-		val chat: Chat
+		val chat: Chat,
 	) : ChannelEvent()
 
 	data class MakeToast(
-		val stringId: Int
+		val stringId: Int,
 	) : ChannelEvent()
 }
