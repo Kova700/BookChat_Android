@@ -23,6 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//TODO : 채팅방 이미지 랜덤으로 안돌아가고 고정되어있음
 @AndroidEntryPoint
 class MakeChannelActivity : AppCompatActivity() {
 
