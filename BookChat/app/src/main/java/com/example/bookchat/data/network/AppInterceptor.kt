@@ -6,6 +6,7 @@ import com.example.bookchat.data.network.model.response.ForbiddenException
 import com.example.bookchat.data.network.model.response.TokenRenewalFailException
 import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.repository.BookChatTokenRepository
+import com.example.bookchat.domain.repository.BookChatTokenRepository.Companion.TOKEN_PREFIX
 import com.google.gson.Gson
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -18,11 +19,11 @@ import javax.inject.Inject
 
 class AppInterceptor @Inject constructor(
 	private val bookChatTokenRepository: BookChatTokenRepository,
-	private val gson: Gson
+	private val gson: Gson,
 ) : Interceptor {
 
 	override fun intercept(
-		chain: Interceptor.Chain
+		chain: Interceptor.Chain,
 	): Response {
 		val bookchatToken = runBlocking { bookChatTokenRepository.getBookChatToken() }
 		var response = chain.requestWithAccessToken(bookchatToken)
@@ -56,7 +57,7 @@ class AppInterceptor @Inject constructor(
 
 		val newToken = response.parseToToken()
 		runBlocking { bookChatTokenRepository.saveBookChatToken(newToken) }
-		return newToken
+		return newToken.copy(accessToken = "$TOKEN_PREFIX ${newToken.accessToken}")
 	}
 
 	private fun Interceptor.Chain.requestWithAccessToken(bookChatToken: BookChatToken?): Response {
@@ -83,7 +84,7 @@ class AppInterceptor @Inject constructor(
 
 	private fun getNewRequest(
 		requestBody: RequestBody,
-		requestUrl: String
+		requestUrl: String,
 	): Request {
 		return Request.Builder()
 			.url(requestUrl)
@@ -97,7 +98,7 @@ class AppInterceptor @Inject constructor(
 
 	private fun <T> getJsonRequestBody(
 		content: T,
-		contentType: String
+		contentType: String,
 	): RequestBody {
 		val jsonString = gson.toJson(content)
 		return jsonString.toRequestBody(contentType.toMediaTypeOrNull())
