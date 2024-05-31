@@ -33,7 +33,13 @@ class ChannelDrawerHeaderItemViewHolder(
 
 class ChannelDrawerDataItemViewHolder(
 	private val binding: ItemChatDrawerDataBinding,
+	private val onClickUserProfile: ((Int) -> Unit)?,
 ) : ChatDrawerItemViewHolder(binding) {
+	init {
+		binding.root.setOnClickListener {
+			onClickUserProfile?.invoke(absoluteAdapterPosition)
+		}
+	}
 
 	override fun bind(channelDrawerItem: ChannelDrawerItem) {
 		val item = (channelDrawerItem as ChannelDrawerItem.UserItem)

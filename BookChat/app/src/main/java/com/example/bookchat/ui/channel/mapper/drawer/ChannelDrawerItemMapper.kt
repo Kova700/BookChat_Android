@@ -45,3 +45,12 @@ fun Channel.toDrawerItems(client: User): List<ChannelDrawerItem> {
 	})
 
 }
+
+fun ChannelDrawerItem.UserItem.toUser(): User {
+	return User(
+		id = id,
+		nickname = nickname,
+		profileImageUrl = profileImageUrl,
+		defaultProfileImageType = defaultProfileImageType,
+	)
+}

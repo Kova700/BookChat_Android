@@ -13,8 +13,9 @@ import com.example.bookchat.utils.BookImgSizeManager
 import javax.inject.Inject
 
 class ChannelDrawerAdapter @Inject constructor(
-	private val bookImgSizeManager: BookImgSizeManager
+	private val bookImgSizeManager: BookImgSizeManager,
 ) : ListAdapter<ChannelDrawerItem, ChatDrawerItemViewHolder>(CHANNEL_DRAWER_ITEM_COMPARATOR) {
+	var onClickUserProfile: ((Int) -> Unit)? = null
 
 	override fun getItemViewType(position: Int): Int {
 		return when (getItem(position)) {
@@ -25,7 +26,7 @@ class ChannelDrawerAdapter @Inject constructor(
 
 	override fun onCreateViewHolder(
 		parent: ViewGroup,
-		viewType: Int
+		viewType: Int,
 	): ChatDrawerItemViewHolder {
 		when (viewType) {
 			R.layout.item_chat_drawer_header -> {
@@ -43,7 +44,7 @@ class ChannelDrawerAdapter @Inject constructor(
 						LayoutInflater.from(parent.context), R.layout.item_chat_drawer_data,
 						parent, false
 					)
-				return ChannelDrawerDataItemViewHolder(binding)
+				return ChannelDrawerDataItemViewHolder(binding, onClickUserProfile)
 			}
 
 			else -> throw Exception("unknown ViewHolder Type")

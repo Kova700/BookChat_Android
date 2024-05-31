@@ -19,7 +19,9 @@ import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.channel.adapter.chat.ChatItemAdapter
 import com.example.bookchat.ui.channel.adapter.drawer.ChannelDrawerAdapter
+import com.example.bookchat.ui.channel.mapper.drawer.toUser
 import com.example.bookchat.ui.channel.model.chat.ChatItem
+import com.example.bookchat.ui.channel.model.drawer.ChannelDrawerItem
 import com.example.bookchat.ui.channel.userprofile.UserProfileActivity
 import com.example.bookchat.utils.isOnListBottom
 import com.example.bookchat.utils.isOnListTop
@@ -134,6 +136,11 @@ class ChannelActivity : AppCompatActivity() {
 			channelViewModel.onClickUserProfile(user)
 		}
 		chatItemAdapter.registerAdapterDataObserver(adapterDataObserver)
+
+		channelDrawerAdapter.onClickUserProfile = { itemPosition ->
+			val userItem = (channelDrawerAdapter.currentList[itemPosition] as ChannelDrawerItem.UserItem)
+			channelViewModel.onClickUserProfile(userItem.toUser())
+		}
 	}
 
 	private val adapterDataObserver = object : RecyclerView.AdapterDataObserver() {
