@@ -14,13 +14,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityChannelBinding
+import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.channel.chatting.adapter.ChatItemAdapter
-import com.example.bookchat.ui.channel.drawer.adapter.ChannelDrawerAdapter
-import com.example.bookchat.ui.channel.drawer.mapper.toUser
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
+import com.example.bookchat.ui.channel.drawer.adapter.ChannelDrawerAdapter
+import com.example.bookchat.ui.channel.drawer.dialog.ChannelExitWarningDialog
+import com.example.bookchat.ui.channel.drawer.mapper.toUser
 import com.example.bookchat.ui.channel.drawer.model.ChannelDrawerItem
 import com.example.bookchat.ui.channel.userprofile.UserProfileActivity
 import com.example.bookchat.utils.isOnListBottom
@@ -229,8 +231,30 @@ class ChannelActivity : AppCompatActivity() {
 //		startActivity(intent)
 	}
 
+	private fun setExplodedChannelUiState() {
+		//TODO : "방장이 채팅방을 종료했습니다. 더 이상 대화가 불가능합니다." Notice Dialog
+		//  isExplode로 변경된 채팅방을 emit받은 ChannelActivity에서는 채팅 입력을 불가능하게 비활성화 UI를 노출
+	}
+
+	private fun setBannedClientUIState() {
+		//TODO : "채팅방 관리자에의해 강퇴되었습니다." Notice Dialog
+		//  isBanned로 변경된 채팅방을 emit받은 ChannelActivity에서는 채팅 입력을 불가능하게 비활성화 UI를 노출
+	}
+
+	private fun showChannelExitWarningDialog(clientAuthority: ChannelMemberAuthority) {
+		val dialog = ChannelExitWarningDialog(
+			clientAuthority = clientAuthority,
+			onClickOkBtn = { channelViewModel.onClickChannelExitDialogBtn() }
+		)
+		dialog.show(supportFragmentManager, DIALOG_TAG_CHANNEL_EXIT_WARNING)
+	}
+
 	private fun setBackPressedDispatcher() {
 		onBackPressedDispatcher.addCallback {
+			if (binding.drawerLayout.isDrawerOpen(GravityCompat.END)) {
+				binding.drawerLayout.closeDrawer(GravityCompat.END)
+				return@addCallback
+			}
 			channelViewModel.onClickBackBtn()
 		}
 	}
@@ -279,20 +303,27 @@ class ChannelActivity : AppCompatActivity() {
 			is ChannelEvent.MakeToast -> makeToast(event.stringId)
 			is ChannelEvent.NewChatOccurEvent -> checkIfNewChatNoticeIsRequired(event.chat)
 			ChannelEvent.MoveChannelSetting -> moveChannelSetting()
+			is ChannelEvent.ShowChannelExitWarningDialog ->
+				showChannelExitWarningDialog(event.clientAuthority)
+
+			ChannelEvent.ChannelExplode -> setExplodedChannelUiState()
+			ChannelEvent.ClientBanned -> setBannedClientUIState()
 		}
 	}
 
 	private fun openOrCloseDrawer() {
-		val drawerLayout = binding.drawerLayout
-		if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
-			drawerLayout.closeDrawer(GravityCompat.END)
-			return
+		with(binding.drawerLayout) {
+			if (isDrawerOpen(GravityCompat.END)) {
+				closeDrawer(GravityCompat.END)
+				return
+			}
+			openDrawer(GravityCompat.END)
 		}
-		drawerLayout.openDrawer(GravityCompat.END)
 	}
 
 	companion object {
 		const val EXTRA_USER_ID = "EXTRA_USER_ID"
 		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
+		const val DIALOG_TAG_CHANNEL_EXIT_WARNING = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
 	}
 }

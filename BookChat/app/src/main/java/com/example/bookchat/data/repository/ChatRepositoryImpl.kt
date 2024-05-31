@@ -1,5 +1,6 @@
 package com.example.bookchat.data.repository
 
+import android.util.Log
 import com.example.bookchat.data.database.dao.ChatDAO
 import com.example.bookchat.data.mapper.toChat
 import com.example.bookchat.data.mapper.toChatEntity
@@ -11,6 +12,7 @@ import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.utils.Constants.TAG
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,7 +54,7 @@ class ChatRepositoryImpl @Inject constructor(
 
 	override fun getChatsFlow(
 		initFlag: Boolean,
-		channelId: Long
+		channelId: Long,
 	): Flow<List<Chat>> {
 		if (initFlag) clearCachedData()
 		return sortedChats
@@ -73,7 +75,7 @@ class ChatRepositoryImpl @Inject constructor(
 	 * 더 이상 호출하지 않고, channelLastChat만 갱신하여 유저에게 새로운 채팅이 있음을 알림 */
 	override suspend fun syncChats(
 		channelId: Long,
-		maxAttempts: Int
+		maxAttempts: Int,
 	): List<Chat> {
 		_isNewerChatFullyLoaded.value = false
 
@@ -120,7 +122,7 @@ class ChatRepositoryImpl @Inject constructor(
 	override suspend fun getNewestChats(
 		channelId: Long,
 		size: Int,
-		maxAttempts: Int
+		maxAttempts: Int,
 	): List<Chat> {
 		for (attempt in 0 until maxAttempts) {
 
@@ -305,7 +307,7 @@ class ChatRepositoryImpl @Inject constructor(
 		channelId: Long,
 		message: String,
 		clientId: Long,
-		chatStatus: ChatStatus
+		chatStatus: ChatStatus,
 	): Long {
 		val chatId = chatDAO.insertWaitingChat(
 			channelId = channelId,
@@ -324,7 +326,7 @@ class ChatRepositoryImpl @Inject constructor(
 		newChatId: Long,
 		dispatchTime: String,
 		status: Int,
-		targetChatId: Long
+		targetChatId: Long,
 	) {
 		chatDAO.updateWaitingChat(newChatId, dispatchTime, status, targetChatId)
 		val newChat = chatDAO.getChat(newChatId)?.toChat() ?: return
@@ -339,6 +341,11 @@ class ChatRepositoryImpl @Inject constructor(
 		currentNewerChatPage = null
 		_isOlderChatFullyLoaded.value = false
 		_isNewerChatFullyLoaded.value = true
+	}
+
+	override suspend fun deleteChannelAllChat(channelId: Long) {
+		Log.d(TAG, "ChatRepositoryImpl: deleteChannelAllChat() - called")
+		chatDAO.deleteChannelAllChat(channelId)
 	}
 
 	/** 로그아웃 + 회원탈퇴시에 모든 repository 일괄 호출 */

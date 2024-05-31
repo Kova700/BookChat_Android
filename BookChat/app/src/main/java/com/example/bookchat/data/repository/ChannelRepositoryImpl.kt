@@ -147,12 +147,18 @@ class ChannelRepositoryImpl @Inject constructor(
 		)
 	}
 
-	// TODO : 이미 퇴장되어있는 채널에 퇴장 API 호출하면 넘어오는 응답코드 따로 정의 후,
-	//  해당 코드 응답시, 예외 던지기
 	override suspend fun leaveChannel(channelId: Long) {
-		val resultCode = bookChatApi.leaveChannel(channelId).code()
-		Log.d(TAG, "ChannelClientRepositoryImpl: leaveChannel() - resultCode : $resultCode")
+		Log.d(TAG, "ChannelRepositoryImpl: leaveChannel() - called")
+		val response = bookChatApi.leaveChannel(channelId)
+		Log.d(TAG, "ChannelRepositoryImpl: leaveChannel() - response :${response.code()}")
 		channelDAO.delete(channelId)
+		//여기서 지우고 다시 서버로부터 로드 되고 있음 지금 (안띄워야지)
+		//방장이 채널 나가기를 하면 해당 이벤트를 받지 못한 유저를 위해 채널을 soft 삭제를 하기로 했음,
+		//하지만 방장만 있는 인원수가 1명인 채팅방은 방장이 나가면 더 이상
+		//남은 유저가 없으니까 soft 삭제가 아니라 그냥 삭제가 되어야함 (사용자 채팅방 목록 이랑 전체 채팅방 검색에 나오지 않는)
+		//(but 서버로부터 load되고 있음)
+		//심지어 소켓도 연결되고 채팅도 보내짐 (혹은 채널이 나가지지 않았거나)
+		chatRepository.deleteChannelAllChat(channelId)
 		setChannels(mapChannels.value - channelId)
 	}
 
@@ -298,6 +304,7 @@ class ChannelRepositoryImpl @Inject constructor(
 
 	//TODO : 서버측에서 lastChatID가 가장 높은 순으로 쿼리되게 혹은 쿼리 옵션을 주게 수정 대기
 	//TODO : 해당 함수 인터넷 끊겨있다 연결 trigger발생 시 page :0 부터 재호출
+	//TODO : 오프라인 부터 뿌려주고 리모트 데이터로 수정하는 방향으로 해야함 (리모트 실패하면 오프라인 가져오는게 아니라)
 	/** 지수백오프 getChannels 요청 */
 	/** 서버에 있는 채널 우선적으로 쿼리 */
 	/** Channel 세부 정보는 채팅방 들어 가면 getChannelInfo에 의해 갱신될 예정 */

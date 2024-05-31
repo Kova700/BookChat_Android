@@ -74,7 +74,7 @@ interface ChatDAO {
 		channelId: Long,
 		message: String,
 		clientId: Long,
-		chatStatus: ChatStatus
+		chatStatus: ChatStatus,
 	): Long {
 		val chat = ChatEntity(
 			chatId = getMaxWaitingChatId()?.plus(1) ?: WAITING_CHAT_MIN_ID,
@@ -87,6 +87,12 @@ interface ChatDAO {
 		)
 		return insertChat(chat)
 	}
+
+	@Query(
+		"DELETE FROM Chat " +
+						"WHERE chat_room_id = :channelId"
+	)
+	suspend fun deleteChannelAllChat(channelId :Long)
 
 	@Query("DELETE FROM $CHAT_ENTITY_TABLE_NAME")
 	suspend fun deleteAll()

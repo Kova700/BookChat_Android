@@ -8,39 +8,39 @@ import kotlinx.coroutines.flow.StateFlow
 interface ChatRepository {
 	fun getChatsFlow(
 		initFlag: Boolean = false,
-		channelId: Long
+		channelId: Long,
 	): Flow<List<Chat>>
 
 	suspend fun getOlderChats(
 		channelId: Long,
-		size: Int = CHAT_DEFAULT_LOAD_SIZE
+		size: Int = CHAT_DEFAULT_LOAD_SIZE,
 	)
 
 	suspend fun getChatsAroundId(
 		channelId: Long,
 		baseChatId: Long,
-		size: Int = CHAT_DEFAULT_LOAD_SIZE
+		size: Int = CHAT_DEFAULT_LOAD_SIZE,
 	)
 
 	suspend fun getNewerChats(
 		channelId: Long,
-		size: Int = CHAT_DEFAULT_LOAD_SIZE
+		size: Int = CHAT_DEFAULT_LOAD_SIZE,
 	)
 
 	suspend fun getNewestChats(
 		channelId: Long,
 		size: Int = CHAT_DEFAULT_LOAD_SIZE,
-		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS
+		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS,
 	): List<Chat>
 
 	suspend fun getOfflineNewestChats(
 		channelId: Long,
-		size: Int = CHAT_DEFAULT_LOAD_SIZE
+		size: Int = CHAT_DEFAULT_LOAD_SIZE,
 	)
 
 	suspend fun syncChats(
 		channelId: Long,
-		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS
+		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS,
 	): List<Chat>
 
 	suspend fun insertChat(chat: Chat)
@@ -48,7 +48,7 @@ interface ChatRepository {
 		channelId: Long,
 		message: String,
 		clientId: Long,
-		chatStatus: ChatStatus
+		chatStatus: ChatStatus,
 	): Long
 
 	suspend fun updateWaitingChat(
@@ -59,6 +59,7 @@ interface ChatRepository {
 	)
 
 	suspend fun insertAllChats(chats: List<Chat>)
+	suspend fun deleteChannelAllChat(channelId: Long)
 
 	suspend fun getChat(chatId: Long): Chat
 	suspend fun clear()

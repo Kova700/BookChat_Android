@@ -20,8 +20,8 @@ import com.example.bookchat.domain.usecase.SyncChannelChatsUseCase
 import com.example.bookchat.ui.channel.chatting.ChannelUiState.LoadState
 import com.example.bookchat.ui.channel.chatting.ChannelUiState.UiState
 import com.example.bookchat.ui.channel.chatting.mapper.toChatItems
-import com.example.bookchat.ui.channel.drawer.mapper.toDrawerItems
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
+import com.example.bookchat.ui.channel.drawer.mapper.toDrawerItems
 import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_CHANNEL_ID
 import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -144,7 +144,8 @@ class ChannelViewModel @Inject constructor(
 		when (channelLastChat.chatType) {
 			ChatType.Mine -> scrollToBottom()
 			ChatType.Notice, //TODO : Notice타입의 NewChatNotice UI 만들기
-			ChatType.Other -> startEvent(ChannelEvent.NewChatOccurEvent(channelLastChat))
+			ChatType.Other,
+			-> startEvent(ChannelEvent.NewChatOccurEvent(channelLastChat))
 		}
 	}
 
@@ -310,6 +311,12 @@ class ChannelViewModel @Inject constructor(
 		}
 	}
 
+	private fun exitChannel() = viewModelScope.launch {
+		runCatching { channelRepository.leaveChannel(channelId) }
+			.onSuccess { onClickBackBtn() }
+			.onFailure { startEvent(ChannelEvent.MakeToast(R.string.channel_exit_fail)) }
+	}
+
 	/** "여기까지 읽으셨습니다" 공지가 화면 상에 나타나는 순간 호출*/
 	fun onReadLastReadNotice() {
 		if (uiState.value.needToScrollToLastReadChat.not()
@@ -346,6 +353,11 @@ class ChannelViewModel @Inject constructor(
 	// (인터넷 끊겨있으면 작동 x (안막으면 지수 백오프 돌아감) , 시작점도 이렇게 해야하려나..? )
 	/** 리커넥션이 필요할때 호출되는 함수 */
 	private fun onReconnection() {
+		//리커넥션 되는지
+		//getUserIndfo 왜 호출안되는지
+		//소켓 제대로 연결되고 있는지
+		//isExploded라면 소켓 어떻게 연결되는지 어떤 오류 넘어오는지 확인
+		//아 아예 소켓 연결을 막았구나
 		connectSocket(channelId)
 	}
 
@@ -366,13 +378,11 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun onBanned() {
-		//TODO : "채팅방 관리자에의해 강퇴되었습니다." Notice Dialog
-		//  isBanned로 변경된 채팅방을 emit받은 ChannelActivity에서는 채팅 입력을 불가능하게 비활성화 UI를 노출
+		startEvent(ChannelEvent.ClientBanned)
 	}
 
 	private fun onExplodeChannel() {
-		//TODO : "방장이 채팅방을 종료했습니다. 더 이상 대화가 불가능합니다." Notice Dialog
-		//  isExplode로 변경된 채팅방을 emit받은 ChannelActivity에서는 채팅 입력을 불가능하게 비활성화 UI를 노출
+		startEvent(ChannelEvent.ChannelExplode)
 	}
 
 	private fun scrollToBottom() {
@@ -453,7 +463,11 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	fun onClickChannelExitBtn() {
+		startEvent(ChannelEvent.ShowChannelExitWarningDialog(uiState.value.clientAuthority))
+	}
 
+	fun onClickChannelExitDialogBtn() {
+		exitChannel()
 	}
 
 	fun onClickChannelSettingBtn() {
@@ -474,6 +488,10 @@ class ChannelViewModel @Inject constructor(
 		updateState { copy(uiState = UiState.ERROR) }
 		when (throwable) {
 			is CancellationException -> Unit //JobCancellationException 이게 connectSocket 여기서 왜 잡히는거야
+			//NullPointerException도 connectSocket에서 잡히는데?
+			//ChannelViewModel: handleError(caller : connectSocket) -
+			// throwable: java.lang.NullPointerException: Parameter specified as non-null is null:
+			// method com.example.bookchat.domain.model.Chat.<init>, parameter dispatchTime
 			else -> startEvent(ChannelEvent.MakeToast(R.string.error_network_error))
 		}
 	}

@@ -36,7 +36,7 @@ data class ChannelUiState(
 						&& isNewerChatFullyLoaded.not()
 						&& socketState == SocketState.CONNECTED
 
-	private val clientAuthority
+	val clientAuthority
 		get() = channel?.participantAuthorities?.get(client.id)
 			?: ChannelMemberAuthority.GUEST
 
@@ -80,10 +80,19 @@ data class ChannelUiState(
 sealed class ChannelEvent {
 	object MoveBack : ChannelEvent()
 	object MoveChannelSetting : ChannelEvent()
-	data class MoveUserProfile(val user: User) : ChannelEvent()
+	object ClientBanned : ChannelEvent()
+	object ChannelExplode : ChannelEvent()
 	object CaptureChannel : ChannelEvent()
 	object ScrollToBottom : ChannelEvent()
 	object OpenOrCloseDrawer : ChannelEvent()
+
+	data class MoveUserProfile(
+		val user: User,
+	) : ChannelEvent()
+
+	data class ShowChannelExitWarningDialog(
+		val clientAuthority: ChannelMemberAuthority,
+	) : ChannelEvent()
 
 	data class NewChatOccurEvent(
 		val chat: Chat,
