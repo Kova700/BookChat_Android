@@ -91,7 +91,6 @@ class ChannelViewModel @Inject constructor(
 
 	private fun initUiState() = viewModelScope.launch {
 		val originalChannel = channelRepository.getChannel(channelId)
-		if (originalChannel.isAvailableChannel.not()) return@launch
 
 		val shouldLastReadChatScroll = originalChannel.isExistNewChat
 		updateState {
@@ -103,6 +102,8 @@ class ChannelViewModel @Inject constructor(
 				needToScrollToLastReadChat = shouldLastReadChatScroll,
 			)
 		}
+
+		if (originalChannel.isAvailableChannel.not()) return@launch
 
 		getChannelInfo(channelId)
 		getTempSavedMessage(channelId)
