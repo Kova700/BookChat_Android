@@ -44,7 +44,7 @@ class SignUpViewModel @Inject constructor(
 			.onFailure { failHandler(it) }
 	}
 
-	fun openGallery() {
+	fun onClickCameraBtn(){
 		startEvent(SignUpEvent.PermissionCheck)
 	}
 

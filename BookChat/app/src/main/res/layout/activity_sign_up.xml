@@ -86,7 +86,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/getpicture_btn_back"
             android:elevation="3dp"
-            android:onClick="@{() -> viewModel.openGallery()}"
+            android:onClick="@{() -> viewModel.onClickCameraBtn()}"
             app:layout_constraintBottom_toBottomOf="@+id/user_profile_cardview"
             app:layout_constraintEnd_toEndOf="@+id/user_profile_cardview"
             app:srcCompat="@drawable/ic_getpicture_btn" />
