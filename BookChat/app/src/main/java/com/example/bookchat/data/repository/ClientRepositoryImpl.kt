@@ -12,6 +12,7 @@ import com.example.bookchat.data.mapper.toOAuth2ProviderNetwork
 import com.example.bookchat.data.mapper.toUser
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.request.RequestUserSignIn
+import com.example.bookchat.data.network.model.request.RequestUserSignUp
 import com.example.bookchat.data.network.model.response.NeedToDeviceWarningException
 import com.example.bookchat.data.network.model.response.NeedToSignUpException
 import com.example.bookchat.data.network.model.response.ResponseBodyEmptyException
@@ -81,7 +82,7 @@ class ClientRepositoryImpl @Inject constructor(
 	) {
 		val idToken = cachedIdToken ?: throw IOException("IdToken does not exist.")
 
-		val requestUserSignUp = com.example.bookchat.data.network.model.request.RequestUserSignUp(
+		val requestUserSignUp = RequestUserSignUp(
 			oauth2Provider = idToken.oAuth2Provider.toOAuth2ProviderNetwork(),
 			nickname = nickname,
 			readingTastes = readingTastes.map { it.toNetWork() },
