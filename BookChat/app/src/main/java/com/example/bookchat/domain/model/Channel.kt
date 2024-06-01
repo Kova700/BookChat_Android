@@ -22,6 +22,16 @@ data class Channel(
 	val bookAuthors: List<String>? = null,
 	val bookCoverImageUrl: String? = null,
 ) {
+	val isExistNewChat
+		get() = when {
+			lastReadChatId == null -> false
+			lastChat?.chatId == null -> false
+			lastReadChatId < lastChat.chatId -> true
+			else -> false
+		}
+
+	val isAvailableChannel
+		get() = isBanned.not() && isExploded.not()
 
 	val bookAuthorsString
 		get() = bookAuthors?.joinToString(",")

@@ -30,11 +30,13 @@ data class ChannelUiState(
 		get() = (olderChatsLoadState != LoadState.LOADING)
 						&& isOlderChatFullyLoaded.not()
 						&& socketState == SocketState.CONNECTED
+						&& channel?.isAvailableChannel == true
 
 	val isPossibleToLoadNewerChat
 		get() = (newerChatsLoadState != LoadState.LOADING)
 						&& isNewerChatFullyLoaded.not()
 						&& socketState == SocketState.CONNECTED
+						&& channel?.isAvailableChannel == true
 
 	val clientAuthority
 		get() = channel?.participantAuthorities?.get(client.id)
@@ -80,8 +82,6 @@ data class ChannelUiState(
 sealed class ChannelEvent {
 	object MoveBack : ChannelEvent()
 	object MoveChannelSetting : ChannelEvent()
-	object ClientBanned : ChannelEvent()
-	object ChannelExplode : ChannelEvent()
 	object CaptureChannel : ChannelEvent()
 	object ScrollToBottom : ChannelEvent()
 	object OpenOrCloseDrawer : ChannelEvent()

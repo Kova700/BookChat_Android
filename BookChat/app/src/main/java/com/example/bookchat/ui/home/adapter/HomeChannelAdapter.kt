@@ -1,6 +1,7 @@
 package com.example.bookchat.ui.home.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
@@ -51,5 +52,16 @@ class HomeChannelItemViewHolder(
 
 	fun bind(channel: Channel) {
 		binding.channel = channel
+		binding.uncheckedChatCountTv.text = if (channel.isExistNewChat) "New+" else ""
+		binding.muteChannelIcon.visibility =
+			if ((channel.notificationFlag.not())
+				&& channel.isAvailableChannel.not()
+			) View.VISIBLE else View.GONE
+		binding.topPinChannelIcon.visibility =
+			if ((channel.topPinNum != 0)
+				&& channel.isAvailableChannel.not()
+			) View.VISIBLE else View.GONE
+		binding.unavailableChannelStateGroup.visibility =
+			if (channel.isAvailableChannel.not()) View.VISIBLE else View.GONE
 	}
 }

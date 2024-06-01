@@ -33,6 +33,7 @@ fun Channel.toChannelListItem(): ChannelListItem.ChannelItem {
 		roomSid = roomSid,
 		roomMemberCount = roomMemberCount,
 		defaultRoomImageType = defaultRoomImageType,
+		isExistNewChat = isExistNewChat,
 		notificationFlag = notificationFlag,
 		topPinNum = topPinNum,
 		isExploded = isExploded,

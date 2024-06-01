@@ -91,12 +91,9 @@ class ChannelViewModel @Inject constructor(
 
 	private fun initUiState() = viewModelScope.launch {
 		val originalChannel = channelRepository.getChannel(channelId)
-		val shouldLastReadChatScroll = when {
-			originalChannel.lastReadChatId == null -> false
-			originalChannel.lastChat?.chatId == null -> false
-			originalChannel.lastReadChatId < originalChannel.lastChat.chatId -> true
-			else -> false
-		}
+		if (originalChannel.isAvailableChannel.not()) return@launch
+
+		val shouldLastReadChatScroll = originalChannel.isExistNewChat
 		updateState {
 			copy(
 				channel = originalChannel,
@@ -123,6 +120,7 @@ class ChannelViewModel @Inject constructor(
 
 	private fun observeChannel() = viewModelScope.launch {
 		channelRepository.getChannelFlow(channelId).collect { channel ->
+			if (channel.isAvailableChannel.not()) disconnectSocket()
 			handleChannelNewChat(channel)
 			updateState {
 				copy(
@@ -134,12 +132,8 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun handleChannelNewChat(channel: Channel) {
-		val channelLastChat = channel.lastChat
-		val channelLastReadChatId = channel.lastReadChatId
-
-		if ((channelLastChat == null || channelLastReadChatId == null) ||
-			(channelLastChat.chatId <= channelLastReadChatId)
-		) return
+		val channelLastChat = channel.lastChat ?: return
+		if (channel.isExistNewChat.not()) return
 
 		when (channelLastChat.chatType) {
 			ChatType.Mine -> scrollToBottom()
@@ -287,12 +281,12 @@ class ChannelViewModel @Inject constructor(
 
 	private fun connectSocket(channelId: Long) = viewModelScope.launch {
 		val channel = channelRepository.getChannel(channelId)
-		if (checkChannelConnectable(channel).not()) return@launch
 		runCatching { stompHandler.connectSocket(channel) }
 			.onFailure { handleError(it, "connectSocket") }
 	}
 
 	private fun sendMessage() {
+		if (uiState.value.channel?.isAvailableChannel != true) return
 		val message = uiState.value.enteredMessage
 		if (message.isBlank()) return
 
@@ -326,14 +320,17 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun disconnectSocket() = viewModelScope.launch {
+		Log.d(TAG, "ChannelViewModel: disconnectSocket() - called")
 		stompHandler.disconnectSocket()
 	}
 
 	fun onStartScreen() {
+		if (uiState.value.channel?.isAvailableChannel != true) return
 		onReconnection()
 	}
 
 	fun onStopScreen() {
+		if (uiState.value.channel?.isAvailableChannel != true) return
 		disconnectSocket()
 		updateState { copy(socketState = SocketState.DISCONNECTED) }
 	}
@@ -353,36 +350,7 @@ class ChannelViewModel @Inject constructor(
 	// (인터넷 끊겨있으면 작동 x (안막으면 지수 백오프 돌아감) , 시작점도 이렇게 해야하려나..? )
 	/** 리커넥션이 필요할때 호출되는 함수 */
 	private fun onReconnection() {
-		//리커넥션 되는지
-		//getUserIndfo 왜 호출안되는지
-		//소켓 제대로 연결되고 있는지
-		//isExploded라면 소켓 어떻게 연결되는지 어떤 오류 넘어오는지 확인
-		//아 아예 소켓 연결을 막았구나
 		connectSocket(channelId)
-	}
-
-	private fun checkChannelConnectable(channel: Channel): Boolean {
-		return when {
-			channel.isBanned -> {
-				onBanned()
-				false
-			}
-
-			channel.isExploded -> {
-				onExplodeChannel()
-				false
-			}
-
-			else -> true
-		}
-	}
-
-	private fun onBanned() {
-		startEvent(ChannelEvent.ClientBanned)
-	}
-
-	private fun onExplodeChannel() {
-		startEvent(ChannelEvent.ChannelExplode)
 	}
 
 	private fun scrollToBottom() {
@@ -456,6 +424,12 @@ class ChannelViewModel @Inject constructor(
 
 	fun onClickNewChatNotice() {
 		scrollToBottom()
+	}
+
+	//TODO : 캡처 기능 추가
+	fun onClickCaptureBtn() {
+		if (uiState.value.channel?.isAvailableChannel != true) return
+//		startEvent(ChannelEvent.CaptureChannel)
 	}
 
 	fun onClickMenuBtn() {
