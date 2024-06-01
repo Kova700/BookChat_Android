@@ -8,8 +8,9 @@ import com.example.bookchat.domain.model.User
 
 interface ClientRepository {
 	suspend fun signIn(
-		approveChangingDevice: Boolean = false
+		approveChangingDevice: Boolean = false,
 	)
+
 	suspend fun renewBookChatToken(): BookChatToken?
 
 	suspend fun signUp(
@@ -21,7 +22,7 @@ interface ClientRepository {
 	suspend fun getClientProfile(): User
 	suspend fun signOut(needAServer: Boolean = false)
 	suspend fun withdraw()
-	suspend fun checkForDuplicateUserName(nickName: String)
+	suspend fun isDuplicatedUserNickName(nickName: String): Boolean
 	suspend fun renewFCMToken(fcmToken: FCMToken)
 	fun getCachedIdToken(): IdToken
 	fun saveIdToken(token: IdToken)

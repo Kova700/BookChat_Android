@@ -14,7 +14,6 @@ import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.request.RequestUserSignIn
 import com.example.bookchat.data.network.model.response.NeedToDeviceWarningException
 import com.example.bookchat.data.network.model.response.NeedToSignUpException
-import com.example.bookchat.data.network.model.response.NickNameDuplicateException
 import com.example.bookchat.data.network.model.response.ResponseBodyEmptyException
 import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.model.FCMToken
@@ -45,7 +44,7 @@ class ClientRepositoryImpl @Inject constructor(
 	private var cachedIdToken: IdToken? = null
 
 	override suspend fun signIn(
-		approveChangingDevice: Boolean
+		approveChangingDevice: Boolean,
 	) {
 		val requestUserSignIn = RequestUserSignIn(
 			fcmToken = getFCMToken().text,
@@ -78,7 +77,7 @@ class ClientRepositoryImpl @Inject constructor(
 	override suspend fun signUp(
 		nickname: String,
 		readingTastes: List<ReadingTaste>,
-		userProfile: ByteArray?
+		userProfile: ByteArray?,
 	) {
 		val idToken = cachedIdToken ?: throw IOException("IdToken does not exist.")
 
@@ -127,11 +126,11 @@ class ClientRepositoryImpl @Inject constructor(
 		return bookChatApi.getUserProfile().toUser().also { cachedClient = it }
 	}
 
-	override suspend fun checkForDuplicateUserName(nickName: String) {
+	override suspend fun isDuplicatedUserNickName(nickName: String): Boolean {
 		val response = bookChatApi.requestNameDuplicateCheck(nickName)
-		when (response.code()) {
-			200 -> {}
-			409 -> throw NickNameDuplicateException(response.errorBody()?.string())
+		return when (response.code()) {
+			200 -> false
+			409 -> true
 			else -> throw Exception(
 				createExceptionMessage(
 					response.code(),

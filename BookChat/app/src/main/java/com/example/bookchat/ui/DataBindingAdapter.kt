@@ -4,6 +4,7 @@ import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.core.content.ContextCompat
@@ -17,12 +18,13 @@ import com.example.bookchat.data.*
 import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.domain.model.ChannelDefaultImageType
 import com.example.bookchat.domain.model.ChatStatus
-import com.example.bookchat.domain.model.NameCheckStatus
+import com.example.bookchat.domain.model.NicknameCheckState
 import com.example.bookchat.domain.model.UserDefaultProfileType
 import com.example.bookchat.ui.agony.AgonyUiState
 import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
 import com.example.bookchat.ui.login.LoginUiState
 import com.example.bookchat.utils.*
+import com.example.bookchat.utils.Constants.TAG
 import java.util.*
 
 object DataBindingAdapter {
@@ -65,14 +67,12 @@ object DataBindingAdapter {
 	@BindingAdapter("loadByteArray")
 	fun loadByteArray(imageView: ImageView, byteArray: ByteArray?) {
 		if (byteArray == null || byteArray.isEmpty()) return
-		val key = byteArray.contentHashCode().toString()
 
 		val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
 		Glide.with(imageView.context)
 			.load(bitmap)
 			.placeholder(R.drawable.loading_img)
 			.error(R.drawable.error_img)
-			.signature(ObjectKey(key))
 			.into(imageView)
 	}
 
@@ -82,7 +82,7 @@ object DataBindingAdapter {
 	fun loadUserProfile(
 		imageView: ImageView,
 		userProfileUrl: String?,
-		userDefaultProfileType: UserDefaultProfileType?
+		userDefaultProfileType: UserDefaultProfileType?,
 	) {
 		if (!userProfileUrl?.trim().isNullOrBlank()) {
 			loadUrl(imageView, userProfileUrl)
@@ -93,7 +93,7 @@ object DataBindingAdapter {
 
 	private fun inflateUserDefaultProfileImage(
 		imageView: ImageView,
-		imageType: UserDefaultProfileType?
+		imageType: UserDefaultProfileType?,
 	) {
 		Glide.with(imageView.context)
 			.load(getUserDefaultProfileImage(imageType))
@@ -106,7 +106,8 @@ object DataBindingAdapter {
 	private fun getUserDefaultProfileImage(imageType: UserDefaultProfileType?) =
 		when (imageType) {
 			null,
-			UserDefaultProfileType.ONE -> R.drawable.default_profile_img1
+			UserDefaultProfileType.ONE,
+			-> R.drawable.default_profile_img1
 
 			UserDefaultProfileType.TWO -> R.drawable.default_profile_img2
 			UserDefaultProfileType.THREE -> R.drawable.default_profile_img3
@@ -141,32 +142,31 @@ object DataBindingAdapter {
 	//텍스트 (색 , 글자)
 	@JvmStatic
 	@BindingAdapter("setTextViewFromCheckResult")
-	fun setTextViewFromCheckResult(textView: TextView, nameCheckStatus: NameCheckStatus) {
-		when (nameCheckStatus) {
-			NameCheckStatus.Default -> {
-				textView.text = ""
-			}
+	fun setTextViewFromCheckResult(textView: TextView, nicknameCheckState: NicknameCheckState) {
+		when (nicknameCheckState) {
+			NicknameCheckState.Default -> textView.text = ""
 
-			NameCheckStatus.IsShort -> {
+			NicknameCheckState.IsShort -> {
 				textView.setTextColor(Color.parseColor("#FF004D"))
 				textView.text = textView.context.resources.getString(R.string.name_check_status_short)
 			}
 
-			NameCheckStatus.IsDuplicate -> {
+			NicknameCheckState.IsDuplicate -> {
 				textView.setTextColor(Color.parseColor("#FF004D"))
 				textView.text = textView.context.resources.getString(R.string.name_check_status_duplicate)
 			}
 
-			NameCheckStatus.IsSpecialCharInText -> {
+			NicknameCheckState.IsSpecialCharInText -> {
 				textView.setTextColor(Color.parseColor("#FF004D"))
 				textView.text =
 					textView.context.resources.getString(R.string.name_check_status_special_char)
 			}
 
-			NameCheckStatus.IsPerfect -> {
+			NicknameCheckState.IsPerfect -> {
 				textView.setTextColor(Color.parseColor("#5648FF"))
 				textView.text = textView.context.resources.getString(R.string.name_check_status_perfect)
 			}
+
 		}
 	}
 
@@ -174,9 +174,14 @@ object DataBindingAdapter {
 	//레이아웃 (테두리)
 	@JvmStatic
 	@BindingAdapter("setLayoutFromCheckResult")
-	fun setLayoutFromCheckResult(view: View, nameCheckStatus: NameCheckStatus) {
-		when (nameCheckStatus) {
-			NameCheckStatus.Default -> {
+	fun setLayoutFromCheckResult(view: View, nicknameCheckState: NicknameCheckState) {
+		Log.d(
+			TAG,
+			"DataBindingAdapter: setLayoutFromCheckResult() - nicknameCheckState : $nicknameCheckState"
+		)
+		when (nicknameCheckState) {
+			NicknameCheckState.Default,
+			-> {
 				view.background = ResourcesCompat.getDrawable(
 					view.resources,
 					R.drawable.nickname_input_back_white,
@@ -184,9 +189,10 @@ object DataBindingAdapter {
 				)
 			}
 
-			NameCheckStatus.IsShort,
-			NameCheckStatus.IsDuplicate,
-			NameCheckStatus.IsSpecialCharInText -> {
+			NicknameCheckState.IsShort,
+			NicknameCheckState.IsDuplicate,
+			NicknameCheckState.IsSpecialCharInText,
+			-> {
 				view.background = ResourcesCompat.getDrawable(
 					view.resources,
 					R.drawable.nickname_input_back_red,
@@ -194,7 +200,7 @@ object DataBindingAdapter {
 				)
 			}
 
-			NameCheckStatus.IsPerfect -> {
+			NicknameCheckState.IsPerfect -> {
 				view.background = ResourcesCompat.getDrawable(
 					view.context.resources,
 					R.drawable.nickname_input_back_blue,
@@ -209,7 +215,7 @@ object DataBindingAdapter {
 	@BindingAdapter("setAgonyFolderBackgroundTint")
 	fun setAgonyFolderBackgroundTint(
 		view: View,
-		agonyFolderHexColor: AgonyFolderHexColor
+		agonyFolderHexColor: AgonyFolderHexColor,
 	) {
 		view.backgroundTintList = ColorStateList.valueOf(Color.parseColor(agonyFolderHexColor.hexcolor))
 	}
@@ -224,14 +230,16 @@ object DataBindingAdapter {
 		when (agonyFolderHexColor) {
 			AgonyFolderHexColor.WHITE,
 			AgonyFolderHexColor.YELLOW,
-			AgonyFolderHexColor.ORANGE -> {
+			AgonyFolderHexColor.ORANGE,
+			-> {
 				textView.setTextColor(Color.parseColor("#595959"))
 			}
 
 			AgonyFolderHexColor.BLACK,
 			AgonyFolderHexColor.GREEN,
 			AgonyFolderHexColor.PURPLE,
-			AgonyFolderHexColor.MINT -> {
+			AgonyFolderHexColor.MINT,
+			-> {
 				textView.setTextColor(Color.parseColor("#FFFFFF"))
 			}
 		}
@@ -262,7 +270,7 @@ object DataBindingAdapter {
 	@BindingAdapter("setAgonyFolderEditingCheckedVisibility")
 	fun setAgonyFolderEditingCheckedVisibility(
 		view: View,
-		isSelected: Boolean
+		isSelected: Boolean,
 	) {
 		when (isSelected) {
 			false -> view.visibility = View.INVISIBLE
@@ -275,7 +283,7 @@ object DataBindingAdapter {
 	@BindingAdapter("setAgonyFolderEditingComponentVisibility")
 	fun setAgonyFolderEditingComponentVisibility(
 		view: View,
-		agonyUiState: AgonyUiState.UiState
+		agonyUiState: AgonyUiState.UiState,
 	) {
 		if (agonyUiState == AgonyUiState.UiState.EDITING) {
 			view.visibility = View.VISIBLE
@@ -289,7 +297,7 @@ object DataBindingAdapter {
 	@BindingAdapter("setAgonyFolderDefaultComponentVisibility")
 	fun setAgonyFolderDefaultComponentVisibility(
 		view: View,
-		agonyUiState: AgonyUiState.UiState
+		agonyUiState: AgonyUiState.UiState,
 	) {
 		if (agonyUiState == AgonyUiState.UiState.SUCCESS) {
 			view.visibility = View.VISIBLE
@@ -303,12 +311,13 @@ object DataBindingAdapter {
 	@BindingAdapter("setMakeAgonyTextColorWithFolderHexColor")
 	fun setMakeAgonyTextColorWithFolderHexColor(
 		textView: TextView,
-		agonyFolderHexColor: AgonyFolderHexColor
+		agonyFolderHexColor: AgonyFolderHexColor,
 	) {
 		when (agonyFolderHexColor) {
 			AgonyFolderHexColor.WHITE,
 			AgonyFolderHexColor.YELLOW,
-			AgonyFolderHexColor.ORANGE -> {
+			AgonyFolderHexColor.ORANGE,
+			-> {
 				textView.setTextColor(Color.parseColor("#595959"))
 				textView.setHintTextColor(Color.parseColor("#595959"))
 			}
@@ -316,7 +325,8 @@ object DataBindingAdapter {
 			AgonyFolderHexColor.BLACK,
 			AgonyFolderHexColor.GREEN,
 			AgonyFolderHexColor.PURPLE,
-			AgonyFolderHexColor.MINT -> {
+			AgonyFolderHexColor.MINT,
+			-> {
 				textView.setTextColor(Color.parseColor("#FFFFFF"))
 				textView.setHintTextColor(Color.parseColor("#FFFFFF"))
 			}
@@ -335,7 +345,7 @@ object DataBindingAdapter {
 	@BindingAdapter("setVisibilityInFirstItemView")
 	fun setVisibilityInFirstItemView(
 		view: View,
-		itemState: AgonyRecordListItem.ItemState
+		itemState: AgonyRecordListItem.ItemState,
 	) {
 		if (itemState is AgonyRecordListItem.ItemState.Success) {
 			view.visibility = View.VISIBLE
@@ -349,7 +359,7 @@ object DataBindingAdapter {
 	@BindingAdapter("setVisibilityInEditingItemView")
 	fun setVisibilityInEditingItemView(
 		view: View,
-		itemState: AgonyRecordListItem.ItemState
+		itemState: AgonyRecordListItem.ItemState,
 	) {
 		if (itemState is AgonyRecordListItem.ItemState.Editing) {
 			view.visibility = View.VISIBLE
@@ -363,7 +373,7 @@ object DataBindingAdapter {
 	@BindingAdapter("setVisibilityInLoadingItemView")
 	fun setVisibilityInLoadingItemView(
 		view: View,
-		itemState: AgonyRecordListItem.ItemState
+		itemState: AgonyRecordListItem.ItemState,
 	) {
 		if (itemState == AgonyRecordListItem.ItemState.Loading) {
 			view.visibility = View.VISIBLE
@@ -377,7 +387,7 @@ object DataBindingAdapter {
 	@BindingAdapter("setVisibilityDataItemInDefaultState")
 	fun setVisibilityDataItemInDefaultState(
 		view: View,
-		itemState: AgonyRecordListItem.ItemState
+		itemState: AgonyRecordListItem.ItemState,
 	) {
 		if (itemState is AgonyRecordListItem.ItemState.Success) {
 			view.visibility = View.VISIBLE
@@ -391,7 +401,7 @@ object DataBindingAdapter {
 	@BindingAdapter("setVisibilityDataItemInEditingState")
 	fun setVisibilityDataItemInEditingState(
 		view: View,
-		itemState: AgonyRecordListItem.ItemState
+		itemState: AgonyRecordListItem.ItemState,
 	) {
 		if (itemState is AgonyRecordListItem.ItemState.Editing) {
 			view.visibility = View.VISIBLE
@@ -405,7 +415,7 @@ object DataBindingAdapter {
 	@BindingAdapter("setVisibilityDataItemInLoadingState")
 	fun setVisibilityDataItemInLoadingState(
 		view: View,
-		itemState: AgonyRecordListItem.ItemState
+		itemState: AgonyRecordListItem.ItemState,
 	) {
 		if (itemState == AgonyRecordListItem.ItemState.Loading) {
 			view.visibility = View.VISIBLE
@@ -439,7 +449,7 @@ object DataBindingAdapter {
 	fun setChannelImg(
 		view: ImageView,
 		channelDefaultImageType: ChannelDefaultImageType,
-		imgUrl: String?
+		imgUrl: String?,
 	) {
 		if (imgUrl.isNullOrBlank()) {
 			setRandomChannelImg(view, channelDefaultImageType)
@@ -454,7 +464,7 @@ object DataBindingAdapter {
 	fun setMakeChannelImg(
 		view: ImageView,
 		channelDefaultImageType: ChannelDefaultImageType,
-		imgByteArray: ByteArray?
+		imgByteArray: ByteArray?,
 	) {
 		if (imgByteArray == null) {
 			setRandomChannelImg(view, channelDefaultImageType)
@@ -506,7 +516,8 @@ object DataBindingAdapter {
 	fun setChatSendImgVisibility(view: View, chatStatus: ChatStatus?) {
 		view.visibility = when (chatStatus) {
 			ChatStatus.LOADING,
-			ChatStatus.RETRY_REQUIRED -> View.VISIBLE
+			ChatStatus.RETRY_REQUIRED,
+			-> View.VISIBLE
 
 			else -> View.GONE
 		}

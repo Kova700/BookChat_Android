@@ -73,7 +73,7 @@
 
             <ImageView
                 android:id="@+id/userProfile_iv"
-                loadByteArray="@{viewModel.uiState.userProfileImage}"
+                loadByteArray="@{viewModel.userProfileImage}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:scaleType="fitCenter"
@@ -93,7 +93,7 @@
 
         <View
             android:id="@+id/nickName_layout"
-            setLayoutFromCheckResult="@{viewModel.uiState.nameCheckStatus}"
+            setLayoutFromCheckResult="@{viewModel.uiState.nicknameCheckState}"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginTop="40dp"
@@ -116,6 +116,7 @@
             android:text="@{viewModel.uiState.nickname}"
             android:textColorHint="#CFCFCF"
             android:textSize="13sp"
+            android:maxLength="20"
             app:layout_constraintBottom_toBottomOf="@+id/nickName_layout"
             app:layout_constraintEnd_toStartOf="@+id/text_clear_btn"
             app:layout_constraintStart_toStartOf="@+id/nickName_layout"
@@ -159,7 +160,7 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:onClick="@{() -> viewModel.onClickStartBtn()}"
-            android:text="@string/sign_up_submit_btn"
+            android:text="@string/sign_up_check_nickname_duplicate_btn"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             app:cornerRadius="5dp"
@@ -169,7 +170,7 @@
 
         <TextView
             android:id="@+id/checkResult_tv"
-            setTextViewFromCheckResult="@{viewModel.uiState.nameCheckStatus}"
+            setTextViewFromCheckResult="@{viewModel.uiState.nicknameCheckState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
