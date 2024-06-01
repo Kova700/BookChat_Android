@@ -11,6 +11,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
 import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
+import com.bumptech.glide.signature.ObjectKey
 import com.example.bookchat.R
 import com.example.bookchat.data.*
 import com.example.bookchat.domain.model.AgonyFolderHexColor
@@ -64,12 +65,14 @@ object DataBindingAdapter {
 	@BindingAdapter("loadByteArray")
 	fun loadByteArray(imageView: ImageView, byteArray: ByteArray?) {
 		if (byteArray == null || byteArray.isEmpty()) return
+		val key = byteArray.contentHashCode().toString()
 
 		val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
 		Glide.with(imageView.context)
 			.load(bitmap)
 			.placeholder(R.drawable.loading_img)
 			.error(R.drawable.error_img)
+			.signature(ObjectKey(key))
 			.into(imageView)
 	}
 
