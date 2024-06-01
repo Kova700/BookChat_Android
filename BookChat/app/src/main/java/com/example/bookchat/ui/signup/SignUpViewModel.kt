@@ -27,7 +27,8 @@ class SignUpViewModel @Inject constructor(
 	private val _uiState = MutableStateFlow<SignUpState>(SignUpState.DEFAULT)
 	val uiState = _uiState.asStateFlow()
 
-	private val _userProfileImage = MutableStateFlow<ByteArray?>(null)
+	/** UiState변경 시 깜빡임 때문에 따로 분리 */
+	private val _userProfileImage = MutableStateFlow<ByteArray>(ByteArray(0))
 	val userProfileImage get() = _userProfileImage.asStateFlow()
 
 	private fun checkNicknameDuplication(nickName: String) = viewModelScope.launch {
