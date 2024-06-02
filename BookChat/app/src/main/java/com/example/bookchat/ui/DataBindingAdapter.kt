@@ -2,7 +2,6 @@ package com.example.bookchat.ui
 
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.util.Log
 import android.view.View
@@ -67,10 +66,13 @@ object DataBindingAdapter {
 	@BindingAdapter("loadByteArray")
 	fun loadByteArray(imageView: ImageView, byteArray: ByteArray?) {
 		if (byteArray == null || byteArray.isEmpty()) return
+		val key = byteArray.contentHashCode()
+		if (imageView.tag == key) return
 
-		val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+		imageView.tag = key
 		Glide.with(imageView.context)
-			.load(bitmap)
+			.asBitmap()
+			.load(byteArray)
 			.placeholder(R.drawable.loading_img)
 			.error(R.drawable.error_img)
 			.into(imageView)
