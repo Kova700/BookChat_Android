@@ -6,6 +6,7 @@ data class SignUpState(
 	val uiState: UiState,
 	val nickname: String,
 	val nicknameCheckState: NicknameCheckState,
+	val clientNewImage: ByteArray?,
 ) {
 
 	enum class UiState {
@@ -19,6 +20,7 @@ data class SignUpState(
 			uiState = UiState.SUCCESS,
 			nickname = "",
 			nicknameCheckState = NicknameCheckState.Default,
+			clientNewImage = null
 		)
 	}
 

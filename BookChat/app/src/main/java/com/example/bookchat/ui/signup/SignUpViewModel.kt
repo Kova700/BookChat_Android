@@ -27,10 +27,6 @@ class SignUpViewModel @Inject constructor(
 	private val _uiState = MutableStateFlow<SignUpState>(SignUpState.DEFAULT)
 	val uiState = _uiState.asStateFlow()
 
-	/** UiState변경 시 깜빡임 때문에 따로 분리 */
-	private val _userProfileImage = MutableStateFlow<ByteArray>(ByteArray(0))
-	val userProfileImage get() = _userProfileImage.asStateFlow()
-
 	private fun checkNicknameDuplication(nickName: String) = viewModelScope.launch {
 		runCatching { clientRepository.isDuplicatedUserNickName(nickName) }
 			.onSuccess { isDuplicated ->
@@ -44,7 +40,7 @@ class SignUpViewModel @Inject constructor(
 			.onFailure { failHandler(it) }
 	}
 
-	fun onClickCameraBtn(){
+	fun onClickCameraBtn() {
 		startEvent(SignUpEvent.PermissionCheck)
 	}
 
@@ -55,7 +51,7 @@ class SignUpViewModel @Inject constructor(
 		) return
 
 		val nickName = uiState.value.nickname
-		val userProfile = userProfileImage.value
+		val userProfile = uiState.value.clientNewImage
 		val nameCheckStatus = uiState.value.nicknameCheckState
 
 		if (nameCheckStatus != NicknameCheckState.IsPerfect) {
@@ -100,7 +96,7 @@ class SignUpViewModel @Inject constructor(
 	}
 
 	fun onChangeUserProfile(profile: ByteArray) {
-		_userProfileImage.value = profile
+		updateState { copy(clientNewImage = profile) }
 	}
 
 	fun onClickBackBtn() {
