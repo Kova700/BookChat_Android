@@ -29,6 +29,13 @@ interface BookChatApi {
 		@Part("userSignUpRequest") requestUserSignUp: RequestUserSignUp,
 	)
 
+	@Multipart
+	@POST("/v1/api/users/profile")
+	suspend fun changeUserProfile(
+		@Part userProfileImage: MultipartBody.Part? = null,
+		@Part("changeUserNicknameRequest") requestChangeUserNickname: RequestChangeUserNickname,
+	)
+
 	@POST("/v1/api/users/signin")
 	suspend fun signIn(
 		@Header("OIDC") idToken: String,
@@ -44,8 +51,8 @@ interface BookChatApi {
 	suspend fun withdraw()
 
 	@GET("/v1/api/users/profile")
-	suspend fun getUserProfile(
-	): UserResponse
+	suspend fun getUserProfile()
+					: UserResponse
 
 	/**------------도서------------*/
 

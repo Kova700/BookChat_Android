@@ -32,11 +32,15 @@ class HomeViewModel @Inject constructor(
 	val uiState = _uiState.asStateFlow()
 
 	init {
-		getClientInfo()
+		observeClientFlow()
 		getReadingBookShelfItems()
 		observeChannels()
 		getChannels()
 		observeReadingBookShelfItems()
+	}
+
+	private fun observeClientFlow() = viewModelScope.launch {
+		clientRepository.getClientFlow().collect { updateState { copy(client = it) } }
 	}
 
 	private fun observeReadingBookShelfItems() = viewModelScope.launch {
@@ -70,11 +74,6 @@ class HomeViewModel @Inject constructor(
 			.onFailure {
 				handleError(it)
 			}
-	}
-
-	private fun getClientInfo() = viewModelScope.launch {
-		runCatching { clientRepository.getClientProfile() }
-			.onSuccess { user -> updateState { copy(client = user) } }
 	}
 
 	fun onBookItemClick(bookShelfListItemId: Long) {

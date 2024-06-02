@@ -5,8 +5,12 @@ import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.model.IdToken
 import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.model.User
+import kotlinx.coroutines.flow.Flow
 
 interface ClientRepository {
+
+	fun getClientFlow(): Flow<User>
+
 	suspend fun signIn(
 		approveChangingDevice: Boolean = false,
 	)
@@ -18,6 +22,11 @@ interface ClientRepository {
 		readingTastes: List<ReadingTaste>,
 		userProfile: ByteArray?,
 	)
+
+	suspend fun changeClientProfile(
+		newNickname: String,
+		userProfile: ByteArray?,
+	): User
 
 	suspend fun getClientProfile(): User
 	suspend fun signOut(needAServer: Boolean = false)

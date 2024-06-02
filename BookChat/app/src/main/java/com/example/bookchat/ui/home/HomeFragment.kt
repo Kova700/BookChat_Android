@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 //TODO : 독서중 도서 API 요청 후 로컬 DB 저장 (API 스펙에 BOOKID가 추가되어야함)
-
+//TODO : 클라이언트 정보 Flow로 받기 (수정시 바로 반영)
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 
