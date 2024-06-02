@@ -11,5 +11,5 @@ data class RequestUserSignIn(
 	@SerializedName("approveChangingDevice")
 	val approveChangingDevice: Boolean,
 	@SerializedName("oauth2Provider")
-	val oauth2Provider: com.example.bookchat.data.network.model.OAuth2ProviderNetwork
+	val oauth2Provider: OAuth2ProviderNetwork
 )
