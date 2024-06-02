@@ -33,6 +33,14 @@ data class NotificationMessage(
 	@SerializedName("notificationMessageType")
 	val notificationMessageType: NotificationMessageType
 ) : SocketMessage
+// 응답 :
+//{"targetId":null,
+// "chatId":null,
+// "message":"방장이 오픈채팅방을 종료했습니다.\n더 이상 대화를 할 수 없으며, \n채팅방을 나가면 다시 입장 할 수 없게 됩니다.",
+// "dispatchTime":null,
+// "notificationMessageType":"NOTICE_HOST_EXIT
+// "}
+
 
 //NOTICE_ENTER로 누가 들어왔는지 공지는 띄울 수 있으나
 //들어온 유저의 정보가 없어서

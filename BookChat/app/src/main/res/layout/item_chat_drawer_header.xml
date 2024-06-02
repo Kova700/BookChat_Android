@@ -4,7 +4,7 @@
     <data>
         <variable
             name="headerItem"
-            type="com.example.bookchat.ui.channel.model.drawer.ChannelDrawerItem.Header" />
+            type="com.example.bookchat.ui.channel.drawer.model.ChannelDrawerItem.Header" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

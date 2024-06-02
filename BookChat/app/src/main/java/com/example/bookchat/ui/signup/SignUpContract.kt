@@ -1,19 +1,12 @@
 package com.example.bookchat.ui.signup
 
-import com.example.bookchat.domain.model.NameCheckStatus
-
-/**
-	ByteArray의 equals, hashCode는 내용물이 같음을 검사하지 않음으로
-	ByteArray의 equals,hashCode를 재정의하라는 경고가 나옴.
-	ByteArray가 바뀌면 매번 다른 값으로 인식하기 때문에,
-	굳이 equals,hashCode를 재정의 할 필요는 없음
- */
+import com.example.bookchat.domain.model.NicknameCheckState
 
 data class SignUpState(
 	val uiState: UiState,
 	val nickname: String,
-	val userProfileImage: ByteArray?,
-	val nameCheckStatus: NameCheckStatus,
+	val nicknameCheckState: NicknameCheckState,
+	val clientNewImage: ByteArray?,
 ) {
 
 	enum class UiState {
@@ -26,17 +19,18 @@ data class SignUpState(
 		val DEFAULT = SignUpState(
 			uiState = UiState.SUCCESS,
 			nickname = "",
-			userProfileImage = null,
-			nameCheckStatus = NameCheckStatus.Default,
+			nicknameCheckState = NicknameCheckState.Default,
+			clientNewImage = null
 		)
 	}
+
 }
 
 
 sealed class SignUpEvent {
 	data class MoveToSelectTaste(
 		val userNickname: String,
-		val userProfilByteArray: ByteArray?
+		val userProfilByteArray: ByteArray?,
 	) : SignUpEvent()
 
 	object PermissionCheck : SignUpEvent()

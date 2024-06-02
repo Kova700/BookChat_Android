@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.text.Editable
+import android.text.InputFilter
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,12 +18,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySignUpBinding
+import com.example.bookchat.domain.model.NicknameCheckState
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROPPED_PROFILE_BYTE_ARRAY
 import com.example.bookchat.utils.PermissionManager
 import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.util.regex.Pattern
 
 @AndroidEntryPoint
 class SignUpActivity : AppCompatActivity() {
@@ -57,6 +60,7 @@ class SignUpActivity : AppCompatActivity() {
 
 	private fun setViewState(state: SignUpState) {
 		setNickNameEditTextState(state)
+		setSubmitBtnState(state)
 	}
 
 	private fun setNickNameEditTextState(state: SignUpState) {
@@ -68,8 +72,29 @@ class SignUpActivity : AppCompatActivity() {
 		}
 	}
 
+	private fun setSubmitBtnState(state: SignUpState) {
+		with(binding.startBookchatBtn) {
+			setText(
+				if (state.nicknameCheckState != NicknameCheckState.IsPerfect)
+					R.string.sign_up_check_nickname_duplicate_btn
+				else R.string.sign_up_submit_btn
+			)
+		}
+	}
+
+	private val specialCharFilter = InputFilter { source, _, _, _, _, _ ->
+		val pattern = Pattern.compile(NAME_CHECK_REGULAR_EXPRESSION)
+		if (pattern.matcher(source).matches().not()) {
+			signUpViewModel.onEnteredSpecialChar()
+			return@InputFilter ""
+		}
+		source
+	}
+	private val maxLengthFilter = InputFilter.LengthFilter(MAX_NICKNAME_LENGTH)
+
 	private fun initNickNameEditText() {
 		with(binding.nickNameEt) {
+			filters = arrayOf(specialCharFilter, maxLengthFilter)
 			addTextChangedListener { text: Editable? ->
 				signUpViewModel.onChangeNickname(text.toString())
 			}
@@ -130,5 +155,8 @@ class SignUpActivity : AppCompatActivity() {
 		const val KEYBOARD_DELAY_TIME = 200L
 		const val EXTRA_SIGNUP_USER_NICKNAME = "EXTRA_SIGNUP_USER_NICKNAME"
 		const val EXTRA_USER_PROFILE_BYTE_ARRAY = "EXTRA_USER_PROFILE_BYTE_ARRAY"
+		private const val NAME_CHECK_REGULAR_EXPRESSION =
+			"^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ\\u318D\\u119E\\u11A2\\u2022\\u2025a\\u00B7\\uFE55\\uFF1A]+$"
+		private const val MAX_NICKNAME_LENGTH = 20
 	}
 }

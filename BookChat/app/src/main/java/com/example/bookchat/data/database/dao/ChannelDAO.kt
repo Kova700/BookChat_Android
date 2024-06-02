@@ -165,7 +165,7 @@ interface ChannelDAO {
 		return (getChannel(channelId) != null)
 	}
 
-	@Query("DELETE from Channel WHERE room_id = :channelId")
+	@Query("DELETE FROM Channel WHERE room_id = :channelId")
 	suspend fun delete(channelId: Long)
 
 	@Query(

@@ -24,6 +24,7 @@
     <string name="sign_up_main">북챗에서 활동할\n프로필을 설정해 주세요.</string>
     <string name="sign_up_input_hint">닉네임을 입력해주세요</string>
     <string name="sign_up_submit_btn">북챗 시작하기</string>
+    <string name="sign_up_check_nickname_duplicate_btn">닉네임 중복 확인</string>
     <string name="name_check_status_short">최소 2자리 이상 입력해 주세요.</string>
     <string name="name_check_status_duplicate">이미 사용 중인 닉네임 입니다.</string>
     <string name="name_check_status_special_char">특수문자는 사용 불가능합니다.</string>
@@ -156,6 +157,8 @@
     <!--user edit-->
     <string name="uesr_edit_title">프로필 수정</string>
     <string name="duplicate_check">중복확인</string>
+    <string name="submit_changed_profile">변경하기</string>
+
     <!--notice-->
     <!--app setting-->
     <string name="push_notification">푸시알림</string>
@@ -168,6 +171,17 @@
     <string name="chat_room_send_message">메시지 보내기</string>
     <string name="enter">입장</string>
     <string name="last_read_chat_notice">여기까지 읽으셨습니다.</string>
+    <string name="user_profile_ban">내보내기</string>
+    <string name="user_ban_warning_dialog_title">채팅방 내보내기</string>
+    <string name="user_ban_warning_dialog_content">채팅방에서 내보내시겠습니까?</string>
+    <string name="user_ban_fail">유저 강퇴를 실패했습니다.</string>
+    <string name="channel_exit_warning_dialog_title">채팅방 나가기</string>
+    <string name="channel_exit_warning_dialog_content">채팅방을 나가시겠습니까?</string>
+    <string name="channel_exit_host_warning_dialog_content">*방장을 위임하지 않을 시 방이 삭제됩니다.</string>
+    <string name="channel_exit_fail">채팅방 퇴장을 실패했습니다.</string>
+    <string name="exploded_channel_notice_dialog_content">방장이 채팅방을 종료했습니다.\n더 이상 대화가 불가능합니다.</string>
+    <string name="unavailable_channel_edittext_hint">더이상 대화가 불가능한 상태입니다</string>
+    <string name="channel_banned_user_notice_dialog_content">채팅방 관리자에의해 강퇴되었습니다.\n더 이상 대화가 불가능합니다.</string>
 
     <!--util-->
     <string name="confirm">확인</string>

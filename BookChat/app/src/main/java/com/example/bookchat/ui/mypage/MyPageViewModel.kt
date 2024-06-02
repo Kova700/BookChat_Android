@@ -8,46 +8,46 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
-	private val clientRepository: ClientRepository
+	private val clientRepository: ClientRepository,
 ) : ViewModel() {
-	val cachedClient = MutableStateFlow<User>(User.Default)
-
-	init {
-		getUserInfo()
-	}
+	private val _clientFlow = MutableStateFlow<User>(User.Default)
+	val clientFlow get() = _clientFlow.asStateFlow()
 
 	private val _eventFlow = MutableSharedFlow<MyPageEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
 
-	fun clickUserEditBtn() {
+	init {
+		observeClientFlow()
+	}
+
+	private fun observeClientFlow() = viewModelScope.launch {
+		clientRepository.getClientFlow().collect { user -> _clientFlow.emit(user) }
+	}
+
+	fun onClickUserEditBtn() {
 		startEvent(MyPageEvent.MoveToUserEditPage)
 	}
 
-	fun clickWishBtn() {
+	fun onClickWishBtn() {
 		startEvent(MyPageEvent.MoveToWish)
 	}
 
-	fun clickNoticeBtn() {
+	fun onClickNoticeBtn() {
 		startEvent(MyPageEvent.MoveToNotice)
 	}
 
-	fun clickAccountSetBtn() {
+	fun onClickAccountSetBtn() {
 		startEvent(MyPageEvent.MoveToAccountSetting)
 	}
 
-	fun clickAppSetBtn() {
+	fun onClickAppSetBtn() {
 		startEvent(MyPageEvent.MoveToAppSetting)
-	}
-
-	private fun getUserInfo() = viewModelScope.launch {
-		runCatching { clientRepository.getClientProfile() }
-			.onSuccess { user -> cachedClient.update { user } }
 	}
 
 	private fun startEvent(event: MyPageEvent) = viewModelScope.launch {

@@ -1,5 +1,6 @@
 package com.example.bookchat.data.repository
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -11,10 +12,11 @@ import com.example.bookchat.data.mapper.toNetWork
 import com.example.bookchat.data.mapper.toOAuth2ProviderNetwork
 import com.example.bookchat.data.mapper.toUser
 import com.example.bookchat.data.network.BookChatApi
+import com.example.bookchat.data.network.model.request.RequestChangeUserNickname
 import com.example.bookchat.data.network.model.request.RequestUserSignIn
+import com.example.bookchat.data.network.model.request.RequestUserSignUp
 import com.example.bookchat.data.network.model.response.NeedToDeviceWarningException
 import com.example.bookchat.data.network.model.response.NeedToSignUpException
-import com.example.bookchat.data.network.model.response.NickNameDuplicateException
 import com.example.bookchat.data.network.model.response.ResponseBodyEmptyException
 import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.model.FCMToken
@@ -23,8 +25,13 @@ import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.toMultiPartBody
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.IOException
@@ -40,12 +47,15 @@ class ClientRepositoryImpl @Inject constructor(
 	private val bookChatTokenRepository: BookChatTokenRepository,
 ) : ClientRepository {
 	private val deviceUUIDKey = stringPreferencesKey(DEVICE_UUID_KEY)
-
-	private var cachedClient: User? = null
 	private var cachedIdToken: IdToken? = null
+	private val client = MutableStateFlow<User?>(null)
+
+	override fun getClientFlow(): Flow<User> {
+		return client.asStateFlow().filterNotNull()
+	}
 
 	override suspend fun signIn(
-		approveChangingDevice: Boolean
+		approveChangingDevice: Boolean,
 	) {
 		val requestUserSignIn = RequestUserSignIn(
 			fcmToken = getFCMToken().text,
@@ -78,11 +88,11 @@ class ClientRepositoryImpl @Inject constructor(
 	override suspend fun signUp(
 		nickname: String,
 		readingTastes: List<ReadingTaste>,
-		userProfile: ByteArray?
+		userProfile: ByteArray?,
 	) {
 		val idToken = cachedIdToken ?: throw IOException("IdToken does not exist.")
 
-		val requestUserSignUp = com.example.bookchat.data.network.model.request.RequestUserSignUp(
+		val requestUserSignUp = RequestUserSignUp(
 			oauth2Provider = idToken.oAuth2Provider.toOAuth2ProviderNetwork(),
 			nickname = nickname,
 			readingTastes = readingTastes.map { it.toNetWork() },
@@ -98,6 +108,26 @@ class ClientRepositoryImpl @Inject constructor(
 			),
 			requestUserSignUp = requestUserSignUp
 		)
+	}
+
+	override suspend fun changeClientProfile(
+		newNickname: String,
+		userProfile: ByteArray?,
+	): User {
+		Log.d(TAG, "ClientRepositoryImpl: changeClientProfile() - called")
+		bookChatApi.changeUserProfile(
+			userProfileImage = userProfile?.toMultiPartBody(
+				contentType = CONTENT_TYPE_IMAGE_WEBP,
+				multipartName = PROFILE_IMAGE_MULTIPART_NAME,
+				fileName = PROFILE_IMAGE_FILE_NAME,
+				fileExtension = PROFILE_IMAGE_FILE_EXTENSION
+			),
+			requestChangeUserNickname = RequestChangeUserNickname(nickname = newNickname)
+		)
+
+		/** 갱신을 위해 자체적으로 다시 호출 */
+		return bookChatApi.getUserProfile().toUser()
+			.also { client.emit(it) }
 	}
 
 	override suspend fun renewBookChatToken(): BookChatToken? {
@@ -121,15 +151,16 @@ class ClientRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun getClientProfile(): User {
-		cachedClient?.let { return it }
-		return bookChatApi.getUserProfile().toUser().also { cachedClient = it }
+		return client.firstOrNull()
+			?: bookChatApi.getUserProfile().toUser()
+				.also { client.emit(it) }
 	}
 
-	override suspend fun checkForDuplicateUserName(nickName: String) {
+	override suspend fun isDuplicatedUserNickName(nickName: String): Boolean {
 		val response = bookChatApi.requestNameDuplicateCheck(nickName)
-		when (response.code()) {
-			200 -> {}
-			409 -> throw NickNameDuplicateException(response.errorBody()?.string())
+		return when (response.code()) {
+			200 -> false
+			409 -> true
 			else -> throw Exception(
 				createExceptionMessage(
 					response.code(),

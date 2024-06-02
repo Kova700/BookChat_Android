@@ -15,7 +15,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentHomeBinding
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
-import com.example.bookchat.ui.channel.ChannelActivity
+import com.example.bookchat.ui.channel.chatting.ChannelActivity
 import com.example.bookchat.ui.channelList.ChannelListFragment
 import com.example.bookchat.ui.home.adapter.HomeBookAdapter
 import com.example.bookchat.ui.home.adapter.HomeChannelAdapter
@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 //TODO : 독서중 도서 API 요청 후 로컬 DB 저장 (API 스펙에 BOOKID가 추가되어야함)
-
+//TODO : 클라이언트 정보 Flow로 받기 (수정시 바로 반영)
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 

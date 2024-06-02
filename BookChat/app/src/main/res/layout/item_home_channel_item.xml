@@ -14,27 +14,40 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="30dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="30dp" />
+
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
-            android:layout_marginVertical="10dp"
-            android:layout_marginStart="@dimen/default_margin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
+            android:layout_marginVertical="10dp"
             app:cardCornerRadius="30dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/bookImg"
-                android:layout_width="75dp"
-                android:layout_height="75dp"
-                android:src="@drawable/loading_img"
                 channelDefaultImageType="@{channel.defaultRoomImageType}"
                 imgUrl="@{channel.roomImageUri}"
-                android:scaleType="fitXY" />
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/loading_img" />
         </androidx.cardview.widget.CardView>
 
         <TextView
@@ -57,7 +70,6 @@
             app:layout_constraintStart_toEndOf="@+id/cardView"
             app:layout_constraintTop_toTopOf="@+id/cardView" />
 
-        <!--BackEnd 정비 후, 구현 예정-->
         <TextView
             android:id="@+id/unchecked_chat_count_tv"
             android:layout_width="wrap_content"
@@ -79,20 +91,19 @@
             getFormattedDetailDateTimeText="@{channel.lastChat.dispatchTime}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/default_margin"
             android:layout_marginTop="20dp"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"
             android:textColor="#222222"
             android:textSize="10sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/chat_content_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="60dp"
             android:elegantTextHeight="true"
             android:ellipsize="end"
             android:fontFamily="@font/notosanskr_regular"
@@ -109,18 +120,68 @@
             android:id="@+id/chat_member_count"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
             android:elegantTextHeight="true"
             android:ellipsize="end"
-            android:maxLines="1"
             android:fontFamily="@font/notosanskr_regular"
+            android:maxLines="1"
             android:text="@{String.valueOf(channel.roomMemberCount) + @string/people_count_text}"
             android:textColor="#373737"
             android:textSize="10sp"
             app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toStartOf="@+id/textView11"
             app:layout_constraintStart_toStartOf="@+id/chat_content_tv"
             app:layout_constraintTop_toBottomOf="@+id/chat_content_tv" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/unavailable_channel_state_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="unavailable_channel_shadow, unavailable_channel_icon" />
+
+        <ImageView
+            android:id="@+id/unavailable_channel_shadow"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#66FFFFFF"
+            android:elevation="30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/unavailable_channel_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/unavailable_channel_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintTop_toBottomOf="@+id/textView11" />
+
+        <ImageView
+            android:id="@+id/top_pin_channel_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="7dp"
+            android:visibility="gone"
+            android:src="@drawable/top_pin_channel_icon"
+            app:layout_constraintStart_toEndOf="@+id/mute_channel_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintTop_toBottomOf="@+id/textView11" />
+
+        <ImageView
+            android:id="@+id/mute_channel_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/mute_channel_icon"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/top_pin_channel_icon"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView11" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -8,6 +8,7 @@ import com.example.bookchat.data.datastore.getDataFlow
 import com.example.bookchat.data.datastore.setData
 import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.repository.BookChatTokenRepository
+import com.example.bookchat.domain.repository.BookChatTokenRepository.Companion.TOKEN_PREFIX
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
@@ -39,7 +40,6 @@ class BookChatTokenRepositoryIml @Inject constructor(
 	}
 
 	companion object {
-		private const val TOKEN_PREFIX = "Bearer"
 		private const val BOOKCHAT_TOKEN_KEY = "BOOKCHAT_TOKEN_KEY"
 	}
 }

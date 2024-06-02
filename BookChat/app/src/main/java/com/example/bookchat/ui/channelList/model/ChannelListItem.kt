@@ -21,6 +21,7 @@ sealed interface ChannelListItem {
 		val roomSid: String,
 		val roomMemberCount: Int,
 		val defaultRoomImageType: ChannelDefaultImageType,
+		val isExistNewChat :Boolean = false,
 		val notificationFlag: Boolean = true,
 		val topPinNum: Int = 0,
 		val isExploded: Boolean = false,
@@ -38,6 +39,9 @@ sealed interface ChannelListItem {
 		val bookAuthors: List<String>? = null,
 		val bookCoverImageUrl: String? = null,
 	) : ChannelListItem {
+
+		val isAvailableChannel
+			get() = isBanned.not() && isExploded.not()
 
 		companion object {
 			val DEFAULT = ChannelItem(

@@ -89,7 +89,7 @@
                 android:layout_height="@dimen/make_chat_room_img_height_default"
                 android:scaleType="fitXY"
                 channelDefaultImageType="@{viewmodel.uiState.defaultProfileImageType}"
-                loadByteArray="@{viewmodel.uiState.channelProfileImage}"
+                loadChannelImageByteArray="@{viewmodel.uiState.channelProfileImage}"
                 android:src="@drawable/default_chat_room_img1" />
         </androidx.cardview.widget.CardView>
 

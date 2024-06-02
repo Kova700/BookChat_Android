@@ -297,7 +297,6 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	private suspend fun insertNewChat(chat: Chat) {
-		Log.d(TAG, "StompHandlerImpl: insertNewChat() - chat : ${chat.message}")
 		chatRepository.insertChat(chat)
 	}
 
@@ -316,7 +315,6 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	private suspend fun updateWaitingChatToSuccess(chat: Chat, receiptId: Long) {
-		Log.d(TAG, "StompHandlerImpl: updateWaitingChatToSuccess() - chat: ${chat.message}")
 		chatRepository.updateWaitingChat(
 			targetChatId = receiptId,
 			newChatId = chat.chatId,
@@ -326,7 +324,6 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	private suspend fun updateChannelLastChat(chat: Chat) {
-		Log.d(TAG, "StompHandlerImpl: updateChannelLastChat() - ${chat.message}")
 		channelRepository.updateChannelLastChatIfValid(
 			channelId = chat.chatRoomId,
 			chatId = chat.chatId
@@ -336,12 +333,6 @@ class StompHandlerImpl @Inject constructor(
 	private fun getHeader(): Map<String, String> {
 		val bookchatToken = runBlocking { bookChatTokenRepository.getBookChatToken() }
 		return mapOf(AUTHORIZATION to "${bookchatToken?.accessToken}")
-			.also {
-				Log.d(
-					TAG,
-					"StompHandlerImpl: getHeader() - accessToken : ${bookchatToken?.accessToken}"
-				)
-			}
 	}
 
 	private fun String.parseToSocketMessage(): SocketMessage {
@@ -351,6 +342,12 @@ class StompHandlerImpl @Inject constructor(
 		}
 		return gson.fromJson(this, NotificationMessage::class.java)
 	}
+	//{"targetId":null,
+	// "chatId":null,
+	// "message":"방장이 오픈채팅방을 종료했습니다.\n더 이상 대화를 할 수 없으며, \n채팅방을 나가면 다시 입장 할 수 없게 됩니다.",
+	// "dispatchTime":null,
+	// "notificationMessageType":"NOTICE_HOST_EXIT
+	// "}
 
 	private suspend fun handleSocketError(caller: String, throwable: Throwable) {
 		Log.d(TAG, "StompHandlerImpl: handleSocketError(caller :$caller) - throwable :$throwable")

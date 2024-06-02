@@ -7,4 +7,8 @@ interface BookChatTokenRepository {
 	suspend fun saveBookChatToken(token: BookChatToken)
 	suspend fun isBookChatTokenExist(): Boolean
 	suspend fun clearBookChatToken()
+
+	companion object {
+		const val TOKEN_PREFIX = "Bearer"
+	}
 }

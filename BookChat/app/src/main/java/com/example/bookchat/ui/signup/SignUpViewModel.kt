@@ -5,8 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.data.network.model.response.ForbiddenException
 import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
-import com.example.bookchat.data.network.model.response.NickNameDuplicateException
-import com.example.bookchat.domain.model.NameCheckStatus
+import com.example.bookchat.domain.model.NicknameCheckState
 import com.example.bookchat.domain.repository.ClientRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,12 +14,11 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.regex.Pattern
 import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-	private var clientRepository: ClientRepository
+	private var clientRepository: ClientRepository,
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<SignUpEvent>()
@@ -29,58 +27,34 @@ class SignUpViewModel @Inject constructor(
 	private val _uiState = MutableStateFlow<SignUpState>(SignUpState.DEFAULT)
 	val uiState = _uiState.asStateFlow()
 
-	private fun isAvailableNickname(text: String): Boolean {
-		if (text.length < 2) {
-			updateState {
-				copy(
-					nickname = text,
-					nameCheckStatus = NameCheckStatus.IsShort
-				)
-			}
-			return false
-		}
-
-		val regex =
-			"^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ\\u318D\\u119E\\u11A2\\u2022\\u2025a\\u00B7\\uFE55\\uFF1A]+$"
-		val pattern = Pattern.compile(regex)
-		if (pattern.matcher(text).matches().not()) {
-			updateState { copy(nameCheckStatus = NameCheckStatus.IsSpecialCharInText) }
-			return false
-		}
-
-		updateState {
-			copy(
-				nickname = text,
-				nameCheckStatus = NameCheckStatus.Default
-			)
-		}
-		return true
-	}
-
 	private fun checkNicknameDuplication(nickName: String) = viewModelScope.launch {
-		runCatching { clientRepository.checkForDuplicateUserName(nickName) }
-			.onSuccess { updateState { copy(nameCheckStatus = NameCheckStatus.IsPerfect) } }
+		runCatching { clientRepository.isDuplicatedUserNickName(nickName) }
+			.onSuccess { isDuplicated ->
+				updateState {
+					copy(
+						nicknameCheckState =
+						if (isDuplicated) NicknameCheckState.IsDuplicate else NicknameCheckState.IsPerfect,
+					)
+				}
+			}
 			.onFailure { failHandler(it) }
 	}
 
-	private fun onDuplicateNickname() {
-		updateState { copy(nameCheckStatus = NameCheckStatus.IsDuplicate) }
-	}
-
-	fun openGallery() {
+	fun onClickCameraBtn() {
 		startEvent(SignUpEvent.PermissionCheck)
 	}
 
 	fun onClickStartBtn() {
-		if (uiState.value.uiState == SignUpState.UiState.LOADING) return
+		if (uiState.value.uiState == SignUpState.UiState.LOADING
+			|| uiState.value.nicknameCheckState == NicknameCheckState.IsShort
+			|| uiState.value.nickname.length < 2
+		) return
 
 		val nickName = uiState.value.nickname
-		val userProfile = uiState.value.userProfileImage
-		val nameCheckStatus = uiState.value.nameCheckStatus
+		val userProfile = uiState.value.clientNewImage
+		val nameCheckStatus = uiState.value.nicknameCheckState
 
-		if (isAvailableNickname(nickName).not()) return
-
-		if (nameCheckStatus != NameCheckStatus.IsPerfect) {
+		if (nameCheckStatus != NicknameCheckState.IsPerfect) {
 			checkNicknameDuplication(nickName)
 			return
 		}
@@ -94,11 +68,35 @@ class SignUpViewModel @Inject constructor(
 	}
 
 	fun onChangeNickname(text: String) {
-		isAvailableNickname(text.trim())
+		updateUserNicknameIfValid(text.trim())
+	}
+
+	private fun updateUserNicknameIfValid(text: String) {
+
+		if (text.length < 2) {
+			updateState {
+				copy(
+					nickname = text,
+					nicknameCheckState = NicknameCheckState.IsShort
+				)
+			}
+			return
+		}
+
+		updateState {
+			copy(
+				nickname = text,
+				nicknameCheckState = NicknameCheckState.Default
+			)
+		}
+	}
+
+	fun onEnteredSpecialChar() {
+		updateState { copy(nicknameCheckState = NicknameCheckState.IsSpecialCharInText) }
 	}
 
 	fun onChangeUserProfile(profile: ByteArray) {
-		updateState { copy(userProfileImage = profile) }
+		updateState { copy(clientNewImage = profile) }
 	}
 
 	fun onClickBackBtn() {
@@ -121,7 +119,6 @@ class SignUpViewModel @Inject constructor(
 		when (exception) {
 			is ForbiddenException -> startEvent(SignUpEvent.ErrorEvent(R.string.login_forbidden_user))
 			is NetworkIsNotConnectedException -> startEvent(SignUpEvent.ErrorEvent(R.string.error_network_not_connected))
-			is NickNameDuplicateException -> onDuplicateNickname()
 			else -> {
 				val errorMessage = exception.message
 				if (errorMessage.isNullOrBlank()) startEvent(SignUpEvent.ErrorEvent(R.string.error_else))
@@ -129,4 +126,5 @@ class SignUpViewModel @Inject constructor(
 			}
 		}
 	}
+
 }

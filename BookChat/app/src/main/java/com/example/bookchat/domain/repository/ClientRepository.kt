@@ -5,11 +5,16 @@ import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.model.IdToken
 import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.model.User
+import kotlinx.coroutines.flow.Flow
 
 interface ClientRepository {
+
+	fun getClientFlow(): Flow<User>
+
 	suspend fun signIn(
-		approveChangingDevice: Boolean = false
+		approveChangingDevice: Boolean = false,
 	)
+
 	suspend fun renewBookChatToken(): BookChatToken?
 
 	suspend fun signUp(
@@ -18,10 +23,15 @@ interface ClientRepository {
 		userProfile: ByteArray?,
 	)
 
+	suspend fun changeClientProfile(
+		newNickname: String,
+		userProfile: ByteArray?,
+	): User
+
 	suspend fun getClientProfile(): User
 	suspend fun signOut(needAServer: Boolean = false)
 	suspend fun withdraw()
-	suspend fun checkForDuplicateUserName(nickName: String)
+	suspend fun isDuplicatedUserNickName(nickName: String): Boolean
 	suspend fun renewFCMToken(fcmToken: FCMToken)
 	fun getCachedIdToken(): IdToken
 	fun saveIdToken(token: IdToken)

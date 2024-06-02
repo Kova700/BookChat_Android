@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentMyPageBinding
 import com.example.bookchat.ui.mypage.MyPageViewModel.MyPageEvent
+import com.example.bookchat.ui.mypage.useredit.UserEditActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -23,21 +24,19 @@ class MyPageFragment : Fragment() {
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
-	): View? {
-		binding = DataBindingUtil.inflate(inflater, R.layout.fragment_my_page, container, false)
-		with(binding) {
-			lifecycleOwner = this@MyPageFragment
-			viewmodel = myPageViewModel
-		}
-		observeEvent()
+		savedInstanceState: Bundle?,
+	): View {
+		binding = DataBindingUtil.inflate(
+			inflater, R.layout.fragment_my_page, container, false
+		)
+		binding.lifecycleOwner = this
+		binding.viewmodel = myPageViewModel
+		observeUiEvent()
 		return binding.root
 	}
 
-	private fun observeEvent() {
-		lifecycleScope.launch {
-			myPageViewModel.eventFlow.collect { event -> handleEvent(event) }
-		}
+	private fun observeUiEvent() = lifecycleScope.launch {
+		myPageViewModel.eventFlow.collect { handleEvent(it) }
 	}
 
 	private fun moveToUserEditActivity() {

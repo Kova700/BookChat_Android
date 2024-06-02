@@ -35,7 +35,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	private val channelDAO: ChannelDAO,
 	private val userRepository: UserRepository,
 	private val clientRepository: ClientRepository,
-	private val chatRepository: ChatRepository
+	private val chatRepository: ChatRepository,
 ) : ChannelRepository {
 
 	private val mapChannels = MutableStateFlow<Map<Long, Channel>>(emptyMap())//(channelId, Channel)
@@ -113,7 +113,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		defaultRoomImageType: ChannelDefaultImageType,
 		channelTags: List<String>,
 		selectedBook: Book,
-		channelImage: ByteArray?
+		channelImage: ByteArray?,
 	): Channel {
 		val response = bookChatApi.makeChannel(
 			requestMakeChannel = RequestMakeChannel(
@@ -147,12 +147,28 @@ class ChannelRepositoryImpl @Inject constructor(
 		)
 	}
 
-	// TODO : 이미 퇴장되어있는 채널에 퇴장 API 호출하면 넘어오는 응답코드 따로 정의 후,
-	//  해당 코드 응답시, 예외 던지기
+
+	//TODO : 방장 나갈 경우 받는 메세지에 넘어오는 메세제지 nullable타입 서버 수정 대기 중
 	override suspend fun leaveChannel(channelId: Long) {
-		val resultCode = bookChatApi.leaveChannel(channelId).code()
-		Log.d(TAG, "ChannelClientRepositoryImpl: leaveChannel() - resultCode : $resultCode")
+		Log.d(TAG, "ChannelRepositoryImpl: leaveChannel() - called")
+		val response = bookChatApi.leaveChannel(channelId)
+		Log.d(TAG, "ChannelRepositoryImpl: leaveChannel() - response :${response.code()}")
 		channelDAO.delete(channelId)
+		//현재 방장이 채팅방을 나가면
+
+		//여기서 지우고 다시 서버로부터 로드 되고 있음 지금 (안띄워야지)
+		//방장이 채널 나가기를 하면 해당 이벤트를 받지 못한 유저를 위해 채널을 soft 삭제를 하기로 했음,
+		//하지만 방장만 있는 인원수가 1명인 채팅방은 방장이 나가면 더 이상
+		//남은 유저가 없으니까 soft 삭제가 아니라 그냥 삭제가 되어야함 (사용자 채팅방 목록 이랑 전체 채팅방 검색에 나오지 않는)
+		//(but 서버로부터 load되고 있음)
+		//심지어 소켓도 연결되고 채팅도 보내짐 (혹은 채널이 나가지지 않았거나)
+		//채팅방 삭제조건을 soft삭제가 아니라
+		//터진 상태로 소켓연결 + 채팅 불가능하게 만들고
+		//모든 유저가 채팅방을 나가야지 삭제되는 조건으로 바꾸는게 제일 편할듯 ㅇㅇ
+		//Ban은 그냥 유저를 채팅방 목록에서 지우고 쿼리시에 안넘겨 주면 되는데
+		//채팅방 폭발은 쿼리시에 넘겨줌 (그 사람이 채팅방을 나갈 때 까지) but 클라이언트 단에서 상하 페이징, 소켓 연결 막음
+		//소켓 연결 여부는 서버에서도 막는게 좋을 듯
+		chatRepository.deleteChannelAllChat(channelId)
 		setChannels(mapChannels.value - channelId)
 	}
 
@@ -212,9 +228,20 @@ class ChannelRepositoryImpl @Inject constructor(
 		setChannels(mapChannels.value + mapOf(channelId to newChannel))
 	}
 
-	override suspend fun banChannelMember(channelId: Long, targetUserId: Long) {
+	override suspend fun banChannelMember(
+		channelId: Long,
+		targetUserId: Long,
+		needServer: Boolean,
+	) {
 		val channel = getChannel(channelId)
 		val clientId = clientRepository.getClientProfile().id
+
+		if (needServer) {
+			bookChatApi.banChannelMember(
+				channelId = channel.roomId,
+				userId = targetUserId,
+			)
+		}
 
 		val newParticipants = channel.participants?.filter { it.id != targetUserId }
 		val newParticipantAuthorities = channel.participantAuthorities?.minus(targetUserId)
@@ -237,7 +264,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	override suspend fun updateChannelMemberAuthority(
 		channelId: Long,
 		targetUserId: Long,
-		channelMemberAuthority: ChannelMemberAuthority
+		channelMemberAuthority: ChannelMemberAuthority,
 	) {
 		val channel = getChannel(channelId)
 		val newParticipantAuthorities = channel.participantAuthorities
@@ -287,12 +314,13 @@ class ChannelRepositoryImpl @Inject constructor(
 
 	//TODO : 서버측에서 lastChatID가 가장 높은 순으로 쿼리되게 혹은 쿼리 옵션을 주게 수정 대기
 	//TODO : 해당 함수 인터넷 끊겨있다 연결 trigger발생 시 page :0 부터 재호출
+	//TODO : 오프라인부터 가장 첫페이지 뿌려주고 리모트 데이터로 덮어쓰기하는 방향으로 해야함 (리모트 실패하면 오프라인 가져오는게 아니라)
 	/** 지수백오프 getChannels 요청 */
 	/** 서버에 있는 채널 우선적으로 쿼리 */
 	/** Channel 세부 정보는 채팅방 들어 가면 getChannelInfo에 의해 갱신될 예정 */
 	override suspend fun getChannels(
 		loadSize: Int,
-		maxAttempts: Int
+		maxAttempts: Int,
 	) {
 		if (isEndPage) return
 
@@ -332,7 +360,7 @@ class ChannelRepositoryImpl @Inject constructor(
 
 	private suspend fun getOfflineChannels(
 		loadSize: Int,
-		baseId: Long?
+		baseId: Long?,
 	): List<Channel> {
 		return channelDAO.getChannels(loadSize, baseId ?: 0)
 			.map {

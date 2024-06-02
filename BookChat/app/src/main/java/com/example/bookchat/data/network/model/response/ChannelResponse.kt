@@ -19,6 +19,10 @@ data class ChannelResponse(
 	val roomMemberCount: Int,
 	@SerializedName("defaultRoomImageType")
 	val defaultRoomImageType: ChannelDefaultImageTypeNetwork,
+	@SerializedName("isBanned")
+	val isBanned: Boolean,
+	@SerializedName("isExploded")
+	val isExploded: Boolean,
 	@SerializedName("lastChatId")
 	val lastChatId: Long? = null,
 	@SerializedName("lastChatContent")
