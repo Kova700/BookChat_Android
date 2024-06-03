@@ -68,6 +68,18 @@
         android:theme="@style/Theme.BookChat"
         tools:targetApi="n">
         <activity
+            android:name=".ui.channel.channelsetting.authoritymanage.subhost.SubHostManageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.channel.channelsetting.authoritymanage.host.HostManageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.channel.channelsetting.authoritymanage.ChannelMembersManageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.channel.channelsetting.ChannelSettingActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.channel.userprofile.UserProfileActivity"
             android:exported="false" />
         <activity

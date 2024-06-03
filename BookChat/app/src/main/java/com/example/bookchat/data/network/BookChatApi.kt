@@ -191,9 +191,16 @@ interface BookChatApi {
 	@Multipart
 	@POST("/v1/api/chatrooms")
 	suspend fun makeChannel(
-		@Part("createChatRoomRequest") requestMakeChannel: RequestMakeChannel,
 		@Part chatRoomImage: MultipartBody.Part? = null,
+		@Part("createChatRoomRequest") requestMakeChannel: RequestMakeChannel,
 	): Response<Unit>
+
+	@Multipart
+	@POST("/chatrooms/{roomId}")
+	suspend fun changeChannelSetting(
+		@Part chatRoomImage: MultipartBody.Part? = null,
+		@Part("reviseChatRoomRequest") requestChangeChannelSetting: RequestChangeChannelSetting,
+	)
 
 	@POST("/v1/api/enter/chatrooms/{roomId}")
 	suspend fun enterChannel(

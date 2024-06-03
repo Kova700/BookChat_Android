@@ -19,6 +19,7 @@ import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
+import com.example.bookchat.ui.channel.channelsetting.ChannelSettingActivity
 import com.example.bookchat.ui.channel.chatting.adapter.ChatItemAdapter
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
 import com.example.bookchat.ui.channel.drawer.adapter.ChannelDrawerAdapter
@@ -234,8 +235,10 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun moveChannelSetting() {
-//		val intent = Intent(this, Activity::class.java)
-//		startActivity(intent)
+		val channelId = channelViewModel.uiState.value.channel?.roomId ?: return
+		val intent = Intent(this, ChannelSettingActivity::class.java)
+			.putExtra(EXTRA_CHANNEL_ID, channelId)
+		startActivity(intent)
 	}
 
 	private fun setExplodedChannelUiState(uiState: ChannelUiState) {

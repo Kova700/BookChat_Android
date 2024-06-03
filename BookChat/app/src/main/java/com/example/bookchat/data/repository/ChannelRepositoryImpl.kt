@@ -7,6 +7,7 @@ import com.example.bookchat.data.mapper.toChannel
 import com.example.bookchat.data.mapper.toChannelDefaultImageTypeNetwork
 import com.example.bookchat.data.mapper.toChannelEntity
 import com.example.bookchat.data.network.BookChatApi
+import com.example.bookchat.data.network.model.request.RequestChangeChannelSetting
 import com.example.bookchat.data.network.model.request.RequestMakeChannel
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.Channel
@@ -134,6 +135,30 @@ class ChannelRepositoryImpl @Inject constructor(
 		val createdChannelId = response.headers()["Location"]?.split("/")?.last()?.toLong()
 			?: throw Exception("ChannelId does not exist in Http header.")
 		return getChannel(createdChannelId)
+	}
+
+	override suspend fun changeChannelSetting(
+		channelId: Long,
+		channelTitle: String,
+		channelCapacity: Int,
+		channelTags: List<String>,
+		channelImage: ByteArray?,
+	) {
+		bookChatApi.changeChannelSetting(
+			requestChangeChannelSetting = RequestChangeChannelSetting(
+				channelId = channelId,
+				channelTitle = channelTitle,
+				channelCapacity = channelCapacity,
+				channelTags = channelTags
+			),
+			chatRoomImage = channelImage?.toMultiPartBody(
+				contentType = CONTENT_TYPE_IMAGE_WEBP,
+				multipartName = IMAGE_MULTIPART_NAME,
+				fileName = IMAGE_FILE_NAME,
+				fileExtension = IMAGE_FILE_EXTENSION_WEBP
+			)
+		)
+		getOnlineChannel(channelId)
 	}
 
 	/** DB에 갱신된 LastChat, Participants와 기존에 존재하던
