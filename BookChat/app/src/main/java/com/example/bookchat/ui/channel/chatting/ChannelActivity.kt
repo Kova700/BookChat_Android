@@ -101,7 +101,7 @@ class ChannelActivity : AppCompatActivity() {
 
 	private fun initViewState() {
 		with(binding.chatInputEt) {
-			if (channelViewModel.uiState.value.channel?.isAvailableChannel == true) isEnabled = true
+			if (channelViewModel.uiState.value.channel.isAvailableChannel) isEnabled = true
 			addTextChangedListener { text ->
 				val message = text?.toString() ?: return@addTextChangedListener
 				channelViewModel.onChangeEnteredMessage(message)
@@ -237,7 +237,7 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun moveToUserProfile(user: User) {
-		val channelId = channelViewModel.uiState.value.channel?.roomId ?: return
+		val channelId = channelViewModel.uiState.value.channel.roomId ?: return
 		val intent = Intent(this, UserProfileActivity::class.java)
 			.putExtra(EXTRA_USER_ID, user.id)
 			.putExtra(EXTRA_CHANNEL_ID, channelId)
@@ -252,14 +252,14 @@ class ChannelActivity : AppCompatActivity() {
 		}
 
 	private fun moveChannelSetting() {
-		val channelId = channelViewModel.uiState.value.channel?.roomId ?: return
+		val channelId = channelViewModel.uiState.value.channel.roomId ?: return
 		val intent = Intent(this, ChannelSettingActivity::class.java)
 			.putExtra(EXTRA_CHANNEL_ID, channelId)
 		channelSettingResultLauncher.launch(intent)
 	}
 
 	private fun setExplodedChannelUiState(uiState: ChannelUiState) {
-		if (uiState.channel == null || uiState.channel.isExploded.not()) return
+		if (uiState.channel.isExploded.not()) return
 		showExplodedChannelNoticeDialog()
 		with(binding.chatInputEt) {
 			isEnabled = false
@@ -269,7 +269,7 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun setBannedClientUIState(uiState: ChannelUiState) {
-		if (uiState.channel == null || uiState.channel.isBanned.not()) return
+		if (uiState.channel.isBanned.not()) return
 		showBannedClientNoticeDialog()
 		with(binding.chatInputEt) {
 			isEnabled = false
