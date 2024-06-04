@@ -3,6 +3,7 @@ package com.example.bookchat.data.network
 import com.example.bookchat.data.*
 import com.example.bookchat.data.network.model.BookSearchSortOptionNetWork
 import com.example.bookchat.data.network.model.BookSearchSortOptionNetWork.ACCURACY
+import com.example.bookchat.data.network.model.ChannelMemberAuthorityNetwork
 import com.example.bookchat.data.network.model.SearchSortOptionNetwork
 import com.example.bookchat.data.network.model.request.*
 import com.example.bookchat.data.network.model.response.*
@@ -256,5 +257,12 @@ interface BookChatApi {
 	suspend fun banChannelMember(
 		@Path("roomId") channelId: Long,
 		@Path("userId") userId: Long,
+	)
+
+	@PATCH("/v1/api/chatrooms/{roomId}/participants/{userId}")
+	suspend fun updateChannelMemberAuthority(
+		@Path("roomId") channelId: Long,
+		@Path("userId") targetUserId: Long,
+		@Query("participantStatus") authority: ChannelMemberAuthorityNetwork,
 	)
 }

@@ -21,7 +21,7 @@ interface ChannelDAO {
 						"room_id DESC " +
 						"LIMIT :loadSize"
 	)
-	suspend fun getChannels(loadSize: Int, baseId :Long?): List<ChannelEntity>
+	suspend fun getChannels(loadSize: Int, baseId: Long?): List<ChannelEntity>
 
 	@Query(
 		"SELECT * FROM Channel " +
@@ -74,7 +74,7 @@ interface ChannelDAO {
 		roomSid: String,
 		roomMemberCount: Int,
 		defaultRoomImageType: ChannelDefaultImageType,
-		roomImageUri: String?
+		roomImageUri: String?,
 	)
 
 	@Query(
@@ -84,7 +84,7 @@ interface ChannelDAO {
 	)
 	suspend fun updateLastReadChat(
 		channelId: Long,
-		lastReadChatId: Long
+		lastReadChatId: Long,
 	)
 
 	@Query(
@@ -94,7 +94,7 @@ interface ChannelDAO {
 	)
 	suspend fun updateLastChat(
 		channelId: Long,
-		lastChatId: Long
+		lastChatId: Long,
 	)
 
 	@Query(
@@ -108,7 +108,7 @@ interface ChannelDAO {
 		channelId: Long,
 		participantIds: List<Long>?,
 		roomMemberCount: Int,
-		participantAuthorities: Map<Long, ChannelMemberAuthority>?
+		participantAuthorities: Map<Long, ChannelMemberAuthority>?,
 	)
 
 	@Query(
@@ -118,7 +118,7 @@ interface ChannelDAO {
 	)
 	suspend fun updateChannelMemberAuthorities(
 		channelId: Long,
-		participantAuthorities: Map<Long, ChannelMemberAuthority>?
+		participantAuthorities: Map<Long, ChannelMemberAuthority>?,
 	)
 
 	@Query(
@@ -130,12 +130,13 @@ interface ChannelDAO {
 	suspend fun updateChannelHost(
 		channelId: Long,
 		targetUserId: Long,
-		participantAuthorities: Map<Long, ChannelMemberAuthority>?
+		participantAuthorities: Map<Long, ChannelMemberAuthority>?,
 	)
 
 	@Query(
 		"UPDATE Channel SET " +
 						"room_name = :roomName, " +
+						"host_id = :roomHostId, " +
 						"participant_ids = :participantIds," +
 						"participant_authorities = :participantAuthorities," +
 						"book_title = :bookTitle, " +
@@ -150,6 +151,7 @@ interface ChannelDAO {
 	suspend fun updateDetailInfo(
 		roomId: Long,
 		roomName: String,
+		roomHostId: Long,
 		participantIds: List<Long>?,
 		participantAuthorities: Map<Long, ChannelMemberAuthority>?,
 		bookTitle: String,
@@ -158,7 +160,7 @@ interface ChannelDAO {
 		roomTags: List<String>,
 		roomCapacity: Int,
 		isBanned: Boolean,
-		isExploded: Boolean
+		isExploded: Boolean,
 	)
 
 	suspend fun isExist(channelId: Long): Boolean {
@@ -181,7 +183,7 @@ interface ChannelDAO {
 		participantIds: List<Long>?,
 		roomMemberCount: Int,
 		participantAuthorities: Map<Long, ChannelMemberAuthority>?,
-		isBanned: Boolean
+		isBanned: Boolean,
 	)
 
 	@Query(

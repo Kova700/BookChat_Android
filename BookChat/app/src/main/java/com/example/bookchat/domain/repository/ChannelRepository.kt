@@ -66,6 +66,7 @@ interface ChannelRepository {
 	suspend fun updateChannelHost(
 		channelId: Long,
 		targetUserId: Long,
+		needServer: Boolean = false,
 	)
 
 	suspend fun updateLastReadChatIdIfValid(

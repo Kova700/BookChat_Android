@@ -188,6 +188,8 @@
     <string name="change_channel_capacity">최대 인원 수</string>
     <string name="channel_capacity_setting">최대 인원 설정</string>
     <string name="change_channel_host">방장 변경하기</string>
+    <string name="change_channel_host_success">방장이 변경되었습니다.</string>
+    <string name="change_channel_host_fail">방장 변경을 실패했습니다.</string>
     <string name="change_channel_sub_host">부방장 관리하기</string>
     <string name="change_channel_sub_host_select">부방장 지정하기</string>
     <string name="change_channel_setting_success">채팅방 정보가 변경되었습니다.</string>

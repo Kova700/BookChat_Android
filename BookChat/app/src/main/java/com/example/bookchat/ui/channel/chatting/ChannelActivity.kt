@@ -106,10 +106,6 @@ class ChannelActivity : AppCompatActivity() {
 				channelViewModel.onChangeEnteredMessage(message)
 			}
 		}
-		with(binding.chatDrawerLayout.channelSettingBtn) {
-			visibility = if (channelViewModel.uiState.value.isClientHost) View.VISIBLE else View.GONE
-		}
-
 	}
 
 	private fun setViewState(uiState: ChannelUiState) {
@@ -118,6 +114,7 @@ class ChannelActivity : AppCompatActivity() {
 		setSocketConnectionUiState(uiState)
 		setExplodedChannelUiState(uiState)
 		setBannedClientUIState(uiState)
+		setChannelSettingBtnUiState(uiState)
 	}
 
 	private fun setSocketConnectionUiState(uiState: ChannelUiState) {
@@ -139,6 +136,12 @@ class ChannelActivity : AppCompatActivity() {
 	private fun setNewChatNoticeState(uiState: ChannelUiState) {
 		binding.newChatNoticeLayout.layout.visibility =
 			if (uiState.newChatNotice != null) View.VISIBLE else View.INVISIBLE
+	}
+
+	private fun setChannelSettingBtnUiState(uiState: ChannelUiState) {
+		with(binding.chatDrawerLayout.channelSettingBtn) {
+			visibility = if (uiState.isClientHost) View.VISIBLE else View.GONE
+		}
 	}
 
 	private fun initLayoutManager() {

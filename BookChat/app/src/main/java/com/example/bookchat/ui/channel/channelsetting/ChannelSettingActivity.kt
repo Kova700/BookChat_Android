@@ -90,8 +90,10 @@ class ChannelSettingActivity : AppCompatActivity() {
 		with(binding.applyChannelChange) {
 			if (channelSettingViewModel.uiState.value.isPossibleChangeChannel) {
 				setTextColor(Color.parseColor("#000000"))
+				isEnabled = true
 			} else {
 				setTextColor(Color.parseColor("#D9D9D9"))
+				isEnabled = false
 			}
 		}
 	}
@@ -115,24 +117,32 @@ class ChannelSettingActivity : AppCompatActivity() {
 			}
 		}
 
+	private val manageActivityResultLauncher =
+		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+			if (result.resultCode == RESULT_OK) {
+				finish()
+			}
+		}
+
 	private fun moveToHostManage() {
 		val channelId = channelSettingViewModel.uiState.value.channel.roomId
 		val intent = Intent(this, HostManageActivity::class.java)
 			.putExtra(EXTRA_CHANNEL_ID, channelId)
-		startActivity(intent)
+		manageActivityResultLauncher.launch(intent)
 	}
 
 	private fun moveToSubHostManage() {
 		val channelId = channelSettingViewModel.uiState.value.channel.roomId
 		val intent = Intent(this, SubHostManageActivity::class.java)
 			.putExtra(EXTRA_CHANNEL_ID, channelId)
-		startActivity(intent)
+		manageActivityResultLauncher.launch(intent)
 	}
 
 	private fun showChannelExitWarningDialog() {
 		val existingFragment =
 			supportFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_EXIT_WARNING)
 		if (existingFragment != null) return
+
 		val dialog = ChannelExitWarningDialog(
 			clientAuthority = ChannelMemberAuthority.HOST,
 			onClickOkBtn = { channelSettingViewModel.onClickChannelExitDialogBtn() }
@@ -144,6 +154,7 @@ class ChannelSettingActivity : AppCompatActivity() {
 		val existingFragment =
 			supportFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_CAPACITY_DIALOG)
 		if (existingFragment != null) return
+
 		val dialog = ChannelCapacitySettingDialog(
 			currentCapacity = channelSettingViewModel.uiState.value.channel.roomCapacity ?: return,
 			onClickOkBtn = { newCapacity ->
