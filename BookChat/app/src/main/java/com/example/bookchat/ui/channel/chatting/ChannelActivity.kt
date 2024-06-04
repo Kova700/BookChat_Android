@@ -1,9 +1,11 @@
 package com.example.bookchat.ui.channel.chatting
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -55,6 +57,10 @@ class ChannelActivity : AppCompatActivity() {
 	lateinit var chatItemDecoration: ChatItemDecoration
 
 	private lateinit var linearLayoutManager: LinearLayoutManager
+
+	private val imm by lazy {
+		getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -350,12 +356,21 @@ class ChannelActivity : AppCompatActivity() {
 		}
 	}
 
+	private fun closeKeyboard() {
+		binding.chatInputEt.clearFocus()
+		imm.hideSoftInputFromWindow(
+			binding.chatInputEt.windowToken,
+			InputMethodManager.HIDE_NOT_ALWAYS
+		)
+	}
+
 	private fun openOrCloseDrawer() {
 		with(binding.drawerLayout) {
 			if (isDrawerOpen(GravityCompat.END)) {
 				closeDrawer(GravityCompat.END)
 				return
 			}
+			closeKeyboard()
 			openDrawer(GravityCompat.END)
 		}
 	}
