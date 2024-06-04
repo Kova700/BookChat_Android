@@ -167,7 +167,7 @@
     <string name="withdraw">회원탈퇴</string>
     <string name="withdraw_success">정상적으로 탈퇴되었습니다.</string>
 
-    <!--chat room-->
+    <!--channel-->
     <string name="chat_room_send_message">메시지 보내기</string>
     <string name="enter">입장</string>
     <string name="last_read_chat_notice">여기까지 읽으셨습니다.</string>
@@ -183,10 +183,26 @@
     <string name="unavailable_channel_edittext_hint">더이상 대화가 불가능한 상태입니다</string>
     <string name="channel_banned_user_notice_dialog_content">채팅방 관리자에의해 강퇴되었습니다.\n더 이상 대화가 불가능합니다.</string>
 
+    <!--channel setting-->
+    <string name="channel_setting_title">채팅방 설정</string>
+    <string name="change_channel_capacity">최대 인원 수</string>
+    <string name="channel_capacity_setting">최대 인원 설정</string>
+    <string name="change_channel_host">방장 변경하기</string>
+    <string name="change_channel_host_success">방장이 변경되었습니다.</string>
+    <string name="change_channel_host_fail">방장 변경을 실패했습니다.</string>
+    <string name="change_channel_sub_host">부방장 관리하기</string>
+    <string name="change_channel_sub_host_select">부방장 지정하기</string>
+    <string name="change_channel_sub_host_fail">부방장 변경을 실패했습니다.</string>
+    <string name="change_channel_setting_success">채팅방 정보가 변경되었습니다.</string>
+    <string name="change_channel_setting_fail">채팅방 수정을 실패했습니다.</string>
+    <string name="leave_channel">채팅방 나가기</string>
+    <string name="channel_member_search_by_name">이름으로 검색</string>
+
     <!--util-->
     <string name="confirm">확인</string>
     <string name="cancel">취소</string>
     <string name="finish">완료</string>
+    <string name="apply">적용</string>
     <string name="title">제목</string>
     <string name="content">내용</string>
     <string name="add">추가하기</string>
@@ -196,5 +212,6 @@
     <string name="all_delete">전체삭제</string>
     <string name="back_press_warning">\'뒤로\' 버튼을 한 번 더 누르시면 \n종료됩니다.</string>
     <string name="title_content_empty">제목, 내용을 입력해주세요.</string>
+    <string name="features_not_yet_supported">아직 지원하지 않는 기능입니다</string>
 
 </resources>

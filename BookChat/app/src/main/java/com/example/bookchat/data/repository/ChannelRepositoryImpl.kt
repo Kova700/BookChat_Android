@@ -4,9 +4,11 @@ import android.util.Log
 import com.example.bookchat.data.database.dao.ChannelDAO
 import com.example.bookchat.data.mapper.toBookRequest
 import com.example.bookchat.data.mapper.toChannel
-import com.example.bookchat.data.mapper.toChannelDefaultImageTypeNetwork
 import com.example.bookchat.data.mapper.toChannelEntity
+import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.network.BookChatApi
+import com.example.bookchat.data.network.model.ChannelMemberAuthorityNetwork
+import com.example.bookchat.data.network.model.request.RequestChangeChannelSetting
 import com.example.bookchat.data.network.model.request.RequestMakeChannel
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.Channel
@@ -88,12 +90,14 @@ class ChannelRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun getChannelInfo(channelId: Long) {
+		Log.d(TAG, "ChannelRepositoryImpl: getChannelInfo() - called")
 		val channelInfo = bookChatApi.getChannelInfo(channelId)
 		userRepository.upsertAllUsers(channelInfo.participants)
 
 		channelDAO.updateDetailInfo(
 			roomId = channelId,
 			roomName = channelInfo.roomName,
+			roomHostId = channelInfo.roomHost.id,
 			participantIds = channelInfo.participantIds,
 			participantAuthorities = channelInfo.participantAuthorities,
 			bookTitle = channelInfo.bookTitle,
@@ -119,7 +123,7 @@ class ChannelRepositoryImpl @Inject constructor(
 			requestMakeChannel = RequestMakeChannel(
 				roomName = channelTitle,
 				roomSize = channelSize,
-				defaultRoomImageType = defaultRoomImageType.toChannelDefaultImageTypeNetwork(),
+				defaultRoomImageType = defaultRoomImageType.toNetwork(),
 				hashTags = channelTags,
 				bookRequest = selectedBook.toBookRequest()
 			),
@@ -136,6 +140,31 @@ class ChannelRepositoryImpl @Inject constructor(
 		return getChannel(createdChannelId)
 	}
 
+	override suspend fun changeChannelSetting(
+		channelId: Long,
+		channelTitle: String,
+		channelCapacity: Int,
+		channelTags: List<String>,
+		channelImage: ByteArray?,
+	) {
+		bookChatApi.changeChannelSetting(
+			channelId = channelId,
+			requestChangeChannelSetting = RequestChangeChannelSetting(
+				channelId = channelId,
+				channelTitle = channelTitle,
+				channelCapacity = channelCapacity,
+				channelTags = channelTags
+			),
+			chatRoomImage = channelImage?.toMultiPartBody(
+				contentType = CONTENT_TYPE_IMAGE_WEBP,
+				multipartName = IMAGE_MULTIPART_NAME,
+				fileName = IMAGE_FILE_NAME,
+				fileExtension = IMAGE_FILE_EXTENSION_WEBP
+			)
+		)
+		getOnlineChannel(channelId)
+	}
+
 	/** DB에 갱신된 LastChat, Participants와 기존에 존재하던
 	 * 채널 부가 정보들을 반영해서 반환 (ex : topPin, roomTags, ..) */
 	private suspend fun getChannelWithUpdatedData(channelId: Long): Channel {
@@ -146,7 +175,6 @@ class ChannelRepositoryImpl @Inject constructor(
 			participants = channel.participantIds?.map { userRepository.getUser(it) },
 		)
 	}
-
 
 	//TODO : 방장 나갈 경우 받는 메세지에 넘어오는 메세제지 nullable타입 서버 수정 대기 중
 	override suspend fun leaveChannel(channelId: Long) {
@@ -265,7 +293,17 @@ class ChannelRepositoryImpl @Inject constructor(
 		channelId: Long,
 		targetUserId: Long,
 		channelMemberAuthority: ChannelMemberAuthority,
+		needServer: Boolean,
 	) {
+
+		if (needServer) {
+			bookChatApi.updateChannelMemberAuthority(
+				channelId = channelId,
+				targetUserId = targetUserId,
+				authority = channelMemberAuthority.toNetwork()
+			)
+		}
+
 		val channel = getChannel(channelId)
 		val newParticipantAuthorities = channel.participantAuthorities
 			?.plus(targetUserId to channelMemberAuthority)
@@ -280,12 +318,25 @@ class ChannelRepositoryImpl @Inject constructor(
 		setChannels(mapChannels.value + mapOf(channelId to newChannel))
 	}
 
-	override suspend fun updateChannelHost(channelId: Long, targetUserId: Long) {
+	override suspend fun updateChannelHost(
+		channelId: Long,
+		targetUserId: Long,
+		needServer: Boolean,
+	) {
+		if (needServer) {
+			bookChatApi.updateChannelMemberAuthority(
+				channelId = channelId,
+				targetUserId = targetUserId,
+				authority = ChannelMemberAuthorityNetwork.HOST
+			)
+		}
+
 		val channel = getChannel(channelId)
-		val previousHostId = channel.host?.id!!
+		val previousHostId = channel.host?.id ?: throw Exception("hostId does not exist")
 		val newParticipantAuthorities = channel.participantAuthorities
 			?.plus(previousHostId to ChannelMemberAuthority.GUEST)
 			?.plus(targetUserId to ChannelMemberAuthority.HOST)
+
 		val newChannel = channel.copy(
 			host = userRepository.getUser(targetUserId),
 			participantAuthorities = newParticipantAuthorities

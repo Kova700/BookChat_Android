@@ -1,0 +1,79 @@
+package com.example.bookchat.ui.channel.channelsetting.dialog
+
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.DialogFragment
+import com.example.bookchat.R
+import com.example.bookchat.databinding.DialogChannelCapacitySettingBinding
+import com.example.bookchat.utils.DialogSizeManager
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+
+@AndroidEntryPoint
+class ChannelCapacitySettingDialog(
+	private val currentCapacity: Int,
+	private val onClickOkBtn: (Int) -> Unit,
+) : DialogFragment() {
+	private var _binding: DialogChannelCapacitySettingBinding? = null
+	private val binding get() = _binding!!
+
+	private val selectableValues = arrayOf(
+		"10", "20", "30", "40", "50", "60", "70", "80", "90", "100", "200", "300"
+	)
+
+	@Inject
+	lateinit var dialogSizeManager: DialogSizeManager
+
+	override fun onCreateView(
+		inflater: LayoutInflater,
+		container: ViewGroup?,
+		savedInstanceState: Bundle?,
+	): View {
+		_binding = DataBindingUtil.inflate(
+			inflater, R.layout.dialog_channel_capacity_setting,
+			container, false
+		)
+		binding.lifecycleOwner = viewLifecycleOwner
+		binding.dialog = this
+		return binding.root
+	}
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+		initViewState()
+	}
+
+	override fun onDestroyView() {
+		super.onDestroyView()
+		_binding = null
+	}
+
+	fun onClickCancelBtn() {
+		dismiss()
+	}
+
+	fun onClickOkBtn() {
+		onClickOkBtn.invoke(selectableValues[binding.channelCapacityNp.value].toInt())
+		dismiss()
+	}
+
+	private fun initViewState() {
+		dialogSizeManager.setDialogSize(binding.root)
+		initNumberPickerState()
+	}
+
+	//TODO : binding.channelCapacityNp.value = currentCapacity //기본값으로 0 넘어오는데 수정해야될듯
+	private fun initNumberPickerState() {
+		binding.channelCapacityNp.minValue = 0
+		binding.channelCapacityNp.maxValue = selectableValues.size - 1
+		binding.channelCapacityNp.displayedValues = selectableValues
+		binding.channelCapacityNp.value =
+			selectableValues.indexOfFirst { it.toInt() == currentCapacity }
+	}
+}

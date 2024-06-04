@@ -1,6 +1,6 @@
 package com.example.bookchat.data.repository
 
-import com.example.bookchat.data.mapper.toBookReport
+import com.example.bookchat.data.mapper.toDomain
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.request.RequestRegisterBookReport
 import com.example.bookchat.data.network.model.response.BookReportDoseNotExistException
@@ -18,7 +18,7 @@ class BookReportRepositoryImpl @Inject constructor(
 		when (response.code()) {
 			200 -> {
 				val bookReportResult = response.body()
-				bookReportResult?.let { return bookReportResult.toBookReport() }
+				bookReportResult?.let { return bookReportResult.toDomain() }
 				throw ResponseBodyEmptyException(response.errorBody()?.string())
 			}
 

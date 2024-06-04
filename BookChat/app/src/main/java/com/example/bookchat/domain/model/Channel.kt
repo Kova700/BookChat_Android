@@ -42,6 +42,11 @@ data class Channel(
 	val participantIds
 		get() = participants?.map { it.id }
 
+	val subHosts
+		get() = participants?.filter {
+			participantAuthorities?.get(it.id) == ChannelMemberAuthority.SUB_HOST
+		} ?: emptyList()
+
 	companion object {
 		val DEFAULT = Channel(
 			roomId = 0L,

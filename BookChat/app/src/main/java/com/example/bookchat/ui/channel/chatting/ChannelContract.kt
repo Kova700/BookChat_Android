@@ -11,7 +11,7 @@ import com.example.bookchat.ui.channel.drawer.model.ChannelDrawerItem
 data class ChannelUiState(
 	val uiState: UiState,              //UI 구분 필요 (메인 로딩 프로그래스바 필요)
 	val enteredMessage: String,
-	val channel: Channel?,
+	val channel: Channel,
 	val client: User,
 	val drawerItems: List<ChannelDrawerItem>,
 	val chats: List<ChatItem>,
@@ -60,7 +60,7 @@ data class ChannelUiState(
 	companion object {
 		val DEFAULT = ChannelUiState(
 			enteredMessage = "",
-			channel = null,
+			channel = Channel.DEFAULT,
 			client = User.Default,
 			uiState = UiState.SUCCESS,
 			drawerItems = listOf(ChannelDrawerItem.Header.DEFAULT),

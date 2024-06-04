@@ -34,4 +34,9 @@
         parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/background_bottom_slide_page_input</item>
     </style>
+
+    <style name="NumberPickerTheme" parent="Theme.BookChat">
+        <item name="colorControlNormal">@color/number_picker_divider</item>
+    </style>
+
 </resources>

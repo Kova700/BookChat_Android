@@ -3,16 +3,10 @@ package com.example.bookchat.data.mapper
 import com.example.bookchat.data.network.model.OAuth2ProviderNetwork
 import com.example.bookchat.domain.model.OAuth2Provider
 
-fun com.example.bookchat.data.network.model.OAuth2ProviderNetwork.toOAuth2Provider(): OAuth2Provider {
-	return when (this) {
-		com.example.bookchat.data.network.model.OAuth2ProviderNetwork.GOOGLE -> OAuth2Provider.GOOGLE
-		com.example.bookchat.data.network.model.OAuth2ProviderNetwork.KAKAO -> OAuth2Provider.KAKAO
-	}
+fun OAuth2ProviderNetwork.toDomain(): OAuth2Provider {
+	return OAuth2Provider.valueOf(name)
 }
 
-fun OAuth2Provider.toOAuth2ProviderNetwork(): com.example.bookchat.data.network.model.OAuth2ProviderNetwork {
-	return when (this) {
-		OAuth2Provider.GOOGLE -> com.example.bookchat.data.network.model.OAuth2ProviderNetwork.GOOGLE
-		OAuth2Provider.KAKAO -> com.example.bookchat.data.network.model.OAuth2ProviderNetwork.KAKAO
-	}
+fun OAuth2Provider.toNetwork(): OAuth2ProviderNetwork {
+	return OAuth2ProviderNetwork.valueOf(name)
 }

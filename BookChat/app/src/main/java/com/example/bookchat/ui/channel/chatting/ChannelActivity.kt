@@ -1,10 +1,13 @@
 package com.example.bookchat.ui.channel.chatting
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.addCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -19,6 +22,7 @@ import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
+import com.example.bookchat.ui.channel.channelsetting.ChannelSettingActivity
 import com.example.bookchat.ui.channel.chatting.adapter.ChatItemAdapter
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
 import com.example.bookchat.ui.channel.drawer.adapter.ChannelDrawerAdapter
@@ -54,6 +58,10 @@ class ChannelActivity : AppCompatActivity() {
 	lateinit var chatItemDecoration: ChatItemDecoration
 
 	private lateinit var linearLayoutManager: LinearLayoutManager
+
+	private val imm by lazy {
+		getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -93,16 +101,12 @@ class ChannelActivity : AppCompatActivity() {
 
 	private fun initViewState() {
 		with(binding.chatInputEt) {
-			if (channelViewModel.uiState.value.channel?.isAvailableChannel == true) isEnabled = true
+			if (channelViewModel.uiState.value.channel.isAvailableChannel) isEnabled = true
 			addTextChangedListener { text ->
 				val message = text?.toString() ?: return@addTextChangedListener
 				channelViewModel.onChangeEnteredMessage(message)
 			}
 		}
-		with(binding.chatDrawerLayout.channelSettingBtn) {
-			visibility = if (channelViewModel.uiState.value.isClientHost) View.VISIBLE else View.GONE
-		}
-
 	}
 
 	private fun setViewState(uiState: ChannelUiState) {
@@ -111,6 +115,7 @@ class ChannelActivity : AppCompatActivity() {
 		setSocketConnectionUiState(uiState)
 		setExplodedChannelUiState(uiState)
 		setBannedClientUIState(uiState)
+		setChannelSettingBtnUiState(uiState)
 	}
 
 	private fun setSocketConnectionUiState(uiState: ChannelUiState) {
@@ -132,6 +137,12 @@ class ChannelActivity : AppCompatActivity() {
 	private fun setNewChatNoticeState(uiState: ChannelUiState) {
 		binding.newChatNoticeLayout.layout.visibility =
 			if (uiState.newChatNotice != null) View.VISIBLE else View.INVISIBLE
+	}
+
+	private fun setChannelSettingBtnUiState(uiState: ChannelUiState) {
+		with(binding.chatDrawerLayout.channelSettingBtn) {
+			visibility = if (uiState.isClientHost) View.VISIBLE else View.GONE
+		}
 	}
 
 	private fun initLayoutManager() {
@@ -226,20 +237,29 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun moveToUserProfile(user: User) {
-		val channelId = channelViewModel.uiState.value.channel?.roomId ?: return
+		val channelId = channelViewModel.uiState.value.channel.roomId ?: return
 		val intent = Intent(this, UserProfileActivity::class.java)
 			.putExtra(EXTRA_USER_ID, user.id)
 			.putExtra(EXTRA_CHANNEL_ID, channelId)
 		startActivity(intent)
 	}
 
+	private val channelSettingResultLauncher =
+		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+			if (result.resultCode == RESULT_OK) {
+				finish()
+			}
+		}
+
 	private fun moveChannelSetting() {
-//		val intent = Intent(this, Activity::class.java)
-//		startActivity(intent)
+		val channelId = channelViewModel.uiState.value.channel.roomId ?: return
+		val intent = Intent(this, ChannelSettingActivity::class.java)
+			.putExtra(EXTRA_CHANNEL_ID, channelId)
+		channelSettingResultLauncher.launch(intent)
 	}
 
 	private fun setExplodedChannelUiState(uiState: ChannelUiState) {
-		if (uiState.channel == null || uiState.channel.isExploded.not()) return
+		if (uiState.channel.isExploded.not()) return
 		showExplodedChannelNoticeDialog()
 		with(binding.chatInputEt) {
 			isEnabled = false
@@ -249,7 +269,7 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun setBannedClientUIState(uiState: ChannelUiState) {
-		if (uiState.channel == null || uiState.channel.isBanned.not()) return
+		if (uiState.channel.isBanned.not()) return
 		showBannedClientNoticeDialog()
 		with(binding.chatInputEt) {
 			isEnabled = false
@@ -347,12 +367,21 @@ class ChannelActivity : AppCompatActivity() {
 		}
 	}
 
+	private fun closeKeyboard() {
+		binding.chatInputEt.clearFocus()
+		imm.hideSoftInputFromWindow(
+			binding.chatInputEt.windowToken,
+			InputMethodManager.HIDE_NOT_ALWAYS
+		)
+	}
+
 	private fun openOrCloseDrawer() {
 		with(binding.drawerLayout) {
 			if (isDrawerOpen(GravityCompat.END)) {
 				closeDrawer(GravityCompat.END)
 				return
 			}
+			closeKeyboard()
 			openDrawer(GravityCompat.END)
 		}
 	}

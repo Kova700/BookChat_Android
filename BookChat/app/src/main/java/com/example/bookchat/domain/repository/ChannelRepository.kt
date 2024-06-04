@@ -12,7 +12,7 @@ interface ChannelRepository {
 
 	suspend fun getChannels(
 		loadSize: Int = REMOTE_CHANNELS_LOAD_SIZE,
-		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS
+		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS,
 	)
 
 	suspend fun getChannel(channelId: Long): Channel
@@ -24,45 +24,55 @@ interface ChannelRepository {
 		defaultRoomImageType: ChannelDefaultImageType,
 		channelTags: List<String>,
 		selectedBook: Book,
-		channelImage: ByteArray?
+		channelImage: ByteArray?,
 	): Channel
+
+	suspend fun changeChannelSetting(
+		channelId: Long,
+		channelTitle: String,
+		channelCapacity: Int,
+		channelTags: List<String>,
+		channelImage: ByteArray?,
+	)
 
 	suspend fun leaveChannel(channelId: Long)
 	suspend fun leaveChannelMember(
 		channelId: Long,
-		targetUserId: Long
+		targetUserId: Long,
 	)
 
 	suspend fun leaveChannelHost(
-		channelId: Long
+		channelId: Long,
 	)
 
 	suspend fun enterChannel(channel: Channel)
 	suspend fun enterChannelMember(
 		channelId: Long,
-		targetUserId: Long
+		targetUserId: Long,
 	)
 
 	suspend fun banChannelMember(
 		channelId: Long,
 		targetUserId: Long,
-		needServer :Boolean = false
+		needServer: Boolean = false,
 	)
 
 	suspend fun updateChannelMemberAuthority(
 		channelId: Long,
 		targetUserId: Long,
-		channelMemberAuthority: ChannelMemberAuthority
+		channelMemberAuthority: ChannelMemberAuthority,
+		needServer: Boolean = false,
 	)
 
 	suspend fun updateChannelHost(
 		channelId: Long,
 		targetUserId: Long,
+		needServer: Boolean = false,
 	)
 
 	suspend fun updateLastReadChatIdIfValid(
 		channelId: Long,
-		chatId: Long
+		chatId: Long,
 	)
 
 	suspend fun updateChannelLastChatIfValid(channelId: Long, chatId: Long)

@@ -20,4 +20,5 @@
     <color name="agony_color_yellow">#FFFFE55C</color>
     <color name="agony_color_orange">#FFFF9D43</color>
     <color name="agony_color_selected">#FFACACAC</color>
+    <color name="number_picker_divider">#FFE9E9E9</color>
 </resources>

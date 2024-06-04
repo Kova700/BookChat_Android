@@ -1,7 +1,7 @@
 package com.example.bookchat.data.network.model.response
 
 import com.example.bookchat.data.mapper.getChatType
-import com.example.bookchat.data.mapper.toUserDefaultProfileType
+import com.example.bookchat.data.mapper.toDomain
 import com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork
 import com.example.bookchat.data.network.model.UserDefaultProfileTypeNetwork
 import com.example.bookchat.domain.model.Chat
@@ -57,7 +57,7 @@ data class ChannelResponse(
 					id = id,
 					nickname = senderNickname!!,
 					profileImageUrl = senderProfileImageUrl,
-					defaultProfileImageType = senderDefaultProfileImageType!!.toUserDefaultProfileType()
+					defaultProfileImageType = senderDefaultProfileImageType!!.toDomain()
 				)
 			}
 		)
