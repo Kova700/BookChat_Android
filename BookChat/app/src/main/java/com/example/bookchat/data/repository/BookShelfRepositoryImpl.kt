@@ -1,8 +1,7 @@
 package com.example.bookchat.data.repository
 
 import com.example.bookchat.data.mapper.toBookRequest
-import com.example.bookchat.data.mapper.toBookShelfItem
-import com.example.bookchat.data.mapper.toBookStateInBookShelf
+import com.example.bookchat.data.mapper.toDomain
 import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.request.RequestRegisterBookShelfBook
@@ -68,7 +67,7 @@ class BookShelfRepositoryImpl @Inject constructor(
 		}
 
 		mapBookShelfItems.update {
-			mapBookShelfItems.value + response.contents.map { it.toBookShelfItem(bookShelfState) }
+			mapBookShelfItems.value + response.contents.map { it.toDomain(bookShelfState) }
 				.associateBy { it.bookShelfId }
 		}
 	}
@@ -137,6 +136,6 @@ class BookShelfRepositoryImpl @Inject constructor(
 
 	override suspend fun checkAlreadyInBookShelf(book: Book): BookStateInBookShelf {
 		return bookChatApi.checkAlreadyInBookShelf(book.isbn, book.publishAt)
-			.toBookStateInBookShelf()
+			.toDomain()
 	}
 }

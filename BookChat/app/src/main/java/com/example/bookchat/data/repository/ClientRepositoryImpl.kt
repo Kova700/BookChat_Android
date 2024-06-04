@@ -9,7 +9,7 @@ import com.example.bookchat.data.datastore.getDataFlow
 import com.example.bookchat.data.datastore.setData
 import com.example.bookchat.data.mapper.toBookChatToken
 import com.example.bookchat.data.mapper.toNetWork
-import com.example.bookchat.data.mapper.toOAuth2ProviderNetwork
+import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.mapper.toUser
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.request.RequestChangeUserNickname
@@ -61,7 +61,7 @@ class ClientRepositoryImpl @Inject constructor(
 			fcmToken = getFCMToken().text,
 			deviceToken = getDeviceID(),
 			approveChangingDevice = approveChangingDevice,
-			oauth2Provider = cachedIdToken!!.oAuth2Provider.toOAuth2ProviderNetwork()
+			oauth2Provider = cachedIdToken!!.oAuth2Provider.toNetwork()
 		)
 		val response = bookChatApi.signIn(cachedIdToken!!.token, requestUserSignIn)
 		when (response.code()) {
@@ -93,7 +93,7 @@ class ClientRepositoryImpl @Inject constructor(
 		val idToken = cachedIdToken ?: throw IOException("IdToken does not exist.")
 
 		val requestUserSignUp = RequestUserSignUp(
-			oauth2Provider = idToken.oAuth2Provider.toOAuth2ProviderNetwork(),
+			oauth2Provider = idToken.oAuth2Provider.toNetwork(),
 			nickname = nickname,
 			readingTastes = readingTastes.map { it.toNetWork() },
 		)
