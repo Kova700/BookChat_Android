@@ -1,5 +1,7 @@
 package com.example.bookchat.ui.bookshelf
 
+import com.example.bookchat.domain.model.BookShelfState
+
 data class BookShelfUiState(
 	val uiState: UiState,
 ) {
@@ -19,5 +21,5 @@ data class BookShelfUiState(
 }
 
 sealed class BookShelfEvent {
-	data class ChangeBookShelfTab(val tapIndex: Int) : BookShelfEvent()
+	data class ChangeBookShelfTab(val targetState: BookShelfState) : BookShelfEvent()
 }

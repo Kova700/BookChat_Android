@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentBookshelfBinding
+import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.ui.bookshelf.complete.CompleteBookShelfFragment
 import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfFragment
 import com.example.bookchat.ui.bookshelf.wish.WishBookBookShelfFragment
@@ -69,15 +70,26 @@ class BookShelfFragment : Fragment() {
 		}.attach()
 	}
 
-	private fun changeTab(tabIndex: Int) {
-		binding.viewPager.currentItem = tabIndex
+	private fun changeTab(targetState: BookShelfState) {
+		binding.viewPager.currentItem = convertStateToTabIndex(targetState)
+	}
+
+	private fun convertStateToTabIndex(targetState: BookShelfState): Int {
+		return when (targetState) {
+			BookShelfState.WISH -> WISH_TAB_INDEX
+			BookShelfState.READING -> READING_TAB_INDEX
+			BookShelfState.COMPLETE -> COMPLETE_TAB_INDEX
+		}
 	}
 
 	private fun handleEvent(event: BookShelfEvent) = when (event) {
-		is BookShelfEvent.ChangeBookShelfTab -> changeTab(event.tapIndex)
+		is BookShelfEvent.ChangeBookShelfTab -> changeTab(event.targetState)
 	}
 
 	companion object {
+		private const val WISH_TAB_INDEX = 0
+		private const val READING_TAB_INDEX = 1
+		private const val COMPLETE_TAB_INDEX = 2
 		private val bookShelfTapNameList =
 			listOf(R.string.wish_book, R.string.reading_book, R.string.complete_book)
 	}

@@ -22,24 +22,10 @@ class BookShelfViewModel @Inject constructor(
 	val uiState = _uiState.asStateFlow()
 
 	fun moveToOtherTab(targetState: BookShelfState) {
-		startEvent(BookShelfEvent.ChangeBookShelfTab(convertStateToTabIndex(targetState)))
-	}
-
-	private fun convertStateToTabIndex(targetState: BookShelfState): Int {
-		return when (targetState) {
-			BookShelfState.WISH -> WISH_TAB_INDEX
-			BookShelfState.READING -> READING_TAB_INDEX
-			BookShelfState.COMPLETE -> COMPLETE_TAB_INDEX
-		}
+		startEvent(BookShelfEvent.ChangeBookShelfTab(targetState))
 	}
 
 	private fun startEvent(event: BookShelfEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
-	}
-
-	companion object {
-		const val WISH_TAB_INDEX = 0
-		const val READING_TAB_INDEX = 1
-		const val COMPLETE_TAB_INDEX = 2
 	}
 }
