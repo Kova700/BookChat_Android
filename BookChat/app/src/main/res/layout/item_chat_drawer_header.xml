@@ -51,7 +51,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:layout_gravity="center_vertical"
-            android:foreground="?android:attr/selectableItemBackground"
             app:cardCornerRadius="@dimen/book_img_corner_radius"
             app:cardElevation="@dimen/book_img_elevation"
             app:layout_constraintEnd_toEndOf="parent"
