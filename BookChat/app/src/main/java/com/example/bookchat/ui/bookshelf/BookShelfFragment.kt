@@ -34,7 +34,9 @@ class BookShelfFragment : Fragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding = DataBindingUtil.inflate(inflater, R.layout.fragment_bookshelf, container, false)
+		_binding = DataBindingUtil.inflate(
+			inflater, R.layout.fragment_bookshelf, container, false
+		)
 		viewPagerAdapter = ViewPagerAdapter(fragments, this)
 		binding.lifecycleOwner = viewLifecycleOwner
 		binding.viewPager.adapter = viewPagerAdapter
@@ -57,10 +59,8 @@ class BookShelfFragment : Fragment() {
 		binding.viewPager.setCurrentItem(tabIndex, false)
 	}
 
-	private fun observeEvent() {
-		lifecycleScope.launch {
-			bookShelfViewModel.eventFlow.collect { event -> handleEvent(event) }
-		}
+	private fun observeEvent() = viewLifecycleOwner.lifecycleScope.launch {
+		bookShelfViewModel.eventFlow.collect { event -> handleEvent(event) }
 	}
 
 	private fun initTapLayout() {
