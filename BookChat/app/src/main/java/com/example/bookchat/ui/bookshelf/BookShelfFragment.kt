@@ -24,7 +24,7 @@ class BookShelfFragment : Fragment() {
 	private val binding get() = _binding!!
 	private val bookShelfViewModel by activityViewModels<BookShelfViewModel>()
 
-	private var fragments: List<Fragment> =
+	private val fragments: List<Fragment> =
 		listOf(WishBookBookShelfFragment(), ReadingBookShelfFragment(), CompleteBookShelfFragment())
 
 	private lateinit var viewPagerAdapter: ViewPagerAdapter
@@ -32,7 +32,7 @@ class BookShelfFragment : Fragment() {
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
+		savedInstanceState: Bundle?,
 	): View {
 		_binding = DataBindingUtil.inflate(inflater, R.layout.fragment_bookshelf, container, false)
 		viewPagerAdapter = ViewPagerAdapter(fragments, this)
