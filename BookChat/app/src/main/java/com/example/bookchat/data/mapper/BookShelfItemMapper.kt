@@ -5,7 +5,7 @@ import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.model.BookShelfState
 
-fun BookShelfItemResponse.toBookShelfItem(
+fun BookShelfItemResponse.toDomain(
 	state: BookShelfState,
 ): BookShelfItem {
 	return BookShelfItem(
