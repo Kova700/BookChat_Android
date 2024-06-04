@@ -74,9 +74,7 @@ class BookShelfFragment : Fragment() {
 	}
 
 	private fun handleEvent(event: BookShelfEvent) = when (event) {
-		is BookShelfEvent.ChangeBookShelfTab -> {
-			changeTab(event.tapIndex)
-		}
+		is BookShelfEvent.ChangeBookShelfTab -> changeTab(event.tapIndex)
 	}
 
 	companion object {
