@@ -45,22 +45,20 @@ class ChannelSettingViewModel @Inject constructor(
 
 	}
 
-	//여기서 나가는거 까진 괜찮은데 ChannelActivity는 어떻게 나가지 지금 페이지 Fragment로 했어야했나..?
 	private fun exitChannel() = viewModelScope.launch {
 		runCatching { channelRepository.leaveChannel(channelId) }
-			.onSuccess { onClickXBtn() }
+			.onSuccess { startEvent(ChannelSettingUiEvent.ExitChannel) }
 			.onFailure { startEvent(ChannelSettingUiEvent.MakeToast(R.string.channel_exit_fail)) }
 	}
 
+	//TODO :{"errorCode":"500","message":"예상치 못한 예외가 발생했습니다."} 서버 수정 대기중
 	private fun changeChannelSetting() = viewModelScope.launch {
 		runCatching {
 			channelRepository.changeChannelSetting(
 				channelId = channelId,
 				channelTitle = uiState.value.newTitle,
-				channelCapacity = uiState.value.channel.roomCapacity ?: 0, // TODO : 이거 입력받을까?
-				//현재 Viewmodel에서 받을까 혹은 dialog단에서 그냥 API호출할까
-				//근데 API가 한덩어리 인걸로봐서 그냥 한번에 보내는게 나을 듯
 				channelTags = uiState.value.tagList,
+				channelCapacity = uiState.value.newCapacity,
 				channelImage = uiState.value.newProfileImage
 			)
 		}
@@ -68,7 +66,7 @@ class ChannelSettingViewModel @Inject constructor(
 				startEvent(ChannelSettingUiEvent.MoveBack)
 				startEvent(ChannelSettingUiEvent.MakeToast(R.string.change_channel_setting_success))
 			}
-			.onFailure { }
+			.onFailure { startEvent(ChannelSettingUiEvent.MakeToast(R.string.change_channel_setting_fail)) }
 	}
 
 	fun onClickChannelCapacityBtn() {
@@ -108,8 +106,8 @@ class ChannelSettingViewModel @Inject constructor(
 	}
 
 	fun onClickApplyBtn() = viewModelScope.launch {
-//		if (uiState.value.isPossibleChangeChannel.not()) return@launch
-//		changeChannelSetting()
+		if (uiState.value.isPossibleChangeChannel.not()) return@launch
+		changeChannelSetting()
 	}
 
 	fun onClickChannelExitDialogBtn() {

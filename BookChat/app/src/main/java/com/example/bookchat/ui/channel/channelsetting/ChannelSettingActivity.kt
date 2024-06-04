@@ -35,6 +35,7 @@ class ChannelSettingActivity : AppCompatActivity() {
 
 	@Inject
 	lateinit var makeChannelImgSizeManager: MakeChannelImgSizeManager
+	//TODO : 기본이미지 채널 기본이미지 맞는지 확인
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -56,7 +57,6 @@ class ChannelSettingActivity : AppCompatActivity() {
 		channelSettingViewModel.eventFlow.collect { event -> handleEvent(event) }
 	}
 
-	//TODO : 적용 버튼 리플효과 안보임
 	private fun initViewState() {
 		with(binding.channelTitleEt) {
 			addTextChangedListener { text ->
@@ -164,6 +164,11 @@ class ChannelSettingActivity : AppCompatActivity() {
 		dialog.show(supportFragmentManager, DIALOG_TAG_CHANNEL_CAPACITY_DIALOG)
 	}
 
+	private fun exitChannel() {
+		setResult(RESULT_OK, intent)
+		finish()
+	}
+
 	private fun handleEvent(event: ChannelSettingUiEvent) {
 		when (event) {
 			ChannelSettingUiEvent.MoveBack -> finish()
@@ -173,6 +178,7 @@ class ChannelSettingActivity : AppCompatActivity() {
 			ChannelSettingUiEvent.ShowChannelCapacityDialog -> showChannelCapacityDialog()
 			ChannelSettingUiEvent.MoveHostManage -> moveToHostManage()
 			ChannelSettingUiEvent.MoveSubHostManage -> moveToSubHostManage()
+			ChannelSettingUiEvent.ExitChannel -> exitChannel()
 		}
 	}
 

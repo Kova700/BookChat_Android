@@ -194,6 +194,7 @@
     <string name="change_channel_sub_host_select">부방장 지정하기</string>
     <string name="change_channel_sub_host_fail">부방장 변경을 실패했습니다.</string>
     <string name="change_channel_setting_success">채팅방 정보가 변경되었습니다.</string>
+    <string name="change_channel_setting_fail">채팅방 수정을 실패했습니다.</string>
     <string name="leave_channel">채팅방 나가기</string>
     <string name="channel_member_search_by_name">이름으로 검색</string>
 

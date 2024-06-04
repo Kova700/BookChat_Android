@@ -5,10 +5,10 @@ import com.google.gson.annotations.SerializedName
 data class RequestChangeChannelSetting(
 	@SerializedName("roomId")
 	val channelId: Long,
-	@SerializedName("channelTitle")
+	@SerializedName("roomName")
 	val channelTitle: String,
-	@SerializedName("channelCapacity")
+	@SerializedName("roomSize")
 	val channelCapacity: Int,
-	@SerializedName("channelTags")
+	@SerializedName("tags")
 	val channelTags: List<String>,
 )

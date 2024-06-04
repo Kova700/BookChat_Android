@@ -197,8 +197,9 @@ interface BookChatApi {
 	): Response<Unit>
 
 	@Multipart
-	@POST("/chatrooms/{roomId}")
+	@POST("/v1/api/chatrooms/{roomId}")
 	suspend fun changeChannelSetting(
+		@Path("roomId") channelId: Long,
 		@Part chatRoomImage: MultipartBody.Part? = null,
 		@Part("reviseChatRoomRequest") requestChangeChannelSetting: RequestChangeChannelSetting,
 	)

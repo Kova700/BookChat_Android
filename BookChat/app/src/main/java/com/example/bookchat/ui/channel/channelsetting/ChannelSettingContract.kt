@@ -45,9 +45,6 @@ data class ChannelSettingUiState(
 		val DEFAULT = ChannelSettingUiState(
 			uiState = UiState.SUCCESS,
 			channel = Channel.DEFAULT,
-			//TODO : 근데 요청 보낼때 바뀐애들만 보내야지 안바뀐 애들은 밑에 텅빈값으로 보내면 다 초기화되어버림
-			//유저 프로필 변경도 확인해볼 것
-			//고민 기록 제목 수정도 마찬가지
 			newTitle = "",
 			newTags = "",
 			newCapacity = 0,
@@ -58,6 +55,7 @@ data class ChannelSettingUiState(
 
 sealed class ChannelSettingUiEvent {
 	object MoveBack : ChannelSettingUiEvent()
+	object ExitChannel : ChannelSettingUiEvent()
 	object PermissionCheck : ChannelSettingUiEvent()
 	object ShowChannelExitWarningDialog : ChannelSettingUiEvent()
 	object ShowChannelCapacityDialog : ChannelSettingUiEvent()

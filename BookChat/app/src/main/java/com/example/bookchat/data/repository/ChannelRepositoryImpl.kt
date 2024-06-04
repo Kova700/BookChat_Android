@@ -148,6 +148,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		channelImage: ByteArray?,
 	) {
 		bookChatApi.changeChannelSetting(
+			channelId = channelId,
 			requestChangeChannelSetting = RequestChangeChannelSetting(
 				channelId = channelId,
 				channelTitle = channelTitle,

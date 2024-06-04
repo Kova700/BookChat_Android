@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.addCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -243,11 +244,18 @@ class ChannelActivity : AppCompatActivity() {
 		startActivity(intent)
 	}
 
+	private val channelSettingResultLauncher =
+		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+			if (result.resultCode == RESULT_OK) {
+				finish()
+			}
+		}
+
 	private fun moveChannelSetting() {
 		val channelId = channelViewModel.uiState.value.channel?.roomId ?: return
 		val intent = Intent(this, ChannelSettingActivity::class.java)
 			.putExtra(EXTRA_CHANNEL_ID, channelId)
-		startActivity(intent)
+		channelSettingResultLauncher.launch(intent)
 	}
 
 	private fun setExplodedChannelUiState(uiState: ChannelUiState) {
