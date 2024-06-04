@@ -35,7 +35,7 @@ class MemberItemAdapter @Inject constructor() :
 	}
 
 	companion object {
-		val MEMBER_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<MemberItem>() {
+		private val MEMBER_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<MemberItem>() {
 			override fun areItemsTheSame(oldItem: MemberItem, newItem: MemberItem) =
 				oldItem.id == newItem.id
 

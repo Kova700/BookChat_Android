@@ -61,6 +61,7 @@ interface ChannelRepository {
 		channelId: Long,
 		targetUserId: Long,
 		channelMemberAuthority: ChannelMemberAuthority,
+		needServer: Boolean = false,
 	)
 
 	suspend fun updateChannelHost(

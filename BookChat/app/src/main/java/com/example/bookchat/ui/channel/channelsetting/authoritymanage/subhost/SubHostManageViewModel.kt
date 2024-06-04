@@ -1,10 +1,11 @@
-package com.example.bookchat.ui.channel.channelsetting.authoritymanage.host
+package com.example.bookchat.ui.channel.channelsetting.authoritymanage.subhost
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.domain.model.ChannelMemberAuthority
+import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.ui.channel.channelsetting.ChannelSettingActivity
 import com.example.bookchat.ui.channel.channelsetting.authoritymanage.mapper.toMemberItems
@@ -21,16 +22,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HostManageViewModel @Inject constructor(
+class SubHostManageViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val channelRepository: ChannelRepository,
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(ChannelSettingActivity.EXTRA_CHANNEL_ID)!!
 
-	private val _eventFlow = MutableSharedFlow<HostManageUiEvent>()
+	private val _eventFlow = MutableSharedFlow<SubHostManageUiEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
 
-	private val _uiState = MutableStateFlow(HostManageUiState.DEFAULT)
+	private val _uiState = MutableStateFlow(SubHostManageUiState.DEFAULT)
 	val uiState get() = _uiState.asStateFlow()
 
 	init {
@@ -50,41 +51,71 @@ class HostManageViewModel @Inject constructor(
 					searchedMembers = channel.toMemberItems(
 						searchKeyword = searchKeyword,
 						selectedMemberId = selectedMember?.id,
-						filterTypes = listOf(ChannelMemberAuthority.HOST)
+						filterTypes = listOf(
+							ChannelMemberAuthority.HOST,
+							ChannelMemberAuthority.SUB_HOST,
+						)
 					)
 				)
 			}
 		}.collect()
 	}
 
-	private fun updateChannelHost(selectedMemberId: Long) = viewModelScope.launch {
-		if (uiState.value.uiState == HostManageUiState.UiState.LOADING) return@launch
-		updateState { copy(uiState = HostManageUiState.UiState.LOADING) }
+	private fun updateChannelMemberAuthority(
+		targetUserId: Long,
+		authority: ChannelMemberAuthority,
+		onSuccess: (() -> Unit)? = null,
+	) = viewModelScope.launch {
 		runCatching {
-			channelRepository.updateChannelHost(
+			channelRepository.updateChannelMemberAuthority(
 				channelId = channelId,
-				targetUserId = selectedMemberId,
+				targetUserId = targetUserId,
+				channelMemberAuthority = authority,
 				needServer = true
 			)
 		}
-			.onSuccess {
-				updateState { copy(uiState = HostManageUiState.UiState.SUCCESS) }
-				startEvent(HostManageUiEvent.ShowHostChangeSuccessDialog)
-			}
-			.onFailure { startEvent(HostManageUiEvent.MakeToast(R.string.change_channel_host_fail)) }
+			.onSuccess { onSuccess?.invoke() }
+			.onFailure { startEvent(SubHostManageUiEvent.MakeToast(R.string.change_channel_sub_host_fail)) }
+	}
+
+	fun onClickSubHostDeleteBtn(user: User) {
+		updateChannelMemberAuthority(
+			targetUserId = user.id,
+			authority = ChannelMemberAuthority.GUEST,
+		)
 	}
 
 	fun onClickXBtn() {
-		startEvent(HostManageUiEvent.MoveBack)
+		startEvent(SubHostManageUiEvent.MoveBack)
 	}
 
 	fun onClickApplyBtn() {
 		val selectedMember = uiState.value.selectedMember ?: return
-		updateChannelHost(selectedMember.id)
+		updateChannelMemberAuthority(
+			targetUserId = selectedMember.id,
+			authority = ChannelMemberAuthority.SUB_HOST,
+			onSuccess = {
+				updateState {
+					copy(
+						searchKeyword = "",
+						selectedMember = null
+					)
+				}
+				startEvent(SubHostManageUiEvent.MoveDeleteSubHost)
+			}
+		)
 	}
 
-	fun onClickMember(memberItem: MemberItem) {
-		updateState { copy(selectedMember = memberItem) }
+	fun onClickSubHostAddItem(item: MemberItem) {
+		updateState { copy(selectedMember = item) }
+	}
+
+	fun onClickMoveAddSubHost() {
+		startEvent(SubHostManageUiEvent.MoveAddSubHost)
+	}
+
+	fun onClickMoveDeleteSubHost() {
+		startEvent(SubHostManageUiEvent.MoveDeleteSubHost)
 	}
 
 	fun onChangeSearchKeyWord(text: String) {
@@ -95,11 +126,11 @@ class HostManageViewModel @Inject constructor(
 		updateState { copy(searchKeyword = "") }
 	}
 
-	private inline fun updateState(block: HostManageUiState.() -> HostManageUiState) {
+	private inline fun updateState(block: SubHostManageUiState.() -> SubHostManageUiState) {
 		_uiState.update { _uiState.value.block() }
 	}
 
-	private fun startEvent(event: HostManageUiEvent) = viewModelScope.launch {
+	private fun startEvent(event: SubHostManageUiEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
 	}
 

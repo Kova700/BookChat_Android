@@ -292,7 +292,17 @@ class ChannelRepositoryImpl @Inject constructor(
 		channelId: Long,
 		targetUserId: Long,
 		channelMemberAuthority: ChannelMemberAuthority,
+		needServer: Boolean,
 	) {
+
+		if (needServer) {
+			bookChatApi.updateChannelMemberAuthority(
+				channelId = channelId,
+				targetUserId = targetUserId,
+				authority = channelMemberAuthority.toNetwork()
+			)
+		}
+
 		val channel = getChannel(channelId)
 		val newParticipantAuthorities = channel.participantAuthorities
 			?.plus(targetUserId to channelMemberAuthority)

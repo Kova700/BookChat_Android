@@ -2,19 +2,19 @@ package com.example.bookchat.ui.channel.channelsetting.authoritymanage.mapper
 
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelMemberAuthority
-import com.example.bookchat.domain.model.UserDefaultProfileType
 import com.example.bookchat.ui.channel.channelsetting.authoritymanage.model.MemberItem
 
 fun Channel.toMemberItems(
 	searchKeyword: String,
 	selectedMemberId: Long?,
+	filterTypes: List<ChannelMemberAuthority>,
 ): List<MemberItem> {
 	val items = mutableListOf<MemberItem>()
 
 	participants?.let { users ->
 		items.addAll(
 			users.filter { user ->
-				(participantAuthorities?.get(user.id) != ChannelMemberAuthority.HOST)
+				(filterTypes.contains(participantAuthorities?.get(user.id)).not())
 								&& if (searchKeyword.isBlank()) true else user.nickname.contains(searchKeyword)
 			}.map { user ->
 				MemberItem(
