@@ -8,7 +8,6 @@ import com.example.bookchat.domain.model.Agony
 import com.example.bookchat.domain.model.AgonyRecord
 import com.example.bookchat.domain.repository.AgonyRecordRepository
 import com.example.bookchat.domain.repository.AgonyRepository
-import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.agony.AgonyActivity
 import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordeUiState.UiState
 import com.example.bookchat.ui.agony.agonyrecord.mapper.toAgonyRecord
@@ -29,7 +28,6 @@ import javax.inject.Inject
 @HiltViewModel
 class AgonyRecordViewModel @Inject constructor(
 	private val agonyRecordRepository: AgonyRecordRepository,
-	private val bookShelfRepository: BookShelfRepository,
 	private val agonyRepository: AgonyRepository,
 	private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -51,7 +49,9 @@ class AgonyRecordViewModel @Inject constructor(
 
 	private fun observeAgonyRecords() = viewModelScope.launch {
 		combine(
-			agonyRecordRepository.getAgonyRecordsFlow(), agonyRepository.getAgonyFlow(agonyId), _itemState
+			agonyRecordRepository.getAgonyRecordsFlow(true),
+			agonyRepository.getAgonyFlow(agonyId),
+			_itemState
 		) { records, agony, stateMap -> groupItems(records, agony, stateMap) }
 			.collect { newRecords -> updateState { copy(records = newRecords) } }
 	}
@@ -133,7 +133,6 @@ class AgonyRecordViewModel @Inject constructor(
 			.onSuccess {
 				_itemState.update { _itemState.value + (recordItem.recordId to ItemState.Success()) }
 				updateState { copy(isEditing = false) }
-				startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_revise_success))
 			}
 			.onFailure { startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_revise_fail)) }
 	}
@@ -150,7 +149,6 @@ class AgonyRecordViewModel @Inject constructor(
 		}
 			.onSuccess {
 				_itemState.update { _itemState.value - recordItem.recordId }
-				startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_delete_success))
 			}
 			.onFailure { startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_delete_fail)) }
 	}

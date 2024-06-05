@@ -158,13 +158,20 @@ interface BookChatApi {
 	): Response<Unit>
 
 	@GET("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records")
-	suspend fun getAgonyRecord(
+	suspend fun getAgonyRecords(
 		@Path("bookShelfId") bookShelfId: Long,
 		@Path("agonyId") agonyId: Long,
 		@Query("postCursorId") postCursorId: Long?,
 		@Query("size") size: Int,
 		@Query("sort") sort: SearchSortOptionNetwork,
 	): ResponseGetAgonyRecord
+
+	@GET("v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
+	suspend fun getAgonyRecord(
+		@Path("bookShelfId") bookShelfId: Long,
+		@Path("agonyId") agonyId: Long,
+		@Path("recordId") recordId: Long,
+	): AgonyRecordResponse
 
 	@DELETE("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
 	suspend fun deleteAgonyRecord(
