@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.signup
+package com.example.bookchat.ui.signup.selecttaste
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

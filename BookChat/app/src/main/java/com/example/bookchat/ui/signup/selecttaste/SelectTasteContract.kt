@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.signup
+package com.example.bookchat.ui.signup.selecttaste
 
 import com.example.bookchat.domain.model.ReadingTaste
 

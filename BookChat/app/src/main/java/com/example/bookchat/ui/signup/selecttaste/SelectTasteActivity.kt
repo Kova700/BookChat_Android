@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.signup
+package com.example.bookchat.ui.signup.selecttaste
 
 import android.content.Intent
 import android.graphics.Color

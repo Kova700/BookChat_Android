@@ -143,7 +143,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.signup.SelectTasteActivity"
+            android:name=".ui.signup.selecttaste.SelectTasteActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
