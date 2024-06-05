@@ -16,6 +16,7 @@ import javax.inject.Inject
 class ChannelListAdapter @Inject constructor() :
 	ListAdapter<ChannelListItem, ChannelListItemViewHolder>(CHANNEL_LIST_ITEM_COMPARATOR) {
 	var onItemClick: ((Int) -> Unit)? = null
+	var onItemLongClick: ((Int) -> Unit)? = null
 
 	override fun getItemViewType(position: Int): Int {
 		return when (getItem(position)) {
@@ -39,7 +40,7 @@ class ChannelListAdapter @Inject constructor() :
 					LayoutInflater.from(parent.context), R.layout.item_channel_list_data,
 					parent, false
 				)
-				return ChannelListDataViewHolder(binding, onItemClick)
+				return ChannelListDataViewHolder(binding, onItemClick, onItemLongClick)
 			}
 
 			else -> throw Exception("unknown ViewHolder Type")

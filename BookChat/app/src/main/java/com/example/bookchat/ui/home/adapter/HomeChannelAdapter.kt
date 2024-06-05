@@ -54,13 +54,9 @@ class HomeChannelItemViewHolder(
 		binding.channel = channel
 		binding.uncheckedChatCountTv.text = if (channel.isExistNewChat) "New+" else ""
 		binding.muteChannelIcon.visibility =
-			if ((channel.notificationFlag.not())
-				&& channel.isAvailableChannel.not()
-			) View.VISIBLE else View.GONE
+			if ((channel.notificationFlag.not()) && channel.isAvailableChannel) View.VISIBLE else View.GONE
 		binding.topPinChannelIcon.visibility =
-			if ((channel.topPinNum != 0)
-				&& channel.isAvailableChannel.not()
-			) View.VISIBLE else View.GONE
+			if ((channel.isTopPined) && channel.isAvailableChannel) View.VISIBLE else View.GONE
 		binding.unavailableChannelStateGroup.visibility =
 			if (channel.isAvailableChannel.not()) View.VISIBLE else View.GONE
 	}

@@ -22,26 +22,27 @@ class ChannelListHeaderViewHolder(
 class ChannelListDataViewHolder(
 	private val binding: ItemChannelListDataBinding,
 	private val onItemClick: ((Int) -> Unit)?,
+	private val onItemLongClick: ((Int) -> Unit)?,
 ) : ChannelListItemViewHolder(binding) {
 
 	init {
 		binding.root.setOnClickListener {
-			onItemClick?.invoke(bindingAdapterPosition)
+			onItemClick?.invoke(absoluteAdapterPosition)
+		}
+		binding.root.setOnLongClickListener {
+			onItemLongClick?.invoke(absoluteAdapterPosition)
+			true
 		}
 	}
 
 	override fun bind(channelListItem: ChannelListItem) {
 		val item = (channelListItem as ChannelListItem.ChannelItem)
 		binding.channel = item
-		binding.uncheckedChatCountTv.text = if (channelListItem.isExistNewChat) "New+" else ""
+		binding.uncheckedChatCountTv.text = if (item.isExistNewChat) "New+" else ""
 		binding.muteChannelIcon.visibility =
-			if ((item.notificationFlag.not())
-				&& item.isAvailableChannel.not()
-			) View.VISIBLE else View.GONE
+			if ((item.notificationFlag.not()) && item.isAvailableChannel) View.VISIBLE else View.GONE
 		binding.topPinChannelIcon.visibility =
-			if ((item.topPinNum != 0)
-				&& item.isAvailableChannel.not()
-			) View.VISIBLE else View.GONE
+			if ((item.isTopPined) && item.isAvailableChannel) View.VISIBLE else View.GONE
 		binding.unavailableChannelStateGroup.visibility =
 			if (item.isAvailableChannel.not()) View.VISIBLE else View.GONE
 	}

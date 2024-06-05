@@ -45,9 +45,9 @@ class ChannelRepositoryImpl @Inject constructor(
 		.map { channels ->
 			//ORDER BY top_pin_num DESC, last_chat_id IS NULL DESC, last_chat_id DESC, room_id DESC
 			channels.sortedWith(
-				compareBy<Channel> { channel -> -channel.topPinNum }
+				compareBy<Channel> { channel -> channel.topPinNum.unaryMinus() }
 					.then(nullsFirst(compareBy { channel -> channel.lastChat?.chatId?.unaryMinus() }))
-					.thenBy { channel -> -channel.roomId }
+					.thenBy { channel -> channel.roomId.unaryMinus() }
 			)
 		}
 
@@ -219,11 +219,48 @@ class ChannelRepositoryImpl @Inject constructor(
 		setChannels(mapChannels.value + mapOf(channelId to newChannel))
 	}
 
+	//TODO : 방장인 경우 여기에서 needServer해야하는데 지금 호출 안되고 있음
 	override suspend fun leaveChannelHost(channelId: Long) {
-		val channel = getChannel(channelId)
-		val newChannel = channel.copy(isExploded = true)
 		channelDAO.explosion(channelId)
-		setChannels(mapChannels.value + mapOf(channelId to newChannel))
+		val updatedChannel = getChannelWithUpdatedData(channelId)
+		setChannels(mapChannels.value + (channelId to updatedChannel))
+	}
+
+	override suspend fun muteChannel(channelId: Long) {
+		channelDAO.updateNotificationFlag(
+			channelId = channelId,
+			isNotificationOn = false
+		)
+		val updatedChannel = getChannelWithUpdatedData(channelId)
+		setChannels(mapChannels.value + (channelId to updatedChannel))
+	}
+
+	override suspend fun unMuteChannel(channelId: Long) {
+		channelDAO.updateNotificationFlag(
+			channelId = channelId,
+			isNotificationOn = true
+		)
+		val updatedChannel = getChannelWithUpdatedData(channelId)
+		setChannels(mapChannels.value + (channelId to updatedChannel))
+	}
+
+	override suspend fun topPinChannel(channelId: Long) {
+		val maxTopPinNum = channelDAO.getMaxTopPinNum()
+		channelDAO.updateTopPin(
+			channelId = channelId,
+			isTopPinNum = maxTopPinNum + 1
+		)
+		val updatedChannel = getChannelWithUpdatedData(channelId)
+		setChannels(mapChannels.value + (channelId to updatedChannel))
+	}
+
+	override suspend fun unPinChannel(channelId: Long) {
+		channelDAO.updateTopPin(
+			channelId = channelId,
+			isTopPinNum = 0
+		)
+		val updatedChannel = getChannelWithUpdatedData(channelId)
+		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
 	// TODO : 이미 입장되어있는 채널에 입장 API 호출하면 넘어오는 응답코드 따로 정의 후,

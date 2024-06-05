@@ -15,8 +15,10 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentChannelListBinding
 import com.example.bookchat.ui.channel.chatting.ChannelActivity
 import com.example.bookchat.ui.channelList.adpater.ChannelListAdapter
+import com.example.bookchat.ui.channelList.dialog.ChannelSettingDialog
 import com.example.bookchat.ui.channelList.model.ChannelListItem
 import com.example.bookchat.ui.createchannel.MakeChannelActivity
+import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,7 +36,7 @@ class ChannelListFragment : Fragment() {
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
+		savedInstanceState: Bundle?,
 	): View {
 		_binding = DataBindingUtil.inflate(
 			inflater, R.layout.fragment_channel_list, container, false
@@ -71,8 +73,13 @@ class ChannelListFragment : Fragment() {
 		//TODO : long Click :채팅방 상단고정, 알림 끄기 설정 가능한 다이얼로그
 		//TODO : Swipe : 상단고정, 알림 끄기 UI 노출
 		channelListAdapter.onItemClick = { itemPosition ->
-			channelListViewModel.onChannelItemClick(
+			channelListViewModel.onClickChannelItem(
 				(channelListAdapter.currentList[itemPosition] as ChannelListItem.ChannelItem).roomId
+			)
+		}
+		channelListAdapter.onItemLongClick = { itemPosition ->
+			channelListViewModel.onLongClickChannelItem(
+				(channelListAdapter.currentList[itemPosition] as ChannelListItem.ChannelItem)
 			)
 		}
 	}
@@ -111,15 +118,34 @@ class ChannelListFragment : Fragment() {
 		//TODO : 검색 Fragment로 이동
 	}
 
+	private fun showChannelSettingDialog(channel: ChannelListItem.ChannelItem) {
+		val existingFragment =
+			childFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_SETTING)
+		if (existingFragment != null) return
+
+		val dialog = ChannelSettingDialog(
+			channel = channel,
+			onClickMuteBtn = { channelListViewModel.onClickChannelMute(channel.roomId) },
+			onClickUnMuteBtn = { channelListViewModel.onClickChannelUnMute(channel.roomId) },
+			onClickTopPinBtn = { channelListViewModel.onClickChannelTopPin(channel.roomId) },
+			onClickUnPinBtn = { channelListViewModel.onClickChannelUnPin(channel.roomId) },
+			onClickOkExitBtn = { channelListViewModel.onClickChannelExit(channel.roomId) }
+		)
+		dialog.show(childFragmentManager, DIALOG_TAG_CHANNEL_SETTING)
+	}
+
 	private fun handleEvent(event: ChannelListUiEvent) {
 		when (event) {
 			is ChannelListUiEvent.MoveToMakeChannelPage -> moveToMakeChannel()
 			is ChannelListUiEvent.MoveToChannel -> moveToChannel(event.channelId)
 			is ChannelListUiEvent.MoveToSearchChannelPage -> moveToSearchChannelPage()
+			is ChannelListUiEvent.ShowChannelSettingDialog -> showChannelSettingDialog(event.channel)
+			is ChannelListUiEvent.MakeToast -> makeToast(event.stringId)
 		}
 	}
 
 	companion object {
 		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
+		private const val DIALOG_TAG_CHANNEL_SETTING = "DIALOG_TAG_CHANNEL_SETTING"
 	}
 }

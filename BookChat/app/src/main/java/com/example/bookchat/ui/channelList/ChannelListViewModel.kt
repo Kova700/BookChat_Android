@@ -2,6 +2,7 @@ package com.example.bookchat.ui.channelList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bookchat.R
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.ui.channelList.ChannelListUiState.UiState
@@ -19,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChannelListViewModel @Inject constructor(
-	private val channelRepository: ChannelRepository
+	private val channelRepository: ChannelRepository,
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<ChannelListUiEvent>()
@@ -62,16 +63,57 @@ class ChannelListViewModel @Inject constructor(
 		getChannels()
 	}
 
-	fun clickPlusBtn() {
+	private fun muteChannel(channelId: Long) = viewModelScope.launch {
+		runCatching { channelRepository.muteChannel(channelId) }
+	}
+
+	private fun unMuteChannel(channelId: Long) = viewModelScope.launch {
+		runCatching { channelRepository.unMuteChannel(channelId) }
+	}
+
+	private fun topPinChannel(channelId: Long) = viewModelScope.launch {
+		runCatching { channelRepository.topPinChannel(channelId) }
+	}
+
+	private fun unPinChannel(channelId: Long) = viewModelScope.launch {
+		runCatching { channelRepository.unPinChannel(channelId) }
+	}
+
+	private fun exitChannel(channelId: Long) = viewModelScope.launch {
+		runCatching { channelRepository.leaveChannel(channelId) }
+			.onFailure { startEvent(ChannelListUiEvent.MakeToast(R.string.channel_exit_fail)) }
+	}
+
+	fun onClickPlusBtn() {
 		startEvent(ChannelListUiEvent.MoveToMakeChannelPage)
 	}
 
-	fun onChannelItemClick(channelId: Long) {
+	fun onClickChannelItem(channelId: Long) {
 		startEvent(ChannelListUiEvent.MoveToChannel(channelId))
 	}
 
-	private fun startEvent(event: ChannelListUiEvent) = viewModelScope.launch {
-		_eventFlow.emit(event)
+	fun onLongClickChannelItem(channel: ChannelListItem.ChannelItem) {
+		startEvent(ChannelListUiEvent.ShowChannelSettingDialog(channel))
+	}
+
+	fun onClickChannelMute(channelId: Long) {
+		muteChannel(channelId)
+	}
+
+	fun onClickChannelUnMute(channelId: Long) {
+		unMuteChannel(channelId)
+	}
+
+	fun onClickChannelTopPin(channelId: Long) {
+		topPinChannel(channelId)
+	}
+
+	fun onClickChannelUnPin(channelId: Long) {
+		unPinChannel(channelId)
+	}
+
+	fun onClickChannelExit(channelId: Long) {
+		exitChannel(channelId)
 	}
 
 	private fun handleError(throwable: Throwable) {
@@ -79,8 +121,11 @@ class ChannelListViewModel @Inject constructor(
 	}
 
 	private inline fun updateState(block: ChannelListUiState.() -> ChannelListUiState) {
-		_uiStateFlow.update {
-			_uiStateFlow.value.block()
-		}
+		_uiStateFlow.update { _uiStateFlow.value.block() }
 	}
+
+	private fun startEvent(event: ChannelListUiEvent) = viewModelScope.launch {
+		_eventFlow.emit(event)
+	}
+
 }

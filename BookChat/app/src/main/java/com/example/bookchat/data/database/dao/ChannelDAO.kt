@@ -172,6 +172,32 @@ interface ChannelDAO {
 
 	@Query(
 		"UPDATE Channel SET " +
+						"is_notification_on = :isNotificationOn " +
+						"WHERE room_id = :channelId"
+	)
+	suspend fun updateNotificationFlag(
+		channelId: Long,
+		isNotificationOn: Boolean,
+	)
+
+	@Query(
+		"UPDATE Channel SET " +
+						"top_pin_num = :isTopPinNum " +
+						"WHERE room_id = :channelId"
+	)
+	suspend fun updateTopPin(
+		channelId: Long,
+		isTopPinNum: Int,
+	)
+
+	@Query(
+		"SELECT MAX(top_pin_num) FROM Channel"
+	)
+	/**존재하는 top_pin_num 중 가장 높은 번호를 반환*/
+	suspend fun getMaxTopPinNum(): Int
+
+	@Query(
+		"UPDATE Channel SET " +
 						"participant_ids = :participantIds, " +
 						"room_member_count = :roomMemberCount, " +
 						"participant_authorities = :participantAuthorities, " +
