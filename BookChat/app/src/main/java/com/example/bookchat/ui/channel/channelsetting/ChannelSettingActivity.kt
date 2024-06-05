@@ -88,7 +88,7 @@ class ChannelSettingActivity : AppCompatActivity() {
 		}
 
 		with(binding.applyChannelChange) {
-			if (channelSettingViewModel.uiState.value.isPossibleChangeChannel) {
+			if (state.isPossibleChangeChannel) {
 				setTextColor(Color.parseColor("#000000"))
 				isEnabled = true
 			} else {
