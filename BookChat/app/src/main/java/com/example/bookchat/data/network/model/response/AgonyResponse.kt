@@ -9,5 +9,5 @@ data class AgonyResponse(
 	@SerializedName("title")
 	val title: String,
 	@SerializedName("hexColorCode")
-	val hexColorCode: com.example.bookchat.data.network.model.AgonyFolderHexColorNetwork
+	val hexColorCode: AgonyFolderHexColorNetwork,
 )
