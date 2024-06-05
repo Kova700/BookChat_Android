@@ -62,7 +62,7 @@
             android:gravity="start"
             setMakeAgonyTextColorWithFolderHexColor="@{viewmodel.uiState.selectedColor}"
             android:hint="@string/agony_make_input_hint"
-            android:maxLength="20"
+            android:maxLength="30"
             android:textSize="14sp"
             android:background="@null"
             app:layout_constraintBottom_toTopOf="@+id/color_select_layout"

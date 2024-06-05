@@ -8,6 +8,7 @@ import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.domain.repository.AgonyRepository
 import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.agony.AgonyActivity
+import com.example.bookchat.ui.agony.makeagony.MakeAgonyUiState.UiState
 import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,7 +25,7 @@ class MakeAgonyDialogViewModel @Inject constructor(
 	private val agonyRepository: AgonyRepository,
 	private val bookShelfRepository: BookShelfRepository,
 ) : ViewModel() {
-	private val bookShelfListItemId =
+	private val bookShelfItemId =
 		savedStateHandle.get<Long>(AgonyActivity.EXTRA_BOOKSHELF_ID)!!
 
 	private val _eventFlow = MutableSharedFlow<MakeAgonyUiEvent>()
@@ -34,13 +35,17 @@ class MakeAgonyDialogViewModel @Inject constructor(
 	val uiState get() = _uiState.asStateFlow()
 
 	init {
-		getItem()
+		initUiState()
 	}
 
-	private fun getItem() {
-		val item =
-			bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)?.toBookShelfListItem()
-		item?.let { updateState { copy(bookshelfItem = item) } }
+	private fun initUiState() {
+		updateState {
+			copy(
+				bookshelfItem = bookShelfRepository
+					.getCachedBookShelfItem(bookShelfItemId)
+					.toBookShelfListItem()
+			)
+		}
 	}
 
 	fun onRegisterBtnClick() {
@@ -48,7 +53,10 @@ class MakeAgonyDialogViewModel @Inject constructor(
 			startEvent(MakeAgonyUiEvent.MakeToast(R.string.agony_make_empty))
 			return
 		}
-		registerAgony(uiState.value.agonyTitle, uiState.value.selectedColor)
+		registerAgony(
+			title = uiState.value.agonyTitle,
+			hexColorCode = uiState.value.selectedColor
+		)
 	}
 
 	fun onTitleChanged(newTitle: String) {
@@ -62,16 +70,21 @@ class MakeAgonyDialogViewModel @Inject constructor(
 
 	private fun registerAgony(
 		title: String,
-		hexColorCode: AgonyFolderHexColor
+		hexColorCode: AgonyFolderHexColor,
 	) = viewModelScope.launch {
+		if (uiState.value.uiState == UiState.LOADING) return@launch
+		updateState { copy(uiState = UiState.LOADING) }
 		runCatching {
 			agonyRepository.makeAgony(
-				uiState.value.bookshelfItem.bookShelfId,
-				title,
-				hexColorCode
+				bookShelfId = bookShelfItemId,
+				title = title,
+				hexColorCode = hexColorCode
 			)
 		}
-			.onSuccess { startEvent(MakeAgonyUiEvent.MoveToBack) }
+			.onSuccess {
+				updateState { copy(uiState = UiState.SUCCESS) }
+				startEvent(MakeAgonyUiEvent.MoveToBack)
+			}
 			.onFailure {
 				startEvent(MakeAgonyUiEvent.MakeToast(R.string.agony_make_fail))
 			}
