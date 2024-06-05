@@ -9,7 +9,8 @@ fun BookShelfListItem.toBookShelfItem(): BookShelfItem {
 		book = book,
 		pages = pages,
 		star = star,
-		state = state
+		state = state,
+		lastUpdatedAt = lastUpdatedAt
 	)
 }
 
@@ -20,7 +21,8 @@ fun BookShelfItem.toBookShelfListItem(isSwiped: Boolean = false): BookShelfListI
 		pages = pages,
 		star = star,
 		isSwiped = isSwiped,
-		state = state
+		state = state,
+		lastUpdatedAt = lastUpdatedAt
 	)
 }
 

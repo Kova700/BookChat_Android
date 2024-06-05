@@ -20,7 +20,9 @@ data class BookShelfItemResponse(
 	@SerializedName("publishAt")
 	val publishAt: String,
 	@SerializedName("pages")
-	var pages: Int,
+	val pages: Int,
 	@SerializedName("star")
-	var star: StarRating?,
+	val star: StarRating?,
+	@SerializedName("lastUpdatedAt")
+	val lastUpdatedAt: String,
 ) : Serializable
