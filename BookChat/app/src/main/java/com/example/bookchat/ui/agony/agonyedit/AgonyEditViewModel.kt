@@ -34,11 +34,15 @@ class AgonyEditViewModel @Inject constructor(
 		initUiState()
 	}
 
-	private fun initUiState() {
+	private fun initUiState() = viewModelScope.launch {
+		val originalAgony = agonyRepository.getAgony(
+			bookShelfId = bookShelfItemId,
+			agonyId = agonyId
+		)
 		updateState {
 			copy(
-				agony = agonyRepository.getCachedAgony(agonyId),
-				newTitle = agonyRepository.getCachedAgony(agonyId).title
+				agony = originalAgony,
+				newTitle = originalAgony.title
 			)
 		}
 	}
