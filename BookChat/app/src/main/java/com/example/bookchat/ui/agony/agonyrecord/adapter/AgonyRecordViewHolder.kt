@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.agonyrecord.adapter
+package com.example.bookchat.ui.agony.agonyrecord.adapter
 
 import android.text.Editable
 import android.view.View
@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.databinding.ItemAgonyRecordDataBinding
 import com.example.bookchat.databinding.ItemAgonyRecordFirstBinding
 import com.example.bookchat.databinding.ItemAgonyRecordHeaderBinding
-import com.example.bookchat.ui.agonyrecord.AgonyRecordSwipeHelper
-import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
+import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordSwipeHelper
+import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
 
 sealed class AgonyRecordViewHolder(
 	binding: ViewDataBinding

@@ -1,6 +1,6 @@
-package com.example.bookchat.ui.agonyrecord
+package com.example.bookchat.ui.agony.agonyrecord
 
-import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
+import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
 
 data class AgonyRecordeUiState(
 	val uiState: UiState,

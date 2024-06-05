@@ -4,6 +4,8 @@ import com.example.bookchat.data.mapper.toAgony
 import com.example.bookchat.data.mapper.toNetWork
 import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.network.BookChatApi
+import com.example.bookchat.data.network.model.request.RequestMakeAgony
+import com.example.bookchat.data.network.model.request.RequestReviseAgony
 import com.example.bookchat.domain.model.Agony
 import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.domain.model.SearchSortOption
@@ -15,7 +17,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class AgonyRepositoryImpl @Inject constructor(
-	private val bookChatApi: BookChatApi
+	private val bookChatApi: BookChatApi,
 ) : AgonyRepository {
 
 	private val mapAgonies = MutableStateFlow<Map<Long, Agony>>(emptyMap()) //(agonyId, Agony)
@@ -72,24 +74,26 @@ class AgonyRepositoryImpl @Inject constructor(
 	override suspend fun makeAgony(
 		bookShelfId: Long,
 		title: String,
-		hexColorCode: AgonyFolderHexColor
+		hexColorCode: AgonyFolderHexColor,
 	) {
-		val requestMakeAgony = com.example.bookchat.data.network.model.request.RequestMakeAgony(
-			title,
-			hexColorCode.toNetWork()
+		val requestMakeAgony = RequestMakeAgony(
+			title = title,
+			hexColorCode = hexColorCode.toNetWork()
 		)
 		bookChatApi.makeAgony(bookShelfId, requestMakeAgony)
 	}
 
 	//TODO : 색상도 변경 가능하게 UI 추가
+	//TODO : Header에 Location 있는지 확인하고 있으면 다시 서버로부터 가져오는 로직 추가
 	override suspend fun reviseAgony(
 		bookShelfId: Long,
-		agony: Agony,
-		newTitle: String
+		agonyId: Long,
+		newTitle: String,
 	) {
-		val requestReviseAgony = com.example.bookchat.data.network.model.request.RequestReviseAgony(
-			newTitle,
-			agony.hexColorCode.toNetWork()
+		val agony = getCachedAgony(agonyId)
+		val requestReviseAgony = RequestReviseAgony(
+			title = newTitle,
+			hexColorCode = agony.hexColorCode.toNetWork()
 		)
 		bookChatApi.reviseAgony(bookShelfId, agony.agonyId, requestReviseAgony)
 		mapAgonies.update { mapAgonies.value + (agony.agonyId to agony.copy(title = newTitle)) }
@@ -97,15 +101,15 @@ class AgonyRepositoryImpl @Inject constructor(
 
 	override suspend fun deleteAgony(
 		bookShelfId: Long,
-		agonyIds: List<Long>
+		agonyIds: List<Long>,
 	) {
 		val agonyIdsString = agonyIds.joinToString(",")
 		bookChatApi.deleteAgony(bookShelfId, agonyIdsString)
 		mapAgonies.update { mapAgonies.value - agonyIds.toSet() }
 	}
 
-	override fun getCachedAgony(agonyId: Long): Agony? {
-		return mapAgonies.value[agonyId]
+	override fun getCachedAgony(agonyId: Long): Agony {
+		return mapAgonies.value[agonyId]!!
 	}
 
 }

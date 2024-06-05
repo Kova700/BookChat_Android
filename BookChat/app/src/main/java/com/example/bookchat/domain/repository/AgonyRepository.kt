@@ -24,7 +24,7 @@ interface AgonyRepository {
 
 	suspend fun reviseAgony(
 		bookShelfId: Long,
-		agony: Agony,
+		agonyId: Long,
 		newTitle: String
 	)
 
@@ -33,7 +33,7 @@ interface AgonyRepository {
 		agonyIds: List<Long>
 	)
 
-	fun getCachedAgony(agonyId: Long): Agony?
+	fun getCachedAgony(agonyId: Long): Agony
 
 	companion object {
 		const val AGONY_LOAD_SIZE = 6

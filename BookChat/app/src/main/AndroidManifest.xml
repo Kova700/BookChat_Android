@@ -119,11 +119,11 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.agony.AgonyEditActivity"
+            android:name=".ui.agony.agonyedit.AgonyEditActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.agonyrecord.AgonyRecordActivity"
+            android:name=".ui.agony.agonyrecord.AgonyRecordActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

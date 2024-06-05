@@ -1,7 +1,7 @@
-package com.example.bookchat.ui.agonyrecord.mapper
+package com.example.bookchat.ui.agony.agonyrecord.mapper
 
 import com.example.bookchat.domain.model.AgonyRecord
-import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
+import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
 
 fun AgonyRecord.toAgonyRecordListItem(
 	itemState: AgonyRecordListItem.ItemState

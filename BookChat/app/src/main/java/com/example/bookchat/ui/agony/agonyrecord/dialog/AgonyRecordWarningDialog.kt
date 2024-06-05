@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.agonyrecord.dialog
+package com.example.bookchat.ui.agony.agonyrecord.dialog
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -11,7 +11,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogAgonyRecordWarningBinding
-import com.example.bookchat.ui.agonyrecord.AgonyRecordViewModel
+import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordViewModel
 
 class AgonyRecordWarningDialog : DialogFragment() {
 

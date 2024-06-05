@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.agonyrecord.model
+package com.example.bookchat.ui.agony.agonyrecord.model
 
 import com.example.bookchat.domain.model.Agony
 

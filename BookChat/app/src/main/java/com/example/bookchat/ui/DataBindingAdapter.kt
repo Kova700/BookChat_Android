@@ -20,7 +20,7 @@ import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.NicknameCheckState
 import com.example.bookchat.domain.model.UserDefaultProfileType
 import com.example.bookchat.ui.agony.AgonyUiState
-import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
+import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
 import com.example.bookchat.ui.login.LoginUiState
 import com.example.bookchat.utils.*
 import com.example.bookchat.utils.Constants.TAG

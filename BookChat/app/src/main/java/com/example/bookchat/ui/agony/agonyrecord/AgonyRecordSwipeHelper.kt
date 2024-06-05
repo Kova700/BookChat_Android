@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.agonyrecord
+package com.example.bookchat.ui.agony.agonyrecord
 
 import android.graphics.Canvas
 import android.view.View
@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_SWIPE
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
-import com.example.bookchat.ui.agonyrecord.adapter.AgonyRecordItemViewHolder
+import com.example.bookchat.ui.agony.agonyrecord.adapter.AgonyRecordItemViewHolder
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min

@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.agony
+package com.example.bookchat.ui.agony.makeagony
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -7,6 +7,7 @@ import com.example.bookchat.R
 import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.domain.repository.AgonyRepository
 import com.example.bookchat.domain.repository.BookShelfRepository
+import com.example.bookchat.ui.agony.AgonyActivity
 import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
