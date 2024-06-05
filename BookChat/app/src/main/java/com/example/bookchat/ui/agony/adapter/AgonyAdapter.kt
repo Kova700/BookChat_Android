@@ -12,10 +12,12 @@ import com.example.bookchat.databinding.ItemAgonyFirstBinding
 import com.example.bookchat.databinding.ItemAgonyHeaderBinding
 import com.example.bookchat.ui.agony.AgonyUiState
 import com.example.bookchat.ui.agony.model.AgonyListItem
+import com.example.bookchat.utils.BookImgSizeManager
 import javax.inject.Inject
 
-class AgonyAdapter @Inject constructor() :
-	ListAdapter<AgonyListItem, AgonyViewHolder>(AGONY_ITEM_COMPARATOR) {
+class AgonyAdapter @Inject constructor(
+	private val bookImgSizeManager: BookImgSizeManager,
+) : ListAdapter<AgonyListItem, AgonyViewHolder>(AGONY_ITEM_COMPARATOR) {
 
 	var agonyUiState: AgonyUiState = AgonyUiState.DEFAULT
 	var onFirstItemClick: (() -> Unit)? = null
@@ -35,7 +37,7 @@ class AgonyAdapter @Inject constructor() :
 
 	override fun onCreateViewHolder(
 		parent: ViewGroup,
-		viewType: Int
+		viewType: Int,
 	): AgonyViewHolder {
 
 		when (viewType) {
@@ -44,7 +46,7 @@ class AgonyAdapter @Inject constructor() :
 					LayoutInflater.from(parent.context), R.layout.item_agony_header,
 					parent, false
 				)
-				return AgonyHeaderItemViewHolder(binding)
+				return AgonyHeaderItemViewHolder(binding, bookImgSizeManager)
 			}
 
 			R.layout.item_agony_first -> {
