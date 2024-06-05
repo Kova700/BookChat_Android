@@ -280,34 +280,6 @@ object DataBindingAdapter {
 		}
 	}
 
-	/** 고민탭 EditingState일 때 View Visibility 설정*/
-	@JvmStatic
-	@BindingAdapter("setAgonyFolderEditingComponentVisibility")
-	fun setAgonyFolderEditingComponentVisibility(
-		view: View,
-		agonyUiState: AgonyUiState.UiState,
-	) {
-		if (agonyUiState == AgonyUiState.UiState.EDITING) {
-			view.visibility = View.VISIBLE
-			return
-		}
-		view.visibility = View.INVISIBLE
-	}
-
-	/** 고민탭 DefaultState일 때 View Visibility 설정*/
-	@JvmStatic
-	@BindingAdapter("setAgonyFolderDefaultComponentVisibility")
-	fun setAgonyFolderDefaultComponentVisibility(
-		view: View,
-		agonyUiState: AgonyUiState.UiState,
-	) {
-		if (agonyUiState == AgonyUiState.UiState.SUCCESS) {
-			view.visibility = View.VISIBLE
-			return
-		}
-		view.visibility = View.INVISIBLE
-	}
-
 	/**고민 생성 Dialog text 색상 설정*/
 	@JvmStatic
 	@BindingAdapter("setMakeAgonyTextColorWithFolderHexColor")

@@ -16,24 +16,27 @@ interface AgonyRepository {
 		size: Int = AGONY_LOAD_SIZE,
 	)
 
+	suspend fun getAgony(
+		bookShelfId: Long,
+		agonyId: Long,
+	): Agony
+
 	suspend fun makeAgony(
 		bookShelfId: Long,
 		title: String,
-		hexColorCode: AgonyFolderHexColor
-	)
+		hexColorCode: AgonyFolderHexColor,
+	): Agony
 
 	suspend fun reviseAgony(
 		bookShelfId: Long,
 		agonyId: Long,
-		newTitle: String
+		newTitle: String,
 	)
 
 	suspend fun deleteAgony(
 		bookShelfId: Long,
-		agonyIds: List<Long>
+		agonyIds: List<Long>,
 	)
-
-	fun getCachedAgony(agonyId: Long): Agony
 
 	companion object {
 		const val AGONY_LOAD_SIZE = 6
