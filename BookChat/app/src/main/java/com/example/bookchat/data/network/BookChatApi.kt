@@ -78,6 +78,11 @@ interface BookChatApi {
 		@Query("sort") sort: SearchSortOptionNetwork = SearchSortOptionNetwork.UPDATED_AT_DESC,
 	): ResponseGetBookShelfBooks
 
+	@GET("/v1/api/bookshelves/{bookShelfId}")
+	suspend fun getBookShelfItem(
+		@Path("bookShelfId") bookShelfId: Long,
+	): BookShelfItemResponse
+
 	@DELETE("/v1/api/bookshelves/{bookId}")
 	suspend fun deleteBookShelfBook(
 		@Path("bookId") bookId: Long,
@@ -125,15 +130,21 @@ interface BookChatApi {
 	suspend fun makeAgony(
 		@Path("bookId") bookId: Long,
 		@Body requestMakeAgony: RequestMakeAgony,
-	)
+	): Response<Unit>
 
 	@GET("/v1/api/bookshelves/{bookShelfId}/agonies")
-	suspend fun getAgony(
+	suspend fun getAgonies(
 		@Path("bookShelfId") bookShelfId: Long,
 		@Query("size") size: Int,
 		@Query("sort") sort: SearchSortOptionNetwork,
 		@Query("postCursorId") postCursorId: Long?,
 	): ResponseGetAgony
+
+	@GET("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}")
+	suspend fun getAgony(
+		@Path("bookShelfId") bookShelfId: Long,
+		@Path("agonyId") agonyId: Long,
+	): AgonyResponse
 
 	@DELETE("/v1/api/bookshelves/{bookShelfId}/agonies/{bookIdListString}")
 	suspend fun deleteAgony(
