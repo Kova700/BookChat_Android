@@ -11,15 +11,12 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
 import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
-import com.bumptech.glide.signature.ObjectKey
 import com.example.bookchat.R
 import com.example.bookchat.data.*
 import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.domain.model.ChannelDefaultImageType
-import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.NicknameCheckState
 import com.example.bookchat.domain.model.UserDefaultProfileType
-import com.example.bookchat.ui.agony.AgonyUiState
 import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
 import com.example.bookchat.ui.login.LoginUiState
 import com.example.bookchat.utils.*
@@ -474,42 +471,6 @@ object DataBindingAdapter {
 			view.maxLines = 1
 		}
 	}
-
-	// TODO : 여기부터
-	/**ChatItem 시간 Text 세팅*/
-	@JvmStatic
-	@BindingAdapter("getFormattedTimeText")
-	fun getFormattedTimeText(view: TextView, dateAndTimeString: String?) {
-		if (dateAndTimeString.isNullOrBlank()) return
-		view.text = DateManager.getFormattedTimeText(dateAndTimeString)
-	}
-
-	/**ChatItem 전송 이미지 Visibility 세팅*/
-	@JvmStatic
-	@BindingAdapter("setChatSendImgVisibility")
-	fun setChatSendImgVisibility(view: View, chatStatus: ChatStatus?) {
-		view.visibility = when (chatStatus) {
-			ChatStatus.LOADING,
-			ChatStatus.RETRY_REQUIRED,
-			-> View.VISIBLE
-
-			else -> View.GONE
-		}
-	}
-
-	/**ChatItem 전송 실패 버튼 Visibility 세팅*/
-	@JvmStatic
-	@BindingAdapter("setChatFailBtnVisibility")
-	fun setChatFailBtnVisibility(view: View, chatStatus: ChatStatus?) {
-		view.visibility = when (chatStatus) {
-			ChatStatus.FAILURE -> View.VISIBLE
-			//TODO : 이거만 보일게 아니라 전송시간 가려야함
-			//TODO : 취소, 재전송 버튼 OnClickListener연결하려면 View 분리해서 사용해야함 (지금 덩어리 하나로 묶였음)
-			else -> View.GONE
-		}
-	}
-
-	//TODO : 여기까지 전부 MyChatViewholder가서 설정하자
 
 	/**DrawerLayout 스와이프 off 세팅*/
 	@JvmStatic

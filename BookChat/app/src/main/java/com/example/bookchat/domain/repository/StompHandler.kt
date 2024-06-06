@@ -1,6 +1,7 @@
 package com.example.bookchat.domain.repository
 
 import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.SocketState
 import kotlinx.coroutines.flow.StateFlow
 
@@ -9,17 +10,18 @@ interface StompHandler {
 
 	suspend fun connectSocket(
 		channel: Channel,
-		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS
+		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS,
 	)
 
 	suspend fun disconnectSocket()
 	suspend fun sendMessage(
 		channelId: Long,
-		message: String
+		message: String,
 	)
+
+	suspend fun retrySendMessage(chatId: Long)
 
 	companion object {
 		private const val DEFAULT_RETRY_MAX_ATTEMPTS = 5
-
 	}
 }

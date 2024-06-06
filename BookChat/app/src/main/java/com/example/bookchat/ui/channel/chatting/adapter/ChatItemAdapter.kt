@@ -18,6 +18,8 @@ import javax.inject.Inject
 class ChatItemAdapter @Inject constructor() :
 	ListAdapter<ChatItem, ChatItemViewHolder>(CHAT_ITEM_COMPARATOR) {
 	var onClickUserProfile: ((Int) -> Unit)? = null
+	var onClickFailedChatRetryBtn: ((Int) -> Unit)? = null
+	var onClickFailedChatDeleteBtn: ((Int) -> Unit)? = null
 
 	val lastReadChatNoticeIndex
 		get() = currentList.indexOfFirst { chatItem ->
@@ -48,7 +50,7 @@ class ChatItemAdapter @Inject constructor() :
 
 	override fun onCreateViewHolder(
 		parent: ViewGroup,
-		viewType: Int
+		viewType: Int,
 	): ChatItemViewHolder {
 		when (viewType) {
 			R.layout.item_chatting_mine -> {
@@ -57,7 +59,11 @@ class ChatItemAdapter @Inject constructor() :
 					R.layout.item_chatting_mine,
 					parent, false
 				)
-				return MyChatViewHolder(binding)
+				return MyChatViewHolder(
+					binding = binding,
+					onClickFailedChatRetryBtn = onClickFailedChatRetryBtn,
+					onClickFailedChatDeleteBtn = onClickFailedChatDeleteBtn
+				)
 			}
 
 			R.layout.item_chatting_other -> {

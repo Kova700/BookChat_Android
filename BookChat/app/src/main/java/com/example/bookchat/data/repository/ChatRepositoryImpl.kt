@@ -354,9 +354,9 @@ class ChatRepositoryImpl @Inject constructor(
 			TAG,
 			"ChatRepositoryImpl: updateWaitingChaft() - receiptId :$receiptId, newChat :$newChat"
 		)
-		chatDAO.deleteChat(receiptId)
+		deleteChat(receiptId)
 		chatDAO.insertChat(newChat.toChatEntity())
-		setChats((mapChats.value - (receiptId)) + (newChat.chatId to newChat))
+		setChats(mapChats.value + (newChat.chatId to newChat))
 	}
 
 	private fun clearCachedData() {
@@ -367,6 +367,11 @@ class ChatRepositoryImpl @Inject constructor(
 		currentNewerChatPage = null
 		_isOlderChatFullyLoaded.value = false
 		_isNewerChatFullyLoaded.value = true
+	}
+
+	override suspend fun deleteChat(chatId: Long) {
+		chatDAO.deleteChat(chatId)
+		setChats(mapChats.value - (chatId))
 	}
 
 	override suspend fun deleteChannelAllChat(channelId: Long) {

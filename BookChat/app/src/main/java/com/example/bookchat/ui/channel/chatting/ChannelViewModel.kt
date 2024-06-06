@@ -284,11 +284,11 @@ class ChannelViewModel @Inject constructor(
 			.onFailure { handleError(it, "connectSocket") }
 	}
 
-	private fun sendMessage() {
+	private fun sendMessage(text: String? = null) {
 		if (uiState.value.channel.isAvailableChannel.not()) return
 		if (uiState.value.socketState != SocketState.CONNECTED) onReconnection()
 
-		val message = uiState.value.enteredMessage
+		val message = text ?: uiState.value.enteredMessage
 		if (message.isBlank()) return
 
 		updateState { copy(enteredMessage = "") }
@@ -298,13 +298,22 @@ class ChannelViewModel @Inject constructor(
 			runCatching {
 				stompHandler.sendMessage(
 					channelId = channelId,
-					message = message
+					message = message,
 				)
 			}
 				.onFailure {
 					handleError(it, "sendMessage")
 				} //소켓 닫혔을 때, 메세지 보내면 StompErrorFrameReceived 넘어옴
 		}
+	}
+
+	private fun deleteFailedChat(chatId: Long) = viewModelScope.launch {
+		chatRepository.deleteChat(chatId)
+	}
+
+	private fun retryFailedChat(chatId: Long) = viewModelScope.launch {
+		if (uiState.value.socketState != SocketState.CONNECTED) return@launch
+		stompHandler.retrySendMessage(chatId)
 	}
 
 	private fun exitChannel() = viewModelScope.launch {
@@ -451,6 +460,14 @@ class ChannelViewModel @Inject constructor(
 
 	fun onClickUserProfile(user: User) {
 		startEvent(ChannelEvent.MoveUserProfile(user))
+	}
+
+	fun onClickFailedChatDeleteBtn(chatId: Long) {
+		deleteFailedChat(chatId)
+	}
+
+	fun onClickFailedChatRetryBtn(chatId: Long) {
+		retryFailedChat(chatId)
 	}
 
 	private fun startEvent(event: ChannelEvent) = viewModelScope.launch {

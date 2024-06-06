@@ -157,9 +157,17 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun initAdapter() {
-		chatItemAdapter.onClickUserProfile = { itemPosition ->
-			val user = (chatItemAdapter.currentList[itemPosition] as ChatItem.AnotherUser).sender!!
-			channelViewModel.onClickUserProfile(user)
+		chatItemAdapter.onClickUserProfile = { position ->
+			val item = (chatItemAdapter.currentList[position] as ChatItem.AnotherUser)
+			channelViewModel.onClickUserProfile(item.sender!!)
+		}
+		chatItemAdapter.onClickFailedChatDeleteBtn = { position ->
+			val item = (chatItemAdapter.currentList[position] as ChatItem.MyChat)
+			channelViewModel.onClickFailedChatDeleteBtn(item.chatId)
+		}
+		chatItemAdapter.onClickFailedChatRetryBtn = { position ->
+			val item = (chatItemAdapter.currentList[position] as ChatItem.MyChat)
+			channelViewModel.onClickFailedChatRetryBtn(item.chatId)
 		}
 		chatItemAdapter.registerAdapterDataObserver(adapterDataObserver)
 

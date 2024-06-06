@@ -162,20 +162,25 @@ class StompHandlerImpl @Inject constructor(
 	private suspend fun retrySendFailedChats(channelId: Long) {
 		val retryRequiredChats = chatRepository.getFailedChats(channelId)
 			.filter { it.status == ChatStatus.RETRY_REQUIRED }.reversed()
-
 		for (chat in retryRequiredChats) {
-			runCatching {
-				stompSession.sendText(
-					destination = "${SEND_MESSAGE_DESTINATION}$channelId",
-					body = gson.toJson(
-						RequestSendChat(
-							receiptId = chat.chatId,
-							message = chat.message
-						)
+			retrySendMessage(chat.chatId)
+		}
+	}
+
+	//실패하면 실패상태로 둬야하는데 중간에 소켓 끊기면 다시 재전송 필요상태임
+	override suspend fun retrySendMessage(chatId: Long) {
+		val chat = chatRepository.getChat(chatId)
+		runCatching {
+			stompSession.sendText(
+				destination = "${SEND_MESSAGE_DESTINATION}${chat.chatRoomId}",
+				body = gson.toJson(
+					RequestSendChat(
+						receiptId = chat.chatId,
+						message = chat.message
 					)
 				)
-			}
-		}
+			)
+		}.onFailure { handleSocketError(caller = "retrySendMessage", it) }
 	}
 
 	override suspend fun disconnectSocket() {
