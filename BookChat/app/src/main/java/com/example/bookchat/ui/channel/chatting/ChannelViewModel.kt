@@ -326,12 +326,12 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	fun onStartScreen() {
-		if (uiState.value.channel?.isAvailableChannel != true) return
+		if (uiState.value.channel.isAvailableChannel.not()) return
 		onReconnection()
 	}
 
 	fun onStopScreen() {
-		if (uiState.value.channel?.isAvailableChannel != true) return
+		if (uiState.value.channel.isAvailableChannel.not()) return
 		disconnectSocket()
 		updateState { copy(socketState = SocketState.DISCONNECTED) }
 	}
@@ -406,9 +406,9 @@ class ChannelViewModel @Inject constructor(
 	//TODO : 홀릭스 / 카톡 버튼처럼 애니메이션으로 만들어보자
 	// 아래에 newChatNotice있을 땐 띄우지 않음 + 없을 때 스크롤 발생하면 띄우기
 	fun onChangeStateOfLookingAtBottom(isBottom: Boolean) {
-		//viewmodel업데이트  isLookingAtBottom
-		//isLookingAtBottom == true라면 아래로 가기 버튼 invisible
-		//isLookingAtBottom == false라면 아래로 가기 버튼 visible
+		val isLookingAtBottom = isBottom && uiState.value.isNewerChatFullyLoaded
+		if (uiState.value.isLookingAtBottom == isLookingAtBottom) return
+		updateState { copy(isLookingAtBottom = isLookingAtBottom) }
 	}
 
 	/** 리스트 상 내 채팅이 아닌 채팅 중 가장 최신 채팅이 화면 상에 나타나는 순간 호출 */
@@ -418,8 +418,8 @@ class ChannelViewModel @Inject constructor(
 		updateState { copy(newChatNotice = null) }
 	}
 
-	//TODO : UI 추가
-	private fun onClickScrollToBottom() {
+	fun onClickScrollToBottom() {
+		Log.d(TAG, "ChannelViewModel: onClickScrollToBottom() - called")
 		scrollToBottom()
 	}
 
@@ -429,7 +429,7 @@ class ChannelViewModel @Inject constructor(
 
 	//TODO : 캡처 기능 추가
 	fun onClickCaptureBtn() {
-		if (uiState.value.channel?.isAvailableChannel != true) return
+		if (uiState.value.channel.isAvailableChannel.not()) return
 //		startEvent(ChannelEvent.CaptureChannel)
 	}
 

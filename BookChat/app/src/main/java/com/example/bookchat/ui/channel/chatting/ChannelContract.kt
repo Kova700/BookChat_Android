@@ -25,21 +25,25 @@ data class ChannelUiState(
 	val newerChatsLoadState: LoadState, //UI 구분 필요 (프로그레스바 Item추가) (Stream참고)
 	val isOlderChatFullyLoaded: Boolean,
 	val isNewerChatFullyLoaded: Boolean,
+	val isLookingAtBottom: Boolean,
 ) {
+	val isPossibleToShowBottomScrollBtn
+		get() = isLookingAtBottom.not() && (newChatNotice == null)
+
 	val isPossibleToLoadOlderChat
 		get() = (olderChatsLoadState != LoadState.LOADING)
 						&& isOlderChatFullyLoaded.not()
 						&& socketState == SocketState.CONNECTED
-						&& channel?.isAvailableChannel == true
+						&& channel.isAvailableChannel
 
 	val isPossibleToLoadNewerChat
 		get() = (newerChatsLoadState != LoadState.LOADING)
 						&& isNewerChatFullyLoaded.not()
 						&& socketState == SocketState.CONNECTED
-						&& channel?.isAvailableChannel == true
+						&& channel.isAvailableChannel
 
 	val clientAuthority
-		get() = channel?.participantAuthorities?.get(client.id)
+		get() = channel.participantAuthorities?.get(client.id)
 			?: ChannelMemberAuthority.GUEST
 
 	val isClientHost
@@ -74,7 +78,8 @@ data class ChannelUiState(
 			olderChatsLoadState = LoadState.SUCCESS,
 			newerChatsLoadState = LoadState.SUCCESS,
 			isOlderChatFullyLoaded = false,
-			isNewerChatFullyLoaded = true
+			isNewerChatFullyLoaded = true,
+			isLookingAtBottom = true
 		)
 	}
 }

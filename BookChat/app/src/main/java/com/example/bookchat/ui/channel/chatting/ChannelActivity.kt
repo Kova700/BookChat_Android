@@ -111,11 +111,17 @@ class ChannelActivity : AppCompatActivity() {
 
 	private fun setViewState(uiState: ChannelUiState) {
 		setMessageBarState(uiState)
+		setBottomScrollBtnState(uiState)
 		setNewChatNoticeState(uiState)
 		setSocketConnectionUiState(uiState)
 		setExplodedChannelUiState(uiState)
 		setBannedClientUIState(uiState)
 		setChannelSettingBtnUiState(uiState)
+	}
+
+	private fun setBottomScrollBtnState(uiState: ChannelUiState) {
+		binding.chatBottomScrollBtn.visibility =
+			if (uiState.isPossibleToShowBottomScrollBtn) View.VISIBLE else View.GONE
 	}
 
 	private fun setSocketConnectionUiState(uiState: ChannelUiState) {
