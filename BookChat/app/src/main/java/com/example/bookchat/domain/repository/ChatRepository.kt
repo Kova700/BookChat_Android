@@ -52,13 +52,15 @@ interface ChatRepository {
 	): Long
 
 	suspend fun updateWaitingChat(
-		newChatId: Long,
-		dispatchTime: String,
-		status: Int,
-		targetChatId: Long,
+		newChat: Chat,
+		receiptId: Long,
 	)
 
-	suspend fun insertAllChats(chats: List<Chat>)
+	suspend fun insertAllChats(
+		channelId: Long,
+		chats: List<Chat>,
+	)
+
 	suspend fun deleteChannelAllChat(channelId: Long)
 
 	suspend fun getChat(chatId: Long): Chat
@@ -72,4 +74,5 @@ interface ChatRepository {
 		private const val DEFAULT_RETRY_MAX_ATTEMPTS = 5
 	}
 
+	suspend fun getFailedChats(channelId: Long): List<Chat>
 }

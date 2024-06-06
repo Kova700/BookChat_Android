@@ -422,15 +422,12 @@ class ChannelRepositoryImpl @Inject constructor(
 				)
 			}.onSuccess { response ->
 				channelDAO.upsertAllChannels(response.channels.toChannelEntity())
-				val chats = response.channels
-					.mapNotNull {
-						it.getLastChat(
-							clientId = clientRepository.getClientProfile().id
-						)
-					}
+				response.channels.forEach {
+					it.getLastChat(clientId = clientRepository.getClientProfile().id)
+						?.let { chat -> chatRepository.insertChat(chat) }
+				}
 				isEndPage = response.cursorMeta.last
 				currentPage = response.cursorMeta.nextCursorId
-				chatRepository.insertAllChats(chats)
 				val newChannels = response.channels.map { getChannelWithUpdatedData(it.roomId) }
 				setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
 				return

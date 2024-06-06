@@ -21,12 +21,16 @@ import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.domain.repository.UserRepository
 import com.example.bookchat.utils.Constants.TAG
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -38,9 +42,10 @@ import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.StompErrorFrameReceived
 import org.hildan.krossbow.stomp.StompSession
 import org.hildan.krossbow.stomp.WebSocketClosedUnexpectedly
+import org.hildan.krossbow.stomp.headers.StompSubscribeHeaders
 import org.hildan.krossbow.stomp.sendText
-import org.hildan.krossbow.stomp.subscribe
 import org.hildan.krossbow.websocket.WebSocketException
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.time.Duration.Companion.seconds
@@ -63,6 +68,7 @@ class StompHandlerImpl @Inject constructor(
 	private val _socketState = MutableStateFlow<SocketState>(SocketState.DISCONNECTED)
 
 	private val mutex = Mutex()
+	private val channelSubscriptionContext = Job() + Dispatchers.IO
 
 	override fun getSocketStateFlow(): StateFlow<SocketState> {
 		return _socketState.asStateFlow()
@@ -71,7 +77,7 @@ class StompHandlerImpl @Inject constructor(
 	/** 실패 시 지수백오프 커넥션 요청*/
 	override suspend fun connectSocket(
 		channel: Channel,
-		maxAttempts: Int
+		maxAttempts: Int,
 	) {
 		mutex.withLock {
 			if (_socketState.value == SocketState.CONNECTING
@@ -93,6 +99,7 @@ class StompHandlerImpl @Inject constructor(
 				stompSession = it
 				subscribeChannel(channel, maxAttempts)
 				return
+
 			}.onFailure { throwable ->
 				if ((throwable is ConnectionException) && haveTriedRenewingToken.not()) {
 					runCatching { clientRepository.renewBookChatToken() }
@@ -106,29 +113,41 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	/** LostReceiptException으로 실패 시에만 지수백오프 구독 요청 */
-	/** + 현재 라이브러리 사정상 소켓연결 여부를 확인할 수 없음으로 구독이 끊기면 disconnect 요청 */
+	/** + 현재 라이브러리 사정상 소켓 연결 여부를 확인할 수 없음으로 구독이 끊기면 disconnect 요청 */
 	private suspend fun subscribeChannel(
 		channel: Channel,
-		maxAttempts: Int
+		maxAttempts: Int,
 	) {
 		for (attempt in 0 until maxAttempts) {
 			Log.d(TAG, "StompHandlerImpl: subscribeChannel() - attempt : $attempt")
 
 			runCatching {
-				stompSession.subscribe("${SUBSCRIBE_CHANNEL_DESTINATION}${channel.roomSid}")
+				stompSession.subscribe(
+					StompSubscribeHeaders(
+						destination = "${SUBSCRIBE_CHANNEL_DESTINATION}${channel.roomSid}",
+						receipt = UUID.randomUUID().toString()
+					)
+				)
 			}.onSuccess { messagesFlow ->
 				_socketState.emit(SocketState.CONNECTED)
-				messagesFlow
-					.catch { handleSocketError("subscribeChannel", it) }
-					.map { it.bodyAsText.parseToSocketMessage() }
-					.collect { socketMessage ->
-						handleSocketMessage(
-							socketMessage = socketMessage,
-							channelId = channel.roomId
-						)
+				val channelSubscription =
+					CoroutineScope(channelSubscriptionContext).launch {
+						messagesFlow
+							.catch { handleSocketError("subscribeChannel", it) }
+							.map { it.bodyAsText.parseToSocketMessage() }
+							.collect { socketMessage ->
+								handleSocketMessage(
+									socketMessage = socketMessage,
+									channelId = channel.roomId
+								)
+							}
 					}
+				retrySendFailedChats(channel.roomId)
+				channelSubscription.join()
+
 				disconnectSocket()
 				return
+
 			}.onFailure { throwable ->
 				if (throwable !is LostReceiptException) {
 					_socketState.emit(SocketState.FAILURE)
@@ -140,6 +159,25 @@ class StompHandlerImpl @Inject constructor(
 		_socketState.emit(SocketState.FAILURE)
 	}
 
+	private suspend fun retrySendFailedChats(channelId: Long) {
+		val retryRequiredChats = chatRepository.getFailedChats(channelId)
+			.filter { it.status == ChatStatus.RETRY_REQUIRED }.reversed()
+
+		for (chat in retryRequiredChats) {
+			runCatching {
+				stompSession.sendText(
+					destination = "${SEND_MESSAGE_DESTINATION}$channelId",
+					body = gson.toJson(
+						RequestSendChat(
+							receiptId = chat.chatId,
+							message = chat.message
+						)
+					)
+				)
+			}
+		}
+	}
+
 	override suspend fun disconnectSocket() {
 		_socketState.emit(SocketState.DISCONNECTED)
 		Log.d(TAG, "StompHandlerImpl: disconnectSocket() - called")
@@ -147,11 +185,9 @@ class StompHandlerImpl @Inject constructor(
 			.onFailure { handleSocketError("disconnectSocket", it) }
 	}
 
-	/** 백엔드측의 receipt 헤더가 사라지는 오류가 있어서 임시로 LostReceiptException 무시
-	 * (+ 전송실패 시 재전송 로직이 있기때문에 따로 예외처리 X) */
 	override suspend fun sendMessage(
 		channelId: Long,
-		message: String
+		message: String,
 	) {
 		Log.d(
 			TAG,
@@ -183,13 +219,15 @@ class StompHandlerImpl @Inject constructor(
 					)
 				)
 			)
-		}
+		}.onFailure { handleSocketError(caller = "sendMessage", it) }
+
 	}
 
 	private suspend fun handleSocketMessage(
 		socketMessage: SocketMessage,
-		channelId: Long
+		channelId: Long,
 	) {
+		Log.d(TAG, "StompHandlerImpl: handleSocketMessage() - socketMessage :$socketMessage")
 		when (socketMessage) {
 			is CommonMessage -> handleCommonMessage(
 				socketMessage = socketMessage,
@@ -205,7 +243,7 @@ class StompHandlerImpl @Inject constructor(
 
 	private suspend fun handleCommonMessage(
 		socketMessage: CommonMessage,
-		channelId: Long
+		channelId: Long,
 	) {
 		Log.d(TAG, "StompHandlerImpl: handleCommonMessage() - ${socketMessage.message}")
 		val clientId = clientRepository.getClientProfile().id
@@ -218,7 +256,8 @@ class StompHandlerImpl @Inject constructor(
 		)
 
 		if (socketMessage.senderId == clientId) {
-			updateWaitingChatToSuccess(chat, receiptId)
+			Log.d(TAG, "StompHandlerImpl: handleCommonMessage() - called")
+			updateWaitingChat(chat, receiptId)
 			updateChannelLastChat(chat)
 			return
 		}
@@ -229,7 +268,7 @@ class StompHandlerImpl @Inject constructor(
 
 	private suspend fun handleNoticeMessage(
 		socketMessage: NotificationMessage,
-		channelId: Long
+		channelId: Long,
 	) {
 		val clientId = clientRepository.getClientProfile().id
 		val chat = socketMessage.toChat(
@@ -303,7 +342,7 @@ class StompHandlerImpl @Inject constructor(
 	private suspend fun insertWaitingChat(
 		channelId: Long,
 		message: String,
-		chatStatus: ChatStatus
+		chatStatus: ChatStatus,
 	): Long {
 		val clientId = clientRepository.getClientProfile().id
 		return chatRepository.insertWaitingChat(
@@ -314,12 +353,11 @@ class StompHandlerImpl @Inject constructor(
 		)
 	}
 
-	private suspend fun updateWaitingChatToSuccess(chat: Chat, receiptId: Long) {
+	private suspend fun updateWaitingChat(chat: Chat, receiptId: Long) {
+		Log.d(TAG, "StompHandlerImpl: updateWaitingChatToSuccess() - receiptId :$receiptId")
 		chatRepository.updateWaitingChat(
-			targetChatId = receiptId,
-			newChatId = chat.chatId,
-			dispatchTime = chat.dispatchTime,
-			status = ChatStatus.SUCCESS.code
+			newChat = chat,
+			receiptId = receiptId
 		)
 	}
 
@@ -331,8 +369,12 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	private fun getHeader(): Map<String, String> {
+		val uuid = UUID.randomUUID()
 		val bookchatToken = runBlocking { bookChatTokenRepository.getBookChatToken() }
-		return mapOf(AUTHORIZATION to "${bookchatToken?.accessToken}")
+		return mapOf(
+			AUTHORIZATION to "${bookchatToken?.accessToken}",
+			RECEIPT to uuid.toString()
+		)
 	}
 
 	private fun String.parseToSocketMessage(): SocketMessage {
@@ -386,6 +428,7 @@ class StompHandlerImpl @Inject constructor(
 
 	companion object {
 		private const val AUTHORIZATION = "Authorization"
+		private const val RECEIPT = "receipt"
 		private const val SEND_MESSAGE_DESTINATION = "/subscriptions/send/chatrooms/"
 		private const val SUBSCRIBE_CHANNEL_DESTINATION = "/topic/"
 		private val DEFAULT_CONNECTION_ATTEMPT_DELAY_TIME = 1.seconds

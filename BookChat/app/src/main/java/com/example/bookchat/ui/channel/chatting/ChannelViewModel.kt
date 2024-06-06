@@ -81,9 +81,9 @@ class ChannelViewModel @Inject constructor(
 	//TODO :
 	// 3. 인터넷 재연결되면 소켓 재연결 트리거
 	// 4. 소켓 재연결되면 RETRY_REQUIRED인 애들은 일괄 전송
-	// 5. 유저 리스트 , 채팅 리스트 방장 부방장 권한 반영 + 현재 권한에 따른 UI 구분
 	// 6. Notice타입의 NewChatNotice UI
 	// 7. Bottom 이동 버튼 UI
+	// 8. 소켓 재연결 아직 불안정함 (+ 실패 상태라도 메세지 전송같은 트리거가 있다면 다시 연결시도 하는 것도 괜찮을 듯)
 
 	init {
 		initUiState()
@@ -198,9 +198,6 @@ class ChannelViewModel @Inject constructor(
 		}
 	}
 
-	//TODO : 소켓 리커넥션 혹은 연결 성공후 채팅 가져올 때,
-	// RETRY_REQUIRED인 애들은 일괄 전송,
-	// LOADING인 애들은 FAILURE처리 (waiting시 소켓 끊긴 경우 재전송으로 인한 중복 전송 방지)
 	private fun onChannelConnected() {
 		if (uiState.value.isFirstConnection) {
 			getFirstChats()
@@ -216,6 +213,7 @@ class ChannelViewModel @Inject constructor(
 		val newestChats = getNewestChats().await() ?: emptyList()
 		if (uiState.value.needToScrollToLastReadChat.not()) return@launch
 		val originalLastReadChatId = uiState.value.originalLastReadChatId ?: return@launch
+
 		val shouldCallGetChatsAroundId =
 			newestChats.map(Chat::chatId).contains(originalLastReadChatId).not()
 		if (shouldCallGetChatsAroundId) getChatsAroundId(originalLastReadChatId)
@@ -287,12 +285,15 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun sendMessage() {
-		if (uiState.value.channel?.isAvailableChannel != true) return
+		if (uiState.value.channel.isAvailableChannel.not()) return
+		if (uiState.value.socketState != SocketState.CONNECTED) onReconnection()
+
 		val message = uiState.value.enteredMessage
 		if (message.isBlank()) return
 
 		updateState { copy(enteredMessage = "") }
 		clearTempSavedMessage()
+
 		viewModelScope.launch {
 			runCatching {
 				stompHandler.sendMessage(
@@ -344,7 +345,8 @@ class ChannelViewModel @Inject constructor(
 
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트간의 채팅 불일치 동기화 */
 	private fun syncChats(channelId: Long) = viewModelScope.launch {
-		syncChannelChatsUseCase(channelId)
+		runCatching { syncChannelChatsUseCase(channelId) }
+			.onFailure { handleError(it) }
 	}
 
 	//TODO : 인터넷(WIFI, Data)연결되면 해당 함수 trigger되어야함
@@ -404,7 +406,6 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	//TODO : 홀릭스 / 카톡 버튼처럼 애니메이션으로 만들어보자
-	// 아래에 newChatNotice있을 땐 띄우지 않음 + 없을 때 스크롤 발생하면 띄우기
 	fun onChangeStateOfLookingAtBottom(isBottom: Boolean) {
 		val isLookingAtBottom = isBottom && uiState.value.isNewerChatFullyLoaded
 		if (uiState.value.isLookingAtBottom == isLookingAtBottom) return
@@ -419,7 +420,6 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	fun onClickScrollToBottom() {
-		Log.d(TAG, "ChannelViewModel: onClickScrollToBottom() - called")
 		scrollToBottom()
 	}
 
@@ -458,7 +458,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	//TODO : 예외처리 분기 추가해야함 (대부분이 현재 세션 연결 취소 후 다시 재연결 해야 함)
-	private suspend fun handleError(throwable: Throwable, caller: String = "기본") {
+	private fun handleError(throwable: Throwable, caller: String = "기본") {
 		Log.d(TAG, "ChannelViewModel: handleError(caller : $caller) - throwable: $throwable")
 		updateState { copy(uiState = UiState.ERROR) }
 		when (throwable) {

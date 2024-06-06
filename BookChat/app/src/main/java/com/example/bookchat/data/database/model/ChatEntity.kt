@@ -23,6 +23,9 @@ data class ChatEntity(
 	@ColumnInfo(name = "message") val message: String,
 	@ColumnInfo(name = "chat_type") val chatType: ChatType,
 	@ColumnInfo(name = "status") val status: Int = ChatStatus.SUCCESS.code,
-)
+){
+	val isRetryRequired
+		get() = status == ChatStatus.RETRY_REQUIRED.code
+}
 
 const val CHAT_ENTITY_TABLE_NAME = "Chat"
