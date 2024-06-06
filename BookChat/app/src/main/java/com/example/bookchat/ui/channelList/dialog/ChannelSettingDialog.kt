@@ -18,11 +18,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ChannelSettingDialog(
 	private val channel: ChannelListItem.ChannelItem,
-	private val onClickMuteBtn: () -> Unit,
-	private val onClickUnMuteBtn: () -> Unit,
-	private val onClickTopPinBtn: () -> Unit,
-	private val onClickUnPinBtn: () -> Unit,
 	private val onClickOkExitBtn: () -> Unit,
+	private val onClickMuteRelatedBtn: () -> Unit,
+	private val onClickTopPinRelatedBtn: () -> Unit,
 ) : DialogFragment() {
 	private var _binding: DialogChannelSettingBinding? = null
 	private val binding get() = _binding!!
@@ -56,14 +54,12 @@ class ChannelSettingDialog(
 	}
 
 	fun onClickMuteBtn() {
-		if (channel.notificationFlag) onClickMuteBtn.invoke()
-		else onClickUnMuteBtn.invoke()
+		onClickMuteRelatedBtn.invoke()
 		dismiss()
 	}
 
 	fun onClickTopPinBtn() {
-		if (channel.isTopPined) onClickUnPinBtn.invoke()
-		else onClickTopPinBtn.invoke()
+		onClickTopPinRelatedBtn.invoke()
 		dismiss()
 	}
 

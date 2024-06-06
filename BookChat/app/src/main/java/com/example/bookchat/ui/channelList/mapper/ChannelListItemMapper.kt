@@ -26,7 +26,7 @@ fun ChannelListItem.ChannelItem.toChannel(): Channel {
 	)
 }
 
-fun Channel.toChannelListItem(): ChannelListItem.ChannelItem {
+fun Channel.toChannelListItem(isSwiped: Boolean): ChannelListItem.ChannelItem {
 	return ChannelListItem.ChannelItem(
 		roomId = roomId,
 		roomName = roomName,
@@ -46,6 +46,20 @@ fun Channel.toChannelListItem(): ChannelListItem.ChannelItem {
 		roomCapacity = roomCapacity,
 		bookTitle = bookTitle,
 		bookAuthors = bookAuthors,
-		bookCoverImageUrl = bookCoverImageUrl
+		bookCoverImageUrl = bookCoverImageUrl,
+		isSwiped = isSwiped
 	)
+}
+
+fun List<Channel>.toChannelListItem(isSwipedMap: Map<Long, Boolean>): List<ChannelListItem> {
+	val groupedItems = mutableListOf<ChannelListItem>()
+	if (this.isEmpty()) return groupedItems
+
+	groupedItems.add(ChannelListItem.Header)
+	groupedItems.addAll(
+		this.map {
+			it.toChannelListItem(isSwipedMap[it.roomId] ?: false)
+		}
+	)
+	return groupedItems
 }

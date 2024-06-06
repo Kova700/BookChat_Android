@@ -38,6 +38,7 @@ sealed interface ChannelListItem {
 		val bookTitle: String? = null,
 		val bookAuthors: List<String>? = null,
 		val bookCoverImageUrl: String? = null,
+		val isSwiped: Boolean = false,
 	) : ChannelListItem {
 
 		val isTopPined

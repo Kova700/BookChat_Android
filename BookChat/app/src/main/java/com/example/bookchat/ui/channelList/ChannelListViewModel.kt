@@ -3,7 +3,6 @@ package com.example.bookchat.ui.channelList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
-import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.ui.channelList.ChannelListUiState.UiState
 import com.example.bookchat.ui.channelList.mapper.toChannelListItem
@@ -13,7 +12,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,24 +28,17 @@ class ChannelListViewModel @Inject constructor(
 	private val _uiStateFlow = MutableStateFlow<ChannelListUiState>(ChannelListUiState.DEFAULT)
 	val uiStateFlow = _uiStateFlow.asStateFlow()
 
+	private val _isSwiped = MutableStateFlow<Map<Long, Boolean>>(emptyMap()) //(channelId, Boolean)
+
 	init {
 		observeChannels()
 		getChannels() //TODO : 인터넷 끊겨있다가 인터넷 연결되면 매번 다시 호출 Trigger
 	}
 
 	private fun observeChannels() = viewModelScope.launch {
-		channelRepository.getChannelsFlow().map { groupItems(it) }
-			.collect { newChannels -> updateState { copy(channelListItem = newChannels) } }
-	}
-
-	//TODO : Mapper로 이전
-	private fun groupItems(channels: List<Channel>): List<ChannelListItem> {
-		val groupedItems = mutableListOf<ChannelListItem>()
-		if (channels.isEmpty()) return groupedItems
-
-		groupedItems.add(ChannelListItem.Header)
-		groupedItems.addAll(channels.map { it.toChannelListItem() })
-		return groupedItems
+		_isSwiped.combine(channelRepository.getChannelsFlow()) { isSwiped, channels ->
+			channels.toChannelListItem(isSwiped)
+		}.collect { updateState { copy(channelListItem = it) } }
 	}
 
 	private fun getChannels() = viewModelScope.launch {
@@ -65,18 +57,22 @@ class ChannelListViewModel @Inject constructor(
 
 	private fun muteChannel(channelId: Long) = viewModelScope.launch {
 		runCatching { channelRepository.muteChannel(channelId) }
+			.onSuccess { _isSwiped.update { _isSwiped.value + (channelId to false) } }
 	}
 
 	private fun unMuteChannel(channelId: Long) = viewModelScope.launch {
 		runCatching { channelRepository.unMuteChannel(channelId) }
+			.onSuccess { _isSwiped.update { _isSwiped.value + (channelId to false) } }
 	}
 
 	private fun topPinChannel(channelId: Long) = viewModelScope.launch {
 		runCatching { channelRepository.topPinChannel(channelId) }
+			.onSuccess { _isSwiped.update { _isSwiped.value + (channelId to false) } }
 	}
 
 	private fun unPinChannel(channelId: Long) = viewModelScope.launch {
 		runCatching { channelRepository.unPinChannel(channelId) }
+			.onSuccess { _isSwiped.update { _isSwiped.value + (channelId to false) } }
 	}
 
 	private fun exitChannel(channelId: Long) = viewModelScope.launch {
@@ -96,20 +92,18 @@ class ChannelListViewModel @Inject constructor(
 		startEvent(ChannelListUiEvent.ShowChannelSettingDialog(channel))
 	}
 
-	fun onClickChannelMute(channelId: Long) {
-		muteChannel(channelId)
+	fun onSwipeChannelItem(channel: ChannelListItem.ChannelItem, isSwiped: Boolean) {
+		_isSwiped.update { _isSwiped.value + (channel.roomId to isSwiped) }
 	}
 
-	fun onClickChannelUnMute(channelId: Long) {
-		unMuteChannel(channelId)
+	fun onClickMuteRelatedBtn(channel: ChannelListItem.ChannelItem) {
+		if (channel.notificationFlag) muteChannel(channel.roomId)
+		else unMuteChannel(channel.roomId)
 	}
 
-	fun onClickChannelTopPin(channelId: Long) {
-		topPinChannel(channelId)
-	}
-
-	fun onClickChannelUnPin(channelId: Long) {
-		unPinChannel(channelId)
+	fun onClickTopPinRelatedBtn(channel: ChannelListItem.ChannelItem) {
+		if (channel.isTopPined) unPinChannel(channel.roomId)
+		else topPinChannel(channel.roomId)
 	}
 
 	fun onClickChannelExit(channelId: Long) {

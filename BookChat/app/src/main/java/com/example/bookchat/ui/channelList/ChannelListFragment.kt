@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
@@ -32,6 +33,9 @@ class ChannelListFragment : Fragment() {
 
 	@Inject
 	lateinit var channelListAdapter: ChannelListAdapter
+
+	@Inject
+	lateinit var channelListIItemSwipeHelper: ChannelListIItemSwipeHelper
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -72,15 +76,25 @@ class ChannelListFragment : Fragment() {
 	private fun initAdapter() {
 		//TODO : long Click :채팅방 상단고정, 알림 끄기 설정 가능한 다이얼로그
 		//TODO : Swipe : 상단고정, 알림 끄기 UI 노출
-		channelListAdapter.onItemClick = { itemPosition ->
-			channelListViewModel.onClickChannelItem(
-				(channelListAdapter.currentList[itemPosition] as ChannelListItem.ChannelItem).roomId
-			)
+		channelListAdapter.onSwipe = { position, isSwiped ->
+			val item = channelListAdapter.currentList[position] as ChannelListItem.ChannelItem
+			channelListViewModel.onSwipeChannelItem(item, isSwiped)
 		}
-		channelListAdapter.onItemLongClick = { itemPosition ->
-			channelListViewModel.onLongClickChannelItem(
-				(channelListAdapter.currentList[itemPosition] as ChannelListItem.ChannelItem)
-			)
+		channelListAdapter.onClick = { position ->
+			val item = (channelListAdapter.currentList[position] as ChannelListItem.ChannelItem)
+			channelListViewModel.onClickChannelItem(item.roomId)
+		}
+		channelListAdapter.onLongClick = { position ->
+			val item = (channelListAdapter.currentList[position] as ChannelListItem.ChannelItem)
+			channelListViewModel.onLongClickChannelItem(item)
+		}
+		channelListAdapter.onClickMuteRelatedBtn = { position ->
+			val item = channelListAdapter.currentList[position] as ChannelListItem.ChannelItem
+			channelListViewModel.onClickMuteRelatedBtn(item)
+		}
+		channelListAdapter.onClickTopPinRelatedBtn = { position ->
+			val item = channelListAdapter.currentList[position] as ChannelListItem.ChannelItem
+			channelListViewModel.onClickTopPinRelatedBtn(item)
 		}
 	}
 
@@ -99,8 +113,14 @@ class ChannelListFragment : Fragment() {
 			adapter = channelListAdapter
 			setHasFixedSize(true)
 			layoutManager = linearLayoutManager
+			initSwipeHelper(this)
 			addOnScrollListener(rcvScrollListener)
 		}
+	}
+
+	private fun initSwipeHelper(recyclerView: RecyclerView) {
+		val itemTouchHelper = ItemTouchHelper(channelListIItemSwipeHelper)
+		itemTouchHelper.attachToRecyclerView(recyclerView)
 	}
 
 	private fun moveToChannel(channelId: Long) {
@@ -125,11 +145,9 @@ class ChannelListFragment : Fragment() {
 
 		val dialog = ChannelSettingDialog(
 			channel = channel,
-			onClickMuteBtn = { channelListViewModel.onClickChannelMute(channel.roomId) },
-			onClickUnMuteBtn = { channelListViewModel.onClickChannelUnMute(channel.roomId) },
-			onClickTopPinBtn = { channelListViewModel.onClickChannelTopPin(channel.roomId) },
-			onClickUnPinBtn = { channelListViewModel.onClickChannelUnPin(channel.roomId) },
-			onClickOkExitBtn = { channelListViewModel.onClickChannelExit(channel.roomId) }
+			onClickOkExitBtn = { channelListViewModel.onClickChannelExit(channel.roomId) },
+			onClickMuteRelatedBtn = { channelListViewModel.onClickMuteRelatedBtn(channel) },
+			onClickTopPinRelatedBtn = { channelListViewModel.onClickTopPinRelatedBtn(channel) },
 		)
 		dialog.show(childFragmentManager, DIALOG_TAG_CHANNEL_SETTING)
 	}
