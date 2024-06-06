@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.agonyrecord
+package com.example.bookchat.ui.agony.agonyrecord
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -8,14 +8,13 @@ import com.example.bookchat.domain.model.Agony
 import com.example.bookchat.domain.model.AgonyRecord
 import com.example.bookchat.domain.repository.AgonyRecordRepository
 import com.example.bookchat.domain.repository.AgonyRepository
-import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.agony.AgonyActivity
-import com.example.bookchat.ui.agonyrecord.AgonyRecordeUiState.UiState
-import com.example.bookchat.ui.agonyrecord.mapper.toAgonyRecord
-import com.example.bookchat.ui.agonyrecord.mapper.toAgonyRecordListItem
-import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
-import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem.Companion.FIRST_ITEM_STABLE_ID
-import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem.ItemState
+import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordeUiState.UiState
+import com.example.bookchat.ui.agony.agonyrecord.mapper.toAgonyRecord
+import com.example.bookchat.ui.agony.agonyrecord.mapper.toAgonyRecordListItem
+import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
+import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem.Companion.FIRST_ITEM_STABLE_ID
+import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem.ItemState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,14 +28,11 @@ import javax.inject.Inject
 @HiltViewModel
 class AgonyRecordViewModel @Inject constructor(
 	private val agonyRecordRepository: AgonyRecordRepository,
-	private val bookShelfRepository: BookShelfRepository,
 	private val agonyRepository: AgonyRepository,
 	private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-	private val bookShelfListItemId =
-		savedStateHandle.get<Long>(AgonyActivity.EXTRA_BOOKSHELF_ID) ?: -1L
-	private val agonyId =
-		savedStateHandle.get<Long>(AgonyActivity.EXTRA_AGONY_ID) ?: -1L
+	private val bookShelfListItemId = savedStateHandle.get<Long>(AgonyActivity.EXTRA_BOOKSHELF_ID)!!
+	private val agonyId = savedStateHandle.get<Long>(AgonyActivity.EXTRA_AGONY_ID)!!
 
 	private val _eventFlow = MutableSharedFlow<AgonyRecordEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
@@ -53,7 +49,9 @@ class AgonyRecordViewModel @Inject constructor(
 
 	private fun observeAgonyRecords() = viewModelScope.launch {
 		combine(
-			agonyRecordRepository.getAgonyRecordsFlow(), agonyRepository.getAgonyFlow(agonyId), _itemState
+			agonyRecordRepository.getAgonyRecordsFlow(true),
+			agonyRepository.getAgonyFlow(agonyId),
+			_itemState
 		) { records, agony, stateMap -> groupItems(records, agony, stateMap) }
 			.collect { newRecords -> updateState { copy(records = newRecords) } }
 	}
@@ -119,7 +117,7 @@ class AgonyRecordViewModel @Inject constructor(
 	private fun reviseAgonyRecord(
 		recordItem: AgonyRecordListItem.Item,
 		newTitle: String,
-		newContent: String
+		newContent: String,
 	) = viewModelScope.launch {
 		_itemState.update { _itemState.value + (recordItem.recordId to ItemState.Loading) }
 		updateState { copy(isEditing = true) }
@@ -135,13 +133,12 @@ class AgonyRecordViewModel @Inject constructor(
 			.onSuccess {
 				_itemState.update { _itemState.value + (recordItem.recordId to ItemState.Success()) }
 				updateState { copy(isEditing = false) }
-				startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_revise_success))
 			}
 			.onFailure { startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_revise_fail)) }
 	}
 
 	private fun deleteAgonyRecord(
-		recordItem: AgonyRecordListItem.Item
+		recordItem: AgonyRecordListItem.Item,
 	) = viewModelScope.launch {
 		runCatching {
 			agonyRecordRepository.deleteAgonyRecord(
@@ -152,7 +149,6 @@ class AgonyRecordViewModel @Inject constructor(
 		}
 			.onSuccess {
 				_itemState.update { _itemState.value - recordItem.recordId }
-				startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_delete_success))
 			}
 			.onFailure { startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_delete_fail)) }
 	}

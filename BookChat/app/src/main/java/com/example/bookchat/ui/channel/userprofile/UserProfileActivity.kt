@@ -61,9 +61,13 @@ class UserProfileActivity : AppCompatActivity() {
 	}
 
 	private fun showUserBanDialog() {
-		val dialog = UserBanWarningDialog {
-			userProfileViewModel.onClickUserBanDialogBtn()
-		}
+		val existingFragment =
+			supportFragmentManager.findFragmentByTag(DIALOG_TAG_USER_BAN_WARNING)
+		if (existingFragment != null) return
+
+		val dialog = UserBanWarningDialog(
+			onClickOkBtn = { userProfileViewModel.onClickUserBanDialogBtn() }
+		)
 		dialog.show(supportFragmentManager, DIALOG_TAG_USER_BAN_WARNING)
 	}
 

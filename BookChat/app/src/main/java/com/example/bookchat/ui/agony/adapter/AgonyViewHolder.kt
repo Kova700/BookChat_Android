@@ -7,14 +7,20 @@ import com.example.bookchat.databinding.ItemAgonyDataEditingBinding
 import com.example.bookchat.databinding.ItemAgonyFirstBinding
 import com.example.bookchat.databinding.ItemAgonyHeaderBinding
 import com.example.bookchat.ui.agony.model.AgonyListItem
+import com.example.bookchat.utils.BookImgSizeManager
 
 sealed class AgonyViewHolder(binding: ViewBinding) : RecyclerView.ViewHolder(binding.root) {
 	abstract fun bind(agonyListItem: AgonyListItem)
 }
 
 class AgonyHeaderItemViewHolder(
-	private val binding: ItemAgonyHeaderBinding
+	private val binding: ItemAgonyHeaderBinding,
+	private val bookImgSizeManager: BookImgSizeManager,
 ) : AgonyViewHolder(binding) {
+	init {
+		bookImgSizeManager.setBookImgSize(binding.bookImg)
+	}
+
 	override fun bind(agonyListItem: AgonyListItem) {
 		binding.bookShelfItem = (agonyListItem as AgonyListItem.Header).bookShelfItem
 	}
@@ -35,7 +41,7 @@ class AgonyFirstItemViewHolder(
 
 class AgonyDataItemViewHolder(
 	private val binding: ItemAgonyDataBinding,
-	private val onItemClick: ((Int) -> Unit)?
+	private val onItemClick: ((Int) -> Unit)?,
 ) : AgonyViewHolder(binding) {
 	init {
 		binding.root.setOnClickListener {

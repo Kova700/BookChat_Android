@@ -3,6 +3,8 @@ package com.example.bookchat.data.repository
 import com.example.bookchat.data.mapper.toAgonyRecord
 import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.network.BookChatApi
+import com.example.bookchat.data.network.model.request.RequestMakeAgonyRecord
+import com.example.bookchat.data.network.model.request.RequestReviseAgonyRecord
 import com.example.bookchat.domain.model.AgonyRecord
 import com.example.bookchat.domain.model.SearchSortOption
 import com.example.bookchat.domain.repository.AgonyRecordRepository
@@ -13,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class AgonyRecordRepositoryImpl @Inject constructor(
-	private val bookChatApi: BookChatApi
+	private val bookChatApi: BookChatApi,
 ) : AgonyRecordRepository {
 
 	private val mapAgonyRecords =
@@ -26,22 +28,27 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 	private var currentPage: Long? = null
 	private var isEndPage = false
 
-	override fun getAgonyRecordsFlow(): Flow<List<AgonyRecord>> {
+	override fun getAgonyRecordsFlow(initFlag: Boolean): Flow<List<AgonyRecord>> {
+		if (initFlag) clearCachedData()
 		return records
+	}
+
+	private fun setAgonyRecords(newAgonyRecords: Map<Long, AgonyRecord>) {
+		mapAgonyRecords.update { newAgonyRecords }
 	}
 
 	override suspend fun getAgonyRecords(
 		bookShelfId: Long,
 		agonyId: Long,
 		size: Int,
-		sort: SearchSortOption
+		sort: SearchSortOption,
 	) {
 		if (cachedAgonyId != agonyId) {
 			clearCachedData()
 		}
 		if (isEndPage) return
 
-		val response = bookChatApi.getAgonyRecord(
+		val response = bookChatApi.getAgonyRecords(
 			bookShelfId = bookShelfId,
 			agonyId = agonyId,
 			postCursorId = currentPage,
@@ -54,26 +61,65 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 		currentPage = response.cursorMeta.nextCursorId
 
 		val newRecords = response.agonyRecordResponseList.toAgonyRecord()
-		mapAgonyRecords.update { mapAgonyRecords.value + newRecords.associateBy { it.recordId } }
+		setAgonyRecords(mapAgonyRecords.value + newRecords.associateBy { it.recordId })
 	}
 
 	private fun clearCachedData() {
-		mapAgonyRecords.update { emptyMap() }
+		setAgonyRecords(emptyMap())
 		cachedAgonyId = -1
 		currentPage = null
 		isEndPage = false
 	}
 
-	//TODO : 생성된 객체 필요
+	override suspend fun getAgonyRecord(
+		bookShelfId: Long,
+		agonyId: Long,
+		recordId: Long,
+	): AgonyRecord {
+		val agonyRecord = mapAgonyRecords.value[recordId]
+			?: getOnlineAgonyRecord(
+				bookShelfId = bookShelfId,
+				agonyId = agonyId,
+				recordId = recordId
+			)
+		setAgonyRecords(mapAgonyRecords.value + (agonyRecord.recordId to agonyRecord))
+		return agonyRecord
+	}
+
+	private suspend fun getOnlineAgonyRecord(
+		bookShelfId: Long,
+		agonyId: Long,
+		recordId: Long,
+	): AgonyRecord {
+		return bookChatApi.getAgonyRecord(
+			bookShelfId = bookShelfId,
+			agonyId = agonyId,
+			recordId = recordId
+		).toAgonyRecord()
+	}
+
 	override suspend fun makeAgonyRecord(
 		bookShelfId: Long,
 		agonyId: Long,
 		title: String,
-		content: String
-	) {
-		val requestMakeAgonyRecord =
-			com.example.bookchat.data.network.model.request.RequestMakeAgonyRecord(title, content)
-		bookChatApi.makeAgonyRecord(bookShelfId, agonyId, requestMakeAgonyRecord)
+		content: String,
+	): AgonyRecord {
+		val requestMakeAgonyRecord = RequestMakeAgonyRecord(title, content)
+		val response = bookChatApi.makeAgonyRecord(
+			bookShelfId = bookShelfId,
+			agonyId = agonyId,
+			requestMakeAgonyRecord = requestMakeAgonyRecord
+		)
+
+		val createdAgonyRecordId = response.headers()["Location"]
+			?.split("/")?.last()?.toLong()
+			?: throw Exception("AgonyRecordId does not exist in Http header.")
+
+		return getAgonyRecord(
+			bookShelfId = bookShelfId,
+			agonyId = agonyId,
+			recordId = createdAgonyRecordId
+		)
 	}
 
 	override suspend fun reviseAgonyRecord(
@@ -81,10 +127,9 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 		agonyId: Long,
 		agonyRecord: AgonyRecord,
 		newTitle: String,
-		newContent: String
+		newContent: String,
 	) {
-		val requestReviseAgonyRecord =
-			com.example.bookchat.data.network.model.request.RequestReviseAgonyRecord(newTitle, newContent)
+		val requestReviseAgonyRecord = RequestReviseAgonyRecord(newTitle, newContent)
 		bookChatApi.reviseAgonyRecord(
 			bookShelfId,
 			agonyId,
@@ -97,16 +142,16 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 			content = newContent,
 			createdAt = agonyRecord.createdAt
 		)
-		mapAgonyRecords.update { mapAgonyRecords.value + (agonyRecord.recordId to newRecord) }
+		setAgonyRecords(mapAgonyRecords.value + (agonyRecord.recordId to newRecord))
 	}
 
 	override suspend fun deleteAgonyRecord(
 		bookShelfId: Long,
 		agonyId: Long,
-		recordId: Long
+		recordId: Long,
 	) {
 		bookChatApi.deleteAgonyRecord(bookShelfId, agonyId, recordId)
-		mapAgonyRecords.update { mapAgonyRecords.value - recordId }
+		setAgonyRecords(mapAgonyRecords.value - recordId)
 	}
 
 }

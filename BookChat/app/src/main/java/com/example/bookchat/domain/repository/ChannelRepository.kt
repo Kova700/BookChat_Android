@@ -45,6 +45,22 @@ interface ChannelRepository {
 		channelId: Long,
 	)
 
+	suspend fun muteChannel(
+		channelId: Long,
+	)
+
+	suspend fun unMuteChannel(
+		channelId: Long,
+	)
+
+	suspend fun topPinChannel(
+		channelId: Long,
+	)
+
+	suspend fun unPinChannel(
+		channelId: Long,
+	)
+
 	suspend fun enterChannel(channel: Channel)
 	suspend fun enterChannelMember(
 		channelId: Long,

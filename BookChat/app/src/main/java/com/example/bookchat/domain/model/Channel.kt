@@ -22,6 +22,9 @@ data class Channel(
 	val bookAuthors: List<String>? = null,
 	val bookCoverImageUrl: String? = null,
 ) {
+	val isTopPined
+		get() = topPinNum != 0
+
 	val isExistNewChat
 		get() = when {
 			lastReadChatId == null -> false

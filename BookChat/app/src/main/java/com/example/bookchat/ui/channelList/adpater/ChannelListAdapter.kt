@@ -15,7 +15,11 @@ import javax.inject.Inject
 //TODO : Swipe : 상단고정, 알림 끄기 UI 노출
 class ChannelListAdapter @Inject constructor() :
 	ListAdapter<ChannelListItem, ChannelListItemViewHolder>(CHANNEL_LIST_ITEM_COMPARATOR) {
-	var onItemClick: ((Int) -> Unit)? = null
+	var onSwipe: ((Int, Boolean) -> Unit)? = null
+	var onClick: ((Int) -> Unit)? = null
+	var onLongClick: ((Int) -> Unit)? = null
+	var onClickMuteRelatedBtn: ((Int) -> Unit)? = null
+	var onClickTopPinRelatedBtn: ((Int) -> Unit)? = null
 
 	override fun getItemViewType(position: Int): Int {
 		return when (getItem(position)) {
@@ -39,7 +43,14 @@ class ChannelListAdapter @Inject constructor() :
 					LayoutInflater.from(parent.context), R.layout.item_channel_list_data,
 					parent, false
 				)
-				return ChannelListDataViewHolder(binding, onItemClick)
+				return ChannelListDataViewHolder(
+					binding = binding,
+					onItemSwipe = onSwipe,
+					onItemClick = onClick,
+					onItemLongClick = onLongClick,
+					onItemMuteClick = onClickMuteRelatedBtn,
+					onItemTopPinClick = onClickTopPinRelatedBtn,
+				)
 			}
 
 			else -> throw Exception("unknown ViewHolder Type")

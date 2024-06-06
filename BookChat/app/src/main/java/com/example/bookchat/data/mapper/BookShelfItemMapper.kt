@@ -4,6 +4,8 @@ import com.example.bookchat.data.network.model.response.BookShelfItemResponse
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.model.BookShelfState
+import com.example.bookchat.utils.DateManager
+import java.util.Date
 
 fun BookShelfItemResponse.toDomain(
 	state: BookShelfState,
@@ -20,6 +22,7 @@ fun BookShelfItemResponse.toDomain(
 		),
 		pages = pages,
 		star = star,
-		state = state
+		state = state,
+		lastUpdatedAt = lastUpdatedAt.let { DateManager.stringToDate(it) } ?: Date()
 	)
 }

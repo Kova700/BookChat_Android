@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.agony
+package com.example.bookchat.ui.agony.makeagony
 
 import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem

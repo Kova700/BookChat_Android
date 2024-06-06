@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.agonyrecord.adapter
+package com.example.bookchat.ui.agony.agonyrecord.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,7 +9,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemAgonyRecordDataBinding
 import com.example.bookchat.databinding.ItemAgonyRecordFirstBinding
 import com.example.bookchat.databinding.ItemAgonyRecordHeaderBinding
-import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
+import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
 import javax.inject.Inject
 
 class AgonyRecordAdapter @Inject constructor() :

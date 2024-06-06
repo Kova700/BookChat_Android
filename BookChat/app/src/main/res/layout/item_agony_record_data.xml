@@ -6,7 +6,7 @@
 
         <variable
             name="record"
-            type="com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem.Item" />
+            type="com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem.Item" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

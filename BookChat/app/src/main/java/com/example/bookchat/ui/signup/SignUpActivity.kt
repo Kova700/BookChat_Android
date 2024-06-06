@@ -21,6 +21,7 @@ import com.example.bookchat.databinding.ActivitySignUpBinding
 import com.example.bookchat.domain.model.NicknameCheckState
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROPPED_PROFILE_BYTE_ARRAY
+import com.example.bookchat.ui.signup.selecttaste.SelectTasteActivity
 import com.example.bookchat.utils.PermissionManager
 import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint

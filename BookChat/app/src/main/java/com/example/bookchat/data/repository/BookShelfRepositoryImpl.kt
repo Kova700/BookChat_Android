@@ -4,6 +4,7 @@ import com.example.bookchat.data.mapper.toBookRequest
 import com.example.bookchat.data.mapper.toDomain
 import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.network.BookChatApi
+import com.example.bookchat.data.network.model.request.RequestChangeBookStatus
 import com.example.bookchat.data.network.model.request.RequestRegisterBookShelfBook
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.BookShelfItem
@@ -23,14 +24,16 @@ import javax.inject.Inject
 
 //TODO : DB적용 후, ROOM에서 Flow로 가저오도록 수정
 class BookShelfRepositoryImpl @Inject constructor(
-	private val bookChatApi: BookChatApi
+	private val bookChatApi: BookChatApi,
 ) : BookShelfRepository {
 	private val mapBookShelfItems =
 		MutableStateFlow<Map<Long, BookShelfItem>>(mapOf()) //(ItemId, Item)
 
-	//TODO : totalItemCount 추후 수정 (불필요한 로직 Too much)
 	private val totalItemCount =
-		MutableStateFlow<Map<BookShelfState, Int>>(mapOf()) //(bookshelfState, totalCount)
+		mapBookShelfItems.map { itemsMap ->
+			itemsMap.values.groupBy { it.state }
+				.mapValues { (bookShelfState, items) -> items.size }
+		}
 
 	private val currentPages: MutableMap<BookShelfState, Long> = mutableMapOf()
 	private var isEndPages: MutableMap<BookShelfState, Boolean> = mutableMapOf()
@@ -39,15 +42,22 @@ class BookShelfRepositoryImpl @Inject constructor(
 		return mapBookShelfItems.map { items ->
 			items.values.toList()
 				.filter { it.state == bookShelfState }
-				//TODO :dispatchTime 같은 정렬 요소가 필요함
-				.sortedWith(compareBy { bookshelfItem -> -bookshelfItem.bookShelfId })
+				//ORDER BY last_updated_at DESC, bookshelf_id DESC
+				.sortedWith(compareBy(
+					{ bookshelfItem -> bookshelfItem.lastUpdatedAt.time.unaryMinus() },
+					{ bookshelfItem -> bookshelfItem.bookShelfId.unaryMinus() }
+				))
 		}.distinctUntilChanged().filterNotNull()
+	}
+
+	private fun setBookShelfItems(newBookShelfItems: Map<Long, BookShelfItem>) {
+		mapBookShelfItems.update { newBookShelfItems }
 	}
 
 	override suspend fun getBookShelfItems(
 		bookShelfState: BookShelfState,
 		size: Int,
-		sort: SearchSortOption
+		sort: SearchSortOption,
 	) {
 		if (isEndPages[bookShelfState] == true) return
 
@@ -62,80 +72,94 @@ class BookShelfRepositoryImpl @Inject constructor(
 		val existingPage = currentPages[bookShelfState] ?: BOOKSHELF_ITEM_FIRST_PAGE
 		currentPages[bookShelfState] = existingPage + 1
 
-		totalItemCount.update {
-			totalItemCount.value + (bookShelfState to response.pageMeta.totalElements)
-		}
-
-		mapBookShelfItems.update {
-			mapBookShelfItems.value + response.contents.map { it.toDomain(bookShelfState) }
+		setBookShelfItems(
+			mapBookShelfItems.value + response.contents
+				.map { it.toDomain(bookShelfState) }
 				.associateBy { it.bookShelfId }
-		}
+		)
+	}
+
+	//TODO : 조회 반환값에 서재의 어떤 상태인지 추가되면 매우 좋을듯
+	// (다중 조회랑 단건 조회랑 스펙이 다름) (가져온놈이 어떤 상태인지는 알아야할 듯)
+	// 수정되면 getCachedBookShelfItem이랑 통합
+	override suspend fun getBookShelfItem(
+		bookShelfId: Long,
+		bookShelfState: BookShelfState,
+	): BookShelfItem {
+		return mapBookShelfItems.value[bookShelfId]
+			?: getOnlineBookShelfItem(
+				bookShelfId = bookShelfId,
+				bookShelfState = bookShelfState
+			)
+	}
+
+	private suspend fun getOnlineBookShelfItem(
+		bookShelfId: Long,
+		bookShelfState: BookShelfState,
+	): BookShelfItem {
+		val bookShelfItem = bookChatApi.getBookShelfItem(bookShelfId).toDomain(bookShelfState)
+		setBookShelfItems(mapBookShelfItems.value + (bookShelfItem.bookShelfId to bookShelfItem))
+		return bookShelfItem
 	}
 
 	override fun getBookShelfTotalItemCountFlow(bookShelfState: BookShelfState): Flow<Int> {
 		return totalItemCount.map { it[bookShelfState] ?: 0 }
 	}
 
-	override fun getCachedBookShelfItem(bookShelfItemId: Long): BookShelfItem? {
-		return mapBookShelfItems.value[bookShelfItemId]
+	override fun getCachedBookShelfItem(bookShelfItemId: Long): BookShelfItem {
+		return mapBookShelfItems.value[bookShelfItemId]!!
 	}
 
-	//TOOD : POST 요청시 생성 후 결과 body로 받아오게 수정
 	override suspend fun registerBookShelfBook(
 		book: Book,
 		bookShelfState: BookShelfState,
-		starRating: StarRating?
+		starRating: StarRating?,
 	) {
-		val requestRegisterBookShelfBook =
-			RequestRegisterBookShelfBook(
-				bookRequest = book.toBookRequest(),
-				bookShelfState = bookShelfState,
-				star = starRating
-			)
-		///v1/api/bookshelves/86
-//		val response = bookChatApi.registerBookShelfBook(requestRegisterBookShelfBook)
-//		val createdItemID = response.headers()["Location"]?.split("/")?.last()?.toLong()
+		val requestRegisterBookShelfBook = RequestRegisterBookShelfBook(
+			bookRequest = book.toBookRequest(),
+			bookShelfState = bookShelfState,
+			star = starRating
+		)
 
-		val newTotalCount = (totalItemCount.value[bookShelfState] ?: 0) + 1
-		totalItemCount.value = totalItemCount.value + (bookShelfState to newTotalCount)
+		val response = bookChatApi.registerBookShelfBook(requestRegisterBookShelfBook)
+
+		val createdItemID = response.headers()["Location"]
+			?.split("/")?.last()?.toLong()
+			?: throw Exception("bookShelfId does not exist in Http header.")
+
+		getOnlineBookShelfItem(
+			bookShelfId = createdItemID,
+			bookShelfState = bookShelfState
+		)
 	}
 
 	override suspend fun deleteBookShelfBook(
 		bookShelfItemId: Long,
-		bookShelfState: BookShelfState
+		bookShelfState: BookShelfState,
 	) {
 		bookChatApi.deleteBookShelfBook(bookShelfItemId)
-
-		mapBookShelfItems.update { mapBookShelfItems.value - bookShelfItemId }
-		val newTotalCount = maxOf((totalItemCount.value[bookShelfState] ?: 0) - 1, 0)
-		totalItemCount.value = totalItemCount.value + (bookShelfState to newTotalCount)
+		setBookShelfItems(mapBookShelfItems.value - bookShelfItemId)
 	}
 
 	override suspend fun changeBookShelfBookStatus(
 		bookShelfItemId: Long,
 		newBookShelfItem: BookShelfItem,
 	) {
-		val request = com.example.bookchat.data.network.model.request.RequestChangeBookStatus(
+		val request = RequestChangeBookStatus(
 			bookShelfState = newBookShelfItem.state,
 			star = newBookShelfItem.star,
 			pages = newBookShelfItem.pages
 		)
+
 		bookChatApi.changeBookShelfBookStatus(bookShelfItemId, request)
-
-		val previousState = mapBookShelfItems.value[bookShelfItemId]?.state ?: return
-		mapBookShelfItems.update {
-			mapBookShelfItems.value + (bookShelfItemId to newBookShelfItem)
-		}
-
-		val newTotalCount = (totalItemCount.value[newBookShelfItem.state] ?: 0) + 1
-		totalItemCount.value = totalItemCount.value + (newBookShelfItem.state to newTotalCount)
-
-		val previousStateNewTotalCount = maxOf((totalItemCount.value[previousState] ?: 0) - 1, 0)
-		totalItemCount.value = totalItemCount.value + (previousState to previousStateNewTotalCount)
+		/** lastUpdate 시간 때문에 서버로부터 다시 받아옴 */
+		getOnlineBookShelfItem(
+			bookShelfId = bookShelfItemId,
+			bookShelfState = newBookShelfItem.state
+		)
 	}
 
 	override suspend fun checkAlreadyInBookShelf(book: Book): BookStateInBookShelf {
-		return bookChatApi.checkAlreadyInBookShelf(book.isbn, book.publishAt)
-			.toDomain()
+		return bookChatApi.checkAlreadyInBookShelf(book.isbn, book.publishAt).toDomain()
 	}
 }

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
+
         <variable
             name="agonyListItem"
             type="com.example.bookchat.ui.agony.model.AgonyListItem.Item" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:background="@drawable/view_round_white"
         android:layout_width="match_parent"
@@ -26,10 +28,11 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/title_agony_folder_tv"
+            setAgonyFolderTextColor="@{agonyListItem.hexColorCode}"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="15dp"
@@ -38,13 +41,12 @@
             android:layout_marginBottom="15dp"
             android:elegantTextHeight="true"
             android:elevation="5dp"
-            android:gravity="start"
+            android:ellipsize="end"
             android:fontFamily="@font/notosanskr_bold"
+            android:gravity="start"
+            android:maxLines="3"
             android:text="@{agonyListItem.title}"
             android:textSize="14sp"
-            android:maxLines="3"
-            android:ellipsize="end"
-            setAgonyFolderTextColor="@{agonyListItem.hexColorCode}"
             app:layout_constraintBottom_toBottomOf="@+id/background_agony_folder_cv"
             app:layout_constraintEnd_toEndOf="@+id/background_agony_folder_cv"
             app:layout_constraintStart_toStartOf="@+id/background_agony_folder_cv"

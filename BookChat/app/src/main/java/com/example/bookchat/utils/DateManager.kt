@@ -7,7 +7,7 @@ import java.util.Locale
 
 object DateManager {
 
-	private fun stringToDate(dateString: String): Date? {
+	fun stringToDate(dateString: String): Date? {
 		val format = SimpleDateFormat(DATE_AND_TIME_FORMAT, Locale.getDefault())
 		return format.parse(dateString)
 	}

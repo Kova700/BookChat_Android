@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="channel"
+            type="com.example.bookchat.ui.channelList.model.ChannelListItem.ChannelItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingVertical="10dp">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/first_start_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.2"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/second_start_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.4"/>
+
+        <com.example.bookchat.ui.customview.AntiDupClickButton
+            android:id="@+id/channel_mute_btn"
+            android:layout_width="0dp"
+            android:layout_height="75dp"
+            android:backgroundTint="#DCDBFF"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:icon="@drawable/mute_channel_icon"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="20dp"
+            app:layout_constraintEnd_toStartOf="@+id/first_start_guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.example.bookchat.ui.customview.AntiDupClickButton
+            android:id="@+id/channel_top_pin_btn"
+            android:layout_width="0dp"
+            android:layout_height="75dp"
+            android:backgroundTint="#8075FF"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:icon="@drawable/top_pin_channel_icon"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="20dp"
+            app:layout_constraintEnd_toStartOf="@+id/second_start_guideline"
+            app:layout_constraintStart_toEndOf="@+id/channel_mute_btn"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

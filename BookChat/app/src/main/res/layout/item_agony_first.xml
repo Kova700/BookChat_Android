@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
 
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:background="@drawable/view_round_white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!--리플이벤트 넣기-->
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardView4"
+            android:id="@+id/background_cv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -20,7 +20,7 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:backgroundTint="#F6F6F6"
             android:minHeight="124dp"
-            app:cardCornerRadius="15dp"
+            app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -5,7 +5,7 @@
     <data>
         <variable
             name="firstItem"
-            type="com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem.FirstItem" />
+            type="com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem.FirstItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

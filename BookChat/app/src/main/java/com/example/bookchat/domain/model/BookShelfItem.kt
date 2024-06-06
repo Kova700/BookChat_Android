@@ -1,12 +1,14 @@
 package com.example.bookchat.domain.model
 
-//TODO : dispatchTime 같은 정렬 요소가 필요함
+import java.util.Date
+
 data class BookShelfItem(
 	val bookShelfId: Long,
 	val book: Book,
 	val pages: Int,
 	val star: StarRating? = null,
 	val state: BookShelfState,
+	val lastUpdatedAt: Date,
 ) {
 	companion object {
 		val DEFAULT = BookShelfItem(
@@ -14,6 +16,7 @@ data class BookShelfItem(
 			book = Book.DEFAULT,
 			pages = 0,
 			state = BookShelfState.WISH,
+			lastUpdatedAt = Date()
 		)
 	}
 }

@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemReadingBookshelfDataBinding
 import com.example.bookchat.databinding.ItemReadingBookshelfHeaderBinding
-import com.example.bookchat.ui.agonyrecord.AgonyRecordSwipeHelper
+import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordSwipeHelper
 import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfItem
 import com.example.bookchat.utils.BookImgSizeManager
 import kotlinx.coroutines.CoroutineScope

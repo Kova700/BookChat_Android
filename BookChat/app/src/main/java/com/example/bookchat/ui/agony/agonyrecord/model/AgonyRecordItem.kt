@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.agonyrecord.model
+package com.example.bookchat.ui.agony.agonyrecord.model
 
 import com.example.bookchat.domain.model.Agony
 
@@ -30,6 +30,8 @@ sealed interface AgonyRecordListItem {
 	sealed interface ItemState {
 		data class Success(val isSwiped: Boolean = false) : ItemState
 		object Loading : ItemState
+
+		/** 타이핑 입력시 마다 새로운 ItemList submit함을 방지하기 위해 가변 프로퍼티 사용*/
 		data class Editing(
 			var titleBeingEdited: String = "",
 			var contentBeingEdited: String = "",

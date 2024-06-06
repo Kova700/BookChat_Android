@@ -2,6 +2,7 @@ package com.example.bookchat.ui.agony
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
@@ -12,7 +13,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAgonyBinding
 import com.example.bookchat.ui.agony.adapter.AgonyAdapter
-import com.example.bookchat.ui.agonyrecord.AgonyRecordActivity
+import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordActivity
+import com.example.bookchat.ui.agony.makeagony.MakeAgonyBottomSheetDialog
+import com.example.bookchat.ui.agony.model.AgonyListItem
+import com.example.bookchat.ui.agony.AgonyUiState.UiState
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -43,6 +47,7 @@ class AgonyActivity : AppCompatActivity() {
 		agonyViewModel.uiState.collect { uiState ->
 			agonyAdapter.submitList(uiState.agonies)
 			agonyAdapter.agonyUiState = uiState
+			setViewState(uiState)
 		}
 	}
 
@@ -50,17 +55,28 @@ class AgonyActivity : AppCompatActivity() {
 		agonyViewModel.eventFlow.collect { event -> handleEvent(event) }
 	}
 
+	private fun setViewState(state: AgonyUiState) {
+		binding.agonyPg.visibility =
+			if (state.uiState == UiState.LOADING) View.VISIBLE else View.GONE
+		binding.edittingStateGroup.visibility =
+		if (state.uiState == UiState.EDITING) View.VISIBLE else View.INVISIBLE
+		binding.wasteBasketBtn.visibility =
+			if (state.uiState == UiState.SUCCESS) View.VISIBLE else View.INVISIBLE
+	}
+
 	private fun initAdapter() {
 		agonyAdapter.onFirstItemClick = {
-			agonyViewModel.onFirstItemClick()
+			agonyViewModel.onClickFirstItem()
 		}
 
 		agonyAdapter.onItemClick = { itemPosition ->
-			agonyViewModel.onItemClick(itemPosition)
+			val item = agonyAdapter.currentList[itemPosition] as AgonyListItem.Item
+			agonyViewModel.onClickItem(item)
 		}
 
 		agonyAdapter.onItemSelect = { itemPosition ->
-			agonyViewModel.onItemSelect(itemPosition)
+			val item = agonyAdapter.currentList[itemPosition] as AgonyListItem.Item
+			agonyViewModel.onItemSelect(item)
 		}
 	}
 
@@ -75,6 +91,10 @@ class AgonyActivity : AppCompatActivity() {
 	}
 
 	private fun openBottomSheetDialog(bookshelfItemId: Long) {
+		val existingFragment =
+			supportFragmentManager.findFragmentByTag(DIALOG_TAG_MAKE_AGONY)
+		if (existingFragment != null) return
+
 		val dialog = MakeAgonyBottomSheetDialog()
 		dialog.arguments = bundleOf(EXTRA_BOOKSHELF_ID to bookshelfItemId)
 		dialog.show(supportFragmentManager, DIALOG_TAG_MAKE_AGONY)
@@ -122,7 +142,7 @@ class AgonyActivity : AppCompatActivity() {
 	}
 
 	companion object {
-		private const val DIALOG_TAG_MAKE_AGONY = "MakeAgonyBottomSheetDialog"
+		private const val DIALOG_TAG_MAKE_AGONY = "DIALOG_TAG_MAKE_AGONY"
 		const val EXTRA_AGONY_ID = "EXTRA_AGONY"
 		const val EXTRA_BOOKSHELF_ID = "EXTRA_BOOK"
 	}

@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.agonyrecord.adapter
+package com.example.bookchat.ui.agony.agonyrecord.adapter
 
 import android.text.Editable
 import android.view.View
@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.databinding.ItemAgonyRecordDataBinding
 import com.example.bookchat.databinding.ItemAgonyRecordFirstBinding
 import com.example.bookchat.databinding.ItemAgonyRecordHeaderBinding
-import com.example.bookchat.ui.agonyrecord.AgonyRecordSwipeHelper
-import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
+import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordSwipeHelper
+import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
 
 sealed class AgonyRecordViewHolder(
 	binding: ViewDataBinding
@@ -84,6 +84,9 @@ class AgonyRecordItemViewHolder(
 	private val onItemDeleteBtnClick: ((Int) -> Unit)?,
 ) : AgonyRecordViewHolder(binding) {
 
+	/** AgonyRecordSwipeHelper와 함께 사용함에 있어서
+	 * ViewModel의 isSwiped 상태 업데이트가 예상보다 지연되어,
+	 * ViewHolder 내에 가변 프로퍼티를 사용 */
 	private var isSwiped: Boolean = false
 
 	init {

@@ -20,7 +20,7 @@ import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.NicknameCheckState
 import com.example.bookchat.domain.model.UserDefaultProfileType
 import com.example.bookchat.ui.agony.AgonyUiState
-import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
+import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
 import com.example.bookchat.ui.login.LoginUiState
 import com.example.bookchat.utils.*
 import com.example.bookchat.utils.Constants.TAG
@@ -278,34 +278,6 @@ object DataBindingAdapter {
 			false -> view.visibility = View.INVISIBLE
 			true -> view.visibility = View.VISIBLE
 		}
-	}
-
-	/** 고민탭 EditingState일 때 View Visibility 설정*/
-	@JvmStatic
-	@BindingAdapter("setAgonyFolderEditingComponentVisibility")
-	fun setAgonyFolderEditingComponentVisibility(
-		view: View,
-		agonyUiState: AgonyUiState.UiState,
-	) {
-		if (agonyUiState == AgonyUiState.UiState.EDITING) {
-			view.visibility = View.VISIBLE
-			return
-		}
-		view.visibility = View.INVISIBLE
-	}
-
-	/** 고민탭 DefaultState일 때 View Visibility 설정*/
-	@JvmStatic
-	@BindingAdapter("setAgonyFolderDefaultComponentVisibility")
-	fun setAgonyFolderDefaultComponentVisibility(
-		view: View,
-		agonyUiState: AgonyUiState.UiState,
-	) {
-		if (agonyUiState == AgonyUiState.UiState.SUCCESS) {
-			view.visibility = View.VISIBLE
-			return
-		}
-		view.visibility = View.INVISIBLE
 	}
 
 	/**고민 생성 Dialog text 색상 설정*/

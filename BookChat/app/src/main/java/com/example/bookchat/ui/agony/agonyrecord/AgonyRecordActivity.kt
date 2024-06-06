@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.agonyrecord
+package com.example.bookchat.ui.agony.agonyrecord
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,10 +12,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAgonyRecordBinding
-import com.example.bookchat.ui.agony.AgonyEditActivity
-import com.example.bookchat.ui.agonyrecord.adapter.AgonyRecordAdapter
-import com.example.bookchat.ui.agonyrecord.dialog.AgonyRecordWarningDialog
-import com.example.bookchat.ui.agonyrecord.model.AgonyRecordListItem
+import com.example.bookchat.ui.agony.agonyedit.AgonyEditActivity
+import com.example.bookchat.ui.agony.agonyrecord.adapter.AgonyRecordAdapter
+import com.example.bookchat.ui.agony.agonyrecord.dialog.AgonyRecordWarningDialog
+import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

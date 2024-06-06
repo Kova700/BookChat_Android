@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
-import com.example.bookchat.domain.model.Agony
 import com.example.bookchat.domain.repository.AgonyRepository
 import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.agony.AgonyUiState.UiState
@@ -27,7 +26,7 @@ class AgonyViewModel @Inject constructor(
 	private val bookShelfRepository: BookShelfRepository,
 	private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-	private val bookShelfListItemId =
+	private val bookShelfItemId =
 		savedStateHandle.get<Long>(ReadingBookDialog.EXTRA_AGONY_BOOKSHELF_ITEM_ID)!!
 
 	private val _eventFlow = MutableSharedFlow<AgonyEvent>()
@@ -39,37 +38,35 @@ class AgonyViewModel @Inject constructor(
 	private val _isSelected = MutableStateFlow<Map<Long, Boolean>>(emptyMap()) //(agonyId, isSelected)
 
 	init {
-		getItem()
+		initUiState()
+	}
+
+	private fun initUiState() = viewModelScope.launch {
+		updateState {
+			copy(
+				bookshelfItem = bookShelfRepository.getCachedBookShelfItem(bookShelfItemId)
+			)
+		}
 		observeAgonies()
 		getAgonies()
 	}
 
-	private fun getItem() {
-		val item =
-			bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)
-		item?.let { updateState { copy(bookshelfItem = item) } }
-	}
-
 	private fun observeAgonies() = viewModelScope.launch {
 		agonyRepository.getAgoniesFlow(true).combine(_isSelected) { items, isSelectedMap ->
-			groupItems(items, isSelectedMap)
-		}.collect { newAgonies -> updateState { copy(agonies = newAgonies) } }
-	}
-
-	private fun groupItems(
-		agonies: List<Agony>,
-		isSelectedMap: Map<Long, Boolean>
-	): List<AgonyListItem> {
-		val groupedItems = mutableListOf<AgonyListItem>()
-		groupedItems.add(AgonyListItem.Header(uiState.value.bookshelfItem))
-		groupedItems.add(AgonyListItem.FirstItem)
-		groupedItems.addAll(agonies.map { it.toAgonyListItem(isSelectedMap[it.agonyId] ?: false) })
-		return groupedItems
+			updateState {
+				copy(
+					agonies = items.toAgonyListItem(
+						bookshelfItem = bookshelfItem,
+						isSelectedMap = isSelectedMap
+					)
+				)
+			}
+		}.collect {}
 	}
 
 	private fun getAgonies() = viewModelScope.launch {
 		updateState { copy(uiState = UiState.LOADING) }
-		runCatching { agonyRepository.getAgonies(bookShelfListItemId) }
+		runCatching { agonyRepository.getAgonies(bookShelfItemId) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 			.onFailure { handleError(it) }
 	}
@@ -82,11 +79,16 @@ class AgonyViewModel @Inject constructor(
 	}
 
 	private fun deleteAgonies() = viewModelScope.launch {
+		if (uiState.value.uiState == UiState.LOADING) return@launch
+		updateState { copy(uiState = UiState.LOADING) }
 		runCatching {
-			agonyRepository.deleteAgony(bookShelfListItemId, _isSelected.value.keys.toList())
+			agonyRepository.deleteAgony(bookShelfItemId, _isSelected.value.keys.toList())
 		}
-			.onSuccess { clickEditCancelBtn() }
-			.onFailure { startEvent(AgonyEvent.MakeToast(R.string.agony_delete_fail)) }
+			.onSuccess { onClickEditCancelBtn() }
+			.onFailure {
+				updateState { copy(uiState = UiState.EDITING) }
+				startEvent(AgonyEvent.MakeToast(R.string.agony_delete_fail))
+			}
 	}
 
 	fun onEditBtnClick() {
@@ -94,11 +96,11 @@ class AgonyViewModel @Inject constructor(
 		startEvent(AgonyEvent.RenewItemViewMode)
 	}
 
-	fun clickDeleteBtn() {
+	fun onClickDeleteBtn() {
 		deleteAgonies()
 	}
 
-	fun clickEditCancelBtn() {
+	fun onClickEditCancelBtn() {
 		updateState { copy(uiState = UiState.SUCCESS) }
 		clearAllSelectedItem()
 		startEvent(AgonyEvent.RenewItemViewMode)
@@ -108,33 +110,32 @@ class AgonyViewModel @Inject constructor(
 		_isSelected.update { emptyMap() }
 	}
 
-	fun clickBackBtn() {
+	fun onClickBackBtn() {
 		startEvent(AgonyEvent.MoveToBack)
 	}
 
-	fun onFirstItemClick() {
+	fun onClickFirstItem() {
 		if (uiState.value.uiState == UiState.EDITING) return
 
 		startEvent(
 			AgonyEvent.OpenBottomSheetDialog(
-				bookshelfItemId = uiState.value.bookshelfItem.bookShelfId
+				bookshelfItemId = bookShelfItemId
 			)
 		)
 	}
 
-	fun onItemClick(itemPosition: Int) {
+	fun onClickItem(item: AgonyListItem.Item) {
 		startEvent(
 			AgonyEvent.MoveToAgonyRecord(
-				bookshelfItemId = uiState.value.bookshelfItem.bookShelfId,
-				agonyListItemId = (uiState.value.agonies[itemPosition] as AgonyListItem.Item).agonyId
+				bookshelfItemId = bookShelfItemId,
+				agonyListItemId = item.agonyId
 			)
 		)
 	}
 
-	fun onItemSelect(itemPosition: Int) {
-		val agony = (uiState.value.agonies[itemPosition] as AgonyListItem.Item)
-		if (agony.isSelected) _isSelected.update { _isSelected.value - agony.agonyId }
-		else _isSelected.update { _isSelected.value + (agony.agonyId to true) }
+	fun onItemSelect(item: AgonyListItem.Item) {
+		if (item.isSelected) _isSelected.update { _isSelected.value - item.agonyId }
+		else _isSelected.update { _isSelected.value + (item.agonyId to true) }
 	}
 
 	private fun startEvent(event: AgonyEvent) = viewModelScope.launch {
