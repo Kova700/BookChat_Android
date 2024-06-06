@@ -84,6 +84,9 @@ class AgonyRecordItemViewHolder(
 	private val onItemDeleteBtnClick: ((Int) -> Unit)?,
 ) : AgonyRecordViewHolder(binding) {
 
+	/** AgonyRecordSwipeHelper와 함께 사용함에 있어서
+	 * ViewModel의 isSwiped 상태 업데이트가 예상보다 지연되어,
+	 * ViewHolder 내에 가변 프로퍼티를 사용 */
 	private var isSwiped: Boolean = false
 
 	init {
