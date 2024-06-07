@@ -127,6 +127,10 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun setSocketConnectionUiState(uiState: ChannelUiState) {
+		Log.d(
+			TAG,
+			"ChannelActivity: setSocketConnectionUiState() - uiState.socketState : ${uiState.socketState}"
+		)
 		when (uiState.socketState) {
 			SocketState.CONNECTING -> {
 				binding.socketStateBar.setText(R.string.connecting_network)
@@ -139,7 +143,9 @@ class ChannelActivity : AppCompatActivity() {
 				binding.socketStateBar.setBackgroundColor(Color.parseColor("#5648FF"))
 				lifecycleScope.launch {
 					delay(SOCKET_CONNECTION_SUCCESS_BAR_EXPOSURE_TIME)
-					binding.socketStateBar.visibility = View.GONE
+					binding.socketStateBar.visibility =
+						if (channelViewModel.uiState.value.socketState == uiState.socketState)
+							View.GONE else View.VISIBLE
 				}
 			}
 

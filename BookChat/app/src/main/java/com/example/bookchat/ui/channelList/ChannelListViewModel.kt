@@ -3,6 +3,8 @@ package com.example.bookchat.ui.channelList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
+import com.example.bookchat.domain.NetworkManager
+import com.example.bookchat.domain.model.NetworkState
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.ui.channelList.ChannelListUiState.UiState
 import com.example.bookchat.ui.channelList.mapper.toChannelListItem
@@ -20,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ChannelListViewModel @Inject constructor(
 	private val channelRepository: ChannelRepository,
+	private val networkManager: NetworkManager,
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<ChannelListUiEvent>()
@@ -33,6 +36,21 @@ class ChannelListViewModel @Inject constructor(
 	init {
 		observeChannels()
 		getChannels() //TODO : 인터넷 끊겨있다가 인터넷 연결되면 매번 다시 호출 Trigger
+		observeNetworkState()
+	}
+
+	private fun observeNetworkState() = viewModelScope.launch {
+		networkManager.getStateFlow().collect { state ->
+			when (state) {
+				NetworkState.CONNECTED -> {
+					//getChannels() //이전 Page유지가 아닌 가장 최신 페이지 호출해야함
+					//TODO : 네트워크 알림 표시 공지
+				}
+				NetworkState.DISCONNECTED -> {
+					//TODO : 네트워크 미연결 알림 표시 공지
+				}
+			}
+		}
 	}
 
 	private fun observeChannels() = viewModelScope.launch {

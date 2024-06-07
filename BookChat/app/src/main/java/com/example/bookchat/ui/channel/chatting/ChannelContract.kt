@@ -3,6 +3,7 @@ package com.example.bookchat.ui.channel.chatting
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
+import com.example.bookchat.domain.model.NetworkState
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
@@ -17,6 +18,7 @@ data class ChannelUiState(
 	val chats: List<ChatItem>,
 	val newChatNotice: Chat?,
 	val socketState: SocketState,
+	val networkState: NetworkState,
 	val originalLastReadChatId: Long?,
 	val isVisibleLastReadChatNotice: Boolean,
 	val needToScrollToLastReadChat: Boolean,
@@ -71,6 +73,7 @@ data class ChannelUiState(
 			chats = emptyList(),
 			newChatNotice = null,
 			socketState = SocketState.DISCONNECTED,
+			networkState = NetworkState.DISCONNECTED,
 			isFirstConnection = true,
 			originalLastReadChatId = null,
 			isVisibleLastReadChatNotice = false,

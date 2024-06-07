@@ -142,7 +142,7 @@ class StompHandlerImpl @Inject constructor(
 								)
 							}
 					}
-				retrySendFailedChats(channel.roomId)
+				retrySendFailedChats(channel.roomId) //TODO : 이걸로도 타이밍이 완벽하지 않음
 				channelSubscription.join()
 
 				disconnectSocket()
@@ -167,7 +167,6 @@ class StompHandlerImpl @Inject constructor(
 		}
 	}
 
-	//실패하면 실패상태로 둬야하는데 중간에 소켓 끊기면 다시 재전송 필요상태임
 	override suspend fun retrySendMessage(chatId: Long) {
 		val chat = chatRepository.getChat(chatId)
 		runCatching {

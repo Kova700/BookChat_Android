@@ -6,9 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.data.database.dao.TempMessageDAO
+import com.example.bookchat.domain.NetworkManager
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatType
+import com.example.bookchat.domain.model.NetworkState
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ChannelRepository
@@ -58,6 +60,7 @@ class ChannelViewModel @Inject constructor(
 	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
+	private val networkManager: NetworkManager,
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
 
@@ -68,8 +71,6 @@ class ChannelViewModel @Inject constructor(
 	val uiState = _uiState.asStateFlow()
 
 	//TODO :
-	// 3. 인터넷 재연결되면 소켓 재연결 트리거
-	// 4. 소켓 재연결되면 RETRY_REQUIRED인 애들은 일괄 전송
 	// 6. Notice타입의 NewChatNotice UI
 	// 7. Bottom 이동 버튼 UI
 	// 8. 소켓 재연결 아직 불안정함 (+ 실패 상태라도 메세지 전송같은 트리거가 있다면 다시 연결시도 하는 것도 괜찮을 듯)
@@ -101,7 +102,18 @@ class ChannelViewModel @Inject constructor(
 		getOfflineNewestChats()
 		observeChatsLoadState()
 		observeSocketState()
-		connectSocket(channelId)
+		observeNetworkState()
+	}
+
+	private fun observeNetworkState() = viewModelScope.launch {
+		networkManager.getStateFlow().collect { state ->
+			updateState { copy(networkState = state) }
+			when (state) {
+				NetworkState.CONNECTED -> connectSocket("observeNetworkState")
+				//여기서 인터넷 연결 안되어있다고 호출 막으면 의도치 않게 인터넷이 끊긴 경우 재연결이 되려나..?
+				NetworkState.DISCONNECTED -> Unit
+			}
+		}
 	}
 
 	private suspend fun getOfflineNewestChats() {
@@ -183,7 +195,7 @@ class ChannelViewModel @Inject constructor(
 			SocketState.CONNECTING -> Unit
 			SocketState.CONNECTED -> onChannelConnected()
 			SocketState.FAILURE -> onChannelConnectFail()
-			SocketState.NEED_RECONNECTION -> onReconnection()
+			SocketState.NEED_RECONNECTION -> connectSocket("handleSocketState")
 		}
 	}
 
@@ -220,7 +232,7 @@ class ChannelViewModel @Inject constructor(
 					)
 				}
 				if (shouldBottomScroll) startEvent(ChannelEvent.ScrollToBottom)
-			}.onFailure { handleError(it) } //TODO : api 실패 알림
+			}.onFailure { handleError(it, "getNewestChats") } //TODO : api 실패 알림
 			.getOrNull()
 	}
 
@@ -230,7 +242,7 @@ class ChannelViewModel @Inject constructor(
 		updateState { copy(newerChatsLoadState = LoadState.LOADING) }
 		runCatching { chatRepository.getNewerChats(channelId) }
 			.onSuccess { updateState { copy(newerChatsLoadState = LoadState.SUCCESS) } }
-			.onFailure { handleError(it) } //TODO : api 실패 알림
+			.onFailure { handleError(it, "getNewerChats") } //TODO : api 실패 알림
 	}
 
 	//TODO : 하단에 프로그래스바 추가
@@ -239,7 +251,7 @@ class ChannelViewModel @Inject constructor(
 		updateState { copy(olderChatsLoadState = LoadState.LOADING) }
 		runCatching { chatRepository.getOlderChats(channelId) }
 			.onSuccess { updateState { copy(olderChatsLoadState = LoadState.SUCCESS) } }
-			.onFailure { handleError(it) } //TODO : api 실패 알림
+			.onFailure { handleError(it, "getOlderChats") } //TODO : api 실패 알림
 	}
 
 	private fun getChatsAroundId(baseChatId: Long) = viewModelScope.launch {
@@ -252,7 +264,7 @@ class ChannelViewModel @Inject constructor(
 			)
 		}
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { handleError(it) } //TODO : 그냥 로컬데이터 최하단 화면 유지
+			.onFailure { handleError(it, "getChatsAroundId") } //TODO : 그냥 로컬데이터 최하단 화면 유지
 	}
 
 	private fun onChannelConnectFail() = viewModelScope.launch {
@@ -263,11 +275,14 @@ class ChannelViewModel @Inject constructor(
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트 간의 데이터 불일치를 메우기 위해서 임시로
 	 * 리커넥션 시마다 호출 (이벤트 History받는 로직 구현 이전까지 )*/
 	private fun getChannelInfo(channelId: Long) = viewModelScope.launch {
+		if (uiState.value.networkState == NetworkState.DISCONNECTED) return@launch
 		runCatching { channelRepository.getChannelInfo(channelId) }
-			.onFailure { handleError(it) }
+			.onFailure { handleError(it, "getChannelInfo") }
 	}
 
-	private fun connectSocket(channelId: Long) = viewModelScope.launch {
+	private fun connectSocket(caller: String) = viewModelScope.launch {
+		if (uiState.value.networkState == NetworkState.DISCONNECTED) return@launch
+		Log.d(TAG, "ChannelViewModel: connectSocket() - caller : $caller")
 		val channel = channelRepository.getChannel(channelId)
 		runCatching { stompHandler.connectSocket(channel) }
 			.onFailure { handleError(it, "connectSocket") }
@@ -275,7 +290,7 @@ class ChannelViewModel @Inject constructor(
 
 	private fun sendMessage(text: String? = null) {
 		if (uiState.value.channel.isAvailableChannel.not()) return
-		if (uiState.value.socketState != SocketState.CONNECTED) onReconnection()
+		if (uiState.value.socketState != SocketState.CONNECTED) connectSocket("sendMessage")
 
 		val message = text ?: uiState.value.enteredMessage
 		if (message.isBlank()) return
@@ -292,7 +307,7 @@ class ChannelViewModel @Inject constructor(
 			}
 				.onFailure {
 					handleError(it, "sendMessage")
-				} //소켓 닫혔을 때, 메세지 보내면 StompErrorFrameReceived 넘어옴
+				} //TODO : 소켓 닫혔을 때, 메세지 보내면 StompErrorFrameReceived 넘어옴
 		}
 	}
 
@@ -326,7 +341,7 @@ class ChannelViewModel @Inject constructor(
 
 	fun onStartScreen() {
 		if (uiState.value.channel.isAvailableChannel.not()) return
-		onReconnection()
+		connectSocket("onStartScreen")
 	}
 
 	fun onStopScreen() {
@@ -344,14 +359,7 @@ class ChannelViewModel @Inject constructor(
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트간의 채팅 불일치 동기화 */
 	private fun syncChats(channelId: Long) = viewModelScope.launch {
 		runCatching { syncChannelChatsUseCase(channelId) }
-			.onFailure { handleError(it) }
-	}
-
-	//TODO : 인터넷(WIFI, Data)연결되면 해당 함수 trigger되어야함
-	// (인터넷 끊겨있으면 작동 x (안막으면 지수 백오프 돌아감) , 시작점도 이렇게 해야하려나..? )
-	/** 리커넥션이 필요할때 호출되는 함수 */
-	private fun onReconnection() {
-		connectSocket(channelId)
+			.onFailure { handleError(it, "syncChats") }
 	}
 
 	private fun scrollToBottom() {

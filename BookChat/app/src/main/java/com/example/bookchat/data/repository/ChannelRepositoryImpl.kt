@@ -89,6 +89,9 @@ class ChannelRepositoryImpl @Inject constructor(
 			.also { channelDAO.upsertChannel(it.toChannelEntity()) }
 	}
 
+	//왜 throwable: java.net.UnknownHostException:
+	// Unable to resolve host "bookchat.link": No address associated with hostname
+	//예외가 터질까?
 	override suspend fun getChannelInfo(channelId: Long) {
 		Log.d(TAG, "ChannelRepositoryImpl: getChannelInfo() - called")
 		val channelInfo = bookChatApi.getChannelInfo(channelId)
