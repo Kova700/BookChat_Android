@@ -11,6 +11,10 @@ interface ChannelRepository {
 	fun getChannelFlow(channelId: Long): Flow<Channel>
 
 	suspend fun getChannels(
+		loadSize: Int = REMOTE_CHANNELS_LOAD_SIZE
+	)
+
+	suspend fun getMostActiveChannels(
 		loadSize: Int = REMOTE_CHANNELS_LOAD_SIZE,
 		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS,
 	)

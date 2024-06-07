@@ -10,7 +10,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class ChatItemDecoration @Inject constructor(
-	@ApplicationContext applicationContext: Context
+	@ApplicationContext applicationContext: Context,
 ) : RecyclerView.ItemDecoration() {
 
 	private val contextResources = applicationContext.resources
@@ -20,7 +20,7 @@ class ChatItemDecoration @Inject constructor(
 		outRect: Rect,
 		view: View,
 		parent: RecyclerView,
-		state: RecyclerView.State
+		state: RecyclerView.State,
 	) {
 		super.getItemOffsets(outRect, view, parent, state)
 		val position = parent.getChildAdapterPosition(view)
@@ -32,9 +32,14 @@ class ChatItemDecoration @Inject constructor(
 				outRect.bottom = getPxFromDp(USER_CHAT_BOTTOM_OFFSET_DP)
 			}
 
+			R.layout.item_chatting_date -> {
+				outRect.bottom = getPxFromDp(DATE_CHAT_TOP_BOTTOM_OFFSET_DP)
+				outRect.top = getPxFromDp(DATE_CHAT_TOP_BOTTOM_OFFSET_DP)
+			}
+
 			else -> {
-				outRect.bottom = getPxFromDp(NOTICE_CHAT_BOTTOM_OFFSET_DP)
-				outRect.top = getPxFromDp(NOTICE_CHAT_BOTTOM_OFFSET_DP)
+				outRect.bottom = getPxFromDp(NOTICE_CHAT_TOP_BOTTOM_OFFSET_DP)
+				outRect.top = getPxFromDp(NOTICE_CHAT_TOP_BOTTOM_OFFSET_DP)
 			}
 		}
 	}
@@ -44,6 +49,7 @@ class ChatItemDecoration @Inject constructor(
 
 	companion object {
 		private const val USER_CHAT_BOTTOM_OFFSET_DP = 7
-		private const val NOTICE_CHAT_BOTTOM_OFFSET_DP = 15
+		private const val NOTICE_CHAT_TOP_BOTTOM_OFFSET_DP = 10
+		private const val DATE_CHAT_TOP_BOTTOM_OFFSET_DP = 15
 	}
 }

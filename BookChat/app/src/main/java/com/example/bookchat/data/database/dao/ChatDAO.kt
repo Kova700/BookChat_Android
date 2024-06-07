@@ -41,19 +41,8 @@ interface ChatDAO {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insertChat(chat: ChatEntity): Long
 
-	@Query(
-		"UPDATE Chat SET " +
-						"chat_id = :newChatId, " +
-						"dispatch_time = :dispatchTime, " +
-						"status = :status " +
-						"WHERE chat_id = :targetChatId"
-	)
-	suspend fun updateWaitingChat(
-		newChatId: Long,
-		dispatchTime: String,
-		status: Int,
-		targetChatId: Long,
-	)
+	@Query("DELETE FROM Chat WHERE chat_id = :targetChatId")
+	suspend fun deleteChat(targetChatId: Long)
 
 	@Query(
 		"SELECT MAX(chat_id) FROM Chat " +
@@ -92,7 +81,7 @@ interface ChatDAO {
 		"DELETE FROM Chat " +
 						"WHERE chat_room_id = :channelId"
 	)
-	suspend fun deleteChannelAllChat(channelId :Long)
+	suspend fun deleteChannelAllChat(channelId: Long)
 
 	@Query("DELETE FROM $CHAT_ENTITY_TABLE_NAME")
 	suspend fun deleteAll()

@@ -189,6 +189,11 @@
     <string name="exploded_channel_notice_dialog_content">방장이 채팅방을 종료했습니다.\n더 이상 대화가 불가능합니다.</string>
     <string name="unavailable_channel_edittext_hint">더이상 대화가 불가능한 상태입니다</string>
     <string name="channel_banned_user_notice_dialog_content">채팅방 관리자에의해 강퇴되었습니다.\n더 이상 대화가 불가능합니다.</string>
+    <string name="connecting_network">네트워크를 연결중 입니다.</string>
+    <string name="connected_network">연결되었습니다.</string>
+    <string name="offline_network">오프라인 상태입니다.</string>
+    <string name="please_connect_the_network">네트워크를 연결해주세요.</string>
+
 
     <!--channel setting-->
     <string name="channel_setting_title">채팅방 설정</string>

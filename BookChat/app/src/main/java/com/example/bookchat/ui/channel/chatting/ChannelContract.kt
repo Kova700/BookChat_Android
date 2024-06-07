@@ -3,13 +3,14 @@ package com.example.bookchat.ui.channel.chatting
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
+import com.example.bookchat.domain.model.NetworkState
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
 import com.example.bookchat.ui.channel.drawer.model.ChannelDrawerItem
 
 data class ChannelUiState(
-	val uiState: UiState,              //UI 구분 필요 (메인 로딩 프로그래스바 필요)
+	val uiState: UiState,
 	val enteredMessage: String,
 	val channel: Channel,
 	val client: User,
@@ -17,29 +18,37 @@ data class ChannelUiState(
 	val chats: List<ChatItem>,
 	val newChatNotice: Chat?,
 	val socketState: SocketState,
+	val networkState: NetworkState,
 	val originalLastReadChatId: Long?,
 	val isVisibleLastReadChatNotice: Boolean,
 	val needToScrollToLastReadChat: Boolean,
 	val isFirstConnection: Boolean,
-	val olderChatsLoadState: LoadState, //UI 구분 필요 (프로그레스바 Item추가) (Stream참고)
-	val newerChatsLoadState: LoadState, //UI 구분 필요 (프로그레스바 Item추가) (Stream참고)
+	val olderChatsLoadState: LoadState,
+	val newerChatsLoadState: LoadState,
 	val isOlderChatFullyLoaded: Boolean,
 	val isNewerChatFullyLoaded: Boolean,
+	val isLookingAtBottom: Boolean,
 ) {
+	val isNetworkDisconnected
+		get() = networkState == NetworkState.DISCONNECTED
+
+	val isPossibleToShowBottomScrollBtn
+		get() = isLookingAtBottom.not() && (newChatNotice == null)
+
 	val isPossibleToLoadOlderChat
 		get() = (olderChatsLoadState != LoadState.LOADING)
 						&& isOlderChatFullyLoaded.not()
 						&& socketState == SocketState.CONNECTED
-						&& channel?.isAvailableChannel == true
+						&& channel.isAvailableChannel
 
 	val isPossibleToLoadNewerChat
 		get() = (newerChatsLoadState != LoadState.LOADING)
 						&& isNewerChatFullyLoaded.not()
 						&& socketState == SocketState.CONNECTED
-						&& channel?.isAvailableChannel == true
+						&& channel.isAvailableChannel
 
 	val clientAuthority
-		get() = channel?.participantAuthorities?.get(client.id)
+		get() = channel.participantAuthorities?.get(client.id)
 			?: ChannelMemberAuthority.GUEST
 
 	val isClientHost
@@ -67,6 +76,7 @@ data class ChannelUiState(
 			chats = emptyList(),
 			newChatNotice = null,
 			socketState = SocketState.DISCONNECTED,
+			networkState = NetworkState.DISCONNECTED,
 			isFirstConnection = true,
 			originalLastReadChatId = null,
 			isVisibleLastReadChatNotice = false,
@@ -74,7 +84,8 @@ data class ChannelUiState(
 			olderChatsLoadState = LoadState.SUCCESS,
 			newerChatsLoadState = LoadState.SUCCESS,
 			isOlderChatFullyLoaded = false,
-			isNewerChatFullyLoaded = true
+			isNewerChatFullyLoaded = true,
+			isLookingAtBottom = true
 		)
 	}
 }

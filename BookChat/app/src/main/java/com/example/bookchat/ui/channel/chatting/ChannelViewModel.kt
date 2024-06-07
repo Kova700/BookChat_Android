@@ -6,9 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.data.database.dao.TempMessageDAO
+import com.example.bookchat.domain.NetworkManager
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatType
+import com.example.bookchat.domain.model.NetworkState
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ChannelRepository
@@ -36,27 +38,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 //TODO : 점검 중 , 새로운 업데이트 RemoteConfig 구성해서 출시 + Crashtics
-//TODO : Activity단위로 소켓 연결이 아닌 앱단위 소켓연결로 수정해서 FCM누락시 정확도 향상 기대
 //TODO : 장문의 긴 채팅 길이 접기 구현해야함, 누르면 전체보기 가능하게
 //TODO : 채팅 꾹 누르면 복사
-//TODO : 뒤로가기 누를 때, 혹시 채팅방 메뉴 켜져 있으면 닫고, 화면 안꺼지게 수정
-//TODO : 채팅방에 들어왔을 때, 채팅스크롤의 위치는 내가 마지막으로 받았던 채팅 (여기까지 읽었습니다)
-//TODO : 전송 중 상태로 어플 종료 시 전송실패로 변경된 UI로 보이게 수정
-//TODO : 또한 전송 중 상태에서 인터넷이 끊겨도, 다시 인터넷이 연결되면 자동으로 전송이 되어야 함
-//TODO : 전송 대기 중이던 채팅 소켓 연결 끊길 시, 혹은 특정 시간 지나면, 전송 실패 UI로 전환
-//TODO : 소켓 재 연결 시마다, 채팅방 정보 조회 API 호출해서 수정 사항 전부 덮어쓰기
-//TODO : 소켓 재 연결 시마다, 로컬에 저장된 마지막 채팅부터 서버의 마지막 채팅(isLast가 올 때)까지 페이징 요청
-//TODO : 소켓 연결 실패 시 예외 처리
 //TODO : 채팅방 정보 조회 실패 시 예외 처리
-//TODO : 소켓 연결 성공 /실패 상관 없이 끝나면 채팅방 채팅 내역 조회
-//TODO : Network 연결 상태 Flow로 실시간 알림 받는 환경 구성
-//TODO : channel isExplode 상태면 채팅창 입력 비활성화 UI 구현
-//TODO : 임시로 NewChat있다고 파란 동그라미 표시라도 하는게 좋을 듯 (해도 되긴 할듯)
-//        (새로운 기기로 채팅방을 불러왔는데 채팅은 계속 추가되고 있음 + 읽은 채팅정보가 로컬에 없으면 N+ 표시없이 채팅이 갱신될거임)
 //TODO : 채팅 로딩 전체 화면 UI 구현
-//TODO : 인터넷 재연결되면 소켓도 재연결 로직
 //TODO : 카톡처럼 이모지 한개이면 이모지 크기 확대
-//TODO : 채팅 간격이 너무 넓음 수정
 //TODO : 출시 전 북챗 문의 방 만들기
 
 @HiltViewModel
@@ -69,6 +55,7 @@ class ChannelViewModel @Inject constructor(
 	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
+	private val networkManager: NetworkManager,
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
 
@@ -79,11 +66,7 @@ class ChannelViewModel @Inject constructor(
 	val uiState = _uiState.asStateFlow()
 
 	//TODO :
-	// 3. 인터넷 재연결되면 소켓 재연결 트리거
-	// 4. 소켓 재연결되면 RETRY_REQUIRED인 애들은 일괄 전송
-	// 5. 유저 리스트 , 채팅 리스트 방장 부방장 권한 반영 + 현재 권한에 따른 UI 구분
 	// 6. Notice타입의 NewChatNotice UI
-	// 7. Bottom 이동 버튼 UI
 
 	init {
 		initUiState()
@@ -112,7 +95,17 @@ class ChannelViewModel @Inject constructor(
 		getOfflineNewestChats()
 		observeChatsLoadState()
 		observeSocketState()
-		connectSocket(channelId)
+		observeNetworkState()
+	}
+
+	private fun observeNetworkState() = viewModelScope.launch {
+		networkManager.getStateFlow().collect { state ->
+			updateState { copy(networkState = state) }
+			when (state) {
+				NetworkState.CONNECTED -> connectSocket("observeNetworkState")
+				NetworkState.DISCONNECTED -> Unit
+			}
+		}
 	}
 
 	private suspend fun getOfflineNewestChats() {
@@ -194,13 +187,10 @@ class ChannelViewModel @Inject constructor(
 			SocketState.CONNECTING -> Unit
 			SocketState.CONNECTED -> onChannelConnected()
 			SocketState.FAILURE -> onChannelConnectFail()
-			SocketState.NEED_RECONNECTION -> onReconnection()
+			SocketState.NEED_RECONNECTION -> connectSocket("handleSocketState")
 		}
 	}
 
-	//TODO : 소켓 리커넥션 혹은 연결 성공후 채팅 가져올 때,
-	// RETRY_REQUIRED인 애들은 일괄 전송,
-	// LOADING인 애들은 FAILURE처리 (waiting시 소켓 끊긴 경우 재전송으로 인한 중복 전송 방지)
 	private fun onChannelConnected() {
 		if (uiState.value.isFirstConnection) {
 			getFirstChats()
@@ -216,6 +206,7 @@ class ChannelViewModel @Inject constructor(
 		val newestChats = getNewestChats().await() ?: emptyList()
 		if (uiState.value.needToScrollToLastReadChat.not()) return@launch
 		val originalLastReadChatId = uiState.value.originalLastReadChatId ?: return@launch
+
 		val shouldCallGetChatsAroundId =
 			newestChats.map(Chat::chatId).contains(originalLastReadChatId).not()
 		if (shouldCallGetChatsAroundId) getChatsAroundId(originalLastReadChatId)
@@ -233,26 +224,24 @@ class ChannelViewModel @Inject constructor(
 					)
 				}
 				if (shouldBottomScroll) startEvent(ChannelEvent.ScrollToBottom)
-			}.onFailure { handleError(it) } //TODO : api 실패 알림
+			}.onFailure { handleError(it, "getNewestChats") } //TODO : api 실패 알림
 			.getOrNull()
 	}
 
-	//TODO : 상단에 프로그래스바 추가
 	private fun getNewerChats() = viewModelScope.launch {
 		if (uiState.value.isPossibleToLoadNewerChat.not()) return@launch
 		updateState { copy(newerChatsLoadState = LoadState.LOADING) }
 		runCatching { chatRepository.getNewerChats(channelId) }
 			.onSuccess { updateState { copy(newerChatsLoadState = LoadState.SUCCESS) } }
-			.onFailure { handleError(it) } //TODO : api 실패 알림
+			.onFailure { handleError(it, "getNewerChats") } //TODO : api 실패 알림
 	}
 
-	//TODO : 하단에 프로그래스바 추가
 	private fun getOlderChats() = viewModelScope.launch {
 		if (uiState.value.isPossibleToLoadOlderChat.not()) return@launch
 		updateState { copy(olderChatsLoadState = LoadState.LOADING) }
 		runCatching { chatRepository.getOlderChats(channelId) }
 			.onSuccess { updateState { copy(olderChatsLoadState = LoadState.SUCCESS) } }
-			.onFailure { handleError(it) } //TODO : api 실패 알림
+			.onFailure { handleError(it, "getOlderChats") } //TODO : api 실패 알림
 	}
 
 	private fun getChatsAroundId(baseChatId: Long) = viewModelScope.launch {
@@ -265,7 +254,7 @@ class ChannelViewModel @Inject constructor(
 			)
 		}
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { handleError(it) } //TODO : 그냥 로컬데이터 최하단 화면 유지
+			.onFailure { handleError(it, "getChatsAroundId") } //TODO : 그냥 로컬데이터 최하단 화면 유지
 	}
 
 	private fun onChannelConnectFail() = viewModelScope.launch {
@@ -276,34 +265,49 @@ class ChannelViewModel @Inject constructor(
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트 간의 데이터 불일치를 메우기 위해서 임시로
 	 * 리커넥션 시마다 호출 (이벤트 History받는 로직 구현 이전까지 )*/
 	private fun getChannelInfo(channelId: Long) = viewModelScope.launch {
+		if (uiState.value.isNetworkDisconnected) return@launch
 		runCatching { channelRepository.getChannelInfo(channelId) }
-			.onFailure { handleError(it) }
+			.onFailure { handleError(it, "getChannelInfo") }
 	}
 
-	private fun connectSocket(channelId: Long) = viewModelScope.launch {
+	private fun connectSocket(caller: String) = viewModelScope.launch {
+		if (uiState.value.isNetworkDisconnected) return@launch
+		Log.d(TAG, "ChannelViewModel: connectSocket() - caller : $caller")
 		val channel = channelRepository.getChannel(channelId)
 		runCatching { stompHandler.connectSocket(channel) }
 			.onFailure { handleError(it, "connectSocket") }
 	}
 
-	private fun sendMessage() {
-		if (uiState.value.channel?.isAvailableChannel != true) return
-		val message = uiState.value.enteredMessage
+	private fun sendMessage(text: String? = null) {
+		if (uiState.value.channel.isAvailableChannel.not()) return
+		if (uiState.value.socketState != SocketState.CONNECTED) connectSocket("sendMessage")
+
+		val message = text ?: uiState.value.enteredMessage
 		if (message.isBlank()) return
 
 		updateState { copy(enteredMessage = "") }
 		clearTempSavedMessage()
+
 		viewModelScope.launch {
 			runCatching {
 				stompHandler.sendMessage(
 					channelId = channelId,
-					message = message
+					message = message,
 				)
 			}
 				.onFailure {
 					handleError(it, "sendMessage")
-				} //소켓 닫혔을 때, 메세지 보내면 StompErrorFrameReceived 넘어옴
+				} //TODO : 소켓 닫혔을 때, 메세지 보내면 StompErrorFrameReceived 넘어옴
 		}
+	}
+
+	private fun deleteFailedChat(chatId: Long) = viewModelScope.launch {
+		chatRepository.deleteChat(chatId)
+	}
+
+	private fun retryFailedChat(chatId: Long) = viewModelScope.launch {
+		if (uiState.value.socketState != SocketState.CONNECTED) return@launch
+		stompHandler.retrySendMessage(chatId)
 	}
 
 	private fun exitChannel() = viewModelScope.launch {
@@ -326,12 +330,12 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	fun onStartScreen() {
-		if (uiState.value.channel?.isAvailableChannel != true) return
-		onReconnection()
+		if (uiState.value.channel.isAvailableChannel.not()) return
+		connectSocket("onStartScreen")
 	}
 
 	fun onStopScreen() {
-		if (uiState.value.channel?.isAvailableChannel != true) return
+		if (uiState.value.channel.isAvailableChannel.not()) return
 		disconnectSocket()
 		updateState { copy(socketState = SocketState.DISCONNECTED) }
 	}
@@ -344,14 +348,8 @@ class ChannelViewModel @Inject constructor(
 
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트간의 채팅 불일치 동기화 */
 	private fun syncChats(channelId: Long) = viewModelScope.launch {
-		syncChannelChatsUseCase(channelId)
-	}
-
-	//TODO : 인터넷(WIFI, Data)연결되면 해당 함수 trigger되어야함
-	// (인터넷 끊겨있으면 작동 x (안막으면 지수 백오프 돌아감) , 시작점도 이렇게 해야하려나..? )
-	/** 리커넥션이 필요할때 호출되는 함수 */
-	private fun onReconnection() {
-		connectSocket(channelId)
+		runCatching { syncChannelChatsUseCase(channelId) }
+			.onFailure { handleError(it, "syncChats") }
 	}
 
 	private fun scrollToBottom() {
@@ -404,11 +402,10 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	//TODO : 홀릭스 / 카톡 버튼처럼 애니메이션으로 만들어보자
-	// 아래에 newChatNotice있을 땐 띄우지 않음 + 없을 때 스크롤 발생하면 띄우기
 	fun onChangeStateOfLookingAtBottom(isBottom: Boolean) {
-		//viewmodel업데이트  isLookingAtBottom
-		//isLookingAtBottom == true라면 아래로 가기 버튼 invisible
-		//isLookingAtBottom == false라면 아래로 가기 버튼 visible
+		val isLookingAtBottom = isBottom && uiState.value.isNewerChatFullyLoaded
+		if (uiState.value.isLookingAtBottom == isLookingAtBottom) return
+		updateState { copy(isLookingAtBottom = isLookingAtBottom) }
 	}
 
 	/** 리스트 상 내 채팅이 아닌 채팅 중 가장 최신 채팅이 화면 상에 나타나는 순간 호출 */
@@ -418,8 +415,7 @@ class ChannelViewModel @Inject constructor(
 		updateState { copy(newChatNotice = null) }
 	}
 
-	//TODO : UI 추가
-	private fun onClickScrollToBottom() {
+	fun onClickScrollToBottom() {
 		scrollToBottom()
 	}
 
@@ -429,7 +425,7 @@ class ChannelViewModel @Inject constructor(
 
 	//TODO : 캡처 기능 추가
 	fun onClickCaptureBtn() {
-		if (uiState.value.channel?.isAvailableChannel != true) return
+		if (uiState.value.channel.isAvailableChannel.not()) return
 //		startEvent(ChannelEvent.CaptureChannel)
 	}
 
@@ -453,12 +449,20 @@ class ChannelViewModel @Inject constructor(
 		startEvent(ChannelEvent.MoveUserProfile(user))
 	}
 
+	fun onClickFailedChatDeleteBtn(chatId: Long) {
+		deleteFailedChat(chatId)
+	}
+
+	fun onClickFailedChatRetryBtn(chatId: Long) {
+		retryFailedChat(chatId)
+	}
+
 	private fun startEvent(event: ChannelEvent) = viewModelScope.launch {
 		eventFlow.emit(event)
 	}
 
 	//TODO : 예외처리 분기 추가해야함 (대부분이 현재 세션 연결 취소 후 다시 재연결 해야 함)
-	private suspend fun handleError(throwable: Throwable, caller: String = "기본") {
+	private fun handleError(throwable: Throwable, caller: String = "기본") {
 		Log.d(TAG, "ChannelViewModel: handleError(caller : $caller) - throwable: $throwable")
 		updateState { copy(uiState = UiState.ERROR) }
 		when (throwable) {

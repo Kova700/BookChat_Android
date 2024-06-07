@@ -24,6 +24,19 @@
             android:layout_height="match_parent"
             tools:context=".ui.channel.chatting.ChannelActivity">
 
+            <TextView
+                android:id="@+id/socket_state_bar"
+                android:layout_width="0dp"
+                android:layout_height="18dp"
+                android:background="#666666"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:visibility="gone"
+                android:textSize="10sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <com.example.bookchat.ui.customview.AntiDupClickImageButton
                 android:id="@+id/back_btn"
                 android:layout_width="35dp"
@@ -33,7 +46,7 @@
                 android:onClick="@{() -> viewmodel.onClickBackBtn()}"
                 app:layout_constraintBottom_toTopOf="@+id/top_divider"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/socket_state_bar"
                 app:srcCompat="@drawable/ic_back_btn" />
 
             <com.example.bookchat.ui.customview.AntiDupClickImageButton
@@ -45,7 +58,7 @@
                 android:onClick="@{() -> viewmodel.onClickMenuBtn()}"
                 app:layout_constraintBottom_toTopOf="@+id/top_divider"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/socket_state_bar"
                 app:srcCompat="@drawable/chat_menu_btn" />
 
             <TextView
@@ -65,7 +78,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/room_member_count"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toEndOf="@+id/back_btn"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/socket_state_bar"/>
 
             <TextView
                 android:id="@+id/room_member_count"
@@ -82,7 +95,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/top_divider"
                 app:layout_constraintEnd_toStartOf="@+id/menu_btn_in_chat_room"
                 app:layout_constraintStart_toEndOf="@+id/chat_room_title"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/socket_state_bar"/>
 
             <View
                 android:id="@+id/top_divider"
@@ -92,7 +105,7 @@
                 android:background="#D9D9D9"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/socket_state_bar"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/chatting_rcv"
@@ -106,14 +119,15 @@
 
             <include
                 android:id="@+id/new_chat_notice_layout"
+                layout="@layout/layout_new_chat_notice"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                layout="@layout/layout_new_chat_notice"
-                app:viewmodel="@{viewmodel}"
                 android:layout_marginBottom="13dp"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="@+id/chatting_rcv"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:viewmodel="@{viewmodel}" />
 
             <View
                 android:id="@+id/bottom_divider"
@@ -125,12 +139,31 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
+            <androidx.cardview.widget.CardView
+                android:id="@+id/chat_bottom_scroll_btn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                app:cardCornerRadius="100dp"
+                app:cardElevation="10dp"
+                app:layout_constraintBottom_toTopOf="@+id/bottom_divider"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <ImageButton
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:onClick="@{() -> viewmodel.onClickScrollToBottom()}"
+                    android:background="?android:selectableItemBackground"
+                    app:srcCompat="@drawable/chat_bottom_scroll_btn" />
+            </androidx.cardview.widget.CardView>
+
             <com.example.bookchat.ui.customview.AntiDupClickImageButton
                 android:id="@+id/capture_btn"
                 android:layout_width="60dp"
                 android:layout_height="0dp"
-                android:onClick="@{() -> viewmodel.onClickCaptureBtn()}"
                 android:background="?android:selectableItemBackground"
+                android:onClick="@{() -> viewmodel.onClickCaptureBtn()}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/bottom_divider"
@@ -163,6 +196,7 @@
                     android:layout_marginStart="20dp"
                     android:background="@null"
                     android:elegantTextHeight="true"
+                    android:enabled="false"
                     android:fontFamily="@font/roboto_regular"
                     android:gravity="center_vertical"
                     android:hint="@string/chat_room_send_message"
@@ -172,7 +206,6 @@
                     android:textColor="#303030"
                     android:textColorHint="#CFCFCF"
                     android:textSize="12sp"
-                    android:enabled="false"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/chat_send_btn"
                     app:layout_constraintStart_toStartOf="parent"

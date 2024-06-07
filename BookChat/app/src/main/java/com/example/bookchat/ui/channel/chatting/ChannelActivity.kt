@@ -2,6 +2,7 @@ package com.example.bookchat.ui.channel.chatting
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -38,6 +39,7 @@ import com.example.bookchat.utils.isOnListTop
 import com.example.bookchat.utils.isVisiblePosition
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -111,6 +113,7 @@ class ChannelActivity : AppCompatActivity() {
 
 	private fun setViewState(uiState: ChannelUiState) {
 		setMessageBarState(uiState)
+		setBottomScrollBtnState(uiState)
 		setNewChatNoticeState(uiState)
 		setSocketConnectionUiState(uiState)
 		setExplodedChannelUiState(uiState)
@@ -118,11 +121,43 @@ class ChannelActivity : AppCompatActivity() {
 		setChannelSettingBtnUiState(uiState)
 	}
 
+	private fun setBottomScrollBtnState(uiState: ChannelUiState) {
+		binding.chatBottomScrollBtn.visibility =
+			if (uiState.isPossibleToShowBottomScrollBtn) View.VISIBLE else View.GONE
+	}
+
 	private fun setSocketConnectionUiState(uiState: ChannelUiState) {
-		//TODO : 이 상태에 맞게 유저에게 소켓 연결 상태 UI 제공 (상단에 소켓연결상태)
-		//  연결되면 카톡처럼 상단에 "연결되었습니다" 3초정도 보여주고 사라짐(GONE)
-		//  연결 끊기면 "오프라인 상태입니다" 회색 배경 계속 보여주기
-		uiState.socketState
+		Log.d(
+			TAG,
+			"ChannelActivity: setSocketConnectionUiState() - uiState.socketState : ${uiState.socketState}"
+		)
+		when (uiState.socketState) {
+			SocketState.CONNECTING -> {
+				binding.socketStateBar.setText(R.string.connecting_network)
+				binding.socketStateBar.setBackgroundColor(Color.parseColor("#666666"))
+				binding.socketStateBar.visibility = View.VISIBLE
+			}
+
+			SocketState.CONNECTED -> {
+				binding.socketStateBar.setText(R.string.connected_network)
+				binding.socketStateBar.setBackgroundColor(Color.parseColor("#5648FF"))
+				lifecycleScope.launch {
+					delay(SOCKET_CONNECTION_SUCCESS_BAR_EXPOSURE_TIME)
+					binding.socketStateBar.visibility =
+						if (channelViewModel.uiState.value.socketState == uiState.socketState)
+							View.GONE else View.VISIBLE
+				}
+			}
+
+			SocketState.FAILURE,
+			SocketState.NEED_RECONNECTION,
+			SocketState.DISCONNECTED,
+			-> {
+				binding.socketStateBar.setText(R.string.offline_network)
+				binding.socketStateBar.setBackgroundColor(Color.parseColor("#666666"))
+				binding.socketStateBar.visibility = View.VISIBLE
+			}
+		}
 	}
 
 	private fun setMessageBarState(uiState: ChannelUiState) {
@@ -151,9 +186,17 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun initAdapter() {
-		chatItemAdapter.onClickUserProfile = { itemPosition ->
-			val user = (chatItemAdapter.currentList[itemPosition] as ChatItem.AnotherUser).sender!!
-			channelViewModel.onClickUserProfile(user)
+		chatItemAdapter.onClickUserProfile = { position ->
+			val item = (chatItemAdapter.currentList[position] as ChatItem.AnotherUser)
+			channelViewModel.onClickUserProfile(item.sender!!)
+		}
+		chatItemAdapter.onClickFailedChatDeleteBtn = { position ->
+			val item = (chatItemAdapter.currentList[position] as ChatItem.MyChat)
+			channelViewModel.onClickFailedChatDeleteBtn(item.chatId)
+		}
+		chatItemAdapter.onClickFailedChatRetryBtn = { position ->
+			val item = (chatItemAdapter.currentList[position] as ChatItem.MyChat)
+			channelViewModel.onClickFailedChatRetryBtn(item.chatId)
 		}
 		chatItemAdapter.registerAdapterDataObserver(adapterDataObserver)
 
@@ -389,8 +432,10 @@ class ChannelActivity : AppCompatActivity() {
 	companion object {
 		const val EXTRA_USER_ID = "EXTRA_USER_ID"
 		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
-		const val DIALOG_TAG_CHANNEL_EXIT_WARNING = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
-		const val DIALOG_TAG_EXPLODED_CHANNEL_NOTICE = "DIALOG_TAG_EXPLODED_CHANNEL_NOTICE"
-		const val DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE = "DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE"
+		private const val DIALOG_TAG_CHANNEL_EXIT_WARNING = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
+		private const val DIALOG_TAG_EXPLODED_CHANNEL_NOTICE = "DIALOG_TAG_EXPLODED_CHANNEL_NOTICE"
+		private const val DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE =
+			"DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE"
+		private const val SOCKET_CONNECTION_SUCCESS_BAR_EXPOSURE_TIME = 1500L
 	}
 }

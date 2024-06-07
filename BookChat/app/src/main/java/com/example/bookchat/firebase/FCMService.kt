@@ -84,10 +84,11 @@ FCMService : FirebaseMessagingService() {
 	}
 
 	//TODO : WorkerManager로 백엔드 작업 위임 (예외처리까지 같이)
-	//TODO : 혹시 가능하다면 senderId도...?
+	//TODO : 혹시 가능하다면 senderId도...? (서버 수정 요청 + 백엔드 측에게 내가 보낸 메세지도 FCM 수신됨 공지)
 	private fun handleChatMessage(fcmMessage: FcmMessage) {
 		val fcmMessageBody = fcmMessage.body
 		CoroutineScope(Dispatchers.IO).launch {
+			//TODO : 내가 친 메세지라면 API가 호출될 수도 있는데 사전에 방지하는게 좋아보임 특히 getChat이거
 			val channel = channelRepository.getChannel(fcmMessageBody.channelId)
 			val chat = chatRepository.getChat(fcmMessageBody.chatId)
 
@@ -104,7 +105,8 @@ FCMService : FirebaseMessagingService() {
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			val importance = NotificationManager.IMPORTANCE_HIGH
-			val notificationChannel = NotificationChannel(channel.roomId.toString(), channelName, importance)
+			val notificationChannel =
+				NotificationChannel(channel.roomId.toString(), channelName, importance)
 			notificationChannel.description = channelDescription
 
 			// 채널에 대한 각종 설정(불빛, 진동 등) (추후 다시 세팅)

@@ -89,6 +89,9 @@ class ChannelRepositoryImpl @Inject constructor(
 			.also { channelDAO.upsertChannel(it.toChannelEntity()) }
 	}
 
+	//왜 throwable: java.net.UnknownHostException:
+	// Unable to resolve host "bookchat.link": No address associated with hostname
+	//예외가 터질까?
 	override suspend fun getChannelInfo(channelId: Long) {
 		Log.d(TAG, "ChannelRepositoryImpl: getChannelInfo() - called")
 		val channelInfo = bookChatApi.getChannelInfo(channelId)
@@ -400,57 +403,67 @@ class ChannelRepositoryImpl @Inject constructor(
 		setChannels(mapChannels.value + mapOf(channelId to newChannel))
 	}
 
-	//TODO : 서버측에서 lastChatID가 가장 높은 순으로 쿼리되게 혹은 쿼리 옵션을 주게 수정 대기
-	//TODO : 해당 함수 인터넷 끊겨있다 연결 trigger발생 시 page :0 부터 재호출
-	//TODO : 오프라인부터 가장 첫페이지 뿌려주고 리모트 데이터로 덮어쓰기하는 방향으로 해야함 (리모트 실패하면 오프라인 가져오는게 아니라)
-	/** 지수백오프 getChannels 요청 */
-	/** 서버에 있는 채널 우선적으로 쿼리 */
-	/** Channel 세부 정보는 채팅방 들어 가면 getChannelInfo에 의해 갱신될 예정 */
-	override suspend fun getChannels(
+	/** 지수 백오프 적용 */
+	override suspend fun getMostActiveChannels(
 		loadSize: Int,
 		maxAttempts: Int,
 	) {
-		if (isEndPage) return
+		setChannels(
+			mapChannels.value + getOfflineMostActiveChannels(
+				loadSize = loadSize
+			).associateBy { it.roomId })
 
 		for (attempt in 0 until maxAttempts) {
-			Log.d(TAG, "ChannelRepositoryImpl: getChannels() - attempt : $attempt")
+			Log.d(TAG, "ChannelRepositoryImpl: getMostActiveChannels() - attempt : $attempt")
 
 			runCatching {
 				bookChatApi.getChannels(
-					postCursorId = currentPage,
+					postCursorId = null,
 					size = loadSize
 				)
 			}.onSuccess { response ->
 				channelDAO.upsertAllChannels(response.channels.toChannelEntity())
-				val chats = response.channels
-					.mapNotNull {
-						it.getLastChat(
-							clientId = clientRepository.getClientProfile().id
-						)
-					}
+				response.channels.forEach {
+					it.getLastChat(clientId = clientRepository.getClientProfile().id)
+						?.let { chat -> chatRepository.insertChat(chat) }
+				}
 				isEndPage = response.cursorMeta.last
 				currentPage = response.cursorMeta.nextCursorId
-				chatRepository.insertAllChats(chats)
 				val newChannels = response.channels.map { getChannelWithUpdatedData(it.roomId) }
 				setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
 				return
+
 			}
 			delay((DEFAULT_RETRY_ATTEMPT_DELAY_TIME * (1.5).pow(attempt)))
 		}
-
-		/**조회 실패시 오프라인 모드로 전환*/
-		setChannels(
-			mapChannels.value + getOfflineChannels(
-				loadSize,
-				currentPage
-			).associateBy { it.roomId })
+		throw Exception("failed to retrieve most active channels") //TODO : 커스텀 예외 쓰자
 	}
 
-	private suspend fun getOfflineChannels(
-		loadSize: Int,
-		baseId: Long?,
-	): List<Channel> {
-		return channelDAO.getChannels(loadSize, baseId ?: 0)
+	//TODO : 서버측에서 lastChatID가 가장 높은 순으로 쿼리되게 혹은 쿼리 옵션을 주게 수정 대기
+	//  페이징 방식 수정되면 수정된 offset방식으로 getMostActiveChannels처럼 로컬 우선 쿼리로 수정
+	/** 로컬 데이터 우선적으로 쿼리 */
+	/** Channel 세부 정보는 채팅방 들어 가면 getChannelInfo에 의해 갱신될 예정 */
+	override suspend fun getChannels(loadSize: Int) {
+		if (isEndPage) return
+
+		val response = bookChatApi.getChannels(
+			postCursorId = currentPage,
+			size = loadSize
+		)
+
+		channelDAO.upsertAllChannels(response.channels.toChannelEntity())
+		response.channels.forEach {
+			it.getLastChat(clientId = clientRepository.getClientProfile().id)
+				?.let { chat -> chatRepository.insertChat(chat) }
+		}
+		isEndPage = response.cursorMeta.last
+		currentPage = response.cursorMeta.nextCursorId
+		val newChannels = response.channels.map { getChannelWithUpdatedData(it.roomId) }
+		setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
+	}
+
+	private suspend fun getOfflineMostActiveChannels(loadSize: Int): List<Channel> {
+		return channelDAO.getMostActiveChannels(loadSize, 0)
 			.map {
 				it.toChannel(
 					getChat = { chatId -> chatRepository.getChat(chatId) },

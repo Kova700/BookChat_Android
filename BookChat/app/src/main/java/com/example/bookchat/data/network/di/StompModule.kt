@@ -24,10 +24,10 @@ object StompModule {
 
 	@Provides
 	@Singleton
-					/** withAutoReconnect : 소켓 재연결만 반영되고 재구독 기능은 아직 개발되지 않음으로 사용 X*/
 	fun provideWebSocketClient(
 		okHttpClient: OkHttpClient,
 	): WebSocketClient {
+		/** withAutoReconnect : 소켓 재연결만 반영되고 재구독 기능은 아직 개발되지 않음으로 사용 X */
 		return OkHttpWebSocketClient(okHttpClient)
 	}
 
@@ -36,10 +36,11 @@ object StompModule {
 	fun provideStompClient(
 		webSocketClient: WebSocketClient,
 	): StompClient {
+		/** 백엔드측의 send Frame에 대한 receipt 헤더가 사라지는 오류가 있어서 autoReceipt 사용 X */
 		return StompClient(
 			webSocketClient = webSocketClient,
 			configure = {
-				autoReceipt = true
+//				autoReceipt = true
 				receiptTimeout = 10.seconds
 				heartBeat = HeartBeat(
 					minSendPeriod = 10.seconds,
@@ -73,7 +74,7 @@ object StompModule {
 
 		override suspend fun onFrameDecoded(
 			originalFrame: WebSocketFrame,
-			decodedFrame: StompFrame
+			decodedFrame: StompFrame,
 		) {
 			super.onFrameDecoded(originalFrame, decodedFrame)
 			Log.d(TAG, "StompModule: onFrameDecoded() - originalFrame : $originalFrame")
