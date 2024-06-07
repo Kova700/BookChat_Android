@@ -43,7 +43,6 @@ import javax.inject.Inject
 //TODO : 채팅방 정보 조회 실패 시 예외 처리
 //TODO : 채팅 로딩 전체 화면 UI 구현
 //TODO : 카톡처럼 이모지 한개이면 이모지 크기 확대
-//TODO : 채팅 간격이 너무 넓음 수정
 //TODO : 출시 전 북챗 문의 방 만들기
 
 @HiltViewModel
@@ -189,15 +188,6 @@ class ChannelViewModel @Inject constructor(
 			SocketState.CONNECTED -> onChannelConnected()
 			SocketState.FAILURE -> onChannelConnectFail()
 			SocketState.NEED_RECONNECTION -> connectSocket("handleSocketState")
-			//이거는 소켓 재연결하게 해줘야하는거아니냐 네트워크 연결안됐다 하더라도 (네트워크가 원치않게 끊길때 호출되라고 만든거니까 ㅇㅇ)
-			//그리고 재시도 중에 인터넷 연결되어서 재시도하는거면 횟수를 추가해주던 다시 지수 백오프 하던 해야될거같은데
-			//1번 실패하면 그냥 재시도 씹힘
-
-			//네트워크가 disconnect되었는데 다시 연결은 사실 의미가 없고,
-			//재연결 되었을떄, 요청이 맞긴해 NEED_RECONNECTION도 네트워크가 살아있다면 요청보내고 그게 아니라면 안보내는게 맞지
-			//해결해야할 점은 유효하지 않은 재시도(인터넷을 끊었는데 NEED_RECONNECTION가 발생했고, 아직 인터넷이 끊겼다는 내용을 받지 못한 경우) 중
-			//인터넷이 재연결 되었고, 인터넷 재연결으로 인한 지수 백오프가 무시되고
-			//마지막 1회의 재연결 중이었고, 그 요청이 실패 해버린다면 그냥 재요청이 안됨
 		}
 	}
 
