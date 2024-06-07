@@ -8,10 +8,12 @@ import com.example.bookchat.data.network.model.response.CommonMessage
 import com.example.bookchat.data.network.model.response.NotificationMessage
 import com.example.bookchat.data.network.model.response.NotificationMessageType
 import com.example.bookchat.data.network.model.response.SocketMessage
+import com.example.bookchat.domain.NetworkManager
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
+import com.example.bookchat.domain.model.NetworkState
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ChannelRepository
@@ -29,6 +31,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -61,6 +64,7 @@ class StompHandlerImpl @Inject constructor(
 	private val clientRepository: ClientRepository,
 	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val userRepository: UserRepository,
+	private val networkManager: NetworkManager,
 	private val gson: Gson,
 ) : StompHandler {
 
@@ -89,6 +93,7 @@ class StompHandlerImpl @Inject constructor(
 		var haveTriedRenewingToken = false
 		for (attempt in 0 until maxAttempts) {
 			Log.d(TAG, "StompHandlerImpl: connectSocket() - attempt : $attempt")
+			if (networkManager.getStateFlow().first() == NetworkState.DISCONNECTED) return
 
 			runCatching {
 				stompClient.connect(
@@ -120,6 +125,7 @@ class StompHandlerImpl @Inject constructor(
 	) {
 		for (attempt in 0 until maxAttempts) {
 			Log.d(TAG, "StompHandlerImpl: subscribeChannel() - attempt : $attempt")
+			if (networkManager.getStateFlow().first() == NetworkState.DISCONNECTED) return
 
 			runCatching {
 				stompSession.subscribe(

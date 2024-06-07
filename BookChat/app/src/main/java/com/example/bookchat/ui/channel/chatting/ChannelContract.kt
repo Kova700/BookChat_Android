@@ -10,7 +10,7 @@ import com.example.bookchat.ui.channel.chatting.model.ChatItem
 import com.example.bookchat.ui.channel.drawer.model.ChannelDrawerItem
 
 data class ChannelUiState(
-	val uiState: UiState,              //UI 구분 필요 (메인 로딩 프로그래스바 필요)
+	val uiState: UiState,
 	val enteredMessage: String,
 	val channel: Channel,
 	val client: User,
@@ -23,12 +23,15 @@ data class ChannelUiState(
 	val isVisibleLastReadChatNotice: Boolean,
 	val needToScrollToLastReadChat: Boolean,
 	val isFirstConnection: Boolean,
-	val olderChatsLoadState: LoadState, //UI 구분 필요 (프로그레스바 Item추가) (Stream참고)
-	val newerChatsLoadState: LoadState, //UI 구분 필요 (프로그레스바 Item추가) (Stream참고)
+	val olderChatsLoadState: LoadState,
+	val newerChatsLoadState: LoadState,
 	val isOlderChatFullyLoaded: Boolean,
 	val isNewerChatFullyLoaded: Boolean,
 	val isLookingAtBottom: Boolean,
 ) {
+	val isNetworkDisconnected
+		get() = networkState == NetworkState.DISCONNECTED
+
 	val isPossibleToShowBottomScrollBtn
 		get() = isLookingAtBottom.not() && (newChatNotice == null)
 

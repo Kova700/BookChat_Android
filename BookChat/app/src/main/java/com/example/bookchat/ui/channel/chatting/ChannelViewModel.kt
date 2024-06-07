@@ -38,14 +38,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 //TODO : 점검 중 , 새로운 업데이트 RemoteConfig 구성해서 출시 + Crashtics
-//TODO : Activity단위로 소켓 연결이 아닌 앱단위 소켓연결로 수정해서 FCM누락시 정확도 향상 기대
 //TODO : 장문의 긴 채팅 길이 접기 구현해야함, 누르면 전체보기 가능하게
 //TODO : 채팅 꾹 누르면 복사
-//TODO : 소켓 연결 실패 시 예외 처리
 //TODO : 채팅방 정보 조회 실패 시 예외 처리
-//TODO : Network 연결 상태 Flow로 실시간 알림 받는 환경 구성
 //TODO : 채팅 로딩 전체 화면 UI 구현
-//TODO : 인터넷 재연결되면 소켓도 재연결 로직
 //TODO : 카톡처럼 이모지 한개이면 이모지 크기 확대
 //TODO : 채팅 간격이 너무 넓음 수정
 //TODO : 출시 전 북챗 문의 방 만들기
@@ -72,8 +68,6 @@ class ChannelViewModel @Inject constructor(
 
 	//TODO :
 	// 6. Notice타입의 NewChatNotice UI
-	// 7. Bottom 이동 버튼 UI
-	// 8. 소켓 재연결 아직 불안정함 (+ 실패 상태라도 메세지 전송같은 트리거가 있다면 다시 연결시도 하는 것도 괜찮을 듯)
 
 	init {
 		initUiState()
@@ -110,7 +104,6 @@ class ChannelViewModel @Inject constructor(
 			updateState { copy(networkState = state) }
 			when (state) {
 				NetworkState.CONNECTED -> connectSocket("observeNetworkState")
-				//여기서 인터넷 연결 안되어있다고 호출 막으면 의도치 않게 인터넷이 끊긴 경우 재연결이 되려나..?
 				NetworkState.DISCONNECTED -> Unit
 			}
 		}
@@ -196,6 +189,15 @@ class ChannelViewModel @Inject constructor(
 			SocketState.CONNECTED -> onChannelConnected()
 			SocketState.FAILURE -> onChannelConnectFail()
 			SocketState.NEED_RECONNECTION -> connectSocket("handleSocketState")
+			//이거는 소켓 재연결하게 해줘야하는거아니냐 네트워크 연결안됐다 하더라도 (네트워크가 원치않게 끊길때 호출되라고 만든거니까 ㅇㅇ)
+			//그리고 재시도 중에 인터넷 연결되어서 재시도하는거면 횟수를 추가해주던 다시 지수 백오프 하던 해야될거같은데
+			//1번 실패하면 그냥 재시도 씹힘
+
+			//네트워크가 disconnect되었는데 다시 연결은 사실 의미가 없고,
+			//재연결 되었을떄, 요청이 맞긴해 NEED_RECONNECTION도 네트워크가 살아있다면 요청보내고 그게 아니라면 안보내는게 맞지
+			//해결해야할 점은 유효하지 않은 재시도(인터넷을 끊었는데 NEED_RECONNECTION가 발생했고, 아직 인터넷이 끊겼다는 내용을 받지 못한 경우) 중
+			//인터넷이 재연결 되었고, 인터넷 재연결으로 인한 지수 백오프가 무시되고
+			//마지막 1회의 재연결 중이었고, 그 요청이 실패 해버린다면 그냥 재요청이 안됨
 		}
 	}
 
@@ -236,7 +238,6 @@ class ChannelViewModel @Inject constructor(
 			.getOrNull()
 	}
 
-	//TODO : 상단에 프로그래스바 추가
 	private fun getNewerChats() = viewModelScope.launch {
 		if (uiState.value.isPossibleToLoadNewerChat.not()) return@launch
 		updateState { copy(newerChatsLoadState = LoadState.LOADING) }
@@ -245,7 +246,6 @@ class ChannelViewModel @Inject constructor(
 			.onFailure { handleError(it, "getNewerChats") } //TODO : api 실패 알림
 	}
 
-	//TODO : 하단에 프로그래스바 추가
 	private fun getOlderChats() = viewModelScope.launch {
 		if (uiState.value.isPossibleToLoadOlderChat.not()) return@launch
 		updateState { copy(olderChatsLoadState = LoadState.LOADING) }
@@ -275,13 +275,13 @@ class ChannelViewModel @Inject constructor(
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트 간의 데이터 불일치를 메우기 위해서 임시로
 	 * 리커넥션 시마다 호출 (이벤트 History받는 로직 구현 이전까지 )*/
 	private fun getChannelInfo(channelId: Long) = viewModelScope.launch {
-		if (uiState.value.networkState == NetworkState.DISCONNECTED) return@launch
+		if (uiState.value.isNetworkDisconnected) return@launch
 		runCatching { channelRepository.getChannelInfo(channelId) }
 			.onFailure { handleError(it, "getChannelInfo") }
 	}
 
 	private fun connectSocket(caller: String) = viewModelScope.launch {
-		if (uiState.value.networkState == NetworkState.DISCONNECTED) return@launch
+		if (uiState.value.isNetworkDisconnected) return@launch
 		Log.d(TAG, "ChannelViewModel: connectSocket() - caller : $caller")
 		val channel = channelRepository.getChannel(channelId)
 		runCatching { stompHandler.connectSocket(channel) }
