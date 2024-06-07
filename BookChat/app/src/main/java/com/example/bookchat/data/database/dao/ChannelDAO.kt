@@ -14,14 +14,16 @@ interface ChannelDAO {
 
 	@Query(
 		"SELECT * FROM Channel " +
-						"WHERE room_id > :baseId " +
-						"ORDER BY top_pin_num DESC, " +
-						"last_chat_id IS NULL DESC, " +
+						"ORDER BY last_chat_id IS NULL DESC, " +
 						"last_chat_id DESC, " +
+						"top_pin_num DESC, " +
 						"room_id DESC " +
-						"LIMIT :loadSize"
+						"LIMIT :pageSize OFFSET :offset"
 	)
-	suspend fun getChannels(loadSize: Int, baseId: Long?): List<ChannelEntity>
+	suspend fun getMostActiveChannels(
+		pageSize: Int,
+		offset: Int,
+	): List<ChannelEntity>
 
 	@Query(
 		"SELECT * FROM Channel " +

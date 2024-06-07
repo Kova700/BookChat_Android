@@ -1,6 +1,7 @@
 package com.example.bookchat.ui.channelList
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentChannelListBinding
+import com.example.bookchat.domain.model.NetworkState
 import com.example.bookchat.ui.channel.chatting.ChannelActivity
 import com.example.bookchat.ui.channelList.adpater.ChannelListAdapter
 import com.example.bookchat.ui.channelList.dialog.ChannelSettingDialog
@@ -68,14 +70,31 @@ class ChannelListFragment : Fragment() {
 	}
 
 	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
-		channelListViewModel.uiStateFlow.collect { uiState ->
+		channelListViewModel.uiState.collect { uiState ->
 			channelListAdapter.submitList(uiState.channelListItem)
+			setViewState(uiState)
+		}
+	}
+
+	private fun setViewState(uiState: ChannelListUiState) {
+		setNetworkStateBarUiState(uiState)
+	}
+
+	private fun setNetworkStateBarUiState(uiState: ChannelListUiState) {
+		when (uiState.networkState) {
+			NetworkState.CONNECTED -> {
+				binding.networkStateBar.visibility = View.GONE
+			}
+
+			NetworkState.DISCONNECTED -> {
+				binding.networkStateBar.setText(R.string.please_connect_the_network)
+				binding.networkStateBar.setBackgroundColor(Color.parseColor("#666666"))
+				binding.networkStateBar.visibility = View.VISIBLE
+			}
 		}
 	}
 
 	private fun initAdapter() {
-		//TODO : long Click :채팅방 상단고정, 알림 끄기 설정 가능한 다이얼로그
-		//TODO : Swipe : 상단고정, 알림 끄기 UI 노출
 		channelListAdapter.onSwipe = { position, isSwiped ->
 			val item = channelListAdapter.currentList[position] as ChannelListItem.ChannelItem
 			channelListViewModel.onSwipeChannelItem(item, isSwiped)

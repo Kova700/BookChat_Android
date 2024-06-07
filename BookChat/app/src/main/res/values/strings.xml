@@ -192,6 +192,8 @@
     <string name="connecting_network">네트워크를 연결중 입니다.</string>
     <string name="connected_network">연결되었습니다.</string>
     <string name="offline_network">오프라인 상태입니다.</string>
+    <string name="please_connect_the_network">네트워크를 연결해주세요.</string>
+
 
     <!--channel setting-->
     <string name="channel_setting_title">채팅방 설정</string>

@@ -28,27 +28,23 @@ class ChannelListViewModel @Inject constructor(
 	private val _eventFlow = MutableSharedFlow<ChannelListUiEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
 
-	private val _uiStateFlow = MutableStateFlow<ChannelListUiState>(ChannelListUiState.DEFAULT)
-	val uiStateFlow = _uiStateFlow.asStateFlow()
+	private val _uiState = MutableStateFlow<ChannelListUiState>(ChannelListUiState.DEFAULT)
+	val uiState = _uiState.asStateFlow()
 
 	private val _isSwiped = MutableStateFlow<Map<Long, Boolean>>(emptyMap()) //(channelId, Boolean)
 
 	init {
 		observeChannels()
-		getChannels() //TODO : 인터넷 끊겨있다가 인터넷 연결되면 매번 다시 호출 Trigger
+		getMostActiveChannels()
 		observeNetworkState()
 	}
 
 	private fun observeNetworkState() = viewModelScope.launch {
 		networkManager.getStateFlow().collect { state ->
+			updateState { copy(networkState = state) }
 			when (state) {
-				NetworkState.CONNECTED -> {
-					//getChannels() //이전 Page유지가 아닌 가장 최신 페이지 호출해야함
-					//TODO : 네트워크 알림 표시 공지
-				}
-				NetworkState.DISCONNECTED -> {
-					//TODO : 네트워크 미연결 알림 표시 공지
-				}
+				NetworkState.CONNECTED -> getMostActiveChannels()
+				NetworkState.DISCONNECTED -> Unit
 			}
 		}
 	}
@@ -59,7 +55,16 @@ class ChannelListViewModel @Inject constructor(
 		}.collect { updateState { copy(channelListItem = it) } }
 	}
 
+	private fun getMostActiveChannels() = viewModelScope.launch {
+		if (uiState.value.uiState == UiState.LOADING) return@launch
+		updateState { copy(uiState = UiState.LOADING) }
+		runCatching { channelRepository.getMostActiveChannels() }
+			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
+			.onFailure { handleError(it) }
+	}
+
 	private fun getChannels() = viewModelScope.launch {
+		if (uiState.value.uiState == UiState.LOADING) return@launch
 		updateState { copy(uiState = UiState.LOADING) }
 		runCatching { channelRepository.getChannels() }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
@@ -67,8 +72,8 @@ class ChannelListViewModel @Inject constructor(
 	}
 
 	fun loadNextChannels(lastVisibleItemPosition: Int) {
-		if (uiStateFlow.value.channelListItem.size - 1 > lastVisibleItemPosition ||
-			uiStateFlow.value.uiState == UiState.LOADING
+		if (uiState.value.channelListItem.size - 1 > lastVisibleItemPosition
+			|| uiState.value.networkState == NetworkState.DISCONNECTED
 		) return
 		getChannels()
 	}
@@ -133,7 +138,7 @@ class ChannelListViewModel @Inject constructor(
 	}
 
 	private inline fun updateState(block: ChannelListUiState.() -> ChannelListUiState) {
-		_uiStateFlow.update { _uiStateFlow.value.block() }
+		_uiState.update { _uiState.value.block() }
 	}
 
 	private fun startEvent(event: ChannelListUiEvent) = viewModelScope.launch {

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
+
         <variable
             name="viewmodel"
             type="com.example.bookchat.ui.channelList.ChannelListViewModel" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -15,55 +18,53 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_begin="30dp"/>
+            app:layout_constraintGuide_begin="30dp" />
+
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_end="30dp"/>
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_top"
-            app:layout_constraintGuide_begin="30dp"
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            app:layout_constraintGuide_end="30dp" />
+        <TextView
+            android:id="@+id/network_state_bar"
+            android:layout_width="0dp"
+            android:layout_height="18dp"
+            android:background="#666666"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView25"
+            android:id="@+id/channel_list_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
             android:layout_marginBottom="7dp"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_bold"
             android:text="@string/chat"
             android:textColor="#222222"
             android:textSize="18sp"
-            app:layout_constraintBottom_toTopOf="@+id/chat_rcv"
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toTopOf="@+id/guideline_top" />
+            app:layout_constraintTop_toBottomOf="@+id/network_state_bar" />
 
         <com.example.bookchat.ui.customview.AntiDupClickImageButton
             android:id="@+id/antiDupClickImageButton8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
+            android:layout_marginTop="30dp"
+            android:padding="5dp"
+            android:background="?android:selectableItemBackgroundBorderless"
             android:onClick="@{() -> viewmodel.onClickPlusBtn()}"
-            android:background="?android:selectableItemBackgroundBorderless"
             android:src="@drawable/ic_plus_btn_black"
-            app:layout_constraintBottom_toBottomOf="@+id/textView25"
-            app:layout_constraintEnd_toStartOf="@+id/antiDupClickImageButton4"
-            app:layout_constraintTop_toTopOf="@+id/guideline_top" />
-
-        <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/antiDupClickImageButton4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_search_btn"
-            app:layout_constraintBottom_toBottomOf="@+id/textView25"
+            app:layout_constraintBottom_toBottomOf="@+id/channel_list_title"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-            app:layout_constraintTop_toTopOf="@+id/guideline_top" />
+            app:layout_constraintTop_toBottomOf="@+id/network_state_bar" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chat_rcv"
@@ -72,7 +73,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView25" />
+            app:layout_constraintTop_toBottomOf="@+id/channel_list_title" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
