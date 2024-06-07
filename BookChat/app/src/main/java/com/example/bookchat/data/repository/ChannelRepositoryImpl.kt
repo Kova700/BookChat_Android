@@ -431,6 +431,8 @@ class ChannelRepositoryImpl @Inject constructor(
 				currentPage = response.cursorMeta.nextCursorId
 				val newChannels = response.channels.map { getChannelWithUpdatedData(it.roomId) }
 				setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
+				return
+
 			}
 			delay((DEFAULT_RETRY_ATTEMPT_DELAY_TIME * (1.5).pow(attempt)))
 		}
