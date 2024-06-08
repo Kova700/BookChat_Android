@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -122,9 +123,33 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun setBottomScrollBtnState(uiState: ChannelUiState) {
-		binding.chatBottomScrollBtn.visibility =
-			if (uiState.isPossibleToShowBottomScrollBtn) View.VISIBLE else View.GONE
+		with(binding.chatBottomScrollBtn) {
+			if (uiState.isPossibleToShowBottomScrollBtn) {
+				if (visibility == View.VISIBLE) return
+				visibility = View.VISIBLE
+				alpha = 0f
+				scaleX = 0f
+				scaleY = 0f
+				animate()
+					.scaleX(1f)
+					.scaleY(1f)
+					.alpha(1f)
+					.setInterpolator(OvershootInterpolator())
+					.setDuration(300)
+				return
+			}
+
+			//맨처음 이 애니메이션 시작됨 수정 필요
+			if (visibility != View.VISIBLE) return
+			animate()
+				.scaleX(0f)
+				.scaleY(0f)
+				.alpha(0f)
+				.setDuration(300)
+				.withEndAction { visibility = View.GONE }
+		}
 	}
+
 
 	private fun setSocketConnectionUiState(uiState: ChannelUiState) {
 		Log.d(
