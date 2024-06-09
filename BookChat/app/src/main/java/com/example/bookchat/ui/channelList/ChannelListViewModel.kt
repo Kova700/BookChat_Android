@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.domain.NetworkManager
+import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.NetworkState
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.ui.channelList.ChannelListUiState.UiState
@@ -111,8 +112,14 @@ class ChannelListViewModel @Inject constructor(
 		startEvent(ChannelListUiEvent.MoveToChannel(channelId))
 	}
 
+	//TODO : ChannelResponse에 호스트 정보 반영되면 호스트 유무 반영해서 전달
 	fun onLongClickChannelItem(channel: ChannelListItem.ChannelItem) {
-		startEvent(ChannelListUiEvent.ShowChannelSettingDialog(channel))
+		startEvent(
+			ChannelListUiEvent.ShowChannelSettingDialog(
+				clientAuthority = ChannelMemberAuthority.GUEST,
+				channel = channel
+			)
+		)
 	}
 
 	fun onSwipeChannelItem(channel: ChannelListItem.ChannelItem, isSwiped: Boolean) {
