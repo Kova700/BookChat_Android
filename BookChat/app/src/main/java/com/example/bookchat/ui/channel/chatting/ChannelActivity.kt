@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewPropertyAnimator
 import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.addCallback
@@ -24,6 +25,7 @@ import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
+import com.example.bookchat.ui.channel.channelsetting.ChannelSettingActivity.Companion.RESULT_CODE_USER_CHANNEL_EXIT
 import com.example.bookchat.ui.channel.channelsetting.ChannelSettingActivity
 import com.example.bookchat.ui.channel.chatting.adapter.ChatItemAdapter
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
@@ -35,6 +37,7 @@ import com.example.bookchat.ui.channel.drawer.mapper.toUser
 import com.example.bookchat.ui.channel.drawer.model.ChannelDrawerItem
 import com.example.bookchat.ui.channel.userprofile.UserProfileActivity
 import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.isOnHigherPosition
 import com.example.bookchat.utils.isOnListBottom
 import com.example.bookchat.utils.isOnListTop
 import com.example.bookchat.utils.isVisiblePosition
@@ -43,8 +46,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.abs
 
-
+//TODO : 폭발한 채팅방 나가기 할 때, 서버 요청 실패하더라도 괜찮게 예외처리 (soft삭제라 서버에 없는 채팅방 일 수도 있음)
+//TODO : 유저가 해당 채팅방을 안보고 채널 목록을 보고 있는 상황에서 채팅방에 강퇴당한 후, 채팅방을 누르고 들어오면 아무 UI가 안뜸 (강퇴당했다는 UI 마저도 안뜸)
 @AndroidEntryPoint
 class ChannelActivity : AppCompatActivity() {
 
@@ -56,9 +61,6 @@ class ChannelActivity : AppCompatActivity() {
 
 	@Inject
 	lateinit var channelDrawerAdapter: ChannelDrawerAdapter
-
-	@Inject
-	lateinit var chatItemDecoration: ChatItemDecoration
 
 	private lateinit var linearLayoutManager: LinearLayoutManager
 
@@ -114,63 +116,68 @@ class ChannelActivity : AppCompatActivity() {
 
 	private fun setViewState(uiState: ChannelUiState) {
 		setMessageBarState(uiState)
-		setBottomScrollBtnState(uiState)
 		setNewChatNoticeState(uiState)
 		setSocketConnectionUiState(uiState)
 		setExplodedChannelUiState(uiState)
 		setBannedClientUIState(uiState)
 		setChannelSettingBtnUiState(uiState)
+		setCaptureMode(uiState)
 	}
 
-	private fun setBottomScrollBtnState(uiState: ChannelUiState) {
-		with(binding.chatBottomScrollBtn) {
-			if (uiState.isPossibleToShowBottomScrollBtn) {
+	private fun setCaptureMode(uiState: ChannelUiState) {
+		if (uiState.isCaptureMode) changeToCaptureMode()
+		else changeToDefaultMode()
+	}
+
+	private var isGoneAnimatingSocketStateBar = false
+	private fun setSocketConnectionUiState(uiState: ChannelUiState) {
+		fun setVisible() {
+			with(binding.socketStateBar) {
 				if (visibility == View.VISIBLE) return
 				visibility = View.VISIBLE
-				alpha = 0f
-				scaleX = 0f
-				scaleY = 0f
 				animate()
-					.scaleX(1f)
+					.translationY(0F)
 					.scaleY(1f)
 					.alpha(1f)
-					.setInterpolator(OvershootInterpolator())
 					.setDuration(300)
-				return
 			}
-
-			//맨처음 이 애니메이션 시작됨 수정 필요
-			if (visibility != View.VISIBLE) return
-			animate()
-				.scaleX(0f)
-				.scaleY(0f)
-				.alpha(0f)
-				.setDuration(300)
-				.withEndAction { visibility = View.GONE }
 		}
-	}
 
+		fun setGone() {
+			with(binding.socketStateBar) {
+				if (channelViewModel.uiState.value.socketState == uiState.socketState) {
+					if (isGoneAnimatingSocketStateBar || visibility == View.GONE) return
+					isGoneAnimatingSocketStateBar = true
+					animate()
+						.translationY(-height.toFloat())
+						.scaleY(0f)
+						.alpha(0f)
+						.setDuration(300)
+						.withEndAction {
+							visibility = View.GONE
+							isGoneAnimatingSocketStateBar = false
+						}
+				} else visibility = View.VISIBLE
+			}
+		}
 
-	private fun setSocketConnectionUiState(uiState: ChannelUiState) {
-		Log.d(
-			TAG,
-			"ChannelActivity: setSocketConnectionUiState() - uiState.socketState : ${uiState.socketState}"
-		)
 		when (uiState.socketState) {
 			SocketState.CONNECTING -> {
-				binding.socketStateBar.setText(R.string.connecting_network)
-				binding.socketStateBar.setBackgroundColor(Color.parseColor("#666666"))
-				binding.socketStateBar.visibility = View.VISIBLE
+				with(binding.socketStateBar) {
+					setText(R.string.connecting_network)
+					setBackgroundColor(Color.parseColor("#666666"))
+					setVisible()
+				}
 			}
 
 			SocketState.CONNECTED -> {
-				binding.socketStateBar.setText(R.string.connected_network)
-				binding.socketStateBar.setBackgroundColor(Color.parseColor("#5648FF"))
-				lifecycleScope.launch {
-					delay(SOCKET_CONNECTION_SUCCESS_BAR_EXPOSURE_TIME)
-					binding.socketStateBar.visibility =
-						if (channelViewModel.uiState.value.socketState == uiState.socketState)
-							View.GONE else View.VISIBLE
+				with(binding.socketStateBar) {
+					setText(R.string.connected_network)
+					setBackgroundColor(Color.parseColor("#5648FF"))
+					lifecycleScope.launch {
+						delay(SOCKET_CONNECTION_SUCCESS_BAR_EXPOSURE_TIME)
+						setGone()
+					}
 				}
 			}
 
@@ -178,9 +185,11 @@ class ChannelActivity : AppCompatActivity() {
 			SocketState.NEED_RECONNECTION,
 			SocketState.DISCONNECTED,
 			-> {
-				binding.socketStateBar.setText(R.string.offline_network)
-				binding.socketStateBar.setBackgroundColor(Color.parseColor("#666666"))
-				binding.socketStateBar.visibility = View.VISIBLE
+				with(binding.socketStateBar) {
+					setText(R.string.offline_network)
+					setBackgroundColor(Color.parseColor("#666666"))
+					setVisible()
+				}
 			}
 		}
 	}
@@ -211,6 +220,10 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun initAdapter() {
+		chatItemAdapter.onSelectCaptureChat = { position ->
+			val item = (chatItemAdapter.currentList[position] as ChatItem)
+			channelViewModel.onSelectCaptureChat(item.getCategoryId())
+		}
 		chatItemAdapter.onClickUserProfile = { position ->
 			val item = (chatItemAdapter.currentList[position] as ChatItem.AnotherUser)
 			channelViewModel.onClickUserProfile(item.sender!!)
@@ -262,13 +275,69 @@ class ChannelActivity : AppCompatActivity() {
 		scrollToBottom()
 	}
 
+	private var bottomScrollBtnAnimation: ViewPropertyAnimator? = null
+	private val overshootInterpolator = OvershootInterpolator()
+	private var isGoneAnimatingBottomScrollBtn = false
+	private fun setBottomScrollBtnState() {
+		fun setVisible() {
+			with(binding.chatBottomScrollBtn) {
+				if (isGoneAnimatingBottomScrollBtn.not() && visibility == View.VISIBLE) return
+				isGoneAnimatingBottomScrollBtn = false
+				bottomScrollBtnAnimation?.cancel()
+				visibility = View.VISIBLE
+				scaleX = 0f
+				scaleY = 0f
+				alpha = 0f
+				bottomScrollBtnAnimation = animate()
+					.scaleX(1f)
+					.scaleY(1f)
+					.alpha(1f)
+					.setInterpolator(overshootInterpolator)
+					.setDuration(300)
+					.withEndAction {
+						bottomScrollBtnAnimation = null
+					}
+			}
+		}
+
+		fun setGone() {
+			with(binding.chatBottomScrollBtn) {
+				if (visibility != View.VISIBLE) return
+				isGoneAnimatingBottomScrollBtn = true
+				bottomScrollBtnAnimation?.cancel()
+				bottomScrollBtnAnimation = animate()
+					.scaleX(0f)
+					.scaleY(0f)
+					.alpha(0f)
+					.setDuration(300)
+					.withEndAction {
+						visibility = View.GONE
+						bottomScrollBtnAnimation = null
+						isGoneAnimatingBottomScrollBtn = false
+					}
+			}
+		}
+
+		val isPossibleToShowBottomScrollBtn = linearLayoutManager.isOnListBottom().not()
+						&& linearLayoutManager.isOnHigherPosition(BOTTOM_SCROLL_BTN_REFERENCE_POSITION)
+						&& (channelViewModel.uiState.value.newChatNotice == null)
+						&& channelViewModel.uiState.value.isNewerChatFullyLoaded
+
+		if (isPossibleToShowBottomScrollBtn) {
+			setVisible()
+			return
+		}
+
+		if (linearLayoutManager.isOnListBottom()) setGone()
+	}
+
 	private fun initRcv() {
 		val rcvScrollListener = object : RecyclerView.OnScrollListener() {
 			override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
 				super.onScrolled(recyclerView, dx, dy)
 				removeNewChatNoticeIfAppearsOnScreen()
 				removeLastReadNoticeScrollFlagIfAppearsOnScreen()
-				channelViewModel.onChangeStateOfLookingAtBottom(linearLayoutManager.isOnListBottom())
+				setBottomScrollBtnState()
 				when {
 					linearLayoutManager.isOnListTop() -> channelViewModel.onReachedTopChat()
 					linearLayoutManager.isOnListBottom() -> channelViewModel.onReachedBottomChat()
@@ -279,7 +348,6 @@ class ChannelActivity : AppCompatActivity() {
 		binding.chattingRcv.apply {
 			adapter = chatItemAdapter
 			setHasFixedSize(true)
-			addItemDecoration(chatItemDecoration)
 			layoutManager = linearLayoutManager
 			addOnScrollListener(rcvScrollListener)
 		}
@@ -292,6 +360,7 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun removeNewChatNoticeIfAppearsOnScreen() {
+		if (channelViewModel.uiState.value.newChatNotice == null) return
 		val newestChatNotMineIndex = chatItemAdapter.newestChatNotMineIndex
 		if (linearLayoutManager.isVisiblePosition(newestChatNotMineIndex).not()) return
 		val item = chatItemAdapter.currentList[newestChatNotMineIndex] as ChatItem.Message
@@ -299,6 +368,7 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun removeLastReadNoticeScrollFlagIfAppearsOnScreen() {
+		if (channelViewModel.uiState.value.needToScrollToLastReadChat.not()) return
 		val lastReadChatNoticeIndex = chatItemAdapter.lastReadChatNoticeIndex
 		if (linearLayoutManager.isVisiblePosition(lastReadChatNoticeIndex).not()) return
 		channelViewModel.onReadLastReadNotice()
@@ -314,13 +384,11 @@ class ChannelActivity : AppCompatActivity() {
 
 	private val channelSettingResultLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-			if (result.resultCode == RESULT_OK) {
-				finish()
-			}
+			if (result.resultCode == RESULT_CODE_USER_CHANNEL_EXIT) finish()
 		}
 
 	private fun moveChannelSetting() {
-		val channelId = channelViewModel.uiState.value.channel.roomId ?: return
+		val channelId = channelViewModel.uiState.value.channel.roomId
 		val intent = Intent(this, ChannelSettingActivity::class.java)
 			.putExtra(EXTRA_CHANNEL_ID, channelId)
 		channelSettingResultLauncher.launch(intent)
@@ -329,8 +397,15 @@ class ChannelActivity : AppCompatActivity() {
 	private fun setExplodedChannelUiState(uiState: ChannelUiState) {
 		if (uiState.channel.isExploded.not()) return
 		showExplodedChannelNoticeDialog()
+		with(binding.captureBtn) {
+			isEnabled = false
+			isClickable = false
+			background = null
+		}
 		with(binding.chatInputEt) {
 			isEnabled = false
+			isClickable = false
+			isFocusable = false
 			setText("")
 			setHint(R.string.unavailable_channel_edittext_hint)
 		}
@@ -339,8 +414,15 @@ class ChannelActivity : AppCompatActivity() {
 	private fun setBannedClientUIState(uiState: ChannelUiState) {
 		if (uiState.channel.isBanned.not()) return
 		showBannedClientNoticeDialog()
+		with(binding.captureBtn) {
+			isEnabled = false
+			isClickable = false
+			background = null
+		}
 		with(binding.chatInputEt) {
 			isEnabled = false
+			isClickable = false
+			isFocusable = false
 			setText("")
 			setHint(R.string.unavailable_channel_edittext_hint)
 		}
@@ -376,6 +458,7 @@ class ChannelActivity : AppCompatActivity() {
 		dialog.show(supportFragmentManager, DIALOG_TAG_CHANNEL_EXIT_WARNING)
 	}
 
+	//TODO : 캡처모드라면 캡처모드 해제
 	private fun setBackPressedDispatcher() {
 		onBackPressedDispatcher.addCallback {
 			if (binding.drawerLayout.isDrawerOpen(GravityCompat.END)) {
@@ -420,16 +503,66 @@ class ChannelActivity : AppCompatActivity() {
 		channelViewModel.onNeedNewChatNotice(channelLastChat)
 	}
 
+	private fun changeToCaptureMode() {
+		with(binding.chatInputEt) {
+			clearFocus()
+			isEnabled = false
+		}
+		binding.captureBtn.isEnabled = false
+		binding.chatSendBtn.isEnabled = false
+		chatItemAdapter.changeToCaptureMode()
+		binding.channelCaptureLayout.layout.visibility = View.VISIBLE
+		binding.captureModeBottomShadow.visibility = View.VISIBLE
+	}
+
+	private fun changeToDefaultMode() {
+		binding.chatInputEt.isEnabled = true
+		binding.captureBtn.isEnabled = true
+		binding.chatSendBtn.isEnabled = true
+		chatItemAdapter.changeToDefaultMode()
+		binding.channelCaptureLayout.layout.visibility = View.GONE
+		binding.captureModeBottomShadow.visibility = View.GONE
+	}
+
+	private fun onSelectedCaptureChat(selectedItemId: Long) {
+		//-1이라면 존재하지 않는거임
+		val headerIndex = chatItemAdapter.captureHeaderIndex
+		val bottomIndex = chatItemAdapter.captureBottomIndex
+		when {
+			headerIndex == -1 || bottomIndex == -1 -> {
+				channelViewModel.onChangeCaptureHeaderItem(selectedItemId)
+				channelViewModel.onChangeCaptureBottomItem(selectedItemId)
+			}
+
+			headerIndex == bottomIndex -> {
+				val currentIndex = headerIndex
+				when {
+					currentIndex < selectedItemId -> channelViewModel.onChangeCaptureHeaderItem(selectedItemId)
+					currentIndex > selectedItemId -> channelViewModel.onChangeCaptureBottomItem(selectedItemId)
+				}
+			}
+
+			headerIndex != bottomIndex -> {
+				val headerGap = abs(headerIndex - selectedItemId)
+				val bottomGap = abs(bottomIndex - selectedItemId)
+				when {
+					headerGap < bottomGap -> channelViewModel.onChangeCaptureHeaderItem(selectedItemId)
+					headerGap > bottomGap -> channelViewModel.onChangeCaptureBottomItem(selectedItemId)
+				}
+			}
+		}
+	}
+
 	private fun handleEvent(event: ChannelEvent) {
 		when (event) {
 			ChannelEvent.MoveBack -> finish()
-			ChannelEvent.CaptureChannel -> {}
 			ChannelEvent.OpenOrCloseDrawer -> openOrCloseDrawer()
 			ChannelEvent.ScrollToBottom -> scrollToBottom()
+			ChannelEvent.MoveChannelSetting -> moveChannelSetting()
+			is ChannelEvent.SelectedCaptureChat -> onSelectedCaptureChat(event.selectedItemId)
 			is ChannelEvent.MoveUserProfile -> moveToUserProfile(event.user)
 			is ChannelEvent.MakeToast -> makeToast(event.stringId)
 			is ChannelEvent.NewChatOccurEvent -> checkIfNewChatNoticeIsRequired(event.chat)
-			ChannelEvent.MoveChannelSetting -> moveChannelSetting()
 			is ChannelEvent.ShowChannelExitWarningDialog ->
 				showChannelExitWarningDialog(event.clientAuthority)
 		}
@@ -462,5 +595,6 @@ class ChannelActivity : AppCompatActivity() {
 		private const val DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE =
 			"DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE"
 		private const val SOCKET_CONNECTION_SUCCESS_BAR_EXPOSURE_TIME = 1500L
+		private const val BOTTOM_SCROLL_BTN_REFERENCE_POSITION = 3
 	}
 }
