@@ -165,7 +165,7 @@ class ChannelSettingActivity : AppCompatActivity() {
 	}
 
 	private fun exitChannel() {
-		setResult(RESULT_OK, intent)
+		setResult(RESULT_CODE_USER_CHANNEL_EXIT, intent)
 		finish()
 	}
 
@@ -185,6 +185,7 @@ class ChannelSettingActivity : AppCompatActivity() {
 	companion object {
 		private const val DIALOG_TAG_CHANNEL_EXIT_WARNING = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
 		private const val DIALOG_TAG_CHANNEL_CAPACITY_DIALOG = "DIALOG_TAG_CHANNEL_CAPACITY_DIALOG"
+		const val RESULT_CODE_USER_CHANNEL_EXIT = 100
 		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
 	}
 }
