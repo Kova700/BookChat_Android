@@ -13,19 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_begin="30dp" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_end="30dp" />
         <TextView
             android:id="@+id/network_state_bar"
             android:layout_width="0dp"
@@ -39,32 +26,54 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/channel_list_title"
-            android:layout_width="wrap_content"
+        <!--TODO : 아래 여백 필요 상단 레이아웃 만들고 구분하자 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/channel_list_header_layout"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="7dp"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_bold"
-            android:text="@string/chat"
-            android:textColor="#222222"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@+id/network_state_bar" />
+            android:paddingTop="20dp"
+            android:paddingBottom="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/network_state_bar">
 
-        <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/antiDupClickImageButton8"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:padding="5dp"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:onClick="@{() -> viewmodel.onClickPlusBtn()}"
-            android:src="@drawable/ic_plus_btn_black"
-            app:layout_constraintBottom_toBottomOf="@+id/channel_list_title"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-            app:layout_constraintTop_toBottomOf="@+id/network_state_bar" />
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="30dp" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_end="30dp" />
+
+            <TextView
+                android:id="@+id/channel_list_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_bold"
+                android:text="@string/chat"
+                android:textColor="#222222"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="@+id/guideline_start"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.example.bookchat.ui.customview.AntiDupClickImageButton
+                android:id="@+id/antiDupClickImageButton8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?android:selectableItemBackgroundBorderless"
+                android:onClick="@{() -> viewmodel.onClickPlusBtn()}"
+                android:padding="5dp"
+                android:src="@drawable/ic_plus_btn_black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chat_rcv"
@@ -73,7 +82,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/channel_list_title" />
+            app:layout_constraintTop_toBottomOf="@+id/channel_list_header_layout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
