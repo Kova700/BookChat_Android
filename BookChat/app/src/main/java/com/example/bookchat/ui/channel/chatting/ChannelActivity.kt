@@ -25,8 +25,8 @@ import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
-import com.example.bookchat.ui.channel.channelsetting.ChannelSettingActivity.Companion.RESULT_CODE_USER_CHANNEL_EXIT
 import com.example.bookchat.ui.channel.channelsetting.ChannelSettingActivity
+import com.example.bookchat.ui.channel.channelsetting.ChannelSettingActivity.Companion.RESULT_CODE_USER_CHANNEL_EXIT
 import com.example.bookchat.ui.channel.chatting.adapter.ChatItemAdapter
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
 import com.example.bookchat.ui.channel.drawer.adapter.ChannelDrawerAdapter
@@ -46,7 +46,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.abs
 
 //TODO : 폭발한 채팅방 나가기 할 때, 서버 요청 실패하더라도 괜찮게 예외처리 (soft삭제라 서버에 없는 채팅방 일 수도 있음)
 //TODO : 유저가 해당 채팅방을 안보고 채널 목록을 보고 있는 상황에서 채팅방에 강퇴당한 후, 채팅방을 누르고 들어오면 아무 UI가 안뜸 (강퇴당했다는 UI 마저도 안뜸)
@@ -80,6 +79,7 @@ class ChannelActivity : AppCompatActivity() {
 		initViewState()
 		observeUiState()
 		observeUiEvent()
+		observeCaptureIds()
 	}
 
 	override fun onStart() {
@@ -102,6 +102,37 @@ class ChannelActivity : AppCompatActivity() {
 
 	private fun observeUiEvent() = lifecycleScope.launch {
 		channelViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun observeCaptureIds() = lifecycleScope.launch {
+		channelViewModel.captureIds.collect { captureIds ->
+			setCaptureViewState(captureIds)
+		}
+	}
+
+	private fun setCaptureViewState(captureIds: Pair<Long?, Long?>) {
+		val (headerId, bottomId) = captureIds
+		with(binding.channelCaptureLayout) {
+			if (headerId != null || bottomId != null) {
+				channelScrapConfirmBtn.setTextColor(Color.parseColor("#000000"))
+				channelScrapConfirmBtn.isEnabled = true
+				backBtn.visibility = View.INVISIBLE
+				channelScrapSelectCancelBtn.visibility = View.VISIBLE
+				channelScrapExplanationCommentTv.setText(
+					R.string.channel_scrap_explanation_comment_on_selected
+				)
+				return
+			}
+
+			channelScrapConfirmBtn.setTextColor(Color.parseColor("#A0A0A5"))
+			channelScrapConfirmBtn.isEnabled = false
+			backBtn.visibility = View.VISIBLE
+			channelScrapSelectCancelBtn.visibility = View.GONE
+			channelScrapExplanationCommentTv.setText(
+				R.string.channel_scrap_explanation_comment
+			)
+
+		}
 	}
 
 	private fun initViewState() {
@@ -236,12 +267,11 @@ class ChannelActivity : AppCompatActivity() {
 			val item = (chatItemAdapter.currentList[position] as ChatItem.MyChat)
 			channelViewModel.onClickFailedChatRetryBtn(item.chatId)
 		}
-		chatItemAdapter.registerAdapterDataObserver(adapterDataObserver)
-
 		channelDrawerAdapter.onClickUserProfile = { itemPosition ->
 			val userItem = (channelDrawerAdapter.currentList[itemPosition] as ChannelDrawerItem.UserItem)
 			channelViewModel.onClickUserProfile(userItem.toUser())
 		}
+		chatItemAdapter.registerAdapterDataObserver(adapterDataObserver)
 	}
 
 	private val adapterDataObserver = object : RecyclerView.AdapterDataObserver() {
@@ -375,7 +405,7 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun moveToUserProfile(user: User) {
-		val channelId = channelViewModel.uiState.value.channel.roomId ?: return
+		val channelId = channelViewModel.uiState.value.channel.roomId
 		val intent = Intent(this, UserProfileActivity::class.java)
 			.putExtra(EXTRA_USER_ID, user.id)
 			.putExtra(EXTRA_CHANNEL_ID, channelId)
@@ -458,12 +488,18 @@ class ChannelActivity : AppCompatActivity() {
 		dialog.show(supportFragmentManager, DIALOG_TAG_CHANNEL_EXIT_WARNING)
 	}
 
-	//TODO : 캡처모드라면 캡처모드 해제
 	private fun setBackPressedDispatcher() {
 		onBackPressedDispatcher.addCallback {
-			if (binding.drawerLayout.isDrawerOpen(GravityCompat.END)) {
-				binding.drawerLayout.closeDrawer(GravityCompat.END)
-				return@addCallback
+			when {
+				binding.drawerLayout.isDrawerOpen(GravityCompat.END) -> {
+					binding.drawerLayout.closeDrawer(GravityCompat.END)
+					return@addCallback
+				}
+
+				channelViewModel.uiState.value.isCaptureMode -> {
+					channelViewModel.onClickCancelCapture()
+					return@addCallback
+				}
 			}
 			channelViewModel.onClickBackBtn()
 		}
@@ -524,42 +560,12 @@ class ChannelActivity : AppCompatActivity() {
 		binding.captureModeBottomShadow.visibility = View.GONE
 	}
 
-	private fun onSelectedCaptureChat(selectedItemId: Long) {
-		//-1이라면 존재하지 않는거임
-		val headerIndex = chatItemAdapter.captureHeaderIndex
-		val bottomIndex = chatItemAdapter.captureBottomIndex
-		when {
-			headerIndex == -1 || bottomIndex == -1 -> {
-				channelViewModel.onChangeCaptureHeaderItem(selectedItemId)
-				channelViewModel.onChangeCaptureBottomItem(selectedItemId)
-			}
-
-			headerIndex == bottomIndex -> {
-				val currentIndex = headerIndex
-				when {
-					currentIndex < selectedItemId -> channelViewModel.onChangeCaptureHeaderItem(selectedItemId)
-					currentIndex > selectedItemId -> channelViewModel.onChangeCaptureBottomItem(selectedItemId)
-				}
-			}
-
-			headerIndex != bottomIndex -> {
-				val headerGap = abs(headerIndex - selectedItemId)
-				val bottomGap = abs(bottomIndex - selectedItemId)
-				when {
-					headerGap < bottomGap -> channelViewModel.onChangeCaptureHeaderItem(selectedItemId)
-					headerGap > bottomGap -> channelViewModel.onChangeCaptureBottomItem(selectedItemId)
-				}
-			}
-		}
-	}
-
 	private fun handleEvent(event: ChannelEvent) {
 		when (event) {
 			ChannelEvent.MoveBack -> finish()
 			ChannelEvent.OpenOrCloseDrawer -> openOrCloseDrawer()
 			ChannelEvent.ScrollToBottom -> scrollToBottom()
 			ChannelEvent.MoveChannelSetting -> moveChannelSetting()
-			is ChannelEvent.SelectedCaptureChat -> onSelectedCaptureChat(event.selectedItemId)
 			is ChannelEvent.MoveUserProfile -> moveToUserProfile(event.user)
 			is ChannelEvent.MakeToast -> makeToast(event.stringId)
 			is ChannelEvent.NewChatOccurEvent -> checkIfNewChatNoticeIsRequired(event.chat)

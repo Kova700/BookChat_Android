@@ -32,10 +32,11 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.abs
 
 //TODO : 점검 중 , 새로운 업데이트 RemoteConfig 구성해서 출시 + Crashtics
 //TODO : 장문의 긴 채팅 길이 접기 구현해야함, 누르면 전체보기 가능하게
@@ -65,6 +66,11 @@ class ChannelViewModel @Inject constructor(
 	private val _uiState = MutableStateFlow<ChannelUiState>(ChannelUiState.DEFAULT)
 	val uiState = _uiState.asStateFlow()
 
+	/** 너무 잦은 chatItem 갱신을 방지하기 위해 uiState와 분리하여 combine*/
+	private val _captureIds =
+		MutableStateFlow<Pair<Long?, Long?>>(Pair(null, null)) // (headerId,bottomId)
+	val captureIds get() = _captureIds.asStateFlow()
+
 	//TODO :
 	// 6. Notice타입의 NewChatNotice UI
 
@@ -85,17 +91,18 @@ class ChannelViewModel @Inject constructor(
 				needToScrollToLastReadChat = shouldLastReadChatScroll,
 			)
 		}
-
+		observeNetworkState()
+		getChannelInfo(channelId) //이거는 호출 할 수 있어야할거같은데? (그래야 채널에서 강퇴 됐는지 아닌지 알지)
+		//isBaned, isExploded가 넘어오는게 아니라 강퇴당하면 그냥 (그럼 채팅방 정보 조회에서 두개의 flag는 의미가 없는거 아닌가? true라면 그냥 404넘어오니까)
+		//404 {"errorCode":"4040500","message":"참여자를 찾을 수 없습니다."} 넘어옴
+		//채팅방 터진 유무는 그냥 넘오긴함 404 안뜨고
 		if (originalChannel.isAvailableChannel.not()) return@launch
-
-		getChannelInfo(channelId)
 		getTempSavedMessage(channelId)
 		observeChannel()
 		observeChats()
 		getOfflineNewestChats()
 		observeChatsLoadState()
 		observeSocketState()
-		observeNetworkState()
 	}
 
 	private fun observeNetworkState() = viewModelScope.launch {
@@ -142,12 +149,17 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun observeChats() = viewModelScope.launch {
-		getChatsFlowUserCase(
-			initFlag = true,
-			channelId = channelId
-		).map { chats ->
+		combine(
+			getChatsFlowUserCase(
+				initFlag = true,
+				channelId = channelId
+			),
+			captureIds
+		) { chats, captureHeaderBottomIds ->
 			chats.toChatItems(
 				channel = uiState.value.channel,
+				captureHeaderItemId = captureHeaderBottomIds.first,
+				captureBottomItemId = captureHeaderBottomIds.second,
 				focusTargetId = uiState.value.originalLastReadChatId,
 				isVisibleLastReadChatNotice = uiState.value.isVisibleLastReadChatNotice
 			)
@@ -265,7 +277,7 @@ class ChannelViewModel @Inject constructor(
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트 간의 데이터 불일치를 메우기 위해서 임시로
 	 * 리커넥션 시마다 호출 (이벤트 History받는 로직 구현 이전까지 )*/
 	private fun getChannelInfo(channelId: Long) = viewModelScope.launch {
-		if (uiState.value.isNetworkDisconnected) return@launch
+//		if (uiState.value.isNetworkDisconnected) return@launch
 		runCatching { channelRepository.getChannelInfo(channelId) }
 			.onFailure { handleError(it, "getChannelInfo") }
 	}
@@ -383,6 +395,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	fun onClickSendMessage() {
+		if (uiState.value.isCaptureMode) return
 		sendMessage()
 	}
 
@@ -401,13 +414,6 @@ class ChannelViewModel @Inject constructor(
 		getNewerChats()
 	}
 
-	//TODO : 홀릭스 / 카톡 버튼처럼 애니메이션으로 만들어보자
-	fun onChangeStateOfLookingAtBottom(isBottom: Boolean) {
-		val isLookingAtBottom = isBottom && uiState.value.isNewerChatFullyLoaded
-		if (uiState.value.isLookingAtBottom == isLookingAtBottom) return
-		updateState { copy(isLookingAtBottom = isLookingAtBottom) }
-	}
-
 	/** 리스트 상 내 채팅이 아닌 채팅 중 가장 최신 채팅이 화면 상에 나타나는 순간 호출 */
 	fun onReadNewestChatNotMineInList(chatItem: ChatItem.Message) {
 		val nowNewChatNotice = uiState.value.newChatNotice
@@ -423,25 +429,113 @@ class ChannelViewModel @Inject constructor(
 		scrollToBottom()
 	}
 
-	//TODO : 캡처 기능 추가
+	//TODO : 서재에 도서 등록 안되어있으면 등록 경고 다이얼로그
 	fun onClickCaptureBtn() {
-		if (uiState.value.channel.isAvailableChannel.not()) return
-//		startEvent(ChannelEvent.CaptureChannel)
+		if (uiState.value.channel.isAvailableChannel.not()
+			|| uiState.value.chats.isEmpty()
+		) return
+		updateState { copy(isCaptureMode = true) }
+		_captureIds.update { Pair(null, null) }
 	}
 
 	fun onClickMenuBtn() {
+		if (uiState.value.isCaptureMode) return
 		startEvent(ChannelEvent.OpenOrCloseDrawer)
 	}
 
 	fun onClickChannelExitBtn() {
+		if (uiState.value.isCaptureMode) return
 		startEvent(ChannelEvent.ShowChannelExitWarningDialog(uiState.value.clientAuthority))
 	}
 
+	fun onClickCancelCaptureSelection() {
+		_captureIds.update { Pair(null, null) }
+	}
+
+	fun onClickCancelCapture() {
+		updateState { copy(isCaptureMode = false) }
+		_captureIds.update { Pair(null, null) }
+	}
+
+	//TODO : 레파지토리 따로 만들어야겠네
+	private fun makeChatsCapture() = viewModelScope.launch {
+		runCatching { }
+	}
+
+	fun onClickCompleteCapture() {
+		val (headerId, bottomId) = captureIds.value
+		val chatMessages = uiState.value.chats
+		val headerIndex = chatMessages.indexOfFirst { it.getCategoryId() == headerId }
+		val bottomIndex = chatMessages.indexOfFirst { it.getCategoryId() == bottomId }
+		chatMessages.subList(headerIndex, bottomIndex)
+			.filter { it !is ChatItem.LastReadChatNotice }
+
+		//API 성공하면
+		//updateState {
+		//			copy(
+		//				isCaptureMode = false,
+		//				captureHeaderItemId = null,
+		//				captureBottomItemId = null
+		//			)
+		//		}
+	}
+
+	fun onSelectCaptureChat(chatItemId: Long) {
+		if (uiState.value.isCaptureMode.not()) return
+
+		val (headerId, bottomId) = captureIds.value
+		val chatMessages = uiState.value.chats
+		var newHeaderId = headerId
+		var newBottomId = bottomId
+
+		when {
+			headerId == null || bottomId == null -> {
+				newHeaderId = chatItemId
+				newBottomId = chatItemId
+			}
+
+			headerId == bottomId -> {
+				val newSelectedIndex = chatMessages.indexOfFirst { it.getCategoryId() == chatItemId }
+				val headerIndex = chatMessages.indexOfFirst { it.getCategoryId() == headerId }
+				val currentIndex = headerIndex
+				when {
+					currentIndex < newSelectedIndex -> newHeaderId = chatItemId
+					currentIndex > newSelectedIndex -> newBottomId = chatItemId
+				}
+			}
+
+			headerId != bottomId -> {
+				val newSelectedIndex = chatMessages.indexOfFirst { it.getCategoryId() == chatItemId }
+				val headerIndex = chatMessages.indexOfFirst { it.getCategoryId() == headerId }
+				val bottomIndex = chatMessages.indexOfFirst { it.getCategoryId() == bottomId }
+				val headerGap = abs(headerIndex - newSelectedIndex)
+				val bottomGap = abs(bottomIndex - newSelectedIndex)
+				when {
+					headerGap < bottomGap -> newHeaderId = chatItemId
+					headerGap > bottomGap -> newBottomId = chatItemId
+					else -> newBottomId = chatItemId
+				}
+			}
+		}
+		val newHeaderIndex = chatMessages.indexOfFirst { it.getCategoryId() == newHeaderId }
+		val newBottomIndex = chatMessages.indexOfFirst { it.getCategoryId() == newBottomId }
+		val selectedItemsCount = abs(newHeaderIndex - newBottomIndex) + 1
+
+		if (selectedItemsCount > 30) {
+			//TODO 30개 이상 선택할 수 없다고 경고 토스트
+			startEvent(ChannelEvent.MakeToast(R.string.channel_scrap_selected_count_over))
+			return
+		}
+		_captureIds.update { Pair(newHeaderId, newBottomId) }
+	}
+
 	fun onClickChannelExitDialogBtn() {
+		if (uiState.value.isCaptureMode) return
 		exitChannel()
 	}
 
 	fun onClickChannelSettingBtn() {
+		if (uiState.value.isCaptureMode) return
 		startEvent(ChannelEvent.MoveChannelSetting)
 	}
 

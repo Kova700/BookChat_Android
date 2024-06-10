@@ -193,7 +193,11 @@
     <string name="connected_network">연결되었습니다.</string>
     <string name="offline_network">오프라인 상태입니다.</string>
     <string name="please_connect_the_network">네트워크를 연결해주세요.</string>
-
+    <string name="channel_scrap">채팅방 스크랩</string>
+    <string name="channel_scrap_explanation_comment">스크랩할 말풍선을 선택해주세요</string>
+    <string name="channel_scrap_explanation_comment_on_selected">캡처 영역을 지정해주세요</string>
+    <string name="cancel_selection">선택해제</string>
+    <string name="channel_scrap_selected_count_over">채팅 스크랩은 30개 까지만 가능합니다.</string>
 
     <!--channel setting-->
     <string name="channel_setting_title">채팅방 설정</string>

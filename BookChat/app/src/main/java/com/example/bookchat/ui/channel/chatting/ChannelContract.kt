@@ -27,13 +27,10 @@ data class ChannelUiState(
 	val newerChatsLoadState: LoadState,
 	val isOlderChatFullyLoaded: Boolean,
 	val isNewerChatFullyLoaded: Boolean,
-	val isLookingAtBottom: Boolean,
+	val isCaptureMode: Boolean,
 ) {
 	val isNetworkDisconnected
 		get() = networkState == NetworkState.DISCONNECTED
-
-	val isPossibleToShowBottomScrollBtn
-		get() = isLookingAtBottom.not() && (newChatNotice == null)
 
 	val isPossibleToLoadOlderChat
 		get() = (olderChatsLoadState != LoadState.LOADING)
@@ -85,7 +82,7 @@ data class ChannelUiState(
 			newerChatsLoadState = LoadState.SUCCESS,
 			isOlderChatFullyLoaded = false,
 			isNewerChatFullyLoaded = true,
-			isLookingAtBottom = true
+			isCaptureMode = false,
 		)
 	}
 }
@@ -93,7 +90,6 @@ data class ChannelUiState(
 sealed class ChannelEvent {
 	object MoveBack : ChannelEvent()
 	object MoveChannelSetting : ChannelEvent()
-	object CaptureChannel : ChannelEvent()
 	object ScrollToBottom : ChannelEvent()
 	object OpenOrCloseDrawer : ChannelEvent()
 
