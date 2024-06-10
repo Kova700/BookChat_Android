@@ -21,7 +21,6 @@ import com.example.bookchat.ui.search.model.SearchResultItem
 import com.example.bookchat.ui.search.model.SearchTarget
 import com.example.bookchat.utils.BookImgSizeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -38,7 +37,7 @@ class SearchViewModel @Inject constructor(
 	private val bookSearchRepository: BookSearchRepository,
 	private val channelSearchRepository: ChannelSearchRepository,
 	private val searchHistoryRepository: SearchHistoryRepository,
-	private val bookImgSizeManager: BookImgSizeManager
+	private val bookImgSizeManager: BookImgSizeManager,
 ) : ViewModel() {
 
 	private val searchPurpose =
@@ -90,7 +89,7 @@ class SearchViewModel @Inject constructor(
 
 	private fun groupItems(
 		books: List<Book>? = null,
-		channels: List<Channel>? = null
+		channels: List<Channel>? = null,
 	): List<SearchResultItem> {
 		val groupedItems = mutableListOf<SearchResultItem>()
 		if (books.isNullOrEmpty() && channels.isNullOrEmpty()) return groupedItems
@@ -191,7 +190,6 @@ class SearchViewModel @Inject constructor(
 	}
 
 	private suspend fun searchSuccessCallBack(isEmpty: Boolean) {
-		delay(SKELETON_DURATION)
 		if (isEmpty) updateState { copy(searchResultState = SearchResultState.Empty) }
 		else updateState { copy(searchResultState = SearchResultState.Success) }
 	}
@@ -307,7 +305,4 @@ class SearchViewModel @Inject constructor(
 		}
 	}
 
-	companion object {
-		private const val SKELETON_DURATION = 700L
-	}
 }
