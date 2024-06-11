@@ -9,9 +9,9 @@ data class RequestMakeChannel(
 	@SerializedName("roomSize")
 	val roomSize: Int,
 	@SerializedName("defaultRoomImageType")
-	val defaultRoomImageType: com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork,
+	val defaultRoomImageType: ChannelDefaultImageTypeNetwork,
 	@SerializedName("hashTags")
 	val hashTags: List<String>,
 	@SerializedName("bookRequest")
-	val bookRequest: com.example.bookchat.data.network.model.request.BookRequest
+	val bookRequest: BookRequest,
 )

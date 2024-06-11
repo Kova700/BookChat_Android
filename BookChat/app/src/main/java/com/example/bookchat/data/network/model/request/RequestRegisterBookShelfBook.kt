@@ -6,9 +6,9 @@ import com.google.gson.annotations.SerializedName
 
 class RequestRegisterBookShelfBook(
 	@SerializedName("bookRequest")
-	private val bookRequest: com.example.bookchat.data.network.model.request.BookRequest,
+	private val bookRequest: BookRequest,
 	@SerializedName("readingStatus")
 	private val bookShelfState: BookShelfState,
 	@SerializedName("star")
-	private val star: StarRating? = null
+	private val star: StarRating? = null,
 )
