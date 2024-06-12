@@ -110,8 +110,8 @@ class ChannelActivity : AppCompatActivity() {
 		}
 	}
 
-	private fun setCaptureViewState(captureIds: Pair<Long?, Long?>) {
-		val (headerId, bottomId) = captureIds
+	private fun setCaptureViewState(captureIds: Pair<Long, Long>?) {
+		val (headerId, bottomId) = captureIds ?: Pair(null, null)
 		with(binding.channelCaptureLayout) {
 			if (headerId != null || bottomId != null) {
 				channelScrapConfirmBtn.setTextColor(Color.parseColor("#000000"))

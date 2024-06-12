@@ -9,6 +9,7 @@ import com.example.bookchat.data.repository.BookShelfRepositoryImpl
 import com.example.bookchat.data.repository.ChannelRepositoryImpl
 import com.example.bookchat.data.repository.ChannelSearchRepositoryImpl
 import com.example.bookchat.data.repository.ChatRepositoryImpl
+import com.example.bookchat.data.repository.ChatScrapRepositoryImpl
 import com.example.bookchat.data.repository.ClientRepositoryImpl
 import com.example.bookchat.data.repository.SearchHistoryRepositoryImpl
 import com.example.bookchat.data.repository.UserRepositoryImpl
@@ -21,6 +22,7 @@ import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChannelSearchRepository
 import com.example.bookchat.domain.repository.ChatRepository
+import com.example.bookchat.domain.repository.ChatScrapRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.SearchHistoryRepository
 import com.example.bookchat.domain.repository.UserRepository
@@ -36,72 +38,78 @@ interface RepositoryModule {
 	@Binds
 	@Singleton
 	fun bindBookChatTokenRepository(
-		repository: BookChatTokenRepositoryIml
+		repository: BookChatTokenRepositoryIml,
 	): BookChatTokenRepository
 
 	@Binds
 	@Singleton
 	fun bindClientRepository(
-		repository: ClientRepositoryImpl
+		repository: ClientRepositoryImpl,
 	): ClientRepository
 
 	@Binds
 	@Singleton
 	fun bindBookShelfRepository(
-		repository: BookShelfRepositoryImpl
+		repository: BookShelfRepositoryImpl,
 	): BookShelfRepository
 
 	@Binds
 	@Singleton
 	fun bindBookSearchRepository(
-		repository: BookSearchRepositoryImpl
+		repository: BookSearchRepositoryImpl,
 	): BookSearchRepository
 
 	@Binds
 	@Singleton
 	fun bindBookReportRepository(
-		repository: BookReportRepositoryImpl
+		repository: BookReportRepositoryImpl,
 	): BookReportRepository
 
 	@Binds
 	@Singleton
 	fun bindAgonyRepository(
-		repository: AgonyRepositoryImpl
+		repository: AgonyRepositoryImpl,
 	): AgonyRepository
 
 	@Binds
 	@Singleton
 	fun bindAgonyRecordRepository(
-		repository: AgonyRecordRepositoryImpl
+		repository: AgonyRecordRepositoryImpl,
 	): AgonyRecordRepository
 
 	@Binds
 	@Singleton
 	fun bindChannelRepository(
-		repository: ChannelRepositoryImpl
+		repository: ChannelRepositoryImpl,
 	): ChannelRepository
 
 	@Binds
 	@Singleton
 	fun bindUserRepository(
-		repository: UserRepositoryImpl
+		repository: UserRepositoryImpl,
 	): UserRepository
 
 	@Binds
 	@Singleton
 	fun bindChatRepository(
-		repository: ChatRepositoryImpl
+		repository: ChatRepositoryImpl,
 	): ChatRepository
 
 	@Binds
 	@Singleton
 	fun bindChannelSearchRepository(
-		repository: ChannelSearchRepositoryImpl
+		repository: ChannelSearchRepositoryImpl,
 	): ChannelSearchRepository
 
 	@Binds
 	@Singleton
 	fun bindSearchHistoryRepository(
-		repository: SearchHistoryRepositoryImpl
+		repository: SearchHistoryRepositoryImpl,
 	): SearchHistoryRepository
+
+	@Binds
+	@Singleton
+	fun bindChatScrapRepository(
+		repository: ChatScrapRepositoryImpl,
+	): ChatScrapRepository
 }

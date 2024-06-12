@@ -13,8 +13,10 @@ import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.domain.model.NetworkState
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
+import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
+import com.example.bookchat.domain.repository.ChatScrapRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.domain.usecase.GetChatsFlowUseCase
@@ -56,6 +58,8 @@ class ChannelViewModel @Inject constructor(
 	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
+	private val chatScrapRepository: ChatScrapRepository,
+	private val bookShelfRepository: BookShelfRepository,
 	private val networkManager: NetworkManager,
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
@@ -68,7 +72,7 @@ class ChannelViewModel @Inject constructor(
 
 	/** 너무 잦은 chatItem 갱신을 방지하기 위해 uiState와 분리하여 combine*/
 	private val _captureIds =
-		MutableStateFlow<Pair<Long?, Long?>>(Pair(null, null)) // (headerId,bottomId)
+		MutableStateFlow<Pair<Long, Long>?>(null) // (headerId,bottomId)
 	val captureIds get() = _captureIds.asStateFlow()
 
 	//TODO :
@@ -158,8 +162,8 @@ class ChannelViewModel @Inject constructor(
 		) { chats, captureHeaderBottomIds ->
 			chats.toChatItems(
 				channel = uiState.value.channel,
-				captureHeaderItemId = captureHeaderBottomIds.first,
-				captureBottomItemId = captureHeaderBottomIds.second,
+				captureHeaderItemId = captureHeaderBottomIds?.first,
+				captureBottomItemId = captureHeaderBottomIds?.second,
 				focusTargetId = uiState.value.originalLastReadChatId,
 				isVisibleLastReadChatNotice = uiState.value.isVisibleLastReadChatNotice
 			)
@@ -435,7 +439,7 @@ class ChannelViewModel @Inject constructor(
 			|| uiState.value.chats.isEmpty()
 		) return
 		updateState { copy(isCaptureMode = true) }
-		_captureIds.update { Pair(null, null) }
+		_captureIds.update { null }
 	}
 
 	fun onClickMenuBtn() {
@@ -449,41 +453,44 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	fun onClickCancelCaptureSelection() {
-		_captureIds.update { Pair(null, null) }
+		_captureIds.update { null }
 	}
 
 	fun onClickCancelCapture() {
 		updateState { copy(isCaptureMode = false) }
-		_captureIds.update { Pair(null, null) }
+		_captureIds.update { null }
 	}
 
-	//TODO : 레파지토리 따로 만들어야겠네
-	private fun makeChatsCapture() = viewModelScope.launch {
-		runCatching { }
+	//TODO : bookShelfId를 어케 가져오지?
+	//  도서가 없는 상태에서 다시 도서를 등록하려면 Book객체가 Channel안에 있어야함
+	//  혹은 BookshelfId만으로 등록을 가능하게 하거나
+	// 백엔드측 응답 대기중
+	private fun makeChatsCapture(
+		scrapContent: List<ChatItem>,
+	) = viewModelScope.launch {
+		runCatching {
+//			chatScrapRepository.makeChatScrap(
+//				bookShelfId =,
+//				scrapContent =
+//			)
+		}
+			.onSuccess { onClickCancelCapture() }
+			.onFailure { }
 	}
-
+	//TODO : 백엔드측 응답 대기중
 	fun onClickCompleteCapture() {
-		val (headerId, bottomId) = captureIds.value
+		val (headerId, bottomId) = captureIds.value ?: return
 		val chatMessages = uiState.value.chats
 		val headerIndex = chatMessages.indexOfFirst { it.getCategoryId() == headerId }
 		val bottomIndex = chatMessages.indexOfFirst { it.getCategoryId() == bottomId }
-		chatMessages.subList(headerIndex, bottomIndex)
-			.filter { it !is ChatItem.LastReadChatNotice }
-
-		//API 성공하면
-		//updateState {
-		//			copy(
-		//				isCaptureMode = false,
-		//				captureHeaderItemId = null,
-		//				captureBottomItemId = null
-		//			)
-		//		}
+//		makeChatsCapture(chatMessages.subList(headerIndex, bottomIndex)
+//			.filter { it !is ChatItem.LastReadChatNotice })
 	}
 
 	fun onSelectCaptureChat(chatItemId: Long) {
 		if (uiState.value.isCaptureMode.not()) return
 
-		val (headerId, bottomId) = captureIds.value
+		val (headerId, bottomId) = captureIds.value ?: Pair(null, null)
 		val chatMessages = uiState.value.chats
 		var newHeaderId = headerId
 		var newBottomId = bottomId
@@ -522,11 +529,11 @@ class ChannelViewModel @Inject constructor(
 		val selectedItemsCount = abs(newHeaderIndex - newBottomIndex) + 1
 
 		if (selectedItemsCount > 30) {
-			//TODO 30개 이상 선택할 수 없다고 경고 토스트
 			startEvent(ChannelEvent.MakeToast(R.string.channel_scrap_selected_count_over))
 			return
 		}
-		_captureIds.update { Pair(newHeaderId, newBottomId) }
+		if (newHeaderId == null || newBottomId == null) _captureIds.update { null }
+		else _captureIds.update { Pair(newHeaderId, newBottomId) }
 	}
 
 	fun onClickChannelExitDialogBtn() {
