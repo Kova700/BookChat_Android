@@ -1,10 +1,10 @@
 package com.example.bookchat.ui.search.channelInfo
 
-import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.ChannelSearchResult
 
 data class ChannelInfoUiState(
 	val uiState: UiState,
-	val channel: Channel
+	val channel: ChannelSearchResult,
 ) {
 
 	enum class UiState {
@@ -16,18 +16,19 @@ data class ChannelInfoUiState(
 	companion object {
 		val DEFAULT = ChannelInfoUiState(
 			uiState = UiState.LOADING,
-			channel = Channel.DEFAULT
+			channel = ChannelSearchResult.DEFAULT
 		)
 	}
 }
 
 sealed class ChannelInfoEvent {
 	object MoveToBack : ChannelInfoEvent()
+	object ShowFullChannelDialog : ChannelInfoEvent()
 	data class MoveToChannel(
-		val channelId: Long
+		val channelId: Long,
 	) : ChannelInfoEvent()
 
 	data class MakeToast(
-		val stringId: Int
+		val stringId: Int,
 	) : ChannelInfoEvent()
 }
