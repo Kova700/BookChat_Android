@@ -45,34 +45,18 @@ object DateManager {
 
 	fun getFormattedDetailDateTimeText(dateTimeString: String): String =
 		when {
-			isToday(dateTimeString) -> {
-				getDetailFormattedTodayText(dateTimeString)
-			}
-
-			isYesterday(dateTimeString) -> {
-				getFormattedYesterdayText()
-			}
-
-			isThisYear(dateTimeString) -> {
-				getFormattedThisYearText(dateTimeString)
-			}
-
-			else -> {
-				getFormattedElseYearText(dateTimeString)
-			}
+			isToday(dateTimeString) -> getDetailFormattedTodayText(dateTimeString)
+			isYesterday(dateTimeString) -> getFormattedYesterdayText()
+			isThisYear(dateTimeString) -> getFormattedThisYearText(dateTimeString)
+			else -> getFormattedElseYearText(dateTimeString)
 		}
 
 	fun getFormattedAbstractDateTimeText(dateTimeString: String): String =
 		when {
-			isToday(dateTimeString) -> {
-				getAbstractFormattedTodayText(dateTimeString)
-			}
-
-			isYesterday(dateTimeString) -> {
-				getFormattedYesterdayText()
-			}
-
-			else -> EMPTY
+			isToday(dateTimeString) -> getAbstractFormattedTodayText(dateTimeString)
+			isYesterday(dateTimeString) -> getFormattedYesterdayText()
+			isThisYear(dateTimeString) -> getFormattedThisYearText(dateTimeString)
+			else -> getFormattedElseYearText(dateTimeString)
 		}
 
 	fun getFormattedTimeText(dateTimeString: String): String =
