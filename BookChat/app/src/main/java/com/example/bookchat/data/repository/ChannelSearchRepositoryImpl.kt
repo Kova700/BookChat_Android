@@ -32,6 +32,7 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 	private val channels = mapChannels.map { it.values.toList() }.filterNotNull()
 
 	private var cachedSearchKeyword = ""
+	private var cachedSearchFilter = SearchFilter.BOOK_TITLE
 	private var currentPage: Long? = null
 	private var isEndPage = false
 
@@ -45,7 +46,9 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 		searchFilter: SearchFilter,
 		size: Int,
 	): List<ChannelSearchResult> {
-		if (cachedSearchKeyword != keyword) clearCachedData()
+		if (cachedSearchKeyword != keyword
+			|| cachedSearchFilter != searchFilter
+		) clearCachedData()
 		if (isEndPage) return channels.firstOrNull() ?: emptyList()
 
 		val requestGetSearchedChannels = getRequestGetSearchedChannels(
@@ -63,6 +66,7 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 		)
 
 		cachedSearchKeyword = keyword
+		cachedSearchFilter = searchFilter
 		isEndPage = response.cursorMeta.last
 		currentPage = response.cursorMeta.nextCursorId
 

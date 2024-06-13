@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
+import com.example.bookchat.domain.model.SearchFilter
 import com.example.bookchat.domain.model.SearchPurpose
 import com.example.bookchat.domain.repository.BookSearchRepository
 import com.example.bookchat.domain.repository.ChannelSearchRepository
@@ -231,13 +232,21 @@ class SearchViewModel @Inject constructor(
 
 	fun onBookItemClick(bookItem: SearchResultItem.BookItem) {
 		when (uiState.value.searchPurpose) {
-			SearchPurpose.SEARCH_BOTH -> startEvent(SearchEvent.MoveToSearchBookDialog(bookItem.toBook()))
+			SearchPurpose.SEARCH_BOTH -> startEvent(SearchEvent.ShowSearchBookDialog(bookItem.toBook()))
 			SearchPurpose.MAKE_CHANNEL -> startEvent(
-				SearchEvent.MoveToMakeChannelSelectBookDialog(bookItem.toBook())
+				SearchEvent.ShowMakeChannelSelectBookDialog(bookItem.toBook())
 			)
 
 			SearchPurpose.SEARCH_CHANNEL -> Unit
 		}
+	}
+
+	fun onClickSearchFilter(selectedFilter: SearchFilter) {
+		updateState { copy(searchFilter = selectedFilter) }
+	}
+
+	fun onClickSearchFilterBtn() {
+		startEvent(SearchEvent.ShowSearchFilterSelectDialog)
 	}
 
 	fun onChannelItemClick(channelId: Long) {

@@ -30,6 +30,7 @@ import com.example.bookchat.ui.createchannel.MakeChannelSelectBookActivity
 import com.example.bookchat.ui.search.SearchUiState.SearchTapState
 import com.example.bookchat.ui.search.channelInfo.ChannelInfoActivity
 import com.example.bookchat.ui.search.dialog.SearchBookDialog
+import com.example.bookchat.ui.search.dialog.SearchFilterSelectDialog
 import com.example.bookchat.ui.search.model.SearchTarget
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
@@ -80,8 +81,7 @@ class SearchFragment : Fragment() {
 	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
 		searchViewModel.uiState.collect { uiState ->
 			handleFragment(uiState.searchTapState)
-			setViewVisibility(uiState.searchTapState)
-			setSearchBarState(uiState)
+			setViewState(uiState)
 		}
 	}
 
@@ -110,6 +110,12 @@ class SearchFragment : Fragment() {
 		}
 	}
 
+	private fun setViewState(uiState: SearchUiState) {
+		setViewVisibility(uiState.searchTapState)
+		setSearchBarState(uiState)
+		setSearchFilterBtnState(uiState)
+	}
+
 	private fun setSearchBarState(uiState: SearchUiState) {
 		with(binding.searchEditText) {
 			if (uiState.searchKeyword != text.toString()) {
@@ -119,10 +125,19 @@ class SearchFragment : Fragment() {
 		}
 	}
 
+	private fun setSearchFilterBtnState(uiState: SearchUiState) {
+		with(binding.searchFilterBtn) {
+			if (uiState.searchFilter != SearchFilter.BOOK_TITLE) setImageResource(R.drawable.search_filter_blue_icon)
+			else setImageResource(R.drawable.search_filter_black_icon)
+		}
+	}
+
 	private fun setViewVisibility(searchTapState: SearchTapState) {
 		with(binding) {
 			backBtn.visibility = if (searchTapState.isDefault) View.INVISIBLE else View.VISIBLE
 			animationTouchEventView.visibility =
+				if (searchTapState.isDefault) View.VISIBLE else View.INVISIBLE
+			searchFilterBtn.visibility =
 				if (searchTapState.isDefault) View.VISIBLE else View.INVISIBLE
 			searchDeleteBtn.visibility =
 				if (searchTapState.isDefaultOrHistory) View.INVISIBLE else View.VISIBLE
@@ -223,18 +238,32 @@ class SearchFragment : Fragment() {
 		)
 	}
 
-	private fun moveToSearchTapBookDialog(book: Book) {
+	private fun showSearchTapBookDialog(book: Book) {
+		val existingFragment = childFragmentManager.findFragmentByTag(DIALOG_TAG_SEARCH_BOOK)
+		if (existingFragment != null) return
 		val dialog = SearchBookDialog()
 		dialog.arguments = bundleOf(EXTRA_SEARCHED_BOOK_ITEM_ID to book.isbn)
 		dialog.show(childFragmentManager, DIALOG_TAG_SEARCH_BOOK)
 	}
 
-	private fun moveToMakeChannelSelectBookDialog(book: Book) {
+	private fun showMakeChannelSelectBookDialog(book: Book) {
+		val existingFragment = childFragmentManager.findFragmentByTag(DIALOG_TAG_SELECT_BOOK)
+		if (existingFragment != null) return
 		val dialog = MakeChannelBookSelectDialog(
 			onClickMakeChannel = { finishWithSelectedChannelBook(book.isbn) },
 			selectedBook = book
 		)
 		dialog.show(childFragmentManager, DIALOG_TAG_SELECT_BOOK)
+	}
+
+	private fun showSearchFilterSelectDialog() {
+		val existingFragment = childFragmentManager.findFragmentByTag(DIALOG_TAG_SELECT_SEARCH_FILTER)
+		if (existingFragment != null) return
+		val dialog = SearchFilterSelectDialog(
+			onSelectFilter = { searchViewModel.onClickSearchFilter(it) },
+			searchUiState = searchViewModel.uiState
+		)
+		dialog.show(childFragmentManager, DIALOG_TAG_SELECT_SEARCH_FILTER)
 	}
 
 	private fun finishWithSelectedChannelBook(bookIsbn: String) {
@@ -258,12 +287,13 @@ class SearchFragment : Fragment() {
 				searchFilter = event.searchFilter
 			)
 
-			is SearchEvent.MoveToSearchBookDialog -> moveToSearchTapBookDialog(event.book)
-			is SearchEvent.MoveToMakeChannelSelectBookDialog ->
-				moveToMakeChannelSelectBookDialog(event.book)
+			is SearchEvent.ShowSearchBookDialog -> showSearchTapBookDialog(event.book)
+			is SearchEvent.ShowMakeChannelSelectBookDialog ->
+				showMakeChannelSelectBookDialog(event.book)
 
 			is SearchEvent.MoveToChannelInfo -> moveToChannelInfo(event.channelId)
 			is SearchEvent.MakeToast -> makeToast(event.stringId)
+			is SearchEvent.ShowSearchFilterSelectDialog -> showSearchFilterSelectDialog()
 		}
 	}
 
@@ -274,8 +304,9 @@ class SearchFragment : Fragment() {
 		const val EXTRA_SEARCH_FILTER = "EXTRA_CHAT_SEARCH_FILTER"
 
 		const val EXTRA_SEARCHED_BOOK_ITEM_ID = "EXTRA_SEARCHED_BOOK_ITEM_ID"
+		const val EXTRA_CLICKED_CHANNEL_ID = "EXTRA_CLICKED_CHANNEL_ID"
 		const val DIALOG_TAG_SEARCH_BOOK = "DIALOG_TAG_SEARCH_BOOK"
 		const val DIALOG_TAG_SELECT_BOOK = "DIALOG_TAG_SELECT_BOOK"
-		const val EXTRA_CLICKED_CHANNEL_ID = "EXTRA_CLICKED_CHANNEL_ID"
+		const val DIALOG_TAG_SELECT_SEARCH_FILTER = "DIALOG_TAG_SELECT_SEARCH_FILTER"
 	}
 }

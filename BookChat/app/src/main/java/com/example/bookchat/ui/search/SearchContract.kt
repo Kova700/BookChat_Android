@@ -59,6 +59,8 @@ data class SearchUiState(
 }
 
 sealed class SearchEvent {
+	object ShowSearchFilterSelectDialog : SearchEvent()
+
 	data class MoveToDetail(
 		val searchKeyword: String,
 		val searchTarget: SearchTarget,
@@ -66,11 +68,11 @@ sealed class SearchEvent {
 		val searchFilter: SearchFilter,
 	) : SearchEvent()
 
-	data class MoveToSearchBookDialog(
+	data class ShowSearchBookDialog(
 		val book: Book,
 	) : SearchEvent()
 
-	data class MoveToMakeChannelSelectBookDialog(
+	data class ShowMakeChannelSelectBookDialog(
 		val book: Book,
 	) : SearchEvent()
 

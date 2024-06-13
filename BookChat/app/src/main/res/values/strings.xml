@@ -80,6 +80,11 @@
 
     <!--search-->
     <string name="book">도서</string>
+    <string name="book_title">도서명</string>
+    <string name="isbn">ISBN</string>
+    <string name="channel_title">채팅방 제목</string>
+    <string name="channel_tag">채팅방 TAG</string>
+    <string name="search_filter">검색 필터</string>
     <string name="recommend_keyword">추천 검색어</string>
     <string name="recent_search_keyword">최근 검색어</string>
     <string name="related_book_name">관련 도서명</string>
