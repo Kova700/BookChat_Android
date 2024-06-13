@@ -1,7 +1,6 @@
 package com.example.bookchat.ui.search.mapper
 
 import com.example.bookchat.domain.model.Book
-import com.example.bookchat.domain.model.ChannelSearchResult
 import com.example.bookchat.ui.search.model.SearchResultItem
 
 fun Book.toBookItem(): SearchResultItem.BookItem {
@@ -26,17 +25,10 @@ fun SearchResultItem.BookItem.toBook(): Book {
 	)
 }
 
-fun ChannelSearchResult.toChannelItem(): SearchResultItem.ChannelItem {
-	return SearchResultItem.ChannelItem(
-		roomId = roomId,
-		roomName = roomName,
-		roomSid = roomSid,
-		roomMemberCount = roomMemberCount,
-		defaultRoomImageType = defaultRoomImageType,
-		roomImageUri = roomImageUri,
-		lastChat = lastChat,
-		host = host,
-		tagsString = tagsString,
-		roomCapacity = roomCapacity,
-	)
+fun List<Book>.toBookSearchResultItem(flexBoxDummyItemCount: Int): List<SearchResultItem> {
+	val groupedItems = mutableListOf<SearchResultItem>()
+	groupedItems.addAll(this.map { it.toBookItem() })
+	(0 until flexBoxDummyItemCount)
+		.forEach { i -> groupedItems.add(SearchResultItem.BookDummy(i)) }
+	return groupedItems
 }
