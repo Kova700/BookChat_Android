@@ -54,7 +54,7 @@ class SearchFragment : Fragment() {
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
+		savedInstanceState: Bundle?,
 	): View {
 		_binding = DataBindingUtil.inflate(
 			inflater, R.layout.fragment_search, container, false
@@ -121,19 +121,13 @@ class SearchFragment : Fragment() {
 
 	private fun setViewVisibility(searchTapState: SearchTapState) {
 		with(binding) {
-			backBtn.visibility = if (isSearchTapDefault(searchTapState)) View.INVISIBLE else View.VISIBLE
+			backBtn.visibility = if (searchTapState.isDefault) View.INVISIBLE else View.VISIBLE
 			animationTouchEventView.visibility =
-				if (isSearchTapDefault(searchTapState)) View.VISIBLE else View.INVISIBLE
+				if (searchTapState.isDefault) View.VISIBLE else View.INVISIBLE
 			searchDeleteBtn.visibility =
-				if (isSearchTapDefaultOrHistory(searchTapState)) View.INVISIBLE else View.VISIBLE
+				if (searchTapState.isDefaultOrHistory) View.INVISIBLE else View.VISIBLE
 		}
 	}
-
-	private fun isSearchTapDefault(searchTapState: SearchTapState) =
-		searchTapState is SearchTapState.Default
-
-	private fun isSearchTapDefaultOrHistory(searchTapState: SearchTapState) =
-		(searchTapState is SearchTapState.Default) || (searchTapState is SearchTapState.History)
 
 	private fun handleFragment(searchTapState: SearchTapState) {
 		val currentDestinationId = navHostFragment.findNavController().currentDestination?.id
@@ -178,7 +172,7 @@ class SearchFragment : Fragment() {
 		searchKeyword: String,
 		searchTarget: SearchTarget,
 		searchPurpose: SearchPurpose,
-		searchFilter: SearchFilter
+		searchFilter: SearchFilter,
 	) {
 		val intent = Intent(requireActivity(), SearchDetailActivity::class.java)
 		intent.putExtra(EXTRA_SEARCH_KEYWORD, searchKeyword)
@@ -188,80 +182,33 @@ class SearchFragment : Fragment() {
 		detailActivityLauncher.launch(intent)
 	}
 
-	/* 애니메이션 처리 전부 MotionLayout으로 마이그레이션 예정 */
-	private fun foldSearchWindowAnimation() {
-		val windowAnimator = AnimatorInflater.loadAnimator(
-			requireContext(),
-			R.animator.clicked_searchwindow_animator
-		)
-		windowAnimator.apply {
-			setTarget(binding.searchWindow)
-			binding.searchWindow.pivotX = 0.0f
-			binding.searchWindow.pivotY = 0.0f
-			doOnStart {
-				binding.searchEditText.isEnabled = true
-				binding.searchEditText.requestFocus()
-				openKeyboard(binding.searchEditText)
-			}
-			start()
-		}
-		val btnAnimator = AnimatorInflater.loadAnimator(
-			requireContext(),
-			R.animator.clicked_searchwindow_btn_animator
-		)
-		btnAnimator.apply {
-			setTarget(binding.searchBtn)
-			binding.searchBtn.pivotX = 0.0f
-			binding.searchBtn.pivotY = 0.0f
-			start()
-		}
-		val etAnimator = AnimatorInflater.loadAnimator(
-			requireContext(),
-			R.animator.clicked_searchwindow_et_animator
-		)
-		etAnimator.apply {
-			setTarget(binding.searchEditText)
-			binding.searchEditText.pivotX = 0.0f
-			binding.searchEditText.pivotY = 0.0f
+	private fun applyAnimation(target: View, animatorResId: Int, onStart: () -> Unit) {
+		target.pivotX = 0f
+		target.pivotY = 0f
+		val animator = AnimatorInflater.loadAnimator(requireContext(), animatorResId)
+		animator.apply {
+			setTarget(target)
+			doOnStart { onStart() }
 			start()
 		}
 	}
 
-	/* 애니메이션 처리 전부 MotionLayout으로 마이그레이션 예정 */
+	private fun foldSearchWindowAnimation() {
+		applyAnimation(binding.searchWindow, R.animator.clicked_searchwindow_animator) {
+			binding.searchEditText.isEnabled = true
+			binding.searchEditText.requestFocus()
+			openKeyboard(binding.searchEditText)
+		}
+		applyAnimation(binding.searchBtn, R.animator.clicked_searchwindow_btn_animator) {}
+		applyAnimation(binding.searchEditText, R.animator.clicked_searchwindow_et_animator) {}
+	}
+
 	private fun expandSearchWindowAnimation() {
-		val windowAnimator = AnimatorInflater.loadAnimator(
-			requireContext(),
-			R.animator.unclicked_searchwindow_animator
-		)
-		windowAnimator.apply {
-			setTarget(binding.searchWindow)
-			binding.searchWindow.pivotX = 0.0f
-			binding.searchWindow.pivotY = 0.0f
-			doOnStart {
-				binding.searchEditText.isEnabled = false
-			}
-			start()
+		applyAnimation(binding.searchWindow, R.animator.unclicked_searchwindow_animator) {
+			binding.searchEditText.isEnabled = false
 		}
-		val btnAnimator = AnimatorInflater.loadAnimator(
-			requireContext(),
-			R.animator.unclicked_searchwindow_btn_animator
-		)
-		btnAnimator.apply {
-			setTarget(binding.searchBtn)
-			binding.searchBtn.pivotX = 0.0f
-			binding.searchBtn.pivotY = 0.0f
-			start()
-		}
-		val etAnimator = AnimatorInflater.loadAnimator(
-			requireContext(),
-			R.animator.unclicked_searchwindow_et_animator
-		)
-		etAnimator.apply {
-			setTarget(binding.searchEditText)
-			binding.searchEditText.pivotX = 0.0f
-			binding.searchEditText.pivotY = 0.0f
-			start()
-		}
+		applyAnimation(binding.searchBtn, R.animator.unclicked_searchwindow_btn_animator) {}
+		applyAnimation(binding.searchEditText, R.animator.unclicked_searchwindow_et_animator) {}
 	}
 
 	private fun openKeyboard(view: View) {

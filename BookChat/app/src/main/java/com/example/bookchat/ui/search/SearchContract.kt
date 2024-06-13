@@ -14,25 +14,28 @@ data class SearchUiState(
 	val searchKeyword: String,
 	val searchResultState: SearchResultState,
 	val searchResults: List<SearchResultItem>,
-	val searchHistory: List<String>
+	val searchHistory: List<String>,
 ) {
 
 	sealed class SearchTapState(open val fragmentId: Int) {
 		data class Default(
-			override val fragmentId: Int = R.id.searchTapDefaultFragment
+			override val fragmentId: Int = R.id.searchTapDefaultFragment,
 		) : SearchTapState(fragmentId)
 
 		data class History(
-			override val fragmentId: Int = R.id.searchTapHistoryFragment
+			override val fragmentId: Int = R.id.searchTapHistoryFragment,
 		) : SearchTapState(fragmentId)
 
 		data class Searching(
-			override val fragmentId: Int = R.id.searchTapSearchingFragment
+			override val fragmentId: Int = R.id.searchTapSearchingFragment,
 		) : SearchTapState(fragmentId)
 
 		data class Result(
-			override val fragmentId: Int = R.id.searchTapResultFragment
+			override val fragmentId: Int = R.id.searchTapResultFragment,
 		) : SearchTapState(fragmentId)
+
+		val isDefault get() = this is Default
+		val isDefaultOrHistory get() = this is Default || this is History
 	}
 
 	sealed class SearchResultState {
@@ -60,23 +63,23 @@ sealed class SearchEvent {
 		val searchKeyword: String,
 		val searchTarget: SearchTarget,
 		val searchPurpose: SearchPurpose,
-		val searchFilter: SearchFilter
+		val searchFilter: SearchFilter,
 	) : SearchEvent()
 
 	data class MoveToSearchBookDialog(
-		val book: Book
+		val book: Book,
 	) : SearchEvent()
 
 	data class MoveToMakeChannelSelectBookDialog(
-		val book: Book
+		val book: Book,
 	) : SearchEvent()
 
 	data class MoveToChannelInfo(
-		val channelId: Long
+		val channelId: Long,
 	) : SearchEvent()
 
 	data class MakeToast(
-		val stringId: Int
+		val stringId: Int,
 	) : SearchEvent()
 
 }
