@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
+import com.example.bookchat.data.mapper.toChannel
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChannelSearchRepository
 import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_CLICKED_CHANNEL_ID
@@ -43,15 +44,23 @@ class ChannelInfoViewModel @Inject constructor(
 		updateState { copy(channel = channelSearchRepository.getCachedChannel(channelId)) }
 	}
 
-	//TODO : 이미 입장되어있는 채팅방이더라도 200이 넘어와서 따로, 예외처리 하지 않았음
-	// isEntered 반영하면 됨
 	private fun enterChannel() = viewModelScope.launch {
-		if (channelRepository.isChannelAlreadyEntered(uiState.value.channel.roomId)) {
+		if (uiState.value.channel.isEntered) {
 			startEvent(ChannelInfoEvent.MoveToChannel(uiState.value.channel.roomId))
 			return@launch
 		}
 
-		runCatching { channelRepository.enterChannel(uiState.value.channel) }
+		if (uiState.value.channel.isFull) {
+			startEvent(ChannelInfoEvent.ShowFullChannelDialog)
+			return@launch
+		}
+
+		//TODO : 입장 요청한 채팅방 정원이 꽉찬 경우
+		// 유저에게 정원이 꽉차서 입장에 실패했음을 알리기 위해
+		// 정원이 꽉차서 실패한 경우에 대한 응답을 서버로 부터 받는게 필요
+		// 클라이언트 단에서 1차적으로 막겠지만 2차적으로 서버에도 필요하다고 생각됨
+		//  수정된다면 위에 다이얼로그 띄우는 로직 failHandler로 옮기기
+		runCatching { channelRepository.enterChannel(uiState.value.channel.toChannel()) }
 			.onSuccess { startEvent(ChannelInfoEvent.MoveToChannel(uiState.value.channel.roomId)) }
 			.onFailure {
 				failHandler(it)

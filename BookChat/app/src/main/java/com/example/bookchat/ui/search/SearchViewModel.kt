@@ -7,6 +7,7 @@ import com.example.bookchat.R
 import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.ChannelSearchResult
 import com.example.bookchat.domain.model.SearchPurpose
 import com.example.bookchat.domain.repository.BookSearchRepository
 import com.example.bookchat.domain.repository.ChannelSearchRepository
@@ -89,7 +90,7 @@ class SearchViewModel @Inject constructor(
 
 	private fun groupItems(
 		books: List<Book>? = null,
-		channels: List<Channel>? = null,
+		channels: List<ChannelSearchResult>? = null,
 	): List<SearchResultItem> {
 		val groupedItems = mutableListOf<SearchResultItem>()
 		if (books.isNullOrEmpty() && channels.isNullOrEmpty()) return groupedItems

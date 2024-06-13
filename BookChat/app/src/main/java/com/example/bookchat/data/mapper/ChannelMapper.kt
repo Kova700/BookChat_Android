@@ -6,6 +6,7 @@ import com.example.bookchat.data.network.model.response.ChannelSearchResponse
 import com.example.bookchat.data.network.model.response.ChannelSingleSearchResponse
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelMemberAuthority
+import com.example.bookchat.domain.model.ChannelSearchResult
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.User
 
@@ -63,7 +64,7 @@ fun Channel.toChannelEntity(): ChannelEntity {
 
 suspend fun ChannelEntity.toChannel(
 	getChat: suspend (Long) -> Chat,
-	getUser: suspend (Long) -> User
+	getUser: suspend (Long) -> User,
 ): Channel {
 	return Channel(
 		roomId = roomId,
@@ -89,12 +90,11 @@ suspend fun ChannelEntity.toChannel(
 	)
 }
 
-//TODO : Channel말고 isEntered 필드 반영하는 새로운 도메인 레이어 data class만들어야할듯?
-suspend fun ChannelSearchResponse.toChannel(
+suspend fun ChannelSearchResponse.toChannelSearchResult(
 	clientId: Long,
-	getUser: suspend (Long) -> User
-): Channel {
-	return Channel(
+	getUser: suspend (Long) -> User,
+): ChannelSearchResult {
+	return ChannelSearchResult(
 		roomId = roomId,
 		roomName = roomName,
 		roomSid = roomSid,
@@ -104,8 +104,6 @@ suspend fun ChannelSearchResponse.toChannel(
 		roomTags = tags.split(","),
 		roomCapacity = roomSize,
 		host = host,
-		participants = listOf(host),
-		participantAuthorities = mapOf(host.id to ChannelMemberAuthority.HOST),
 		lastChat = this.getLastChat(
 			clientId = clientId,
 			getUser = getUser
@@ -113,8 +111,29 @@ suspend fun ChannelSearchResponse.toChannel(
 		bookTitle = bookTitle,
 		bookAuthors = bookAuthors,
 		bookCoverImageUrl = bookCoverImageUri,
-		isBanned = isBanned
-		//isEntered
+		isBanned = isBanned,
+		isEntered = isEntered
+	)
+}
+
+fun ChannelSearchResult.toChannel(): Channel {
+	return Channel(
+		roomId = roomId,
+		roomName = roomName,
+		roomSid = roomSid,
+		roomImageUri = roomImageUri,
+		roomMemberCount = roomMemberCount,
+		defaultRoomImageType = defaultRoomImageType,
+		roomTags = roomTags,
+		roomCapacity = roomCapacity,
+		host = host,
+		participants = listOf(host),
+		participantAuthorities = mapOf(host.id to ChannelMemberAuthority.HOST),
+		lastChat = lastChat,
+		bookTitle = bookTitle,
+		bookAuthors = bookAuthors,
+		bookCoverImageUrl = bookCoverImageUrl,
+		isBanned = isBanned,
 	)
 }
 

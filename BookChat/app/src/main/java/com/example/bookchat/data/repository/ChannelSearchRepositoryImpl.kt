@@ -1,9 +1,9 @@
 package com.example.bookchat.data.repository
 
-import com.example.bookchat.data.mapper.toChannel
+import com.example.bookchat.data.mapper.toChannelSearchResult
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.request.RequestGetSearchedChannels
-import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.ChannelSearchResult
 import com.example.bookchat.domain.model.SearchFilter
 import com.example.bookchat.domain.model.SearchFilter.BOOK_ISBN
 import com.example.bookchat.domain.model.SearchFilter.BOOK_TITLE
@@ -24,30 +24,28 @@ import javax.inject.Inject
 class ChannelSearchRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi,
 	private val clientRepository: ClientRepository,
-	private val userRepository: UserRepository
+	private val userRepository: UserRepository,
 ) : ChannelSearchRepository {
 
-	private val mapChannels = MutableStateFlow<Map<Long, Channel>>(emptyMap())//(channelId, Channel)
+	private val mapChannels =
+		MutableStateFlow<Map<Long, ChannelSearchResult>>(emptyMap())//(channelId, Channel)
 	private val channels = mapChannels.map { it.values.toList() }.filterNotNull()
 
 	private var cachedSearchKeyword = ""
 	private var currentPage: Long? = null
 	private var isEndPage = false
 
-	override fun getChannelsFLow(initFlag: Boolean): Flow<List<Channel>> {
+	override fun getChannelsFLow(initFlag: Boolean): Flow<List<ChannelSearchResult>> {
 		if (initFlag) clearCachedData()
 		return channels
 	}
 
-	//TODO : Channel말고 isEntered 필드 반영하는 새로운 data class만들어야할듯?
 	override suspend fun search(
 		keyword: String,
 		searchFilter: SearchFilter,
-		size: Int
-	): List<Channel> {
-		if (cachedSearchKeyword != keyword) {
-			clearCachedData()
-		}
+		size: Int,
+	): List<ChannelSearchResult> {
+		if (cachedSearchKeyword != keyword) clearCachedData()
 		if (isEndPage) return channels.firstOrNull() ?: emptyList()
 
 		val requestGetSearchedChannels = getRequestGetSearchedChannels(
@@ -70,7 +68,7 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 
 		val newChannels = response.channels
 			.map {
-				it.toChannel(
+				it.toChannelSearchResult(
 					clientId = clientRepository.getClientProfile().id,
 					getUser = { userId -> userRepository.getUser(userId) }
 				)
@@ -79,7 +77,19 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 		return channels.first()
 	}
 
-	override fun getCachedChannel(channelId: Long): Channel {
+	private fun getRequestGetSearchedChannels(
+		keyword: String,
+		searchFilter: SearchFilter,
+	): RequestGetSearchedChannels {
+		return when (searchFilter) {
+			ROOM_NAME -> RequestGetSearchedChannels(roomName = keyword)
+			BOOK_TITLE -> RequestGetSearchedChannels(title = keyword)
+			BOOK_ISBN -> RequestGetSearchedChannels(isbn = keyword)
+			ROOM_TAGS -> RequestGetSearchedChannels(tags = keyword)
+		}
+	}
+
+	override fun getCachedChannel(channelId: Long): ChannelSearchResult {
 		return mapChannels.value[channelId]!!
 	}
 
@@ -90,15 +100,4 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 		isEndPage = false
 	}
 
-	private fun getRequestGetSearchedChannels(
-		keyword: String,
-		searchFilter: SearchFilter
-	): RequestGetSearchedChannels {
-		return when (searchFilter) {
-			ROOM_NAME -> RequestGetSearchedChannels(roomName = keyword)
-			BOOK_TITLE -> RequestGetSearchedChannels(title = keyword)
-			BOOK_ISBN -> RequestGetSearchedChannels(isbn = keyword)
-			ROOM_TAGS -> RequestGetSearchedChannels(tags = keyword)
-		}
-	}
 }

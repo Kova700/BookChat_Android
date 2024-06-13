@@ -1,7 +1,6 @@
 package com.example.bookchat.ui.search.model
 
 import com.example.bookchat.domain.model.ChannelDefaultImageType
-import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.User
 
@@ -25,7 +24,7 @@ sealed interface SearchResultItem {
 		val authors: List<String>,
 		val publisher: String,
 		var publishAt: String,
-		val bookCoverImageUrl: String
+		val bookCoverImageUrl: String,
 	) : SearchResultItem
 
 	data class BookDummy(val id: Int) : SearchResultItem
@@ -38,18 +37,11 @@ sealed interface SearchResultItem {
 		val roomSid: String,
 		val roomMemberCount: Int,
 		val defaultRoomImageType: ChannelDefaultImageType,
-		val notificationFlag: Boolean = true,
-		val topPinNum: Int = 0,
-		val roomImageUri: String? = null,
-		val lastChat: Chat? = null,
-		val host: User? = null,
-		val participants: List<User>? = null,
-		val participantAuthorities: Map<Long, ChannelMemberAuthority>? = null,
-		val tagsString: String? = null,
-		val roomCapacity: Int? = null,
-		val bookTitle: String? = null,
-		val bookAuthors: List<String>? = null,
-		val bookCoverImageUrl: String? = null,
+		val roomImageUri: String?,
+		val lastChat: Chat?,
+		val host: User,
+		val tagsString: String,
+		val roomCapacity: Int,
 	) : SearchResultItem
 
 	object ChannelEmpty : SearchResultItem

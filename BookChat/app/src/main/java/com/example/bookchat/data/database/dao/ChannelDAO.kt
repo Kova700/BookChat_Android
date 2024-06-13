@@ -165,10 +165,6 @@ interface ChannelDAO {
 		isExploded: Boolean,
 	)
 
-	suspend fun isExist(channelId: Long): Boolean {
-		return (getChannel(channelId) != null)
-	}
-
 	@Query("DELETE FROM Channel WHERE room_id = :channelId")
 	suspend fun delete(channelId: Long)
 

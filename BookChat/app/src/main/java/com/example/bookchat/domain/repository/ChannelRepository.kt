@@ -96,7 +96,6 @@ interface ChannelRepository {
 	)
 
 	suspend fun updateChannelLastChatIfValid(channelId: Long, chatId: Long)
-	suspend fun isChannelAlreadyEntered(channelId: Long): Boolean
 
 	companion object {
 		private const val REMOTE_CHANNELS_LOAD_SIZE = 15
