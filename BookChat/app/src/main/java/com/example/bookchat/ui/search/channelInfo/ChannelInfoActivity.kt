@@ -62,13 +62,16 @@ class ChannelInfoActivity : AppCompatActivity() {
 
 	private fun setDateTimeText(state: ChannelInfoUiState) {
 		state.channel.lastChat?.let {
-			binding.chatRoomLastActiveTv.text =
-				DateManager.getFormattedAbstractDateTimeText(it.dispatchTime)
+			binding.channelLastActiveTv.text =
+				getString(
+					R.string.channel_last_active_time,
+					DateManager.getFormattedAbstractDateTimeText(it.dispatchTime)
+				)
 		}
 	}
 
 	private fun setRoomMemberCountText(state: ChannelInfoUiState) {
-		binding.roomMemberCount.text =
+		binding.channelMemberCount.text =
 			getString(
 				R.string.room_member_count,
 				state.channel.roomMemberCount,
