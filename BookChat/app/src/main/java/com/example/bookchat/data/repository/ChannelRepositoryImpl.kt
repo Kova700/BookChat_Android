@@ -10,6 +10,7 @@ import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.ChannelMemberAuthorityNetwork
 import com.example.bookchat.data.network.model.request.RequestChangeChannelSetting
 import com.example.bookchat.data.network.model.request.RequestMakeChannel
+import com.example.bookchat.data.network.model.response.FailResponseBody
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelDefaultImageType
@@ -20,6 +21,7 @@ import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.UserRepository
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.toMultiPartBody
+import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +40,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	private val userRepository: UserRepository,
 	private val clientRepository: ClientRepository,
 	private val chatRepository: ChatRepository,
+	private val gson: Gson,
 ) : ChannelRepository {
 
 	private val mapChannels = MutableStateFlow<Map<Long, Channel>>(emptyMap())//(channelId, Channel)
@@ -68,6 +71,8 @@ class ChannelRepositoryImpl @Inject constructor(
 
 	/** 로컬에 있는 채널 우선적으로 쿼리
 	 * (API를 통해 받아온 Channel에는 LastChat을 비롯한 detail정보가 없음) */
+	//TODO : getOnlineChannel가 호출될 수 있는 경우
+	// 해당 함수 호출자에 실패에 대한 예외처리가 있는지 확인
 	override suspend fun getChannel(channelId: Long): Channel {
 		val channel = mapChannels.value[channelId]
 			?: getOfflineChannel(channelId)
@@ -266,11 +271,16 @@ class ChannelRepositoryImpl @Inject constructor(
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
-	// TODO : 이미 입장되어있는 채널에 입장 API 호출하면 넘어오는 응답코드 따로 정의 후,
-	//  해당 코드 응답시, 예외 던지기 (isEntered반영하면 수정가능)
 	override suspend fun enterChannel(channel: Channel) {
-		val resultCode = bookChatApi.enterChannel(channel.roomId).code()
-		Log.d(TAG, "ChannelRepositoryImpl: enter() - resultCode : $resultCode")
+		val response = bookChatApi.enterChannel(channel.roomId)
+		if (response.code() == 400) {
+			val failResponseBody = runCatching {
+				gson.fromJson(response.errorBody()?.string(), FailResponseBody::class.java)
+			}
+			val alreadyEntered =
+				failResponseBody.getOrNull()?.errorCode == CHANNEL_ENTER_RESPONSE_CODE_ALREADY_ENTERED
+			if (alreadyEntered.not()) throw Exception("failed to enter channel")
+		}
 		channelDAO.upsertChannel(channel.toChannelEntity())
 		setChannels(mapChannels.value + mapOf(channel.roomId to channel))
 	}
@@ -473,7 +483,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun updateChannelLastChatIfValid(channelId: Long, chatId: Long) {
-		val existingLastChatId = channelDAO.getChannel(channelId)?.lastChatId //왜 DB부터 볼까 인메모리 데이터 안봐?
+		val existingLastChatId = channelDAO.getChannel(channelId)?.lastChatId
 		if (existingLastChatId != null && chatId <= existingLastChatId) return
 
 		channelDAO.updateLastChat(
@@ -483,12 +493,6 @@ class ChannelRepositoryImpl @Inject constructor(
 
 		val updatedChannel = getChannelWithUpdatedData(channelId)
 		setChannels(mapChannels.value + (channelId to updatedChannel))
-	}
-
-	//TODO : 데이터를 load해놓지 않았다면 크게 유의미한 함수는 아님
-	// (API로 수정하거나 Channel객체를 받을 때 참가유무를 가지고 있는상태로 수정되어야함)
-	override suspend fun isChannelAlreadyEntered(channelId: Long): Boolean {
-		return channelDAO.isExist(channelId)
 	}
 
 	private fun clearCachedData() {
@@ -509,6 +513,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		private const val IMAGE_FILE_EXTENSION_WEBP = ".webp"
 		private const val IMAGE_MULTIPART_NAME = "chatRoomImage"
 		private val DEFAULT_RETRY_ATTEMPT_DELAY_TIME = 1.seconds
+		private const val CHANNEL_ENTER_RESPONSE_CODE_ALREADY_ENTERED = 4000501
 	}
 
 }

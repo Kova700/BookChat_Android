@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.search.channelInfo
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +9,7 @@ import com.example.bookchat.data.mapper.toChannel
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChannelSearchRepository
 import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_CLICKED_CHANNEL_ID
+import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,11 +18,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-// TODO : DB에 채팅방 있는거 보고 있으면 요청 안보내고 바로 채팅방 페이지 이동하는 걸로 수정
-//  + DB에 채팅방이 없더라도, 서버로부터 Status Code 넘겨 받아서, 차단된 사용자인지,
-//  채팅방 인원이 다 차서 못들어가는지, 이미 들어와있는 유저인지 ,
-//  성공적으로 입장했는지, 분기가 필요함
 
 @HiltViewModel
 class ChannelInfoViewModel @Inject constructor(
@@ -44,6 +41,9 @@ class ChannelInfoViewModel @Inject constructor(
 		updateState { copy(channel = channelSearchRepository.getCachedChannel(channelId)) }
 	}
 
+	//TODO : 검색된 결과는 isEntered인 채로 있는데
+	//  이 창을 가지고 채널 목록 가서 채널을 나간다음
+	//  입장버튼을 누르면 원인 불명의 nullPointException이 나옴
 	private fun enterChannel() = viewModelScope.launch {
 		if (uiState.value.channel.isEntered) {
 			startEvent(ChannelInfoEvent.MoveToChannel(uiState.value.channel.roomId))
@@ -81,13 +81,10 @@ class ChannelInfoViewModel @Inject constructor(
 	}
 
 	private inline fun updateState(block: ChannelInfoUiState.() -> ChannelInfoUiState) {
-		_uiState.update {
-			_uiState.value.block()
-		}
+		_uiState.update { _uiState.value.block() }
 	}
 
 	private fun failHandler(throwable: Throwable) {
-		// TODO : 이미 채팅방에 입장한 유저라면 채팅방 페이지로 이동
-		//  + 이미 DB에 해당 채팅방 정보가 있을거임 (초기 로그인시에 다 가져오니까)
+		Log.d(TAG, "ChannelInfoViewModel: failHandler() - throwable : $throwable")
 	}
 }
