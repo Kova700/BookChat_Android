@@ -18,8 +18,6 @@ data class ChannelSearchResult(
 	val bookAuthors: List<String>,
 	val bookCoverImageUrl: String,
 ) {
-	val isFull
-		get() = roomMemberCount >= roomCapacity
 
 	val bookAuthorsString
 		get() = bookAuthors.joinToString(",")
