@@ -139,6 +139,7 @@ interface ChannelDAO {
 		"UPDATE Channel SET " +
 						"room_name = :roomName, " +
 						"host_id = :roomHostId, " +
+						"room_member_count = :roomMemberCount, " +
 						"participant_ids = :participantIds," +
 						"participant_authorities = :participantAuthorities," +
 						"book_title = :bookTitle, " +
@@ -154,6 +155,7 @@ interface ChannelDAO {
 		roomId: Long,
 		roomName: String,
 		roomHostId: Long,
+		roomMemberCount: Int,
 		participantIds: List<Long>?,
 		participantAuthorities: Map<Long, ChannelMemberAuthority>?,
 		bookTitle: String,

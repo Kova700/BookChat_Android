@@ -101,12 +101,14 @@ class ChannelRepositoryImpl @Inject constructor(
 	override suspend fun getChannelInfo(channelId: Long) {
 		Log.d(TAG, "ChannelRepositoryImpl: getChannelInfo() - called")
 		val channelInfo = bookChatApi.getChannelInfo(channelId)
-		userRepository.upsertAllUsers(channelInfo.participants)
+		val participants = channelInfo.participants
+		userRepository.upsertAllUsers(participants)
 
 		channelDAO.updateDetailInfo(
 			roomId = channelId,
 			roomName = channelInfo.roomName,
 			roomHostId = channelInfo.roomHost.id,
+			roomMemberCount = participants.size,
 			participantIds = channelInfo.participantIds,
 			participantAuthorities = channelInfo.participantAuthorities,
 			bookTitle = channelInfo.bookTitle,

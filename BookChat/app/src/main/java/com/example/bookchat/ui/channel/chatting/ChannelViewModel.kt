@@ -59,7 +59,6 @@ class ChannelViewModel @Inject constructor(
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
 	private val chatScrapRepository: ChatScrapRepository,
-	private val bookShelfRepository: BookShelfRepository,
 	private val networkManager: NetworkManager,
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
@@ -83,7 +82,8 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun initUiState() = viewModelScope.launch {
-		val originalChannel = channelRepository.getChannel(channelId)
+		val originalChannel = runCatching { channelRepository.getChannel(channelId) }
+			.getOrNull() ?: Channel.DEFAULT
 
 		val shouldLastReadChatScroll = originalChannel.isExistNewChat
 		updateState {
@@ -289,8 +289,8 @@ class ChannelViewModel @Inject constructor(
 	private fun connectSocket(caller: String) = viewModelScope.launch {
 		if (uiState.value.isNetworkDisconnected) return@launch
 		Log.d(TAG, "ChannelViewModel: connectSocket() - caller : $caller")
-		val channel = channelRepository.getChannel(channelId)
-		runCatching { stompHandler.connectSocket(channel) }
+		if (uiState.value.channel == Channel.DEFAULT) return@launch
+		runCatching { stompHandler.connectSocket(uiState.value.channel) }
 			.onFailure { handleError(it, "connectSocket") }
 	}
 
@@ -477,6 +477,7 @@ class ChannelViewModel @Inject constructor(
 			.onSuccess { onClickCancelCapture() }
 			.onFailure { }
 	}
+
 	//TODO : 백엔드측 응답 대기중
 	fun onClickCompleteCapture() {
 		val (headerId, bottomId) = captureIds.value ?: return
