@@ -10,6 +10,7 @@ import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.ChannelMemberAuthorityNetwork
 import com.example.bookchat.data.network.model.request.RequestChangeChannelSetting
 import com.example.bookchat.data.network.model.request.RequestMakeChannel
+import com.example.bookchat.data.network.model.response.ChannelIsFullException
 import com.example.bookchat.data.network.model.response.FailResponseBody
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.Channel
@@ -71,24 +72,24 @@ class ChannelRepositoryImpl @Inject constructor(
 
 	/** 로컬에 있는 채널 우선적으로 쿼리
 	 * (API를 통해 받아온 Channel에는 LastChat을 비롯한 detail정보가 없음) */
-	//TODO : getOnlineChannel가 호출될 수 있는 경우
-	// 해당 함수 호출자에 실패에 대한 예외처리가 있는지 확인
 	override suspend fun getChannel(channelId: Long): Channel {
-		val channel = mapChannels.value[channelId]
-			?: getOfflineChannel(channelId)
-			?: getOnlineChannel(channelId)
+		val cachedChannel = mapChannels.value[channelId]
+		if (cachedChannel != null) return cachedChannel
 
-		setChannels(mapChannels.value + (channelId to channel))
-		return channel
+		val channel = getOfflineChannel(channelId) ?: getOnlineChannel(channelId)
+		return channel.also { setChannels(mapChannels.value + (channelId to it)) }
 	}
 
 	private suspend fun getOfflineChannel(channelId: Long): Channel? {
 		return channelDAO.getChannel(channelId)?.toChannel(
 			getChat = { chatId -> chatRepository.getChat(chatId) },
-			getUser = { userId -> userRepository.getUser(userId) })
+			getUser = { userId -> userRepository.getUser(userId) }
+		)
 	}
 
-	/** LastChat을 비롯한 Channel detail 정보가 없음 */
+	/** LastChat을 비롯한 Channel detail 정보가 없음
+	 * + 해당 채팅방에 입장하지 않은 채로 해당 API 호출하면 예외 던짐
+	 * {"errorCode":"4040400","message":"채팅방을 찾을 수 없습니다."}*/
 	private suspend fun getOnlineChannel(channelId: Long): Channel {
 		return bookChatApi.getChannel(channelId).toChannel()
 			.also { channelDAO.upsertChannel(it.toChannelEntity()) }
@@ -277,9 +278,11 @@ class ChannelRepositoryImpl @Inject constructor(
 			val failResponseBody = runCatching {
 				gson.fromJson(response.errorBody()?.string(), FailResponseBody::class.java)
 			}
-			val alreadyEntered =
-				failResponseBody.getOrNull()?.errorCode == CHANNEL_ENTER_RESPONSE_CODE_ALREADY_ENTERED
-			if (alreadyEntered.not()) throw Exception("failed to enter channel")
+			when (failResponseBody.getOrNull()?.errorCode) {
+				RESPONSE_CODE_ALREADY_ENTERED_CHANNEL -> Unit
+				RESPONSE_CODE_CHANNEL_IS_FULL -> throw ChannelIsFullException()
+				else -> throw Exception("failed to enter channel")
+			}
 		}
 		channelDAO.upsertChannel(channel.toChannelEntity())
 		setChannels(mapChannels.value + mapOf(channel.roomId to channel))
@@ -513,7 +516,8 @@ class ChannelRepositoryImpl @Inject constructor(
 		private const val IMAGE_FILE_EXTENSION_WEBP = ".webp"
 		private const val IMAGE_MULTIPART_NAME = "chatRoomImage"
 		private val DEFAULT_RETRY_ATTEMPT_DELAY_TIME = 1.seconds
-		private const val CHANNEL_ENTER_RESPONSE_CODE_ALREADY_ENTERED = 4000501
+		private const val RESPONSE_CODE_ALREADY_ENTERED_CHANNEL = 4000501
+		private const val RESPONSE_CODE_CHANNEL_IS_FULL = 4000400
 	}
 
 }
