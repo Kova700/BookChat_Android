@@ -2,7 +2,9 @@ package com.example.bookchat.ui.channel.channelsetting
 
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -18,8 +20,9 @@ import com.example.bookchat.ui.channel.channelsetting.dialog.ChannelCapacitySett
 import com.example.bookchat.ui.channel.drawer.dialog.ChannelExitWarningDialog
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.utils.MakeChannelImgSizeManager
-import com.example.bookchat.utils.PermissionManager
 import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.permissions.galleryPermissions
+import com.example.bookchat.utils.permissions.getPermissionsLauncher
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,8 +33,19 @@ class ChannelSettingActivity : AppCompatActivity() {
 
 	private val channelSettingViewModel by viewModels<ChannelSettingViewModel>()
 
-	private val permissionsLauncher =
-		PermissionManager.getPermissionsLauncher(this) { moveToImageCrop() }
+	private val permissionsLauncher = this.getPermissionsLauncher(
+		onSuccess = { moveToImageCrop() },
+		onDenied = {
+			makeToast(R.string.permission_denied)
+		},
+		onExplained = {
+			makeToast(R.string.permission_explained)
+			val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+			val uri = Uri.fromParts(SCHEME_PACKAGE, packageName, null)
+			intent.data = uri
+			startActivity(intent)
+		}
+	)
 
 	@Inject
 	lateinit var makeChannelImgSizeManager: MakeChannelImgSizeManager
@@ -99,7 +113,7 @@ class ChannelSettingActivity : AppCompatActivity() {
 	}
 
 	private fun startChannelProfileEdit() {
-		permissionsLauncher.launch(PermissionManager.getGalleryPermissions())
+		permissionsLauncher.launch(galleryPermissions)
 	}
 
 	private fun moveToImageCrop() {
@@ -187,5 +201,6 @@ class ChannelSettingActivity : AppCompatActivity() {
 		private const val DIALOG_TAG_CHANNEL_CAPACITY_DIALOG = "DIALOG_TAG_CHANNEL_CAPACITY_DIALOG"
 		const val RESULT_CODE_USER_CHANNEL_EXIT = 100
 		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
+		private const val SCHEME_PACKAGE = "package"
 	}
 }

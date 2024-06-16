@@ -1,4 +1,4 @@
-package com.example.bookchat.utils
+package com.example.bookchat.utils.bitmap
 
 import android.graphics.Bitmap
 import android.os.Build
