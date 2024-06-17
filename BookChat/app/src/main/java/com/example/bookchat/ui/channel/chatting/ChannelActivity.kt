@@ -29,6 +29,7 @@ import com.example.bookchat.ui.channel.channelsetting.ChannelSettingActivity
 import com.example.bookchat.ui.channel.channelsetting.ChannelSettingActivity.Companion.RESULT_CODE_USER_CHANNEL_EXIT
 import com.example.bookchat.ui.channel.chatting.adapter.ChatItemAdapter
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
+import com.example.bookchat.ui.channel.chatting.util.captureItems
 import com.example.bookchat.ui.channel.drawer.adapter.ChannelDrawerAdapter
 import com.example.bookchat.ui.channel.drawer.dialog.ChannelBannedUserNoticeDialog
 import com.example.bookchat.ui.channel.drawer.dialog.ChannelExitWarningDialog
@@ -560,6 +561,25 @@ class ChannelActivity : AppCompatActivity() {
 		binding.captureModeBottomShadow.visibility = View.GONE
 	}
 
+	private fun makeCaptureImage(
+		headerIndex: Int, bottomIndex: Int,
+	) {
+		runCatching {
+			binding.chattingRcv.captureItems(
+				headerIndex = headerIndex,
+				bottomIndex = bottomIndex
+			)
+		}
+			.onSuccess {
+				channelViewModel.onClickCancelCapture()
+				makeToast(R.string.channel_scrap_success)
+			}
+			.onFailure {
+				Log.d(TAG, "ChannelActivity: makeCaptureImage() - throwable : $it")
+				makeToast(R.string.channel_scrap_fail)
+			}
+	}
+
 	private fun handleEvent(event: ChannelEvent) {
 		when (event) {
 			ChannelEvent.MoveBack -> finish()
@@ -571,6 +591,10 @@ class ChannelActivity : AppCompatActivity() {
 			is ChannelEvent.NewChatOccurEvent -> checkIfNewChatNoticeIsRequired(event.chat)
 			is ChannelEvent.ShowChannelExitWarningDialog ->
 				showChannelExitWarningDialog(event.clientAuthority)
+
+			is ChannelEvent.MakeCaptureImage -> makeCaptureImage(
+				headerIndex = event.headerIndex, bottomIndex = event.bottomIndex
+			)
 		}
 	}
 

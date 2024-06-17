@@ -13,7 +13,6 @@ import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.domain.model.NetworkState
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
-import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ChatScrapRepository
@@ -45,7 +44,7 @@ import kotlin.math.abs
 //TODO : 채팅 꾹 누르면 복사
 //TODO : 채팅방 정보 조회 실패 시 예외 처리
 //TODO : 채팅 로딩 전체 화면 UI 구현
-//TODO : 카톡처럼 이모지 한개이면 이모지 크기 확대
+//TODO : 카톡처럼 이모지 한 개이면 이모지 크기 확대
 //TODO : 출시 전 북챗 문의 방 만들기
 
 @HiltViewModel
@@ -96,10 +95,10 @@ class ChannelViewModel @Inject constructor(
 			)
 		}
 		observeNetworkState()
-		getChannelInfo(channelId) //이거는 호출 할 수 있어야할거같은데? (그래야 채널에서 강퇴 됐는지 아닌지 알지)
-		//isBaned, isExploded가 넘어오는게 아니라 강퇴당하면 그냥 (그럼 채팅방 정보 조회에서 두개의 flag는 의미가 없는거 아닌가? true라면 그냥 404넘어오니까)
-		//404 {"errorCode":"4040500","message":"참여자를 찾을 수 없습니다."} 넘어옴
-		//채팅방 터진 유무는 그냥 넘오긴함 404 안뜨고
+		//TODO: 채널에서 강퇴되었는지 , 채널이 폭파되었는지 알기 위해 해당 API를 호출해야함
+		// 하지만,isBaned, isExploded가 넘어오는게 아니라 강퇴 당하면 그냥 404 {"errorCode":"4040500","message":"참여자를 찾을 수 없습니다."} 넘어옴
+		// 채팅방 터진 경우는 404안뜨고 isExploded = true로 잘 넘어오긴함 (서버 수정 대기중)
+		getChannelInfo(channelId)
 		if (originalChannel.isAvailableChannel.not()) return@launch
 		getTempSavedMessage(channelId)
 		observeChannel()
@@ -461,31 +460,19 @@ class ChannelViewModel @Inject constructor(
 		_captureIds.update { null }
 	}
 
-	//TODO : bookShelfId를 어케 가져오지?
-	//  도서가 없는 상태에서 다시 도서를 등록하려면 Book객체가 Channel안에 있어야함
-	//  혹은 BookshelfId만으로 등록을 가능하게 하거나
-	// 백엔드측 응답 대기중
-	private fun makeChatsCapture(
-		scrapContent: List<ChatItem>,
-	) = viewModelScope.launch {
-		runCatching {
-//			chatScrapRepository.makeChatScrap(
-//				bookShelfId =,
-//				scrapContent =
-//			)
-		}
-			.onSuccess { onClickCancelCapture() }
-			.onFailure { }
-	}
-
-	//TODO : 백엔드측 응답 대기중
 	fun onClickCompleteCapture() {
 		val (headerId, bottomId) = captureIds.value ?: return
 		val chatMessages = uiState.value.chats
 		val headerIndex = chatMessages.indexOfFirst { it.getCategoryId() == headerId }
 		val bottomIndex = chatMessages.indexOfFirst { it.getCategoryId() == bottomId }
-//		makeChatsCapture(chatMessages.subList(headerIndex, bottomIndex)
-//			.filter { it !is ChatItem.LastReadChatNotice })
+		if (headerIndex == -1 || bottomIndex == -1) return
+
+		startEvent(
+			ChannelEvent.MakeCaptureImage(
+				headerIndex = headerIndex,
+				bottomIndex = bottomIndex
+			)
+		)
 	}
 
 	fun onSelectCaptureChat(chatItemId: Long) {

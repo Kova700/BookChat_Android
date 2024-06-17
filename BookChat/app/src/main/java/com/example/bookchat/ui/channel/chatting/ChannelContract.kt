@@ -93,6 +93,11 @@ sealed class ChannelEvent {
 	object ScrollToBottom : ChannelEvent()
 	object OpenOrCloseDrawer : ChannelEvent()
 
+	data class MakeCaptureImage(
+		val headerIndex: Int,
+		val bottomIndex: Int,
+	) : ChannelEvent()
+
 	data class MoveUserProfile(
 		val user: User,
 	) : ChannelEvent()
