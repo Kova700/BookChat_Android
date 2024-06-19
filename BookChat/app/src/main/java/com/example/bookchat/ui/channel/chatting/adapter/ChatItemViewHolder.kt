@@ -132,6 +132,7 @@ class MyChatCaptureViewHolder(
 	override fun bind(chatItem: ChatItem) {
 		val item = chatItem as ChatItem.MyChat
 		binding.chat = item
+		binding.executePendingBindings()
 		setViewState(item)
 		setCaptureViewState(chatItem)
 	}
@@ -194,6 +195,7 @@ class AnotherUserChatCaptureViewHolder(
 	override fun bind(chatItem: ChatItem) {
 		val item = chatItem as ChatItem.AnotherUser
 		binding.chat = item
+		binding.executePendingBindings()
 		setAdminItemView(item)
 		setCaptureViewState(chatItem)
 	}
@@ -251,6 +253,7 @@ class NoticeChatCaptureViewHolder(
 	override fun bind(chatItem: ChatItem) {
 		val item = chatItem as ChatItem.Notification
 		binding.chat = item
+		binding.executePendingBindings()
 		setCaptureViewState(chatItem)
 	}
 
@@ -297,6 +300,7 @@ class DateSeparatorCaptureViewHolder(
 	override fun bind(chatItem: ChatItem) {
 		val item = chatItem as ChatItem.DateSeparator
 		binding.dateString = item.date
+		binding.executePendingBindings()
 		setCaptureViewState(chatItem)
 	}
 
