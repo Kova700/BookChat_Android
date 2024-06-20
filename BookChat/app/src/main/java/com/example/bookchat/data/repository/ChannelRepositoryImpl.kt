@@ -274,6 +274,8 @@ class ChannelRepositoryImpl @Inject constructor(
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
+	//TODO : 차단된 사용자인 경우, 폭파된 채팅방인 경우
+	// 차단된 사용자 Or 폭파된 채팅방 임을 알리는 예외를 던져야함
 	override suspend fun enterChannel(channel: Channel) {
 		val response = bookChatApi.enterChannel(channel.roomId)
 		if (response.code() == 400) {
