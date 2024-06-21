@@ -19,12 +19,9 @@ import com.example.bookchat.ui.channel.chatting.model.ChatItem
 import com.example.bookchat.utils.DateManager
 
 //TODO :
-// 문제점 2 : 선택되지 않은 애들 중 chat_default_layout로 설정되는 애들이 있음
-// 문제점 3 : 클릭된 탑 바텀 사이 미들도 배경도 chat_capture_only_one_layout로 설정됨
-// 문제점 4 : 3개 남은 상황에서 가운데 누르면 변경이 안됨
-// 문제점 6 : 선택된 애들 개수 한정이 필요함 (20개 정도?)
-// 문제점 7 : 날짜에는 선택 배경조차 안생김
-// 문제점 8 : 아래 채팅 입력창도 그림자가 생겨야함
+// 문제점 1 : 캡처 채팅 아이템과 일반 채팅 아이템을 굳이 뷰홀더랑 레이아웃을 구분해야할까?
+// 문제점 2 : 캡처시에 이미지 로드가 완료되지 않았는데 캡처가 찍혀버리는 상황이 생김 +
+//           CardView radius가 사라지는 문제도 있음
 
 sealed class ChatItemViewHolder(
 	binding: ViewDataBinding,
@@ -72,7 +69,7 @@ class AnotherUserChatViewHolder(
 	private val onClickUserProfile: ((Int) -> Unit)?,
 ) : ChatItemViewHolder(binding) {
 	init {
-		binding.userProfileCv.setOnClickListener {
+		binding.userProfileIv.setOnClickListener {
 			onClickUserProfile?.invoke(absoluteAdapterPosition)
 		}
 	}

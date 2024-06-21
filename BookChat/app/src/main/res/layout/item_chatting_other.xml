@@ -31,25 +31,20 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.80" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/user_profile_cv"
+            <!--매우 작은 padding울 츄가해야지 캡처 시 검은 배경이 사라지는 이슈가 있어서 추가-->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/user_profile_iv"
+                userDefaultProfileImageType="@{chat.sender.defaultProfileImageType}"
+                userProfileUrl="@{chat.sender.profileImageUrl}"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
+                android:scaleType="fitXY"
+                android:padding="0.1dp"
                 android:layout_marginStart="20dp"
-                app:cardCornerRadius="15dp"
-                app:cardElevation="0dp"
+                app:shapeAppearanceOverlay="@style/UserProfileImageRoundedCorners"
+                android:src="@drawable/loading_img"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/user_profile_iv"
-                    userDefaultProfileImageType="@{chat.sender.defaultProfileImageType}"
-                    userProfileUrl="@{chat.sender.profileImageUrl}"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/loading_img" />
-            </androidx.cardview.widget.CardView>
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <ImageView
                 android:id="@+id/host_crown"
@@ -57,8 +52,8 @@
                 android:layout_height="14dp"
                 android:src="@drawable/host_crown"
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@+id/user_profile_cv"
-                app:layout_constraintEnd_toEndOf="@+id/user_profile_cv" />
+                app:layout_constraintBottom_toBottomOf="@+id/user_profile_iv"
+                app:layout_constraintEnd_toEndOf="@+id/user_profile_iv" />
 
             <ImageView
                 android:id="@+id/sub_host_crown"
@@ -66,8 +61,8 @@
                 android:layout_height="14dp"
                 android:src="@drawable/sub_host_crown"
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@+id/user_profile_cv"
-                app:layout_constraintEnd_toEndOf="@+id/user_profile_cv" />
+                app:layout_constraintBottom_toBottomOf="@+id/user_profile_iv"
+                app:layout_constraintEnd_toEndOf="@+id/user_profile_iv" />
 
             <TextView
                 android:id="@+id/uesr_nickname_tv"
@@ -84,7 +79,7 @@
                 app:layout_constrainedWidth="true"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/user_profile_cv"
+                app:layout_constraintStart_toEndOf="@+id/user_profile_iv"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
@@ -114,7 +109,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/user_profile_cv"
+                app:layout_constraintStart_toEndOf="@+id/user_profile_iv"
                 app:layout_constraintTop_toBottomOf="@+id/uesr_nickname_tv">
 
                 <TextView
