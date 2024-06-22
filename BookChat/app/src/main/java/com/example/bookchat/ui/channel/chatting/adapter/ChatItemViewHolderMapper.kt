@@ -5,15 +5,10 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemChattingDateBinding
-import com.example.bookchat.databinding.ItemChattingDateCaptureBinding
 import com.example.bookchat.databinding.ItemChattingLastReadNoticeBinding
-import com.example.bookchat.databinding.ItemChattingLastReadNoticeCaptureBinding
 import com.example.bookchat.databinding.ItemChattingMineBinding
-import com.example.bookchat.databinding.ItemChattingMineCaptureBinding
 import com.example.bookchat.databinding.ItemChattingNoticeBinding
-import com.example.bookchat.databinding.ItemChattingNoticeCaptureBinding
 import com.example.bookchat.databinding.ItemChattingOtherBinding
-import com.example.bookchat.databinding.ItemChattingOtherCaptureBinding
 
 fun getChatItemViewHolder(
 	parent: ViewGroup,
@@ -35,6 +30,7 @@ fun getChatItemViewHolder(
 				binding = binding,
 				onClickFailedChatRetryBtn = onClickFailedChatRetryBtn,
 				onClickFailedChatDeleteBtn = onClickFailedChatDeleteBtn,
+				onSelectCaptureChat = onSelectCaptureChat,
 			)
 		}
 
@@ -47,6 +43,7 @@ fun getChatItemViewHolder(
 			AnotherUserChatViewHolder(
 				binding = binding,
 				onClickUserProfile = onClickUserProfile,
+				onSelectCaptureChat = onSelectCaptureChat,
 			)
 		}
 
@@ -56,7 +53,10 @@ fun getChatItemViewHolder(
 				R.layout.item_chatting_notice,
 				parent, false
 			)
-			NoticeChatViewHolder(binding)
+			NoticeChatViewHolder(
+				binding = binding,
+				onSelectCaptureChat = onSelectCaptureChat,
+			)
 		}
 
 		R.layout.item_chatting_date -> {
@@ -65,7 +65,10 @@ fun getChatItemViewHolder(
 				R.layout.item_chatting_date,
 				parent, false
 			)
-			DateSeparatorViewHolder(binding)
+			DateSeparatorViewHolder(
+				binding = binding,
+				onSelectCaptureChat = onSelectCaptureChat,
+			)
 		}
 
 		R.layout.item_chatting_last_read_notice -> {
@@ -74,69 +77,11 @@ fun getChatItemViewHolder(
 				R.layout.item_chatting_last_read_notice,
 				parent, false
 			)
-			LastReadNoticeViewHolder(binding)
-		}
-
-		R.layout.item_chatting_mine_capture -> {
-			val binding: ItemChattingMineCaptureBinding = DataBindingUtil.inflate(
-				LayoutInflater.from(parent.context),
-				R.layout.item_chatting_mine_capture,
-				parent, false
-			)
-			MyChatCaptureViewHolder(
+			LastReadNoticeViewHolder(
 				binding = binding,
-				onSelectCaptureChat = onSelectCaptureChat
+				onSelectCaptureChat = onSelectCaptureChat,
 			)
 		}
-
-		R.layout.item_chatting_other_capture -> {
-			val binding: ItemChattingOtherCaptureBinding = DataBindingUtil.inflate(
-				LayoutInflater.from(parent.context),
-				R.layout.item_chatting_other_capture,
-				parent, false
-			)
-			AnotherUserChatCaptureViewHolder(
-				binding = binding,
-				onSelectCaptureChat = onSelectCaptureChat
-			)
-		}
-
-		R.layout.item_chatting_notice_capture -> {
-			val binding: ItemChattingNoticeCaptureBinding = DataBindingUtil.inflate(
-				LayoutInflater.from(parent.context),
-				R.layout.item_chatting_notice_capture,
-				parent, false
-			)
-			NoticeChatCaptureViewHolder(
-				binding = binding,
-				onSelectCaptureChat = onSelectCaptureChat
-			)
-		}
-
-		R.layout.item_chatting_date_capture -> {
-			val binding: ItemChattingDateCaptureBinding = DataBindingUtil.inflate(
-				LayoutInflater.from(parent.context),
-				R.layout.item_chatting_date_capture,
-				parent, false
-			)
-			DateSeparatorCaptureViewHolder(
-				binding = binding,
-				onSelectCaptureChat = onSelectCaptureChat
-			)
-		}
-
-		R.layout.item_chatting_last_read_notice_capture -> {
-			val binding: ItemChattingLastReadNoticeCaptureBinding = DataBindingUtil.inflate(
-				LayoutInflater.from(parent.context),
-				R.layout.item_chatting_last_read_notice_capture,
-				parent, false
-			)
-			LastReadNoticeCaptureViewHolder(
-				binding = binding,
-				onSelectCaptureChat = onSelectCaptureChat
-			)
-		}
-
 		else -> throw RuntimeException("Received unknown ViewHolderType")
 	}
 }

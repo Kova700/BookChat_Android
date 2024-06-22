@@ -535,14 +535,17 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	fun onClickUserProfile(user: User) {
+		if (uiState.value.isCaptureMode) return
 		startEvent(ChannelEvent.MoveUserProfile(user))
 	}
 
 	fun onClickFailedChatDeleteBtn(chatId: Long) {
+		if (uiState.value.isCaptureMode) return
 		deleteFailedChat(chatId)
 	}
 
 	fun onClickFailedChatRetryBtn(chatId: Long) {
+		if (uiState.value.isCaptureMode) return
 		retryFailedChat(chatId)
 	}
 

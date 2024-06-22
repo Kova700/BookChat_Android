@@ -35,16 +35,6 @@ class ChatItemAdapter @Inject constructor() :
 		}
 
 	override fun getItemViewType(position: Int): Int {
-		if (isCaptureMode) {
-			return when (getItem(position)) {
-				is ChatItem.MyChat -> R.layout.item_chatting_mine_capture
-				is ChatItem.AnotherUser -> R.layout.item_chatting_other_capture
-				is ChatItem.DateSeparator -> R.layout.item_chatting_date_capture
-				is ChatItem.Notification -> R.layout.item_chatting_notice_capture
-				is ChatItem.LastReadChatNotice -> R.layout.item_chatting_last_read_notice_capture
-			}
-		}
-
 		return when (getItem(position)) {
 			is ChatItem.MyChat -> R.layout.item_chatting_mine
 			is ChatItem.AnotherUser -> R.layout.item_chatting_other
@@ -69,7 +59,11 @@ class ChatItemAdapter @Inject constructor() :
 	}
 
 	override fun onBindViewHolder(holder: ChatItemViewHolder, position: Int) {
-		holder.bind(getItem(position))
+		holder.bind(chatItem = getItem(position), isCaptureMode = isCaptureMode)
+	}
+
+	fun onBindViewHolderForCapture(holder: ChatItemViewHolder, position: Int) {
+		holder.bind(chatItem = getItem(position), isCaptureMode = false)
 	}
 
 	fun changeToDefaultMode() {

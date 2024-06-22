@@ -572,7 +572,7 @@ class ChannelActivity : AppCompatActivity() {
 		}
 			.onSuccess {
 				channelViewModel.onClickCancelCapture()
-				makeToast(R.string.channel_scrap_success)
+				makeToast(R.string.channel_scrap_success) //TODO : Toast 말고 커스텀 UI로 구성
 			}
 			.onFailure {
 				Log.d(TAG, "ChannelActivity: makeCaptureImage() - throwable : $it")
