@@ -283,27 +283,4 @@ interface BookChatApi {
 		@Path("userId") targetUserId: Long,
 		@Query("participantStatus") authority: ChannelMemberAuthorityNetwork,
 	)
-
-	/**------------채팅 스크랩------------*/
-	@POST("/v1/api/scraps")
-	suspend fun makeChatScrap(
-		@Body requestMakeChatScrap: RequestMakeChatScrap,
-	): Response<Unit>
-
-	@GET("/v1/api/scraps")
-	suspend fun getChatScraps(
-		@Query("bookShelfId") bookShelfId: Long,
-		@Query("postCursorId") postCursorId: Long,
-		@Query("size") size: Int,
-	): ResponseGetChatScrap
-
-	@GET("/v1/api/scraps/{scrapId}")
-	suspend fun getChatScrap(
-		@Path("scrapId") scrapId: Long
-	): ChatScrapResponse
-
-	@DELETE("/v1/api/scraps/{scrapId}")
-	suspend fun deleteChatScrap(
-		@Path("scrapId") scrapId: Long
-	)
 }

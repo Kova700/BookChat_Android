@@ -15,7 +15,6 @@ import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
-import com.example.bookchat.domain.repository.ChatScrapRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.domain.usecase.GetChatsFlowUseCase
@@ -57,7 +56,6 @@ class ChannelViewModel @Inject constructor(
 	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
-	private val chatScrapRepository: ChatScrapRepository,
 	private val networkManager: NetworkManager,
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
