@@ -4,9 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.util.Log
 import android.util.LruCache
-import com.example.bookchat.utils.Constants.TAG
 
 fun getMergedBitmap(
 	cacheRange: IntRange,
@@ -14,7 +12,6 @@ fun getMergedBitmap(
 	bigBitmapWidth: Int,
 	bigBitmapHeight: Int,
 ): Bitmap {
-	Log.d(TAG, ": getMergedBitmap() - called")
 	val bigBitmap = Bitmap.createBitmap(
 		bigBitmapWidth,
 		bigBitmapHeight,

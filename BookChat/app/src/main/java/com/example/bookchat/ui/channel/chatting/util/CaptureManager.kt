@@ -2,13 +2,11 @@ package com.example.bookchat.ui.channel.chatting.util
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.util.Log
 import android.util.LruCache
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.ui.channel.chatting.adapter.ChatItemAdapter
 import com.example.bookchat.ui.channel.chatting.adapter.ChatItemViewHolder
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.bitmap.getMergedBitmap
 import com.example.bookchat.utils.image.saveImage
 
@@ -72,16 +70,9 @@ fun RecyclerView.captureItems(
 	context.saveImage(mergedBitmap)
 }
 
-//TODO : 분할 저장 잘 작동하는지 확인
 fun LruCache<Int, Bitmap>.canPutBitmapInCache(bitmap: Bitmap): Boolean {
 	val bitmapKBSize = bitmap.byteCount / 1024
 	val currentCacheSize = this.size()
 	val maxCacheSize = this.maxSize()
-//	val maxCacheSize = 2 //TODO : 이거 줄이니까 바로 그냥
-	//  ChannelActivity: makeCaptureImage() - throwable : java.lang.IllegalArgumentException: width and height must be > 0 터짐
-	Log.d(
-		TAG, ": canPutBitmapInCache() - currentCacheSize : $currentCacheSize \n" +
-						"maxCacheSize(maxMemoryKB / 4) : $maxCacheSize"
-	)
 	return currentCacheSize + bitmapKBSize <= maxCacheSize
 }
