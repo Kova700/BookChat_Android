@@ -1,7 +1,6 @@
 package com.example.bookchat.data.network.model.request
 
 import com.google.gson.annotations.SerializedName
-import java.io.Serializable
 
 data class BookRequest(
 	@SerializedName("isbn")
@@ -15,5 +14,5 @@ data class BookRequest(
 	@SerializedName("publishAt")
 	var publishAt: String,
 	@SerializedName("bookCoverImageUrl")
-	val bookCoverImageUrl: String
-) : Serializable
+	val bookCoverImageUrl: String,
+)

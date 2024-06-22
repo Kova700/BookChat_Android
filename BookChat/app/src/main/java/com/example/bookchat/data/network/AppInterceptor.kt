@@ -70,7 +70,6 @@ class AppInterceptor @Inject constructor(
 	// 채팅 connect요청도 이거임(예외처리해야함)
 	private fun Response.getException(): Exception? {
 		return when (code) {
-			400 -> BadRequestException(message)
 			403 -> ForbiddenException(message)
 			else -> null
 		}

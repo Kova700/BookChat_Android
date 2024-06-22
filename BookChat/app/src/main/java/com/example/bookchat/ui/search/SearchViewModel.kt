@@ -5,8 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
-import com.example.bookchat.domain.model.Book
-import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.SearchFilter
 import com.example.bookchat.domain.model.SearchPurpose
 import com.example.bookchat.domain.repository.BookSearchRepository
 import com.example.bookchat.domain.repository.ChannelSearchRepository
@@ -14,14 +13,12 @@ import com.example.bookchat.domain.repository.SearchHistoryRepository
 import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_SEARCH_PURPOSE
 import com.example.bookchat.ui.search.SearchUiState.SearchResultState
 import com.example.bookchat.ui.search.SearchUiState.SearchTapState
+import com.example.bookchat.ui.search.mapper.groupItems
 import com.example.bookchat.ui.search.mapper.toBook
-import com.example.bookchat.ui.search.mapper.toBookItem
-import com.example.bookchat.ui.search.mapper.toChannelItem
 import com.example.bookchat.ui.search.model.SearchResultItem
 import com.example.bookchat.ui.search.model.SearchTarget
 import com.example.bookchat.utils.BookImgSizeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -38,7 +35,7 @@ class SearchViewModel @Inject constructor(
 	private val bookSearchRepository: BookSearchRepository,
 	private val channelSearchRepository: ChannelSearchRepository,
 	private val searchHistoryRepository: SearchHistoryRepository,
-	private val bookImgSizeManager: BookImgSizeManager
+	private val bookImgSizeManager: BookImgSizeManager,
 ) : ViewModel() {
 
 	private val searchPurpose =
@@ -66,18 +63,34 @@ class SearchViewModel @Inject constructor(
 				combine(
 					channelSearchRepository.getChannelsFLow(true),
 					bookSearchRepository.getBooksFLow(true)
-				) { channels, books -> groupItems(channels = channels, books = books) }
-					.collect { items -> updateState { copy(searchResults = items) } }
+				) { channels, books ->
+					groupItems(
+						channels = channels,
+						books = books,
+						searchPurpose = searchPurpose,
+						bookImgSizeManager = bookImgSizeManager
+					)
+				}.collect { items -> updateState { copy(searchResults = items) } }
 			}
 
 			SearchPurpose.MAKE_CHANNEL -> {
-				bookSearchRepository.getBooksFLow(true).map { groupItems(books = it) }
-					.collect { items -> updateState { copy(searchResults = items) } }
+				bookSearchRepository.getBooksFLow(true).map {
+					groupItems(
+						books = it,
+						searchPurpose = searchPurpose,
+						bookImgSizeManager = bookImgSizeManager
+					)
+				}.collect { items -> updateState { copy(searchResults = items) } }
 			}
 
 			SearchPurpose.SEARCH_CHANNEL -> {
-				channelSearchRepository.getChannelsFLow(true).map { groupItems(channels = it) }
-					.collect { items -> updateState { copy(searchResults = items) } }
+				channelSearchRepository.getChannelsFLow(true).map {
+					groupItems(
+						channels = it,
+						searchPurpose = searchPurpose,
+						bookImgSizeManager = bookImgSizeManager
+					)
+				}.collect { items -> updateState { copy(searchResults = items) } }
 			}
 		}
 	}
@@ -86,54 +99,6 @@ class SearchViewModel @Inject constructor(
 		searchHistoryRepository.getSearchHistoryFlow().collect {
 			updateState { copy(searchHistory = it) }
 		}
-	}
-
-	private fun groupItems(
-		books: List<Book>? = null,
-		channels: List<Channel>? = null
-	): List<SearchResultItem> {
-		val groupedItems = mutableListOf<SearchResultItem>()
-		if (books.isNullOrEmpty() && channels.isNullOrEmpty()) return groupedItems
-
-		fun addBookItems() {
-			groupedItems.add(SearchResultItem.BookHeader)
-			if (books.isNullOrEmpty()) {
-				groupedItems.add(SearchResultItem.BookEmpty)
-			} else {
-				val defaultSize = bookImgSizeManager.flexBoxBookSpanSize * 2
-				val exposureItemCount = if (books.size > defaultSize) defaultSize else books.size
-				groupedItems.addAll(books.take(exposureItemCount).map { it.toBookItem() })
-
-				val dummyItemCount = bookImgSizeManager.getFlexBoxDummyItemCount(exposureItemCount)
-				(0 until dummyItemCount).forEach { i -> groupedItems.add(SearchResultItem.BookDummy(i)) }
-			}
-		}
-
-		fun addChannelItems() {
-			groupedItems.add(SearchResultItem.ChannelHeader)
-			if (channels.isNullOrEmpty()) {
-				groupedItems.add(SearchResultItem.ChannelEmpty)
-			} else {
-				val exposureItemCount = if (channels.size > 3) 3 else channels.size
-				groupedItems.addAll(channels.take(exposureItemCount).map { it.toChannelItem() })
-			}
-		}
-
-		when (uiState.value.searchPurpose) {
-			SearchPurpose.SEARCH_BOTH -> {
-				addBookItems()
-				addChannelItems()
-			}
-
-			SearchPurpose.MAKE_CHANNEL -> {
-				addBookItems()
-			}
-
-			SearchPurpose.SEARCH_CHANNEL -> {
-				addChannelItems()
-			}
-		}
-		return groupedItems
 	}
 
 	//TODO : 현재 도서명으로만 검색되고 있는거 같음 , 채팅방 명으로 검색안되고 있음
@@ -191,7 +156,6 @@ class SearchViewModel @Inject constructor(
 	}
 
 	private suspend fun searchSuccessCallBack(isEmpty: Boolean) {
-		delay(SKELETON_DURATION)
 		if (isEmpty) updateState { copy(searchResultState = SearchResultState.Empty) }
 		else updateState { copy(searchResultState = SearchResultState.Success) }
 	}
@@ -268,13 +232,21 @@ class SearchViewModel @Inject constructor(
 
 	fun onBookItemClick(bookItem: SearchResultItem.BookItem) {
 		when (uiState.value.searchPurpose) {
-			SearchPurpose.SEARCH_BOTH -> startEvent(SearchEvent.MoveToSearchBookDialog(bookItem.toBook()))
+			SearchPurpose.SEARCH_BOTH -> startEvent(SearchEvent.ShowSearchBookDialog(bookItem.toBook()))
 			SearchPurpose.MAKE_CHANNEL -> startEvent(
-				SearchEvent.MoveToMakeChannelSelectBookDialog(bookItem.toBook())
+				SearchEvent.ShowMakeChannelSelectBookDialog(bookItem.toBook())
 			)
 
 			SearchPurpose.SEARCH_CHANNEL -> Unit
 		}
+	}
+
+	fun onClickSearchFilter(selectedFilter: SearchFilter) {
+		updateState { copy(searchFilter = selectedFilter) }
+	}
+
+	fun onClickSearchFilterBtn() {
+		startEvent(SearchEvent.ShowSearchFilterSelectDialog)
 	}
 
 	fun onChannelItemClick(channelId: Long) {
@@ -307,7 +279,4 @@ class SearchViewModel @Inject constructor(
 		}
 	}
 
-	companion object {
-		private const val SKELETON_DURATION = 700L
-	}
 }

@@ -15,6 +15,12 @@ fun LinearLayoutManager.isVisiblePosition(itemPosition: Int): Boolean {
 	return (itemCount != 0) && itemPosition in fvip..lvip
 }
 
+fun LinearLayoutManager.isOnHigherPosition(itemPosition: Int): Boolean {
+	val fvip = findFirstVisibleItemPosition()
+	if (fvip == RecyclerView.NO_POSITION) return false
+	return (itemCount != 0) && (fvip > itemPosition)
+}
+
 fun LinearLayoutManager.isOnListBottom(): Boolean {
 	return (itemCount != 0) && isVisiblePosition(0)
 }

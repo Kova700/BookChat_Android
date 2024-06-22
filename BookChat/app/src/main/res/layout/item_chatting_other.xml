@@ -10,118 +10,137 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/root_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.80" />
+        <View
+            android:id="@+id/chat_capture_layout_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/chat_capture_default_layout"
+            android:elevation="10dp"
+            android:outlineProvider="none"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/user_profile_cv"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_marginStart="20dp"
-            app:cardCornerRadius="15dp"
-            app:cardElevation="0dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="7dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.80" />
+
+            <!--매우 작은 padding울 추가해야지 캡처 시 검은 배경이 사라지는 이슈가 있어서 추가-->
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/user_profile_iv"
                 userDefaultProfileImageType="@{chat.sender.defaultProfileImageType}"
                 userProfileUrl="@{chat.sender.profileImageUrl}"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:scaleType="fitXY"
-                android:src="@drawable/loading_img" />
-        </androidx.cardview.widget.CardView>
+                android:padding="0.1dp"
+                android:layout_marginStart="20dp"
+                app:shapeAppearanceOverlay="@style/UserProfileImageRoundedCorners"
+                android:src="@drawable/loading_img"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
-        <ImageView
-            android:id="@+id/host_crown"
-            android:layout_width="14dp"
-            android:layout_height="14dp"
-            android:src="@drawable/host_crown"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/user_profile_cv"
-            app:layout_constraintEnd_toEndOf="@+id/user_profile_cv" />
+            <ImageView
+                android:id="@+id/host_crown"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/host_crown"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/user_profile_iv"
+                app:layout_constraintEnd_toEndOf="@+id/user_profile_iv" />
 
-        <ImageView
-            android:id="@+id/sub_host_crown"
-            android:layout_width="14dp"
-            android:layout_height="14dp"
-            android:src="@drawable/sub_host_crown"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/user_profile_cv"
-            app:layout_constraintEnd_toEndOf="@+id/user_profile_cv" />
-
-        <TextView
-            android:id="@+id/uesr_nickname_tv"
-            setUserNickname="@{chat.sender.nickname}"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:elegantTextHeight="true"
-            android:ellipsize="end"
-            android:fontFamily="@font/notosanskr_regular"
-            android:maxLines="1"
-            android:textColor="#000000"
-            android:textSize="10sp"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/user_profile_cv"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/chat_dispatch_time_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_regular"
-            android:textColor="#303030"
-            android:textSize="10sp"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/chatting_layout" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/chatting_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="3dp"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/chat_bubble_gray"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="6dp"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/user_profile_cv"
-            app:layout_constraintTop_toBottomOf="@+id/uesr_nickname_tv">
+            <ImageView
+                android:id="@+id/sub_host_crown"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/sub_host_crown"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/user_profile_iv"
+                app:layout_constraintEnd_toEndOf="@+id/user_profile_iv" />
 
             <TextView
-                android:id="@+id/chat_tv"
+                android:id="@+id/uesr_nickname_tv"
+                setUserNickname="@{chat.sender.nickname}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:elegantTextHeight="true"
+                android:ellipsize="end"
+                android:fontFamily="@font/notosanskr_regular"
+                android:maxLines="1"
+                android:textColor="#000000"
+                android:textSize="10sp"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/user_profile_iv"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/chat_dispatch_time_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
                 android:elegantTextHeight="true"
                 android:fontFamily="@font/notosanskr_regular"
-                android:text="@{chat.message}"
                 android:textColor="#303030"
-                android:textSize="12sp"
+                android:textSize="10sp"
+                app:layout_constrainedWidth="true"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_constraintStart_toEndOf="@+id/chatting_layout" />
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/chatting_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/chat_bubble_gray"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="6dp"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/user_profile_iv"
+                app:layout_constraintTop_toBottomOf="@+id/uesr_nickname_tv">
+
+                <TextView
+                    android:id="@+id/chat_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:elegantTextHeight="true"
+                    android:fontFamily="@font/notosanskr_regular"
+                    android:text="@{chat.message}"
+                    android:textColor="#303030"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

@@ -52,8 +52,7 @@ interface BookChatApi {
 	suspend fun withdraw()
 
 	@GET("/v1/api/users/profile")
-	suspend fun getUserProfile()
-					: UserResponse
+	suspend fun getUserProfile(): UserResponse
 
 	/**------------도서------------*/
 

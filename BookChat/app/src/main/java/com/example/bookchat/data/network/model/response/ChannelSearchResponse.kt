@@ -49,7 +49,7 @@ data class ChannelSearchResponse(
 	@SerializedName("lastChatDispatchTime")
 	val lastChatDispatchTime: String? = null,
 	@SerializedName("isEntered")
-	val isEntered :Boolean, //TODO : Channel말고 isEntered 필드 반영하는 새로운 data class만들어야할듯?
+	val isEntered :Boolean,
 	@SerializedName("isBanned")
 	val isBanned :Boolean
 ) {

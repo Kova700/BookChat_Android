@@ -8,6 +8,13 @@ import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.User
 import com.google.gson.annotations.SerializedName
 
+//TODO : Host 정보가 필요함
+//  val id: Long,
+//	val nickname: String,
+//	val profileImageUrl: String?,
+//	val defaultProfileImageType: UserDefaultProfileType
+// 채팅방 목록 꾹 눌러서 뜨는 dialog에서 나가기 누르면 경고 띄워야하는데 방장 유무를 몰라서 빨간글씨 띄울지 말지를 모름
+
 data class ChannelResponse(
 	@SerializedName("roomId")
 	val roomId: Long,

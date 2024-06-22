@@ -4,18 +4,25 @@ import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.User
 
-sealed interface ChatItem {
+sealed class ChatItem(
+	open val isCaptureHeader: Boolean,
+	open val isCaptureMiddle: Boolean,
+	open val isCaptureBottom: Boolean,
+) {
 	fun getCategoryId(): Long {
 		return when (this) {
 			is Message -> chatId
 			is DateSeparator -> date.hashCode().toLong()
-			is LastReadChatNotice -> hashCode().toLong()
+			is LastReadChatNotice -> LAST_READ_ITEM_STABLE_ID
 		}
 	}
 
 	sealed class Message(
 		open val chatId: Long,
-	) : ChatItem
+		override val isCaptureHeader: Boolean,
+		override val isCaptureMiddle: Boolean,
+		override val isCaptureBottom: Boolean,
+	) : ChatItem(isCaptureHeader, isCaptureMiddle, isCaptureBottom)
 
 	data class MyChat(
 		override val chatId: Long,
@@ -24,7 +31,10 @@ sealed interface ChatItem {
 		val status: ChatStatus,
 		val dispatchTime: String,
 		val sender: User?,
-	) : Message(chatId)
+		override val isCaptureHeader: Boolean,
+		override val isCaptureMiddle: Boolean,
+		override val isCaptureBottom: Boolean,
+	) : Message(chatId, isCaptureHeader, isCaptureMiddle, isCaptureBottom)
 
 	data class AnotherUser(
 		override val chatId: Long,
@@ -33,7 +43,10 @@ sealed interface ChatItem {
 		val dispatchTime: String,
 		val sender: User?,
 		val authority: ChannelMemberAuthority,
-	) : Message(chatId) {
+		override val isCaptureHeader: Boolean,
+		override val isCaptureMiddle: Boolean,
+		override val isCaptureBottom: Boolean,
+	) : Message(chatId, isCaptureHeader, isCaptureMiddle, isCaptureBottom) {
 		val isTargetUserHost
 			get() = authority == ChannelMemberAuthority.HOST
 
@@ -46,12 +59,25 @@ sealed interface ChatItem {
 		val chatRoomId: Long,
 		val message: String,
 		val dispatchTime: String,
-	) : Message(chatId)
+		override val isCaptureHeader: Boolean,
+		override val isCaptureMiddle: Boolean,
+		override val isCaptureBottom: Boolean,
+	) : Message(chatId, isCaptureHeader, isCaptureMiddle, isCaptureBottom)
 
-	object LastReadChatNotice : ChatItem
+	data class LastReadChatNotice(
+		override val isCaptureHeader: Boolean,
+		override val isCaptureMiddle: Boolean,
+		override val isCaptureBottom: Boolean,
+	) : ChatItem(isCaptureHeader, isCaptureMiddle, isCaptureBottom)
 
 	data class DateSeparator(
 		val date: String,
-	) : ChatItem
+		override val isCaptureHeader: Boolean,
+		override val isCaptureMiddle: Boolean,
+		override val isCaptureBottom: Boolean,
+	) : ChatItem(isCaptureHeader, isCaptureMiddle, isCaptureBottom)
 
+	companion object {
+		const val LAST_READ_ITEM_STABLE_ID = -1L
+	}
 }

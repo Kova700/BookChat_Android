@@ -2,7 +2,9 @@ package com.example.bookchat.ui.createchannel
 
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.text.Editable
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -17,8 +19,9 @@ import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_C
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
 import com.example.bookchat.utils.MakeChannelImgSizeManager
-import com.example.bookchat.utils.PermissionManager
 import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.permissions.galleryPermissions
+import com.example.bookchat.utils.permissions.getPermissionsLauncher
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,6 +37,20 @@ class MakeChannelActivity : AppCompatActivity() {
 	@Inject
 	lateinit var makeChannelImgSizeManager: MakeChannelImgSizeManager
 
+	private val permissionsLauncher = this.getPermissionsLauncher(
+		onSuccess = { moveToImageCrop() },
+		onDenied = {
+			makeToast(R.string.permission_denied)
+		},
+		onExplained = {
+			makeToast(R.string.permission_explained)
+			val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+			val uri = Uri.fromParts(SCHEME_PACKAGE, packageName, null)
+			intent.data = uri
+			startActivity(intent)
+		}
+	)
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_make_channel)
@@ -43,9 +60,6 @@ class MakeChannelActivity : AppCompatActivity() {
 		observeUiEvent()
 		initView()
 	}
-
-	private val permissionsLauncher =
-		PermissionManager.getPermissionsLauncher(this) { moveToImageCrop() }
 
 	private fun observeUiState() = lifecycleScope.launch {
 		makeChannelViewModel.uiState.collect { state ->
@@ -58,7 +72,7 @@ class MakeChannelActivity : AppCompatActivity() {
 	}
 
 	private fun startImageEdit() {
-		permissionsLauncher.launch(PermissionManager.getGalleryPermissions())
+		permissionsLauncher.launch(galleryPermissions)
 	}
 
 	private fun initView() {
@@ -156,5 +170,9 @@ class MakeChannelActivity : AppCompatActivity() {
 		is MakeChannelEvent.OpenGallery -> startImageEdit()
 		is MakeChannelEvent.MoveToChannel -> moveToChannel(event.channelId)
 		is MakeChannelEvent.MakeToast -> makeToast(event.stringId)
+	}
+
+	companion object {
+		private const val SCHEME_PACKAGE = "package"
 	}
 }

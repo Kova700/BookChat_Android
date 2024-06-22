@@ -89,6 +89,7 @@ FCMService : FirebaseMessagingService() {
 		val fcmMessageBody = fcmMessage.body
 		CoroutineScope(Dispatchers.IO).launch {
 			//TODO : 내가 친 메세지라면 API가 호출될 수도 있는데 사전에 방지하는게 좋아보임 특히 getChat이거
+			// TODO : API 실패할 경우를 위해 예외처리 해야함
 			val channel = channelRepository.getChannel(fcmMessageBody.channelId)
 			val chat = chatRepository.getChat(fcmMessageBody.chatId)
 

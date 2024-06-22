@@ -1,22 +1,18 @@
 package com.example.bookchat.ui.channel.chatting.adapter
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.bookchat.R
-import com.example.bookchat.databinding.ItemChattingDateBinding
-import com.example.bookchat.databinding.ItemChattingLastReadNoticeBinding
-import com.example.bookchat.databinding.ItemChattingMineBinding
-import com.example.bookchat.databinding.ItemChattingNoticeBinding
-import com.example.bookchat.databinding.ItemChattingOtherBinding
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
 import javax.inject.Inject
 
 class ChatItemAdapter @Inject constructor() :
 	ListAdapter<ChatItem, ChatItemViewHolder>(CHAT_ITEM_COMPARATOR) {
+	private var isCaptureMode = false
+
+	var onSelectCaptureChat: ((Int) -> Unit)? = null
 	var onClickUserProfile: ((Int) -> Unit)? = null
 	var onClickFailedChatRetryBtn: ((Int) -> Unit)? = null
 	var onClickFailedChatDeleteBtn: ((Int) -> Unit)? = null
@@ -52,62 +48,34 @@ class ChatItemAdapter @Inject constructor() :
 		parent: ViewGroup,
 		viewType: Int,
 	): ChatItemViewHolder {
-		when (viewType) {
-			R.layout.item_chatting_mine -> {
-				val binding: ItemChattingMineBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context),
-					R.layout.item_chatting_mine,
-					parent, false
-				)
-				return MyChatViewHolder(
-					binding = binding,
-					onClickFailedChatRetryBtn = onClickFailedChatRetryBtn,
-					onClickFailedChatDeleteBtn = onClickFailedChatDeleteBtn
-				)
-			}
-
-			R.layout.item_chatting_other -> {
-				val binding: ItemChattingOtherBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context),
-					R.layout.item_chatting_other,
-					parent, false
-				)
-				return AnotherUserChatViewHolder(binding, onClickUserProfile)
-			}
-
-			R.layout.item_chatting_notice -> {
-				val binding: ItemChattingNoticeBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context),
-					R.layout.item_chatting_notice,
-					parent, false
-				)
-				return NoticeChatViewHolder(binding)
-			}
-
-			R.layout.item_chatting_date -> {
-				val binding: ItemChattingDateBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context),
-					R.layout.item_chatting_date,
-					parent, false
-				)
-				return DateSeparatorViewHolder(binding)
-			}
-
-			R.layout.item_chatting_last_read_notice -> {
-				val binding: ItemChattingLastReadNoticeBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context),
-					R.layout.item_chatting_last_read_notice,
-					parent, false
-				)
-				return LastReadNoticeViewHolder(binding)
-			}
-
-			else -> throw RuntimeException("Received unknown ViewHolderType")
-		}
+		return getChatItemViewHolder(
+			parent = parent,
+			itemViewType = viewType,
+			onClickUserProfile = onClickUserProfile,
+			onClickFailedChatRetryBtn = onClickFailedChatRetryBtn,
+			onClickFailedChatDeleteBtn = onClickFailedChatDeleteBtn,
+			onSelectCaptureChat = onSelectCaptureChat
+		)
 	}
 
 	override fun onBindViewHolder(holder: ChatItemViewHolder, position: Int) {
-		holder.bind(getItem(position))
+		holder.bind(chatItem = getItem(position), isCaptureMode = isCaptureMode)
+	}
+
+	fun onBindViewHolderForCapture(holder: ChatItemViewHolder, position: Int) {
+		holder.bind(chatItem = getItem(position), isCaptureMode = false)
+	}
+
+	fun changeToDefaultMode() {
+		if (isCaptureMode.not()) return
+		isCaptureMode = false
+		notifyItemRangeChanged(0, itemCount)
+	}
+
+	fun changeToCaptureMode() {
+		if (isCaptureMode) return
+		isCaptureMode = true
+		notifyItemRangeChanged(0, itemCount)
 	}
 
 	companion object {

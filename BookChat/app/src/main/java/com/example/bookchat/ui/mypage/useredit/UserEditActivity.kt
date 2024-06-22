@@ -2,10 +2,12 @@ package com.example.bookchat.ui.mypage.useredit
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.provider.Settings
 import android.text.Editable
 import android.text.InputFilter
 import android.view.View
@@ -21,7 +23,9 @@ import com.example.bookchat.databinding.ActivityUserEditBinding
 import com.example.bookchat.ui.DataBindingAdapter
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROPPED_PROFILE_BYTE_ARRAY
-import com.example.bookchat.utils.PermissionManager
+import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.permissions.galleryPermissions
+import com.example.bookchat.utils.permissions.getPermissionsLauncher
 import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -35,8 +39,19 @@ class UserEditActivity : AppCompatActivity() {
 
 	private val imm by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
-	private val permissionsLauncher =
-		PermissionManager.getPermissionsLauncher(this) { moveToImageCrop() }
+	private val permissionsLauncher = this.getPermissionsLauncher(
+		onSuccess = { moveToImageCrop() },
+		onDenied = {
+			makeToast(R.string.permission_denied)
+		},
+		onExplained = {
+			makeToast(R.string.permission_explained)
+			val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+			val uri = Uri.fromParts(SCHEME_PACKAGE, packageName, null)
+			intent.data = uri
+			startActivity(intent)
+		}
+	)
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -140,7 +155,7 @@ class UserEditActivity : AppCompatActivity() {
 
 	private fun startUserProfileEdit() {
 		closeKeyboard(binding.nickNameEt.windowToken)
-		permissionsLauncher.launch(PermissionManager.getGalleryPermissions())
+		permissionsLauncher.launch(galleryPermissions)
 	}
 
 	private fun moveToImageCrop() {
@@ -172,6 +187,7 @@ class UserEditActivity : AppCompatActivity() {
 		private const val NAME_CHECK_REGULAR_EXPRESSION =
 			"^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ\\u318D\\u119E\\u11A2\\u2022\\u2025a\\u00B7\\uFE55\\uFF1A]+$"
 		private const val MAX_NICKNAME_LENGTH = 20
+		private const val SCHEME_PACKAGE = "package"
 	}
 
 }

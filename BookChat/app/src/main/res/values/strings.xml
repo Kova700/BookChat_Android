@@ -80,6 +80,11 @@
 
     <!--search-->
     <string name="book">도서</string>
+    <string name="book_title">도서명</string>
+    <string name="isbn">ISBN</string>
+    <string name="channel_title">채팅방 제목</string>
+    <string name="channel_tag">채팅방 TAG</string>
+    <string name="search_filter">검색 필터</string>
     <string name="recommend_keyword">추천 검색어</string>
     <string name="recent_search_keyword">최근 검색어</string>
     <string name="related_book_name">관련 도서명</string>
@@ -174,6 +179,13 @@
     <string name="channel_top_pin">채팅방 상단 고정</string>
     <string name="channel_un_pin_">채팅방 상단 고정 해제</string>
 
+    <!--channel info-->
+    <string name="room_member_count">%1$d / %2$d 명</string>
+    <string name="channel_last_active_time">마지막 활성화 : %1$s</string>
+    <string name="banned_channel">참여할 수 없는 채팅방</string>
+    <string name="banned_channel_notice">참여 할 수 없는 채팅방입니다.\n관리자에 의해 내보내기 되었습니다.</string>
+    <string name="full_channel_notice">대화 상대가 많아 참여할 수 없습니다.\n잠시 후 다시 시도해 주세요.</string>
+
     <!--channel-->
     <string name="chat_room_send_message">메시지 보내기</string>
     <string name="enter">입장</string>
@@ -193,7 +205,13 @@
     <string name="connected_network">연결되었습니다.</string>
     <string name="offline_network">오프라인 상태입니다.</string>
     <string name="please_connect_the_network">네트워크를 연결해주세요.</string>
-
+    <string name="channel_scrap">채팅방 스크랩</string>
+    <string name="channel_scrap_explanation_comment">스크랩할 말풍선을 선택해주세요</string>
+    <string name="channel_scrap_explanation_comment_on_selected">캡처 영역을 지정해주세요</string>
+    <string name="cancel_selection">선택해제</string>
+    <string name="channel_scrap_selected_count_over">채팅 스크랩은 30개 까지만 가능합니다.</string>
+    <string name="channel_scrap_success">채팅방 스크랩이 완료되었습니다.</string>
+    <string name="channel_scrap_fail">채팅 캡처를 실패했습니다.</string>
 
     <!--channel setting-->
     <string name="channel_setting_title">채팅방 설정</string>

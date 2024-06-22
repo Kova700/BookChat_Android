@@ -39,4 +39,9 @@
         <item name="colorControlNormal">@color/number_picker_divider</item>
     </style>
 
+    <style name="UserProfileImageRoundedCorners">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">15dp</item>
+    </style>
+
 </resources>

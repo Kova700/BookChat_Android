@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.Book
-import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.SearchFilter
 import com.example.bookchat.domain.model.SearchPurpose
 import com.example.bookchat.domain.repository.BookSearchRepository
@@ -17,7 +16,8 @@ import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_SEARCH_PURP
 import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_SEARCH_TARGET
 import com.example.bookchat.ui.search.mapper.toBook
 import com.example.bookchat.ui.search.mapper.toBookItem
-import com.example.bookchat.ui.search.mapper.toChannelItem
+import com.example.bookchat.ui.search.mapper.toBookSearchResultItem
+import com.example.bookchat.ui.search.mapper.toChannelSearchResultItem
 import com.example.bookchat.ui.search.model.SearchResultItem
 import com.example.bookchat.ui.search.model.SearchTarget
 import com.example.bookchat.ui.search.searchdetail.SearchDetailUiState.UiState
@@ -40,7 +40,7 @@ class SearchDetailViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val bookSearchRepository: BookSearchRepository,
 	private val channelSearchRepository: ChannelSearchRepository,
-	private val bookImgSizeManager: BookImgSizeManager
+	private val bookImgSizeManager: BookImgSizeManager,
 ) : ViewModel() {
 	private val searchKeyword = savedStateHandle.get<String>(EXTRA_SEARCH_KEYWORD)!!
 	private val searchTarget = savedStateHandle.get<SearchTarget>(EXTRA_SEARCH_TARGET)!!
@@ -73,15 +73,16 @@ class SearchDetailViewModel @Inject constructor(
 	private fun observeSearchItems() = viewModelScope.launch {
 		when (searchTarget) {
 			SearchTarget.BOOK -> {
-				bookSearchRepository.getBooksFLow().map { groupBookItems(it) }
-					.collect { items ->
+				bookSearchRepository.getBooksFLow().map {
+					it.toBookSearchResultItem(bookImgSizeManager.getFlexBoxDummyItemCount(it.size))
+				}.collect { items ->
 						if (items.isEmpty()) updateState { copy(uiState = UiState.EMPTY) }
 						else updateState { copy(searchItems = items) }
 					}
 			}
 
 			SearchTarget.CHANNEL -> {
-				channelSearchRepository.getChannelsFLow().map { groupChannelItems(channels = it) }
+				channelSearchRepository.getChannelsFLow().map { it.toChannelSearchResultItem() }
 					.collect { items ->
 						if (items.isEmpty()) updateState { copy(uiState = UiState.EMPTY) }
 						else updateState { copy(searchItems = items) }
@@ -89,20 +90,6 @@ class SearchDetailViewModel @Inject constructor(
 			}
 
 		}
-	}
-
-	private fun groupBookItems(books: List<Book>): List<SearchResultItem> {
-		val groupedItems = mutableListOf<SearchResultItem>()
-		groupedItems.addAll(books.map { it.toBookItem() })
-		val dummyItemCount = bookImgSizeManager.getFlexBoxDummyItemCount(books.size)
-		(0 until dummyItemCount).forEach { i -> groupedItems.add(SearchResultItem.BookDummy(i)) }
-		return groupedItems
-	}
-
-	private fun groupChannelItems(channels: List<Channel>): List<SearchResultItem> {
-		val groupedItems = mutableListOf<SearchResultItem>()
-		groupedItems.addAll(channels.map { it.toChannelItem() })
-		return groupedItems
 	}
 
 	private fun getSearchItems() = viewModelScope.launch {
@@ -117,7 +104,7 @@ class SearchDetailViewModel @Inject constructor(
 		runCatching {
 			bookSearchRepository.search(
 				keyword = searchKeyword,
-				loadSize = bookImgSizeManager.flexBoxBookSpanSize * 6
+				loadSize = bookImgSizeManager.flexBoxBookSpanSize * 10
 			)
 		}
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }

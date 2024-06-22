@@ -32,17 +32,18 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.abs
 
 //TODO : 점검 중 , 새로운 업데이트 RemoteConfig 구성해서 출시 + Crashtics
 //TODO : 장문의 긴 채팅 길이 접기 구현해야함, 누르면 전체보기 가능하게
 //TODO : 채팅 꾹 누르면 복사
 //TODO : 채팅방 정보 조회 실패 시 예외 처리
 //TODO : 채팅 로딩 전체 화면 UI 구현
-//TODO : 카톡처럼 이모지 한개이면 이모지 크기 확대
+//TODO : 카톡처럼 이모지 한 개이면 이모지 크기 확대
 //TODO : 출시 전 북챗 문의 방 만들기
 
 @HiltViewModel
@@ -65,6 +66,11 @@ class ChannelViewModel @Inject constructor(
 	private val _uiState = MutableStateFlow<ChannelUiState>(ChannelUiState.DEFAULT)
 	val uiState = _uiState.asStateFlow()
 
+	/** 너무 잦은 chatItem 갱신을 방지하기 위해 uiState와 분리하여 combine*/
+	private val _captureIds =
+		MutableStateFlow<Pair<Long, Long>?>(null) // (headerId,bottomId)
+	val captureIds get() = _captureIds.asStateFlow()
+
 	//TODO :
 	// 6. Notice타입의 NewChatNotice UI
 
@@ -73,7 +79,8 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun initUiState() = viewModelScope.launch {
-		val originalChannel = channelRepository.getChannel(channelId)
+		val originalChannel = runCatching { channelRepository.getChannel(channelId) }
+			.getOrNull() ?: Channel.DEFAULT
 
 		val shouldLastReadChatScroll = originalChannel.isExistNewChat
 		updateState {
@@ -85,17 +92,18 @@ class ChannelViewModel @Inject constructor(
 				needToScrollToLastReadChat = shouldLastReadChatScroll,
 			)
 		}
-
-		if (originalChannel.isAvailableChannel.not()) return@launch
-
+		observeNetworkState()
+		//TODO: 채널에서 강퇴되었는지 , 채널이 폭파되었는지 알기 위해 해당 API를 호출해야함
+		// 하지만,isBaned, isExploded가 넘어오는게 아니라 강퇴 당하면 그냥 404 {"errorCode":"4040500","message":"참여자를 찾을 수 없습니다."} 넘어옴
+		// 채팅방 터진 경우는 404안뜨고 isExploded = true로 잘 넘어오긴함 (서버 수정 대기중)
 		getChannelInfo(channelId)
+		if (originalChannel.isAvailableChannel.not()) return@launch
 		getTempSavedMessage(channelId)
 		observeChannel()
 		observeChats()
 		getOfflineNewestChats()
 		observeChatsLoadState()
 		observeSocketState()
-		observeNetworkState()
 	}
 
 	private fun observeNetworkState() = viewModelScope.launch {
@@ -142,12 +150,17 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun observeChats() = viewModelScope.launch {
-		getChatsFlowUserCase(
-			initFlag = true,
-			channelId = channelId
-		).map { chats ->
+		combine(
+			getChatsFlowUserCase(
+				initFlag = true,
+				channelId = channelId
+			),
+			captureIds
+		) { chats, captureHeaderBottomIds ->
 			chats.toChatItems(
 				channel = uiState.value.channel,
+				captureHeaderItemId = captureHeaderBottomIds?.first,
+				captureBottomItemId = captureHeaderBottomIds?.second,
 				focusTargetId = uiState.value.originalLastReadChatId,
 				isVisibleLastReadChatNotice = uiState.value.isVisibleLastReadChatNotice
 			)
@@ -265,7 +278,7 @@ class ChannelViewModel @Inject constructor(
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트 간의 데이터 불일치를 메우기 위해서 임시로
 	 * 리커넥션 시마다 호출 (이벤트 History받는 로직 구현 이전까지 )*/
 	private fun getChannelInfo(channelId: Long) = viewModelScope.launch {
-		if (uiState.value.isNetworkDisconnected) return@launch
+//		if (uiState.value.isNetworkDisconnected) return@launch
 		runCatching { channelRepository.getChannelInfo(channelId) }
 			.onFailure { handleError(it, "getChannelInfo") }
 	}
@@ -273,8 +286,8 @@ class ChannelViewModel @Inject constructor(
 	private fun connectSocket(caller: String) = viewModelScope.launch {
 		if (uiState.value.isNetworkDisconnected) return@launch
 		Log.d(TAG, "ChannelViewModel: connectSocket() - caller : $caller")
-		val channel = channelRepository.getChannel(channelId)
-		runCatching { stompHandler.connectSocket(channel) }
+		if (uiState.value.channel == Channel.DEFAULT) return@launch
+		runCatching { stompHandler.connectSocket(uiState.value.channel) }
 			.onFailure { handleError(it, "connectSocket") }
 	}
 
@@ -383,6 +396,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	fun onClickSendMessage() {
+		if (uiState.value.isCaptureMode) return
 		sendMessage()
 	}
 
@@ -401,13 +415,6 @@ class ChannelViewModel @Inject constructor(
 		getNewerChats()
 	}
 
-	//TODO : 홀릭스 / 카톡 버튼처럼 애니메이션으로 만들어보자
-	fun onChangeStateOfLookingAtBottom(isBottom: Boolean) {
-		val isLookingAtBottom = isBottom && uiState.value.isNewerChatFullyLoaded
-		if (uiState.value.isLookingAtBottom == isLookingAtBottom) return
-		updateState { copy(isLookingAtBottom = isLookingAtBottom) }
-	}
-
 	/** 리스트 상 내 채팅이 아닌 채팅 중 가장 최신 채팅이 화면 상에 나타나는 순간 호출 */
 	fun onReadNewestChatNotMineInList(chatItem: ChatItem.Message) {
 		val nowNewChatNotice = uiState.value.newChatNotice
@@ -423,37 +430,120 @@ class ChannelViewModel @Inject constructor(
 		scrollToBottom()
 	}
 
-	//TODO : 캡처 기능 추가
+	//TODO : 서재에 도서 등록 안되어있으면 등록 경고 다이얼로그
 	fun onClickCaptureBtn() {
-		if (uiState.value.channel.isAvailableChannel.not()) return
-//		startEvent(ChannelEvent.CaptureChannel)
+		if (uiState.value.channel.isAvailableChannel.not()
+			|| uiState.value.chats.isEmpty()
+		) return
+		updateState { copy(isCaptureMode = true) }
+		_captureIds.update { null }
 	}
 
 	fun onClickMenuBtn() {
+		if (uiState.value.isCaptureMode) return
 		startEvent(ChannelEvent.OpenOrCloseDrawer)
 	}
 
 	fun onClickChannelExitBtn() {
+		if (uiState.value.isCaptureMode) return
 		startEvent(ChannelEvent.ShowChannelExitWarningDialog(uiState.value.clientAuthority))
 	}
 
+	fun onClickCancelCaptureSelection() {
+		_captureIds.update { null }
+	}
+
+	fun onClickCancelCapture() {
+		updateState { copy(isCaptureMode = false) }
+		_captureIds.update { null }
+	}
+
+	fun onClickCompleteCapture() {
+		val (headerId, bottomId) = captureIds.value ?: return
+		val chatMessages = uiState.value.chats
+		val headerIndex = chatMessages.indexOfFirst { it.getCategoryId() == headerId }
+		val bottomIndex = chatMessages.indexOfFirst { it.getCategoryId() == bottomId }
+		if (headerIndex == -1 || bottomIndex == -1) return
+
+		startEvent(
+			ChannelEvent.MakeCaptureImage(
+				headerIndex = headerIndex,
+				bottomIndex = bottomIndex
+			)
+		)
+	}
+
+	fun onSelectCaptureChat(chatItemId: Long) {
+		if (uiState.value.isCaptureMode.not()) return
+
+		val (headerId, bottomId) = captureIds.value ?: Pair(null, null)
+		val chatMessages = uiState.value.chats
+		var newHeaderId = headerId
+		var newBottomId = bottomId
+
+		when {
+			headerId == null || bottomId == null -> {
+				newHeaderId = chatItemId
+				newBottomId = chatItemId
+			}
+
+			headerId == bottomId -> {
+				val newSelectedIndex = chatMessages.indexOfFirst { it.getCategoryId() == chatItemId }
+				val headerIndex = chatMessages.indexOfFirst { it.getCategoryId() == headerId }
+				val currentIndex = headerIndex
+				when {
+					currentIndex < newSelectedIndex -> newHeaderId = chatItemId
+					currentIndex > newSelectedIndex -> newBottomId = chatItemId
+				}
+			}
+
+			headerId != bottomId -> {
+				val newSelectedIndex = chatMessages.indexOfFirst { it.getCategoryId() == chatItemId }
+				val headerIndex = chatMessages.indexOfFirst { it.getCategoryId() == headerId }
+				val bottomIndex = chatMessages.indexOfFirst { it.getCategoryId() == bottomId }
+				val headerGap = abs(headerIndex - newSelectedIndex)
+				val bottomGap = abs(bottomIndex - newSelectedIndex)
+				when {
+					headerGap < bottomGap -> newHeaderId = chatItemId
+					headerGap > bottomGap -> newBottomId = chatItemId
+					else -> newBottomId = chatItemId
+				}
+			}
+		}
+		val newHeaderIndex = chatMessages.indexOfFirst { it.getCategoryId() == newHeaderId }
+		val newBottomIndex = chatMessages.indexOfFirst { it.getCategoryId() == newBottomId }
+		val selectedItemsCount = abs(newHeaderIndex - newBottomIndex) + 1
+
+		if (selectedItemsCount > 30) {
+			startEvent(ChannelEvent.MakeToast(R.string.channel_scrap_selected_count_over))
+			return
+		}
+		if (newHeaderId == null || newBottomId == null) _captureIds.update { null }
+		else _captureIds.update { Pair(newHeaderId, newBottomId) }
+	}
+
 	fun onClickChannelExitDialogBtn() {
+		if (uiState.value.isCaptureMode) return
 		exitChannel()
 	}
 
 	fun onClickChannelSettingBtn() {
+		if (uiState.value.isCaptureMode) return
 		startEvent(ChannelEvent.MoveChannelSetting)
 	}
 
 	fun onClickUserProfile(user: User) {
+		if (uiState.value.isCaptureMode) return
 		startEvent(ChannelEvent.MoveUserProfile(user))
 	}
 
 	fun onClickFailedChatDeleteBtn(chatId: Long) {
+		if (uiState.value.isCaptureMode) return
 		deleteFailedChat(chatId)
 	}
 
 	fun onClickFailedChatRetryBtn(chatId: Long) {
+		if (uiState.value.isCaptureMode) return
 		retryFailedChat(chatId)
 	}
 

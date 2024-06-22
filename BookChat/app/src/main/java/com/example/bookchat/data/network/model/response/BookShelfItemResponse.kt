@@ -2,7 +2,6 @@ package com.example.bookchat.data.network.model.response
 
 import com.example.bookchat.domain.model.StarRating
 import com.google.gson.annotations.SerializedName
-import java.io.Serializable
 
 data class BookShelfItemResponse(
 	@SerializedName("bookShelfId")
@@ -25,4 +24,4 @@ data class BookShelfItemResponse(
 	val star: StarRating?,
 	@SerializedName("lastUpdatedAt")
 	val lastUpdatedAt: String,
-) : Serializable
+)
