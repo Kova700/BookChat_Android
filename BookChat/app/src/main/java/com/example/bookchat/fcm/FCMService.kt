@@ -1,4 +1,4 @@
-package com.example.bookchat.firebase
+package com.example.bookchat.fcm
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -27,8 +27,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class
-FCMService : FirebaseMessagingService() {
+class FCMService : FirebaseMessagingService() {
+
+	//TODO : 1 : Background 작업 WorkerManager로 위임
+	//TODO : 2 : Notification작업 NotificationHandler 같은 클래스로 이전
+	//TODO : 3 : Notification UI 작업
+
 	@Inject
 	lateinit var gson: Gson
 
