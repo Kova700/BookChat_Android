@@ -54,6 +54,10 @@ class ClientRepositoryImpl @Inject constructor(
 		return client.asStateFlow().filterNotNull()
 	}
 
+	override suspend fun isSignedIn(): Boolean {
+		return bookChatTokenRepository.isBookChatTokenExist()
+	}
+
 	override suspend fun signIn(
 		approveChangingDevice: Boolean,
 	) {
