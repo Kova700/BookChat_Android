@@ -1,15 +1,9 @@
 package com.example.bookchat.fcm
 
 import android.util.Log
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
 import com.example.bookchat.data.network.model.response.FcmMessage
 import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.model.PushType
-import com.example.bookchat.domain.repository.ChannelRepository
-import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.notification.LoadNotificationDataWorker
 import com.example.bookchat.utils.Constants.TAG
@@ -85,25 +79,11 @@ class FCMService : FirebaseMessagingService() {
 		)
 	}
 
-	private fun loadNotificationData(
-		channelId: Long,
-		chatId: Long,
-	) {
-		val loadChatDataWork = OneTimeWorkRequestBuilder<LoadNotificationDataWorker>()
-			.setInputData(
-				workDataOf(
-					LoadNotificationDataWorker.EXTRA_CHANNEL_ID to channelId,
-					LoadNotificationDataWorker.EXTRA_CHAT_ID to chatId
-				)
-			)
-			.build()
-
-		WorkManager
-			.getInstance(applicationContext)
-			.enqueueUniqueWork(
-				"$channelId-$chatId",
-				ExistingWorkPolicy.APPEND_OR_REPLACE,
-				loadChatDataWork
-			)
+	private fun loadNotificationData(channelId: Long, chatId: Long) {
+		LoadNotificationDataWorker.start(
+			context = applicationContext,
+			channelId = channelId,
+			chatId = chatId
+		)
 	}
 }
