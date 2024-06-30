@@ -14,23 +14,37 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 	private lateinit var binding: ActivityMainBinding
+	private lateinit var navHostFragment: NavHostFragment
+	private lateinit var navController: NavController
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 		binding.lifecycleOwner = this
 		initNavigation()
+		moveToChannelListIfNeed()
 	}
 
 	private fun initNavigation() {
-		val navHostFragment =
-			supportFragmentManager.findFragmentById(R.id.container_main) as NavHostFragment
-		val navController = navHostFragment.findNavController()
-		initBottomNavigationView(navController)
+		navHostFragment = supportFragmentManager.findFragmentById(R.id.container_main) as NavHostFragment
+		navController = navHostFragment.findNavController()
+		initBottomNavigationView()
 	}
 
-	private fun initBottomNavigationView(navController: NavController) {
+	private fun initBottomNavigationView() {
 		binding.bnvMain.setupWithNavController(navController)
 	}
 
+	private fun moveToChannelListIfNeed() {
+		if (intent.hasExtra(EXTRA_NEED_SHOW_CHANNEL_LIST).not()) return
+		navigateToChannelListFragment()
+	}
+
+	private fun navigateToChannelListFragment() {
+		navController.navigate(R.id.action_homeFragment_to_channelListFragment)
+	}
+
+	companion object {
+		const val EXTRA_NEED_SHOW_CHANNEL_LIST = "EXTRA_NEED_SHOW_CHANNEL_LIST"
+	}
 }
