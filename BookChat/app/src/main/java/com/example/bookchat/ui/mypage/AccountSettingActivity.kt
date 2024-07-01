@@ -37,9 +37,9 @@ class AccountSettingActivity : AppCompatActivity() {
 	}
 
 	private fun moveToLoginActivity() {
-		val intent = Intent(this, LoginActivity::class.java)
-		intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK //새로운 태스크 생성
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK) // 실행 액티비티 외 모두 제거
+		val intent = Intent(this, LoginActivity::class.java).apply {
+			intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+		}
 		startActivity(intent)
 	}
 
