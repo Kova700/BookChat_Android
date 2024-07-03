@@ -79,6 +79,7 @@ class FCMService : FirebaseMessagingService() {
 		)
 	}
 
+	//TODO :데이터 로드만 하기로 했는데 내부적으로 노티까지 띄움 뭔가 이름 변경 혹은 함수 분리가 필요해보임
 	private fun loadNotificationData(channelId: Long, chatId: Long) {
 		LoadNotificationDataWorker.start(
 			context = applicationContext,

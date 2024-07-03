@@ -16,13 +16,13 @@ import dagger.assisted.AssistedInject
 
 @HiltWorker
 class LoadNotificationDataWorker @AssistedInject constructor(
-	@Assisted context: Context,
+	@Assisted appContext: Context, // 의존성 주입때문에 doWork가 호출이 안되는건가? HiltWorker예제 확인해보자
 	@Assisted workerParams: WorkerParameters,
 	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
 	private val chatNotificationHandler: NotificationHandler,
-) : CoroutineWorker(context, workerParams) {
+) : CoroutineWorker(appContext, workerParams) {
 
 	override suspend fun doWork(): Result {
 		if (clientRepository.isSignedIn().not()) {
@@ -67,8 +67,7 @@ class LoadNotificationDataWorker @AssistedInject constructor(
 						EXTRA_CHANNEL_ID to channelId,
 						EXTRA_CHAT_ID to chatId
 					)
-				)
-				.build()
+				).build()
 
 			WorkManager
 				.getInstance(context)
@@ -77,7 +76,6 @@ class LoadNotificationDataWorker @AssistedInject constructor(
 					ExistingWorkPolicy.APPEND_OR_REPLACE,
 					loadChatDataWork
 				)
-
 		}
 
 	}
