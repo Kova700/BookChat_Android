@@ -212,6 +212,7 @@
     <string name="channel_scrap_selected_count_over">채팅 스크랩은 30개 까지만 가능합니다.</string>
     <string name="channel_scrap_success">채팅방 스크랩이 완료되었습니다.</string>
     <string name="channel_scrap_fail">채팅 캡처를 실패했습니다.</string>
+    <string name="new_message">새로운 메세지</string>
 
     <!--channel setting-->
     <string name="channel_setting_title">채팅방 설정</string>
