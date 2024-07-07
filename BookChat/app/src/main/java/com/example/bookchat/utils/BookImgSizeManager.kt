@@ -54,10 +54,4 @@ class BookImgSizeManager @Inject constructor(
 			layoutParams.height = bookImgHeightPx
 		}
 	}
-
-	fun getPxFromDp(dp: Int): Int =
-		(dp * (displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).toInt()
-
-	fun getDpFromPx(px: Int): Int =
-		(px / (displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).toInt()
 }
