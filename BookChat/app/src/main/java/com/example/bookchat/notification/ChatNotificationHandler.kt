@@ -58,6 +58,8 @@ class ChatNotificationHandler @Inject constructor(
 			notificationManager.createNotificationChannel(notificationChannel)
 		}
 
+		createDynamicShortcut(channel)
+
 		val notification = getChatNotification(
 			notificationId = notificationId,
 			chat = chat,
@@ -65,13 +67,13 @@ class ChatNotificationHandler @Inject constructor(
 			channel = channel,
 			pendingIntent = getPendingIntent(channel)
 		)
-
 		notificationManager.notify(notificationId, notification)
 		notificationManager.notify(0, getGroupNotification())
 		Log.d(TAG, "ChatNotificationHandler: showNotification() - finish")
 	}
 
 	//TODO : 우측 화살표 아래 쌓인 노티 메세지 개수만 표시하고 addMessage하지말자
+	//TODO : 메세지 최대길이, 줄바꿈, 라인 수 제한(1) 설정
 	private suspend fun getChatNotification(
 		notificationId: Int,
 		chat: Chat,
@@ -87,15 +89,16 @@ class ChatNotificationHandler @Inject constructor(
 			.setBadgeIconType(NotificationCompat.BADGE_ICON_LARGE)
 			.setSmallIcon(R.drawable.ic_notification)
 			.setColor(ContextCompat.getColor(context, R.color.notification_background_orange))
-			.setLargeIcon(channel.getChannelIcon())
 			.setStyle(messagingStyle)
+			.setShortcutId(getNotificationId(channel).toString())
 			.setGroup(CHATTING_NOTIFICATION_GROUP_ID)
+			.setCategory(NotificationCompat.CATEGORY_MESSAGE)
 			.setContentIntent(pendingIntent)
 			.setAutoCancel(true)
 			.build()
 	}
 
-	//TODO : 누르면 그냥 채팅방 입장 없이 채팅방 목록으로 이동되게 pendingIntent 추가
+	//TODO : 누르면 그냥 채팅방 입장 없이 채팅방 목록 Fragment로 이동되게 pendingIntent 추가
 	private fun getGroupNotification(): Notification {
 		return NotificationCompat.Builder(context, CHATTING_NOTIFICATION_CHANNEL_ID)
 			.setSmallIcon(R.drawable.ic_notification)
@@ -132,16 +135,15 @@ class ChatNotificationHandler @Inject constructor(
 
 	private suspend fun createDynamicShortcut(channel: Channel) {
 		val shortcutId = getNotificationId(channel).toString()
+		val intent = getMainActivityIntent(channel).setAction(Intent.ACTION_CREATE_SHORTCUT)
 		val shortcutBuilder = ShortcutInfoCompat.Builder(context, shortcutId)
 			.setLongLived(true)
-			//setLocusId
-			.setIntent(getMainActivityIntent(channel))
-			.setShortLabel("ShortLabel")
-			.setLongLabel("LongLabel")
+			.setIntent(intent)
+			.setShortLabel(channel.roomName)
+			.setLongLabel(channel.roomName)
 			.setIcon(iconBuilder.buildIcon(channel.roomImageUri))
 			.build()
 		ShortcutManagerCompat.pushDynamicShortcut(context, shortcutBuilder)
-		//addDynamicShortcuts
 	}
 
 	private fun restoreMessagingStyle(notificationId: Int): NotificationCompat.MessagingStyle? =
@@ -166,9 +168,6 @@ class ChatNotificationHandler @Inject constructor(
 
 	private val Chat.timestamp: Long
 		get() = (DateManager.stringToDate(dispatchTime) ?: Date()).time
-
-	private suspend fun Channel.getChannelIcon(): Icon? =
-		iconBuilder.buildIcon(roomImageUri)?.toIcon(context)
 
 	private suspend fun Channel.toPerson(): Person =
 		Person.Builder()
@@ -196,7 +195,6 @@ class ChatNotificationHandler @Inject constructor(
 		private const val CHATTING_NOTIFICATION_GROUP_ID = "BookChatChattingNotificationGroupId"
 		private const val CHATTING_NOTIFICATION_CHANNEL_NAME = "BookChatChattingNotificationChannel"
 		private const val CHATTING_NOTIFICATION_CHANNEL_ID = "BookChatChattingNotificationChannelId"
-
 	}
 
 }
