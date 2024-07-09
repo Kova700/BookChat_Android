@@ -12,6 +12,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityMainBinding
 import com.example.bookchat.ui.channel.chatting.ChannelActivity
 import com.example.bookchat.ui.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
+import com.example.bookchat.ui.channelList.ChannelListFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -45,17 +46,12 @@ class MainActivity : AppCompatActivity() {
 		) return
 
 		val channelId = intent.getLongExtra(EXTRA_CHANNEL_ID, -1)
-		navigateToChannelListFragment()
 		moveToChannel(channelId)
-	}
-
-	private fun navigateToChannelListFragment() {
-		navController.navigate(R.id.action_homeFragment_to_channelListFragment)
 	}
 
 	private fun moveToChannel(channelId: Long) {
 		val intent = Intent(this, ChannelActivity::class.java)
-		intent.putExtra(EXTRA_CHANNEL_ID, channelId)
+		intent.putExtra(ChannelListFragment.EXTRA_CHANNEL_ID, channelId)
 		startActivity(intent)
 	}
 
