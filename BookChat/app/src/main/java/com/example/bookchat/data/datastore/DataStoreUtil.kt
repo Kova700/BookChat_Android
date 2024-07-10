@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
-suspend fun <T : Any> DataStore<Preferences>.getDataFlow(
+fun <T : Any> DataStore<Preferences>.getDataFlow(
 	preferencesKey: Preferences.Key<T>,
 ): Flow<T?> {
 	return data.catch { emit(emptyPreferences()) }
