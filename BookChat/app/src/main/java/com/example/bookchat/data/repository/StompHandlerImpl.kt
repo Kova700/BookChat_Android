@@ -74,6 +74,8 @@ class StompHandlerImpl @Inject constructor(
 	private val mutex = Mutex()
 	private val channelSubscriptionContext = Job() + Dispatchers.IO
 
+	private var connectedChannelId: Long = -1
+
 	override fun getSocketStateFlow(): StateFlow<SocketState> {
 		return _socketState.asStateFlow()
 	}
@@ -136,6 +138,8 @@ class StompHandlerImpl @Inject constructor(
 				)
 			}.onSuccess { messagesFlow ->
 				_socketState.emit(SocketState.CONNECTED)
+				connectedChannelId = channel.roomId
+
 				val channelSubscription =
 					CoroutineScope(channelSubscriptionContext).launch {
 						messagesFlow
@@ -148,7 +152,7 @@ class StompHandlerImpl @Inject constructor(
 								)
 							}
 					}
-				retrySendFailedChats(channel.roomId) //TODO : 이걸로도 타이밍이 완벽하지 않음
+				retrySendFailedChats(channel.roomId) //TODO : 이걸로도 타이밍이 완벽하지 않음 (소켓 연결이 완벽히 재연결 되었을 떄, 실패된 채팅들 전송되게)
 				channelSubscription.join()
 
 				disconnectSocket()
@@ -188,8 +192,14 @@ class StompHandlerImpl @Inject constructor(
 		}.onFailure { handleSocketError(caller = "retrySendMessage", it) }
 	}
 
+	override fun isSocketConnected(channelId: Long): Boolean {
+		return _socketState.value == SocketState.CONNECTED
+						&& connectedChannelId == channelId
+	}
+
 	override suspend fun disconnectSocket() {
 		_socketState.emit(SocketState.DISCONNECTED)
+		connectedChannelId = -1
 		Log.d(TAG, "StompHandlerImpl: disconnectSocket() - called")
 		runCatching { stompSession.disconnect() }
 			.onFailure { handleSocketError("disconnectSocket", it) }

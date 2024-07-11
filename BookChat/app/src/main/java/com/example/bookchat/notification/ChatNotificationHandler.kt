@@ -16,6 +16,8 @@ import com.example.bookchat.R
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.User
+import com.example.bookchat.domain.repository.ChattingNotificationInfoRepository
+import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
 import com.example.bookchat.utils.DateManager
@@ -26,6 +28,8 @@ import javax.inject.Inject
 class ChatNotificationHandler @Inject constructor(
 	@ApplicationContext private val context: Context,
 	private val iconBuilder: IconBuilder,
+	private val stompHandler: StompHandler,
+	private val chattingNotificationInfoRepository: ChattingNotificationInfoRepository,
 ) : NotificationHandler {
 
 	private val notificationManager =
@@ -41,20 +45,20 @@ class ChatNotificationHandler @Inject constructor(
 				}
 			}
 
-
-	//TODO : 이미 띄워져 있는 노티가 있을때, 띄워져있던 채팅의 ID가 지금 띄우려는 채팅
-	//        ID보다 크다면 노티를 띄우지 않는다.
-	//TODO : ChannelActivity가 현재 Notification에 해당하는 채널을 띄우고 았다면 노티를 띄우지 않는다.
 	//TODO : 노티 띄우기전에 권한 체크
-	//TODO : 노티를 눌러서 ChannelActivity로 이동한게 아닌 직접 유저가 눌러서 해당 채팅방에 들어가더라도
-	//        해당 채팅방에 해당하는 노티는 제거
 	//TODO : 카톡처럼 Doze 상태에도 노티 받을 수 있게 권한 받기
 
 	override suspend fun showNotification(channel: Channel, chat: Chat) {
-		chat.sender ?: return
-		if (channel.notificationFlag.not()) return
+		if (chat.sender == null) return
 
 		val notificationId = getNotificationId(channel)
+		if (shouldShowNotification(
+				channel = channel,
+				chat = chat,
+				notificationId = notificationId
+			).not()
+		) return
+
 		createDynamicShortcut(channel)
 
 		val notification = getChatNotification(
@@ -63,8 +67,24 @@ class ChatNotificationHandler @Inject constructor(
 			channel = channel,
 			pendingIntent = getPendingIntent(channel)
 		)
+		chattingNotificationInfoRepository.updateShownNotificationInfo(
+			notificationId = notificationId,
+			lastTimestamp = chat.timestamp
+		)
 		notificationManager.notify(notificationId, notification)
-		notificationManager.notify(0, getGroupNotification())
+		notificationManager.notify(CHATTING_NOTIFICATION_GROUP_ID, getGroupNotification())
+	}
+
+	private suspend fun shouldShowNotification(
+		channel: Channel,
+		chat: Chat,
+		notificationId: Int,
+	): Boolean {
+		val previousTimeStamp =
+			chattingNotificationInfoRepository.getNotificationLastTimestamp(notificationId)
+		return (previousTimeStamp == null || previousTimeStamp < chat.timestamp)
+						&& channel.notificationFlag
+						&& stompHandler.isSocketConnected(channel.roomId).not()
 	}
 
 	//TODO : 우측 화살표 아래 쌓인 노티 메세지 개수만 표시하고 addMessage하지말자
@@ -78,13 +98,15 @@ class ChatNotificationHandler @Inject constructor(
 		val messagingStyle =
 			createMessagingStyle(sender, channel).addMessage(chat.toMessagingStyleMessage())
 
+		messagingStyle.messages.firstOrNull()?.timestamp
+
 		return NotificationCompat.Builder(context, CHATTING_NOTIFICATION_CHANNEL_ID)
 			.setBadgeIconType(NotificationCompat.BADGE_ICON_LARGE)
 			.setSmallIcon(R.drawable.ic_notification)
 			.setColor(ContextCompat.getColor(context, R.color.notification_background_orange))
 			.setStyle(messagingStyle)
 			.setShortcutId(getNotificationId(channel).toString())
-			.setGroup(CHATTING_NOTIFICATION_GROUP_ID)
+			.setGroup(CHATTING_NOTIFICATION_GROUP_KEY)
 			.setCategory(NotificationCompat.CATEGORY_MESSAGE)
 			.setContentIntent(pendingIntent)
 			.setAutoCancel(true)
@@ -97,7 +119,7 @@ class ChatNotificationHandler @Inject constructor(
 			.setSmallIcon(R.drawable.ic_notification)
 			.setColor(ContextCompat.getColor(context, R.color.notification_background_orange))
 			.setAutoCancel(true)
-			.setGroup(CHATTING_NOTIFICATION_GROUP_ID)
+			.setGroup(CHATTING_NOTIFICATION_GROUP_KEY)
 			.setGroupSummary(true)
 			.setPriority(NotificationCompat.PRIORITY_HIGH)
 			.setSubText(context.getString(R.string.new_message))
@@ -121,6 +143,7 @@ class ChatNotificationHandler @Inject constructor(
 		}
 	}
 
+	//TODO : channel profileImageUrl 없으면 default Image로 icon 만들게 수정
 	private suspend fun createDynamicShortcut(channel: Channel) {
 		val shortcutId = getNotificationId(channel).toString()
 		val intent = getMainActivityIntent(channel).setAction(Intent.ACTION_CREATE_SHORTCUT)
@@ -132,6 +155,27 @@ class ChatNotificationHandler @Inject constructor(
 			.setIcon(iconBuilder.buildIcon(channel.roomImageUri))
 			.build()
 		ShortcutManagerCompat.pushDynamicShortcut(context, shortcutBuilder)
+	}
+
+	private suspend fun checkAndRemoveNotificationGroup() {
+		val chatNotificationCount = notificationManager.activeNotifications
+			.count { it.notification.group == CHATTING_NOTIFICATION_GROUP_KEY }
+		if (chatNotificationCount > 1) return
+
+		dismissNotification(CHATTING_NOTIFICATION_GROUP_ID)
+	}
+
+	private fun checkAndRemoveShortcut(channel: Channel) {
+		val shortcutId = getNotificationId(channel).toString()
+		ShortcutManagerCompat.getDynamicShortcuts(context)
+			.find { it.id == shortcutId }
+			?.let {
+				ShortcutManagerCompat.removeDynamicShortcuts(context, listOf(shortcutId))
+			}
+	}
+
+	private fun clearShortcut() {
+		ShortcutManagerCompat.removeAllDynamicShortcuts(context)
 	}
 
 	private suspend fun createMessagingStyle(
@@ -149,6 +193,7 @@ class ChatNotificationHandler @Inject constructor(
 	private val Chat.timestamp: Long
 		get() = (DateManager.stringToDate(dispatchTime) ?: Date()).time
 
+	//TODO : user profileImageUrl 없으면 default Image로 icon 만들게 수정
 	private suspend fun User.toPerson(): Person =
 		Person.Builder()
 			.setKey(id.toString())
@@ -160,12 +205,26 @@ class ChatNotificationHandler @Inject constructor(
 		return channel.roomId.hashCode()
 	}
 
-	override fun dismissChannelNotifications(channelId: Long) {}
+	override suspend fun dismissChannelNotifications(channel: Channel) {
+		dismissNotification(getNotificationId(channel))
+		checkAndRemoveShortcut(channel)
+		checkAndRemoveNotificationGroup()
+	}
 
-	override fun dismissAllNotifications() {}
+	override suspend fun dismissAllNotifications() {
+		notificationManager.cancelAll()
+		chattingNotificationInfoRepository.clearShownNotificationInfos()
+		clearShortcut()
+	}
+
+	override suspend fun dismissNotification(notificationId: Int) {
+		notificationManager.cancel(notificationId)
+		chattingNotificationInfoRepository.removeShownNotificationInfo(notificationId)
+	}
 
 	companion object {
-		private const val CHATTING_NOTIFICATION_GROUP_ID = "BookChatChattingNotificationGroupId"
+		private val CHATTING_NOTIFICATION_GROUP_ID = "BookChatChattingNotificationGroupId".hashCode()
+		private const val CHATTING_NOTIFICATION_GROUP_KEY = "BookChatChattingNotificationGroupKey"
 		private const val CHATTING_NOTIFICATION_CHANNEL_NAME = "BookChatChattingNotificationChannel"
 		private const val CHATTING_NOTIFICATION_CHANNEL_ID = "BookChatChattingNotificationChannelId"
 	}

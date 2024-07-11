@@ -5,6 +5,7 @@ import com.example.bookchat.domain.model.Chat
 
 interface NotificationHandler {
 	suspend fun showNotification(channel: Channel, chat: Chat)
-	fun dismissChannelNotifications(channelId: Long)
-	fun dismissAllNotifications()
+	suspend fun dismissChannelNotifications(channel: Channel)
+	suspend fun dismissAllNotifications()
+	suspend fun dismissNotification(notificationId: Int)
 }
