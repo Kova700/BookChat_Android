@@ -40,10 +40,10 @@ class MakeChannelActivity : AppCompatActivity() {
 	private val permissionsLauncher = this.getPermissionsLauncher(
 		onSuccess = { moveToImageCrop() },
 		onDenied = {
-			makeToast(R.string.permission_denied)
+			makeToast(R.string.gallery_permission_denied)
 		},
 		onExplained = {
-			makeToast(R.string.permission_explained)
+			makeToast(R.string.gallery_permission_explained)
 			val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
 			val uri = Uri.fromParts(SCHEME_PACKAGE, packageName, null)
 			intent.data = uri
