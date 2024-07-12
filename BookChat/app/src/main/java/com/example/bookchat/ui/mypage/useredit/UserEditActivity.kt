@@ -75,9 +75,15 @@ class UserEditActivity : AppCompatActivity() {
 	}
 
 	private fun setViewState(state: UserEditUiState) {
+		setLoadingViewState(state)
 		setNickNameEditTextState(state)
 		setSubmitBtnState(state)
 		setProfileImageViewState(state)
+	}
+
+	private fun setLoadingViewState(state: UserEditUiState) {
+		binding.progressBar.visibility =
+			if (state.uiState == UserEditUiState.UiState.LOADING) View.VISIBLE else View.GONE
 	}
 
 	private fun setProfileImageViewState(state: UserEditUiState) {
@@ -97,10 +103,6 @@ class UserEditActivity : AppCompatActivity() {
 		}
 	}
 
-	//처음 버튼은 버튼 숨기고 상태가 변경되면(닉네임이 변경되거나, 사진이 등록되거나 == isExistsChange)
-	//버튼 노출 ("변경하기" 이든 "중복확인" 이든)
-	//프로필 변경 유무와 상관없이 닉네임이 변경되었다면 "중복확인" 노출 (중복 검사 API 호출해야함)
-	//닉네임이 변경되지 않았다면 "변경하기" 노출 (중복확인 API 호출하지 않아도 됨)
 	private fun setSubmitBtnState(state: UserEditUiState) {
 		with(binding.nicknameSubmitBtn) {
 			visibility = if (userEditViewModel.uiState.value.isExistsChange) View.VISIBLE else View.GONE

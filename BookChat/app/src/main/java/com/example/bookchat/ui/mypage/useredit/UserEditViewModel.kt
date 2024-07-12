@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//TODO : 유저 프로필 기본 프로필로 변경하는 DIalog와 같은 UI가 필요함
+
 @HiltViewModel
 class UserEditViewModel @Inject constructor(
 	private val clientRepository: ClientRepository,
@@ -41,6 +43,7 @@ class UserEditViewModel @Inject constructor(
 		}
 	}
 
+	//TODO : 사용할 수 없는 이름이거나 중복된 경우 UI노출이 나와야하는데 나오지 않고 있음
 	private fun checkNicknameDuplication(nickName: String) = viewModelScope.launch {
 		runCatching { clientRepository.isDuplicatedUserNickName(nickName) }
 			.onSuccess { isDuplicated ->
@@ -71,11 +74,12 @@ class UserEditViewModel @Inject constructor(
 		changeClientProfile(nickName, userProfile)
 	}
 
-	//TODO : 변경 호출은 성공하지만 서버에서 변경되지 않은 이전값을 보내주는 이슈 수정 대기 중
 	private fun changeClientProfile(
 		newNickName: String,
 		userProfile: ByteArray?,
 	) = viewModelScope.launch {
+		updateState { copy(uiState = UserEditUiState.UiState.LOADING) }
+
 		runCatching {
 			clientRepository.changeClientProfile(
 				newNickname = newNickName,
@@ -86,14 +90,17 @@ class UserEditViewModel @Inject constructor(
 				updateState {
 					copy(
 						client = newClient,
-						clientNewImage = null
+						clientNewImage = null,
+						uiState = UserEditUiState.UiState.SUCCESS
 					)
 				}
 				startEvent(UserEditUiEvent.MoveToBack)
 			}
 			.onFailure {
 				handleError(it)
-				startEvent(UserEditUiEvent.ErrorEvent(R.string.my_page_profile_edit_fail)) }
+				startEvent(UserEditUiEvent.ErrorEvent(R.string.my_page_profile_edit_fail))
+				updateState { copy(uiState = UserEditUiState.UiState.ERROR) }
+			}
 	}
 
 	fun onEnteredSpecialChar() {
@@ -114,6 +121,15 @@ class UserEditViewModel @Inject constructor(
 
 	fun onClickCameraBtn() {
 		startEvent(UserEditUiEvent.PermissionCheck)
+	}
+
+	fun onClickUserProfileDeleteBtn() {
+		updateState {
+			copy(
+				client = client.copy(profileImageUrl = null),
+				clientNewImage = null
+			)
+		}
 	}
 
 	private fun updateUserNicknameIfValid(text: String) {
