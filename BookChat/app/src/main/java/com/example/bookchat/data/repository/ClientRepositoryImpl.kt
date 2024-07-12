@@ -114,6 +114,7 @@ class ClientRepositoryImpl @Inject constructor(
 		)
 	}
 
+	//TODO : userProfile = null로 보내면 null로 설정이 안됨 (서버 수정 대기중)
 	override suspend fun changeClientProfile(
 		newNickname: String,
 		userProfile: ByteArray?,

@@ -22,6 +22,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityUserEditBinding
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROPPED_PROFILE_BYTE_ARRAY
+import com.example.bookchat.ui.mypage.useredit.dialog.UserProfileEditDialog
 import com.example.bookchat.utils.image.loadChangedUserProfile
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.permissions.galleryPermissions
@@ -59,9 +60,9 @@ class UserEditActivity : AppCompatActivity() {
 		binding.lifecycleOwner = this
 		binding.viewmodel = userEditViewModel
 		setFocus()
+		initViewState()
 		observeUiState()
 		observeUiEvent()
-		initNickNameEditText()
 	}
 
 	private fun observeUiState() = lifecycleScope.launch {
@@ -122,6 +123,11 @@ class UserEditActivity : AppCompatActivity() {
 		source
 	}
 
+	private fun initViewState() {
+		initNickNameEditText()
+		binding.cameraBtn.setOnClickListener { userEditViewModel.onClickCameraBtn() }
+	}
+
 	private val maxLengthFilter = InputFilter.LengthFilter(MAX_NICKNAME_LENGTH)
 
 	private fun initNickNameEditText() {
@@ -158,6 +164,18 @@ class UserEditActivity : AppCompatActivity() {
 		cropActivityResultLauncher.launch(intent)
 	}
 
+	private fun showUserProfileEditDialog() {
+		val existingFragment =
+			supportFragmentManager.findFragmentByTag(DIALOG_TAG_USER_PROFILE_EDIT)
+		if (existingFragment != null) return
+
+		val dialog = UserProfileEditDialog(
+			onSelectDefaultImage = { userEditViewModel.onSelectDefaultProfileImage() },
+			onSelectGallery = { userEditViewModel.onSelectGallery() }
+		)
+		dialog.show(supportFragmentManager, DIALOG_TAG_USER_PROFILE_EDIT)
+	}
+
 	private val cropActivityResultLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 			if (result.resultCode == RESULT_OK) {
@@ -171,9 +189,10 @@ class UserEditActivity : AppCompatActivity() {
 	private fun handleUiEvent(event: UserEditUiEvent) {
 		when (event) {
 			UserEditUiEvent.MoveToBack -> finish()
-			UserEditUiEvent.PermissionCheck -> startUserProfileEdit()
+			UserEditUiEvent.MoveToGallery -> startUserProfileEdit()
 			is UserEditUiEvent.ErrorEvent -> binding.root.showSnackBar(event.stringId)
 			is UserEditUiEvent.UnknownErrorEvent -> binding.root.showSnackBar(event.message)
+			UserEditUiEvent.ShowUserProfileEditDialog -> showUserProfileEditDialog()
 		}
 	}
 
@@ -183,6 +202,8 @@ class UserEditActivity : AppCompatActivity() {
 			"^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ\\u318D\\u119E\\u11A2\\u2022\\u2025a\\u00B7\\uFE55\\uFF1A]+$"
 		private const val MAX_NICKNAME_LENGTH = 20
 		private const val SCHEME_PACKAGE = "package"
+		private const val DIALOG_TAG_USER_PROFILE_EDIT = "DIALOG_TAG_USER_PROFILE_EDIT"
+
 	}
 
 }

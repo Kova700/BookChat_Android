@@ -38,6 +38,16 @@
             android:orientation="vertical"
             app:layout_constraintGuide_end="30dp" />
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <com.example.bookchat.ui.customview.AntiDupClickImageButton
             android:id="@+id/back_btn"
             android:layout_width="wrap_content"
@@ -83,12 +93,11 @@
         </androidx.cardview.widget.CardView>
 
         <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/imageButton2"
+            android:id="@+id/camera_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/getpicture_btn_back"
             android:elevation="3dp"
-            android:onClick="@{() -> viewmodel.onClickCameraBtn()}"
             app:layout_constraintBottom_toBottomOf="@+id/user_profile_cv"
             app:layout_constraintEnd_toEndOf="@+id/user_profile_cv"
             app:srcCompat="@drawable/ic_getpicture_btn" />

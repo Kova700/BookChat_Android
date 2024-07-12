@@ -165,6 +165,9 @@
     <string name="uesr_edit_title">프로필 수정</string>
     <string name="duplicate_check">중복확인</string>
     <string name="submit_changed_profile">변경하기</string>
+    <string name="user_profile_picture_setting">프로필 사진 설정</string>
+    <string name="select_picture_from_gallery">앨범에서 사진 선택</string>
+    <string name="select_picture_default_image">기본 이미지 적용</string>
 
     <!--notice-->
     <!--app setting-->

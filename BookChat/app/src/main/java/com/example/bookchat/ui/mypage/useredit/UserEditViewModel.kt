@@ -74,6 +74,7 @@ class UserEditViewModel @Inject constructor(
 		changeClientProfile(nickName, userProfile)
 	}
 
+	//TODO : userProfile = null로 보내면 null로 설정이 안됨 (서버 수정 대기중)
 	private fun changeClientProfile(
 		newNickName: String,
 		userProfile: ByteArray?,
@@ -120,14 +121,19 @@ class UserEditViewModel @Inject constructor(
 	}
 
 	fun onClickCameraBtn() {
-		startEvent(UserEditUiEvent.PermissionCheck)
+		startEvent(UserEditUiEvent.ShowUserProfileEditDialog)
 	}
 
-	fun onClickUserProfileDeleteBtn() {
+	fun onSelectGallery() {
+		startEvent(UserEditUiEvent.MoveToGallery)
+	}
+
+	fun onSelectDefaultProfileImage() {
 		updateState {
 			copy(
 				client = client.copy(profileImageUrl = null),
-				clientNewImage = null
+				clientNewImage = null,
+				isSelectedDefaultImage = true
 			)
 		}
 	}

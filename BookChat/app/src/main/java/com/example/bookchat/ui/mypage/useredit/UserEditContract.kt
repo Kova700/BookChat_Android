@@ -9,10 +9,13 @@ data class UserEditUiState(
 	val clientNewImage: ByteArray?,
 	val nicknameCheckState: NicknameCheckState,
 	val client: User,
+	val isSelectedDefaultImage: Boolean,
 ) {
 
 	val isExistsChange
-		get() = isNicknameChanged || isProfileChanged
+		get() = isNicknameChanged
+						|| isProfileChanged
+						|| isSelectedDefaultImage
 
 	private val isNicknameChanged
 		get() = newNickname != client.nickname
@@ -36,15 +39,17 @@ data class UserEditUiState(
 			newNickname = "",
 			clientNewImage = null,
 			nicknameCheckState = NicknameCheckState.Default,
-			client = User.Default
+			client = User.Default,
+			isSelectedDefaultImage = false
 		)
 	}
 
 }
 
 sealed class UserEditUiEvent {
-	object PermissionCheck : UserEditUiEvent()
+	object MoveToGallery : UserEditUiEvent()
 	object MoveToBack : UserEditUiEvent()
+	object ShowUserProfileEditDialog : UserEditUiEvent()
 	data class ErrorEvent(val stringId: Int) : UserEditUiEvent()
 	data class UnknownErrorEvent(val message: String) : UserEditUiEvent()
 }
