@@ -15,6 +15,8 @@ import com.example.bookchat.ui.search.channelInfo.dialog.BannedChannelNoticeDial
 import com.example.bookchat.ui.search.channelInfo.dialog.FullChannelNoticeDialog
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DateManager
+import com.example.bookchat.utils.image.loadChannelProfile
+import com.example.bookchat.utils.image.loadUrl
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -53,11 +55,27 @@ class ChannelInfoActivity : AppCompatActivity() {
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
 	}
 
-	private fun setViewState(state: ChannelInfoUiState) {
-		setDateTimeText(state)
-		setRoomMemberCountText(state)
-		setChannelEnterBtnState(state)
-		if (state.channel.isBanned) showBannedChannelNoticeDialog()
+	private fun setViewState(uiState: ChannelInfoUiState) {
+		setChannelImage(uiState)
+		setBookCoverImage(uiState)
+		setDateTimeText(uiState)
+		setRoomMemberCountText(uiState)
+		setChannelEnterBtnState(uiState)
+		if (uiState.channel.isBanned) showBannedChannelNoticeDialog()
+	}
+
+	private fun setBookCoverImage(state: ChannelInfoUiState) {
+		binding.bookImg.loadUrl(
+			url = state.channel.bookCoverImageUrl,
+			errorResId = R.drawable.empty_img
+		)
+	}
+
+	private fun setChannelImage(state: ChannelInfoUiState) {
+		binding.channelBackgroundIv.loadChannelProfile(
+			imageUrl = state.channel.roomImageUri,
+			channelDefaultImageType = state.channel.defaultRoomImageType
+		)
 	}
 
 	private fun setDateTimeText(state: ChannelInfoUiState) {
@@ -73,7 +91,7 @@ class ChannelInfoActivity : AppCompatActivity() {
 	private fun setRoomMemberCountText(state: ChannelInfoUiState) {
 		binding.channelMemberCount.text =
 			getString(
-				R.string.room_member_count,
+				R.string.current_room_member_count,
 				state.channel.roomMemberCount,
 				state.channel.roomCapacity
 			)

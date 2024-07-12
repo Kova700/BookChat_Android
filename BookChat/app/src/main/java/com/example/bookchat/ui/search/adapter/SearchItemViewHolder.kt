@@ -2,6 +2,7 @@ package com.example.bookchat.ui.search.adapter
 
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemSearchBookDataBinding
 import com.example.bookchat.databinding.ItemSearchBookDummyBinding
 import com.example.bookchat.databinding.ItemSearchBookEmptyBinding
@@ -12,16 +13,17 @@ import com.example.bookchat.databinding.ItemSearchChannelHeaderBinding
 import com.example.bookchat.ui.search.model.SearchResultItem
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DateManager
+import com.example.bookchat.utils.image.loadChannelProfile
 
 sealed class SearchItemViewHolder(
-	binding: ViewDataBinding
+	binding: ViewDataBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 	abstract fun bind(searchResultItem: SearchResultItem)
 }
 
 class BookHeaderViewHolder(
 	private val binding: ItemSearchBookHeaderBinding,
-	private val onBookHeaderBtnClick: (() -> Unit)?
+	private val onBookHeaderBtnClick: (() -> Unit)?,
 ) : SearchItemViewHolder(binding) {
 	init {
 		binding.searchBookHeaderIb.setOnClickListener {
@@ -33,7 +35,7 @@ class BookHeaderViewHolder(
 }
 
 class BookEmptyViewHolder(
-	private val binding: ItemSearchBookEmptyBinding
+	private val binding: ItemSearchBookEmptyBinding,
 ) : SearchItemViewHolder(binding) {
 	override fun bind(searchResultItem: SearchResultItem) {}
 }
@@ -41,7 +43,7 @@ class BookEmptyViewHolder(
 class BookItemViewHolder(
 	private val binding: ItemSearchBookDataBinding,
 	private val bookImgSizeManager: BookImgSizeManager,
-	private val onItemClick: ((Int) -> Unit)?
+	private val onItemClick: ((Int) -> Unit)?,
 ) : SearchItemViewHolder(binding) {
 	init {
 		binding.root.setOnClickListener {
@@ -69,7 +71,7 @@ class BookDummyViewHolder(
 
 class ChannelHeaderViewHolder(
 	private val binding: ItemSearchChannelHeaderBinding,
-	private val onChannelHeaderBtnClick: (() -> Unit)?
+	private val onChannelHeaderBtnClick: (() -> Unit)?,
 ) : SearchItemViewHolder(binding) {
 	init {
 		binding.searchChannelHeaderIb.setOnClickListener {
@@ -81,14 +83,14 @@ class ChannelHeaderViewHolder(
 }
 
 class ChannelEmptyViewHolder(
-	private val binding: ItemSearchChannelEmptyBinding
+	private val binding: ItemSearchChannelEmptyBinding,
 ) : SearchItemViewHolder(binding) {
 	override fun bind(searchResultItem: SearchResultItem) {}
 }
 
 class ChannelItemViewHolder(
 	private val binding: ItemSearchChannelDataBinding,
-	private val onItemClick: ((Int) -> Unit)?
+	private val onItemClick: ((Int) -> Unit)?,
 ) : SearchItemViewHolder(binding) {
 	init {
 		binding.root.setOnClickListener {
@@ -103,5 +105,14 @@ class ChannelItemViewHolder(
 			binding.lastChatDispatchTimeTv.text =
 				DateManager.getFormattedAbstractDateTimeText(it.dispatchTime)
 		}
+		binding.channelImageIv.loadChannelProfile(
+			imageUrl = item.roomImageUri,
+			channelDefaultImageType = item.defaultRoomImageType
+		)
+
+		binding.roommemberCountTv.text = itemView.context.getString(
+			R.string.room_member_count,
+			item.roomMemberCount
+		)
 	}
 }

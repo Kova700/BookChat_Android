@@ -20,6 +20,7 @@ import com.example.bookchat.ui.channel.channelsetting.dialog.ChannelCapacitySett
 import com.example.bookchat.ui.channel.drawer.dialog.ChannelExitWarningDialog
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.utils.MakeChannelImgSizeManager
+import com.example.bookchat.utils.image.loadChangedChannelProfile
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.permissions.galleryPermissions
 import com.example.bookchat.utils.permissions.getPermissionsLauncher
@@ -84,32 +85,52 @@ class ChannelSettingActivity : AppCompatActivity() {
 				channelSettingViewModel.onChangeChannelTags(message)
 			}
 		}
-		makeChannelImgSizeManager.setMakeChannelImgSize(binding.channelImgIvIv)
+		makeChannelImgSizeManager.setMakeChannelImgSize(binding.channelImgIv)
 	}
 
-	private fun setViewState(state: ChannelSettingUiState) {
-		with(binding.channelTitleEt) {
-			if (state.newTitle != text.toString()) {
-				setText(state.newTitle)
-				setSelection(state.newTitle.length)
-			}
-		}
-		with(binding.channelTagEt) {
-			if (state.newTags != text.toString()) {
-				setText(state.newTags)
-				setSelection(state.newTags.length)
-			}
-		}
+	private fun setViewState(uiState: ChannelSettingUiState) {
+		setChannelTitleEditTextState(uiState)
+		setChannelTagEditTextState(uiState)
+		setApplyChannelChangeBtnState(uiState)
+		setChannelImage(uiState)
+	}
 
-		with(binding.applyChannelChange) {
-			if (state.isPossibleChangeChannel) {
-				setTextColor(Color.parseColor("#000000"))
-				isEnabled = true
-			} else {
-				setTextColor(Color.parseColor("#D9D9D9"))
-				isEnabled = false
+	private fun setChannelTitleEditTextState(uiState: ChannelSettingUiState) {
+		with(binding.channelTitleEt) {
+			if (uiState.newTitle != text.toString()) {
+				setText(uiState.newTitle)
+				setSelection(uiState.newTitle.length)
 			}
 		}
+	}
+
+	private fun setChannelTagEditTextState(uiState: ChannelSettingUiState) {
+		with(binding.channelTagEt) {
+			if (uiState.newTags != text.toString()) {
+				setText(uiState.newTags)
+				setSelection(uiState.newTags.length)
+			}
+		}
+	}
+
+	private fun setApplyChannelChangeBtnState(uiState: ChannelSettingUiState) {
+		with(binding.applyChannelChangeBtn) {
+			if (uiState.isPossibleChangeChannel) {
+				isEnabled = true
+				setTextColor(Color.parseColor("#000000"))
+			} else {
+				isEnabled = false
+				setTextColor(Color.parseColor("#D9D9D9"))
+			}
+		}
+	}
+
+	private fun setChannelImage(uiState: ChannelSettingUiState) {
+		binding.channelImgIv.loadChangedChannelProfile(
+			imageUrl = uiState.channel.roomImageUri,
+			channelDefaultImageType = uiState.channel.defaultRoomImageType,
+			byteArray = uiState.newProfileImage,
+		)
 	}
 
 	private fun startChannelProfileEdit() {

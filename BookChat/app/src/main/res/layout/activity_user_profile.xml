@@ -57,8 +57,8 @@
             android:id="@+id/host_crown"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:visibility="gone"
             android:src="@drawable/host_crown"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/user_profile_cardview"
             app:layout_constraintEnd_toEndOf="@+id/user_profile_cardview" />
 
@@ -66,10 +66,11 @@
             android:id="@+id/sub_host_crown"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:visibility="gone"
             android:src="@drawable/sub_host_crown"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/user_profile_cardview"
             app:layout_constraintEnd_toEndOf="@+id/user_profile_cardview" />
+
         <TextView
             android:id="@+id/nickname_tv"
             android:layout_width="0dp"
@@ -119,11 +120,11 @@
             android:elevation="5dp"
             android:enabled="true"
             android:focusable="true"
-            android:padding="20dp"
             android:fontFamily="@font/notosanskr_regular"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:onClick="@{() -> viewmodel.onClickUserBanBtn()}"
+            android:padding="20dp"
             android:paddingHorizontal="1dp"
             android:paddingVertical="0dp"
             android:text="@string/user_profile_ban"
@@ -148,8 +149,6 @@
 
         <ImageView
             android:id="@+id/chat_room_background_iv"
-            channelDefaultImageType="@{viewmodel.uiState.channel.defaultRoomImageType}"
-            imgUrl="@{viewmodel.uiState.channel.roomImageUri}"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="#B3272727"

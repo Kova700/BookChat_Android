@@ -8,6 +8,7 @@ import com.example.bookchat.databinding.ItemChannelListDataBinding
 import com.example.bookchat.databinding.ItemChannelListHeaderBinding
 import com.example.bookchat.ui.channelList.ChannelListIItemSwipeHelper.Companion.CHANNEL_LIST_ITEM_SWIPE_VIEW_PERCENT
 import com.example.bookchat.ui.channelList.model.ChannelListItem
+import com.example.bookchat.utils.image.loadChannelProfile
 
 sealed class ChannelListItemViewHolder(
 	binding: ViewDataBinding,
@@ -55,23 +56,33 @@ class ChannelListDataViewHolder(
 		val item = (channelListItem as ChannelListItem.ChannelItem)
 		isSwiped = item.isSwiped
 		setViewHolderSwipeState(binding.channelListSwipeView, item.isSwiped)
+		setViewState(item)
+	}
 
-		binding.channel = item
-		binding.uncheckedChatCountTv.text = if (item.isExistNewChat) "New+" else ""
-		binding.muteChannelIcon.visibility =
-			if ((item.notificationFlag.not()) && item.isAvailableChannel) View.VISIBLE else View.GONE
-		binding.topPinChannelIcon.visibility =
-			if ((item.isTopPined) && item.isAvailableChannel) View.VISIBLE else View.GONE
-		binding.unavailableChannelStateGroup.visibility =
-			if (item.isAvailableChannel.not()) View.VISIBLE else View.GONE
-		binding.channelListSwipeBackground.channelMuteBtn.setIconResource(
-			if (channelListItem.notificationFlag) R.drawable.mute_channel_icon
-			else R.drawable.un_mute_channel_icon
-		)
-		binding.channelListSwipeBackground.channelTopPinBtn.setIconResource(
-			if (channelListItem.isTopPined) R.drawable.un_top_pin_channel_icon
-			else R.drawable.top_pin_channel_icon
-		)
+	fun setViewState(channelListItem: ChannelListItem) {
+		val item = (channelListItem as ChannelListItem.ChannelItem)
+		with(binding) {
+			channel = item
+			uncheckedChatCountTv.text = if (item.isExistNewChat) "New+" else ""
+			muteChannelIcon.visibility =
+				if ((item.notificationFlag.not()) && item.isAvailableChannel) View.VISIBLE else View.GONE
+			topPinChannelIcon.visibility =
+				if ((item.isTopPined) && item.isAvailableChannel) View.VISIBLE else View.GONE
+			unavailableChannelStateGroup.visibility =
+				if (item.isAvailableChannel.not()) View.VISIBLE else View.GONE
+			channelListSwipeBackground.channelMuteBtn.setIconResource(
+				if (channelListItem.notificationFlag) R.drawable.mute_channel_icon
+				else R.drawable.un_mute_channel_icon
+			)
+			channelListSwipeBackground.channelTopPinBtn.setIconResource(
+				if (channelListItem.isTopPined) R.drawable.un_top_pin_channel_icon
+				else R.drawable.top_pin_channel_icon
+			)
+			channelImgIv.loadChannelProfile(
+				imageUrl = item.roomImageUri,
+				channelDefaultImageType = item.defaultRoomImageType
+			)
+		}
 	}
 
 	fun setSwiped(isSwiped: Boolean) {

@@ -182,13 +182,14 @@
     <string name="channel_un_pin_">채팅방 상단 고정 해제</string>
 
     <!--channel info-->
-    <string name="room_member_count">%1$d / %2$d 명</string>
+    <string name="current_room_member_count">%1$d / %2$d 명</string>
     <string name="channel_last_active_time">마지막 활성화 : %1$s</string>
     <string name="banned_channel">참여할 수 없는 채팅방</string>
     <string name="banned_channel_notice">참여 할 수 없는 채팅방입니다.\n관리자에 의해 내보내기 되었습니다.</string>
     <string name="full_channel_notice">대화 상대가 많아 참여할 수 없습니다.\n잠시 후 다시 시도해 주세요.</string>
 
     <!--channel-->
+    <string name="room_member_count">%1$d명</string>
     <string name="chat_room_send_message">메시지 보내기</string>
     <string name="enter">입장</string>
     <string name="last_read_chat_notice">여기까지 읽으셨습니다.</string>

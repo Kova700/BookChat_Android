@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <data>
-        <import type="android.view.View"/>
+
+        <import type="android.view.View" />
+
         <variable
             name="viewmodel"
             type="com.example.bookchat.ui.createchannel.MakeChannelViewModel" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/make_chat_room_screen"
         android:layout_width="match_parent"
@@ -19,27 +23,29 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_begin="30dp"/>
+            app:layout_constraintGuide_begin="30dp" />
+
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_end="30dp"/>
+            app:layout_constraintGuide_end="30dp" />
+
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="30dp"/>
+            app:layout_constraintGuide_begin="30dp" />
 
         <com.example.bookchat.ui.customview.AntiDupClickImageButton
             android:id="@+id/antiDupClickImageButton6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?android:selectableItemBackgroundBorderless"
-            android:src="@drawable/x_icon"
             android:onClick="@{() -> viewmodel.onClickXBtn()}"
+            android:src="@drawable/x_icon"
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
             app:layout_constraintTop_toTopOf="@+id/guideline_top" />
 
@@ -61,12 +67,12 @@
             android:id="@+id/make_channel_finish_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/finish"
-            android:textColor="#B5B7BB"
-            android:padding="4dp"
-            android:textSize="14sp"
             android:background="?android:selectableItemBackgroundBorderless"
             android:onClick="@{() -> viewmodel.onClickFinishBtn()}"
+            android:padding="4dp"
+            android:text="@string/finish"
+            android:textColor="#B5B7BB"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/textView30"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintTop_toTopOf="@+id/textView30" />
@@ -88,8 +94,6 @@
                 android:layout_width="@dimen/make_chat_room_img_width_default"
                 android:layout_height="@dimen/make_chat_room_img_height_default"
                 android:scaleType="fitXY"
-                channelDefaultImageType="@{viewmodel.uiState.defaultProfileImageType}"
-                loadChannelImageByteArray="@{viewmodel.uiState.channelProfileImage}"
                 android:src="@drawable/default_chat_room_img1" />
         </androidx.cardview.widget.CardView>
 
@@ -133,8 +137,8 @@
             android:layout_marginEnd="10dp"
             android:background="?android:selectableItemBackgroundBorderless"
             android:onClick="@{() -> viewmodel.onClickTextDeleteBtn()}"
-            android:visibility="@{viewmodel.uiState.channelTitle.length() == 0 ? View.GONE : View.VISIBLE}"
             android:src="@drawable/ic_text_delete_btn"
+            android:visibility="@{viewmodel.uiState.channelTitle.length() == 0 ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toTopOf="@+id/underlineView"
             app:layout_constraintEnd_toStartOf="@+id/text_count_tv"
             app:layout_constraintTop_toTopOf="@+id/channel_title_et" />
@@ -168,10 +172,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="40dp"
-            app:cardElevation="0dp"
             android:backgroundTint="#F5F5F5"
             app:cardCornerRadius="5dp"
-            app:layout_constrainedWidth = "true"
+            app:cardElevation="0dp"
+            app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toStartOf="@+id/text_count_tv2"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -182,9 +186,9 @@
                 android:id="@+id/hash_tag_et"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@null"
                 android:fontFamily="@font/roboto_regular"
                 android:hint="@string/make_chat_room_tag_hint"
-                android:background="@null"
                 android:maxLength="50"
                 android:minWidth="200dp"
                 android:paddingHorizontal="8dp"
@@ -203,9 +207,9 @@
             android:text="@{String.valueOf(viewmodel.uiState.channelTag.length()) + '/' + String.valueOf(50)}"
             android:textColor="#303030"
             android:textSize="10sp"
-            app:layout_constraintStart_toEndOf="@+id/hash_tag_background"
-            app:layout_constraintEnd_toEndOf="@+id/underlineView"
             app:layout_constraintBottom_toBottomOf="@+id/hash_tag_background"
+            app:layout_constraintEnd_toEndOf="@+id/underlineView"
+            app:layout_constraintStart_toEndOf="@+id/hash_tag_background"
             app:layout_constraintTop_toTopOf="@+id/hash_tag_background" />
 
         <com.example.bookchat.ui.customview.AntiDupClickButton
@@ -215,18 +219,18 @@
             android:layout_marginTop="20dp"
             android:backgroundTint="#FFFFFF"
             android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:minWidth="75dp"
             android:minHeight="40dp"
             android:onClick="@{() -> viewmodel.onClickSelectBookBtn()}"
-            android:visibility="@{viewmodel.uiState.selectedBook == null ? View.VISIBLE : View.INVISIBLE}"
+            android:stateListAnimator="@null"
             android:text="@string/make_chat_room_book_select"
             android:textColor="#5648FF"
             android:textSize="12sp"
+            android:visibility="@{viewmodel.uiState.selectedBook == null ? View.VISIBLE : View.INVISIBLE}"
             app:cornerRadius="30dp"
-            android:stateListAnimator="@null"
-            android:fontFamily="@font/notosanskr_regular"
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
             app:layout_constraintTop_toBottomOf="@+id/hash_tag_background"
             app:strokeColor="#5648FF"
@@ -282,6 +286,7 @@
 
                 <TextView
                     android:id="@+id/textView35"
+                    setSelected="@{true}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
@@ -290,10 +295,9 @@
                     android:elegantTextHeight="true"
                     android:ellipsize="marquee"
                     android:fontFamily="@font/notosanskr_bold"
+                    android:marqueeRepeatLimit="marquee_forever"
                     android:singleLine="true"
                     android:text="@{viewmodel.uiState.selectedBook.title}"
-                    setSelected="@{true}"
-                    android:marqueeRepeatLimit="marquee_forever"
                     android:textColor="#222222"
                     android:textSize="14sp"
                     app:layout_constrainedWidth="true"
@@ -305,6 +309,7 @@
                     app:layout_constraintVertical_bias="1.0" />
 
                 <TextView
+                    setSelected="@{true}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
@@ -312,10 +317,9 @@
                     android:elegantTextHeight="true"
                     android:ellipsize="marquee"
                     android:fontFamily="@font/notosanskr_regular"
+                    android:marqueeRepeatLimit="marquee_forever"
                     android:singleLine="true"
                     android:text="@{viewmodel.uiState.selectedBook.authors[0]}"
-                    setSelected="@{true}"
-                    android:marqueeRepeatLimit="marquee_forever"
                     android:textColor="#373737"
                     android:textSize="11sp"
                     app:layout_constrainedWidth="true"
@@ -332,12 +336,12 @@
             android:layout_height="21dp"
             android:layout_marginStart="-17dp"
             android:layout_marginTop="-5dp"
-            android:visibility="@{viewmodel.uiState.selectedBook != null ? View.VISIBLE : View.INVISIBLE}"
             android:background="?android:selectableItemBackgroundBorderless"
-            android:onClick="@{() -> viewmodel.onClickDeleteSelectedBookBtn()}"
             android:elevation="5dp"
+            android:onClick="@{() -> viewmodel.onClickDeleteSelectedBookBtn()}"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_text_delete_btn"
+            android:visibility="@{viewmodel.uiState.selectedBook != null ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintStart_toEndOf="@+id/cardView9"
             app:layout_constraintTop_toTopOf="@+id/cardView9" />
 
