@@ -32,7 +32,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/user_profile_cardview"
+            android:id="@+id/user_profile_cv"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_gravity="center"
@@ -44,9 +44,7 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <ImageView
-                android:id="@+id/userProfile_iv"
-                userDefaultProfileImageType="@{viewmodel.uiState.targetUser.defaultProfileImageType}"
-                userProfileUrl="@{viewmodel.uiState.targetUser.profileImageUrl}"
+                android:id="@+id/user_profile_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:scaleType="fitCenter"
@@ -59,8 +57,8 @@
             android:layout_height="32dp"
             android:src="@drawable/host_crown"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/user_profile_cardview"
-            app:layout_constraintEnd_toEndOf="@+id/user_profile_cardview" />
+            app:layout_constraintBottom_toBottomOf="@+id/user_profile_cv"
+            app:layout_constraintEnd_toEndOf="@+id/user_profile_cv" />
 
         <ImageView
             android:id="@+id/sub_host_crown"
@@ -68,8 +66,8 @@
             android:layout_height="32dp"
             android:src="@drawable/sub_host_crown"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/user_profile_cardview"
-            app:layout_constraintEnd_toEndOf="@+id/user_profile_cardview" />
+            app:layout_constraintBottom_toBottomOf="@+id/user_profile_cv"
+            app:layout_constraintEnd_toEndOf="@+id/user_profile_cv" />
 
         <TextView
             android:id="@+id/nickname_tv"
@@ -90,7 +88,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/user_profile_cardview" />
+            app:layout_constraintTop_toBottomOf="@+id/user_profile_cv" />
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/admins_can_see_group"

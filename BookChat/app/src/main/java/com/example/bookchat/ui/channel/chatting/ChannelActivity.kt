@@ -38,6 +38,7 @@ import com.example.bookchat.ui.channel.drawer.mapper.toUser
 import com.example.bookchat.ui.channel.drawer.model.ChannelDrawerItem
 import com.example.bookchat.ui.channel.userprofile.UserProfileActivity
 import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.image.loadUserProfile
 import com.example.bookchat.utils.isOnHigherPosition
 import com.example.bookchat.utils.isOnListBottom
 import com.example.bookchat.utils.isOnListTop
@@ -238,6 +239,10 @@ class ChannelActivity : AppCompatActivity() {
 	private fun setNewChatNoticeState(uiState: ChannelUiState) {
 		binding.newChatNoticeLayout.layout.visibility =
 			if (uiState.newChatNotice != null) View.VISIBLE else View.INVISIBLE
+		binding.newChatNoticeLayout.userProfileIv.loadUserProfile(
+			imageUrl = uiState.newChatNotice?.sender?.profileImageUrl,
+			userDefaultProfileType = uiState.newChatNotice?.sender?.defaultProfileImageType
+		)
 	}
 
 	private fun setChannelSettingBtnUiState(uiState: ChannelUiState) {

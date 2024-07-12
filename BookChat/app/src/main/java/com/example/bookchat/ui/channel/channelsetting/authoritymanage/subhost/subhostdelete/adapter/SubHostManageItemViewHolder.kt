@@ -3,6 +3,7 @@ package com.example.bookchat.ui.channel.channelsetting.authoritymanage.subhost.s
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.databinding.ItemSubHostDeleteBinding
 import com.example.bookchat.domain.model.User
+import com.example.bookchat.utils.image.loadUserProfile
 
 class SubHostManageItemViewHolder(
 	private val binding: ItemSubHostDeleteBinding,
@@ -16,5 +17,9 @@ class SubHostManageItemViewHolder(
 
 	fun bind(user: User) {
 		binding.user = user
+		binding.userProfileIv.loadUserProfile(
+			imageUrl = user.profileImageUrl,
+			userDefaultProfileType = user.defaultProfileImageType
+		)
 	}
 }

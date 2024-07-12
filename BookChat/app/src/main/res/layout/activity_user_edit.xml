@@ -74,18 +74,6 @@
             app:layout_constraintStart_toStartOf="@id/guideline_start"
             app:layout_constraintTop_toBottomOf="@+id/mypage_title">
 
-            <!--
-            1. byteArray가 있으면 우선적으로 띄운다
-            2. 유저 정보 수정 API가 성공하면 byteArray = null 처리 한다.
-            3. 변경된 client의 프로필 이미지 url을 띄운다.
-            4. 수정된 client 객체에 이미지 url이 없다면 default 이미지를 띄운다.
-            -->
-            <!--
-                        loadByteArray="@{viewmodel.clientProfileImage}"
-                        userDefaultProfileImageType="@{viewmodel.uiState.client.defaultProfileImageType}"
-                        userProfileUrl="@{viewmodel.uiState.client.profileImageUrl}"
-            -->
-
             <ImageView
                 android:id="@+id/userProfile_iv"
                 android:layout_width="wrap_content"

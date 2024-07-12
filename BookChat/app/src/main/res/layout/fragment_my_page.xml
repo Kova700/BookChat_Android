@@ -62,8 +62,6 @@
                 android:id="@+id/userProfile_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                userProfileUrl="@{viewmodel.clientFlow.profileImageUrl}"
-                userDefaultProfileImageType="@{viewmodel.clientFlow.defaultProfileImageType}"
                 android:scaleType="fitCenter"
                 android:src="@drawable/default_profile_img1" />
         </androidx.cardview.widget.CardView>
@@ -79,7 +77,7 @@
             android:fontFamily="@font/notosanskr_bold"
             android:maxLength="20"
             android:maxLines="1"
-            android:text="@{viewmodel.clientFlow.nickname}"
+            android:text="@{viewmodel.uiState.nickname}"
             android:textColor="#373737"
             android:textSize="20sp"
             app:layout_constrainedWidth="true"

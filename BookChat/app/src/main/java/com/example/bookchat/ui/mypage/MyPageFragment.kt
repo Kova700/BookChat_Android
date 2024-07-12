@@ -11,14 +11,18 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentMyPageBinding
+import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.mypage.MyPageViewModel.MyPageEvent
 import com.example.bookchat.ui.mypage.useredit.UserEditActivity
+import com.example.bookchat.utils.image.loadUserProfile
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MyPageFragment : Fragment() {
-	private lateinit var binding: FragmentMyPageBinding
+
+	private var _binding: FragmentMyPageBinding? = null
+	private val binding get() = _binding!!
 	private val myPageViewModel by activityViewModels<MyPageViewModel>()
 
 	override fun onCreateView(
@@ -26,17 +30,40 @@ class MyPageFragment : Fragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		binding = DataBindingUtil.inflate(
+		_binding = DataBindingUtil.inflate(
 			inflater, R.layout.fragment_my_page, container, false
 		)
 		binding.lifecycleOwner = this
 		binding.viewmodel = myPageViewModel
-		observeUiEvent()
 		return binding.root
 	}
 
-	private fun observeUiEvent() = lifecycleScope.launch {
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		observeUiState()
+		observeUiEvent()
+	}
+
+	override fun onDestroyView() {
+		super.onDestroyView()
+		_binding = null
+	}
+
+	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
+		myPageViewModel.uiState.collect { uiState ->
+			setViewState(uiState)
+		}
+	}
+
+	private fun observeUiEvent() = viewLifecycleOwner.lifecycleScope.launch {
 		myPageViewModel.eventFlow.collect { handleEvent(it) }
+	}
+
+	private fun setViewState(uiState: User) {
+		binding.userProfileIv.loadUserProfile(
+			imageUrl = uiState.profileImageUrl,
+			userDefaultProfileType = uiState.defaultProfileImageType
+		)
 	}
 
 	private fun moveToUserEditActivity() {

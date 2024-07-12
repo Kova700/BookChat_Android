@@ -1,7 +1,6 @@
 package com.example.bookchat.ui
 
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.util.Log
 import android.view.View
@@ -14,15 +13,11 @@ import com.example.bookchat.R
 import com.example.bookchat.data.*
 import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.domain.model.NicknameCheckState
-import com.example.bookchat.domain.model.UserDefaultProfileType
 import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
 import com.example.bookchat.ui.login.LoginUiState
 import com.example.bookchat.utils.*
 import com.example.bookchat.utils.Constants.TAG
-import com.example.bookchat.utils.image.loadBitmap
-import com.example.bookchat.utils.image.loadByteArray
 import com.example.bookchat.utils.image.loadUrl
-import com.example.bookchat.utils.image.loadUserProfile
 import java.util.*
 
 object DataBindingAdapter {
@@ -39,31 +34,6 @@ object DataBindingAdapter {
 	@BindingAdapter("loadUrl")
 	fun loadUrl(imageView: ImageView, url: String?) {
 		imageView.loadUrl(url)
-	}
-
-	/**이미지뷰 이미지 설정(Bitmap)*/
-	@JvmStatic
-	@BindingAdapter("loadBitmap")
-	fun loadBitmap(imageView: ImageView, bitmap: Bitmap?) {
-		imageView.loadBitmap(bitmap)
-	}
-
-	/**이미지뷰 이미지 설정(ByteArray)*/
-	@JvmStatic
-	@BindingAdapter("loadByteArray")
-	fun loadByteArray(imageView: ImageView, byteArray: ByteArray?) {
-		imageView.loadByteArray(byteArray)
-	}
-
-	/**유저 프로필 이미지 출력*/
-	@JvmStatic
-	@BindingAdapter("userProfileUrl", "userDefaultProfileImageType", requireAll = false)
-	fun loadUserProfile(
-		imageView: ImageView,
-		userProfileUrl: String?,
-		userDefaultProfileType: UserDefaultProfileType?,
-	) {
-		imageView.loadUserProfile(userProfileUrl, userDefaultProfileType)
 	}
 
 	@JvmStatic

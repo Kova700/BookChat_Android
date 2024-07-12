@@ -11,6 +11,7 @@ import com.example.bookchat.databinding.ItemChattingOtherBinding
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
 import com.example.bookchat.utils.DateManager
+import com.example.bookchat.utils.image.loadUserProfile
 
 sealed class ChatItemViewHolder(
 	binding: ViewDataBinding,
@@ -121,6 +122,10 @@ class AnotherUserChatViewHolder(
 			chatDispatchTimeTv.text =
 				if (item.dispatchTime.isNotBlank()) DateManager.getFormattedTimeText(item.dispatchTime)
 				else ""
+			userProfileIv.loadUserProfile(
+				imageUrl = item.sender?.profileImageUrl,
+				userDefaultProfileType = item.sender?.defaultProfileImageType
+			)
 			userProfileIv.isClickable = isCaptureMode.not()
 			executePendingBindings()
 		}

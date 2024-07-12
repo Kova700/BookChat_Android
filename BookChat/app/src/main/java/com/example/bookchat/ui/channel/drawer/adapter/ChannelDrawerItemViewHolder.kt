@@ -10,6 +10,7 @@ import com.example.bookchat.databinding.ItemChatDrawerDataBinding
 import com.example.bookchat.databinding.ItemChatDrawerHeaderBinding
 import com.example.bookchat.ui.channel.drawer.model.ChannelDrawerItem
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.image.loadUserProfile
 
 sealed class ChatDrawerItemViewHolder(
 	binding: ViewDataBinding,
@@ -44,6 +45,10 @@ class ChannelDrawerDataItemViewHolder(
 	override fun bind(channelDrawerItem: ChannelDrawerItem) {
 		val item = (channelDrawerItem as ChannelDrawerItem.UserItem)
 		binding.userItem = item
+		binding.userProfileIv.loadUserProfile(
+			imageUrl = item.profileImageUrl,
+			userDefaultProfileType = item.defaultProfileImageType
+		)
 		setClientItemView(item)
 		setAdminItemView(item)
 	}

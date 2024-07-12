@@ -10,6 +10,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityUserProfileBinding
 import com.example.bookchat.ui.channel.userprofile.dialog.UserBanWarningDialog
 import com.example.bookchat.utils.image.loadChannelProfile
+import com.example.bookchat.utils.image.loadUserProfile
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -55,6 +56,10 @@ class UserProfileActivity : AppCompatActivity() {
 			chatRoomBackgroundIv.loadChannelProfile(
 				imageUrl = uiState.channel.roomImageUri,
 				channelDefaultImageType = uiState.channel.defaultRoomImageType
+			)
+			userProfileIv.loadUserProfile(
+				imageUrl = uiState.targetUser.profileImageUrl,
+				userDefaultProfileType = uiState.targetUser.defaultProfileImageType
 			)
 		}
 	}

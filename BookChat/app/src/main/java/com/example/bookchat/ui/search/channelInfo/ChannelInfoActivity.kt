@@ -17,6 +17,7 @@ import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DateManager
 import com.example.bookchat.utils.image.loadChannelProfile
 import com.example.bookchat.utils.image.loadUrl
+import com.example.bookchat.utils.image.loadUserProfile
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -58,10 +59,18 @@ class ChannelInfoActivity : AppCompatActivity() {
 	private fun setViewState(uiState: ChannelInfoUiState) {
 		setChannelImage(uiState)
 		setBookCoverImage(uiState)
+		setHostProfileImage(uiState)
 		setDateTimeText(uiState)
 		setRoomMemberCountText(uiState)
 		setChannelEnterBtnState(uiState)
 		if (uiState.channel.isBanned) showBannedChannelNoticeDialog()
+	}
+
+	private fun setHostProfileImage(uiState: ChannelInfoUiState) {
+		binding.hostProfileImgIv.loadUserProfile(
+			imageUrl = uiState.channel.host.profileImageUrl,
+			userDefaultProfileType = uiState.channel.host.defaultProfileImageType
+		)
 	}
 
 	private fun setBookCoverImage(state: ChannelInfoUiState) {

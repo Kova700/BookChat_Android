@@ -20,9 +20,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityUserEditBinding
-import com.example.bookchat.ui.DataBindingAdapter
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROPPED_PROFILE_BYTE_ARRAY
+import com.example.bookchat.utils.image.loadChangedUserProfile
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.permissions.galleryPermissions
 import com.example.bookchat.utils.permissions.getPermissionsLauncher
@@ -39,7 +39,7 @@ class UserEditActivity : AppCompatActivity() {
 
 	private val imm by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
-	private val permissionsLauncher = this.getPermissionsLauncher(
+	private val permissionsLauncher = getPermissionsLauncher(
 		onSuccess = { moveToImageCrop() },
 		onDenied = {
 			makeToast(R.string.gallery_permission_denied)
@@ -81,18 +81,11 @@ class UserEditActivity : AppCompatActivity() {
 	}
 
 	private fun setProfileImageViewState(state: UserEditUiState) {
-		if (state.clientNewImage != null) {
-			DataBindingAdapter.loadByteArray(
-				imageView = binding.userProfileIv,
-				byteArray = state.clientNewImage
-			)
-		} else {
-			DataBindingAdapter.loadUserProfile(
-				imageView = binding.userProfileIv,
-				userProfileUrl = state.client.profileImageUrl,
-				userDefaultProfileType = state.client.defaultProfileImageType
-			)
-		}
+		binding.userProfileIv.loadChangedUserProfile(
+			imageUrl = state.client.profileImageUrl,
+			userDefaultProfileType = state.client.defaultProfileImageType,
+			byteArray = state.clientNewImage
+		)
 	}
 
 	private fun setNickNameEditTextState(state: UserEditUiState) {
