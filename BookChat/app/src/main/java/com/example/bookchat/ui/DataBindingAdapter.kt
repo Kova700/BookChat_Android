@@ -19,6 +19,7 @@ import com.example.bookchat.domain.model.NicknameCheckState
 import com.example.bookchat.domain.model.UserDefaultProfileType
 import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
 import com.example.bookchat.ui.login.LoginUiState
+import com.example.bookchat.ui.mapper.getResId
 import com.example.bookchat.utils.*
 import com.example.bookchat.utils.Constants.TAG
 import java.util.*
@@ -95,24 +96,12 @@ object DataBindingAdapter {
 		imageType: UserDefaultProfileType?,
 	) {
 		Glide.with(imageView.context)
-			.load(getUserDefaultProfileImage(imageType))
+			.load(imageType.getResId())
 			.fitCenter()
 			.placeholder(R.drawable.loading_img)
 			.error(R.drawable.error_img)
 			.into(imageView)
 	}
-
-	private fun getUserDefaultProfileImage(imageType: UserDefaultProfileType?) =
-		when (imageType) {
-			null,
-			UserDefaultProfileType.ONE,
-			-> R.drawable.default_profile_img1
-
-			UserDefaultProfileType.TWO -> R.drawable.default_profile_img2
-			UserDefaultProfileType.THREE -> R.drawable.default_profile_img3
-			UserDefaultProfileType.FOUR -> R.drawable.default_profile_img4
-			UserDefaultProfileType.FIVE -> R.drawable.default_profile_img5
-		}
 
 	@JvmStatic
 	@BindingAdapter("setUserNickname")
@@ -423,7 +412,7 @@ object DataBindingAdapter {
 		imgUrl: String?,
 	) {
 		if (imgUrl.isNullOrBlank()) {
-			setRandomChannelImg(view, channelDefaultImageType)
+			view.setImageResource(channelDefaultImageType.getResId())
 			return
 		}
 		loadUrl(view, imgUrl)
@@ -438,23 +427,10 @@ object DataBindingAdapter {
 		imgByteArray: ByteArray?,
 	) {
 		if (imgByteArray == null) {
-			setRandomChannelImg(view, channelDefaultImageType)
+			view.setImageResource(channelDefaultImageType.getResId())
 			return
 		}
 		loadByteArray(view, imgByteArray)
-	}
-
-	@JvmStatic
-	fun setRandomChannelImg(view: ImageView, channelDefaultImageType: ChannelDefaultImageType) {
-		when (channelDefaultImageType) {
-			ChannelDefaultImageType.ONE -> view.setImageResource(R.drawable.default_chat_room_img1)
-			ChannelDefaultImageType.TWO -> view.setImageResource(R.drawable.default_chat_room_img2)
-			ChannelDefaultImageType.THREE -> view.setImageResource(R.drawable.default_chat_room_img3)
-			ChannelDefaultImageType.FOUR -> view.setImageResource(R.drawable.default_chat_room_img4)
-			ChannelDefaultImageType.FIVE -> view.setImageResource(R.drawable.default_chat_room_img5)
-			ChannelDefaultImageType.SIX -> view.setImageResource(R.drawable.default_chat_room_img6)
-			ChannelDefaultImageType.SEVEN -> view.setImageResource(R.drawable.default_chat_room_img7)
-		}
 	}
 
 	/**Shimmer Animation Start/Stop 설정*/

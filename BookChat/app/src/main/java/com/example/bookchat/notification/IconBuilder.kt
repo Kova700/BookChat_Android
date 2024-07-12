@@ -1,6 +1,7 @@
 package com.example.bookchat.notification
 
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.core.graphics.drawable.IconCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -12,31 +13,44 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface IconBuilder {
-	suspend fun buildIcon(imageUrl: String?): IconCompat?
+	suspend fun buildIcon(
+		imageUrl: String?,
+		defaultImage: Bitmap,
+	): IconCompat
 }
 
 class IconBuilderImpl @Inject constructor(
 	@ApplicationContext private val context: Context,
 ) : IconBuilder {
-	override suspend fun buildIcon(imageUrl: String?): IconCompat? {
-		if (imageUrl.isNullOrBlank()) return null
+	override suspend fun buildIcon(
+		imageUrl: String?,
+		defaultImage: Bitmap,
+	): IconCompat {
+		if (imageUrl.isNullOrBlank()) return IconCompat.createWithBitmap(defaultImage)
 
-		val imageSize = 35.dpToPx(context)
-		val roundedCornersRadiusPx = 14.dpToPx(context)
+		return imageUrl.getImageBitmap(
+			imageSizePx = 35.dpToPx(context),
+			roundedCornersRadiusPx = 14.dpToPx(context)
+		)?.let(IconCompat::createWithBitmap)
+			?: IconCompat.createWithBitmap(defaultImage)
+	}
 
+	private suspend fun String.getImageBitmap(
+		imageSizePx: Int,
+		roundedCornersRadiusPx: Int,
+	): Bitmap? {
 		return withContext(Dispatchers.IO) {
 			runCatching {
 				Glide.with(context)
 					.asBitmap()
-					.load(imageUrl)
+					.load(this)
 					.apply(
 						RequestOptions
-							.overrideOf(imageSize)
+							.overrideOf(imageSizePx)
 							.transform(RoundedCorners(roundedCornersRadiusPx))
 					)
 					.submit()
 					.get()
-					?.let(IconCompat::createWithBitmap)
 			}.getOrNull()
 		}
 	}

@@ -20,6 +20,7 @@ import com.example.bookchat.domain.repository.ChattingNotificationInfoRepository
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
+import com.example.bookchat.ui.mapper.getBitmap
 import com.example.bookchat.utils.DateManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Date
@@ -44,9 +45,6 @@ class ChatNotificationHandler @Inject constructor(
 					createNotificationChannel(notificationChannel)
 				}
 			}
-
-	//TODO : 노티 띄우기전에 권한 체크
-	//TODO : 카톡처럼 Doze 상태에도 노티 받을 수 있게 권한 받기
 
 	override suspend fun showNotification(channel: Channel, chat: Chat) {
 		if (chat.sender == null) return
@@ -87,8 +85,6 @@ class ChatNotificationHandler @Inject constructor(
 						&& stompHandler.isSocketConnected(channel.roomId).not()
 	}
 
-	//TODO : 우측 화살표 아래 쌓인 노티 메세지 개수만 표시하고 addMessage하지말자
-	//TODO : 메세지 최대길이, 줄바꿈, 라인 수 제한(1) 설정
 	private suspend fun getChatNotification(
 		chat: Chat,
 		sender: User,
@@ -138,21 +134,25 @@ class ChatNotificationHandler @Inject constructor(
 	private fun getMainActivityIntent(channel: Channel): Intent {
 		return Intent(context, MainActivity::class.java).apply {
 			flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-			putExtra(MainActivity.EXTRA_NEED_SHOW_CHANNEL_LIST, true)
 			putExtra(EXTRA_CHANNEL_ID, channel.roomId)
 		}
 	}
 
-	//TODO : channel profileImageUrl 없으면 default Image로 icon 만들게 수정
+	//TODO : channel profileImageUrl 없으면 default Image로 icon 만들게 수정 (테스트 필요)
 	private suspend fun createDynamicShortcut(channel: Channel) {
 		val shortcutId = getNotificationId(channel).toString()
 		val intent = getMainActivityIntent(channel).setAction(Intent.ACTION_CREATE_SHORTCUT)
+
+		val icon = iconBuilder.buildIcon(
+			imageUrl = channel.roomImageUri,
+			defaultImage = channel.defaultRoomImageType.getBitmap(context)
+		)
 		val shortcutBuilder = ShortcutInfoCompat.Builder(context, shortcutId)
 			.setLongLived(true)
 			.setIntent(intent)
 			.setShortLabel(channel.roomName)
 			.setLongLabel(channel.roomName)
-			.setIcon(iconBuilder.buildIcon(channel.roomImageUri))
+			.setIcon(icon)
 			.build()
 		ShortcutManagerCompat.pushDynamicShortcut(context, shortcutBuilder)
 	}
@@ -193,13 +193,18 @@ class ChatNotificationHandler @Inject constructor(
 	private val Chat.timestamp: Long
 		get() = (DateManager.stringToDate(dispatchTime) ?: Date()).time
 
-	//TODO : user profileImageUrl 없으면 default Image로 icon 만들게 수정
-	private suspend fun User.toPerson(): Person =
-		Person.Builder()
+	//TODO : user profileImageUrl 없으면 default Image로 icon 만들게 수정 (테스트 필요)
+	private suspend fun User.toPerson(): Person {
+		val icon = iconBuilder.buildIcon(
+			imageUrl = profileImageUrl,
+			defaultImage = defaultProfileImageType.getBitmap(context)
+		)
+		return Person.Builder()
 			.setKey(id.toString())
 			.setName(nickname)
-			.setIcon(iconBuilder.buildIcon(profileImageUrl))
+			.setIcon(icon)
 			.build()
+	}
 
 	private fun getNotificationId(channel: Channel): Int {
 		return channel.roomId.hashCode()
