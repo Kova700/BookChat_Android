@@ -11,6 +11,11 @@ val galleryPermissions =
 		Manifest.permission.WRITE_EXTERNAL_STORAGE
 	)
 
+val notificationPermission =
+	if (isAndroidVersionAtLeastTiramisu()) {
+		arrayOf(Manifest.permission.POST_NOTIFICATIONS)
+	} else emptyArray()
+
 private fun isAndroidVersionAtLeastTiramisu(): Boolean {
 	return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 }

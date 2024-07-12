@@ -8,8 +8,10 @@
     <string name="error_else">일시적인 현상이거나 네트워크 문제일 수 있으니,\n잠시 후 다시 시도해 주세요.\n계속해서 문제가 발생하는 경우 문의를 부탁드립니다.</string>
 
     <!--permission-->
-    <string name="gallery_permission_denied">[사진 및 미디어]\n권한을 허용해주세요.</string>
-    <string name="gallery_permission_explained">[권한] - [파일 및 미디어]\n권한을 허용해주세요.</string>
+    <string name="gallery_permission_denied">[사진 및 동영상]\n권한을 허용해주세요.</string>
+    <string name="gallery_permission_explained">[권한] - [사진 및 동영상]\n권한을 허용해주세요.</string>
+    <string name="notification_permission_denied">[알림]\n권한을 허용해주세요.</string>
+    <string name="notification_permission_explained">[권한] - [알림]\n권한을 허용해주세요.</string>
 
     <!--login-->
     <string name="login_main_slogan">책으로 연결되는 우리\n이제부터 북챗으로 대화해요</string>
