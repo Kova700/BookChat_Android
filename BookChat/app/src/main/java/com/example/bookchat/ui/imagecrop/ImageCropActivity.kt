@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityImageCropBinding
-import com.example.bookchat.utils.bitmap.compressToByteArray
+import com.example.bookchat.utils.image.bitmap.compressToByteArray
 
 //TODO : 채팅방 이미지는 1:1 비율로하면 깨짐 (수정 가능하게 수정)
 class ImageCropActivity : AppCompatActivity() {

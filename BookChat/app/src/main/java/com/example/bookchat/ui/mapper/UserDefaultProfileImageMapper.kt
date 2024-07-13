@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import com.example.bookchat.R
 import com.example.bookchat.domain.model.UserDefaultProfileType
-import com.example.bookchat.utils.bitmap.getImageBitmap
+import com.example.bookchat.utils.image.bitmap.getImageBitmap
 import com.example.bookchat.utils.dpToPx
 
 fun UserDefaultProfileType?.getResId() =

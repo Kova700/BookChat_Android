@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.core.graphics.drawable.IconCompat
 import com.example.bookchat.utils.Constants.TAG
-import com.example.bookchat.utils.bitmap.getImageBitmap
+import com.example.bookchat.utils.image.bitmap.getImageBitmap
 import com.example.bookchat.utils.dpToPx
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
