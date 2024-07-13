@@ -18,6 +18,7 @@ import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogSta
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState.Loading
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager
+import com.example.bookchat.utils.image.loadUrl
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -40,7 +41,7 @@ class SearchBookDialog : DialogFragment() {
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
+		savedInstanceState: Bundle?,
 	): View {
 		_binding =
 			DataBindingUtil.inflate(inflater, R.layout.dialog_search_book_clicked, container, false)
@@ -64,7 +65,7 @@ class SearchBookDialog : DialogFragment() {
 
 	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
 		searchBookDialogViewModel.uiState.collect { state ->
-			setViewVisibility(state.uiState)
+			setViewState(state)
 		}
 	}
 
@@ -75,6 +76,11 @@ class SearchBookDialog : DialogFragment() {
 	private fun initViewState() {
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
 		dialogSizeManager.setDialogSize(binding.dialogLayout)
+	}
+
+	private fun setViewState(uiState: SearchDialogUiState) {
+		binding.bookImg.loadUrl(uiState.book.bookCoverImageUrl)
+		setViewVisibility(uiState.uiState)
 	}
 
 	private fun setViewVisibility(uiState: SearchDialogState) {

@@ -18,28 +18,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_begin="20dp"/>
+            app:layout_constraintGuide_begin="20dp" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_end="20dp"/>
+            app:layout_constraintGuide_end="20dp" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="10dp"/>
+            app:layout_constraintGuide_begin="10dp" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_bottom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_end="10dp"/>
+            app:layout_constraintGuide_end="10dp" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/bookBackground_agonize"
@@ -59,8 +59,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="40dp"
             android:layout_marginVertical="30dp"
+            android:layout_marginStart="40dp"
             app:cardCornerRadius="@dimen/book_img_corner_radius"
             app:cardElevation="@dimen/book_img_elevation"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -69,7 +69,6 @@
 
             <ImageView
                 android:id="@+id/book_img"
-                loadUrl="@{bookShelfItem.book.bookCoverImageUrl}"
                 android:layout_width="@dimen/book_img_width_default"
                 android:layout_height="@dimen/book_img_height_default"
                 android:scaleType="fitXY"

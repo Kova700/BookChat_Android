@@ -20,6 +20,7 @@ import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
 import com.example.bookchat.utils.MakeChannelImgSizeManager
 import com.example.bookchat.utils.image.loadChangedChannelProfile
+import com.example.bookchat.utils.image.loadUrl
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.permissions.galleryPermissions
 import com.example.bookchat.utils.permissions.getPermissionsLauncher
@@ -99,6 +100,11 @@ class MakeChannelActivity : AppCompatActivity() {
 		setSubmitTextState(uiState)
 		setChannelTitleEditTextState(uiState)
 		setChannelTagEditTextState(uiState)
+		setSelectBookImage(uiState)
+	}
+
+	private fun setSelectBookImage(uiState: MakeChannelUiState) {
+		binding.selectedBookImgIv.loadUrl(uiState.selectedBook?.bookCoverImageUrl)
 	}
 
 	private fun setChannelImage(uiState: MakeChannelUiState) {

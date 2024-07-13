@@ -14,6 +14,7 @@ import com.example.bookchat.ui.search.model.SearchResultItem
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.getFormattedAbstractDateTimeText
 import com.example.bookchat.utils.image.loadChannelProfile
+import com.example.bookchat.utils.image.loadUrl
 
 sealed class SearchItemViewHolder(
 	binding: ViewDataBinding,
@@ -55,6 +56,7 @@ class BookItemViewHolder(
 	override fun bind(searchResultItem: SearchResultItem) {
 		val item = (searchResultItem as SearchResultItem.BookItem)
 		binding.book = item
+		binding.bookImg.loadUrl(item.bookCoverImageUrl)
 	}
 }
 

@@ -10,6 +10,7 @@ import com.example.bookchat.databinding.ItemChatDrawerDataBinding
 import com.example.bookchat.databinding.ItemChatDrawerHeaderBinding
 import com.example.bookchat.ui.channel.drawer.model.ChannelDrawerItem
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.image.loadUrl
 import com.example.bookchat.utils.image.loadUserProfile
 
 sealed class ChatDrawerItemViewHolder(
@@ -29,6 +30,7 @@ class ChannelDrawerHeaderItemViewHolder(
 	override fun bind(channelDrawerItem: ChannelDrawerItem) {
 		val item = (channelDrawerItem as ChannelDrawerItem.Header)
 		binding.headerItem = item
+		binding.bookImg.loadUrl(item.bookCoverImageUrl)
 	}
 }
 

@@ -14,6 +14,7 @@ import com.example.bookchat.databinding.ItemReadingBookshelfHeaderBinding
 import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordSwipeHelper
 import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfItem
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.image.loadUrl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -21,7 +22,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ReadingBookShelfDataAdapter @Inject constructor(
-	private val bookImgSizeManager: BookImgSizeManager
+	private val bookImgSizeManager: BookImgSizeManager,
 ) : ListAdapter<ReadingBookShelfItem, ReadingBookViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
 
 	var onItemClick: ((Int) -> Unit)? = null
@@ -38,7 +39,7 @@ class ReadingBookShelfDataAdapter @Inject constructor(
 
 	override fun onCreateViewHolder(
 		parent: ViewGroup,
-		viewType: Int
+		viewType: Int,
 	): ReadingBookViewHolder {
 
 		when (viewType) {
@@ -76,14 +77,14 @@ class ReadingBookShelfDataAdapter @Inject constructor(
 		val BOOK_SHELF_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<ReadingBookShelfItem>() {
 			override fun areItemsTheSame(
 				oldItem: ReadingBookShelfItem,
-				newItem: ReadingBookShelfItem
+				newItem: ReadingBookShelfItem,
 			): Boolean {
 				return oldItem.getCategoryId() == newItem.getCategoryId()
 			}
 
 			override fun areContentsTheSame(
 				oldItem: ReadingBookShelfItem,
-				newItem: ReadingBookShelfItem
+				newItem: ReadingBookShelfItem,
 			): Boolean {
 				return oldItem == newItem
 			}
@@ -92,7 +93,7 @@ class ReadingBookShelfDataAdapter @Inject constructor(
 }
 
 sealed class ReadingBookViewHolder(
-	binding: ViewDataBinding
+	binding: ViewDataBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 	abstract fun bind(readingBookShelfItem: ReadingBookShelfItem)
 }
@@ -111,7 +112,7 @@ class ReadingBookItemViewHolder(
 	private val onItemClick: ((Int) -> Unit)?,
 	private val onLongItemClick: ((Int, Boolean) -> Unit)?,
 	private val onPageInputBtnClick: ((Int) -> Unit)?,
-	private val onDeleteClick: ((Int) -> Unit)?
+	private val onDeleteClick: ((Int) -> Unit)?,
 ) : ReadingBookViewHolder(binding) {
 
 	init {
@@ -134,6 +135,7 @@ class ReadingBookItemViewHolder(
 	override fun bind(readingBookShelfItem: ReadingBookShelfItem) {
 		val bookShelfListItem = (readingBookShelfItem as ReadingBookShelfItem.Item).bookShelfListItem
 		binding.bookShelfListItem = bookShelfListItem
+		binding.bookImg.loadUrl(bookShelfListItem.book.bookCoverImageUrl)
 		setViewHolderSwipeState(binding.swipeView, bookShelfListItem.isSwiped)
 	}
 
@@ -151,7 +153,7 @@ class ReadingBookItemViewHolder(
 	private fun onLongItemClickWithAnimation(
 		swipeableView: View,
 		onLongItemClick: ((Int, Boolean) -> Unit)?,
-		bindingAdapterPosition: Int
+		bindingAdapterPosition: Int,
 	) = CoroutineScope(Dispatchers.Main).launch {
 		val swipedX = swipeableView.width.toFloat() * SWIPE_VIEW_PERCENT
 

@@ -278,7 +278,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
-                        loadUrl="@{viewmodel.uiState.selectedBook.bookCoverImageUrl}"
+                        android:id="@+id/selected_book_img_iv"
                         android:layout_width="51dp"
                         android:layout_height="81dp"
                         android:scaleType="fitXY" />

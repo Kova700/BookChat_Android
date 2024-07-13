@@ -18,6 +18,7 @@ import com.example.bookchat.ui.bookreport.BookReportActivity
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog.Companion.EXTRA_AGONY_BOOKSHELF_ITEM_ID
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager
+import com.example.bookchat.utils.image.loadUrl
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,7 +40,7 @@ class CompleteBookDialog : DialogFragment() {
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
+		savedInstanceState: Bundle?,
 	): View {
 		_binding = DataBindingUtil.inflate(
 			inflater, R.layout.dialog_complete_book_tap_clicked,
@@ -53,6 +54,7 @@ class CompleteBookDialog : DialogFragment() {
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+		observeUiState()
 		observeUiEvent()
 		initViewState()
 	}
@@ -62,8 +64,16 @@ class CompleteBookDialog : DialogFragment() {
 		_binding = null
 	}
 
+	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
+		completeBookTapDialogViewModel.uiState.collect { state -> setViewState(state) }
+	}
+
 	private fun observeUiEvent() = viewLifecycleOwner.lifecycleScope.launch {
 		completeBookTapDialogViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun setViewState(uiState: CompleteBookDialogUiState) {
+		binding.bookImg.loadUrl(uiState.completeItem.book.bookCoverImageUrl)
 	}
 
 	private fun initViewState() {

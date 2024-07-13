@@ -10,10 +10,11 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemWishBookshelfDataBinding
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.image.loadUrl
 import javax.inject.Inject
 
 class HomeBookAdapter @Inject constructor(
-	private val bookImgSizeManager: BookImgSizeManager
+	private val bookImgSizeManager: BookImgSizeManager,
 ) : ListAdapter<BookShelfListItem, HomeBookItemViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
 	var onItemClick: ((Int) -> Unit)? = null
 
@@ -43,7 +44,7 @@ class HomeBookAdapter @Inject constructor(
 class HomeBookItemViewHolder(
 	private val binding: ItemWishBookshelfDataBinding,
 	private val bookImgSizeManager: BookImgSizeManager,
-	private val onItemClick: ((Int) -> Unit)?
+	private val onItemClick: ((Int) -> Unit)?,
 ) : RecyclerView.ViewHolder(binding.root) {
 
 	init {
@@ -55,6 +56,7 @@ class HomeBookItemViewHolder(
 
 	fun bind(bookShelfListItem: BookShelfListItem) {
 		binding.bookShelfListItem = bookShelfListItem
+		binding.bookImg.loadUrl(bookShelfListItem.book.bookCoverImageUrl)
 	}
 
 }

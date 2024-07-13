@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <variable
             name="viewmodel"
             type="com.example.bookchat.ui.bookshelf.wish.dialog.WishBookDialogViewModel" />
@@ -39,7 +40,6 @@
 
                 <ImageView
                     android:id="@+id/bookImg"
-                    loadUrl="@{viewmodel.uiState.wishItem.book.bookCoverImageUrl}"
                     android:layout_width="@dimen/book_img_width_default"
                     android:layout_height="@dimen/book_img_height_default"
                     android:scaleType="fitXY"

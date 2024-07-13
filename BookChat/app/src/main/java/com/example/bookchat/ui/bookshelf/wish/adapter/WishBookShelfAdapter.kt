@@ -13,10 +13,11 @@ import com.example.bookchat.databinding.ItemWishBookshelfDataBinding
 import com.example.bookchat.databinding.ItemWishBookshelfHeaderBinding
 import com.example.bookchat.ui.bookshelf.wish.WishBookShelfItem
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.image.loadUrl
 import javax.inject.Inject
 
 class WishBookShelfAdapter @Inject constructor(
-	private val bookImgSizeManager: BookImgSizeManager
+	private val bookImgSizeManager: BookImgSizeManager,
 ) : ListAdapter<WishBookShelfItem, WishBookViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
 	var onItemClick: ((Int) -> Unit)? = null
 
@@ -65,14 +66,14 @@ class WishBookShelfAdapter @Inject constructor(
 		val BOOK_SHELF_ITEM_COMPARATOR = object : DiffUtil.ItemCallback<WishBookShelfItem>() {
 			override fun areItemsTheSame(
 				oldItem: WishBookShelfItem,
-				newItem: WishBookShelfItem
+				newItem: WishBookShelfItem,
 			): Boolean {
 				return oldItem.getCategoryId() == newItem.getCategoryId()
 			}
 
 			override fun areContentsTheSame(
 				oldItem: WishBookShelfItem,
-				newItem: WishBookShelfItem
+				newItem: WishBookShelfItem,
 			): Boolean {
 				return oldItem == newItem
 			}
@@ -81,7 +82,7 @@ class WishBookShelfAdapter @Inject constructor(
 }
 
 sealed class WishBookViewHolder(
-	binding: ViewDataBinding
+	binding: ViewDataBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 	abstract fun bind(wishBookShelfItem: WishBookShelfItem)
 }
@@ -109,6 +110,7 @@ class WishBookItemViewHolder(
 
 	override fun bind(wishBookShelfItem: WishBookShelfItem) {
 		binding.bookShelfListItem = (wishBookShelfItem as WishBookShelfItem.Item).bookShelfListItem
+		binding.bookImg.loadUrl(wishBookShelfItem.bookShelfListItem.book.bookCoverImageUrl)
 	}
 }
 

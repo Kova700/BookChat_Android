@@ -18,6 +18,7 @@ import com.example.bookchat.ui.agony.AgonyActivity
 import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfViewModel
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager
+import com.example.bookchat.utils.image.loadUrl
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -97,6 +98,8 @@ class ReadingBookDialog : DialogFragment() {
 			setBackgroundColor(Color.parseColor("#D9D9D9"))
 			isEnabled = false
 		}
+
+		binding.bookImg.loadUrl(state.readingItem.book.bookCoverImageUrl)
 	}
 
 	private fun moveToAgony(bookShelfListItemId: Long) {

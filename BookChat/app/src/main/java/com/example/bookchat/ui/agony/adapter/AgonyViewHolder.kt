@@ -13,6 +13,7 @@ import com.example.bookchat.databinding.ItemAgonyHeaderBinding
 import com.example.bookchat.ui.agony.makeagony.util.getTextColorHexInt
 import com.example.bookchat.ui.agony.model.AgonyListItem
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.image.loadUrl
 
 sealed class AgonyViewHolder(binding: ViewBinding) : RecyclerView.ViewHolder(binding.root) {
 	abstract fun bind(agonyListItem: AgonyListItem)
@@ -28,6 +29,7 @@ class AgonyHeaderItemViewHolder(
 
 	override fun bind(agonyListItem: AgonyListItem) {
 		binding.bookShelfItem = (agonyListItem as AgonyListItem.Header).bookShelfItem
+		binding.bookImg.loadUrl(binding.bookShelfItem?.book?.bookCoverImageUrl)
 	}
 }
 
