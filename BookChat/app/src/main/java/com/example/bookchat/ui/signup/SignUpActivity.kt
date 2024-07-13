@@ -26,6 +26,9 @@ import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROPP
 import com.example.bookchat.ui.signup.selecttaste.SelectTasteActivity
 import com.example.bookchat.utils.image.loadByteArray
 import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.namecheck.getNameCheckResultBackgroundResId
+import com.example.bookchat.utils.namecheck.getNameCheckResultHexInt
+import com.example.bookchat.utils.namecheck.getNameCheckResultText
 import com.example.bookchat.utils.permissions.galleryPermissions
 import com.example.bookchat.utils.permissions.getPermissionsLauncher
 import com.example.bookchat.utils.showSnackBar
@@ -79,6 +82,21 @@ class SignUpActivity : AppCompatActivity() {
 		setNickNameEditTextState(state)
 		setSubmitBtnState(state)
 		setUserProfileImage(state)
+		setNameCheckResultTextViewState(state)
+		setNameCheckResultLayoutState(state)
+	}
+
+	private fun setNameCheckResultLayoutState(state: SignUpState) {
+		binding.nickNameLayout.setBackgroundResource(
+			state.nicknameCheckState.getNameCheckResultBackgroundResId()
+		)
+	}
+
+	private fun setNameCheckResultTextViewState(state: SignUpState) {
+		with(binding.checkResultTv) {
+			setTextColor(state.nicknameCheckState.getNameCheckResultHexInt(context))
+			text = state.nicknameCheckState.getNameCheckResultText(context)
+		}
 	}
 
 	private fun setUserProfileImage(state: SignUpState) {
