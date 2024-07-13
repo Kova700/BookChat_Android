@@ -13,6 +13,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityBookReportBinding
 import com.example.bookchat.ui.bookreport.BookReportUiState.UiState
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.image.loadUrl
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
@@ -74,6 +75,9 @@ class BookReportActivity : AppCompatActivity() {
 				setSelection(uiState.enteredContent.length)
 			}
 		}
+		binding.bookImg.loadUrl(uiState.bookshelfItem.book.bookCoverImageUrl)
+		binding.bookReportBookTitleTv.isSelected = true
+		binding.bookReportBookAuthorsTv.isSelected = true
 	}
 
 	private fun setViewVisibility(uiState: BookReportUiState) {
@@ -87,7 +91,7 @@ class BookReportActivity : AppCompatActivity() {
 
 	private fun showWarningDialog(
 		warningTextStringId: Int,
-		onOkClick: () -> Unit
+		onOkClick: () -> Unit,
 	) {
 		val dialog = BookReportWarningDialog(
 			warningTextStringId = warningTextStringId,

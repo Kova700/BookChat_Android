@@ -8,6 +8,8 @@ data class ReadingBookDialogUiState(
 	val readingItem: BookShelfListItem,
 	val starRating: Float,
 ) {
+	val haveStar
+		get() = starRating != 0F
 
 	enum class UiState {
 		SUCCESS,
@@ -27,14 +29,14 @@ data class ReadingBookDialogUiState(
 
 sealed class ReadingBookDialogEvent {
 	data class MoveToAgony(
-		val bookShelfListItemId: Long
+		val bookShelfListItemId: Long,
 	) : ReadingBookDialogEvent()
 
 	data class ChangeBookShelfTab(
-		val targetState: BookShelfState
+		val targetState: BookShelfState,
 	) : ReadingBookDialogEvent()
 
 	data class MakeToast(
-		val stringId: Int
+		val stringId: Int,
 	) : ReadingBookDialogEvent()
 }

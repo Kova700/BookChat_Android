@@ -13,7 +13,10 @@ fun ImageView.loadUrl(
 	placeholderResId: Int = R.drawable.loading_img,
 	errorResId: Int = R.drawable.error_img,
 ) {
-	if (url.isNullOrEmpty()) return
+	if (url.isNullOrEmpty()) {
+		loadResId(R.drawable.empty_img)
+		return
+	}
 
 	Glide.with(context)
 		.load(url)
@@ -61,7 +64,6 @@ fun ImageView.loadResId(
 ) {
 	Glide.with(context)
 		.load(resId)
-		.fitCenter()
 		.placeholder(placeholderResId)
 		.error(errorResId)
 		.into(this)

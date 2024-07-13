@@ -95,14 +95,13 @@
                 android:textColor="#5648FF"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@+id/chat_room_title_tv"
-                app:layout_constraintEnd_toStartOf="@+id/textView11"
+                app:layout_constraintEnd_toStartOf="@+id/dispatch_time_tv"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/chat_room_title_tv"
                 app:layout_constraintTop_toTopOf="@+id/chat_room_title_tv" />
 
             <TextView
-                android:id="@+id/textView11"
-                getFormattedDetailDateTimeText="@{channel.lastChat.dispatchTime}"
+                android:id="@+id/dispatch_time_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -126,7 +125,7 @@
                 android:textColor="#373737"
                 android:textSize="12sp"
                 app:layout_constrainedWidth="true"
-                app:layout_constraintEnd_toStartOf="@+id/textView11"
+                app:layout_constraintEnd_toStartOf="@+id/dispatch_time_tv"
                 app:layout_constraintStart_toStartOf="@+id/chat_room_title_tv"
                 app:layout_constraintTop_toBottomOf="@+id/chat_room_title_tv" />
 
@@ -171,7 +170,7 @@
                 android:src="@drawable/unavailable_channel_icon"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-                app:layout_constraintTop_toBottomOf="@+id/textView11" />
+                app:layout_constraintTop_toBottomOf="@+id/dispatch_time_tv" />
 
             <ImageView
                 android:id="@+id/top_pin_channel_icon"
@@ -183,7 +182,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end"
                 app:layout_constraintStart_toEndOf="@+id/mute_channel_icon"
-                app:layout_constraintTop_toBottomOf="@+id/textView11" />
+                app:layout_constraintTop_toBottomOf="@+id/dispatch_time_tv" />
 
             <ImageView
                 android:id="@+id/mute_channel_icon"
@@ -196,7 +195,7 @@
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView11" />
+                app:layout_constraintTop_toBottomOf="@+id/dispatch_time_tv" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

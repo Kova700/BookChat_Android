@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogMakeAgonyBottomSheetBinding
+import com.example.bookchat.ui.agony.makeagony.util.getTextColorHexInt
 import com.example.bookchat.utils.makeToast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,7 +30,7 @@ class MakeAgonyBottomSheetDialog : BottomSheetDialogFragment() {
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
+		savedInstanceState: Bundle?,
 	): View {
 		_binding =
 			DataBindingUtil.inflate(
@@ -38,7 +39,6 @@ class MakeAgonyBottomSheetDialog : BottomSheetDialogFragment() {
 			)
 		binding.viewmodel = makeAgonyDialogViewModel
 		binding.lifecycleOwner = this
-
 		return binding.root
 	}
 
@@ -56,8 +56,7 @@ class MakeAgonyBottomSheetDialog : BottomSheetDialogFragment() {
 
 	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
 		makeAgonyDialogViewModel.uiState.collect { uiState ->
-			binding.makeAgonyFolderCv.backgroundTintList =
-				ColorStateList.valueOf(Color.parseColor(uiState.selectedColor.hexcolor))
+			setViewState(uiState)
 		}
 	}
 
@@ -71,9 +70,18 @@ class MakeAgonyBottomSheetDialog : BottomSheetDialogFragment() {
 		}
 	}
 
+	private fun setViewState(uiState: MakeAgonyUiState) {
+		binding.makeAgonyFolderCv.backgroundTintList =
+			ColorStateList.valueOf(Color.parseColor(uiState.selectedColor.hexcolor))
+		with(binding.agonyFolderTitleEt) {
+			setTextColor(uiState.selectedColor.getTextColorHexInt())
+			setHintTextColor(uiState.selectedColor.getTextColorHexInt())
+		}
+	}
+
 	private fun handleEvent(event: MakeAgonyUiEvent) {
 		when (event) {
-			is MakeAgonyUiEvent.MoveToBack -> this.dismiss()
+			is MakeAgonyUiEvent.MoveToBack -> dismiss()
 			is MakeAgonyUiEvent.MakeToast -> makeToast(event.stringId)
 		}
 	}

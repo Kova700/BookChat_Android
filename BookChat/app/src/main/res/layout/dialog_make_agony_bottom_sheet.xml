@@ -60,7 +60,6 @@
             android:fontFamily="@font/notosanskr_regular"
             android:elegantTextHeight="true"
             android:gravity="start"
-            setMakeAgonyTextColorWithFolderHexColor="@{viewmodel.uiState.selectedColor}"
             android:hint="@string/agony_make_input_hint"
             android:maxLength="30"
             android:textSize="14sp"

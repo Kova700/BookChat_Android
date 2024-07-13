@@ -21,5 +21,6 @@ class SubHostManageItemViewHolder(
 			imageUrl = user.profileImageUrl,
 			userDefaultProfileType = user.defaultProfileImageType
 		)
+		binding.uesrNicknameTv.text = user.nickname.ifBlank { "(알 수 없음)" }
 	}
 }

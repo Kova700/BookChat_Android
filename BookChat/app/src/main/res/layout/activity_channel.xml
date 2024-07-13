@@ -14,7 +14,6 @@
 
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
-        setDrawerLayoutSwipeOff="@{true}"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -212,7 +211,6 @@
 
                     <com.example.bookchat.ui.customview.BookChatEditText
                         android:id="@+id/chat_input_et"
-                        setChatInputEtFocusChangeListener="@{true}"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"

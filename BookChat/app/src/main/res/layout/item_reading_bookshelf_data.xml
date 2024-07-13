@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
+
         <variable
             name="BookShelfListItem"
             type="com.example.bookchat.ui.bookshelf.model.BookShelfListItem" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -26,18 +29,18 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/bookshelf_swipe_item_margin_horizontal"
             android:layout_marginVertical="@dimen/bookshelf_swipe_item_margin_vertical"
+            android:foreground="?android:attr/selectableItemBackground"
             app:cardCornerRadius="@dimen/swipe_item_corner_radius"
             app:cardElevation="@dimen/swipe_item_elevation"
-            android:foreground="?android:attr/selectableItemBackground"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_margin="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardView2"
@@ -56,18 +59,16 @@
                         android:layout_width="@dimen/book_img_width_default"
                         android:layout_height="@dimen/book_img_height_default"
                         android:scaleType="fitXY"
-                        loadUrl="@{BookShelfListItem.book.bookCoverImageUrl}"
-                        android:src="@drawable/empty_img"/>
+                        android:src="@drawable/empty_img" />
                 </androidx.cardview.widget.CardView>
 
                 <TextView
-                    android:id="@+id/textView13"
-                    setSelected="@{Boolean.TRUE}"
+                    android:id="@+id/selected_book_title_tv"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="30dp"
-                    android:layout_marginEnd="15dp"
                     android:layout_marginTop="35dp"
+                    android:layout_marginEnd="15dp"
                     android:elegantTextHeight="true"
                     android:ellipsize="marquee"
                     android:fontFamily="@font/notosanskr_bold"
@@ -81,8 +82,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/textView14"
-                    setSelected="@{Boolean.TRUE}"
+                    android:id="@+id/selected_book_authors_tv"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="30dp"
@@ -98,7 +98,7 @@
                     android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/cardView2"
-                    app:layout_constraintTop_toBottomOf="@+id/textView13" />
+                    app:layout_constraintTop_toBottomOf="@+id/selected_book_title_tv" />
 
                 <TextView
                     android:id="@+id/textView15"
@@ -113,7 +113,7 @@
                     android:textSize="16sp"
                     app:layout_constraintEnd_toStartOf="@+id/pageBtn"
                     app:layout_constraintStart_toEndOf="@+id/cardView2"
-                    app:layout_constraintTop_toBottomOf="@+id/textView14" />
+                    app:layout_constraintTop_toBottomOf="@+id/selected_book_authors_tv" />
 
                 <ImageButton
                     android:id="@+id/pageBtn"
@@ -122,7 +122,7 @@
                     android:background="?android:selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_open_page_input_btn"
                     app:layout_constraintBottom_toBottomOf="@+id/textView15"
-                    app:layout_constraintEnd_toEndOf="@+id/textView14"
+                    app:layout_constraintEnd_toEndOf="@+id/selected_book_authors_tv"
                     app:layout_constraintTop_toTopOf="@+id/textView15" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

@@ -139,7 +139,6 @@
 
                 <ImageView
                     android:id="@+id/bookImg"
-                    loadUrl="@{viewmodel.uiState.bookshelfItem.book.bookCoverImageUrl}"
                     android:layout_width="@dimen/book_img_width_default"
                     android:layout_height="@dimen/book_img_height_default"
                     android:scaleType="fitXY"
@@ -148,7 +147,6 @@
 
             <TextView
                 android:id="@+id/book_report_book_title_tv"
-                setSelected="@{Boolean.TRUE}"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="15dp"
@@ -169,7 +167,6 @@
 
             <TextView
                 android:id="@+id/book_report_book_authors_tv"
-                setSelected="@{Boolean.TRUE}"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="15dp"

@@ -16,6 +16,7 @@ import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.ui.bookshelf.wish.WishBookShelfViewModel
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager
+import com.example.bookchat.utils.image.loadUrl
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -41,7 +42,7 @@ class WishBookDialog : DialogFragment() {
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
+		savedInstanceState: Bundle?,
 	): View? {
 		_binding =
 			DataBindingUtil.inflate(inflater, R.layout.dialog_wish_book_tap_clicked, container, false)
@@ -53,6 +54,7 @@ class WishBookDialog : DialogFragment() {
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+		observeUiState()
 		observeUiEvent()
 		initViewState()
 	}
@@ -62,8 +64,21 @@ class WishBookDialog : DialogFragment() {
 		_binding = null
 	}
 
+	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
+		wishBookDialogViewModel.uiState.collect { uiState ->
+			setViewState(uiState)
+		}
+	}
+
 	private fun observeUiEvent() = viewLifecycleOwner.lifecycleScope.launch {
 		wishBookDialogViewModel.eventFlow.collect(::handleEvent)
+	}
+
+	private fun setViewState(uiState: WishBookDialogUiState) {
+		binding.bookImg.loadUrl(uiState.wishItem.book.bookCoverImageUrl)
+		binding.selectedBookTitleTv.isSelected = true
+		binding.selectedBookAuthorsTv.isSelected = true
+		binding.selectedBookPublishAtTv.isSelected = true
 	}
 
 	private fun initViewState() {

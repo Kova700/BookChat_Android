@@ -92,7 +92,6 @@
 
         <View
             android:id="@+id/nickName_layout"
-            setLayoutFromCheckResult="@{viewModel.uiState.nicknameCheckState}"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginTop="40dp"
@@ -111,11 +110,11 @@
             android:layout_marginEnd="10dp"
             android:background="@null"
             android:hint="@string/sign_up_input_hint"
+            android:maxLength="20"
             android:singleLine="true"
             android:text="@{viewModel.uiState.nickname}"
             android:textColorHint="#CFCFCF"
             android:textSize="13sp"
-            android:maxLength="20"
             app:layout_constraintBottom_toBottomOf="@+id/nickName_layout"
             app:layout_constraintEnd_toStartOf="@+id/text_clear_btn"
             app:layout_constraintStart_toStartOf="@+id/nickName_layout"
@@ -169,7 +168,6 @@
 
         <TextView
             android:id="@+id/checkResult_tv"
-            setTextViewFromCheckResult="@{viewModel.uiState.nicknameCheckState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"

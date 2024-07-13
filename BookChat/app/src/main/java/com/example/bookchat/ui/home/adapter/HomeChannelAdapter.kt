@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemHomeChannelItemBinding
 import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.utils.getFormattedDetailDateTimeText
 import com.example.bookchat.utils.image.loadChannelProfile
 import javax.inject.Inject
 
@@ -54,6 +55,8 @@ class HomeChannelItemViewHolder(
 	fun bind(channel: Channel) {
 		with(binding) {
 			binding.channel = channel
+			dispatchTimeTv.text =
+				channel.lastChat?.dispatchTime?.let { getFormattedDetailDateTimeText(it) }
 			uncheckedChatCountTv.text = if (channel.isExistNewChat) "New+" else ""
 			muteChannelIcon.visibility =
 				if ((channel.notificationFlag.not()) && channel.isAvailableChannel) View.VISIBLE else View.GONE

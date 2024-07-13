@@ -25,6 +25,9 @@ import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROPP
 import com.example.bookchat.ui.mypage.useredit.dialog.UserProfileEditDialog
 import com.example.bookchat.utils.image.loadChangedUserProfile
 import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.namecheck.getNameCheckResultBackgroundResId
+import com.example.bookchat.utils.namecheck.getNameCheckResultHexInt
+import com.example.bookchat.utils.namecheck.getNameCheckResultText
 import com.example.bookchat.utils.permissions.galleryPermissions
 import com.example.bookchat.utils.permissions.getPermissionsLauncher
 import com.example.bookchat.utils.showSnackBar
@@ -80,6 +83,21 @@ class UserEditActivity : AppCompatActivity() {
 		setNickNameEditTextState(state)
 		setSubmitBtnState(state)
 		setProfileImageViewState(state)
+		setNameCheckResultTextViewState(state)
+		setNameCheckResultLayoutState(state)
+	}
+
+	private fun setNameCheckResultLayoutState(state: UserEditUiState) {
+		binding.nickNameLayout.setBackgroundResource(
+			state.nicknameCheckState.getNameCheckResultBackgroundResId()
+		)
+	}
+
+	private fun setNameCheckResultTextViewState(state: UserEditUiState) {
+		with(binding.checkResultTv) {
+			setTextColor(state.nicknameCheckState.getNameCheckResultHexInt(context))
+			text = state.nicknameCheckState.getNameCheckResultText(context)
+		}
 	}
 
 	private fun setLoadingViewState(state: UserEditUiState) {

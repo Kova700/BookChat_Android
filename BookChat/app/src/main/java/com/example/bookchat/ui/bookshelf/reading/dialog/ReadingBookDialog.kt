@@ -18,6 +18,7 @@ import com.example.bookchat.ui.agony.AgonyActivity
 import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfViewModel
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager
+import com.example.bookchat.utils.image.loadUrl
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -43,7 +44,7 @@ class ReadingBookDialog : DialogFragment() {
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
+		savedInstanceState: Bundle?,
 	): View? {
 		_binding =
 			DataBindingUtil.inflate(inflater, R.layout.dialog_reading_book_tap_clicked, container, false)
@@ -87,6 +88,21 @@ class ReadingBookDialog : DialogFragment() {
 		if (binding.readingBookRatingBar.rating != state.starRating) {
 			binding.readingBookRatingBar.rating = state.starRating
 		}
+
+		with(binding.changeStatusToReadingBtn) {
+			if (state.haveStar) {
+				setBackgroundColor(Color.parseColor("#5648FF"))
+				isEnabled = true
+				return
+			}
+			setBackgroundColor(Color.parseColor("#D9D9D9"))
+			isEnabled = false
+		}
+
+		binding.bookImg.loadUrl(state.readingItem.book.bookCoverImageUrl)
+		binding.selectedBookTitleTv.isSelected = true
+		binding.selectedBookAuthorsTv.isSelected = true
+		binding.selectedBookPublishAtTv.isSelected = true
 	}
 
 	private fun moveToAgony(bookShelfListItemId: Long) {

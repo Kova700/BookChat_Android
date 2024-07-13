@@ -119,6 +119,8 @@ class AnotherUserChatViewHolder(
 				captureLayoutView = binding.chatCaptureLayoutView,
 				rootLayout = binding.root
 			)
+			uesrNicknameTv.text =
+				if (item.sender?.nickname.isNullOrBlank()) "(알 수 없음)" else item.sender?.nickname
 			chatDispatchTimeTv.text =
 				if (item.dispatchTime.isNotBlank()) getFormattedTimeText(item.dispatchTime)
 				else ""
