@@ -13,7 +13,6 @@ import com.example.bookchat.databinding.ItemCompleteBookshelfDataBinding
 import com.example.bookchat.databinding.ItemCompleteBookshelfHeaderBinding
 import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordSwipeHelper
 import com.example.bookchat.ui.bookshelf.complete.CompleteBookShelfItem
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.image.loadUrl
 import kotlinx.coroutines.CoroutineScope
@@ -137,6 +136,8 @@ class CompleteBookItemViewHolder(
 		val bookShelfListItem = (completeBookShelfItem as CompleteBookShelfItem.Item).bookShelfListItem
 		binding.bookShelfListItem = bookShelfListItem
 		binding.bookImg.loadUrl(bookShelfListItem.book.bookCoverImageUrl)
+		binding.selectedBookTitleTv.isSelected = true
+		binding.selectedBookAuthorsTv.isSelected = true
 		setViewHolderSwipeState(binding.swipeView, bookShelfListItem.isSwiped)
 	}
 

@@ -76,8 +76,7 @@
         </androidx.cardview.widget.CardView>
 
         <TextView
-            android:id="@+id/textView31"
-            setSelected="@{Boolean.TRUE}"
+            android:id="@+id/selected_book_title_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="35dp"
@@ -97,7 +96,7 @@
             app:layout_constraintTop_toTopOf="@+id/bookCardView_agonize" />
 
         <TextView
-            setSelected="@{Boolean.TRUE}"
+            android:id="@+id/selected_book_authors_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="35dp"
@@ -114,7 +113,7 @@
             android:textSize="11sp"
             app:layout_constraintEnd_toEndOf="@+id/bookBackground_agonize"
             app:layout_constraintStart_toEndOf="@+id/bookCardView_agonize"
-            app:layout_constraintTop_toBottomOf="@+id/textView31" />
+            app:layout_constraintTop_toBottomOf="@+id/selected_book_title_tv" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

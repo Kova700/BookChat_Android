@@ -58,6 +58,9 @@ class MakeChannelBookSelectDialog(
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
 		dialogSizeManager.setDialogSize(binding.makeChannelSelectBookDialogLayout)
 		binding.bookImg.loadUrl(selectedBook.bookCoverImageUrl)
+		binding.selectedBookTitleTv.isSelected = true
+		binding.selectedBookAuthorsTv.isSelected = true
+		binding.selectedBookPublishAtTv.isSelected = true
 	}
 
 	fun onClickMakeChannel() {

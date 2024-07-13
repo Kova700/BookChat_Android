@@ -48,8 +48,7 @@
             </androidx.cardview.widget.CardView>
 
             <TextView
-                android:id="@+id/textView26"
-                setSelected="@{Boolean.TRUE}"
+                android:id="@+id/selected_book_title_tv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="17dp"
@@ -67,8 +66,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/cardView2" />
 
             <TextView
-                android:id="@+id/textView27"
-                setSelected="@{Boolean.TRUE}"
+                android:id="@+id/selected_book_authors_tv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
@@ -83,11 +81,10 @@
                 android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="@+id/sub_background_complete"
                 app:layout_constraintStart_toStartOf="@+id/sub_background_complete"
-                app:layout_constraintTop_toBottomOf="@+id/textView26" />
+                app:layout_constraintTop_toBottomOf="@+id/selected_book_title_tv" />
 
             <TextView
-                android:id="@+id/textView28"
-                setSelected="@{Boolean.TRUE}"
+                android:id="@+id/selected_book_publish_at_tv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
@@ -102,7 +99,7 @@
                 android:textSize="10sp"
                 app:layout_constraintEnd_toEndOf="@+id/sub_background_complete"
                 app:layout_constraintStart_toStartOf="@+id/sub_background_complete"
-                app:layout_constraintTop_toBottomOf="@+id/textView27" />
+                app:layout_constraintTop_toBottomOf="@+id/selected_book_authors_tv" />
 
             <com.willy.ratingbar.ScaleRatingBar
                 android:id="@+id/readingBook_ratingBar"
@@ -115,7 +112,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/cardView2"
                 app:layout_constraintStart_toStartOf="@+id/cardView2"
-                app:layout_constraintTop_toBottomOf="@+id/textView28"
+                app:layout_constraintTop_toBottomOf="@+id/selected_book_publish_at_tv"
                 app:rating="@{viewmodel.uiState.completeItem.star.value}"
                 app:srb_drawableEmpty="@drawable/ic_star_not_fill"
                 app:srb_drawableFilled="@drawable/ic_star_fill"

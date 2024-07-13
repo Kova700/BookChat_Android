@@ -79,7 +79,6 @@
 
         <TextView
             android:id="@+id/book_title_tv"
-            setSelected="@{Boolean.TRUE}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="17dp"
@@ -98,7 +97,6 @@
 
         <TextView
             android:id="@+id/book_authors_tv"
-            setSelected="@{Boolean.TRUE}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
@@ -117,7 +115,6 @@
 
         <TextView
             android:id="@+id/book_publishA_tv"
-            setSelected="@{Boolean.TRUE}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"

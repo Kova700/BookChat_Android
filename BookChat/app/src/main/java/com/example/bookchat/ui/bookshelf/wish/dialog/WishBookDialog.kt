@@ -76,6 +76,9 @@ class WishBookDialog : DialogFragment() {
 
 	private fun setViewState(uiState: WishBookDialogUiState) {
 		binding.bookImg.loadUrl(uiState.wishItem.book.bookCoverImageUrl)
+		binding.selectedBookTitleTv.isSelected = true
+		binding.selectedBookAuthorsTv.isSelected = true
+		binding.selectedBookPublishAtTv.isSelected = true
 	}
 
 	private fun initViewState() {

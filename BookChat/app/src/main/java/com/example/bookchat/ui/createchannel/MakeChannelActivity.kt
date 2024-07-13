@@ -101,6 +101,8 @@ class MakeChannelActivity : AppCompatActivity() {
 		setChannelTitleEditTextState(uiState)
 		setChannelTagEditTextState(uiState)
 		setSelectBookImage(uiState)
+		binding.selectedBookTitleTv.isSelected = true
+		binding.selectedBookAuthorsTv.isSelected = true
 	}
 
 	private fun setSelectBookImage(uiState: MakeChannelUiState) {

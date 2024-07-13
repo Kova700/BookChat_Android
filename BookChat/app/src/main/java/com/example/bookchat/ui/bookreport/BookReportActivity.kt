@@ -76,6 +76,8 @@ class BookReportActivity : AppCompatActivity() {
 			}
 		}
 		binding.bookImg.loadUrl(uiState.bookshelfItem.book.bookCoverImageUrl)
+		binding.bookReportBookTitleTv.isSelected = true
+		binding.bookReportBookAuthorsTv.isSelected = true
 	}
 
 	private fun setViewVisibility(uiState: BookReportUiState) {

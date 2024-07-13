@@ -30,6 +30,8 @@ class AgonyHeaderItemViewHolder(
 	override fun bind(agonyListItem: AgonyListItem) {
 		binding.bookShelfItem = (agonyListItem as AgonyListItem.Header).bookShelfItem
 		binding.bookImg.loadUrl(binding.bookShelfItem?.book?.bookCoverImageUrl)
+		binding.selectedBookTitleTv.isSelected = true
+		binding.selectedBookAuthorsTv.isSelected = true
 	}
 }
 

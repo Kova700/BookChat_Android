@@ -136,6 +136,8 @@ class ReadingBookItemViewHolder(
 		val bookShelfListItem = (readingBookShelfItem as ReadingBookShelfItem.Item).bookShelfListItem
 		binding.bookShelfListItem = bookShelfListItem
 		binding.bookImg.loadUrl(bookShelfListItem.book.bookCoverImageUrl)
+		binding.selectedBookTitleTv.isSelected = true
+		binding.selectedBookAuthorsTv.isSelected = true
 		setViewHolderSwipeState(binding.swipeView, bookShelfListItem.isSwiped)
 	}
 

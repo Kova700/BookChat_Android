@@ -38,8 +38,7 @@
         </androidx.cardview.widget.CardView>
 
         <TextView
-            android:id="@+id/textView26"
-            setSelected="@{Boolean.TRUE}"
+            android:id="@+id/selected_book_title_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="17dp"
@@ -57,8 +56,7 @@
             app:layout_constraintTop_toBottomOf="@+id/cardView2" />
 
         <TextView
-            android:id="@+id/textView27"
-            setSelected="@{Boolean.TRUE}"
+            android:id="@+id/selected_book_authors_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
@@ -73,11 +71,10 @@
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView26" />
+            app:layout_constraintTop_toBottomOf="@+id/selected_book_title_tv" />
 
         <TextView
-            android:id="@+id/textView28"
-            setSelected="@{Boolean.TRUE}"
+            android:id="@+id/selected_book_publish_at_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
@@ -93,7 +90,7 @@
             app:layout_constraintBottom_toTopOf="@+id/make_chat_room_btn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView27" />
+            app:layout_constraintTop_toBottomOf="@+id/selected_book_authors_tv" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/make_chat_room_btn"
@@ -114,7 +111,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView28" />
+            app:layout_constraintTop_toBottomOf="@+id/selected_book_publish_at_tv" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -147,7 +147,6 @@
 
             <TextView
                 android:id="@+id/book_report_book_title_tv"
-                setSelected="@{Boolean.TRUE}"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="15dp"
@@ -168,7 +167,6 @@
 
             <TextView
                 android:id="@+id/book_report_book_authors_tv"
-                setSelected="@{Boolean.TRUE}"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="15dp"

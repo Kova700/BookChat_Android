@@ -79,6 +79,9 @@ class CompleteBookDialog : DialogFragment() {
 	private fun initViewState() {
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
 		dialogSizeManager.setDialogSize(binding.completeDialogLayout)
+		binding.selectedBookTitleTv.isSelected = true
+		binding.selectedBookAuthorsTv.isSelected = true
+		binding.selectedBookPublishAtTv.isSelected = true
 	}
 
 	private fun moveToAgony(bookShelfItemId: Long) {

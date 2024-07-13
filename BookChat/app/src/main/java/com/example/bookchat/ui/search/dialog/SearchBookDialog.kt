@@ -80,6 +80,9 @@ class SearchBookDialog : DialogFragment() {
 
 	private fun setViewState(uiState: SearchDialogUiState) {
 		binding.bookImg.loadUrl(uiState.book.bookCoverImageUrl)
+		binding.bookTitleTv.isSelected = true
+		binding.bookAuthorsTv.isSelected = true
+		binding.bookPublishATv.isSelected = true
 		setViewVisibility(uiState.uiState)
 	}
 

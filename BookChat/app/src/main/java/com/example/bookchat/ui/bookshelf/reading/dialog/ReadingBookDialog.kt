@@ -100,6 +100,9 @@ class ReadingBookDialog : DialogFragment() {
 		}
 
 		binding.bookImg.loadUrl(state.readingItem.book.bookCoverImageUrl)
+		binding.selectedBookTitleTv.isSelected = true
+		binding.selectedBookAuthorsTv.isSelected = true
+		binding.selectedBookPublishAtTv.isSelected = true
 	}
 
 	private fun moveToAgony(bookShelfListItemId: Long) {
