@@ -12,8 +12,6 @@ import com.example.bookchat.R
 import com.example.bookchat.data.*
 import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.domain.model.NicknameCheckState
-import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
-import com.example.bookchat.ui.login.LoginUiState
 import com.example.bookchat.utils.*
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.image.loadUrl
@@ -223,97 +221,6 @@ object DataBindingAdapter {
 				textView.setHintTextColor(Color.parseColor("#FFFFFF"))
 			}
 		}
-	}
-
-	/**고민 Color Circle Click 가능 여부 설정*/
-	@JvmStatic
-	@BindingAdapter("setClickableWithAgonyFolderHexColor")
-	fun setClickableWithAgonyFolderHexColor(toggleButton: ToggleButton, checkedFlag: Boolean) {
-		toggleButton.isClickable = !checkedFlag
-	}
-
-	/**고민 기록 FirstItem Default State일 때 View Visibility 설정*/
-	@JvmStatic
-	@BindingAdapter("setVisibilityInFirstItemView")
-	fun setVisibilityInFirstItemView(
-		view: View,
-		itemState: AgonyRecordListItem.ItemState,
-	) {
-		if (itemState is AgonyRecordListItem.ItemState.Success) {
-			view.visibility = View.VISIBLE
-			return
-		}
-		view.visibility = View.INVISIBLE
-	}
-
-	/**고민 기록 FirstItem Editing State일 때 View Visibility 설정*/
-	@JvmStatic
-	@BindingAdapter("setVisibilityInEditingItemView")
-	fun setVisibilityInEditingItemView(
-		view: View,
-		itemState: AgonyRecordListItem.ItemState,
-	) {
-		if (itemState is AgonyRecordListItem.ItemState.Editing) {
-			view.visibility = View.VISIBLE
-			return
-		}
-		view.visibility = View.INVISIBLE
-	}
-
-	/**고민 기록 FirstItem Loading State일 때 View Visibility 설정*/
-	@JvmStatic
-	@BindingAdapter("setVisibilityInLoadingItemView")
-	fun setVisibilityInLoadingItemView(
-		view: View,
-		itemState: AgonyRecordListItem.ItemState,
-	) {
-		if (itemState == AgonyRecordListItem.ItemState.Loading) {
-			view.visibility = View.VISIBLE
-			return
-		}
-		view.visibility = View.INVISIBLE
-	}
-
-	/**고민 기록 DataItem Default State일 때 View Visibility 설정*/
-	@JvmStatic
-	@BindingAdapter("setVisibilityDataItemInDefaultState")
-	fun setVisibilityDataItemInDefaultState(
-		view: View,
-		itemState: AgonyRecordListItem.ItemState,
-	) {
-		if (itemState is AgonyRecordListItem.ItemState.Success) {
-			view.visibility = View.VISIBLE
-			return
-		}
-		view.visibility = View.INVISIBLE
-	}
-
-	/**고민 기록 DataItem Editing State일 때 View Visibility 설정*/
-	@JvmStatic
-	@BindingAdapter("setVisibilityDataItemInEditingState")
-	fun setVisibilityDataItemInEditingState(
-		view: View,
-		itemState: AgonyRecordListItem.ItemState,
-	) {
-		if (itemState is AgonyRecordListItem.ItemState.Editing) {
-			view.visibility = View.VISIBLE
-			return
-		}
-		view.visibility = View.INVISIBLE
-	}
-
-	/**고민 기록 DataItem Loading State일 때 View Visibility 설정*/
-	@JvmStatic
-	@BindingAdapter("setVisibilityDataItemInLoadingState")
-	fun setVisibilityDataItemInLoadingState(
-		view: View,
-		itemState: AgonyRecordListItem.ItemState,
-	) {
-		if (itemState == AgonyRecordListItem.ItemState.Loading) {
-			view.visibility = View.VISIBLE
-			return
-		}
-		view.visibility = View.INVISIBLE
 	}
 
 	/**UserChatRoomListItem 시간 Text 세팅*/

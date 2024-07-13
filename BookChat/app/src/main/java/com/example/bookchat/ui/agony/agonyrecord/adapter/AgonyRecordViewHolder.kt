@@ -12,7 +12,7 @@ import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordSwipeHelper
 import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
 
 sealed class AgonyRecordViewHolder(
-	binding: ViewDataBinding
+	binding: ViewDataBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 	abstract fun bind(agonyRecordListItem: AgonyRecordListItem)
 }
@@ -57,21 +57,30 @@ class AgonyRecordFirstItemViewHolder(
 		val item = agonyRecordListItem as AgonyRecordListItem.FirstItem
 		binding.firstItem = item
 		binding.editLayout.agonyRecordFirstItemTitleEt
+		setViewState(item.state)
 
-		if (item.state is AgonyRecordListItem.ItemState.Editing) {
+	}
+
+	private fun setViewState(state: AgonyRecordListItem.ItemState) {
+		binding.progressbar.visibility =
+			if (state is AgonyRecordListItem.ItemState.Loading) View.VISIBLE else View.GONE
+		binding.editLayout.root.visibility =
+			if (state is AgonyRecordListItem.ItemState.Editing) View.VISIBLE else View.INVISIBLE
+		binding.agonyRecordFirstItemCv.visibility =
+			if (state is AgonyRecordListItem.ItemState.Success) View.VISIBLE else View.INVISIBLE
+
+		if (state is AgonyRecordListItem.ItemState.Editing) {
 			with(binding.editLayout) {
-				agonyRecordFirstItemTitleEt.setText(item.state.titleBeingEdited)
-				agonyRecordFirstItemContentEt.setText(item.state.contentBeingEdited)
+				agonyRecordFirstItemTitleEt.setText(state.titleBeingEdited)
+				agonyRecordFirstItemContentEt.setText(state.contentBeingEdited)
 				agonyRecordFirstItemTitleEt.addTextChangedListener { text: Editable? ->
-					item.state.titleBeingEdited = text.toString()
+					state.titleBeingEdited = text.toString()
 				}
 				agonyRecordFirstItemContentEt.addTextChangedListener { text: Editable? ->
-					item.state.contentBeingEdited = text.toString()
+					state.contentBeingEdited = text.toString()
 				}
 			}
-
 		}
-
 	}
 }
 
@@ -107,24 +116,37 @@ class AgonyRecordItemViewHolder(
 	override fun bind(agonyRecordListItem: AgonyRecordListItem) {
 		val item = agonyRecordListItem as AgonyRecordListItem.Item
 		binding.record = item
+		setViewState(item.state)
+	}
 
-		when (item.state) {
+	private fun setViewState(state: AgonyRecordListItem.ItemState) {
+		binding.progressbar.visibility =
+			if (state is AgonyRecordListItem.ItemState.Loading) View.VISIBLE else View.GONE
+		binding.editLayout.root.visibility =
+			if (state is AgonyRecordListItem.ItemState.Editing) View.VISIBLE else View.INVISIBLE
+		binding.swipeView.visibility =
+			if (state is AgonyRecordListItem.ItemState.Success) View.VISIBLE else View.INVISIBLE
+		binding.swipeBackground.root.visibility =
+			if (state is AgonyRecordListItem.ItemState.Success) View.VISIBLE else View.INVISIBLE
+
+
+		when (state) {
 			is AgonyRecordListItem.ItemState.Editing -> {
 				with(binding.editLayout) {
-					agonyRecordEditTitleEt.setText(item.state.titleBeingEdited)
-					agonyRecordEditContentEt.setText(item.state.contentBeingEdited)
+					agonyRecordEditTitleEt.setText(state.titleBeingEdited)
+					agonyRecordEditContentEt.setText(state.contentBeingEdited)
 					agonyRecordEditTitleEt.addTextChangedListener { text: Editable? ->
-						item.state.titleBeingEdited = text.toString()
+						state.titleBeingEdited = text.toString()
 					}
 					agonyRecordEditContentEt.addTextChangedListener { text: Editable? ->
-						item.state.contentBeingEdited = text.toString()
+						state.contentBeingEdited = text.toString()
 					}
 				}
 			}
 
 			is AgonyRecordListItem.ItemState.Success -> {
-				isSwiped = item.state.isSwiped
-				setViewHolderSwipeState(binding.swipeView, item.state.isSwiped)
+				isSwiped = state.isSwiped
+				setViewHolderSwipeState(binding.swipeView, state.isSwiped)
 			}
 
 			else -> {}

@@ -14,7 +14,7 @@
         android:layout_height="wrap_content">
 
         <ProgressBar
-            setVisibilityDataItemInLoadingState="@{record.state}"
+            android:id="@+id/progressbar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -30,11 +30,10 @@
         <include
             android:id="@+id/edit_layout"
             layout="@layout/item_agony_record_edit_data"
-            app:record="@{record}"/>
+            app:record="@{record}" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/swipe_view"
-            setVisibilityDataItemInDefaultState="@{record.state}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"

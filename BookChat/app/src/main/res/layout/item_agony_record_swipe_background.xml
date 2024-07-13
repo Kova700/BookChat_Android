@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+
     <data>
+
         <variable
             name="record"
             type="com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem.Item" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        setVisibilityDataItemInDefaultState="@{record.state}"
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        android:layout_height="wrap_content">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/background"
@@ -21,8 +21,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="30dp"
             android:layout_marginBottom="10dp"
-            android:foreground="?android:attr/selectableItemBackground"
             android:backgroundTint="#D9D9D9"
+            android:foreground="?android:attr/selectableItemBackground"
             android:minHeight="190dp"
             app:cardCornerRadius="15dp"
             app:cardElevation="0dp"
