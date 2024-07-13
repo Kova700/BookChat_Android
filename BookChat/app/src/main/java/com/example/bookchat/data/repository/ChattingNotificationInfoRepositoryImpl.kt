@@ -33,15 +33,14 @@ class ChattingNotificationInfoRepositoryImpl @Inject constructor(
 
 	override suspend fun updateShownNotificationInfo(notificationId: Int, lastTimestamp: Long) {
 		val notificationInfos = getShownNotificationInfos()
-			.associateBy { it.notificationId }
-			.toMutableMap()
+			.associateByTo(mutableMapOf()) { it.notificationId }
 
 		val previousInfo = notificationInfos[notificationId]
 		val currentInfo = ActivatedChatNotificationInfo(notificationId, lastTimestamp)
 		if (previousInfo != null && previousInfo.lastTimestamp > currentInfo.lastTimestamp) return
 
 		notificationInfos[notificationId] = currentInfo
-		dataStore.setData(notificationIdKey, gson.toJson(notificationInfos.toList()))
+		dataStore.setData(notificationIdKey, gson.toJson(notificationInfos.values))
 	}
 
 	override suspend fun removeShownNotificationInfo(notificationId: Int) {
