@@ -148,7 +148,6 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/change_status_to_reading_btn"
-            setButtonColor="@{viewmodel.uiState.starRating == 0L}"
             android:layout_width="0dp"
             android:layout_height="45dp"
             android:layout_marginStart="4dp"

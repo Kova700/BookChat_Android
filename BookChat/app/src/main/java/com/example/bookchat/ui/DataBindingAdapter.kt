@@ -40,19 +40,6 @@ object DataBindingAdapter {
 		textview.text = nickname
 	}
 
-	/**독서취향 : 제출 버튼 색상 설정*/
-	@JvmStatic
-	@BindingAdapter("setButtonColor")
-	fun setButtonColor(button: Button, booleanFlag: Boolean) {
-		if (booleanFlag) {
-			button.setBackgroundColor(Color.parseColor("#D9D9D9"))
-			button.isEnabled = false
-			return
-		}
-		button.setBackgroundColor(Color.parseColor("#5648FF"))
-		button.isEnabled = true
-	}
-
 	/**회원가입 :닉네임 검사 상황별 안내문구*/
 	//텍스트 (색 , 글자)
 	@JvmStatic
