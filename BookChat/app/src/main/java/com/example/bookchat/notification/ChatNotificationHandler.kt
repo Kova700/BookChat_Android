@@ -65,10 +65,12 @@ class ChatNotificationHandler @Inject constructor(
 			channel = channel,
 			pendingIntent = getPendingIntent(channel)
 		)
+
 		chattingNotificationInfoRepository.updateShownNotificationInfo(
 			notificationId = notificationId,
 			lastTimestamp = chat.timestamp
 		)
+
 		notificationManager.notify(notificationId, notification)
 		notificationManager.notify(CHATTING_NOTIFICATION_GROUP_ID, getGroupNotification())
 	}
@@ -93,8 +95,6 @@ class ChatNotificationHandler @Inject constructor(
 	): Notification {
 		val messagingStyle =
 			createMessagingStyle(sender, channel).addMessage(chat.toMessagingStyleMessage())
-
-		messagingStyle.messages.firstOrNull()?.timestamp
 
 		return NotificationCompat.Builder(context, CHATTING_NOTIFICATION_CHANNEL_ID)
 			.setBadgeIconType(NotificationCompat.BADGE_ICON_LARGE)
@@ -138,7 +138,6 @@ class ChatNotificationHandler @Inject constructor(
 		}
 	}
 
-	//TODO : channel profileImageUrl 없으면 default Image로 icon 만들게 수정 (테스트 필요)
 	private suspend fun createDynamicShortcut(channel: Channel) {
 		val shortcutId = getNotificationId(channel).toString()
 		val intent = getMainActivityIntent(channel).setAction(Intent.ACTION_CREATE_SHORTCUT)
@@ -193,7 +192,6 @@ class ChatNotificationHandler @Inject constructor(
 	private val Chat.timestamp: Long
 		get() = (DateManager.stringToDate(dispatchTime) ?: Date()).time
 
-	//TODO : user profileImageUrl 없으면 default Image로 icon 만들게 수정 (테스트 필요)
 	private suspend fun User.toPerson(): Person {
 		val icon = iconBuilder.buildIcon(
 			imageUrl = profileImageUrl,

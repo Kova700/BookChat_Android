@@ -2,9 +2,10 @@ package com.example.bookchat.ui.mapper
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import com.example.bookchat.R
 import com.example.bookchat.domain.model.ChannelDefaultImageType
+import com.example.bookchat.utils.bitmap.getImageBitmap
+import com.example.bookchat.utils.dpToPx
 
 fun ChannelDefaultImageType.getResId() =
 	when (this) {
@@ -17,5 +18,14 @@ fun ChannelDefaultImageType.getResId() =
 		ChannelDefaultImageType.SEVEN -> R.drawable.default_chat_room_img7
 	}
 
-fun ChannelDefaultImageType.getBitmap(context: Context): Bitmap =
-	BitmapFactory.decodeResource(context.resources, getResId())
+fun ChannelDefaultImageType.getBitmap(
+	context: Context,
+	imageSizePx: Int = 35.dpToPx(context),
+	roundedCornersRadiusPx: Int = 14.dpToPx(context),
+): Bitmap {
+	return getResId().getImageBitmap(
+		context = context,
+		imageSizePx = imageSizePx,
+		roundedCornersRadiusPx = roundedCornersRadiusPx
+	)!!
+}
