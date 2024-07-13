@@ -8,7 +8,6 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
-import androidx.drawerlayout.widget.DrawerLayout
 import com.example.bookchat.R
 import com.example.bookchat.data.*
 import com.example.bookchat.domain.model.AgonyFolderHexColor
@@ -336,25 +335,4 @@ object DataBindingAdapter {
 		view.text = getFormattedDetailDateTimeText(dateAndTimeString)
 	}
 
-	/**Shimmer Animation Start/Stop 설정*/
-	@JvmStatic
-	@BindingAdapter("setChatInputEtFocusChangeListener")
-	fun setChatInputEtFocusChangeListener(editText: EditText, bool: Boolean) {
-		editText.setOnFocusChangeListener { view, hasFocus ->
-			if (view !is EditText) return@setOnFocusChangeListener
-
-			if (hasFocus) {
-				view.maxLines = 4
-				return@setOnFocusChangeListener
-			}
-			view.maxLines = 1
-		}
-	}
-
-	/**DrawerLayout 스와이프 off 세팅*/
-	@JvmStatic
-	@BindingAdapter("setDrawerLayoutSwipeOff")
-	fun setDrawerLayoutSwipeOff(view: DrawerLayout, bool: Boolean?) {
-		view.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-	}
 }

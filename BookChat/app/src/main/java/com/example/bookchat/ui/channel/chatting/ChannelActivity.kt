@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -144,6 +145,10 @@ class ChannelActivity : AppCompatActivity() {
 				val message = text?.toString() ?: return@addTextChangedListener
 				channelViewModel.onChangeEnteredMessage(message)
 			}
+		}
+		binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+		binding.chatInputEt.setOnFocusChangeListener { _, hasFocus ->
+			binding.chatInputEt.maxLines = if (hasFocus) 4 else 1
 		}
 	}
 
