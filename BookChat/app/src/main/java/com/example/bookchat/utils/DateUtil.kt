@@ -5,39 +5,31 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-fun stringToDate(dateString: String): Date? {
-	val format = SimpleDateFormat(DATE_AND_TIME_FORMAT, Locale.getDefault())
-	return format.parse(dateString)
-}
+private val dateFormat
+	get() = SimpleDateFormat(DATE_AND_TIME_FORMAT, Locale.getDefault())
 
-//Long 타입 timeStamp를 String으로 변환하는 함수
-fun timeStampToString(timeStamp: Long): String {
-	val format = SimpleDateFormat(DATE_AND_TIME_FORMAT, Locale.getDefault())
-	return format.format(Date(timeStamp))
-}
+//String = Date String (DATE_AND_TIME_FORMAT)
+fun String.toDate(): Date? =
+	runCatching { dateFormat.parse(this) }.getOrNull()
 
-fun getCurrentDateTimeString(): String =
-	SimpleDateFormat(DATE_AND_TIME_FORMAT, Locale.getDefault())
-		.format(Date())
+//Long = timeStamp
+fun Long.toDateString(): String? =
+	runCatching { dateFormat.format(Date(this)) }.getOrNull()
 
-private fun getDateString(dateTimeString: String) =
-	dateTimeString.split(T).first()
+fun getCurrentDateTimeString(): String = dateFormat.format(Date())
 
-private fun getTimeString(dateTimeString: String) =
-	dateTimeString.split(T).last()
+private fun String.getDateString() = split(T).firstOrNull()
+private fun String.getTimeString() = split(T).lastOrNull()
 
 fun getDateKoreanString(dateTimeString: String): String {
-	val (year, month, day) = getDateString(dateTimeString).split(HYPHEN)
+	val (year, month, day) = dateTimeString.getDateString()?.split(HYPHEN) ?: return ""
 	return "${year}$YEAR ${month.toInt()}$MONTH  ${day.toInt()}$DAY " +
 					getWeekKoreanString(dateTimeString)
 }
 
 private fun getWeekKoreanString(dateTimeString: String): String {
-	var date: Date? = null
-	runCatching { date = stringToDate(dateTimeString) }
-
 	val dayNum = Calendar.getInstance()
-		.apply { time = date ?: return "" }
+		.apply { time = dateTimeString.toDate() ?: return "" }
 		.get(Calendar.DAY_OF_WEEK)
 
 	return when (dayNum) {
@@ -67,34 +59,34 @@ fun getFormattedTimeText(dateTimeString: String): String =
 	getDetailFormattedTodayText(dateTimeString)
 
 private fun getAbstractFormattedTodayText(dateTimeString: String): String {
-	val (cTime, cMinute) = getTimeString(getCurrentDateTimeString()).split(COLON)
-		.dropLast(1).map { it.toInt() }
-	val (iTime, iMinute) = getTimeString(dateTimeString).split(COLON)
-		.dropLast(1).map { it.toInt() }
+	val (cTime, cMinute) = getCurrentDateTimeString().getTimeString()?.split(COLON)
+		?.dropLast(1)?.map { it.toInt() } ?: return ""
+	val (iTime, iMinute) = dateTimeString.getTimeString()?.split(COLON)
+		?.dropLast(1)?.map { it.toInt() } ?: return ""
+
 	if ((cTime == iTime) && (cMinute - iMinute <= 5)) return JUST_AGO
 	if ((cTime == iTime) && (cMinute - iMinute <= 30)) return THIRTY_AGO
 	return (cTime - iTime).toString() + HOUR_AGO
 }
 
 private fun getDetailFormattedTodayText(dateTimeString: String): String {
-	val (time, minute, second) = getTimeString(dateTimeString).split(COLON)
-	val flag = if (time.toInt() >= 12) PM else AM
-	return when (flag) {
+	val (time, minute, second) = dateTimeString.getTimeString()?.split(COLON) ?: return ""
+	return when (val flag = if (time.toInt() >= 12) PM else AM) {
 		PM -> flag + SPACE + getPmTime(time.toInt()) + COLON + minute
 		AM -> flag + SPACE + getAmTime(time.toInt()) + COLON + minute
-		else -> throw Exception("Time Formatting is Fail")
+		else -> return ""
 	}
 }
 
 private fun getFormattedYesterdayText() = YESTERDAY
 
 private fun getFormattedThisYearText(dateTimeString: String): String {
-	val (iMonth, iDay) = getDateString(dateTimeString).split(HYPHEN).drop(1)
+	val (iMonth, iDay) = dateTimeString.getDateString()?.split(HYPHEN)?.drop(1) ?: return ""
 	return iMonth.toInt().toString() + MONTH + iDay.toInt() + DAY
 }
 
 private fun getFormattedElseYearText(dateTimeString: String): String {
-	val (iYear, iMonth, iDay) = getDateString(dateTimeString).split(HYPHEN)
+	val (iYear, iMonth, iDay) = dateTimeString.getDateString()?.split(HYPHEN) ?: return ""
 	return "$iYear.$iMonth.$iDay"
 }
 
@@ -102,8 +94,10 @@ private fun getPmTime(time: Int): Int = if (time - 12 == 0) 12 else time - 12
 private fun getAmTime(time: Int): Int = if (time == 0) 12 else time
 
 private fun isToday(dateTimeString: String): Boolean {
-	val (cYear, cMonth, cDay) = getDateString(getCurrentDateTimeString()).split(HYPHEN)
-	val (iYear, iMonth, iDay) = getDateString(dateTimeString).split(HYPHEN)
+	val (cYear, cMonth, cDay) = getCurrentDateTimeString().getDateString()?.split(HYPHEN)
+		?: return false
+	val (iYear, iMonth, iDay) = dateTimeString.getDateString()?.split(HYPHEN)
+		?: return false
 	return (cYear == iYear) && (cMonth == iMonth) && (cDay == iDay)
 }
 
@@ -116,21 +110,21 @@ private fun isYesterday(dateTimeString: String): Boolean {
 		cMonth = (it.get(Calendar.MONTH) + 1).toString()
 		cDay = it.get(Calendar.DATE).toString()
 	}
-	val (iYear, iMonth, iDay) = getDateString(dateTimeString).split(HYPHEN)
-		.map { it.toInt().toString() }
+	val (iYear, iMonth, iDay) = dateTimeString.getDateString()?.split(HYPHEN)
+		?.map { it.toInt().toString() } ?: return false
 	return (cYear == iYear) && (cMonth == iMonth) && (cDay == iDay)
 }
 
 private fun isThisYear(dateTimeString: String): Boolean {
-	val cYear = getDateString(getCurrentDateTimeString()).split(HYPHEN).first()
-	val iYear = getDateString(dateTimeString).split(HYPHEN).first()
+	val cYear = getCurrentDateTimeString().getDateString()?.split(HYPHEN)?.first()
+	val iYear = dateTimeString.getDateString()?.split(HYPHEN)?.first()
 	return cYear == iYear
 }
 
 fun isSameDate(dateTimeString: String?, other: String?): Boolean {
 	if (dateTimeString.isNullOrBlank() || other.isNullOrBlank()) return false
-	val (year, month, day) = getDateString(dateTimeString).split(HYPHEN)
-	val (oYear, oMonth, oDay) = getDateString(other).split(HYPHEN)
+	val (year, month, day) = dateTimeString.getDateString()?.split(HYPHEN) ?: return false
+	val (oYear, oMonth, oDay) = other.getDateString()?.split(HYPHEN) ?: return false
 	return (year == oYear) && (month == oMonth) && (day == oDay)
 }
 
