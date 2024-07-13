@@ -316,17 +316,6 @@ object DataBindingAdapter {
 		view.visibility = View.INVISIBLE
 	}
 
-	/**Login 페이지 Loading UI Visibility 설정*/
-	@JvmStatic
-	@BindingAdapter("setVisibilityLoadingUIInLogin")
-	fun setVisibilityLoadingUIInLogin(view: View, uiState: LoginUiState.UiState) {
-		if (uiState == LoginUiState.UiState.LOADING) {
-			view.visibility = View.VISIBLE
-			return
-		}
-		view.visibility = View.INVISIBLE
-	}
-
 	/**UserChatRoomListItem 시간 Text 세팅*/
 	@JvmStatic
 	@BindingAdapter("getFormattedDetailDateTimeText")

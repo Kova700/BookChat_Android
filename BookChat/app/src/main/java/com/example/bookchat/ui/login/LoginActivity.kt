@@ -2,6 +2,7 @@ package com.example.bookchat.ui.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -34,11 +35,23 @@ class LoginActivity : AppCompatActivity() {
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
 		binding.lifecycleOwner = this
 		binding.viewmodel = loginViewModel
+		observeUiState()
 		observeUiEvent()
+	}
+
+	private fun observeUiState() = lifecycleScope.launch {
+		loginViewModel.uiState.collect { uiState ->
+			setViewState(uiState)
+		}
 	}
 
 	private fun observeUiEvent() = lifecycleScope.launch {
 		loginViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun setViewState(uiState: LoginUiState) {
+		binding.progressbar.visibility =
+			if (uiState.uiState == LoginUiState.UiState.LOADING) View.VISIBLE else View.GONE
 	}
 
 	private fun startKakaoLogin() = lifecycleScope.launch {
