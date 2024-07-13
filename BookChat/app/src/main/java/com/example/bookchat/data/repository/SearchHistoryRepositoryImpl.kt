@@ -3,12 +3,11 @@ package com.example.bookchat.data.repository
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.example.bookchat.data.datastore.getDataFlow
 import com.example.bookchat.domain.repository.SearchHistoryRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -22,10 +21,9 @@ class SearchHistoryRepositoryImpl @Inject constructor(
 	private var cachedHistoryList = mutableListOf<String>()
 
 	override fun getSearchHistoryFlow(): Flow<List<String>> {
-		return dataStore.data
-			.catch { emit(emptyPreferences()) }
-			.map {
-				it[historyKey]?.let { historyString ->
+		return dataStore.getDataFlow(historyKey)
+			.map { historyString ->
+				historyString?.let {
 					gson.fromJson(historyString, Array<String>::class.java).toMutableList()
 				} ?: emptyList()
 			}.onEach { cachedHistoryList = it.toMutableList() }

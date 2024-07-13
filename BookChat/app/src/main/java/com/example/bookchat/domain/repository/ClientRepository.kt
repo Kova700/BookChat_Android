@@ -11,6 +11,8 @@ interface ClientRepository {
 
 	fun getClientFlow(): Flow<User>
 
+	suspend fun isSignedIn(): Boolean
+
 	suspend fun signIn(
 		approveChangingDevice: Boolean = false,
 	)

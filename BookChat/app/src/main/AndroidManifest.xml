@@ -6,8 +6,13 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"
+        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <supports-screens
         android:largeScreens="false"
@@ -65,8 +70,7 @@
         android:resizeableActivity="false"
         android:roundIcon="@mipmap/ic_bookchat_app_icon_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.BookChat"
-        tools:targetApi="n">
+        android:theme="@style/Theme.BookChat">
         <activity
             android:name=".ui.channel.channelsetting.authoritymanage.subhost.SubHostManageActivity"
             android:exported="false" />
@@ -201,12 +205,19 @@
         </activity>
 
         <service
-            android:name=".firebase.FCMService"
+            android:name=".fcm.FCMService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            tools:node="remove">
+        </provider>
+
     </application>
 
 </manifest>

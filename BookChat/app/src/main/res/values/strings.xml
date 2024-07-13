@@ -8,8 +8,10 @@
     <string name="error_else">일시적인 현상이거나 네트워크 문제일 수 있으니,\n잠시 후 다시 시도해 주세요.\n계속해서 문제가 발생하는 경우 문의를 부탁드립니다.</string>
 
     <!--permission-->
-    <string name="permission_denied">[사진 및 미디어]\n권한을 허용해주세요.</string>
-    <string name="permission_explained">[권한] - [파일 및 미디어]\n권한을 허용해주세요.</string>
+    <string name="gallery_permission_denied">[사진 및 동영상]\n권한을 허용해주세요.</string>
+    <string name="gallery_permission_explained">[권한] - [사진 및 동영상]\n권한을 허용해주세요.</string>
+    <string name="notification_permission_denied">[알림]\n권한을 허용해주세요.</string>
+    <string name="notification_permission_explained">[권한] - [알림]\n권한을 허용해주세요.</string>
 
     <!--login-->
     <string name="login_main_slogan">책으로 연결되는 우리\n이제부터 북챗으로 대화해요</string>
@@ -163,6 +165,9 @@
     <string name="uesr_edit_title">프로필 수정</string>
     <string name="duplicate_check">중복확인</string>
     <string name="submit_changed_profile">변경하기</string>
+    <string name="user_profile_picture_setting">프로필 사진 설정</string>
+    <string name="select_picture_from_gallery">앨범에서 사진 선택</string>
+    <string name="select_picture_default_image">기본 이미지 적용</string>
 
     <!--notice-->
     <!--app setting-->
@@ -180,13 +185,14 @@
     <string name="channel_un_pin_">채팅방 상단 고정 해제</string>
 
     <!--channel info-->
-    <string name="room_member_count">%1$d / %2$d 명</string>
+    <string name="current_room_member_count">%1$d / %2$d 명</string>
     <string name="channel_last_active_time">마지막 활성화 : %1$s</string>
     <string name="banned_channel">참여할 수 없는 채팅방</string>
     <string name="banned_channel_notice">참여 할 수 없는 채팅방입니다.\n관리자에 의해 내보내기 되었습니다.</string>
     <string name="full_channel_notice">대화 상대가 많아 참여할 수 없습니다.\n잠시 후 다시 시도해 주세요.</string>
 
     <!--channel-->
+    <string name="room_member_count">%1$d명</string>
     <string name="chat_room_send_message">메시지 보내기</string>
     <string name="enter">입장</string>
     <string name="last_read_chat_notice">여기까지 읽으셨습니다.</string>
@@ -212,6 +218,7 @@
     <string name="channel_scrap_selected_count_over">채팅 스크랩은 30개 까지만 가능합니다.</string>
     <string name="channel_scrap_success">채팅방 스크랩이 완료되었습니다.</string>
     <string name="channel_scrap_fail">채팅 캡처를 실패했습니다.</string>
+    <string name="new_message">새로운 메세지</string>
 
     <!--channel setting-->
     <string name="channel_setting_title">채팅방 설정</string>

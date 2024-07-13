@@ -24,6 +24,7 @@ import com.example.bookchat.domain.model.NicknameCheckState
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROPPED_PROFILE_BYTE_ARRAY
 import com.example.bookchat.ui.signup.selecttaste.SelectTasteActivity
+import com.example.bookchat.utils.image.loadByteArray
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.permissions.galleryPermissions
 import com.example.bookchat.utils.permissions.getPermissionsLauncher
@@ -42,10 +43,10 @@ class SignUpActivity : AppCompatActivity() {
 	private val permissionsLauncher = this.getPermissionsLauncher(
 		onSuccess = { moveToImageCrop() },
 		onDenied = {
-			makeToast(R.string.permission_denied)
+			makeToast(R.string.gallery_permission_denied)
 		},
 		onExplained = {
-			makeToast(R.string.permission_explained)
+			makeToast(R.string.gallery_permission_explained)
 			val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
 			val uri = Uri.fromParts(SCHEME_PACKAGE, packageName, null)
 			intent.data = uri
@@ -77,6 +78,13 @@ class SignUpActivity : AppCompatActivity() {
 	private fun setViewState(state: SignUpState) {
 		setNickNameEditTextState(state)
 		setSubmitBtnState(state)
+		setUserProfileImage(state)
+	}
+
+	private fun setUserProfileImage(state: SignUpState) {
+		binding.userProfileIv.loadByteArray(
+			byteArray = state.clientNewImage
+		)
 	}
 
 	private fun setNickNameEditTextState(state: SignUpState) {

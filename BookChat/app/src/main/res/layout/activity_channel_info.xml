@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="viewmodel"
             type="com.example.bookchat.ui.search.channelInfo.ChannelInfoViewModel" />
@@ -34,8 +35,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:layout_marginTop="25dp"
-            android:onClick="@{() -> viewmodel.onClickBackBtn()}"
             android:background="?android:selectableItemBackground"
+            android:onClick="@{() -> viewmodel.onClickBackBtn()}"
             android:src="@drawable/back_btn_white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -43,14 +44,14 @@
         <ScrollView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constrainedHeight="true"
             android:layout_marginTop="10dp"
+            app:layout_constrainedHeight="true"
             app:layout_constraintBottom_toTopOf="@+id/enter_channel_btn"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
             app:layout_constraintTop_toBottomOf="@+id/back_btn">
 
-    <!--TODO : 이전버전, 카톡 보면서 비교할점 찾고 수정할 점 수정하자. -->
+            <!--TODO : 이전버전, 카톡 보면서 비교할점 찾고 수정할 점 수정하자. -->
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -72,7 +73,6 @@
 
                     <ImageView
                         android:id="@+id/book_img"
-                        loadUrl="@{viewmodel.uiState.channel.bookCoverImageUrl}"
                         android:layout_width="@dimen/book_img_width_default"
                         android:layout_height="@dimen/book_img_height_default"
                         android:scaleType="fitXY"
@@ -127,13 +127,13 @@
 
                 <TextView
                     android:id="@+id/channel_tags_tv"
-                    android:text="@{viewmodel.uiState.channel.tagsString}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:elegantTextHeight="true"
                     android:ellipsize="end"
                     android:fontFamily="@font/notosanskr_regular"
+                    android:text="@{viewmodel.uiState.channel.tagsString}"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -152,8 +152,6 @@
 
                     <ImageView
                         android:id="@+id/host_profile_img_iv"
-                        userDefaultProfileImageType="@{viewmodel.uiState.channel.host.defaultProfileImageType}"
-                        userProfileUrl="@{viewmodel.uiState.channel.host.profileImageUrl}"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:background="#D9D9D9"
@@ -173,9 +171,9 @@
                     android:text="@{viewmodel.uiState.channel.host.nickname}"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
+                    app:layout_constraintBottom_toTopOf="@+id/channel_member_count"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintBottom_toTopOf="@+id/channel_member_count"
                     app:layout_constraintStart_toEndOf="@+id/host_profile_image_cv"
                     app:layout_constraintTop_toTopOf="@+id/host_profile_image_cv" />
 
@@ -188,8 +186,8 @@
                     android:fontFamily="@font/notosanskr_regular"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
-                    app:layout_constraintBottom_toBottomOf="@+id/host_profile_image_cv"
                     app:layout_constrainedWidth="true"
+                    app:layout_constraintBottom_toBottomOf="@+id/host_profile_image_cv"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toEndOf="@+id/host_profile_image_cv"
@@ -224,11 +222,11 @@
             android:elegantTextHeight="true"
             android:insetTop="0dp"
             android:insetBottom="0dp"
+            android:onClick="@{() -> viewmodel.onClickEnterBtn()}"
             android:stateListAnimator="@null"
             android:text="@string/enter"
             android:textColor="#FFFFFF"
             app:cornerRadius="10dp"
-            android:onClick="@{() -> viewmodel.onClickEnterBtn()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -248,8 +246,6 @@
 
         <ImageView
             android:id="@+id/channel_background_iv"
-            channelDefaultImageType="@{viewmodel.uiState.channel.defaultRoomImageType}"
-            imgUrl="@{viewmodel.uiState.channel.roomImageUri}"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="#B3272727"

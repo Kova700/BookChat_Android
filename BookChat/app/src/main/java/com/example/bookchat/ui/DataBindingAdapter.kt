@@ -1,7 +1,6 @@
 package com.example.bookchat.ui
 
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.util.Log
 import android.view.View
@@ -10,17 +9,15 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
 import androidx.drawerlayout.widget.DrawerLayout
-import com.bumptech.glide.Glide
 import com.example.bookchat.R
 import com.example.bookchat.data.*
 import com.example.bookchat.domain.model.AgonyFolderHexColor
-import com.example.bookchat.domain.model.ChannelDefaultImageType
 import com.example.bookchat.domain.model.NicknameCheckState
-import com.example.bookchat.domain.model.UserDefaultProfileType
 import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
 import com.example.bookchat.ui.login.LoginUiState
 import com.example.bookchat.utils.*
 import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.image.loadUrl
 import java.util.*
 
 object DataBindingAdapter {
@@ -36,83 +33,8 @@ object DataBindingAdapter {
 	@JvmStatic
 	@BindingAdapter("loadUrl")
 	fun loadUrl(imageView: ImageView, url: String?) {
-		if (url.isNullOrEmpty()) return
-
-		Glide.with(imageView.context)
-			.load(url)
-			.placeholder(R.drawable.loading_img)
-			.error(R.drawable.error_img)
-			.into(imageView)
+		imageView.loadUrl(url)
 	}
-
-	/**이미지뷰 이미지 설정(Bitmap)*/
-	@JvmStatic
-	@BindingAdapter("loadBitmap")
-	fun loadBitmap(imageView: ImageView, bitmap: Bitmap?) {
-		if (bitmap == null) return
-
-		Glide.with(imageView.context)
-			.load(bitmap)
-			.placeholder(R.drawable.loading_img)
-			.error(R.drawable.error_img)
-			.into(imageView)
-	}
-
-	/**이미지뷰 이미지 설정(ByteArray)*/
-	@JvmStatic
-	@BindingAdapter("loadByteArray")
-	fun loadByteArray(imageView: ImageView, byteArray: ByteArray?) {
-		if (byteArray == null || byteArray.isEmpty()) return
-		val key = byteArray.contentHashCode()
-		if (imageView.tag == key) return
-
-		imageView.tag = key
-		Glide.with(imageView.context)
-			.asBitmap()
-			.load(byteArray)
-			.placeholder(R.drawable.loading_img)
-			.error(R.drawable.error_img)
-			.into(imageView)
-	}
-
-	/**유저 프로필 이미지 출력*/
-	@JvmStatic
-	@BindingAdapter("userProfileUrl", "userDefaultProfileImageType", requireAll = false)
-	fun loadUserProfile(
-		imageView: ImageView,
-		userProfileUrl: String?,
-		userDefaultProfileType: UserDefaultProfileType?,
-	) {
-		if (!userProfileUrl?.trim().isNullOrBlank()) {
-			loadUrl(imageView, userProfileUrl)
-			return
-		}
-		inflateUserDefaultProfileImage(imageView, userDefaultProfileType)
-	}
-
-	private fun inflateUserDefaultProfileImage(
-		imageView: ImageView,
-		imageType: UserDefaultProfileType?,
-	) {
-		Glide.with(imageView.context)
-			.load(getUserDefaultProfileImage(imageType))
-			.fitCenter()
-			.placeholder(R.drawable.loading_img)
-			.error(R.drawable.error_img)
-			.into(imageView)
-	}
-
-	private fun getUserDefaultProfileImage(imageType: UserDefaultProfileType?) =
-		when (imageType) {
-			null,
-			UserDefaultProfileType.ONE,
-			-> R.drawable.default_profile_img1
-
-			UserDefaultProfileType.TWO -> R.drawable.default_profile_img2
-			UserDefaultProfileType.THREE -> R.drawable.default_profile_img3
-			UserDefaultProfileType.FOUR -> R.drawable.default_profile_img4
-			UserDefaultProfileType.FIVE -> R.drawable.default_profile_img5
-		}
 
 	@JvmStatic
 	@BindingAdapter("setUserNickname")
@@ -411,50 +333,7 @@ object DataBindingAdapter {
 	@BindingAdapter("getFormattedDetailDateTimeText")
 	fun getFormattedDetailDateTimeText(view: TextView, dateAndTimeString: String?) {
 		if (dateAndTimeString.isNullOrBlank()) return
-		view.text = DateManager.getFormattedDetailDateTimeText(dateAndTimeString)
-	}
-
-	/**UserChatRoomListItem 채팅방 이미지 세팅*/
-	@JvmStatic
-	@BindingAdapter("channelDefaultImageType", "imgUrl", requireAll = false)
-	fun setChannelImg(
-		view: ImageView,
-		channelDefaultImageType: ChannelDefaultImageType,
-		imgUrl: String?,
-	) {
-		if (imgUrl.isNullOrBlank()) {
-			setRandomChannelImg(view, channelDefaultImageType)
-			return
-		}
-		loadUrl(view, imgUrl)
-	}
-
-	/** MakeChatRoom 채팅방 생성 기본 이미지 세팅*/
-	@JvmStatic
-	@BindingAdapter("channelDefaultImageType", "loadChannelImageByteArray", requireAll = false)
-	fun setMakeChannelImg(
-		view: ImageView,
-		channelDefaultImageType: ChannelDefaultImageType,
-		imgByteArray: ByteArray?,
-	) {
-		if (imgByteArray == null) {
-			setRandomChannelImg(view, channelDefaultImageType)
-			return
-		}
-		loadByteArray(view, imgByteArray)
-	}
-
-	@JvmStatic
-	fun setRandomChannelImg(view: ImageView, channelDefaultImageType: ChannelDefaultImageType) {
-		when (channelDefaultImageType) {
-			ChannelDefaultImageType.ONE -> view.setImageResource(R.drawable.default_chat_room_img1)
-			ChannelDefaultImageType.TWO -> view.setImageResource(R.drawable.default_chat_room_img2)
-			ChannelDefaultImageType.THREE -> view.setImageResource(R.drawable.default_chat_room_img3)
-			ChannelDefaultImageType.FOUR -> view.setImageResource(R.drawable.default_chat_room_img4)
-			ChannelDefaultImageType.FIVE -> view.setImageResource(R.drawable.default_chat_room_img5)
-			ChannelDefaultImageType.SIX -> view.setImageResource(R.drawable.default_chat_room_img6)
-			ChannelDefaultImageType.SEVEN -> view.setImageResource(R.drawable.default_chat_room_img7)
-		}
+		view.text = getFormattedDetailDateTimeText(dateAndTimeString)
 	}
 
 	/**Shimmer Animation Start/Stop 설정*/

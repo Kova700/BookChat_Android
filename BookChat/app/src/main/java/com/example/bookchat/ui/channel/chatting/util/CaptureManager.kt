@@ -7,7 +7,7 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.ui.channel.chatting.adapter.ChatItemAdapter
 import com.example.bookchat.ui.channel.chatting.adapter.ChatItemViewHolder
-import com.example.bookchat.utils.bitmap.getMergedBitmap
+import com.example.bookchat.utils.image.bitmap.getMergedBitmap
 import com.example.bookchat.utils.image.saveImage
 
 fun RecyclerView.captureItems(

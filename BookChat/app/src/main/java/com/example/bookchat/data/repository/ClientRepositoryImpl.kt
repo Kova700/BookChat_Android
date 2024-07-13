@@ -54,6 +54,10 @@ class ClientRepositoryImpl @Inject constructor(
 		return client.asStateFlow().filterNotNull()
 	}
 
+	override suspend fun isSignedIn(): Boolean {
+		return bookChatTokenRepository.isBookChatTokenExist()
+	}
+
 	override suspend fun signIn(
 		approveChangingDevice: Boolean,
 	) {
@@ -110,6 +114,7 @@ class ClientRepositoryImpl @Inject constructor(
 		)
 	}
 
+	//TODO : userProfile = null로 보내면 null로 설정이 안됨 (서버 수정 대기중)
 	override suspend fun changeClientProfile(
 		newNickname: String,
 		userProfile: ByteArray?,

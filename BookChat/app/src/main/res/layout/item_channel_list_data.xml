@@ -24,8 +24,8 @@
             android:background="#FFFFFF"
             android:clickable="true"
             android:focusable="true"
-            android:paddingVertical="10dp"
             android:foreground="?android:attr/selectableItemBackgroundBorderless"
+            android:paddingVertical="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -58,8 +58,6 @@
 
                 <ImageView
                     android:id="@+id/channel_img_iv"
-                    channelDefaultImageType="@{channel.defaultRoomImageType}"
-                    imgUrl="@{channel.roomImageUri}"
                     android:layout_width="75dp"
                     android:layout_height="75dp"
                     android:scaleType="fitXY"

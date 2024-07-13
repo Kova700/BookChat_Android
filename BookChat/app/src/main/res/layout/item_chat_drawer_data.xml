@@ -45,8 +45,6 @@
 
             <ImageView
                 android:id="@+id/user_profile_iv"
-                userDefaultProfileImageType="@{userItem.defaultProfileImageType}"
-                userProfileUrl="@{userItem.profileImageUrl}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:scaleType="fitXY"

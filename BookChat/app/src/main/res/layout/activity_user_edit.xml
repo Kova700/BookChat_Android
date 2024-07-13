@@ -38,6 +38,16 @@
             android:orientation="vertical"
             app:layout_constraintGuide_end="30dp" />
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <com.example.bookchat.ui.customview.AntiDupClickImageButton
             android:id="@+id/back_btn"
             android:layout_width="wrap_content"
@@ -74,18 +84,6 @@
             app:layout_constraintStart_toStartOf="@id/guideline_start"
             app:layout_constraintTop_toBottomOf="@+id/mypage_title">
 
-            <!--
-            1. byteArray가 있으면 우선적으로 띄운다
-            2. 유저 정보 수정 API가 성공하면 byteArray = null 처리 한다.
-            3. 변경된 client의 프로필 이미지 url을 띄운다.
-            4. 수정된 client 객체에 이미지 url이 없다면 default 이미지를 띄운다.
-            -->
-            <!--
-                        loadByteArray="@{viewmodel.clientProfileImage}"
-                        userDefaultProfileImageType="@{viewmodel.uiState.client.defaultProfileImageType}"
-                        userProfileUrl="@{viewmodel.uiState.client.profileImageUrl}"
-            -->
-
             <ImageView
                 android:id="@+id/userProfile_iv"
                 android:layout_width="wrap_content"
@@ -95,12 +93,11 @@
         </androidx.cardview.widget.CardView>
 
         <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/imageButton2"
+            android:id="@+id/camera_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/getpicture_btn_back"
             android:elevation="3dp"
-            android:onClick="@{() -> viewmodel.onClickCameraBtn()}"
             app:layout_constraintBottom_toBottomOf="@+id/user_profile_cv"
             app:layout_constraintEnd_toEndOf="@+id/user_profile_cv"
             app:srcCompat="@drawable/ic_getpicture_btn" />

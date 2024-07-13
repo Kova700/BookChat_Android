@@ -16,8 +16,8 @@ import javax.inject.Inject
 class MyPageViewModel @Inject constructor(
 	private val clientRepository: ClientRepository,
 ) : ViewModel() {
-	private val _clientFlow = MutableStateFlow<User>(User.Default)
-	val clientFlow get() = _clientFlow.asStateFlow()
+	private val _uiState = MutableStateFlow<User>(User.Default)
+	val uiState get() = _uiState.asStateFlow()
 
 	private val _eventFlow = MutableSharedFlow<MyPageEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
@@ -27,7 +27,7 @@ class MyPageViewModel @Inject constructor(
 	}
 
 	private fun observeClientFlow() = viewModelScope.launch {
-		clientRepository.getClientFlow().collect { user -> _clientFlow.emit(user) }
+		clientRepository.getClientFlow().collect { user -> _uiState.emit(user) }
 	}
 
 	fun onClickUserEditBtn() {

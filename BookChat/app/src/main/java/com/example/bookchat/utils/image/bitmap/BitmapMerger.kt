@@ -1,4 +1,4 @@
-package com.example.bookchat.utils.bitmap
+package com.example.bookchat.utils.image.bitmap
 
 import android.graphics.Bitmap
 import android.graphics.Canvas

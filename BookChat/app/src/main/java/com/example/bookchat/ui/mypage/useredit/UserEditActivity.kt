@@ -20,9 +20,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityUserEditBinding
-import com.example.bookchat.ui.DataBindingAdapter
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROPPED_PROFILE_BYTE_ARRAY
+import com.example.bookchat.ui.mypage.useredit.dialog.UserProfileEditDialog
+import com.example.bookchat.utils.image.loadChangedUserProfile
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.permissions.galleryPermissions
 import com.example.bookchat.utils.permissions.getPermissionsLauncher
@@ -39,13 +40,13 @@ class UserEditActivity : AppCompatActivity() {
 
 	private val imm by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
-	private val permissionsLauncher = this.getPermissionsLauncher(
+	private val permissionsLauncher = getPermissionsLauncher(
 		onSuccess = { moveToImageCrop() },
 		onDenied = {
-			makeToast(R.string.permission_denied)
+			makeToast(R.string.gallery_permission_denied)
 		},
 		onExplained = {
-			makeToast(R.string.permission_explained)
+			makeToast(R.string.gallery_permission_explained)
 			val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
 			val uri = Uri.fromParts(SCHEME_PACKAGE, packageName, null)
 			intent.data = uri
@@ -59,9 +60,9 @@ class UserEditActivity : AppCompatActivity() {
 		binding.lifecycleOwner = this
 		binding.viewmodel = userEditViewModel
 		setFocus()
+		initViewState()
 		observeUiState()
 		observeUiEvent()
-		initNickNameEditText()
 	}
 
 	private fun observeUiState() = lifecycleScope.launch {
@@ -75,24 +76,23 @@ class UserEditActivity : AppCompatActivity() {
 	}
 
 	private fun setViewState(state: UserEditUiState) {
+		setLoadingViewState(state)
 		setNickNameEditTextState(state)
 		setSubmitBtnState(state)
 		setProfileImageViewState(state)
 	}
 
+	private fun setLoadingViewState(state: UserEditUiState) {
+		binding.progressBar.visibility =
+			if (state.uiState == UserEditUiState.UiState.LOADING) View.VISIBLE else View.GONE
+	}
+
 	private fun setProfileImageViewState(state: UserEditUiState) {
-		if (state.clientNewImage != null) {
-			DataBindingAdapter.loadByteArray(
-				imageView = binding.userProfileIv,
-				byteArray = state.clientNewImage
-			)
-		} else {
-			DataBindingAdapter.loadUserProfile(
-				imageView = binding.userProfileIv,
-				userProfileUrl = state.client.profileImageUrl,
-				userDefaultProfileType = state.client.defaultProfileImageType
-			)
-		}
+		binding.userProfileIv.loadChangedUserProfile(
+			imageUrl = state.client.profileImageUrl,
+			userDefaultProfileType = state.client.defaultProfileImageType,
+			byteArray = state.clientNewImage
+		)
 	}
 
 	private fun setNickNameEditTextState(state: UserEditUiState) {
@@ -104,10 +104,6 @@ class UserEditActivity : AppCompatActivity() {
 		}
 	}
 
-	//처음 버튼은 버튼 숨기고 상태가 변경되면(닉네임이 변경되거나, 사진이 등록되거나 == isExistsChange)
-	//버튼 노출 ("변경하기" 이든 "중복확인" 이든)
-	//프로필 변경 유무와 상관없이 닉네임이 변경되었다면 "중복확인" 노출 (중복 검사 API 호출해야함)
-	//닉네임이 변경되지 않았다면 "변경하기" 노출 (중복확인 API 호출하지 않아도 됨)
 	private fun setSubmitBtnState(state: UserEditUiState) {
 		with(binding.nicknameSubmitBtn) {
 			visibility = if (userEditViewModel.uiState.value.isExistsChange) View.VISIBLE else View.GONE
@@ -125,6 +121,11 @@ class UserEditActivity : AppCompatActivity() {
 			return@InputFilter ""
 		}
 		source
+	}
+
+	private fun initViewState() {
+		initNickNameEditText()
+		binding.cameraBtn.setOnClickListener { userEditViewModel.onClickCameraBtn() }
 	}
 
 	private val maxLengthFilter = InputFilter.LengthFilter(MAX_NICKNAME_LENGTH)
@@ -163,6 +164,18 @@ class UserEditActivity : AppCompatActivity() {
 		cropActivityResultLauncher.launch(intent)
 	}
 
+	private fun showUserProfileEditDialog() {
+		val existingFragment =
+			supportFragmentManager.findFragmentByTag(DIALOG_TAG_USER_PROFILE_EDIT)
+		if (existingFragment != null) return
+
+		val dialog = UserProfileEditDialog(
+			onSelectDefaultImage = { userEditViewModel.onSelectDefaultProfileImage() },
+			onSelectGallery = { userEditViewModel.onSelectGallery() }
+		)
+		dialog.show(supportFragmentManager, DIALOG_TAG_USER_PROFILE_EDIT)
+	}
+
 	private val cropActivityResultLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 			if (result.resultCode == RESULT_OK) {
@@ -176,9 +189,10 @@ class UserEditActivity : AppCompatActivity() {
 	private fun handleUiEvent(event: UserEditUiEvent) {
 		when (event) {
 			UserEditUiEvent.MoveToBack -> finish()
-			UserEditUiEvent.PermissionCheck -> startUserProfileEdit()
+			UserEditUiEvent.MoveToGallery -> startUserProfileEdit()
 			is UserEditUiEvent.ErrorEvent -> binding.root.showSnackBar(event.stringId)
 			is UserEditUiEvent.UnknownErrorEvent -> binding.root.showSnackBar(event.message)
+			UserEditUiEvent.ShowUserProfileEditDialog -> showUserProfileEditDialog()
 		}
 	}
 
@@ -188,6 +202,8 @@ class UserEditActivity : AppCompatActivity() {
 			"^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ\\u318D\\u119E\\u11A2\\u2022\\u2025a\\u00B7\\uFE55\\uFF1A]+$"
 		private const val MAX_NICKNAME_LENGTH = 20
 		private const val SCHEME_PACKAGE = "package"
+		private const val DIALOG_TAG_USER_PROFILE_EDIT = "DIALOG_TAG_USER_PROFILE_EDIT"
+
 	}
 
 }

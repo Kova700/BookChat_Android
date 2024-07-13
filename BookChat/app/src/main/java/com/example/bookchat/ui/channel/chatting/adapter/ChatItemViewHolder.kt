@@ -10,7 +10,8 @@ import com.example.bookchat.databinding.ItemChattingNoticeBinding
 import com.example.bookchat.databinding.ItemChattingOtherBinding
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
-import com.example.bookchat.utils.DateManager
+import com.example.bookchat.utils.getFormattedTimeText
+import com.example.bookchat.utils.image.loadUserProfile
 
 sealed class ChatItemViewHolder(
 	binding: ViewDataBinding,
@@ -67,7 +68,7 @@ class MyChatViewHolder(
 				if (item.status == ChatStatus.LOADING || item.status == ChatStatus.RETRY_REQUIRED)
 					View.VISIBLE else View.GONE
 			chatDispatchTimeTv.text =
-				if (item.dispatchTime.isNotBlank()) DateManager.getFormattedTimeText(item.dispatchTime)
+				if (item.dispatchTime.isNotBlank()) getFormattedTimeText(item.dispatchTime)
 				else ""
 			setCaptureViewState(
 				isCaptureMode = isCaptureMode,
@@ -119,8 +120,12 @@ class AnotherUserChatViewHolder(
 				rootLayout = binding.root
 			)
 			chatDispatchTimeTv.text =
-				if (item.dispatchTime.isNotBlank()) DateManager.getFormattedTimeText(item.dispatchTime)
+				if (item.dispatchTime.isNotBlank()) getFormattedTimeText(item.dispatchTime)
 				else ""
+			userProfileIv.loadUserProfile(
+				imageUrl = item.sender?.profileImageUrl,
+				userDefaultProfileType = item.sender?.defaultProfileImageType
+			)
 			userProfileIv.isClickable = isCaptureMode.not()
 			executePendingBindings()
 		}

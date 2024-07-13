@@ -61,8 +61,6 @@
 
                     <ImageView
                         android:id="@+id/user_profile_iv"
-                        userDefaultProfileImageType="@{viewmodel.uiState.newChatNotice.sender.defaultProfileImageType}"
-                        userProfileUrl="@{viewmodel.uiState.newChatNotice.sender.profileImageUrl}"
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:scaleType="fitXY"

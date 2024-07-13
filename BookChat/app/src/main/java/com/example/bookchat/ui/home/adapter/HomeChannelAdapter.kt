@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemHomeChannelItemBinding
 import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.utils.image.loadChannelProfile
 import javax.inject.Inject
 
 class HomeChannelAdapter @Inject constructor() :
@@ -41,7 +42,7 @@ class HomeChannelAdapter @Inject constructor() :
 
 class HomeChannelItemViewHolder(
 	private val binding: ItemHomeChannelItemBinding,
-	private val onItemClick: ((Int) -> Unit)?
+	private val onItemClick: ((Int) -> Unit)?,
 ) : RecyclerView.ViewHolder(binding.root) {
 
 	init {
@@ -51,13 +52,19 @@ class HomeChannelItemViewHolder(
 	}
 
 	fun bind(channel: Channel) {
-		binding.channel = channel
-		binding.uncheckedChatCountTv.text = if (channel.isExistNewChat) "New+" else ""
-		binding.muteChannelIcon.visibility =
-			if ((channel.notificationFlag.not()) && channel.isAvailableChannel) View.VISIBLE else View.GONE
-		binding.topPinChannelIcon.visibility =
-			if ((channel.isTopPined) && channel.isAvailableChannel) View.VISIBLE else View.GONE
-		binding.unavailableChannelStateGroup.visibility =
-			if (channel.isAvailableChannel.not()) View.VISIBLE else View.GONE
+		with(binding) {
+			binding.channel = channel
+			uncheckedChatCountTv.text = if (channel.isExistNewChat) "New+" else ""
+			muteChannelIcon.visibility =
+				if ((channel.notificationFlag.not()) && channel.isAvailableChannel) View.VISIBLE else View.GONE
+			topPinChannelIcon.visibility =
+				if ((channel.isTopPined) && channel.isAvailableChannel) View.VISIBLE else View.GONE
+			unavailableChannelStateGroup.visibility =
+				if (channel.isAvailableChannel.not()) View.VISIBLE else View.GONE
+			channelImageIv.loadChannelProfile(
+				imageUrl = channel.roomImageUri,
+				channelDefaultImageType = channel.defaultRoomImageType
+			)
+		}
 	}
 }

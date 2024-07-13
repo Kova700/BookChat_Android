@@ -44,11 +44,9 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.80" />
 
-            <!--매우 작은 padding울 추가해야지 캡처 시 검은 배경이 사라지는 이슈가 있어서 추가-->
+            <!--매우 작은 padding 이라도 추가해야지 캡처 시 검은 배경이 사라지는 이슈가 있어서 추가-->
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/user_profile_iv"
-                userDefaultProfileImageType="@{chat.sender.defaultProfileImageType}"
-                userProfileUrl="@{chat.sender.profileImageUrl}"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
                 android:scaleType="fitXY"

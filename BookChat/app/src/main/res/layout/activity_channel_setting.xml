@@ -64,7 +64,7 @@
             app:layout_constraintTop_toTopOf="@+id/guideline_top" />
 
         <TextView
-            android:id="@+id/apply_channel_change"
+            android:id="@+id/apply_channel_change_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?android:selectableItemBackgroundBorderless"
@@ -91,9 +91,7 @@
             app:layout_constraintTop_toBottomOf="@+id/channel_setting_title">
 
             <ImageView
-                android:id="@+id/channel_img_iv_iv"
-                channelDefaultImageType="@{viewmodel.uiState.channel.defaultRoomImageType}"
-                loadChannelImageByteArray="@{viewmodel.uiState.newProfileImage}"
+                android:id="@+id/channel_img_iv"
                 android:layout_width="@dimen/make_chat_room_img_width_default"
                 android:layout_height="@dimen/make_chat_room_img_height_default"
                 android:scaleType="fitXY"

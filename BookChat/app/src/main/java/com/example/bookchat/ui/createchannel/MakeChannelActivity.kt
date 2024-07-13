@@ -19,6 +19,7 @@ import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_C
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
 import com.example.bookchat.utils.MakeChannelImgSizeManager
+import com.example.bookchat.utils.image.loadChangedChannelProfile
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.permissions.galleryPermissions
 import com.example.bookchat.utils.permissions.getPermissionsLauncher
@@ -40,10 +41,10 @@ class MakeChannelActivity : AppCompatActivity() {
 	private val permissionsLauncher = this.getPermissionsLauncher(
 		onSuccess = { moveToImageCrop() },
 		onDenied = {
-			makeToast(R.string.permission_denied)
+			makeToast(R.string.gallery_permission_denied)
 		},
 		onExplained = {
-			makeToast(R.string.permission_explained)
+			makeToast(R.string.gallery_permission_explained)
 			val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
 			val uri = Uri.fromParts(SCHEME_PACKAGE, packageName, null)
 			intent.data = uri
@@ -94,9 +95,18 @@ class MakeChannelActivity : AppCompatActivity() {
 	}
 
 	private fun setViewState(uiState: MakeChannelUiState) {
+		setChannelImage(uiState)
 		setSubmitTextState(uiState)
 		setChannelTitleEditTextState(uiState)
 		setChannelTagEditTextState(uiState)
+	}
+
+	private fun setChannelImage(uiState: MakeChannelUiState) {
+		binding.channelImg.loadChangedChannelProfile(
+			imageUrl = null,
+			channelDefaultImageType = uiState.defaultProfileImageType,
+			byteArray = uiState.channelProfileImage,
+		)
 	}
 
 	private fun setChannelTitleEditTextState(uiState: MakeChannelUiState) {

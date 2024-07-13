@@ -19,6 +19,7 @@ import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.domain.usecase.GetChatsFlowUseCase
 import com.example.bookchat.domain.usecase.SyncChannelChatsUseCase
+import com.example.bookchat.notification.NotificationHandler
 import com.example.bookchat.ui.channel.chatting.ChannelUiState.LoadState
 import com.example.bookchat.ui.channel.chatting.ChannelUiState.UiState
 import com.example.bookchat.ui.channel.chatting.mapper.toChatItems
@@ -33,6 +34,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -57,6 +59,7 @@ class ChannelViewModel @Inject constructor(
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
 	private val networkManager: NetworkManager,
+	private val chatNotificationHandler: NotificationHandler,
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
 
@@ -121,16 +124,18 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun observeChannel() = viewModelScope.launch {
-		channelRepository.getChannelFlow(channelId).collect { channel ->
-			if (channel.isAvailableChannel.not()) disconnectSocket()
-			handleChannelNewChat(channel)
-			updateState {
-				copy(
-					channel = channel,
-					drawerItems = channel.toDrawerItems(client)
-				)
+		channelRepository.getChannelFlow(channelId)
+			.onEach { chatNotificationHandler.dismissChannelNotifications(it) }
+			.collect { channel ->
+				if (channel.isAvailableChannel.not()) disconnectSocket()
+				handleChannelNewChat(channel)
+				updateState {
+					copy(
+						channel = channel,
+						drawerItems = channel.toDrawerItems(client)
+					)
+				}
 			}
-		}
 	}
 
 	private fun handleChannelNewChat(channel: Channel) {
