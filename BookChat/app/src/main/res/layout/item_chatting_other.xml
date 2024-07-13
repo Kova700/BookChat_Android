@@ -49,13 +49,13 @@
                 android:id="@+id/user_profile_iv"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:scaleType="fitXY"
-                android:padding="0.1dp"
                 android:layout_marginStart="20dp"
-                app:shapeAppearanceOverlay="@style/UserProfileImageRoundedCorners"
+                android:padding="0.1dp"
+                android:scaleType="fitXY"
                 android:src="@drawable/loading_img"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearanceOverlay="@style/UserProfileImageRoundedCorners" />
 
             <ImageView
                 android:id="@+id/host_crown"
@@ -77,7 +77,6 @@
 
             <TextView
                 android:id="@+id/uesr_nickname_tv"
-                setUserNickname="@{chat.sender.nickname}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"

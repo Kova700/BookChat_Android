@@ -30,16 +30,6 @@ object DataBindingAdapter {
 		imageView.loadUrl(url)
 	}
 
-	@JvmStatic
-	@BindingAdapter("setUserNickname")
-	fun setUserNickname(textview: TextView, nickname: String?) {
-		if (nickname.isNullOrBlank()) {
-			textview.text = "(알 수 없음)"
-			return
-		}
-		textview.text = nickname
-	}
-
 	/**회원가입 :닉네임 검사 상황별 안내문구*/
 	//텍스트 (색 , 글자)
 	@JvmStatic

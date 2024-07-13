@@ -24,5 +24,6 @@ class MemberItemViewHolder(
 			imageUrl = item.profileImageUrl,
 			userDefaultProfileType = item.defaultProfileImageType
 		)
+		binding.uesrNicknameTv.text = item.nickname.ifBlank { "(알 수 없음)" }
 	}
 }
