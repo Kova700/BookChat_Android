@@ -8,6 +8,7 @@ import com.example.bookchat.databinding.ItemChannelListDataBinding
 import com.example.bookchat.databinding.ItemChannelListHeaderBinding
 import com.example.bookchat.ui.channelList.ChannelListIItemSwipeHelper.Companion.CHANNEL_LIST_ITEM_SWIPE_VIEW_PERCENT
 import com.example.bookchat.ui.channelList.model.ChannelListItem
+import com.example.bookchat.utils.getFormattedDetailDateTimeText
 import com.example.bookchat.utils.image.loadChannelProfile
 
 sealed class ChannelListItemViewHolder(
@@ -63,6 +64,7 @@ class ChannelListDataViewHolder(
 		val item = (channelListItem as ChannelListItem.ChannelItem)
 		with(binding) {
 			channel = item
+			dispatchTimeTv.text = item.lastChat?.dispatchTime?.let { getFormattedDetailDateTimeText(it) }
 			uncheckedChatCountTv.text = if (item.isExistNewChat) "New+" else ""
 			muteChannelIcon.visibility =
 				if ((item.notificationFlag.not()) && item.isAvailableChannel) View.VISIBLE else View.GONE

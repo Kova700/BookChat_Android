@@ -223,12 +223,4 @@ object DataBindingAdapter {
 		}
 	}
 
-	/**UserChatRoomListItem 시간 Text 세팅*/
-	@JvmStatic
-	@BindingAdapter("getFormattedDetailDateTimeText")
-	fun getFormattedDetailDateTimeText(view: TextView, dateAndTimeString: String?) {
-		if (dateAndTimeString.isNullOrBlank()) return
-		view.text = getFormattedDetailDateTimeText(dateAndTimeString)
-	}
-
 }
