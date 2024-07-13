@@ -333,7 +333,7 @@ object DataBindingAdapter {
 	@BindingAdapter("getFormattedDetailDateTimeText")
 	fun getFormattedDetailDateTimeText(view: TextView, dateAndTimeString: String?) {
 		if (dateAndTimeString.isNullOrBlank()) return
-		view.text = DateManager.getFormattedDetailDateTimeText(dateAndTimeString)
+		view.text = getFormattedDetailDateTimeText(dateAndTimeString)
 	}
 
 	/**Shimmer Animation Start/Stop 설정*/

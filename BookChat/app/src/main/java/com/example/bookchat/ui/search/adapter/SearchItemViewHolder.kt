@@ -12,7 +12,7 @@ import com.example.bookchat.databinding.ItemSearchChannelEmptyBinding
 import com.example.bookchat.databinding.ItemSearchChannelHeaderBinding
 import com.example.bookchat.ui.search.model.SearchResultItem
 import com.example.bookchat.utils.BookImgSizeManager
-import com.example.bookchat.utils.DateManager
+import com.example.bookchat.utils.getFormattedAbstractDateTimeText
 import com.example.bookchat.utils.image.loadChannelProfile
 
 sealed class SearchItemViewHolder(
@@ -103,7 +103,7 @@ class ChannelItemViewHolder(
 		binding.channel = item
 		item.lastChat?.let {
 			binding.lastChatDispatchTimeTv.text =
-				DateManager.getFormattedAbstractDateTimeText(it.dispatchTime)
+				getFormattedAbstractDateTimeText(it.dispatchTime)
 		}
 		binding.channelImageIv.loadChannelProfile(
 			imageUrl = item.roomImageUri,

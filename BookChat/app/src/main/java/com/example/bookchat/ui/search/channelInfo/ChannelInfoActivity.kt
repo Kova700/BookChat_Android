@@ -14,7 +14,7 @@ import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_C
 import com.example.bookchat.ui.search.channelInfo.dialog.BannedChannelNoticeDialog
 import com.example.bookchat.ui.search.channelInfo.dialog.FullChannelNoticeDialog
 import com.example.bookchat.utils.BookImgSizeManager
-import com.example.bookchat.utils.DateManager
+import com.example.bookchat.utils.getFormattedAbstractDateTimeText
 import com.example.bookchat.utils.image.loadChannelProfile
 import com.example.bookchat.utils.image.loadUrl
 import com.example.bookchat.utils.image.loadUserProfile
@@ -92,7 +92,7 @@ class ChannelInfoActivity : AppCompatActivity() {
 			binding.channelLastActiveTv.text =
 				getString(
 					R.string.channel_last_active_time,
-					DateManager.getFormattedAbstractDateTimeText(it.dispatchTime)
+					getFormattedAbstractDateTimeText(it.dispatchTime)
 				)
 		}
 	}

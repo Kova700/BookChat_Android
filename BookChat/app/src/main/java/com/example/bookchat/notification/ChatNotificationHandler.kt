@@ -21,7 +21,7 @@ import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
 import com.example.bookchat.ui.mapper.getBitmap
-import com.example.bookchat.utils.DateManager
+import com.example.bookchat.utils.stringToDate
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Date
 import javax.inject.Inject
@@ -190,7 +190,7 @@ class ChatNotificationHandler @Inject constructor(
 		NotificationCompat.MessagingStyle.Message(message, timestamp, sender?.toPerson())
 
 	private val Chat.timestamp: Long
-		get() = (DateManager.stringToDate(dispatchTime) ?: Date()).time
+		get() = (stringToDate(dispatchTime) ?: Date()).time
 
 	private suspend fun User.toPerson(): Person {
 		val icon = iconBuilder.buildIcon(

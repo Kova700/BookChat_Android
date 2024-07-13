@@ -6,7 +6,8 @@ import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
-import com.example.bookchat.utils.DateManager
+import com.example.bookchat.utils.getDateKoreanString
+import com.example.bookchat.utils.isSameDate
 
 fun List<Chat>.toChatItems(
 	channel: Channel?,
@@ -102,7 +103,7 @@ fun List<Chat>.toChatItems(
 		if (chat.status != ChatStatus.SUCCESS) continue
 
 		if (i == lastIndex) {
-			val date = DateManager.getDateKoreanString(chat.dispatchTime)
+			val date = getDateKoreanString(chat.dispatchTime)
 			val isCaptureBottom = captureBottomItemId == date.hashCode().toLong()
 			val isCaptureHeader = captureHeaderItemId == date.hashCode().toLong()
 			isFindCaptureBottom = isFindCaptureBottom || isCaptureBottom
@@ -121,12 +122,12 @@ fun List<Chat>.toChatItems(
 			continue
 		}
 
-		val isSameDate = DateManager.isSameDate(
+		val isSameDate = isSameDate(
 			dateTimeString = chat.dispatchTime,
 			other = this[i + 1].dispatchTime
 		)
 		if (isSameDate.not()) {
-			val date = DateManager.getDateKoreanString(chat.dispatchTime)
+			val date = getDateKoreanString(chat.dispatchTime)
 			val isCaptureBottom = captureBottomItemId == date.hashCode().toLong()
 			val isCaptureHeader = captureHeaderItemId == date.hashCode().toLong()
 			isFindCaptureBottom = isFindCaptureBottom || isCaptureBottom

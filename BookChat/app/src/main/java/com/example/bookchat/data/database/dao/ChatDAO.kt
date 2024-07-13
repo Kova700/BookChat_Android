@@ -11,7 +11,7 @@ import com.example.bookchat.data.database.model.combined.ChatWithUser
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.domain.model.SUCCESS_CHAT_STATUS_CODE
-import com.example.bookchat.utils.DateManager
+import com.example.bookchat.utils.getCurrentDateTimeString
 
 @Dao
 interface ChatDAO {
@@ -69,7 +69,7 @@ interface ChatDAO {
 			chatId = getMaxWaitingChatId()?.plus(1) ?: WAITING_CHAT_MIN_ID,
 			chatRoomId = channelId,
 			senderId = clientId,
-			dispatchTime = DateManager.getCurrentDateTimeString(),
+			dispatchTime = getCurrentDateTimeString(),
 			status = chatStatus.code,
 			message = message,
 			chatType = ChatType.Mine,
