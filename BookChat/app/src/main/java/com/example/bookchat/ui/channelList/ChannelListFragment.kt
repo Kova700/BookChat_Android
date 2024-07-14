@@ -49,7 +49,7 @@ class ChannelListFragment : Fragment() {
 		_binding = DataBindingUtil.inflate(
 			inflater, R.layout.fragment_channel_list, container, false
 		)
-		binding.lifecycleOwner = this.viewLifecycleOwner
+		binding.lifecycleOwner = viewLifecycleOwner
 		binding.viewmodel = channelListViewModel
 		return binding.root
 	}
@@ -58,6 +58,7 @@ class ChannelListFragment : Fragment() {
 		super.onViewCreated(view, savedInstanceState)
 		initAdapter()
 		initRecyclerView()
+		initViewState()
 		observeUiEvent()
 		observeUiState()
 	}
@@ -65,6 +66,11 @@ class ChannelListFragment : Fragment() {
 	override fun onDestroyView() {
 		super.onDestroyView()
 		_binding = null
+	}
+
+	private fun initViewState() {
+		binding.channelAddBtn.setOnClickListener { channelListViewModel.onClickPlusBtn() }
+		binding.emptyChannelAddBtn.setOnClickListener { channelListViewModel.onClickPlusBtn() }
 	}
 
 	private fun observeUiEvent() = viewLifecycleOwner.lifecycleScope.launch {
@@ -80,6 +86,14 @@ class ChannelListFragment : Fragment() {
 
 	private fun setViewState(uiState: ChannelListUiState) {
 		setNetworkStateBarUiState(uiState)
+		emptyChatRoomLayoutState(uiState)
+	}
+
+	private fun emptyChatRoomLayoutState(uiState: ChannelListUiState) {
+		binding.emptyChannelLayout.visibility =
+			if (uiState.channelListItem.isEmpty()) View.VISIBLE else View.GONE
+		binding.channelListRcv.visibility =
+			if (uiState.channelListItem.isNotEmpty()) View.VISIBLE else View.GONE
 	}
 
 	private fun setNetworkStateBarUiState(uiState: ChannelListUiState) {
@@ -130,7 +144,7 @@ class ChannelListFragment : Fragment() {
 			}
 		}
 
-		with(binding.chatRcv) {
+		with(binding.channelListRcv) {
 			adapter = channelListAdapter
 			setHasFixedSize(true)
 			layoutManager = linearLayoutManager
