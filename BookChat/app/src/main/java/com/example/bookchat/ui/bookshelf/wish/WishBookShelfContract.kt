@@ -7,6 +7,8 @@ data class WishBookShelfUiState(
 	val uiState: UiState,
 	val wishItems: List<WishBookShelfItem>,
 ) {
+	val isEmptyWishData: Boolean
+		get() = wishItems.filterIsInstance<WishBookShelfItem.Item>().isEmpty()
 
 	enum class UiState {
 		SUCCESS,
@@ -26,11 +28,11 @@ data class WishBookShelfUiState(
 sealed class WishBookShelfEvent {
 
 	data class MoveToWishBookDialog(
-		val item: BookShelfListItem
+		val item: BookShelfListItem,
 	) : WishBookShelfEvent()
 
 	data class ChangeBookShelfTab(
-		val targetState: BookShelfState
+		val targetState: BookShelfState,
 	) : WishBookShelfEvent()
 
 }

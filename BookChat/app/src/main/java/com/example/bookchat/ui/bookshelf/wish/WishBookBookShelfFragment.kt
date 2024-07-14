@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentWishBookshelfBinding
 import com.example.bookchat.domain.model.BookShelfState
+import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.bookshelf.BookShelfViewModel
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.bookshelf.wish.adapter.WishBookShelfAdapter
@@ -40,8 +41,8 @@ class WishBookBookShelfFragment : Fragment() {
 
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
-		savedInstanceState: Bundle?
-	): View? {
+		savedInstanceState: Bundle?,
+	): View {
 		_binding =
 			DataBindingUtil.inflate(inflater, R.layout.fragment_wish_bookshelf, container, false)
 		binding.lifecycleOwner = this.viewLifecycleOwner
@@ -53,6 +54,7 @@ class WishBookBookShelfFragment : Fragment() {
 		super.onViewCreated(view, savedInstanceState)
 		initAdapter()
 		initRecyclerView()
+		initViewState()
 		observeUiEvent()
 		observeUiState()
 	}
@@ -66,12 +68,24 @@ class WishBookBookShelfFragment : Fragment() {
 		wishBookShelfViewModel.eventFlow.collect(::handleEvent)
 	}
 
-	//TODO : List Empty UI 연결
-	//TODO : swipeRefreshLayoutComplete API 연결
 	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
 		wishBookShelfViewModel.uiState.collect { uiState ->
+			setViewState(uiState)
 			wishBookShelfAdapter.submitList(uiState.wishItems)
 		}
+	}
+
+	private fun initViewState() {
+		binding.bookshelfEmptyLayout.addBookBtn.setOnClickListener {
+			(requireActivity() as MainActivity).navigateToSearchFragment()
+		}
+	}
+
+	private fun setViewState(uiState: WishBookShelfUiState) {
+		binding.bookshelfEmptyLayout.root.visibility =
+			if (uiState.isEmptyWishData) View.VISIBLE else View.GONE
+		binding.bookshelfWishRcv.visibility =
+			if (uiState.isEmptyWishData.not()) View.VISIBLE else View.GONE
 	}
 
 	private fun initAdapter() {
@@ -98,7 +112,7 @@ class WishBookBookShelfFragment : Fragment() {
 				)
 			}
 		}
-		with(binding.wishBookRcv) {
+		with(binding.bookshelfWishRcv) {
 			adapter = wishBookShelfAdapter
 			layoutManager = flexboxLayoutManager
 			addOnScrollListener(rcvScrollListener)
