@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentHomeBinding
 import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.channel.chatting.ChannelActivity
 import com.example.bookchat.ui.channelList.ChannelListFragment
@@ -24,7 +25,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 //TODO : 독서중 도서 API 요청 후 로컬 DB 저장 (API 스펙에 BOOKID가 추가되어야함)
-//TODO : 클라이언트 정보 Flow로 받기 (수정시 바로 반영)
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 
@@ -44,7 +44,7 @@ class HomeFragment : Fragment() {
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
+		savedInstanceState: Bundle?,
 	): View {
 		_binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
 		binding.lifecycleOwner = this.viewLifecycleOwner
@@ -122,8 +122,8 @@ class HomeFragment : Fragment() {
 		}
 	}
 
-	private fun moveToReadingBookShelf(bookShelfListItemId: Long) {
-		//TODO : ReadingBookShelfFragment로 Fragment 전환
+	private fun moveToReadingBookShelf() {
+		(requireActivity() as MainActivity).navigateToBookShelfFragment()
 	}
 
 	private fun moveToChannel(channelId: Long) {
@@ -135,7 +135,7 @@ class HomeFragment : Fragment() {
 	private fun handleEvent(event: HomeUiEvent) {
 		when (event) {
 			is HomeUiEvent.MoveToChannel -> moveToChannel(event.channelId)
-			is HomeUiEvent.MoveToReadingBookShelf -> moveToReadingBookShelf(event.bookShelfListItemId)
+			is HomeUiEvent.MoveToReadingBookShelf -> moveToReadingBookShelf()
 		}
 	}
 

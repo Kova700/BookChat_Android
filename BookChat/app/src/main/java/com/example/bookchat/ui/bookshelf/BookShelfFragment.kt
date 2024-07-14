@@ -47,7 +47,7 @@ class BookShelfFragment : Fragment() {
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		initTapLayout()
-		inflateFirstTab(1)
+		inflateFirstTab()
 		observeEvent()
 	}
 
@@ -56,7 +56,8 @@ class BookShelfFragment : Fragment() {
 		_binding = null
 	}
 
-	private fun inflateFirstTab(tabIndex: Int) {
+	private fun inflateFirstTab() {
+		val tabIndex = BookShelfState.READING.getTabIndex()
 		binding.viewPager.setCurrentItem(tabIndex, false)
 	}
 
@@ -71,14 +72,14 @@ class BookShelfFragment : Fragment() {
 	}
 
 	private fun changeTab(targetState: BookShelfState) {
-		binding.viewPager.currentItem = convertStateToTabIndex(targetState)
+		binding.viewPager.currentItem = targetState.getTabIndex()
 	}
 
-	private fun convertStateToTabIndex(targetState: BookShelfState): Int {
-		return when (targetState) {
-			BookShelfState.WISH -> WISH_TAB_INDEX
-			BookShelfState.READING -> READING_TAB_INDEX
-			BookShelfState.COMPLETE -> COMPLETE_TAB_INDEX
+	private fun BookShelfState.getTabIndex(): Int {
+		return when (this) {
+			BookShelfState.WISH -> fragments.indexOfFirst { it is WishBookBookShelfFragment }
+			BookShelfState.READING -> fragments.indexOfFirst { it is ReadingBookShelfFragment }
+			BookShelfState.COMPLETE -> fragments.indexOfFirst { it is CompleteBookShelfFragment }
 		}
 	}
 
@@ -87,9 +88,6 @@ class BookShelfFragment : Fragment() {
 	}
 
 	companion object {
-		private const val WISH_TAB_INDEX = 0
-		private const val READING_TAB_INDEX = 1
-		private const val COMPLETE_TAB_INDEX = 2
 		private val bookShelfTapNameList =
 			listOf(R.string.wish_book, R.string.reading_book, R.string.complete_book)
 	}

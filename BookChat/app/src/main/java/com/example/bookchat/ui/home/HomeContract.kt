@@ -31,5 +31,5 @@ data class HomeUiState(
 
 sealed class HomeUiEvent {
 	data class MoveToChannel(val channelId: Long) : HomeUiEvent()
-	data class MoveToReadingBookShelf(val bookShelfListItemId: Long) : HomeUiEvent()
+	object MoveToReadingBookShelf : HomeUiEvent()
 }

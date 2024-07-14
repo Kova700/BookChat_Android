@@ -77,7 +77,7 @@ class HomeViewModel @Inject constructor(
 	}
 
 	fun onBookItemClick(bookShelfListItemId: Long) {
-		startEvent(HomeUiEvent.MoveToReadingBookShelf(bookShelfListItemId))
+		startEvent(HomeUiEvent.MoveToReadingBookShelf)
 	}
 
 	fun onChannelItemClick(channelId: Long) {
