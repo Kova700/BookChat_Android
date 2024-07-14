@@ -132,9 +132,21 @@
                 android:layout_height="wrap_content"
                 android:background="?android:selectableItemBackgroundBorderless"
                 android:padding="5dp"
+                android:layout_marginEnd="10dp"
                 android:src="@drawable/ic_plus_btn_black"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/guideline_end" />
+                app:layout_constraintEnd_toStartOf="@+id/channel_search_btn" />
+
+            <com.example.bookchat.ui.customview.AntiDupClickImageButton
+                android:id="@+id/channel_search_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:background="?android:selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_search_btn"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView

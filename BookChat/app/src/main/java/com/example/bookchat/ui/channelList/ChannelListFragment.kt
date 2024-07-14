@@ -17,6 +17,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentChannelListBinding
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.NetworkState
+import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.channel.chatting.ChannelActivity
 import com.example.bookchat.ui.channel.drawer.dialog.ChannelExitWarningDialog
 import com.example.bookchat.ui.channelList.adpater.ChannelListAdapter
@@ -68,11 +69,6 @@ class ChannelListFragment : Fragment() {
 		_binding = null
 	}
 
-	private fun initViewState() {
-		binding.channelAddBtn.setOnClickListener { channelListViewModel.onClickPlusBtn() }
-		binding.emptyChannelAddBtn.setOnClickListener { channelListViewModel.onClickPlusBtn() }
-	}
-
 	private fun observeUiEvent() = viewLifecycleOwner.lifecycleScope.launch {
 		channelListViewModel.eventFlow.collect { event -> handleEvent(event) }
 	}
@@ -82,6 +78,16 @@ class ChannelListFragment : Fragment() {
 			channelListAdapter.submitList(uiState.channelListItem)
 			setViewState(uiState)
 		}
+	}
+
+	private fun initViewState() {
+		binding.channelAddBtn.setOnClickListener { channelListViewModel.onClickPlusBtn() }
+		binding.emptyChannelAddBtn.setOnClickListener { channelListViewModel.onClickPlusBtn() }
+		binding.channelSearchBtn.setOnClickListener { moveBottomNavToSearch() }
+	}
+
+	private fun moveBottomNavToSearch() {
+		(requireActivity() as MainActivity).navigateToSearchFragment()
 	}
 
 	private fun setViewState(uiState: ChannelListUiState) {
