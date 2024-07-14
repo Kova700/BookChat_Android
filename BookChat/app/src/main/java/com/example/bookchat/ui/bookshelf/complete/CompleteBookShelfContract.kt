@@ -6,8 +6,11 @@ import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 data class CompleteBookShelfUiState(
 	val uiState: UiState,
 	val completeItems: List<CompleteBookShelfItem>,
-	val totalItemCount: Int, //서버에 저장된 총 아이템 개수
+	val totalItemCount: Int,
 ) {
+
+	val isEmptyReadingData: Boolean
+		get() = completeItems.filterIsInstance<CompleteBookShelfItem.Item>().isEmpty()
 
 	enum class UiState {
 		SUCCESS,
@@ -27,11 +30,11 @@ data class CompleteBookShelfUiState(
 
 sealed class CompleteBookShelfEvent {
 	data class MoveToCompleteBookDialog(
-		val bookShelfListItem: BookShelfListItem
+		val bookShelfListItem: BookShelfListItem,
 	) : CompleteBookShelfEvent()
 
 	data class MakeToast(
-		val stringId: Int
+		val stringId: Int,
 	) : CompleteBookShelfEvent()
 }
 

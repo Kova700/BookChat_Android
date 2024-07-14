@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentCompleteBookshelfBinding
+import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.bookshelf.complete.adapter.CompleteBookShelfDataAdapter
 import com.example.bookchat.ui.bookshelf.complete.dialog.CompleteBookDialog
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
@@ -34,8 +35,8 @@ class CompleteBookShelfFragment : Fragment() {
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
-	): View? {
+		savedInstanceState: Bundle?,
+	): View {
 		_binding =
 			DataBindingUtil.inflate(inflater, R.layout.fragment_complete_bookshelf, container, false)
 		binding.lifecycleOwner = this.viewLifecycleOwner
@@ -47,6 +48,7 @@ class CompleteBookShelfFragment : Fragment() {
 		super.onViewCreated(view, savedInstanceState)
 		initAdapter()
 		initRecyclerView()
+		initViewState()
 		observeUiEvent()
 		observeUiState()
 	}
@@ -56,16 +58,28 @@ class CompleteBookShelfFragment : Fragment() {
 		_binding = null
 	}
 
+	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
+		completeBookShelfViewModel.uiState.collect { uiState ->
+			setViewState(uiState)
+			completeBookShelfDataAdapter.submitList(uiState.completeItems)
+		}
+	}
+
 	private fun observeUiEvent() = viewLifecycleOwner.lifecycleScope.launch {
 		completeBookShelfViewModel.eventFlow.collect(::handleEvent)
 	}
 
-	//TODO : List Empty UI 연결
-	//TODO : swipeRefreshLayoutComplete API 연결
-	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
-		completeBookShelfViewModel.uiState.collect { uiState ->
-			completeBookShelfDataAdapter.submitList(uiState.completeItems)
+	private fun initViewState() {
+		binding.bookshelfEmptyLayout.addBookBtn.setOnClickListener {
+			(requireActivity() as MainActivity).navigateToSearchFragment()
 		}
+	}
+
+	private fun setViewState(uiState: CompleteBookShelfUiState) {
+		binding.bookshelfEmptyLayout.root.visibility =
+			if (uiState.isEmptyReadingData) View.VISIBLE else View.GONE
+		binding.bookshelfCompleteRcv.visibility =
+			if (uiState.isEmptyReadingData.not()) View.VISIBLE else View.GONE
 	}
 
 	private fun initAdapter() {
@@ -99,7 +113,7 @@ class CompleteBookShelfFragment : Fragment() {
 				)
 			}
 		}
-		with(binding.completeBookRcv) {
+		with(binding.bookshelfCompleteRcv) {
 			adapter = completeBookShelfDataAdapter
 			setHasFixedSize(true)
 			layoutManager = linearLayoutManager
