@@ -105,14 +105,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="30dp"
                     android:layout_marginTop="15dp"
-                    android:isIndicator="false"
-                    android:numStars="5"
                     app:layout_constraintStart_toEndOf="@+id/cardView2"
                     app:layout_constraintTop_toBottomOf="@+id/selected_book_authors_tv"
                     app:rating="@{bookShelfListItem.star.value}"
                     app:srb_drawableEmpty="@drawable/ic_star_not_fill"
                     app:srb_drawableFilled="@drawable/ic_star_fill"
                     app:srb_isIndicator="true"
+                    app:srb_numStars="5"
                     app:srb_starPadding="2dp"
                     app:srb_stepSize="0.5" />
 
