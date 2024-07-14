@@ -131,7 +131,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/textView23" />
 
                 <com.example.bookchat.ui.customview.AntiDupClickButton
-                    android:id="@+id/antiDupClickButton"
+                    android:id="@+id/book_add_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"

@@ -18,6 +18,7 @@ import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.channel.chatting.ChannelActivity
 import com.example.bookchat.ui.channelList.ChannelListFragment
+import com.example.bookchat.ui.createchannel.MakeChannelActivity
 import com.example.bookchat.ui.home.adapter.HomeBookAdapter
 import com.example.bookchat.ui.home.adapter.HomeChannelAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,6 +57,7 @@ class HomeFragment : Fragment() {
 		super.onViewCreated(view, savedInstanceState)
 		initAdapter()
 		initRecyclerView()
+		initViewState()
 		observeUiEvent()
 		observeUiState()
 	}
@@ -75,6 +77,13 @@ class HomeFragment : Fragment() {
 			homeChannelAdapter.submitList(uiState.channels)
 			setEmptyUiVisibility(uiState.readingBookShelfBooks, uiState.channels)
 		}
+	}
+
+	private fun initViewState() {
+		binding.bookAddBtn.setOnClickListener {
+			(requireActivity() as MainActivity).navigateToSearchFragment()
+		}
+		binding.chatRoomAddBtn.setOnClickListener { moveToMakeChannel() }
 	}
 
 	private fun setEmptyUiVisibility(bookItems: List<BookShelfListItem>, channels: List<Channel>) {
@@ -129,6 +138,11 @@ class HomeFragment : Fragment() {
 	private fun moveToChannel(channelId: Long) {
 		val intent = Intent(requireContext(), ChannelActivity::class.java)
 		intent.putExtra(ChannelListFragment.EXTRA_CHANNEL_ID, channelId)
+		startActivity(intent)
+	}
+
+	private fun moveToMakeChannel() {
+		val intent = Intent(requireContext(), MakeChannelActivity::class.java)
 		startActivity(intent)
 	}
 
