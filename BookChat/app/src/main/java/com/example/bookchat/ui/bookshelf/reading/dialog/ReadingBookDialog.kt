@@ -15,6 +15,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogReadingBookTapClickedBinding
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.ui.agony.AgonyActivity
+import com.example.bookchat.ui.agony.AgonyViewModel
 import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfViewModel
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager
@@ -89,7 +90,7 @@ class ReadingBookDialog : DialogFragment() {
 			binding.readingBookRatingBar.rating = state.starRating
 		}
 
-		with(binding.changeStatusToReadingBtn) {
+		with(binding.changeStatusToCompleteBtn) {
 			if (state.haveStar) {
 				setBackgroundColor(Color.parseColor("#5648FF"))
 				isEnabled = true
@@ -107,7 +108,7 @@ class ReadingBookDialog : DialogFragment() {
 
 	private fun moveToAgony(bookShelfListItemId: Long) {
 		val intent = Intent(requireContext(), AgonyActivity::class.java)
-			.putExtra(EXTRA_AGONY_BOOKSHELF_ITEM_ID, bookShelfListItemId)
+			.putExtra(AgonyViewModel.EXTRA_AGONY_BOOKSHELF_ITEM_ID, bookShelfListItemId)
 		startActivity(intent)
 	}
 
@@ -123,7 +124,6 @@ class ReadingBookDialog : DialogFragment() {
 	}
 
 	companion object {
-		const val EXTRA_AGONY_BOOKSHELF_ITEM_ID = "EXTRA_AGONIZE_BOOK"
 		const val EXTRA_READING_BOOKSHELF_ITEM_ID = "EXTRA_READING_BOOKSHELF_ITEM_ID"
 	}
 }

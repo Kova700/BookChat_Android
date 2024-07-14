@@ -66,6 +66,10 @@ class WishBookDialogViewModel @Inject constructor(
 		deleteWishBookShelfItem(uiState.value.wishItem)
 	}
 
+	fun onMoveToAgonyClick() {
+		startEvent(WishBookDialogEvent.MoveToAgony(bookShelfListItemId))
+	}
+
 	private fun onItemAddClick() {
 		if (uiState.value.uiState == UiState.LOADING) return
 		addWishBookShelfItem(uiState.value.wishItem)
@@ -106,7 +110,7 @@ class WishBookDialogViewModel @Inject constructor(
 
 	private fun changeBookShelfItemStatus(
 		bookShelfItem: BookShelfListItem,
-		newState: BookShelfState
+		newState: BookShelfState,
 	) {
 		updateState { copy(uiState = UiState.LOADING) }
 		viewModelScope.launch {

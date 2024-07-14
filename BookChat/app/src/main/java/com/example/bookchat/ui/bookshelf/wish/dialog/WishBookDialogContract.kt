@@ -27,10 +27,14 @@ data class WishBookDialogUiState(
 
 sealed class WishBookDialogEvent {
 	data class ChangeBookShelfTab(
-		val targetState: BookShelfState
+		val targetState: BookShelfState,
 	) : WishBookDialogEvent()
 
 	data class MakeToast(
-		val stringId: Int
+		val stringId: Int,
+	) : WishBookDialogEvent()
+
+	data class MoveToAgony(
+		val bookShelfListItemId: Long,
 	) : WishBookDialogEvent()
 }

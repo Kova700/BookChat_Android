@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.bookshelf.wish.dialog
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -13,6 +14,8 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogWishBookTapClickedBinding
 import com.example.bookchat.domain.model.BookShelfState
+import com.example.bookchat.ui.agony.AgonyActivity
+import com.example.bookchat.ui.agony.AgonyViewModel
 import com.example.bookchat.ui.bookshelf.wish.WishBookShelfViewModel
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager
@@ -91,9 +94,16 @@ class WishBookDialog : DialogFragment() {
 		dismiss()
 	}
 
+	private fun moveToAgony(bookShelfListItemId: Long) {
+		val intent = Intent(requireContext(), AgonyActivity::class.java)
+			.putExtra(AgonyViewModel.EXTRA_AGONY_BOOKSHELF_ITEM_ID, bookShelfListItemId)
+		startActivity(intent)
+	}
+
 	private fun handleEvent(event: WishBookDialogEvent) = when (event) {
 		is WishBookDialogEvent.ChangeBookShelfTab -> moveToOtherTab(event.targetState)
 		is WishBookDialogEvent.MakeToast -> makeToast(event.stringId)
+		is WishBookDialogEvent.MoveToAgony -> moveToAgony(event.bookShelfListItemId)
 	}
 
 	companion object {

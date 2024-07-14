@@ -116,28 +116,53 @@
                 app:layout_constraintEnd_toEndOf="@+id/cardView2"
                 app:layout_constraintStart_toStartOf="@+id/cardView2"
                 app:layout_constraintTop_toBottomOf="@+id/selected_book_publish_at_tv" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/move_to_agony_btn"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="4dp"
+            android:backgroundTint="#FFFFFF"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:onClick="@{() -> viewmodel.onMoveToAgonyClick()}"
+            android:stateListAnimator="@null"
+            android:text="@string/agony_record"
+            android:textColor="#5648FF"
+            app:cornerRadius="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/change_status_to_reading_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sub_background_wish"
+            app:layout_constraintVertical_bias="0.0"
+            app:strokeColor="#5648FF"
+            app:strokeWidth="1dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/change_status_to_reading_btn"
             android:layout_width="0dp"
             android:layout_height="45dp"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="30dp"
             android:backgroundTint="#5648FF"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:onClick="@{() -> viewmodel.onChangeToReadingClick()}"
+            android:onClick="@{() -> viewmodel.onChangeToCompleteClick()}"
             android:stateListAnimator="@null"
             android:text="@string/reading_book"
             android:textColor="#FFFFFF"
             app:cornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sub_background_wish" />
+            app:layout_constraintStart_toEndOf="@+id/move_to_agony_btn"
+            app:layout_constraintTop_toBottomOf="@+id/sub_background_wish"
+            app:layout_constraintVertical_bias="0.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

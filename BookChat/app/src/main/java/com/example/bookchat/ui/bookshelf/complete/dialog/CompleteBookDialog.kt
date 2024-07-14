@@ -14,8 +14,8 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogCompleteBookTapClickedBinding
 import com.example.bookchat.ui.agony.AgonyActivity
+import com.example.bookchat.ui.agony.AgonyViewModel
 import com.example.bookchat.ui.bookreport.BookReportActivity
-import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog.Companion.EXTRA_AGONY_BOOKSHELF_ITEM_ID
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager
 import com.example.bookchat.utils.image.loadUrl
@@ -86,7 +86,7 @@ class CompleteBookDialog : DialogFragment() {
 
 	private fun moveToAgony(bookShelfItemId: Long) {
 		val intent = Intent(requireContext(), AgonyActivity::class.java)
-			.putExtra(EXTRA_AGONY_BOOKSHELF_ITEM_ID, bookShelfItemId)
+			.putExtra(AgonyViewModel.EXTRA_AGONY_BOOKSHELF_ITEM_ID, bookShelfItemId)
 		startActivity(intent)
 	}
 

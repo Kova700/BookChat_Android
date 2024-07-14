@@ -9,7 +9,6 @@ import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.agony.AgonyUiState.UiState
 import com.example.bookchat.ui.agony.mapper.toAgonyListItem
 import com.example.bookchat.ui.agony.model.AgonyListItem
-import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +26,7 @@ class AgonyViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 	private val bookShelfItemId =
-		savedStateHandle.get<Long>(ReadingBookDialog.EXTRA_AGONY_BOOKSHELF_ITEM_ID)!!
+		savedStateHandle.get<Long>(EXTRA_AGONY_BOOKSHELF_ITEM_ID)!!
 
 	private val _eventFlow = MutableSharedFlow<AgonyEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
@@ -150,4 +149,7 @@ class AgonyViewModel @Inject constructor(
 		updateState { copy(uiState = UiState.ERROR) }
 	}
 
+	companion object {
+		const val EXTRA_AGONY_BOOKSHELF_ITEM_ID = "EXTRA_AGONIZE_BOOK"
+	}
 }
