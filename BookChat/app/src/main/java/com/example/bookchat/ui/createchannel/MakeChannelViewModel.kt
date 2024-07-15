@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.ChannelDefaultImageType
 import com.example.bookchat.domain.repository.BookSearchRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.ui.createchannel.MakeChannelUiState.UiState
@@ -19,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MakeChannelViewModel @Inject constructor(
 	private val channelRepository: ChannelRepository,
-	private val bookSearchRepository: BookSearchRepository
+	private val bookSearchRepository: BookSearchRepository,
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<MakeChannelEvent>()
@@ -27,6 +28,14 @@ class MakeChannelViewModel @Inject constructor(
 
 	private val _uiState = MutableStateFlow<MakeChannelUiState>(MakeChannelUiState.DEFAULT)
 	val uiState get() = _uiState.asStateFlow()
+
+	init {
+		updateState {
+			copy(
+				defaultProfileImageType = ChannelDefaultImageType.getNewRandomType(defaultProfileImageType)
+			)
+		}
+	}
 
 	private fun makeChannel() = viewModelScope.launch {
 		updateState { copy(uiState = UiState.LOADING) }
@@ -94,7 +103,22 @@ class MakeChannelViewModel @Inject constructor(
 		updateState { copy(selectedBook = null) }
 	}
 
-	fun onClickImgEditBtn() {
+	fun onClickCameraBtn() {
+		startEvent(MakeChannelEvent.ShowChannelImageSelectDialog)
+	}
+
+	fun onClickChangeDefaultImage() {
+		updateState {
+			copy(
+				defaultProfileImageType = ChannelDefaultImageType.getNewRandomType(
+					defaultProfileImageType
+				),
+				channelProfileImage = null
+			)
+		}
+	}
+
+	fun onClickGallery() {
 		startEvent(MakeChannelEvent.OpenGallery)
 	}
 

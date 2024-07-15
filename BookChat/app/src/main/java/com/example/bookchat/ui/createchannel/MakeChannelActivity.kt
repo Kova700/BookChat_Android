@@ -16,6 +16,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityMakeChannelBinding
 import com.example.bookchat.ui.channel.chatting.ChannelActivity
 import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_CHANNEL_ID
+import com.example.bookchat.ui.createchannel.dialog.MakeChannelImageSelectDialog
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
 import com.example.bookchat.utils.MakeChannelImgSizeManager
@@ -28,7 +29,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO : 채팅방 이미지 랜덤으로 안돌아가고 고정되어있음
 @AndroidEntryPoint
 class MakeChannelActivity : AppCompatActivity() {
 
@@ -182,15 +182,29 @@ class MakeChannelActivity : AppCompatActivity() {
 		finish()
 	}
 
+	private fun showChannelImageSelectDialog() {
+		val existingFragment =
+			supportFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_IMAGE_SELECT)
+		if (existingFragment != null) return
+
+		val dialog = MakeChannelImageSelectDialog(
+			onSelectChangeDefaultImage = { makeChannelViewModel.onClickChangeDefaultImage() },
+			onSelectGallery = { makeChannelViewModel.onClickGallery() }
+		)
+		dialog.show(supportFragmentManager, DIALOG_TAG_CHANNEL_IMAGE_SELECT)
+	}
+
 	private fun handleEvent(event: MakeChannelEvent) = when (event) {
 		is MakeChannelEvent.MoveToBack -> finish()
 		is MakeChannelEvent.MoveToBookSelect -> moveToBookSelect()
 		is MakeChannelEvent.OpenGallery -> startImageEdit()
 		is MakeChannelEvent.MoveToChannel -> moveToChannel(event.channelId)
 		is MakeChannelEvent.MakeToast -> makeToast(event.stringId)
+		MakeChannelEvent.ShowChannelImageSelectDialog -> showChannelImageSelectDialog()
 	}
 
 	companion object {
 		private const val SCHEME_PACKAGE = "package"
+		private const val DIALOG_TAG_CHANNEL_IMAGE_SELECT = "DIALOG_TAG_CHANNEL_IMAGE_SELECT"
 	}
 }

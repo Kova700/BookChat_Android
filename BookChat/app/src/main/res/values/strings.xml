@@ -139,6 +139,8 @@
 
     <!--make chat room-->
     <string name="chat">채팅</string>
+    <string name="make_chat_room_set_cover_image">커버 이미지 설정</string>
+    <string name="make_chat_room_default_image_change">기본 이미지 변경</string>
     <string name="chat_room">채팅방</string>
     <string name="my_chat_room">나의 채팅방</string>
     <string name="make_chat_room">채팅방 만들기</string>
