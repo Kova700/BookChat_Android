@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogSearchFilterSelectBinding
 import com.example.bookchat.domain.model.SearchFilter
+import com.example.bookchat.domain.model.SearchPurpose
 import com.example.bookchat.ui.search.SearchUiState
 import com.example.bookchat.utils.DialogSizeManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -76,6 +77,14 @@ class SearchFilterSelectDialog(
 	}
 
 	private fun setViewState(state: SearchUiState) {
+		if (state.searchPurpose == SearchPurpose.MAKE_CHANNEL) {
+			binding.searchFilterChannelTitleBtn.visibility = View.GONE
+			binding.searchFilterChannelTagBtn.visibility = View.GONE
+		}
+		setBtnColor(state)
+	}
+
+	private fun setBtnColor(state: SearchUiState) {
 		fun TextView.setColor(targetFilter: SearchFilter) {
 			if (state.searchFilter == targetFilter) setTextColor(Color.parseColor("#5648FF"))
 			else setTextColor(Color.parseColor("#000000"))

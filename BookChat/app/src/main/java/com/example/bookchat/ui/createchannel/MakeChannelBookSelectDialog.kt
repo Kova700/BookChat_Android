@@ -14,8 +14,10 @@ import com.example.bookchat.domain.model.Book
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager
 import com.example.bookchat.utils.image.loadUrl
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class MakeChannelBookSelectDialog(
 	private val onClickMakeChannel: () -> Unit,
 	val selectedBook: Book,

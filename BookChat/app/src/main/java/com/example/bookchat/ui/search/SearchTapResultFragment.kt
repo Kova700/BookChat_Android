@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentSearchTapResultBinding
+import com.example.bookchat.domain.model.SearchPurpose
 import com.example.bookchat.ui.search.SearchUiState.SearchResultState
 import com.example.bookchat.ui.search.adapter.SearchItemAdapter
 import com.example.bookchat.ui.search.model.SearchResultItem
@@ -73,6 +74,7 @@ class SearchTapResultFragment : Fragment() {
 	private fun initViewState() {
 		initShimmerGridLayout()
 		initShimmerBook()
+		initShimmerChannel()
 	}
 
 	private fun initShimmerGridLayout() {
@@ -90,6 +92,15 @@ class SearchTapResultFragment : Fragment() {
 			bookImgSizeManager.setBookImgSize(shimmerBook4.bookImg)
 			bookImgSizeManager.setBookImgSize(shimmerBook5.bookImg)
 			bookImgSizeManager.setBookImgSize(shimmerBook6.bookImg)
+		}
+	}
+
+	private fun initShimmerChannel() {
+		val isMakeChannelPurpose =
+			searchViewModel.uiState.value.searchPurpose == SearchPurpose.MAKE_CHANNEL
+		with(binding.resultShimmerLayout) {
+			channelShimmerGroup.visibility =
+				if (isMakeChannelPurpose) View.GONE else View.VISIBLE
 		}
 	}
 

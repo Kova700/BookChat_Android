@@ -18,6 +18,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.example.bookchat.R
@@ -48,6 +49,7 @@ class SearchFragment : Fragment() {
 	private val searchViewModel by activityViewModels<SearchViewModel>()
 
 	private lateinit var navHostFragment: NavHostFragment
+	private lateinit var navController: NavController
 
 	private val imm by lazy {
 		requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -93,6 +95,7 @@ class SearchFragment : Fragment() {
 	private fun initNavHost() {
 		navHostFragment =
 			childFragmentManager.findFragmentById(R.id.container_search) as NavHostFragment
+		navController = navHostFragment.findNavController()
 	}
 
 	private fun initSearchBar() {
@@ -150,26 +153,26 @@ class SearchFragment : Fragment() {
 		if (searchTapState.fragmentId == currentDestinationId) return
 
 		if (currentDestinationId != null) {
-			navHostFragment.findNavController().popBackStack(currentDestinationId, true)
+			navController.popBackStack(currentDestinationId, true)
 		}
 		when (searchTapState) {
 			is SearchTapState.Default -> {
 				expandSearchWindowAnimation()
-				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
+				navController.navigate(searchTapState.fragmentId)
 			}
 
 			is SearchTapState.History -> {
 				foldSearchWindowAnimation()
-				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
+				navController.navigate(searchTapState.fragmentId)
 			}
 
 			is SearchTapState.Searching -> {
-				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
+				navController.navigate(searchTapState.fragmentId)
 			}
 
 			is SearchTapState.Result -> {
 				closeKeyboard()
-				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
+				navController.navigate(searchTapState.fragmentId)
 			}
 		}
 	}
@@ -268,9 +271,8 @@ class SearchFragment : Fragment() {
 	}
 
 	private fun finishWithSelectedChannelBook(bookIsbn: String) {
-		when (val parentActivity = requireActivity()) {
-			is MakeChannelSelectBookActivity -> parentActivity.finishBookSelect(bookIsbn)
-		}
+		val parentActivity = requireActivity() as? MakeChannelSelectBookActivity ?: return
+		parentActivity.finishBookSelect(bookIsbn)
 	}
 
 	private fun moveToChannelInfo(channelId: Long) {

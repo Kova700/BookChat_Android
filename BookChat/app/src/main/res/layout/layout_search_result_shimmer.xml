@@ -87,8 +87,14 @@
                     layout="@layout/item_search_book_shimmer" />
             </GridLayout>
 
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/channel_shimmer_Group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="channel_title_shimmer,channel_detail_btn_shimmer,shimmer_channel_list_layout" />
+
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardView16"
+                android:id="@+id/channel_title_shimmer"
                 android:layout_width="75dp"
                 android:layout_height="28dp"
                 android:layout_gravity="start"
@@ -100,6 +106,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/shimmer_book_rcv_grid_layout" />
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/channel_detail_btn_shimmer"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_gravity="end"
@@ -107,16 +114,17 @@
                 app:cardCornerRadius="5dp"
                 app:cardElevation="0dp"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-                app:layout_constraintTop_toTopOf="@+id/cardView16" />
+                app:layout_constraintTop_toTopOf="@+id/channel_title_shimmer" />
 
             <LinearLayout
+                android:id="@+id/shimmer_channel_list_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="17dp"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start"
-                app:layout_constraintTop_toBottomOf="@+id/cardView16">
+                app:layout_constraintTop_toBottomOf="@+id/channel_title_shimmer">
 
                 <include layout="@layout/item_search_channel_shimmer" />
 
