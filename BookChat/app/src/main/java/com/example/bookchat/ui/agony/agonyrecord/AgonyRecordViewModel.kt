@@ -245,10 +245,6 @@ class AgonyRecordViewModel @Inject constructor(
 		_itemState.update { _itemState.value + (FIRST_ITEM_STABLE_ID to state) }
 	}
 
-	fun onFolderBtnClick() {
-		startEvent(AgonyRecordEvent.OpenChattingScrapDialog)
-	}
-
 	fun onBackBtnClick() {
 		if (uiState.value.isEditing) {
 			startEvent(AgonyRecordEvent.ShowEditCancelWarning)

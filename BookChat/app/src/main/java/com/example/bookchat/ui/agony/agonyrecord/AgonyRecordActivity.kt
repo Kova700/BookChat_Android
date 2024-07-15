@@ -125,10 +125,6 @@ class AgonyRecordActivity : AppCompatActivity() {
 		itemTouchHelper.attachToRecyclerView(recyclerView)
 	}
 
-	private fun openChattingScrapDialog() {
-
-	}
-
 	private fun showEditCancelWarning() {
 		val warningDialog = AgonyRecordWarningDialog()
 		warningDialog.show(this.supportFragmentManager, DIALOG_TAG_WARNING_EDIT_CANCEL)
@@ -147,7 +143,6 @@ class AgonyRecordActivity : AppCompatActivity() {
 			)
 
 			is AgonyRecordEvent.ShowEditCancelWarning -> showEditCancelWarning()
-			is AgonyRecordEvent.OpenChattingScrapDialog -> openChattingScrapDialog()
 			is AgonyRecordEvent.MakeToast -> makeToast(event.stringId)
 		}
 	}
