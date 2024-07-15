@@ -39,7 +39,7 @@ class SearchTapResultFragment : Fragment() {
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
+		savedInstanceState: Bundle?,
 	): View {
 		_binding =
 			DataBindingUtil.inflate(
@@ -134,6 +134,9 @@ class SearchTapResultFragment : Fragment() {
 			searchViewModel.onChannelItemClick(
 				((searchItemAdapter.currentList[position]) as SearchResultItem.ChannelItem).roomId
 			)
+		}
+		searchItemAdapter.onClickMakeChannelBtn = {
+			searchViewModel.onClickMakeChannelBtn()
 		}
 	}
 

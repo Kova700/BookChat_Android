@@ -25,6 +25,7 @@ import com.example.bookchat.databinding.FragmentSearchBinding
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.SearchFilter
 import com.example.bookchat.domain.model.SearchPurpose
+import com.example.bookchat.ui.createchannel.MakeChannelActivity
 import com.example.bookchat.ui.createchannel.MakeChannelBookSelectDialog
 import com.example.bookchat.ui.createchannel.MakeChannelSelectBookActivity
 import com.example.bookchat.ui.search.SearchUiState.SearchTapState
@@ -278,6 +279,11 @@ class SearchFragment : Fragment() {
 		startActivity(intent)
 	}
 
+	private fun moveToMakeChannel() {
+		val intent = Intent(requireContext(), MakeChannelActivity::class.java)
+		startActivity(intent)
+	}
+
 	private fun handleEvent(event: SearchEvent) {
 		when (event) {
 			is SearchEvent.MoveToDetail -> moveToDetail(
@@ -294,6 +300,7 @@ class SearchFragment : Fragment() {
 			is SearchEvent.MoveToChannelInfo -> moveToChannelInfo(event.channelId)
 			is SearchEvent.MakeToast -> makeToast(event.stringId)
 			is SearchEvent.ShowSearchFilterSelectDialog -> showSearchFilterSelectDialog()
+			SearchEvent.MoveToMakeChannel -> moveToMakeChannel()
 		}
 	}
 

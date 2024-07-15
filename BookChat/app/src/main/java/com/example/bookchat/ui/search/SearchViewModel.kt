@@ -101,7 +101,6 @@ class SearchViewModel @Inject constructor(
 		}
 	}
 
-	//TODO : 현재 도서명으로만 검색되고 있는거 같음 , 채팅방 명으로 검색안되고 있음
 	private fun search(keyword: String) = viewModelScope.launch {
 		updateState {
 			copy(
@@ -259,6 +258,10 @@ class SearchViewModel @Inject constructor(
 
 	fun onClickKeywordClearBtn() {
 		clearSearchBar()
+	}
+
+	fun onClickMakeChannelBtn() {
+		startEvent(SearchEvent.MoveToMakeChannel)
 	}
 
 	private fun startEvent(event: SearchEvent) = viewModelScope.launch {

@@ -80,6 +80,8 @@ sealed class SearchEvent {
 		val channelId: Long,
 	) : SearchEvent()
 
+	object MoveToMakeChannel : SearchEvent()
+
 	data class MakeToast(
 		val stringId: Int,
 	) : SearchEvent()
