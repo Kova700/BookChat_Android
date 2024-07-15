@@ -98,11 +98,16 @@ class ChannelSettingViewModel @Inject constructor(
 	}
 
 	fun onChangeChannelProfile(profile: ByteArray) {
-		updateState { copy(newProfileImage = profile) }
+		updateState {
+			copy(
+				newProfileImage = profile,
+				isSelectedDefaultImage = false
+			)
+		}
 	}
 
 	fun onClickCameraBtn() {
-		startEvent(ChannelSettingUiEvent.PermissionCheck)
+		startEvent(ChannelSettingUiEvent.ShowProfileEditDialog)
 	}
 
 	fun onClickApplyBtn() = viewModelScope.launch {
@@ -112,6 +117,20 @@ class ChannelSettingViewModel @Inject constructor(
 
 	fun onClickChannelExitDialogBtn() {
 		exitChannel()
+	}
+
+	fun onSelectGallery() {
+		startEvent(ChannelSettingUiEvent.MoveToGallery)
+	}
+
+	fun onSelectDefaultProfileImage() {
+		updateState {
+			copy(
+				channel = channel.copy(roomImageUri = null),
+				newProfileImage = null,
+				isSelectedDefaultImage = true
+			)
+		}
 	}
 
 	fun onClickChannelCapacityDialogBtn(newCapacity: Int) {

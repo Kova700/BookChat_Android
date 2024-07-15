@@ -9,10 +9,12 @@ data class ChannelSettingUiState(
 	val newTags: String,
 	val newCapacity: Int,
 	val newProfileImage: ByteArray?,
+	val isSelectedDefaultImage: Boolean,
 ) {
 	private val isExistsChange
 		get() = isTitleChanged || isTagsChanged
 						|| isProfileChanged || isCapacityChanged
+						|| isSelectedDefaultImage
 
 	private val isTitleChanged
 		get() = newTitle != channel.roomName
@@ -49,6 +51,7 @@ data class ChannelSettingUiState(
 			newTags = "",
 			newCapacity = 0,
 			newProfileImage = null,
+			isSelectedDefaultImage = false
 		)
 	}
 }
@@ -56,7 +59,8 @@ data class ChannelSettingUiState(
 sealed class ChannelSettingUiEvent {
 	object MoveBack : ChannelSettingUiEvent()
 	object ExitChannel : ChannelSettingUiEvent()
-	object PermissionCheck : ChannelSettingUiEvent()
+	object MoveToGallery : ChannelSettingUiEvent()
+	object ShowProfileEditDialog : ChannelSettingUiEvent()
 	object ShowChannelExitWarningDialog : ChannelSettingUiEvent()
 	object ShowChannelCapacityDialog : ChannelSettingUiEvent()
 	object MoveHostManage : ChannelSettingUiEvent()

@@ -49,7 +49,7 @@ data class UserEditUiState(
 sealed class UserEditUiEvent {
 	object MoveToGallery : UserEditUiEvent()
 	object MoveToBack : UserEditUiEvent()
-	object ShowUserProfileEditDialog : UserEditUiEvent()
+	object ShowProfileEditDialog : UserEditUiEvent()
 	data class ErrorEvent(val stringId: Int) : UserEditUiEvent()
 	data class UnknownErrorEvent(val message: String) : UserEditUiEvent()
 }

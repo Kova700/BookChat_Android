@@ -109,7 +109,12 @@ class UserEditViewModel @Inject constructor(
 	}
 
 	fun onChangeUserProfile(profile: ByteArray) {
-		updateState { copy(clientNewImage = profile) }
+		updateState {
+			copy(
+				clientNewImage = profile,
+				isSelectedDefaultImage = false
+			)
+		}
 	}
 
 	fun onClickBackBtn() {
@@ -121,7 +126,7 @@ class UserEditViewModel @Inject constructor(
 	}
 
 	fun onClickCameraBtn() {
-		startEvent(UserEditUiEvent.ShowUserProfileEditDialog)
+		startEvent(UserEditUiEvent.ShowProfileEditDialog)
 	}
 
 	fun onSelectGallery() {

@@ -9,18 +9,18 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import com.example.bookchat.R
-import com.example.bookchat.databinding.DialogUserProfileEditBinding
+import com.example.bookchat.databinding.DialogProfileEditBinding
 import com.example.bookchat.utils.DialogSizeManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class UserProfileEditDialog(
+class ProfileEditDialog(
 	private val onSelectDefaultImage: () -> Unit,
 	private val onSelectGallery: () -> Unit,
 ) : DialogFragment() {
 
-	private var _binding: DialogUserProfileEditBinding? = null
+	private var _binding: DialogProfileEditBinding? = null
 	private val binding get() = _binding!!
 
 	@Inject
@@ -32,7 +32,7 @@ class UserProfileEditDialog(
 		savedInstanceState: Bundle?,
 	): View {
 		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.dialog_user_profile_edit,
+			inflater, R.layout.dialog_profile_edit,
 			container, false
 		)
 		binding.dialog = this

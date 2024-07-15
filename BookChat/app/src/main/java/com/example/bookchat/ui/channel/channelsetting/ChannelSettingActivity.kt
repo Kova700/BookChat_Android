@@ -19,6 +19,7 @@ import com.example.bookchat.ui.channel.channelsetting.authoritymanage.subhost.Su
 import com.example.bookchat.ui.channel.channelsetting.dialog.ChannelCapacitySettingDialog
 import com.example.bookchat.ui.channel.drawer.dialog.ChannelExitWarningDialog
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
+import com.example.bookchat.ui.mypage.useredit.dialog.ProfileEditDialog
 import com.example.bookchat.utils.MakeChannelImgSizeManager
 import com.example.bookchat.utils.image.loadChangedChannelProfile
 import com.example.bookchat.utils.makeToast
@@ -173,6 +174,18 @@ class ChannelSettingActivity : AppCompatActivity() {
 		manageActivityResultLauncher.launch(intent)
 	}
 
+	private fun showProfileEditDialog() {
+		val existingFragment =
+			supportFragmentManager.findFragmentByTag(DIALOG_TAG_PROFILE_EDIT)
+		if (existingFragment != null) return
+
+		val dialog = ProfileEditDialog(
+			onSelectDefaultImage = { channelSettingViewModel.onSelectDefaultProfileImage() },
+			onSelectGallery = { channelSettingViewModel.onSelectGallery() }
+		)
+		dialog.show(supportFragmentManager, DIALOG_TAG_PROFILE_EDIT)
+	}
+
 	private fun showChannelExitWarningDialog() {
 		val existingFragment =
 			supportFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_EXIT_WARNING)
@@ -207,19 +220,21 @@ class ChannelSettingActivity : AppCompatActivity() {
 	private fun handleEvent(event: ChannelSettingUiEvent) {
 		when (event) {
 			ChannelSettingUiEvent.MoveBack -> finish()
-			ChannelSettingUiEvent.PermissionCheck -> startChannelProfileEdit()
+			ChannelSettingUiEvent.MoveToGallery -> startChannelProfileEdit()
 			ChannelSettingUiEvent.ShowChannelExitWarningDialog -> showChannelExitWarningDialog()
 			is ChannelSettingUiEvent.MakeToast -> makeToast(event.stringId)
 			ChannelSettingUiEvent.ShowChannelCapacityDialog -> showChannelCapacityDialog()
 			ChannelSettingUiEvent.MoveHostManage -> moveToHostManage()
 			ChannelSettingUiEvent.MoveSubHostManage -> moveToSubHostManage()
 			ChannelSettingUiEvent.ExitChannel -> exitChannel()
+			ChannelSettingUiEvent.ShowProfileEditDialog -> showProfileEditDialog()
 		}
 	}
 
 	companion object {
 		private const val DIALOG_TAG_CHANNEL_EXIT_WARNING = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
 		private const val DIALOG_TAG_CHANNEL_CAPACITY_DIALOG = "DIALOG_TAG_CHANNEL_CAPACITY_DIALOG"
+		private const val DIALOG_TAG_PROFILE_EDIT = "DIALOG_TAG_USER_PROFILE_EDIT"
 		const val RESULT_CODE_USER_CHANNEL_EXIT = 100
 		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
 		private const val SCHEME_PACKAGE = "package"
