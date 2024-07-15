@@ -28,8 +28,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO : Empty UI 연결 필요
-
 @AndroidEntryPoint
 class SearchDetailActivity : AppCompatActivity() {
 
@@ -55,11 +53,19 @@ class SearchDetailActivity : AppCompatActivity() {
 	private fun observeUiState() = lifecycleScope.launch {
 		searchDetailViewModel.uiState.collect { state ->
 			searchItemAdapter.submitList(state.searchItems)
+			setViewState(state)
 		}
 	}
 
 	private fun observeUiEvent() = lifecycleScope.launch {
 		searchDetailViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun setViewState(state: SearchDetailUiState) {
+		binding.searchResultRcv.visibility =
+			if (state.searchItems.isNotEmpty()) RecyclerView.VISIBLE else RecyclerView.GONE
+		binding.resultEmptyLayout.visibility =
+			if (state.searchItems.isEmpty()) RecyclerView.VISIBLE else RecyclerView.GONE
 	}
 
 	private fun initAdapter() {
