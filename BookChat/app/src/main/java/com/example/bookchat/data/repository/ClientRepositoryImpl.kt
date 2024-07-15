@@ -1,6 +1,5 @@
 package com.example.bookchat.data.repository
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -25,7 +24,6 @@ import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.toMultiPartBody
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.flow.Flow
@@ -119,7 +117,6 @@ class ClientRepositoryImpl @Inject constructor(
 		newNickname: String,
 		userProfile: ByteArray?,
 	): User {
-		Log.d(TAG, "ClientRepositoryImpl: changeClientProfile() - called")
 		bookChatApi.changeUserProfile(
 			userProfileImage = userProfile?.toMultiPartBody(
 				contentType = CONTENT_TYPE_IMAGE_WEBP,
