@@ -23,6 +23,7 @@
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_bold"
             android:paddingHorizontal="20dp"
+            android:paddingVertical="10dp"
             android:text="@string/user_profile_picture_setting"
             android:textColor="#000000"
             android:textSize="15sp"
