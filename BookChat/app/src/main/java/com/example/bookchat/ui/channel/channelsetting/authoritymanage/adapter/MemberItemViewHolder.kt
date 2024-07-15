@@ -14,6 +14,9 @@ class MemberItemViewHolder(
 		binding.root.setOnClickListener {
 			onClick?.invoke(absoluteAdapterPosition)
 		}
+		binding.memberSelectRb.setOnClickListener {
+			onClick?.invoke(absoluteAdapterPosition)
+		}
 	}
 
 	fun bind(item: MemberItem) {
