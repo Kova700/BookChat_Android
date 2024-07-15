@@ -22,9 +22,11 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityUserEditBinding
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROPPED_PROFILE_BYTE_ARRAY
-import com.example.bookchat.ui.mypage.useredit.dialog.UserProfileEditDialog
+import com.example.bookchat.ui.mypage.useredit.dialog.ProfileEditDialog
 import com.example.bookchat.utils.image.loadChangedUserProfile
 import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.namecheck.MAX_NICKNAME_LENGTH
+import com.example.bookchat.utils.namecheck.NAME_CHECK_REGULAR_EXPRESSION
 import com.example.bookchat.utils.namecheck.getNameCheckResultBackgroundResId
 import com.example.bookchat.utils.namecheck.getNameCheckResultHexInt
 import com.example.bookchat.utils.namecheck.getNameCheckResultText
@@ -182,16 +184,16 @@ class UserEditActivity : AppCompatActivity() {
 		cropActivityResultLauncher.launch(intent)
 	}
 
-	private fun showUserProfileEditDialog() {
+	private fun showProfileEditDialog() {
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_USER_PROFILE_EDIT)
+			supportFragmentManager.findFragmentByTag(DIALOG_TAG_PROFILE_EDIT)
 		if (existingFragment != null) return
 
-		val dialog = UserProfileEditDialog(
+		val dialog = ProfileEditDialog(
 			onSelectDefaultImage = { userEditViewModel.onSelectDefaultProfileImage() },
 			onSelectGallery = { userEditViewModel.onSelectGallery() }
 		)
-		dialog.show(supportFragmentManager, DIALOG_TAG_USER_PROFILE_EDIT)
+		dialog.show(supportFragmentManager, DIALOG_TAG_PROFILE_EDIT)
 	}
 
 	private val cropActivityResultLauncher =
@@ -210,17 +212,14 @@ class UserEditActivity : AppCompatActivity() {
 			UserEditUiEvent.MoveToGallery -> startUserProfileEdit()
 			is UserEditUiEvent.ErrorEvent -> binding.root.showSnackBar(event.stringId)
 			is UserEditUiEvent.UnknownErrorEvent -> binding.root.showSnackBar(event.message)
-			UserEditUiEvent.ShowUserProfileEditDialog -> showUserProfileEditDialog()
+			UserEditUiEvent.ShowProfileEditDialog -> showProfileEditDialog()
 		}
 	}
 
 	companion object {
 		private const val KEYBOARD_DELAY_TIME = 200L
-		private const val NAME_CHECK_REGULAR_EXPRESSION =
-			"^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ\\u318D\\u119E\\u11A2\\u2022\\u2025a\\u00B7\\uFE55\\uFF1A]+$"
-		private const val MAX_NICKNAME_LENGTH = 20
 		private const val SCHEME_PACKAGE = "package"
-		private const val DIALOG_TAG_USER_PROFILE_EDIT = "DIALOG_TAG_USER_PROFILE_EDIT"
+		private const val DIALOG_TAG_PROFILE_EDIT = "DIALOG_TAG_USER_PROFILE_EDIT"
 
 	}
 

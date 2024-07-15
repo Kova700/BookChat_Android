@@ -26,6 +26,8 @@ import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROPP
 import com.example.bookchat.ui.signup.selecttaste.SelectTasteActivity
 import com.example.bookchat.utils.image.loadByteArray
 import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.namecheck.MAX_NICKNAME_LENGTH
+import com.example.bookchat.utils.namecheck.NAME_CHECK_REGULAR_EXPRESSION
 import com.example.bookchat.utils.namecheck.getNameCheckResultBackgroundResId
 import com.example.bookchat.utils.namecheck.getNameCheckResultHexInt
 import com.example.bookchat.utils.namecheck.getNameCheckResultText
@@ -197,9 +199,6 @@ class SignUpActivity : AppCompatActivity() {
 		const val KEYBOARD_DELAY_TIME = 200L
 		const val EXTRA_SIGNUP_USER_NICKNAME = "EXTRA_SIGNUP_USER_NICKNAME"
 		const val EXTRA_USER_PROFILE_BYTE_ARRAY = "EXTRA_USER_PROFILE_BYTE_ARRAY"
-		private const val NAME_CHECK_REGULAR_EXPRESSION =
-			"^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ\\u318D\\u119E\\u11A2\\u2022\\u2025a\\u00B7\\uFE55\\uFF1A]+$"
-		private const val MAX_NICKNAME_LENGTH = 20
 		private const val SCHEME_PACKAGE = "package"
 	}
 }

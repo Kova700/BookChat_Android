@@ -5,6 +5,10 @@ import android.graphics.Color
 import com.example.bookchat.R
 import com.example.bookchat.domain.model.NicknameCheckState
 
+const val NAME_CHECK_REGULAR_EXPRESSION =
+	"^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ\\u318D\\u119E\\u11A2\\u2022\\u2025a\\u00B7\\uFE55\\uFF1A]+$"
+const val MAX_NICKNAME_LENGTH = 20
+
 fun NicknameCheckState.getNameCheckResultText(context: Context): String {
 	return when (this) {
 		NicknameCheckState.Default -> ""
