@@ -3,7 +3,6 @@ package com.example.bookchat.domain.repository
 import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.model.IdToken
-import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.model.User
 import kotlinx.coroutines.flow.Flow
 
@@ -14,12 +13,6 @@ interface ClientRepository {
 	suspend fun isSignedIn(): Boolean
 
 	suspend fun renewBookChatToken(): BookChatToken
-
-	suspend fun signUp(
-		nickname: String,
-		readingTastes: List<ReadingTaste>,
-		userProfile: ByteArray?,
-	)
 
 	suspend fun changeClientProfile(
 		newNickname: String,

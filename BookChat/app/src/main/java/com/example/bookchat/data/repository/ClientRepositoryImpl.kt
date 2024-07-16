@@ -42,30 +42,6 @@ class ClientRepositoryImpl @Inject constructor(
 		return bookChatTokenRepository.isBookChatTokenExist()
 	}
 
-	override suspend fun signUp(
-		nickname: String,
-		readingTastes: List<ReadingTaste>,
-		userProfile: ByteArray?,
-	) {
-		val idToken = oAuthIdTokenRepository.getIdToken()
-		val requestUserSignUp = RequestUserSignUp(
-			oauth2Provider = idToken.oAuth2Provider.toNetwork(),
-			nickname = nickname,
-			readingTastes = readingTastes.map { it.toNetWork() },
-		)
-
-		bookChatApi.signUp(
-			idToken = idToken.token,
-			userProfileImage = userProfile?.toMultiPartBody(
-				contentType = CONTENT_TYPE_IMAGE_WEBP,
-				multipartName = PROFILE_IMAGE_MULTIPART_NAME,
-				fileName = PROFILE_IMAGE_FILE_NAME,
-				fileExtension = PROFILE_IMAGE_FILE_EXTENSION
-			),
-			requestUserSignUp = requestUserSignUp
-		)
-	}
-
 	//TODO : userProfile = null로 보내면 null로 설정이 안됨 (서버 수정 대기중)
 	override suspend fun changeClientProfile(
 		newNickname: String,
