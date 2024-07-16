@@ -6,11 +6,7 @@ import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.mapper.toUser
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.request.RequestChangeUserNickname
-import com.example.bookchat.data.network.model.request.RequestUserSignIn
 import com.example.bookchat.data.network.model.request.RequestUserSignUp
-import com.example.bookchat.data.network.model.response.NeedToDeviceWarningException
-import com.example.bookchat.data.network.model.response.NeedToSignUpException
-import com.example.bookchat.data.network.model.response.ResponseBodyEmptyException
 import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.model.IdToken
@@ -18,8 +14,8 @@ import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.repository.DeviceIDRepository
 import com.example.bookchat.domain.repository.FCMTokenRepository
+import com.example.bookchat.domain.repository.OAuthIdTokenRepository
 import com.example.bookchat.utils.toMultiPartBody
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,9 +30,8 @@ class ClientRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi,
 	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val fcmTokenRepository: FCMTokenRepository,
-	private val deviceIdRepository: DeviceIDRepository,
+	private val oAuthIdTokenRepository: OAuthIdTokenRepository,
 ) : ClientRepository {
-	private var cachedIdToken: IdToken? = null
 	private val client = MutableStateFlow<User?>(null)
 
 	override fun getClientFlow(): Flow<User> {
@@ -47,44 +42,12 @@ class ClientRepositoryImpl @Inject constructor(
 		return bookChatTokenRepository.isBookChatTokenExist()
 	}
 
-	override suspend fun signIn(
-		approveChangingDevice: Boolean,
-	) {
-		val requestUserSignIn = RequestUserSignIn(
-			fcmToken = getFCMToken().text,
-			deviceToken = getDeviceID(),
-			approveChangingDevice = approveChangingDevice,
-			oauth2Provider = cachedIdToken!!.oAuth2Provider.toNetwork()
-		)
-		val response = bookChatApi.signIn(cachedIdToken!!.token, requestUserSignIn)
-		when (response.code()) {
-			200 -> {
-				val token = response.body()
-				token?.let {
-					bookChatTokenRepository.saveBookChatToken(token.toBookChatToken())
-					return
-				}
-				throw ResponseBodyEmptyException(response.errorBody()?.string())
-			}
-
-			404 -> throw NeedToSignUpException(response.errorBody()?.string())
-			409 -> throw NeedToDeviceWarningException(response.errorBody()?.string())
-			else -> throw Exception(
-				createExceptionMessage(
-					response.code(),
-					response.errorBody()?.string()
-				)
-			)
-		}
-	}
-
 	override suspend fun signUp(
 		nickname: String,
 		readingTastes: List<ReadingTaste>,
 		userProfile: ByteArray?,
 	) {
-		val idToken = cachedIdToken ?: throw IOException("IdToken does not exist.")
-
+		val idToken = oAuthIdTokenRepository.getIdToken()
 		val requestUserSignUp = RequestUserSignUp(
 			oauth2Provider = idToken.oAuth2Provider.toNetwork(),
 			nickname = nickname,
@@ -122,8 +85,9 @@ class ClientRepositoryImpl @Inject constructor(
 			.also { client.update { it } }
 	}
 
-	override suspend fun renewBookChatToken(): BookChatToken? {
-		val refreshToken = bookChatTokenRepository.getBookChatToken()?.refreshToken ?: return null
+	override suspend fun renewBookChatToken(): BookChatToken {
+		val refreshToken = bookChatTokenRepository.getBookChatToken()?.refreshToken
+			?: throw IOException("Refresh Token does not exist.")
 		val newToken = bookChatApi.renewBookChatToken(refreshToken).toBookChatToken()
 		bookChatTokenRepository.saveBookChatToken(newToken)
 		return newToken
@@ -169,28 +133,16 @@ class ClientRepositoryImpl @Inject constructor(
 		fcmTokenRepository.renewFCMToken(fcmToken)
 	}
 
-	private suspend fun getFCMToken(): FCMToken {
-		return fcmTokenRepository.getFCMToken()
-	}
-
-	private suspend fun getDeviceID(): String {
-		return deviceIdRepository.getDeviceID()
-	}
-
 	override fun getCachedIdToken(): IdToken {
-		return cachedIdToken!!
+		return oAuthIdTokenRepository.getIdToken()
 	}
 
 	override fun saveIdToken(token: IdToken) {
-		cachedIdToken = token
-	}
-
-	private suspend fun clearDeviceUUIDKey() {
-		deviceIdRepository.clearDeviceID()
+		oAuthIdTokenRepository.saveIdToken(token)
 	}
 
 	override suspend fun clear() {
-
+		client.update { null }
 		//DB, DataStore, Repository에 있는 InMemoryData 전부 clear
 		//1. 하나하나 전부 clear
 		//2. 앱 데이터 전부 지우는 함수 하나 있다면 그거 찾아서 호출
@@ -201,8 +153,6 @@ class ClientRepositoryImpl @Inject constructor(
 	}
 
 	companion object {
-		private const val DEVICE_UUID_KEY = "DEVICE_UUID_KEY"
-
 		const val CONTENT_TYPE_IMAGE_WEBP = "image/webp"
 		const val PROFILE_IMAGE_FILE_NAME = "profile_img"
 		const val PROFILE_IMAGE_FILE_EXTENSION = ".webp"

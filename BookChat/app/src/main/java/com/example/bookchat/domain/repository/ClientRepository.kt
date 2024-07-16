@@ -13,11 +13,7 @@ interface ClientRepository {
 
 	suspend fun isSignedIn(): Boolean
 
-	suspend fun signIn(
-		approveChangingDevice: Boolean = false,
-	)
-
-	suspend fun renewBookChatToken(): BookChatToken?
+	suspend fun renewBookChatToken(): BookChatToken
 
 	suspend fun signUp(
 		nickname: String,

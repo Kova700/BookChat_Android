@@ -9,7 +9,7 @@ data class RequestUserSignIn(
 	@SerializedName("deviceToken")
 	val deviceToken: String,
 	@SerializedName("approveChangingDevice")
-	val approveChangingDevice: Boolean,
+	val isDeviceChangeApproved: Boolean,
 	@SerializedName("oauth2Provider")
 	val oauth2Provider: OAuth2ProviderNetwork
 )

@@ -11,6 +11,7 @@ import com.example.bookchat.data.network.model.response.NeedToSignUpException
 import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.IdToken
 import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.domain.usecase.LoginUseCase
 import com.example.bookchat.ui.login.LoginUiState.UiState
 import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +25,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-	private val clientRepository: ClientRepository
+	private val clientRepository: ClientRepository,
+	private val loginUseCase: LoginUseCase,
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<LoginEvent>()
@@ -34,10 +36,10 @@ class LoginViewModel @Inject constructor(
 	val uiState get() = _uiState.asStateFlow()
 
 	fun login(
-		isApproveChangingDevice: Boolean = false
+		isDeviceChangeApproved: Boolean = false,
 	) = viewModelScope.launch {
 		updateState { copy(uiState = UiState.LOADING) }
-		runCatching { clientRepository.signIn(isApproveChangingDevice) }
+		runCatching { loginUseCase(isDeviceChangeApproved) }
 			.onSuccess { getClientProfile() }
 			.onFailure { failHandler(it) }
 			.also { updateState { copy(uiState = UiState.SUCCESS) } }
@@ -63,7 +65,7 @@ class LoginViewModel @Inject constructor(
 	}
 
 	fun onClickDeviceWarningOk() {
-		login(isApproveChangingDevice = true)
+		login(isDeviceChangeApproved = true)
 	}
 
 	private fun startEvent(event: LoginEvent) = viewModelScope.launch {
