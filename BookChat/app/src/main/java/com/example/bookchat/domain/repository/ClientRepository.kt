@@ -2,7 +2,6 @@ package com.example.bookchat.domain.repository
 
 import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.model.FCMToken
-import com.example.bookchat.domain.model.IdToken
 import com.example.bookchat.domain.model.User
 import kotlinx.coroutines.flow.Flow
 
@@ -24,8 +23,5 @@ interface ClientRepository {
 	suspend fun withdraw()
 	suspend fun isDuplicatedUserNickName(nickName: String): Boolean
 	suspend fun renewFCMToken(fcmToken: FCMToken)
-	fun getCachedIdToken(): IdToken
-	fun saveIdToken(token: IdToken)
-
 	suspend fun clear()
 }

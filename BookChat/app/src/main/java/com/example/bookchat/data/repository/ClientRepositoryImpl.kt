@@ -1,21 +1,15 @@
 package com.example.bookchat.data.repository
 
 import com.example.bookchat.data.mapper.toBookChatToken
-import com.example.bookchat.data.mapper.toNetWork
-import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.mapper.toUser
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.request.RequestChangeUserNickname
-import com.example.bookchat.data.network.model.request.RequestUserSignUp
 import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.model.FCMToken
-import com.example.bookchat.domain.model.IdToken
-import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.FCMTokenRepository
-import com.example.bookchat.domain.repository.OAuthIdTokenRepository
 import com.example.bookchat.utils.toMultiPartBody
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +24,6 @@ class ClientRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi,
 	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val fcmTokenRepository: FCMTokenRepository,
-	private val oAuthIdTokenRepository: OAuthIdTokenRepository,
 ) : ClientRepository {
 	private val client = MutableStateFlow<User?>(null)
 
@@ -107,14 +100,6 @@ class ClientRepositoryImpl @Inject constructor(
 
 	override suspend fun renewFCMToken(fcmToken: FCMToken) {
 		fcmTokenRepository.renewFCMToken(fcmToken)
-	}
-
-	override fun getCachedIdToken(): IdToken {
-		return oAuthIdTokenRepository.getIdToken()
-	}
-
-	override fun saveIdToken(token: IdToken) {
-		oAuthIdTokenRepository.saveIdToken(token)
 	}
 
 	override suspend fun clear() {

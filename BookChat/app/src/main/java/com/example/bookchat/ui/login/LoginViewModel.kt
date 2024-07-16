@@ -11,6 +11,7 @@ import com.example.bookchat.data.network.model.response.NeedToSignUpException
 import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.IdToken
 import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.domain.repository.OAuthIdTokenRepository
 import com.example.bookchat.domain.usecase.LoginUseCase
 import com.example.bookchat.ui.login.LoginUiState.UiState
 import com.example.bookchat.utils.Constants.TAG
@@ -26,6 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
 	private val clientRepository: ClientRepository,
+	private val oAuthIdTokenRepository: OAuthIdTokenRepository,
 	private val loginUseCase: LoginUseCase,
 ) : ViewModel() {
 
@@ -53,7 +55,7 @@ class LoginViewModel @Inject constructor(
 
 	fun onChangeIdToken(idToken: IdToken) {
 		updateState { copy(idToken = idToken) }
-		clientRepository.saveIdToken(idToken)
+		oAuthIdTokenRepository.saveIdToken(idToken)
 	}
 
 	fun onClickKakaoLoginBtn() {
