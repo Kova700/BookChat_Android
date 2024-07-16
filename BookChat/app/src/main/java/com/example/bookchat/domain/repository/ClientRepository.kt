@@ -7,8 +7,6 @@ interface ClientRepository {
 
 	fun getClientFlow(): Flow<User>
 
-	suspend fun isSignedIn(): Boolean
-
 	suspend fun changeClientProfile(
 		newNickname: String,
 		userProfile: ByteArray?,

@@ -8,6 +8,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
@@ -16,16 +17,17 @@ import dagger.assisted.AssistedInject
 
 @HiltWorker
 class ChatNotificationWorker @AssistedInject constructor(
-	@Assisted appContext: Context,
+	@Assisted appContext: Context, //주입의 의미가 없어져버림,,,,
 	@Assisted workerParams: WorkerParameters,
 	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
+	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val chatNotificationHandler: NotificationHandler,
 ) : CoroutineWorker(appContext, workerParams) {
 
 	override suspend fun doWork(): Result {
-		if (clientRepository.isSignedIn().not()) {
+		if (bookChatTokenRepository.isBookChatTokenExist().not()) {
 			return Result.success()
 		}
 

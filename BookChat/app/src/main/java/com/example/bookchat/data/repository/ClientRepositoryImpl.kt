@@ -1,12 +1,9 @@
 package com.example.bookchat.data.repository
 
-import com.example.bookchat.data.mapper.toBookChatToken
 import com.example.bookchat.data.mapper.toUser
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.request.RequestChangeUserNickname
-import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.model.User
-import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.utils.toMultiPartBody
 import kotlinx.coroutines.flow.Flow
@@ -15,22 +12,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
-import java.io.IOException
 import javax.inject.Inject
 
 class ClientRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi,
-	private val bookChatTokenRepository: BookChatTokenRepository,
 ) : ClientRepository {
 	private val client = MutableStateFlow<User?>(null)
 
 	override fun getClientFlow(): Flow<User> {
 		return client.asStateFlow().filterNotNull()
-	}
-
-	//TODO : bookChatTokenRepository로 이전 필요
-	override suspend fun isSignedIn(): Boolean {
-		return bookChatTokenRepository.isBookChatTokenExist()
 	}
 
 	//TODO : userProfile = null로 보내면 null로 설정이 안됨 (서버 수정 대기중)
