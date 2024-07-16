@@ -13,6 +13,7 @@ import com.example.bookchat.data.repository.ChattingNotificationInfoRepositoryIm
 import com.example.bookchat.data.repository.ClientRepositoryImpl
 import com.example.bookchat.data.repository.DeviceIDRepositoryImpl
 import com.example.bookchat.data.repository.FCMTokenRepositoryImpl
+import com.example.bookchat.data.repository.OAuthIdTokenRepositoryImpl
 import com.example.bookchat.data.repository.SearchHistoryRepositoryImpl
 import com.example.bookchat.data.repository.UserRepositoryImpl
 import com.example.bookchat.domain.repository.AgonyRecordRepository
@@ -28,6 +29,7 @@ import com.example.bookchat.domain.repository.ChattingNotificationInfoRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.DeviceIDRepository
 import com.example.bookchat.domain.repository.FCMTokenRepository
+import com.example.bookchat.domain.repository.OAuthIdTokenRepository
 import com.example.bookchat.domain.repository.SearchHistoryRepository
 import com.example.bookchat.domain.repository.UserRepository
 import dagger.Binds
@@ -56,6 +58,12 @@ interface RepositoryModule {
 	fun bindDeviceIdRepository(
 		repository: DeviceIDRepositoryImpl,
 	): DeviceIDRepository
+
+	@Binds
+	@Singleton
+	fun bindOAuthIdTokenRepository(
+		repository: OAuthIdTokenRepositoryImpl,
+	): OAuthIdTokenRepository
 
 	@Binds
 	@Singleton
