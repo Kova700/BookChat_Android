@@ -31,10 +31,12 @@ interface ClientRepository {
 	): User
 
 	suspend fun getClientProfile(): User
-	suspend fun signOut(needAServer: Boolean = false)
+	suspend fun signOut()
 	suspend fun withdraw()
 	suspend fun isDuplicatedUserNickName(nickName: String): Boolean
 	suspend fun renewFCMToken(fcmToken: FCMToken)
 	fun getCachedIdToken(): IdToken
 	fun saveIdToken(token: IdToken)
+
+	suspend fun clear()
 }
