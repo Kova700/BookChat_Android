@@ -21,6 +21,7 @@ import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.domain.usecase.RenewBookChatTokenUseCase
 import com.example.bookchat.utils.Constants.TAG
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
@@ -64,6 +65,7 @@ class StompHandlerImpl @Inject constructor(
 	private val clientRepository: ClientRepository,
 	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val userRepository: UserRepository,
+	private val renewBookChatTokenUseCase: RenewBookChatTokenUseCase,
 	private val networkManager: NetworkManager,
 	private val gson: Gson,
 ) : StompHandler {
@@ -109,7 +111,7 @@ class StompHandlerImpl @Inject constructor(
 
 			}.onFailure { throwable ->
 				if ((throwable is ConnectionException) && haveTriedRenewingToken.not()) {
-					runCatching { clientRepository.renewBookChatToken() }
+					runCatching { renewBookChatTokenUseCase() }
 						.onSuccess { haveTriedRenewingToken = true }
 				}
 				Log.d(TAG, "StompHandlerImpl: connectSocket().onFailure() - throwable :$throwable")

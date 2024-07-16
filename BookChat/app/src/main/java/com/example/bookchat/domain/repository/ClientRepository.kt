@@ -1,7 +1,5 @@
 package com.example.bookchat.domain.repository
 
-import com.example.bookchat.domain.model.BookChatToken
-import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.model.User
 import kotlinx.coroutines.flow.Flow
 
@@ -10,8 +8,6 @@ interface ClientRepository {
 	fun getClientFlow(): Flow<User>
 
 	suspend fun isSignedIn(): Boolean
-
-	suspend fun renewBookChatToken(): BookChatToken
 
 	suspend fun changeClientProfile(
 		newNickname: String,

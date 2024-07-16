@@ -52,14 +52,6 @@ class ClientRepositoryImpl @Inject constructor(
 			.also { client.update { it } }
 	}
 
-	override suspend fun renewBookChatToken(): BookChatToken {
-		val refreshToken = bookChatTokenRepository.getBookChatToken()?.refreshToken
-			?: throw IOException("Refresh Token does not exist.")
-		val newToken = bookChatApi.renewBookChatToken(refreshToken).toBookChatToken()
-		bookChatTokenRepository.saveBookChatToken(newToken)
-		return newToken
-	}
-
 	/** LogoutUsecase를 이용해 로컬 데이터 삭제가 필요함으로 해당 함수 단일로 호출 금지 */
 	override suspend fun signOut() {
 		//logout API 호출( == 서버 FCM토큰 삭제)
