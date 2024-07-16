@@ -1,11 +1,5 @@
 package com.example.bookchat.data.repository
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.stringPreferencesKey
-import com.example.bookchat.data.datastore.clearData
-import com.example.bookchat.data.datastore.getDataFlow
-import com.example.bookchat.data.datastore.setData
 import com.example.bookchat.data.mapper.toBookChatToken
 import com.example.bookchat.data.mapper.toNetWork
 import com.example.bookchat.data.mapper.toNetwork
@@ -24,6 +18,7 @@ import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.domain.repository.DeviceIDRepository
 import com.example.bookchat.domain.repository.FCMTokenRepository
 import com.example.bookchat.utils.toMultiPartBody
 import kotlinx.coroutines.flow.Flow
@@ -33,17 +28,14 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import java.io.IOException
-import java.util.UUID
 import javax.inject.Inject
 
-//TODO : BookChatToken, FCMToken , DeviceUUID Repository 구분필요
 class ClientRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi,
-	private val dataStore: DataStore<Preferences>,
 	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val fcmTokenRepository: FCMTokenRepository,
+	private val deviceIdRepository: DeviceIDRepository,
 ) : ClientRepository {
-	private val deviceUUIDKey = stringPreferencesKey(DEVICE_UUID_KEY)
 	private var cachedIdToken: IdToken? = null
 	private val client = MutableStateFlow<User?>(null)
 
@@ -182,7 +174,7 @@ class ClientRepositoryImpl @Inject constructor(
 	}
 
 	private suspend fun getDeviceID(): String {
-		return dataStore.getDataFlow(deviceUUIDKey).firstOrNull() ?: getNewDeviceID()
+		return deviceIdRepository.getDeviceID()
 	}
 
 	override fun getCachedIdToken(): IdToken {
@@ -193,14 +185,8 @@ class ClientRepositoryImpl @Inject constructor(
 		cachedIdToken = token
 	}
 
-	private suspend fun getNewDeviceID(): String {
-		val uuid = UUID.randomUUID().toString()
-		dataStore.setData(deviceUUIDKey, uuid)
-		return uuid
-	}
-
 	private suspend fun clearDeviceUUIDKey() {
-		dataStore.clearData(deviceUUIDKey)
+		deviceIdRepository.clearDeviceID()
 	}
 
 	override suspend fun clear() {
