@@ -5,7 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
-import com.example.bookchat.data.database.dao.TempMessageDAO
 import com.example.bookchat.domain.NetworkManager
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
@@ -14,6 +13,7 @@ import com.example.bookchat.domain.model.NetworkState
 import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ChannelRepository
+import com.example.bookchat.domain.repository.ChannelTempMessageRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.StompHandler
@@ -51,10 +51,10 @@ import kotlin.math.abs
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
-	private val tempMessageDAO: TempMessageDAO, //개선 필요(+ 레이어 구분도 필요)
 	private val stompHandler: StompHandler,
 	private val getChatsFlowUserCase: GetChatsFlowUseCase,
 	private val syncChannelChatsUseCase: SyncChannelChatsUseCase,
+	private val channelTempMessageRepository: ChannelTempMessageRepository,
 	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
@@ -380,19 +380,21 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun getTempSavedMessage(channelId: Long) = viewModelScope.launch {
-		runCatching { tempMessageDAO.getTempMessage(channelId)?.message }
-			.onSuccess {
-				updateState { copy(enteredMessage = it ?: "") }
-			}
+		channelTempMessageRepository.getTempMessage(channelId)?.let { message ->
+			updateState { copy(enteredMessage = message) }
+		}
 	}
 
 	private fun saveTempSavedMessage(text: String) = viewModelScope.launch {
 		if (text.isBlank()) return@launch
-		tempMessageDAO.insertOrUpdateTempMessage(channelId, text)
+		channelTempMessageRepository.saveTempMessage(
+			channelId = channelId,
+			message = text
+		)
 	}
 
 	private fun clearTempSavedMessage() = viewModelScope.launch {
-		tempMessageDAO.setTempSavedMessage(channelId, "")
+		channelTempMessageRepository.deleteTempMessage(channelId)
 	}
 
 	fun onChangeEnteredMessage(text: String) {

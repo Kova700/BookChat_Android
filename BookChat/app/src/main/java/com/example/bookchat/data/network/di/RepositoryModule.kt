@@ -8,6 +8,7 @@ import com.example.bookchat.data.repository.BookSearchRepositoryImpl
 import com.example.bookchat.data.repository.BookShelfRepositoryImpl
 import com.example.bookchat.data.repository.ChannelRepositoryImpl
 import com.example.bookchat.data.repository.ChannelSearchRepositoryImpl
+import com.example.bookchat.data.repository.ChannelTempMessageRepositoryImpl
 import com.example.bookchat.data.repository.ChatRepositoryImpl
 import com.example.bookchat.data.repository.ChattingNotificationInfoRepositoryImpl
 import com.example.bookchat.data.repository.ClientRepositoryImpl
@@ -24,6 +25,7 @@ import com.example.bookchat.domain.repository.BookSearchRepository
 import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChannelSearchRepository
+import com.example.bookchat.domain.repository.ChannelTempMessageRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ChattingNotificationInfoRepository
 import com.example.bookchat.domain.repository.ClientRepository
@@ -41,6 +43,13 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 interface RepositoryModule {
+
+	@Binds
+	@Singleton
+	fun bindChannelTempMessageRepository(
+		repository: ChannelTempMessageRepositoryImpl,
+	): ChannelTempMessageRepository
+
 	@Binds
 	@Singleton
 	fun bindBookChatTokenRepository(
