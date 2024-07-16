@@ -13,7 +13,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
-class BookChatTokenRepositoryIml @Inject constructor(
+class BookChatTokenRepositoryImpl @Inject constructor(
 	private val dataStore: DataStore<Preferences>,
 	private val gson: Gson,
 ) : BookChatTokenRepository {

@@ -2,7 +2,7 @@ package com.example.bookchat.data.network.di
 
 import com.example.bookchat.data.repository.AgonyRecordRepositoryImpl
 import com.example.bookchat.data.repository.AgonyRepositoryImpl
-import com.example.bookchat.data.repository.BookChatTokenRepositoryIml
+import com.example.bookchat.data.repository.BookChatTokenRepositoryImpl
 import com.example.bookchat.data.repository.BookReportRepositoryImpl
 import com.example.bookchat.data.repository.BookSearchRepositoryImpl
 import com.example.bookchat.data.repository.BookShelfRepositoryImpl
@@ -38,7 +38,7 @@ interface RepositoryModule {
 	@Binds
 	@Singleton
 	fun bindBookChatTokenRepository(
-		repository: BookChatTokenRepositoryIml,
+		repository: BookChatTokenRepositoryImpl,
 	): BookChatTokenRepository
 
 	@Binds
