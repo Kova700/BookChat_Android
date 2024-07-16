@@ -29,7 +29,7 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 	private var isEndPage = false
 
 	override fun getAgonyRecordsFlow(initFlag: Boolean): Flow<List<AgonyRecord>> {
-		if (initFlag) clearCachedData()
+		if (initFlag) clear()
 		return records
 	}
 
@@ -43,9 +43,7 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 		size: Int,
 		sort: SearchSortOption,
 	) {
-		if (cachedAgonyId != agonyId) {
-			clearCachedData()
-		}
+		if (cachedAgonyId != agonyId) clear()
 		if (isEndPage) return
 
 		val response = bookChatApi.getAgonyRecords(
@@ -62,13 +60,6 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 
 		val newRecords = response.agonyRecordResponseList.toAgonyRecord()
 		setAgonyRecords(mapAgonyRecords.value + newRecords.associateBy { it.recordId })
-	}
-
-	private fun clearCachedData() {
-		setAgonyRecords(emptyMap())
-		cachedAgonyId = -1
-		currentPage = null
-		isEndPage = false
 	}
 
 	override suspend fun getAgonyRecord(
@@ -152,6 +143,13 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 	) {
 		bookChatApi.deleteAgonyRecord(bookShelfId, agonyId, recordId)
 		setAgonyRecords(mapAgonyRecords.value - recordId)
+	}
+
+	override fun clear() {
+		setAgonyRecords(emptyMap())
+		cachedAgonyId = -1
+		currentPage = null
+		isEndPage = false
 	}
 
 }

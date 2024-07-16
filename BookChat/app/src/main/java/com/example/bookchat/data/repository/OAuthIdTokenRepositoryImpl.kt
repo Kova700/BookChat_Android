@@ -5,7 +5,8 @@ import com.example.bookchat.domain.repository.OAuthIdTokenRepository
 import java.io.IOException
 import javax.inject.Inject
 
-class OAuthIdTokenRepositoryImpl @Inject constructor() : OAuthIdTokenRepository {
+class OAuthIdTokenRepositoryImpl @Inject constructor(
+) : OAuthIdTokenRepository {
 	private var cachedIdToken: IdToken? = null
 
 	override fun getIdToken(): IdToken {
@@ -14,6 +15,10 @@ class OAuthIdTokenRepositoryImpl @Inject constructor() : OAuthIdTokenRepository 
 
 	override fun saveIdToken(token: IdToken) {
 		cachedIdToken = token
+	}
+
+	override fun clear() {
+		cachedIdToken = null
 	}
 
 }

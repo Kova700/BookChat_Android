@@ -216,7 +216,7 @@ class ChatNotificationHandler @Inject constructor(
 
 	override suspend fun dismissAllNotifications() {
 		notificationManager.cancelAll()
-		chattingNotificationInfoRepository.clearShownNotificationInfos()
+		chattingNotificationInfoRepository.clear()
 		clearShortcut()
 	}
 

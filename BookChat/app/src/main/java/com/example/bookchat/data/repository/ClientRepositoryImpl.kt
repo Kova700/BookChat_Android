@@ -28,6 +28,7 @@ class ClientRepositoryImpl @Inject constructor(
 		return client.asStateFlow().filterNotNull()
 	}
 
+	//TODO : bookChatTokenRepository로 이전 필요
 	override suspend fun isSignedIn(): Boolean {
 		return bookChatTokenRepository.isBookChatTokenExist()
 	}
@@ -59,12 +60,12 @@ class ClientRepositoryImpl @Inject constructor(
 		return newToken
 	}
 
+	/** LogoutUsecase를 이용해 로컬 데이터 삭제가 필요함으로 해당 함수 단일로 호출 금지 */
 	override suspend fun signOut() {
-		//Server FCM토큰 삭제 or logout API 호출
-		bookChatTokenRepository.clearBookChatToken()
-		//로컬에 FCM 토큰, 북챗 토큰, Room, DataStore 초기화
+		//logout API 호출( == 서버 FCM토큰 삭제)
 	}
 
+	/** WithdrawUsecase를 이용해 로컬 데이터 삭제가 필요함으로 해당 함수 단일로 호출 금지 */
 	//TODO :회원 탈퇴 후 재가입 가능 기간 정책 결정해야함
 	override suspend fun withdraw() {
 		bookChatApi.withdraw()
@@ -97,9 +98,6 @@ class ClientRepositoryImpl @Inject constructor(
 
 	override suspend fun clear() {
 		client.update { null }
-		//DB, DataStore, Repository에 있는 InMemoryData 전부 clear
-		//1. 하나하나 전부 clear
-		//2. 앱 데이터 전부 지우는 함수 하나 있다면 그거 찾아서 호출
 	}
 
 	private fun createExceptionMessage(responseCode: Int, responseErrorBody: String?): String {

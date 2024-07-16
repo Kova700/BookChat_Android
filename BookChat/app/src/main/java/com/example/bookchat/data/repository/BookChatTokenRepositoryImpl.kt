@@ -37,7 +37,7 @@ class BookChatTokenRepositoryImpl @Inject constructor(
 		return getBookChatToken() != null
 	}
 
-	override suspend fun clearBookChatToken() {
+	override suspend fun clear() {
 		dataStore.clearData(bookChatTokenKey)
 	}
 

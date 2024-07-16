@@ -19,4 +19,5 @@ interface ChannelSearchRepository {
 		private const val SIMPLE_SEARCH_CHANNELS_LOAD_SIZE = 10
 	}
 
+	fun clear()
 }

@@ -26,7 +26,7 @@ class DeviceIDRepositoryImpl @Inject constructor(
 		return uuid
 	}
 
-	override suspend fun clearDeviceID() {
+	override suspend fun clear() {
 		dataStore.clearData(deviceUUIDKey)
 	}
 

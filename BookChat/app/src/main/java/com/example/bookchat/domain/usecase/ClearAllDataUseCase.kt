@@ -1,0 +1,55 @@
+package com.example.bookchat.domain.usecase
+
+import com.example.bookchat.domain.repository.AgonyRecordRepository
+import com.example.bookchat.domain.repository.AgonyRepository
+import com.example.bookchat.domain.repository.BookChatTokenRepository
+import com.example.bookchat.domain.repository.BookSearchRepository
+import com.example.bookchat.domain.repository.BookShelfRepository
+import com.example.bookchat.domain.repository.ChannelRepository
+import com.example.bookchat.domain.repository.ChannelSearchRepository
+import com.example.bookchat.domain.repository.ChannelTempMessageRepository
+import com.example.bookchat.domain.repository.ChatRepository
+import com.example.bookchat.domain.repository.ChattingNotificationInfoRepository
+import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.domain.repository.DeviceIDRepository
+import com.example.bookchat.domain.repository.OAuthIdTokenRepository
+import com.example.bookchat.domain.repository.SearchHistoryRepository
+import com.example.bookchat.domain.repository.UserRepository
+import javax.inject.Inject
+
+class ClearAllDataUseCase @Inject constructor(
+	private val agonyRecordRepository: AgonyRecordRepository,
+	private val agonyRepository: AgonyRepository,
+	private val bookChatTokenRepository: BookChatTokenRepository,
+	private val bookSearchRepository: BookSearchRepository,
+	private val bookShelfRepository: BookShelfRepository,
+	private val channelRepository: ChannelRepository,
+	private val channelSearchRepository: ChannelSearchRepository,
+	private val chatRepository: ChatRepository,
+	private val chattingNotificationInfoRepository: ChattingNotificationInfoRepository,
+	private val clientRepository: ClientRepository,
+	private val deviceIDRepository: DeviceIDRepository,
+	private val oAuthIdTokenRepository: OAuthIdTokenRepository,
+	private val searchHistoryRepository: SearchHistoryRepository,
+	private val userRepository: UserRepository,
+	private val channelTempMessageRepository: ChannelTempMessageRepository,
+) {
+
+	suspend operator fun invoke() {
+		agonyRecordRepository.clear()
+		agonyRepository.clear()
+		bookChatTokenRepository.clear()
+		bookSearchRepository.clear()
+		bookShelfRepository.clear()
+		channelRepository.clear()
+		channelSearchRepository.clear()
+		chatRepository.clear()
+		chattingNotificationInfoRepository.clear()
+		clientRepository.clear()
+		deviceIDRepository.clear()
+		oAuthIdTokenRepository.clear()
+		searchHistoryRepository.clear()
+		userRepository.clear()
+		channelTempMessageRepository.clear()
+	}
+}

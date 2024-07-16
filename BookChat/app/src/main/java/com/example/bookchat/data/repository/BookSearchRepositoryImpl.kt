@@ -25,7 +25,7 @@ class BookSearchRepositoryImpl @Inject constructor(
 	private var isEndPage = false
 
 	override fun getBooksFLow(initFlag: Boolean): Flow<List<Book>> {
-		if (initFlag) clearCachedData()
+		if (initFlag) clear()
 		return books
 	}
 
@@ -35,7 +35,7 @@ class BookSearchRepositoryImpl @Inject constructor(
 		sort: BookSearchSortOption,
 	): List<Book> {
 		if (cachedSearchKeyword != keyword) {
-			clearCachedData()
+			clear()
 		}
 		if (isEndPage) return books.firstOrNull() ?: emptyList()
 
@@ -58,7 +58,7 @@ class BookSearchRepositoryImpl @Inject constructor(
 		return mapBooks.value[isbn]!!
 	}
 
-	private fun clearCachedData() {
+	override fun clear() {
 		mapBooks.update { emptyMap() }
 		cachedSearchKeyword = ""
 		currentPage = 1

@@ -64,16 +64,16 @@ interface ChatRepository {
 	suspend fun deleteChannelAllChat(channelId: Long)
 
 	suspend fun getChat(chatId: Long): Chat
-	suspend fun clear()
 
 	fun getOlderChatIsEndFlow(): StateFlow<Boolean>
 	fun getNewerChatIsEndFlow(): StateFlow<Boolean>
+
+	suspend fun getFailedChats(channelId: Long): List<Chat>
+	suspend fun deleteChat(chatId: Long)
+	suspend fun clear()
 
 	companion object {
 		const val CHAT_DEFAULT_LOAD_SIZE = 30
 		private const val DEFAULT_RETRY_MAX_ATTEMPTS = 5
 	}
-
-	suspend fun getFailedChats(channelId: Long): List<Chat>
-	suspend fun deleteChat(chatId: Long)
 }

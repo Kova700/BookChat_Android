@@ -18,4 +18,6 @@ interface BookSearchRepository {
 	companion object {
 		private const val SEARCH_BOOKS_LOAD_SIZE = 30
 	}
+
+	fun clear()
 }

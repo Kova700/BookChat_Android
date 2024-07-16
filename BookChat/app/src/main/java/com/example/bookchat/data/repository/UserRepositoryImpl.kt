@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi,
-	private val userDao: UserDAO
+	private val userDao: UserDAO,
 ) : UserRepository {
 
 	/** 로컬에 있는 유저 우선적으로 쿼리 */
@@ -27,6 +27,10 @@ class UserRepositoryImpl @Inject constructor(
 
 	override suspend fun upsertAllUsers(users: List<User>) {
 		userDao.upsertAllUsers(users.toUserEntity())
+	}
+
+	override suspend fun clear() {
+		userDao.deleteAll()
 	}
 
 }

@@ -38,6 +38,8 @@ interface BookShelfRepository {
 	fun getCachedBookShelfItem(bookShelfItemId: Long): BookShelfItem
 	fun getBookShelfTotalItemCountFlow(bookShelfState: BookShelfState): Flow<Int>
 
+	fun clear()
+
 	companion object {
 		private const val BOOKSHELF_ITEM_LOAD_SIZE = 20
 		const val BOOKSHELF_ITEM_FIRST_PAGE = 0L

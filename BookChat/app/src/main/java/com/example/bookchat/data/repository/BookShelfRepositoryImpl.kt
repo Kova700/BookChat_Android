@@ -162,4 +162,10 @@ class BookShelfRepositoryImpl @Inject constructor(
 	override suspend fun checkAlreadyInBookShelf(book: Book): BookStateInBookShelf {
 		return bookChatApi.checkAlreadyInBookShelf(book.isbn, book.publishAt).toDomain()
 	}
+
+	override fun clear() {
+		mapBookShelfItems.update { emptyMap() }
+		currentPages.clear()
+		isEndPages.clear()
+	}
 }

@@ -199,7 +199,7 @@ class SearchViewModel @Inject constructor(
 	}
 
 	fun onClickHistoryClearBtn() = viewModelScope.launch {
-		searchHistoryRepository.clearHistory()
+		searchHistoryRepository.clear()
 	}
 
 	fun onBookHeaderBtnClick() {

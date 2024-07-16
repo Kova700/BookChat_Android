@@ -30,7 +30,7 @@ class AgonyRepositoryImpl @Inject constructor(
 	private var isEndPage = false
 
 	override fun getAgoniesFlow(initFlag: Boolean): Flow<List<Agony>> {
-		if (initFlag) clearCachedData()
+		if (initFlag) clear()
 		return agonies
 	}
 
@@ -47,10 +47,7 @@ class AgonyRepositoryImpl @Inject constructor(
 		sort: SearchSortOption,
 		size: Int,
 	) {
-		if (cachedBookShelfItemId != bookShelfId) {
-			clearCachedData()
-		}
-
+		if (cachedBookShelfItemId != bookShelfId) clear()
 		if (isEndPage) return
 
 		val response = bookChatApi.getAgonies(
@@ -88,13 +85,6 @@ class AgonyRepositoryImpl @Inject constructor(
 			bookShelfId = bookShelfId,
 			agonyId = agonyId
 		).toAgony()
-	}
-
-	private fun clearCachedData() {
-		setAgonies(emptyMap())
-		cachedBookShelfItemId = -1
-		currentPage = null
-		isEndPage = false
 	}
 
 	override suspend fun makeAgony(
@@ -146,6 +136,13 @@ class AgonyRepositoryImpl @Inject constructor(
 		val agonyIdsString = agonyIds.joinToString(",")
 		bookChatApi.deleteAgony(bookShelfId, agonyIdsString)
 		setAgonies(mapAgonies.value - agonyIds.toSet())
+	}
+
+	override fun clear() {
+		setAgonies(emptyMap())
+		cachedBookShelfItemId = -1
+		currentPage = null
+		isEndPage = false
 	}
 
 }

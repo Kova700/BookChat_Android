@@ -49,7 +49,7 @@ class ChattingNotificationInfoRepositoryImpl @Inject constructor(
 		dataStore.setData(notificationIdKey, gson.toJson(notificationInfos))
 	}
 
-	override suspend fun clearShownNotificationInfos() {
+	override suspend fun clear() {
 		dataStore.clearData(notificationIdKey)
 	}
 
