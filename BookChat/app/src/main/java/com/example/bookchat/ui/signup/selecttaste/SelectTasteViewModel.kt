@@ -9,6 +9,7 @@ import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedExc
 import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.usecase.LoginUseCase
+import com.example.bookchat.domain.usecase.SignUpUseCase
 import com.example.bookchat.ui.signup.SignUpActivity.Companion.EXTRA_SIGNUP_USER_NICKNAME
 import com.example.bookchat.ui.signup.SignUpActivity.Companion.EXTRA_USER_PROFILE_BYTE_ARRAY
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +26,7 @@ class SelectTasteViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val clientRepository: ClientRepository,
 	private val loginUseCase: LoginUseCase,
+	private val signUpUseCase: SignUpUseCase,
 ) : ViewModel() {
 	private val userNickname = savedStateHandle.get<String>(EXTRA_SIGNUP_USER_NICKNAME)!!
 	private val userProfile = savedStateHandle.get<ByteArray?>(EXTRA_USER_PROFILE_BYTE_ARRAY)!!
@@ -56,7 +58,7 @@ class SelectTasteViewModel @Inject constructor(
 
 	private fun signUp() = viewModelScope.launch {
 		runCatching {
-			clientRepository.signUp(
+			signUpUseCase(
 				nickname = uiState.value.nickname,
 				readingTastes = uiState.value.readingTastes,
 				userProfile = userProfileImage.value
