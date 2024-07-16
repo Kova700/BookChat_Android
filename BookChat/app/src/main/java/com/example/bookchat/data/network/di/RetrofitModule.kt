@@ -1,11 +1,10 @@
 package com.example.bookchat.data.network.di
 
 import com.example.bookchat.BuildConfig.DOMAIN
-import com.example.bookchat.data.network.AppInterceptor
+import com.example.bookchat.data.network.intercepter.AppInterceptor
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.EnumConverterFactory
 import com.example.bookchat.domain.repository.BookChatTokenRepository
-import com.example.bookchat.domain.repository.ClientRepository
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
