@@ -5,6 +5,7 @@ import com.example.bookchat.data.network.model.response.FcmMessage
 import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.model.PushType
 import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.domain.repository.FCMTokenRepository
 import com.example.bookchat.notification.LoadNotificationDataWorker
 import com.example.bookchat.utils.Constants.TAG
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -30,6 +31,9 @@ class FCMService : FirebaseMessagingService() {
 	@Inject
 	lateinit var clientRepository: ClientRepository
 
+	@Inject
+	lateinit var fcmTokenRepository: FCMTokenRepository
+
 	override fun onNewToken(token: String) {
 		super.onNewToken(token)
 		renewFCMToken(FCMToken(text = token))
@@ -44,7 +48,7 @@ class FCMService : FirebaseMessagingService() {
 	//TODO : WorkerManager로 백엔드 작업 위임 (예외처리까지 같이)
 	private fun renewFCMToken(fcmToken: FCMToken) {
 		CoroutineScope(Dispatchers.IO).launch {
-			clientRepository.renewFCMToken(fcmToken)
+			fcmTokenRepository.renewFCMToken(fcmToken)
 		}
 	}
 

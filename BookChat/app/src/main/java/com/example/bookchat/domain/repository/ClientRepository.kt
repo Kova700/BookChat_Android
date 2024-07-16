@@ -22,6 +22,5 @@ interface ClientRepository {
 	suspend fun signOut()
 	suspend fun withdraw()
 	suspend fun isDuplicatedUserNickName(nickName: String): Boolean
-	suspend fun renewFCMToken(fcmToken: FCMToken)
 	suspend fun clear()
 }
