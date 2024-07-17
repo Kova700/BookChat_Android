@@ -76,8 +76,10 @@ fun Response.isTokenExpired(): Boolean {
 }
 
 private fun Response.parseToToken(parser: Gson): BookChatToken {
-	return parser.fromJson(body?.string(), BookChatToken::class.java)
+	val token = parser.fromJson(body?.string(), BookChatToken::class.java)
+	return token.copy(accessToken = "$TOKEN_PREFIX ${token.accessToken}")
 }
 
 const val AUTHORIZATION = "Authorization"
+const val TOKEN_PREFIX = "Bearer"
 const val CONTENT_TYPE_JSON = "application/json; charset=utf-8"
