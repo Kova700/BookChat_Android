@@ -30,6 +30,11 @@ interface BookChatApi {
 		@Part("userSignUpRequest") requestUserSignUp: RequestUserSignUp,
 	)
 
+	@PUT("/v1/api/devices/fcm-token")
+	suspend fun renewFcmToken(
+		@Body fcmToken: String,
+	)
+
 	@Multipart
 	@POST("/v1/api/users/profile")
 	suspend fun changeUserProfile(
