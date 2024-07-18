@@ -45,7 +45,6 @@ class AccountSettingActivity : AppCompatActivity() {
 		finish()
 	}
 
-	//TODO : 방장이 회원탈퇴시 채팅방 터지는지 테스트 필요
 	private fun showWithdrawWarningDialog() {
 		val existingFragment =
 			supportFragmentManager.findFragmentByTag(DIALOG_TAG_WITHDRAW_WARNING)

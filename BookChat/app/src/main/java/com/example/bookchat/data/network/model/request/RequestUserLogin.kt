@@ -3,7 +3,7 @@ package com.example.bookchat.data.network.model.request
 import com.example.bookchat.data.network.model.OAuth2ProviderNetwork
 import com.google.gson.annotations.SerializedName
 
-data class RequestUserSignIn(
+data class RequestUserLogin(
 	@SerializedName("fcmToken")
 	val fcmToken: String,
 	@SerializedName("deviceToken")

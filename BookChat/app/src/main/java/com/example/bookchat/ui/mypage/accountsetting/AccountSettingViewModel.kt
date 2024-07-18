@@ -20,7 +20,7 @@ class AccountSettingViewModel @Inject constructor(
 	private val _eventFlow = MutableSharedFlow<AccountSettingUiEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
 
-	private fun signOut() = viewModelScope.launch {
+	private fun logout() = viewModelScope.launch {
 		runCatching { logoutUseCase() }
 			.onSuccess { startEvent(AccountSettingUiEvent.MoveToLoginPage) }
 			.onFailure { startEvent(AccountSettingUiEvent.MakeToast(R.string.sign_out_fail)) }
@@ -36,7 +36,7 @@ class AccountSettingViewModel @Inject constructor(
 	}
 
 	fun onClickLogoutBtn() {
-		signOut()
+		logout()
 	}
 
 	fun onClickWithdrawConfirm(){

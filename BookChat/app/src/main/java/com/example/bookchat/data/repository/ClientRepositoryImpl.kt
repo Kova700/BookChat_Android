@@ -50,13 +50,14 @@ class ClientRepositoryImpl @Inject constructor(
 
 	/** WithdrawUsecase를 이용해 로컬 데이터 삭제가 필요함으로 해당 함수 단일로 호출 금지 */
 	//TODO :회원 탈퇴 후 재가입 가능 기간 정책 결정해야함
+	//TODO : 회원탈퇴해도 채팅방에 유저로 남아있는 현상이 있음 (부방장은 이상태지만 만약 방장이 이상태라면?)
+	//TODO : 그리고 이 상태로 다시 가입하기하면 400날라오면서 이미 가입된 유저입니다 넘어오고 있음
+	// <-- 400 https://bookchat.link/v1/api/users/signup (256ms)
+	// {"errorCode":"4000100","message":"이미 가입된 사용자입니다."}
+	//TODO : FCM은 또 이전 계정으로 계속 받아지고 있음
+	//TODO : 방장이 회원탈퇴해도 채팅방이 터지지 않고 남아있음
 	override suspend fun withdraw() {
 		bookChatApi.withdraw()
-		//TODO : 회원탈퇴해도 채팅방에 유저로 남아있는 현상이 있음 (부방장은 이상태지만 만약 방장이 이상태라면?)
-		//TODO : 그리고 이 상태로 다시 가입하기하면 400날라오면서 이미 가입된 유저입니다 넘어오고 있음
-		// <-- 400 https://bookchat.link/v1/api/users/signup (256ms)
-		// {"errorCode":"4000100","message":"이미 가입된 사용자입니다."}
-		//TODO : FCM은 또 이전 계정으로 계속 받아지고 있음 ,,,,미친,,
 	}
 
 	override suspend fun getClientProfile(): User {

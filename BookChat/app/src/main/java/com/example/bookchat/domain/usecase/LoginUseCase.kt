@@ -3,7 +3,7 @@ package com.example.bookchat.domain.usecase
 import com.example.bookchat.data.mapper.toBookChatToken
 import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.network.model.request.RequestUserSignIn
+import com.example.bookchat.data.network.model.request.RequestUserLogin
 import com.example.bookchat.data.network.model.response.NeedToDeviceWarningException
 import com.example.bookchat.data.network.model.response.NeedToSignUpException
 import com.example.bookchat.domain.repository.BookChatTokenRepository
@@ -21,14 +21,14 @@ class LoginUseCase @Inject constructor(
 ) {
 	suspend operator fun invoke(isDeviceChangeApproved: Boolean = false) {
 		val idToken = oAuthIdTokenRepository.getIdToken()
-		val requestUserSignIn = RequestUserSignIn(
+		val requestUserLogin = RequestUserLogin(
 			fcmToken = fcmTokenRepository.getFCMToken().text,
 			deviceToken = deviceIdRepository.getDeviceID(),
 			isDeviceChangeApproved = isDeviceChangeApproved,
 			oauth2Provider = idToken.oAuth2Provider.toNetwork()
 		)
 
-		val response = bookChatApi.signIn(idToken.token, requestUserSignIn)
+		val response = bookChatApi.login(idToken.token, requestUserLogin)
 		if (response.isSuccessful) {
 			response.body()?.toBookChatToken()?.let {
 				bookChatTokenRepository.saveBookChatToken(it)
