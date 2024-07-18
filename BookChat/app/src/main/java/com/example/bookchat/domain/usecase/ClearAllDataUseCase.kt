@@ -15,6 +15,7 @@ import com.example.bookchat.domain.repository.DeviceIDRepository
 import com.example.bookchat.domain.repository.OAuthIdTokenRepository
 import com.example.bookchat.domain.repository.SearchHistoryRepository
 import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.notification.chat.ChatNotificationHandler
 import javax.inject.Inject
 
 class ClearAllDataUseCase @Inject constructor(
@@ -33,8 +34,8 @@ class ClearAllDataUseCase @Inject constructor(
 	private val searchHistoryRepository: SearchHistoryRepository,
 	private val userRepository: UserRepository,
 	private val channelTempMessageRepository: ChannelTempMessageRepository,
+	private val chatNotificationHandler: ChatNotificationHandler,
 ) {
-
 	suspend operator fun invoke() {
 		agonyRecordRepository.clear()
 		agonyRepository.clear()
@@ -51,5 +52,6 @@ class ClearAllDataUseCase @Inject constructor(
 		searchHistoryRepository.clear()
 		userRepository.clear()
 		channelTempMessageRepository.clear()
+		chatNotificationHandler.dismissAllNotifications()
 	}
 }
