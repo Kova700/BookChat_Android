@@ -3,12 +3,12 @@ package com.example.bookchat.data.stomp.internal
 import android.util.Log
 import com.example.bookchat.BuildConfig
 import com.example.bookchat.data.stomp.internal.mapper.toChat
-import com.example.bookchat.domain.NetworkManager
+import com.example.bookchat.data.networkmanager.external.NetworkManager
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
-import com.example.bookchat.domain.model.NetworkState
+import com.example.bookchat.data.networkmanager.external.model.NetworkState
 import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository

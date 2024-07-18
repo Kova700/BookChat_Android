@@ -3,9 +3,9 @@ package com.example.bookchat.ui.channelList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
-import com.example.bookchat.domain.NetworkManager
+import com.example.bookchat.data.networkmanager.external.NetworkManager
 import com.example.bookchat.domain.model.ChannelMemberAuthority
-import com.example.bookchat.domain.model.NetworkState
+import com.example.bookchat.data.networkmanager.external.model.NetworkState
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.ui.channelList.ChannelListUiState.UiState
 import com.example.bookchat.ui.channelList.mapper.toChannelListItem

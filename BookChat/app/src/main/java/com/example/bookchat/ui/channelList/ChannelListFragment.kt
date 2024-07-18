@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentChannelListBinding
 import com.example.bookchat.domain.model.ChannelMemberAuthority
-import com.example.bookchat.domain.model.NetworkState
+import com.example.bookchat.data.networkmanager.external.model.NetworkState
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.channel.chatting.ChannelActivity
 import com.example.bookchat.ui.channel.drawer.dialog.ChannelExitWarningDialog

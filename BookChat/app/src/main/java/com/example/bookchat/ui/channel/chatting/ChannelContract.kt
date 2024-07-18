@@ -3,7 +3,7 @@ package com.example.bookchat.ui.channel.chatting
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.model.NetworkState
+import com.example.bookchat.data.networkmanager.external.model.NetworkState
 import com.example.bookchat.data.stomp.external.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.channel.chatting.model.ChatItem

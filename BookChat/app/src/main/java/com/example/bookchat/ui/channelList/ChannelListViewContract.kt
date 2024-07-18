@@ -1,7 +1,7 @@
 package com.example.bookchat.ui.channelList
 
 import com.example.bookchat.domain.model.ChannelMemberAuthority
-import com.example.bookchat.domain.model.NetworkState
+import com.example.bookchat.data.networkmanager.external.model.NetworkState
 import com.example.bookchat.ui.channelList.model.ChannelListItem
 
 data class ChannelListUiState(

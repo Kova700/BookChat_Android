@@ -1,4 +1,4 @@
-package com.example.bookchat.data.networkmanager
+package com.example.bookchat.data.networkmanager.internal
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -6,8 +6,8 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.util.Log
-import com.example.bookchat.domain.NetworkManager
-import com.example.bookchat.domain.model.NetworkState
+import com.example.bookchat.data.networkmanager.external.NetworkManager
+import com.example.bookchat.data.networkmanager.external.model.NetworkState
 import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
