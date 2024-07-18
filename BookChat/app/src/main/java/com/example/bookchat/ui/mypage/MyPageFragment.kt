@@ -13,6 +13,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentMyPageBinding
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.mypage.MyPageViewModel.MyPageEvent
+import com.example.bookchat.ui.mypage.accountsetting.AccountSettingActivity
 import com.example.bookchat.ui.mypage.useredit.UserEditActivity
 import com.example.bookchat.utils.image.loadUserProfile
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,7 +21,6 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MyPageFragment : Fragment() {
-
 	private var _binding: FragmentMyPageBinding? = null
 	private val binding get() = _binding!!
 	private val myPageViewModel by activityViewModels<MyPageViewModel>()

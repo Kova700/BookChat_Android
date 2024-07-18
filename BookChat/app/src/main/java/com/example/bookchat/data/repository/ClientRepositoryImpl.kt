@@ -37,9 +37,8 @@ class ClientRepositoryImpl @Inject constructor(
 			),
 			requestChangeUserNickname = RequestChangeUserNickname(nickname = newNickname)
 		)
-
 		return bookChatApi.getUserProfile().toUser()
-			.also { client.update { it } }
+			.also { newClient -> client.update { newClient } }
 	}
 
 	/** LogoutUsecase를 이용해 로컬 데이터 삭제가 필요함으로 해당 함수 단일로 호출 금지
