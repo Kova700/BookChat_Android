@@ -1,9 +1,9 @@
-package com.example.bookchat.notification
+package com.example.bookchat.notification.chat
 
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
 
-interface NotificationHandler {
+interface ChatNotificationHandler {
 	suspend fun showNotification(channel: Channel, chat: Chat)
 	suspend fun dismissChannelNotifications(channel: Channel)
 	suspend fun dismissAllNotifications()

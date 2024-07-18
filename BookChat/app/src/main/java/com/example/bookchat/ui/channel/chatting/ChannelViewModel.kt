@@ -19,7 +19,7 @@ import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.domain.usecase.GetChatsFlowUseCase
 import com.example.bookchat.domain.usecase.SyncChannelChatsUseCase
-import com.example.bookchat.notification.NotificationHandler
+import com.example.bookchat.notification.chat.ChatNotificationHandler
 import com.example.bookchat.ui.channel.chatting.ChannelUiState.LoadState
 import com.example.bookchat.ui.channel.chatting.ChannelUiState.UiState
 import com.example.bookchat.ui.channel.chatting.mapper.toChatItems
@@ -59,7 +59,7 @@ class ChannelViewModel @Inject constructor(
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
 	private val networkManager: NetworkManager,
-	private val chatNotificationHandler: NotificationHandler,
+	private val chatNotificationHandler: ChatNotificationHandler,
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
 

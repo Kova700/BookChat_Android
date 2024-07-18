@@ -1,7 +1,7 @@
-package com.example.bookchat.notification.di
+package com.example.bookchat.notification.iconbuilder.di
 
-import com.example.bookchat.notification.IconBuilder
-import com.example.bookchat.notification.IconBuilderImpl
+import com.example.bookchat.notification.iconbuilder.IconBuilder
+import com.example.bookchat.notification.iconbuilder.IconBuilderImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

@@ -1,4 +1,4 @@
-package com.example.bookchat.notification
+package com.example.bookchat.fcm.noticechat
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -12,6 +12,7 @@ import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.notification.chat.ChatNotificationHandler
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -23,7 +24,7 @@ class ChatNotificationWorker @AssistedInject constructor(
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
 	private val bookChatTokenRepository: BookChatTokenRepository,
-	private val chatNotificationHandler: NotificationHandler,
+	private val chatNotificationHandler: ChatNotificationHandler,
 ) : CoroutineWorker(appContext, workerParams) {
 
 	override suspend fun doWork(): Result {

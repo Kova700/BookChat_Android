@@ -6,7 +6,7 @@ import com.example.bookchat.domain.model.PushType
 import com.example.bookchat.fcm.forcedlogout.ForcedLogoutManagerImpl
 import com.example.bookchat.fcm.forcedlogout.ForcedLogoutWorker
 import com.example.bookchat.fcm.renewfcmtoken.RenewFcmTokenWorker
-import com.example.bookchat.notification.ChatNotificationWorker
+import com.example.bookchat.fcm.noticechat.ChatNotificationWorker
 import com.example.bookchat.utils.Constants.TAG
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage

@@ -1,4 +1,4 @@
-package com.example.bookchat.fcm.forcedlogout
+package com.example.bookchat.fcm.forcedlogout.dialog
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable

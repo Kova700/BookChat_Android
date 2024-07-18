@@ -1,4 +1,4 @@
-package com.example.bookchat.notification
+package com.example.bookchat.notification.chat
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -18,6 +18,7 @@ import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ChattingNotificationInfoRepository
 import com.example.bookchat.domain.repository.StompHandler
+import com.example.bookchat.notification.iconbuilder.IconBuilder
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
 import com.example.bookchat.ui.mapper.getBitmap
@@ -26,12 +27,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Date
 import javax.inject.Inject
 
-class ChatNotificationHandler @Inject constructor(
+class ChatNotificationHandlerImpl @Inject constructor(
 	@ApplicationContext private val context: Context,
 	private val iconBuilder: IconBuilder,
 	private val stompHandler: StompHandler,
 	private val chattingNotificationInfoRepository: ChattingNotificationInfoRepository,
-) : NotificationHandler {
+) : ChatNotificationHandler {
 
 	private val notificationManager =
 		(context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
