@@ -43,10 +43,13 @@ interface BookChatApi {
 	)
 
 	@POST("/v1/api/users/signin")
-	suspend fun signIn(
+	suspend fun login(
 		@Header("OIDC") idToken: String,
-		@Body requestUserSignIn: RequestUserSignIn,
+		@Body requestUserLogin: RequestUserLogin,
 	): Response<BookChatTokenResponse>
+
+	@POST("/v1/api/users/logout")
+	suspend fun logout()
 
 	@POST("/v1/api/auth/token")
 	suspend fun renewBookChatToken(

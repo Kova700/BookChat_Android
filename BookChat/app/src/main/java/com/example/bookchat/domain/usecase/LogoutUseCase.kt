@@ -8,7 +8,7 @@ class LogoutUseCase @Inject constructor(
 	private val clearAllDataUseCase: ClearAllDataUseCase,
 ) {
 	suspend operator fun invoke(needServer: Boolean = true) {
-		if (needServer) clientRepository.signOut()
+		if (needServer) clientRepository.logout()
 		clearAllDataUseCase()
 	}
 }

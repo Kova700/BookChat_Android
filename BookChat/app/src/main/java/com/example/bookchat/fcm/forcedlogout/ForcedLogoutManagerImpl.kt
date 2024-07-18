@@ -22,7 +22,7 @@ class ForcedLogoutManagerImpl @Inject constructor(
 
 	override suspend fun onLogoutMessageReceived() {
 		shouldShowLogoutNoticeDialog = true
-		logoutUseCase()
+		logoutUseCase(needServer = false)
 		showLogoutDialog()
 	}
 

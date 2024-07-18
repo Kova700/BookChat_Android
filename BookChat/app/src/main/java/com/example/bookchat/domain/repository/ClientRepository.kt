@@ -13,7 +13,7 @@ interface ClientRepository {
 	): User
 
 	suspend fun getClientProfile(): User
-	suspend fun signOut()
+	suspend fun logout()
 	suspend fun withdraw()
 	suspend fun isDuplicatedUserNickName(nickName: String): Boolean
 	suspend fun clear()
