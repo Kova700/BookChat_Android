@@ -17,7 +17,7 @@ import dagger.assisted.AssistedInject
 
 @HiltWorker
 class ChatNotificationWorker @AssistedInject constructor(
-	@Assisted appContext: Context, //주입의 의미가 없어져버림,,,,
+	@Assisted appContext: Context,
 	@Assisted workerParams: WorkerParameters,
 	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository,
