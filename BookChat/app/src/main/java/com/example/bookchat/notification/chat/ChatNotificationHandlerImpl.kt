@@ -17,7 +17,7 @@ import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ChattingNotificationInfoRepository
-import com.example.bookchat.domain.repository.StompHandler
+import com.example.bookchat.data.stomp.external.StompHandler
 import com.example.bookchat.notification.iconbuilder.IconBuilder
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID

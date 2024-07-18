@@ -1,7 +1,7 @@
-package com.example.bookchat.data.network.di
+package com.example.bookchat.data.stomp.internal.di
 
-import com.example.bookchat.data.repository.StompHandlerImpl
-import com.example.bookchat.domain.repository.StompHandler
+import com.example.bookchat.data.stomp.external.StompHandler
+import com.example.bookchat.data.stomp.internal.StompHandlerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

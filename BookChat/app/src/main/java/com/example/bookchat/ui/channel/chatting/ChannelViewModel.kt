@@ -10,13 +10,13 @@ import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.domain.model.NetworkState
-import com.example.bookchat.domain.model.SocketState
+import com.example.bookchat.data.stomp.external.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChannelTempMessageRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.repository.StompHandler
+import com.example.bookchat.data.stomp.external.StompHandler
 import com.example.bookchat.domain.usecase.GetChatsFlowUseCase
 import com.example.bookchat.domain.usecase.SyncChannelChatsUseCase
 import com.example.bookchat.notification.chat.ChatNotificationHandler

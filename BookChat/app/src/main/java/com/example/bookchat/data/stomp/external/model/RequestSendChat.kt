@@ -1,4 +1,4 @@
-package com.example.bookchat.data.network.model.request
+package com.example.bookchat.data.stomp.external.model
 
 import com.google.gson.annotations.SerializedName
 

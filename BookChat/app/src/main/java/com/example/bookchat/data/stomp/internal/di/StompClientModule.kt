@@ -1,4 +1,4 @@
-package com.example.bookchat.data.network.di
+package com.example.bookchat.data.stomp.internal.di
 
 import android.util.Log
 import com.example.bookchat.utils.Constants.TAG
@@ -20,7 +20,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @Module
 @InstallIn(SingletonComponent::class)
-object StompModule {
+object StompClientModule {
 
 	@Provides
 	@Singleton

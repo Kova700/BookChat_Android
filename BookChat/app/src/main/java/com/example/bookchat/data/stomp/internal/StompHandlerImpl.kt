@@ -1,25 +1,25 @@
-package com.example.bookchat.data.repository
+package com.example.bookchat.data.stomp.internal
 
 import android.util.Log
 import com.example.bookchat.BuildConfig
-import com.example.bookchat.data.mapper.toChat
-import com.example.bookchat.data.network.model.request.RequestSendChat
-import com.example.bookchat.data.network.model.response.CommonMessage
-import com.example.bookchat.data.network.model.response.NotificationMessage
-import com.example.bookchat.data.network.model.response.NotificationMessageType
-import com.example.bookchat.data.network.model.response.SocketMessage
+import com.example.bookchat.data.stomp.internal.mapper.toChat
 import com.example.bookchat.domain.NetworkManager
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.domain.model.NetworkState
-import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.repository.StompHandler
+import com.example.bookchat.data.stomp.external.StompHandler
+import com.example.bookchat.data.stomp.external.model.CommonMessage
+import com.example.bookchat.data.stomp.external.model.NotificationMessage
+import com.example.bookchat.data.stomp.external.model.NotificationMessageType
+import com.example.bookchat.data.stomp.external.model.RequestSendChat
+import com.example.bookchat.data.stomp.external.model.SocketMessage
+import com.example.bookchat.data.stomp.external.model.SocketState
 import com.example.bookchat.domain.repository.UserRepository
 import com.example.bookchat.domain.usecase.RenewBookChatTokenUseCase
 import com.example.bookchat.utils.Constants.TAG
@@ -134,7 +134,7 @@ class StompHandlerImpl @Inject constructor(
 			runCatching {
 				stompSession.subscribe(
 					StompSubscribeHeaders(
-						destination = "${SUBSCRIBE_CHANNEL_DESTINATION}${channel.roomSid}",
+						destination = "$SUBSCRIBE_CHANNEL_DESTINATION${channel.roomSid}",
 						receipt = UUID.randomUUID().toString()
 					)
 				)
@@ -183,7 +183,7 @@ class StompHandlerImpl @Inject constructor(
 		val chat = chatRepository.getChat(chatId)
 		runCatching {
 			stompSession.sendText(
-				destination = "${SEND_MESSAGE_DESTINATION}${chat.chatRoomId}",
+				destination = "$SEND_MESSAGE_DESTINATION${chat.chatRoomId}",
 				body = gson.toJson(
 					RequestSendChat(
 						receiptId = chat.chatId,
@@ -233,7 +233,7 @@ class StompHandlerImpl @Inject constructor(
 
 		runCatching {
 			stompSession.sendText(
-				destination = "${SEND_MESSAGE_DESTINATION}$channelId",
+				destination = "$SEND_MESSAGE_DESTINATION$channelId",
 				body = gson.toJson(
 					RequestSendChat(
 						receiptId = receiptId,

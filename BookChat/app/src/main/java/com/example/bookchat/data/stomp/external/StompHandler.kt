@@ -1,9 +1,8 @@
-package com.example.bookchat.domain.repository
+package com.example.bookchat.data.stomp.external
 
 import com.example.bookchat.domain.model.Channel
-import com.example.bookchat.domain.model.SocketState
+import com.example.bookchat.data.stomp.external.model.SocketState
 import kotlinx.coroutines.flow.StateFlow
-
 interface StompHandler {
 	fun getSocketStateFlow(): StateFlow<SocketState>
 

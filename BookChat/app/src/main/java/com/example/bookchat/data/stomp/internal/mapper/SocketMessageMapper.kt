@@ -1,9 +1,10 @@
-package com.example.bookchat.data.mapper
+package com.example.bookchat.data.stomp.internal.mapper
 
 import com.example.bookchat.data.database.model.ChatEntity
-import com.example.bookchat.data.network.model.response.CommonMessage
-import com.example.bookchat.data.network.model.response.NotificationMessage
-import com.example.bookchat.data.network.model.response.SocketMessage
+import com.example.bookchat.data.mapper.getChatType
+import com.example.bookchat.data.stomp.external.model.CommonMessage
+import com.example.bookchat.data.stomp.external.model.NotificationMessage
+import com.example.bookchat.data.stomp.external.model.SocketMessage
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.domain.model.User
