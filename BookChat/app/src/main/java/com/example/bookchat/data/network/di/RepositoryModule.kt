@@ -2,6 +2,7 @@ package com.example.bookchat.data.network.di
 
 import com.example.bookchat.data.repository.AgonyRecordRepositoryImpl
 import com.example.bookchat.data.repository.AgonyRepositoryImpl
+import com.example.bookchat.data.repository.AppSettingRepositoryImpl
 import com.example.bookchat.data.repository.BookChatTokenRepositoryImpl
 import com.example.bookchat.data.repository.BookReportRepositoryImpl
 import com.example.bookchat.data.repository.BookSearchRepositoryImpl
@@ -19,6 +20,7 @@ import com.example.bookchat.data.repository.SearchHistoryRepositoryImpl
 import com.example.bookchat.data.repository.UserRepositoryImpl
 import com.example.bookchat.domain.repository.AgonyRecordRepository
 import com.example.bookchat.domain.repository.AgonyRepository
+import com.example.bookchat.domain.repository.AppSettingRepository
 import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.BookReportRepository
 import com.example.bookchat.domain.repository.BookSearchRepository
@@ -139,6 +141,12 @@ interface RepositoryModule {
 	fun bindSearchHistoryRepository(
 		repository: SearchHistoryRepositoryImpl,
 	): SearchHistoryRepository
+
+	@Binds
+	@Singleton
+	fun bindAppSettingRepository(
+		repository: AppSettingRepositoryImpl,
+	): AppSettingRepository
 
 	@Binds
 	@Singleton

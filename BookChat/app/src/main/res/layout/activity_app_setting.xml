@@ -1,53 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.mypage.AppSettingActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_top"
-        app:layout_constraintGuide_begin="30dp"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.mypage.appsetting.AppSettingActivity">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="30dp"/>
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="30dp" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_end"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_end="30dp"/>
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="30dp" />
 
-    <com.example.bookchat.ui.customview.AntiDupClickImageButton
-        android:id="@+id/back_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="?android:selectableItemBackgroundBorderless"
-        app:layout_constraintBottom_toBottomOf="@+id/mypage_title"
-        app:layout_constraintStart_toStartOf="@id/guideline_start"
-        app:layout_constraintTop_toTopOf="@id/guideline_top"
-        app:srcCompat="@drawable/ic_back_btn" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="30dp" />
 
-    <TextView
-        android:id="@+id/mypage_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:elegantTextHeight="true"
-        android:fontFamily="@font/notosanskr_bold"
-        android:text="@string/app_setting"
-        android:textColor="#222222"
-        android:textSize="18sp"
-        app:layout_constraintStart_toEndOf="@+id/back_btn"
-        app:layout_constraintTop_toTopOf="@id/guideline_top" />
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
+            android:id="@+id/back_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?android:selectableItemBackgroundBorderless"
+            app:layout_constraintBottom_toBottomOf="@+id/mypage_title"
+            app:layout_constraintStart_toStartOf="@id/guideline_start"
+            app:layout_constraintTop_toTopOf="@id/guideline_top"
+            app:srcCompat="@drawable/ic_back_btn" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/mypage_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_bold"
+            android:text="@string/app_setting"
+            android:textColor="#222222"
+            android:textSize="18sp"
+            app:layout_constraintStart_toEndOf="@+id/back_btn"
+            app:layout_constraintTop_toTopOf="@id/guideline_top" />
+
+        <TextView
+            android:id="@+id/textView13"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:text="푸시 알림"
+            android:textColor="#222222"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/mypage_title" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/notification_switch"
+            android:layout_width="70dp"
+            android:layout_height="34dp"
+            android:background="@android:color/transparent"
+            android:thumb="@drawable/selector_notification_switch_thumb"
+            app:layout_constraintBottom_toBottomOf="@+id/textView13"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintTop_toTopOf="@+id/textView13"
+            app:thumbTint="@drawable/selector_notification_switch_thumb_tint"
+            app:track="@drawable/selector_notification_switch_track"
+            app:trackTint="@drawable/selector_notification_switch_track_tint" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

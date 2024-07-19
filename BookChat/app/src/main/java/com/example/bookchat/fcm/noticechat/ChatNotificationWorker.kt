@@ -8,6 +8,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.example.bookchat.domain.repository.AppSettingRepository
 import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
@@ -22,13 +23,16 @@ class ChatNotificationWorker @AssistedInject constructor(
 	@Assisted workerParams: WorkerParameters,
 	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository,
+	private val appSettingRepository: AppSettingRepository,
 	private val clientRepository: ClientRepository,
 	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val chatNotificationHandler: ChatNotificationHandler,
 ) : CoroutineWorker(appContext, workerParams) {
 
 	override suspend fun doWork(): Result {
-		if (bookChatTokenRepository.isBookChatTokenExist().not()) {
+		if (bookChatTokenRepository.isBookChatTokenExist().not()
+			|| appSettingRepository.isPushNotificationEnabled().not()
+		) {
 			return Result.success()
 		}
 
