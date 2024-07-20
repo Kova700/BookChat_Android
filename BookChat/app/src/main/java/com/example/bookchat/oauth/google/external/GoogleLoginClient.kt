@@ -10,6 +10,7 @@ import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
 import com.example.bookchat.domain.model.OAuth2Provider.GOOGLE
 import com.example.bookchat.oauth.google.external.exception.GoogleLoginClientCancelException
+import com.example.bookchat.oauth.google.external.exception.GoogleLoginFailException
 import com.example.bookchat.oauth.model.IdToken
 import com.example.bookchat.oauth.model.IdToken.Companion.ID_TOKEN_PREFIX
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -56,11 +57,8 @@ class GoogleLoginClient @Inject constructor(
 
 	private fun handelError(exception: Throwable) {
 		when (exception) {
-			is GetCredentialException -> {
-				if (exception.type == TYPE_USER_CANCELED) throw GoogleLoginClientCancelException(null)
-			}
-
-			else -> throw exception
+			is GetCredentialException -> if (exception.type == TYPE_USER_CANCELED) throw GoogleLoginClientCancelException()
+			else -> throw GoogleLoginFailException(exception.message)
 		}
 	}
 }
