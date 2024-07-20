@@ -1,6 +1,6 @@
 package com.example.bookchat.data.repository
 
-import com.example.bookchat.oauth.model.IdToken
+import com.example.bookchat.oauth.external.model.IdToken
 import com.example.bookchat.domain.repository.OAuthIdTokenRepository
 import java.io.IOException
 import javax.inject.Inject

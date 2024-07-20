@@ -1,6 +1,6 @@
-package com.example.bookchat.oauth.kakao.internal.di
+package com.example.bookchat.oauth.internal.kakao.internal.di
 
-import com.example.bookchat.oauth.kakao.external.KakaoLoginClient
+import com.example.bookchat.oauth.internal.kakao.external.KakaoLoginClient
 import com.kakao.sdk.user.UserApiClient
 import dagger.Module
 import dagger.Provides

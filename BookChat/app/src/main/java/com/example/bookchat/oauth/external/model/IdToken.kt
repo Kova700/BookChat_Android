@@ -1,4 +1,4 @@
-package com.example.bookchat.oauth.model
+package com.example.bookchat.oauth.external.model
 
 import com.example.bookchat.domain.model.OAuth2Provider
 

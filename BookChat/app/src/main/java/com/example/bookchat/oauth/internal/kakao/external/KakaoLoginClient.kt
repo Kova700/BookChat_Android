@@ -1,12 +1,12 @@
-package com.example.bookchat.oauth.kakao.external
+package com.example.bookchat.oauth.internal.kakao.external
 
 import android.content.Context
 import android.util.Log
 import com.example.bookchat.domain.model.OAuth2Provider.KAKAO
-import com.example.bookchat.oauth.kakao.external.exception.KakaoLoginFailException
-import com.example.bookchat.oauth.kakao.external.exception.KakaoLoginUserCancelException
-import com.example.bookchat.oauth.model.IdToken
-import com.example.bookchat.oauth.model.IdToken.Companion.ID_TOKEN_PREFIX
+import com.example.bookchat.oauth.internal.kakao.external.exception.KakaoLoginFailException
+import com.example.bookchat.oauth.internal.kakao.external.exception.KakaoLoginClientCancelException
+import com.example.bookchat.oauth.external.model.IdToken
+import com.example.bookchat.oauth.external.model.IdToken.Companion.ID_TOKEN_PREFIX
 import com.example.bookchat.utils.Constants.TAG
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
@@ -24,7 +24,7 @@ class KakaoLoginClient @Inject constructor(
 		return if (kakaoUserApiClient.isKakaoTalkLoginAvailable(context)) {
 			loginWithKakaoTalk(context)
 				.getOrElse {
-					if (it.isClientCanceled()) throw KakaoLoginUserCancelException()
+					if (it.isClientCanceled()) throw KakaoLoginClientCancelException()
 					loginWithKakaoAccount(context)
 				}
 		} else loginWithKakaoAccount(context)
@@ -44,7 +44,7 @@ class KakaoLoginClient @Inject constructor(
 				continuation.resume(getLoginResult(token, error))
 			}
 		}.getOrElse {
-			if (it.isClientCanceled()) throw KakaoLoginUserCancelException()
+			if (it.isClientCanceled()) throw KakaoLoginClientCancelException()
 			else throw KakaoLoginFailException(it.message)
 		}
 	}

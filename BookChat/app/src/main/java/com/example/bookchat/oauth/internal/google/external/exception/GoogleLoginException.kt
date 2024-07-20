@@ -1,4 +1,4 @@
-package com.example.bookchat.oauth.google.external.exception
+package com.example.bookchat.oauth.internal.google.external.exception
 
 import java.io.IOException
 

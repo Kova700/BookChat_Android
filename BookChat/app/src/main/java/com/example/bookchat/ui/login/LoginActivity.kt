@@ -2,6 +2,7 @@ package com.example.bookchat.ui.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -9,12 +10,12 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityLoginBinding
-import com.example.bookchat.oauth.google.external.GoogleLoginClient
-import com.example.bookchat.oauth.google.external.exception.GoogleLoginClientCancelException
-import com.example.bookchat.oauth.kakao.external.KakaoLoginClient
-import com.example.bookchat.oauth.kakao.external.exception.KakaoLoginUserCancelException
+import com.example.bookchat.domain.model.OAuth2Provider
+import com.example.bookchat.oauth.external.OAuthClient
+import com.example.bookchat.oauth.external.model.exception.ClientCancelException
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.signup.SignUpActivity
+import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,10 +28,7 @@ class LoginActivity : AppCompatActivity() {
 	private val loginViewModel: LoginViewModel by viewModels()
 
 	@Inject
-	lateinit var kakaoLoginClient: KakaoLoginClient
-
-	@Inject
-	lateinit var googleLoginClient: GoogleLoginClient
+	lateinit var oauthClient: OAuthClient
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -56,28 +54,29 @@ class LoginActivity : AppCompatActivity() {
 			if (uiState.uiState == LoginUiState.UiState.LOADING) View.VISIBLE else View.GONE
 	}
 
-	//TODO : 그냥 단순 유저 Cancel이면 로그인 실패 안띄우게 수정
 	private fun startKakaoLogin() = lifecycleScope.launch {
-		runCatching { kakaoLoginClient.login(this@LoginActivity) }
+		runCatching { oauthClient.login(this@LoginActivity, OAuth2Provider.KAKAO) }
 			.onSuccess {
 				loginViewModel.onChangeIdToken(it)
 				loginViewModel.login()
 			}
 			.onFailure {
-				if (it is KakaoLoginUserCancelException) return@onFailure
-				makeToast(R.string.error_kakao_login)
+				if (it is ClientCancelException) return@onFailure
+				Log.d(TAG, "LoginActivity: startKakaoLogin() - throwable: $it")
+				binding.loginLayout.showSnackBar(R.string.error_kakao_login)
 			}
 	}
 
 	private fun startGoogleLogin() = lifecycleScope.launch {
-		runCatching { googleLoginClient.login(this@LoginActivity) }
+		runCatching { oauthClient.login(this@LoginActivity, OAuth2Provider.GOOGLE) }
 			.onSuccess {
 				loginViewModel.onChangeIdToken(it)
 				loginViewModel.login()
 			}
 			.onFailure {
-				if (it is GoogleLoginClientCancelException) return@onFailure
-				makeToast(R.string.error_google_login)
+				if (it is ClientCancelException) return@onFailure
+				Log.d(TAG, "LoginActivity: startGoogleLogin() - throwable: $it")
+				binding.loginLayout.showSnackBar(R.string.error_google_login)
 			}
 	}
 
