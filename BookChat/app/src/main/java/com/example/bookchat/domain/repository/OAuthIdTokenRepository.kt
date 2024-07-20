@@ -1,6 +1,6 @@
 package com.example.bookchat.domain.repository
 
-import com.example.bookchat.domain.model.IdToken
+import com.example.bookchat.oauth.model.IdToken
 
 interface OAuthIdTokenRepository {
 	fun getIdToken(): IdToken

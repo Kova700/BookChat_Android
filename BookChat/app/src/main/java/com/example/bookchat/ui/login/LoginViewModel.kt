@@ -5,14 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.data.network.model.response.ForbiddenException
-import com.example.bookchat.data.network.model.response.KakaoLoginFailException
 import com.example.bookchat.data.network.model.response.NeedToDeviceWarningException
 import com.example.bookchat.data.network.model.response.NeedToSignUpException
 import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
-import com.example.bookchat.domain.model.IdToken
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.OAuthIdTokenRepository
 import com.example.bookchat.domain.usecase.LoginUseCase
+import com.example.bookchat.oauth.model.IdToken
 import com.example.bookchat.ui.login.LoginUiState.UiState
 import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -86,7 +85,6 @@ class LoginViewModel @Inject constructor(
 			is NeedToDeviceWarningException -> startEvent(LoginEvent.ShowDeviceWarning)
 			is ForbiddenException -> startEvent(LoginEvent.ErrorEvent(R.string.login_forbidden_user))
 			is NetworkIsNotConnectedException -> startEvent(LoginEvent.ErrorEvent(R.string.error_network_not_connected))
-			is KakaoLoginFailException -> startEvent(LoginEvent.ErrorEvent(R.string.error_kakao_login))
 			else -> {
 				val errorMessage = exception.message
 				if (errorMessage.isNullOrBlank()) startEvent(LoginEvent.ErrorEvent(R.string.error_else))

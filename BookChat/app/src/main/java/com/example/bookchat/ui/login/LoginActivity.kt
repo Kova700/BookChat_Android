@@ -12,8 +12,10 @@ import com.example.bookchat.databinding.ActivityLoginBinding
 import com.example.bookchat.oauth.google.external.GoogleLoginClient
 import com.example.bookchat.oauth.google.external.exception.GoogleLoginClientCancelException
 import com.example.bookchat.oauth.kakao.external.KakaoLoginClient
+import com.example.bookchat.oauth.kakao.external.exception.KakaoLoginUserCancelException
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.signup.SignUpActivity
+import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -61,7 +63,10 @@ class LoginActivity : AppCompatActivity() {
 				loginViewModel.onChangeIdToken(it)
 				loginViewModel.login()
 			}
-			.onFailure { handleEvent(LoginEvent.UnknownErrorEvent("Kakao 로그인을 실패했습니다.")) }
+			.onFailure {
+				if (it is KakaoLoginUserCancelException) return@onFailure
+				makeToast(R.string.error_kakao_login)
+			}
 	}
 
 	private fun startGoogleLogin() = lifecycleScope.launch {
@@ -72,7 +77,7 @@ class LoginActivity : AppCompatActivity() {
 			}
 			.onFailure {
 				if (it is GoogleLoginClientCancelException) return@onFailure
-				handleEvent(LoginEvent.UnknownErrorEvent("Google 로그인을 실패했습니다."))
+				makeToast(R.string.error_google_login)
 			}
 	}
 

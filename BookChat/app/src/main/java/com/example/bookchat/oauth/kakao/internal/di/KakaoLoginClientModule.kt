@@ -1,5 +1,6 @@
-package com.example.bookchat.oauth.kakao
+package com.example.bookchat.oauth.kakao.internal.di
 
+import com.example.bookchat.oauth.kakao.external.KakaoLoginClient
 import com.kakao.sdk.user.UserApiClient
 import dagger.Module
 import dagger.Provides
@@ -10,7 +11,7 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-object KakaoModule {
+object KakaoLoginClientModule {
 
 	@Singleton
 	@Provides
