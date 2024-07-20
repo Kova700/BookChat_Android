@@ -14,6 +14,7 @@ import com.example.bookchat.databinding.FragmentMyPageBinding
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.mypage.MyPageViewModel.MyPageEvent
 import com.example.bookchat.ui.mypage.accountsetting.AccountSettingActivity
+import com.example.bookchat.ui.mypage.appsetting.AppSettingActivity
 import com.example.bookchat.ui.mypage.useredit.UserEditActivity
 import com.example.bookchat.utils.image.loadUserProfile
 import dagger.hilt.android.AndroidEntryPoint
