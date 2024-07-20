@@ -9,10 +9,10 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
 import com.example.bookchat.domain.model.OAuth2Provider.GOOGLE
-import com.example.bookchat.oauth.internal.google.external.exception.GoogleLoginClientCancelException
-import com.example.bookchat.oauth.internal.google.external.exception.GoogleLoginFailException
 import com.example.bookchat.oauth.external.model.IdToken
 import com.example.bookchat.oauth.external.model.IdToken.Companion.ID_TOKEN_PREFIX
+import com.example.bookchat.oauth.internal.google.external.exception.GoogleLoginClientCancelException
+import com.example.bookchat.oauth.internal.google.external.exception.GoogleLoginFailException
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import javax.inject.Inject
 
@@ -20,27 +20,27 @@ class GoogleLoginClient @Inject constructor(
 	private val getCredentialRequest: GetCredentialRequest,
 ) {
 
-	suspend fun login(context: Context): IdToken {
-		val credentialManager = CredentialManager.create(context)
+	suspend fun login(activityContext: Context): IdToken {
+		val credentialManager = CredentialManager.create(activityContext)
 		return runCatching {
 			credentialManager.getCredential(
 				request = getCredentialRequest,
-				context = context,
+				context = activityContext,
 			)
 		}.onFailure { handelError(it) }
 			.getOrThrow().getIdToken()
 	}
 
-	private suspend fun logout(context: Context) {
-		clearCredentialState(context)
+	suspend fun logout(activityContext: Context) {
+		clearCredentialState(activityContext)
 	}
 
-	private suspend fun withdraw(context: Context) {
-		clearCredentialState(context)
+	suspend fun withdraw(activityContext: Context) {
+		clearCredentialState(activityContext)
 	}
 
-	private suspend fun clearCredentialState(context: Context) {
-		val credentialManager = CredentialManager.create(context)
+	private suspend fun clearCredentialState(activityContext: Context) {
+		val credentialManager = CredentialManager.create(activityContext)
 		credentialManager.clearCredentialState(ClearCredentialStateRequest())
 	}
 

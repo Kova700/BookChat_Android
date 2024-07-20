@@ -8,17 +8,22 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAccountSettingBinding
+import com.example.bookchat.oauth.external.OAuthClient
 import com.example.bookchat.ui.login.LoginActivity
 import com.example.bookchat.ui.mypage.accountsetting.dialog.WithdrawWarningDialog
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AccountSettingActivity : AppCompatActivity() {
 
 	private lateinit var binding: ActivityAccountSettingBinding
 	private val accountSettingViewModel: AccountSettingViewModel by viewModels()
+
+	@Inject
+	lateinit var oauthClient: OAuthClient
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -36,6 +41,16 @@ class AccountSettingActivity : AppCompatActivity() {
 		binding.backBtn.setOnClickListener { finish() }
 		binding.logoutBtn.setOnClickListener { accountSettingViewModel.onClickLogoutBtn() }
 		binding.withdrawBtn.setOnClickListener { accountSettingViewModel.onClickWithdrawBtn() }
+	}
+
+	private fun startOAuthLogout() = lifecycleScope.launch {
+		runCatching { oauthClient.logout(this@AccountSettingActivity) }
+			.onSuccess { accountSettingViewModel.onSuccessOAuthLogout() }
+	}
+
+	private fun startOAuthWithdraw() = lifecycleScope.launch {
+		runCatching { oauthClient.withdraw(this@AccountSettingActivity) }
+			.onSuccess { accountSettingViewModel.onSuccessOAuthWithdraw() }
 	}
 
 	private fun moveToLoginActivity() {
@@ -61,6 +76,8 @@ class AccountSettingActivity : AppCompatActivity() {
 			is AccountSettingUiEvent.MoveToLoginPage -> moveToLoginActivity()
 			is AccountSettingUiEvent.MakeToast -> makeToast(event.stringId)
 			AccountSettingUiEvent.ShowWithdrawWarningDialog -> showWithdrawWarningDialog()
+			AccountSettingUiEvent.StartOAuthLogout -> startOAuthLogout()
+			AccountSettingUiEvent.StartOAuthWithdraw -> startOAuthWithdraw()
 		}
 	}
 

@@ -17,13 +17,13 @@ class OAuthClientManager @Inject constructor(
 ) : OAuthClient {
 
 	override suspend fun login(
-		context: Context,
+		activityContext: Context,
 		oauth2Provider: OAuth2Provider,
 	): IdToken {
 		return runCatching {
 			when (oauth2Provider) {
-				OAuth2Provider.KAKAO -> kakaoLoginClient.login(context)
-				OAuth2Provider.GOOGLE -> googleLoginClient.login(context)
+				OAuth2Provider.KAKAO -> kakaoLoginClient.login(activityContext)
+				OAuth2Provider.GOOGLE -> googleLoginClient.login(activityContext)
 			}
 		}.getOrElse {
 			if (it is GoogleLoginClientCancelException
@@ -33,11 +33,13 @@ class OAuthClientManager @Inject constructor(
 		}
 	}
 
-	override suspend fun logout() {
-		TODO("Not yet implemented")
+	override suspend fun logout(activityContext: Context) {
+		kakaoLoginClient.logout()
+		googleLoginClient.logout(activityContext)
 	}
 
-	override suspend fun withdraw() {
-		TODO("Not yet implemented")
+	override suspend fun withdraw(activityContext: Context) {
+		kakaoLoginClient.withdraw()
+		googleLoginClient.withdraw(activityContext)
 	}
 }

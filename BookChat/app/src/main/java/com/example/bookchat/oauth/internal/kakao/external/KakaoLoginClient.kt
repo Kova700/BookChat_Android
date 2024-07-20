@@ -1,13 +1,11 @@
 package com.example.bookchat.oauth.internal.kakao.external
 
 import android.content.Context
-import android.util.Log
 import com.example.bookchat.domain.model.OAuth2Provider.KAKAO
-import com.example.bookchat.oauth.internal.kakao.external.exception.KakaoLoginFailException
-import com.example.bookchat.oauth.internal.kakao.external.exception.KakaoLoginClientCancelException
 import com.example.bookchat.oauth.external.model.IdToken
 import com.example.bookchat.oauth.external.model.IdToken.Companion.ID_TOKEN_PREFIX
-import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.oauth.internal.kakao.external.exception.KakaoLoginClientCancelException
+import com.example.bookchat.oauth.internal.kakao.external.exception.KakaoLoginFailException
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
@@ -60,20 +58,14 @@ class KakaoLoginClient @Inject constructor(
 		}
 	}
 
-	//카카오 연결 로그아웃 (임시)
-	suspend fun logout() {
-		kakaoUserApiClient.logout { error ->
-			error?.let { Log.d(TAG, "KakaoSDK: logout() - 로그아웃 실패. SDK에서 토큰 삭제됨 error : ${error}") }
-				?: run { Log.d(TAG, "KakaoSDK: logout() - 로그아웃 성공. SDK에서 토큰 삭제됨") }
-		}
+	/** API 실패해도 SDK 초기화는 이루어짐*/
+	fun logout() {
+		kakaoUserApiClient.logout { _ -> }
 	}
 
-	//카카오 연결 탈퇴 (임시)
-	suspend fun withdraw() {
-		kakaoUserApiClient.unlink { error ->
-			error?.let { Log.d(TAG, "KakaoSDK: unlink() - 연결 끊기 실패. SDK에서 토큰 삭제됨 error : ${error}") }
-				?: run { Log.d(TAG, "KakaoSDK: unlink() - 연결 끊기 성공. SDK에서 토큰 삭제됨") }
-		}
+	/** API 실패해도 SDK 초기화는 이루어짐*/
+	fun withdraw() {
+		kakaoUserApiClient.unlink { _ -> }
 	}
 
 	private fun Throwable.isClientCanceled(): Boolean {

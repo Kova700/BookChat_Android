@@ -6,10 +6,10 @@ import com.example.bookchat.oauth.external.model.IdToken
 
 interface OAuthClient {
 	suspend fun login(
-		context: Context,
+		activityContext: Context,
 		oauth2Provider: OAuth2Provider,
 	): IdToken
 
-	suspend fun logout()
-	suspend fun withdraw()
+	suspend fun logout(activityContext: Context)
+	suspend fun withdraw(activityContext: Context)
 }
