@@ -12,6 +12,7 @@ import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.OAuthIdTokenRepository
 import com.example.bookchat.domain.usecase.LoginUseCase
 import com.example.bookchat.oauth.external.model.IdToken
+import com.example.bookchat.oauth.external.model.exception.ClientCancelException
 import com.example.bookchat.ui.login.LoginUiState.UiState
 import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,9 +37,7 @@ class LoginViewModel @Inject constructor(
 	private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.DEFAULT)
 	val uiState get() = _uiState.asStateFlow()
 
-	fun login(
-		isDeviceChangeApproved: Boolean = false,
-	) = viewModelScope.launch {
+	private fun login(isDeviceChangeApproved: Boolean = false) = viewModelScope.launch {
 		updateState { copy(uiState = UiState.LOADING) }
 		runCatching { loginUseCase(isDeviceChangeApproved) }
 			.onSuccess { getClientProfile() }
@@ -55,6 +54,17 @@ class LoginViewModel @Inject constructor(
 	fun onChangeIdToken(idToken: IdToken) {
 		updateState { copy(idToken = idToken) }
 		oAuthIdTokenRepository.saveIdToken(idToken)
+		login()
+	}
+
+	fun onFailKakaoLogin(throwable: Throwable) {
+		if (throwable is ClientCancelException) return
+		startEvent(LoginEvent.ErrorEvent(R.string.error_kakao_login))
+	}
+
+	fun onFailGoogleLogin(throwable: Throwable) {
+		if (throwable is ClientCancelException) return
+		startEvent(LoginEvent.ErrorEvent(R.string.error_google_login))
 	}
 
 	fun onClickKakaoLoginBtn() {
