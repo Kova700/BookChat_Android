@@ -3,7 +3,6 @@ package com.example.bookchat.oauth.internal.google.internal.di
 import androidx.credentials.GetCredentialRequest
 import com.example.bookchat.BuildConfig
 import com.example.bookchat.oauth.internal.google.external.GoogleLoginClient
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import dagger.Module
 import dagger.Provides
