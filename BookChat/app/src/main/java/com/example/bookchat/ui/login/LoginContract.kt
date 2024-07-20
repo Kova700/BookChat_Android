@@ -1,6 +1,6 @@
 package com.example.bookchat.ui.login
 
-import com.example.bookchat.domain.model.IdToken
+import com.example.bookchat.oauth.model.IdToken
 
 data class LoginUiState(
 	val uiState: UiState,

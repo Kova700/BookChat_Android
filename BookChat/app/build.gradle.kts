@@ -66,7 +66,9 @@ dependencies {
 	// Kakao Login
 	implementation("com.kakao.sdk:v2-user:2.11.0")
 	// Google Login
-	implementation("com.google.android.gms:play-services-auth:21.2.0")
+	implementation("androidx.credentials:credentials:1.2.2")
+	implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
+	implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 	//Firebase BoM(Bill of Materials)
 	implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
 	//Firebase Analytics

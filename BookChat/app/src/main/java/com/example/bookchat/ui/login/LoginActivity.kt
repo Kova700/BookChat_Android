@@ -3,15 +3,15 @@ package com.example.bookchat.ui.login
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityLoginBinding
-import com.example.bookchat.oauth.google.GoogleLoginClient
-import com.example.bookchat.oauth.kakao.KakaoLoginClient
+import com.example.bookchat.oauth.google.external.GoogleLoginClient
+import com.example.bookchat.oauth.google.external.exception.GoogleLoginClientCancelException
+import com.example.bookchat.oauth.kakao.external.KakaoLoginClient
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.signup.SignUpActivity
 import com.example.bookchat.utils.showSnackBar
@@ -54,6 +54,7 @@ class LoginActivity : AppCompatActivity() {
 			if (uiState.uiState == LoginUiState.UiState.LOADING) View.VISIBLE else View.GONE
 	}
 
+	//TODO : 그냥 단순 유저 Cancel이면 로그인 실패 안띄우게 수정
 	private fun startKakaoLogin() = lifecycleScope.launch {
 		runCatching { kakaoLoginClient.login(this@LoginActivity) }
 			.onSuccess {
@@ -64,19 +65,16 @@ class LoginActivity : AppCompatActivity() {
 	}
 
 	private fun startGoogleLogin() = lifecycleScope.launch {
-		googleLoginClient.login(this@LoginActivity, googleLoginResultLauncher)
-	}
-
-	private val googleLoginResultLauncher =
-		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-			if (result.resultCode != RESULT_OK) {
-				handleEvent(LoginEvent.UnknownErrorEvent("Google 로그인을 실패했습니다."))
-				return@registerForActivityResult
+		runCatching { googleLoginClient.login(this@LoginActivity) }
+			.onSuccess {
+				loginViewModel.onChangeIdToken(it)
+				loginViewModel.login()
 			}
-			val idToken = googleLoginClient.getIdTokenFromResultIntent(result.data)
-			loginViewModel.onChangeIdToken(idToken)
-			loginViewModel.login()
-		}
+			.onFailure {
+				if (it is GoogleLoginClientCancelException) return@onFailure
+				handleEvent(LoginEvent.UnknownErrorEvent("Google 로그인을 실패했습니다."))
+			}
+	}
 
 	private fun moveToMain() {
 		startActivity(Intent(this, MainActivity::class.java))
