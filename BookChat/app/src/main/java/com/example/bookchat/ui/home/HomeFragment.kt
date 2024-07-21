@@ -15,12 +15,13 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentHomeBinding
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.ui.MainActivity
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.channel.chatting.ChannelActivity
 import com.example.bookchat.ui.channelList.ChannelListFragment
 import com.example.bookchat.ui.createchannel.MakeChannelActivity
-import com.example.bookchat.ui.home.adapter.HomeBookAdapter
-import com.example.bookchat.ui.home.adapter.HomeChannelAdapter
+import com.example.bookchat.ui.home.book.adapter.HomeBookAdapter
+import com.example.bookchat.ui.home.book.adapter.HomeBookItemDecoration
+import com.example.bookchat.ui.home.book.model.HomeBookItem
+import com.example.bookchat.ui.home.channel.adapter.HomeChannelAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,7 +41,7 @@ class HomeFragment : Fragment() {
 	lateinit var homeChannelAdapter: HomeChannelAdapter
 
 	@Inject
-	lateinit var mainBookItemDecoration: MainBookItemDecoration
+	lateinit var homeBookItemDecoration: HomeBookItemDecoration
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -86,7 +87,7 @@ class HomeFragment : Fragment() {
 		binding.chatRoomAddBtn.setOnClickListener { moveToMakeChannel() }
 	}
 
-	private fun setEmptyUiVisibility(bookItems: List<BookShelfListItem>, channels: List<Channel>) {
+	private fun setEmptyUiVisibility(bookItems: List<HomeBookItem>, channels: List<Channel>) {
 		binding.emptyReadingBookLayout.visibility =
 			if (bookItems.isEmpty()) View.VISIBLE else View.INVISIBLE
 		binding.emptyChatRoomLayout.visibility =
@@ -118,7 +119,7 @@ class HomeFragment : Fragment() {
 	private fun initBookRcv() {
 		with(binding.readingBookRcvMain) {
 			adapter = mainReadingBookAdapter
-			addItemDecoration(mainBookItemDecoration)
+			addItemDecoration(homeBookItemDecoration)
 			layoutManager =
 				LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 		}

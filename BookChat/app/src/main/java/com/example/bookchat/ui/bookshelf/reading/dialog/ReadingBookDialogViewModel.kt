@@ -4,12 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
+import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.model.toStarRating
 import com.example.bookchat.domain.repository.BookShelfRepository
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfItem
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog.Companion.EXTRA_READING_BOOKSHELF_ITEM_ID
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialogUiState.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,9 +39,8 @@ class ReadingBookDialogViewModel @Inject constructor(
 	}
 
 	private fun getItem() {
-		val item =
-			bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)?.toBookShelfListItem()
-		item?.let { updateState { copy(readingItem = item) } }
+		val item = bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)
+		updateState { copy(readingItem = item) }
 	}
 
 	fun onChangeStarRating(rating: Float) {
@@ -61,8 +58,8 @@ class ReadingBookDialogViewModel @Inject constructor(
 	}
 
 	private fun changeBookShelfItemStatus(
-		bookShelfItem: BookShelfListItem,
-		newState: BookShelfState
+		bookShelfItem: BookShelfItem,
+		newState: BookShelfState,
 	) {
 		updateState { copy(uiState = UiState.LOADING) }
 		viewModelScope.launch {
@@ -72,7 +69,7 @@ class ReadingBookDialogViewModel @Inject constructor(
 					newBookShelfItem = bookShelfItem.copy(
 						state = newState,
 						star = uiState.value.starRating.toStarRating()
-					).toBookShelfItem(),
+					)
 				)
 			}.onSuccess {
 				startEvent(

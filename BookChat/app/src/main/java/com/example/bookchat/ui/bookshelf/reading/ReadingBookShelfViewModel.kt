@@ -7,6 +7,7 @@ import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfUiState.UiState
 import com.example.bookchat.ui.bookshelf.reading.mapper.toReadingBookShelfItems
+import com.example.bookchat.ui.bookshelf.reading.model.ReadingBookShelfItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

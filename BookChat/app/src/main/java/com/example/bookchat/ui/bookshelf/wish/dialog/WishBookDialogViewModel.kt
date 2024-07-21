@@ -4,11 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
+import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.repository.BookShelfRepository
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfItem
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.bookshelf.wish.dialog.WishBookDialog.Companion.EXTRA_WISH_BOOKSHELF_ITEM_ID
 import com.example.bookchat.ui.bookshelf.wish.dialog.WishBookDialogUiState.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,9 +36,8 @@ class WishBookDialogViewModel @Inject constructor(
 	}
 
 	private fun getItem() {
-		val item =
-			bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)?.toBookShelfListItem()
-		item?.let { updateState { copy(wishItem = item) } }
+		val item = bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)
+		updateState { copy(wishItem = item) }
 	}
 
 	fun onHeartToggleClick() {
@@ -80,12 +77,12 @@ class WishBookDialogViewModel @Inject constructor(
 		changeBookShelfItemStatus(uiState.value.wishItem, newState)
 	}
 
-	private fun addWishBookShelfItem(bookShelfListItem: BookShelfListItem) {
+	private fun addWishBookShelfItem(bookShelfItem: BookShelfItem) {
 		updateState { copy(uiState = UiState.LOADING) }
 		viewModelScope.launch {
 			runCatching {
 				bookShelfRepository.registerBookShelfBook(
-					book = bookShelfListItem.book,
+					book = bookShelfItem.book,
 					bookShelfState = BookShelfState.WISH,
 				)
 			}
@@ -94,12 +91,12 @@ class WishBookDialogViewModel @Inject constructor(
 		}
 	}
 
-	private fun deleteWishBookShelfItem(bookShelfListItem: BookShelfListItem) {
+	private fun deleteWishBookShelfItem(bookShelfItem: BookShelfItem) {
 		updateState { copy(uiState = UiState.LOADING) }
 		viewModelScope.launch {
 			runCatching {
 				bookShelfRepository.deleteBookShelfBook(
-					bookShelfListItem.bookShelfId,
+					bookShelfItem.bookShelfId,
 					BookShelfState.WISH
 				)
 			}
@@ -109,7 +106,7 @@ class WishBookDialogViewModel @Inject constructor(
 	}
 
 	private fun changeBookShelfItemStatus(
-		bookShelfItem: BookShelfListItem,
+		bookShelfItem: BookShelfItem,
 		newState: BookShelfState,
 	) {
 		updateState { copy(uiState = UiState.LOADING) }
@@ -117,7 +114,7 @@ class WishBookDialogViewModel @Inject constructor(
 			runCatching {
 				bookShelfRepository.changeBookShelfBookStatus(
 					bookShelfItemId = bookShelfItem.bookShelfId,
-					newBookShelfItem = bookShelfItem.copy(state = newState).toBookShelfItem(),
+					newBookShelfItem = bookShelfItem.copy(state = newState),
 				)
 			}.onSuccess {
 				startEvent(

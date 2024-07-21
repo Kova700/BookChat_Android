@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.bookshelf.complete.dialog.CompleteBookDialog.Companion.EXTRA_COMPLETE_BOOKSHELF_ITEM_ID
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,9 +37,8 @@ class CompleteBookDialogViewModel @Inject constructor(
 	}
 
 	private fun getBookShelfItem() {
-		val item =
-			bookShelfRepository.getCachedBookShelfItem(bookShelfItemId)?.toBookShelfListItem()
-		item?.let { updateState { copy(completeItem = item) } }
+		bookShelfRepository.getCachedBookShelfItem(bookShelfItemId)
+			.also { updateState { copy(completeItem = it) } }
 	}
 
 	fun onMoveToBookReportClick() {

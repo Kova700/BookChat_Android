@@ -1,7 +1,7 @@
 package com.example.bookchat.ui.bookshelf.complete.mapper
 
 import com.example.bookchat.domain.model.BookShelfItem
-import com.example.bookchat.ui.bookshelf.complete.CompleteBookShelfItem
+import com.example.bookchat.ui.bookshelf.complete.model.CompleteBookShelfItem
 
 fun List<BookShelfItem>.toCompleteBookShelfItems(
 	totalItemCount: Int,

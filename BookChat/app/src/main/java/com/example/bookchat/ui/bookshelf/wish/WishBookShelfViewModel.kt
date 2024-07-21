@@ -2,12 +2,11 @@ package com.example.bookchat.ui.bookshelf.wish
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.repository.BookShelfRepository
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.bookshelf.wish.WishBookShelfUiState.UiState
+import com.example.bookchat.ui.bookshelf.wish.mapper.toWishBookShelfItems
+import com.example.bookchat.ui.bookshelf.wish.model.WishBookShelfItem
 import com.example.bookchat.utils.BookImgSizeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class WishBookShelfViewModel @Inject constructor(
 	private val bookShelfRepository: BookShelfRepository,
-	private val bookImgSizeManager: BookImgSizeManager
+	private val bookImgSizeManager: BookImgSizeManager,
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<WishBookShelfEvent>()
@@ -39,17 +38,20 @@ class WishBookShelfViewModel @Inject constructor(
 	private fun observeBookShelfItems() = viewModelScope.launch {
 		bookShelfRepository.getBookShelfFlow(BookShelfState.WISH).combine(
 			bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.WISH)
-		) { items, totalCount -> groupWishItems(items, totalCount) }
-			.collect { items -> updateState { copy(wishItems = items) } }
+		) { items, totalCount ->
+			items.toWishBookShelfItems(
+				totalItemCount = totalCount,
+				dummyItemCount = bookImgSizeManager.getFlexBoxDummyItemCount(items.size),
+			)
+		}.collect { items -> updateState { copy(wishItems = items) } }
 	}
 
-	private fun getBookShelfItems() =
-		viewModelScope.launch {
-			updateState { copy(uiState = UiState.LOADING) }
-			runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.WISH) }
-				.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-				.onFailure { handleError(it) }
-		}
+	private fun getBookShelfItems() = viewModelScope.launch {
+		updateState { copy(uiState = UiState.LOADING) }
+		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.WISH) }
+			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
+			.onFailure { handleError(it) }
+	}
 
 	fun loadNextBookShelfItems(lastVisibleItemPosition: Int) {
 		if (uiState.value.wishItems.size - 1 > lastVisibleItemPosition ||
@@ -58,19 +60,7 @@ class WishBookShelfViewModel @Inject constructor(
 		getBookShelfItems()
 	}
 
-	private fun groupWishItems(
-		listItems: List<BookShelfItem>,
-		totalItemCount: Int
-	): List<WishBookShelfItem> {
-		val groupedWishItems = mutableListOf<WishBookShelfItem>()
-		groupedWishItems.add(WishBookShelfItem.Header(totalItemCount))
-		groupedWishItems.addAll(listItems.map { WishBookShelfItem.Item(it.toBookShelfListItem()) })
-		val dummyItemCount = bookImgSizeManager.getFlexBoxDummyItemCount(listItems.size)
-		(0 until dummyItemCount).forEach { i -> groupedWishItems.add(WishBookShelfItem.Dummy(i)) }
-		return groupedWishItems
-	}
-
-	fun onItemClick(bookShelfListItem: BookShelfListItem) {
+	fun onItemClick(bookShelfListItem: WishBookShelfItem.Item) {
 		startEvent(WishBookShelfEvent.MoveToWishBookDialog(bookShelfListItem))
 	}
 
@@ -90,7 +80,6 @@ class WishBookShelfViewModel @Inject constructor(
 
 	private fun handleError(throwable: Throwable) {
 		updateState { copy(uiState = UiState.ERROR) }
-
 	}
 
 }

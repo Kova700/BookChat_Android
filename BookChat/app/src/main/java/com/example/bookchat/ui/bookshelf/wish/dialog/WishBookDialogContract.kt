@@ -1,11 +1,11 @@
 package com.example.bookchat.ui.bookshelf.wish.dialog
 
+import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.model.BookShelfState
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 
 data class WishBookDialogUiState(
 	val uiState: UiState,
-	val wishItem: BookShelfListItem,
+	val wishItem: BookShelfItem,
 	val isToggleChecked: Boolean,
 ) {
 
@@ -19,7 +19,7 @@ data class WishBookDialogUiState(
 	companion object {
 		val DEFAULT = WishBookDialogUiState(
 			uiState = UiState.EMPTY,
-			wishItem = BookShelfListItem.DEFAULT,
+			wishItem = BookShelfItem.DEFAULT,
 			isToggleChecked = true
 		)
 	}

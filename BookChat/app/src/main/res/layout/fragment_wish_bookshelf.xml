@@ -2,20 +2,21 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
-
-        <variable
-            name="viewmodel"
-            type="com.example.bookchat.ui.bookshelf.wish.WishBookShelfViewModel" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <include
             android:id="@+id/bookshelf_empty_layout"
-            layout="@layout/layout_bookshelf_empty"/>
+            layout="@layout/layout_bookshelf_empty"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/wish_bookshelf_shimmer_layout"
+            layout="@layout/layout_wish_bookshelf_shimmer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
 
         <com.example.bookchat.ui.customview.ViewPagerInnerRecyclerView
             android:id="@+id/bookshelf_wish_rcv"

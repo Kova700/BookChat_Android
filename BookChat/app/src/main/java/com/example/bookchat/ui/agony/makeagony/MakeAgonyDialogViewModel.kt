@@ -9,7 +9,6 @@ import com.example.bookchat.domain.repository.AgonyRepository
 import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.agony.AgonyActivity
 import com.example.bookchat.ui.agony.makeagony.MakeAgonyUiState.UiState
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,7 +42,6 @@ class MakeAgonyDialogViewModel @Inject constructor(
 			copy(
 				bookshelfItem = bookShelfRepository
 					.getCachedBookShelfItem(bookShelfItemId)
-					.toBookShelfListItem()
 			)
 		}
 	}

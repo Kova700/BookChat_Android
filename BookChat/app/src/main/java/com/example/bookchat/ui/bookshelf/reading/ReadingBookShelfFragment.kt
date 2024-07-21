@@ -22,6 +22,7 @@ import com.example.bookchat.ui.bookshelf.reading.dialog.PageInputBottomSheetDial
 import com.example.bookchat.ui.bookshelf.reading.dialog.PageInputBottomSheetDialog.Companion.EXTRA_PAGE_INPUT_ITEM_ID
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog.Companion.EXTRA_READING_BOOKSHELF_ITEM_ID
+import com.example.bookchat.ui.bookshelf.reading.model.ReadingBookShelfItem
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -131,10 +132,10 @@ class ReadingBookShelfFragment : Fragment() {
 				(readingBookShelfDataAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item)
 			)
 		}
-		readingBookShelfDataAdapter.onLongItemClick = { itemPosition, isSwipe ->
+		readingBookShelfDataAdapter.onLongItemClick = { itemPosition, isSwiped ->
 			readingBookShelfViewModel.onItemLongClick(
 				(readingBookShelfDataAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item),
-				isSwipe
+				isSwiped
 			)
 		}
 		readingBookShelfDataAdapter.onPageInputBtnClick = { itemPosition ->

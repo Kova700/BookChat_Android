@@ -1,10 +1,10 @@
 package com.example.bookchat.ui.bookshelf.reading.dialog
 
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
+import com.example.bookchat.domain.model.BookShelfItem
 
 data class PageInputDialogUiState(
 	val uiState: UiState,
-	val targetItem: BookShelfListItem,
+	val targetItem: BookShelfItem,
 ) {
 
 	enum class UiState {
@@ -17,7 +17,7 @@ data class PageInputDialogUiState(
 	companion object {
 		val DEFAULT = PageInputDialogUiState(
 			uiState = UiState.EMPTY,
-			targetItem = BookShelfListItem.DEFAULT,
+			targetItem = BookShelfItem.DEFAULT,
 		)
 	}
 }
@@ -25,6 +25,6 @@ data class PageInputDialogUiState(
 sealed class PageInputDialogEvent {
 	object CloseDialog : PageInputDialogEvent()
 	data class MakeToast(
-		val stringId: Int
+		val stringId: Int,
 	) : PageInputDialogEvent()
 }

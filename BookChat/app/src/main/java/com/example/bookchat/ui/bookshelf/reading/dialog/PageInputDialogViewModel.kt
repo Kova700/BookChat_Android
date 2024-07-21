@@ -5,8 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.domain.repository.BookShelfRepository
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfItem
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import com.example.bookchat.ui.bookshelf.reading.dialog.PageInputBottomSheetDialog.Companion.EXTRA_PAGE_INPUT_ITEM_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -38,20 +36,17 @@ class PageInputDialogViewModel @Inject constructor(
 	}
 
 	private fun getItem() {
-		val item =
-			bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)?.toBookShelfListItem()
-		item?.let {
-			updateState { copy(targetItem = item) }
-			inputPage.update { item.pages.toString() }
-		}
+		val item = bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)
+		updateState { copy(targetItem = item) }
+		inputPage.update { item.pages.toString() }
 	}
 
 	private fun registerReadingPage() = viewModelScope.launch {
-		val newBookShelfListItem = uiState.value.targetItem.copy(pages = inputPage.value.trim().toInt())
+		val newBookShelfItem = uiState.value.targetItem.copy(pages = inputPage.value.trim().toInt())
 		runCatching {
 			bookShelfRepository.changeBookShelfBookStatus(
 				bookShelfItemId = uiState.value.targetItem.bookShelfId,
-				newBookShelfItem = newBookShelfListItem.toBookShelfItem()
+				newBookShelfItem = newBookShelfItem
 			)
 		}.onSuccess { startEvent(PageInputDialogEvent.CloseDialog) }
 			.onFailure { startEvent(PageInputDialogEvent.MakeToast(R.string.bookshelf_page_input_fail)) }

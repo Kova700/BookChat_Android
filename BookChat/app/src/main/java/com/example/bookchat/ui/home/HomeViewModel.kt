@@ -6,8 +6,8 @@ import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import com.example.bookchat.ui.home.HomeUiState.UiState
+import com.example.bookchat.ui.home.book.mapper.toHomeBookItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,7 +45,7 @@ class HomeViewModel @Inject constructor(
 
 	private fun observeReadingBookShelfItems() = viewModelScope.launch {
 		bookShelfRepository.getBookShelfFlow(BookShelfState.READING).collect { bookShelfItems ->
-			updateState { copy(readingBookShelfBooks = bookShelfItems.take(3).toBookShelfListItem()) }
+			updateState { copy(readingBookShelfBooks = bookShelfItems.take(3).toHomeBookItems()) }
 		}
 	}
 

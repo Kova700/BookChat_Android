@@ -16,10 +16,11 @@ import com.example.bookchat.databinding.FragmentWishBookshelfBinding
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.bookshelf.BookShelfViewModel
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.bookshelf.wish.adapter.WishBookShelfAdapter
 import com.example.bookchat.ui.bookshelf.wish.dialog.WishBookDialog
 import com.example.bookchat.ui.bookshelf.wish.dialog.WishBookDialog.Companion.EXTRA_WISH_BOOKSHELF_ITEM_ID
+import com.example.bookchat.ui.bookshelf.wish.model.WishBookShelfItem
+import com.example.bookchat.utils.BookImgSizeManager
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -39,14 +40,16 @@ class WishBookBookShelfFragment : Fragment() {
 	@Inject
 	lateinit var wishBookShelfAdapter: WishBookShelfAdapter
 
+	@Inject
+	lateinit var bookImgSizeManager: BookImgSizeManager
+
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
 		_binding =
 			DataBindingUtil.inflate(inflater, R.layout.fragment_wish_bookshelf, container, false)
-		binding.lifecycleOwner = this.viewLifecycleOwner
-		binding.viewmodel = wishBookShelfViewModel
+		binding.lifecycleOwner = viewLifecycleOwner
 		return binding.root
 	}
 
@@ -79,20 +82,35 @@ class WishBookBookShelfFragment : Fragment() {
 		binding.bookshelfEmptyLayout.addBookBtn.setOnClickListener {
 			(requireActivity() as MainActivity).navigateToSearchFragment()
 		}
+		initShimmerBook()
+	}
+
+	private fun initShimmerBook() {
+		with(binding.wishBookshelfShimmerLayout) {
+			bookImgSizeManager.setBookImgSize(shimmerBook1.bookImg)
+			bookImgSizeManager.setBookImgSize(shimmerBook2.bookImg)
+			bookImgSizeManager.setBookImgSize(shimmerBook3.bookImg)
+			bookImgSizeManager.setBookImgSize(shimmerBook4.bookImg)
+			bookImgSizeManager.setBookImgSize(shimmerBook5.bookImg)
+		}
 	}
 
 	private fun setViewState(uiState: WishBookShelfUiState) {
-		binding.bookshelfEmptyLayout.root.visibility =
-			if (uiState.isEmptyWishData) View.VISIBLE else View.GONE
-		binding.bookshelfWishRcv.visibility =
-			if (uiState.isEmptyWishData.not()) View.VISIBLE else View.GONE
+		with(binding) {
+			bookshelfEmptyLayout.root.visibility =
+				if (uiState.isEmptyData) View.VISIBLE else View.GONE
+			bookshelfWishRcv.visibility =
+				if (uiState.isEmptyDataORLoading.not()) View.VISIBLE else View.GONE
+			wishBookshelfShimmerLayout.root.visibility =
+				if (uiState.isLoading) View.VISIBLE else View.GONE
+					.also { wishBookshelfShimmerLayout.shimmerLayout.stopShimmer() }
+		}
 	}
 
 	private fun initAdapter() {
 		wishBookShelfAdapter.onItemClick = { itemPosition ->
 			wishBookShelfViewModel.onItemClick(
 				(wishBookShelfAdapter.currentList[itemPosition] as WishBookShelfItem.Item)
-					.bookShelfListItem
 			)
 		}
 	}
@@ -119,7 +137,7 @@ class WishBookBookShelfFragment : Fragment() {
 		}
 	}
 
-	private fun moveToWishBookDialog(bookShelfListItem: BookShelfListItem) {
+	private fun moveToWishBookDialog(bookShelfListItem: WishBookShelfItem.Item) {
 		val dialog = WishBookDialog()
 		dialog.arguments = bundleOf(EXTRA_WISH_BOOKSHELF_ITEM_ID to bookShelfListItem.bookShelfId)
 		dialog.show(this.childFragmentManager, DIALOG_TAG_WISH)
