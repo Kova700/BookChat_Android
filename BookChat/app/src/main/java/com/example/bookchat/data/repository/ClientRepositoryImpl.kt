@@ -1,15 +1,18 @@
 package com.example.bookchat.data.repository
 
 import com.example.bookchat.data.mapper.toBookChatToken
+import com.example.bookchat.data.mapper.toNetWork
 import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.mapper.toUser
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.request.RequestChangeUserNickname
 import com.example.bookchat.data.network.model.request.RequestUserLogin
+import com.example.bookchat.data.network.model.request.RequestUserSignUp
 import com.example.bookchat.data.network.model.response.NeedToDeviceWarningException
 import com.example.bookchat.data.network.model.response.NeedToSignUpException
 import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.domain.model.FCMToken
+import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.oauth.external.model.IdToken
@@ -56,6 +59,30 @@ class ClientRepositoryImpl @Inject constructor(
 				)
 			)
 		}
+	}
+
+	override suspend fun signUp(
+		idToken: IdToken,
+		nickname: String,
+		readingTastes: List<ReadingTaste>,
+		userProfile: ByteArray?,
+	) {
+		val requestUserSignUp = RequestUserSignUp(
+			oauth2Provider = idToken.oAuth2Provider.toNetwork(),
+			nickname = nickname,
+			readingTastes = readingTastes.map { it.toNetWork() },
+		)
+
+		bookChatApi.signUp(
+			idToken = idToken.token,
+			userProfileImage = userProfile?.toMultiPartBody(
+				contentType = CONTENT_TYPE_IMAGE_WEBP,
+				multipartName = PROFILE_IMAGE_MULTIPART_NAME,
+				fileName = PROFILE_IMAGE_FILE_NAME,
+				fileExtension = PROFILE_IMAGE_FILE_EXTENSION
+			),
+			requestUserSignUp = requestUserSignUp
+		)
 	}
 
 	//TODO : userProfile = null로 보내면 null로 설정이 안됨 (서버 수정 대기중)
