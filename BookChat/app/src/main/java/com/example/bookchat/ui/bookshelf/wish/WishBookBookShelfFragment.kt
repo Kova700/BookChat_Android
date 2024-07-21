@@ -100,7 +100,7 @@ class WishBookBookShelfFragment : Fragment() {
 			bookshelfEmptyLayout.root.visibility =
 				if (uiState.isEmptyData) View.VISIBLE else View.GONE
 			bookshelfWishRcv.visibility =
-				if (uiState.isEmptyDataORLoading.not()) View.VISIBLE else View.GONE
+				if (uiState.isSuccess) View.VISIBLE else View.GONE
 			wishBookshelfShimmerLayout.root.visibility =
 				if (uiState.isLoading) View.VISIBLE else View.GONE
 					.also { wishBookshelfShimmerLayout.shimmerLayout.stopShimmer() }

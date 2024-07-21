@@ -15,8 +15,8 @@ data class CompleteBookShelfUiState(
 	val isLoading: Boolean
 		get() = uiState == UiState.LOADING
 
-	val isEmptyDataORLoading: Boolean
-		get() = isEmptyData || isLoading
+	val isSuccess: Boolean
+		get() = uiState == UiState.SUCCESS
 
 	enum class UiState {
 		SUCCESS,
