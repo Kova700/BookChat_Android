@@ -12,7 +12,8 @@ data class CompleteBookShelfUiState(
 ) {
 
 	val isEmptyData: Boolean
-		get() = completeItems.filterIsInstance<CompleteBookShelfItem.Item>().isEmpty()
+		get() = isLoading.not()
+						&& completeItems.filterIsInstance<CompleteBookShelfItem.Item>().isEmpty()
 
 	val isLoading: Boolean
 		get() = uiState == UiState.LOADING

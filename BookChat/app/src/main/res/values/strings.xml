@@ -72,6 +72,7 @@
     <string name="bookshelf_delete_fail">도서 삭제를 실패했습니다.</string>
     <string name="bookshelf_delete_snack_bar">3초 뒤 도서가 삭제됩니다.</string>
     <string name="bookshelf_delete_snack_bar_cancel">실행취소</string>
+    <string name="bookshelf_page_text">%1$dp</string>
     <string name="bookshelf_page_input_fail">페이지 등록을 실패했습니다.</string>
     <string name="bookshelf_change_to_complete_success">독서완료로 변경되었습니다.</string>
     <string name="bookshelf_change_to_complete_fail">독서완료로 변경을 실패했습니다.</string>

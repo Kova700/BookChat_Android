@@ -133,8 +133,11 @@ class ReadingBookItemViewHolder(
 	}
 
 	override fun bind(readingBookShelfItem: ReadingBookShelfItem) {
-		val bookShelfListItem = (readingBookShelfItem as ReadingBookShelfItem.Item).bookShelfListItem
-		binding.bookShelfListItem = bookShelfListItem
+		val bookShelfListItem = (readingBookShelfItem as ReadingBookShelfItem.Item)
+		binding.selectedBookTitleTv.text = bookShelfListItem.book.title
+		binding.selectedBookAuthorsTv.text = bookShelfListItem.book.authorsString
+		binding.readingPageTv.text =
+			binding.root.context.getString(R.string.bookshelf_page_text, bookShelfListItem.pages)
 		binding.bookImg.loadUrl(bookShelfListItem.book.bookCoverImageUrl)
 		binding.selectedBookTitleTv.isSelected = true
 		binding.selectedBookAuthorsTv.isSelected = true

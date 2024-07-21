@@ -17,12 +17,12 @@ import com.example.bookchat.databinding.FragmentReadingBookshelfBinding
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.bookshelf.BookShelfViewModel
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.bookshelf.reading.adapter.ReadingBookShelfDataAdapter
 import com.example.bookchat.ui.bookshelf.reading.dialog.PageInputBottomSheetDialog
 import com.example.bookchat.ui.bookshelf.reading.dialog.PageInputBottomSheetDialog.Companion.EXTRA_PAGE_INPUT_ITEM_ID
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog.Companion.EXTRA_READING_BOOKSHELF_ITEM_ID
+import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -39,14 +39,19 @@ class ReadingBookShelfFragment : Fragment() {
 	@Inject
 	lateinit var readingBookShelfDataAdapter: ReadingBookShelfDataAdapter
 
+	@Inject
+	lateinit var bookImgSizeManager: BookImgSizeManager
+
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
 		_binding =
-			DataBindingUtil.inflate(inflater, R.layout.fragment_reading_bookshelf, container, false)
-		binding.lifecycleOwner = this.viewLifecycleOwner
-		binding.viewmodel = readingBookShelfViewModel
+			DataBindingUtil.inflate(
+				inflater, R.layout.fragment_reading_bookshelf,
+				container, false
+			)
+		binding.lifecycleOwner = viewLifecycleOwner
 		return binding.root
 	}
 
@@ -79,13 +84,27 @@ class ReadingBookShelfFragment : Fragment() {
 		binding.bookshelfEmptyLayout.addBookBtn.setOnClickListener {
 			(requireActivity() as MainActivity).navigateToSearchFragment()
 		}
+		initShimmerBook()
+	}
+
+	private fun initShimmerBook() {
+		with(binding.readingBookshelfShimmerLayout) {
+			bookImgSizeManager.setBookImgSize(readingBookshelfShimmer1.bookImg)
+			bookImgSizeManager.setBookImgSize(readingBookshelfShimmer2.bookImg)
+			bookImgSizeManager.setBookImgSize(readingBookshelfShimmer3.bookImg)
+		}
 	}
 
 	private fun setViewState(uiState: ReadingBookShelfUiState) {
-		binding.bookshelfEmptyLayout.root.visibility =
-			if (uiState.isEmptyReadingData) View.VISIBLE else View.GONE
-		binding.bookshelfReadingRcv.visibility =
-			if (uiState.isEmptyReadingData.not()) View.VISIBLE else View.GONE
+		with(binding) {
+			bookshelfEmptyLayout.root.visibility =
+				if (uiState.isEmptyData) View.VISIBLE else View.GONE
+			bookshelfReadingRcv.visibility =
+				if (uiState.isEmptyDataORLoading.not()) View.VISIBLE else View.GONE
+			readingBookshelfShimmerLayout.root.visibility =
+				if (uiState.isLoading) View.VISIBLE else View.GONE
+					.also { readingBookshelfShimmerLayout.shimmerLayout.stopShimmer() }
+		}
 	}
 
 	private fun initRecyclerView() {
@@ -110,36 +129,33 @@ class ReadingBookShelfFragment : Fragment() {
 		readingBookShelfDataAdapter.onItemClick = { itemPosition ->
 			readingBookShelfViewModel.onItemClick(
 				(readingBookShelfDataAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item)
-					.bookShelfListItem
 			)
 		}
 		readingBookShelfDataAdapter.onLongItemClick = { itemPosition, isSwipe ->
 			readingBookShelfViewModel.onItemLongClick(
-				(readingBookShelfDataAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item)
-					.bookShelfListItem, isSwipe
+				(readingBookShelfDataAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item),
+				isSwipe
 			)
 		}
 		readingBookShelfDataAdapter.onPageInputBtnClick = { itemPosition ->
 			readingBookShelfViewModel.onPageInputBtnClick(
 				(readingBookShelfDataAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item)
-					.bookShelfListItem
 			)
 		}
 		readingBookShelfDataAdapter.onDeleteClick = { itemPosition ->
 			readingBookShelfViewModel.onItemDeleteClick(
 				(readingBookShelfDataAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item)
-					.bookShelfListItem
 			)
 		}
 	}
 
-	private fun moveToReadingBookDialog(bookShelfListItem: BookShelfListItem) {
+	private fun moveToReadingBookDialog(bookShelfListItem: ReadingBookShelfItem.Item) {
 		val dialog = ReadingBookDialog()
 		dialog.arguments = bundleOf(EXTRA_READING_BOOKSHELF_ITEM_ID to bookShelfListItem.bookShelfId)
 		dialog.show(this.childFragmentManager, DIALOG_TAG_READING)
 	}
 
-	private fun moveToPageInputDialog(bookShelfListItem: BookShelfListItem) {
+	private fun moveToPageInputDialog(bookShelfListItem: ReadingBookShelfItem.Item) {
 		val dialog = PageInputBottomSheetDialog()
 		dialog.arguments = bundleOf(EXTRA_PAGE_INPUT_ITEM_ID to bookShelfListItem.bookShelfId)
 		dialog.show(childFragmentManager, DIALOG_TAG_PAGE_INPUT)

@@ -5,9 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.repository.BookShelfRepository
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfUiState.UiState
+import com.example.bookchat.ui.bookshelf.reading.mapper.toReadingBookShelfItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ReadingBookShelfViewModel @Inject constructor(
-	private val bookShelfRepository: BookShelfRepository
+	private val bookShelfRepository: BookShelfRepository,
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<ReadingBookShelfEvent>()
@@ -42,23 +41,11 @@ class ReadingBookShelfViewModel @Inject constructor(
 			_isSwiped,
 			bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.READING)
 		) { items, isSwipedMap, totalCount ->
-			groupReadingItems(
-				listItems = items.map {
-					it.toBookShelfListItem(isSwipedMap[it.bookShelfId] ?: false)
-				},
-				totalItemCount = totalCount
+			items.toReadingBookShelfItems(
+				totalItemCount = totalCount,
+				isSwipedMap = isSwipedMap
 			)
 		}.collect { newItems -> updateState { copy(readingItems = newItems) } }
-	}
-
-	private fun groupReadingItems(
-		listItems: List<BookShelfListItem>,
-		totalItemCount: Int
-	): List<ReadingBookShelfItem> {
-		val groupedWishItems = mutableListOf<ReadingBookShelfItem>()
-		groupedWishItems.add(ReadingBookShelfItem.Header(totalItemCount))
-		groupedWishItems.addAll(listItems.map { ReadingBookShelfItem.Item(it) })
-		return groupedWishItems
 	}
 
 	private fun getBookShelfItems() = viewModelScope.launch {
@@ -76,7 +63,7 @@ class ReadingBookShelfViewModel @Inject constructor(
 		getBookShelfItems()
 	}
 
-	private fun deleteBookShelfItem(bookShelfListItem: BookShelfListItem) =
+	private fun deleteBookShelfItem(bookShelfListItem: ReadingBookShelfItem.Item) =
 		viewModelScope.launch {
 			runCatching {
 				bookShelfRepository.deleteBookShelfBook(
@@ -87,19 +74,19 @@ class ReadingBookShelfViewModel @Inject constructor(
 		}
 
 
-	fun onItemClick(bookShelfListItem: BookShelfListItem) {
+	fun onItemClick(bookShelfListItem: ReadingBookShelfItem.Item) {
 		startEvent(ReadingBookShelfEvent.MoveToReadingBookDialog(bookShelfListItem))
 	}
 
-	fun onItemLongClick(bookShelfListItem: BookShelfListItem, isSwipe: Boolean) {
+	fun onItemLongClick(bookShelfListItem: ReadingBookShelfItem.Item, isSwipe: Boolean) {
 		_isSwiped.update { _isSwiped.value + (bookShelfListItem.bookShelfId to isSwipe) }
 	}
 
-	fun onPageInputBtnClick(bookShelfListItem: BookShelfListItem) {
+	fun onPageInputBtnClick(bookShelfListItem: ReadingBookShelfItem.Item) {
 		startEvent(ReadingBookShelfEvent.MoveToPageInputDialog(bookShelfListItem))
 	}
 
-	fun onItemDeleteClick(bookShelfListItem: BookShelfListItem) {
+	fun onItemDeleteClick(bookShelfListItem: ReadingBookShelfItem.Item) {
 		deleteBookShelfItem(bookShelfListItem)
 	}
 
