@@ -1,10 +1,18 @@
 package com.example.bookchat.data.repository
 
+import com.example.bookchat.data.mapper.toBookChatToken
+import com.example.bookchat.data.mapper.toNetwork
 import com.example.bookchat.data.mapper.toUser
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.request.RequestChangeUserNickname
+import com.example.bookchat.data.network.model.request.RequestUserLogin
+import com.example.bookchat.data.network.model.response.NeedToDeviceWarningException
+import com.example.bookchat.data.network.model.response.NeedToSignUpException
+import com.example.bookchat.domain.model.BookChatToken
+import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.oauth.external.model.IdToken
 import com.example.bookchat.utils.toMultiPartBody
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +29,33 @@ class ClientRepositoryImpl @Inject constructor(
 
 	override fun getClientFlow(): Flow<User> {
 		return client.asStateFlow().filterNotNull()
+	}
+
+	override suspend fun login(
+		idToken: IdToken,
+		fcmToken: FCMToken,
+		deviceUUID: String,
+		isDeviceChangeApproved: Boolean,
+	): BookChatToken {
+		val requestUserLogin = RequestUserLogin(
+			fcmToken = fcmToken.text,
+			deviceToken = deviceUUID,
+			isDeviceChangeApproved = isDeviceChangeApproved,
+			oauth2Provider = idToken.oAuth2Provider.toNetwork()
+		)
+
+		val response = bookChatApi.login(idToken.token, requestUserLogin)
+		if (response.isSuccessful) response.body()?.toBookChatToken()?.let { return it }
+		when (response.code()) {
+			404 -> throw NeedToSignUpException(response.errorBody()?.string())
+			409 -> throw NeedToDeviceWarningException(response.errorBody()?.string())
+			else -> throw Exception(
+				createExceptionMessage(
+					response.code(),
+					response.errorBody()?.string()
+				)
+			)
+		}
 	}
 
 	//TODO : userProfile = null로 보내면 null로 설정이 안됨 (서버 수정 대기중)

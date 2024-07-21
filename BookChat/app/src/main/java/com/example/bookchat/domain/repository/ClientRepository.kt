@@ -1,11 +1,21 @@
 package com.example.bookchat.domain.repository
 
+import com.example.bookchat.domain.model.BookChatToken
+import com.example.bookchat.domain.model.FCMToken
 import com.example.bookchat.domain.model.User
+import com.example.bookchat.oauth.external.model.IdToken
 import kotlinx.coroutines.flow.Flow
 
 interface ClientRepository {
 
 	fun getClientFlow(): Flow<User>
+
+	suspend fun login(
+		idToken: IdToken,
+		fcmToken: FCMToken,
+		deviceUUID: String,
+		isDeviceChangeApproved: Boolean,
+	) :BookChatToken
 
 	suspend fun changeClientProfile(
 		newNickname: String,
