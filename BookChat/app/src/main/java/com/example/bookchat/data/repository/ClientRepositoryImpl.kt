@@ -103,6 +103,10 @@ class ClientRepositoryImpl @Inject constructor(
 			.also { newClient -> client.update { newClient } }
 	}
 
+	override suspend fun renewBookChatToken(currentToken: BookChatToken): BookChatToken {
+		return bookChatApi.renewBookChatToken(currentToken.refreshToken).toBookChatToken()
+	}
+
 	/** LogoutUsecase를 이용해 로컬 데이터 삭제가 필요함으로 해당 함수 단일로 호출 금지
 	 * (서버 FCM토큰 삭제용도로 사용)*/
 	override suspend fun logout() {

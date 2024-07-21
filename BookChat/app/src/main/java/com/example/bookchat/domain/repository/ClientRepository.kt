@@ -30,6 +30,8 @@ interface ClientRepository {
 		userProfile: ByteArray?,
 	): User
 
+	suspend fun renewBookChatToken(currentToken: BookChatToken): BookChatToken
+
 	suspend fun getClientProfile(): User
 	suspend fun logout()
 	suspend fun withdraw()
