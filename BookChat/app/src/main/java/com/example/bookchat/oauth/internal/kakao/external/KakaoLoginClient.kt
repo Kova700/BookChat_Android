@@ -1,7 +1,7 @@
 package com.example.bookchat.oauth.internal.kakao.external
 
 import android.content.Context
-import com.example.bookchat.domain.model.OAuth2Provider.KAKAO
+import com.example.bookchat.oauth.external.model.OAuth2Provider.KAKAO
 import com.example.bookchat.oauth.external.model.IdToken
 import com.example.bookchat.oauth.external.model.IdToken.Companion.ID_TOKEN_PREFIX
 import com.example.bookchat.oauth.internal.kakao.external.exception.KakaoLoginClientCancelException

@@ -1,7 +1,7 @@
 package com.example.bookchat.oauth.external
 
 import android.content.Context
-import com.example.bookchat.domain.model.OAuth2Provider
+import com.example.bookchat.oauth.external.model.OAuth2Provider
 import com.example.bookchat.oauth.external.model.IdToken
 
 interface OAuthClient {

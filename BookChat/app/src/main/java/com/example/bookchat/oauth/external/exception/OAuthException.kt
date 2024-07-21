@@ -1,4 +1,4 @@
-package com.example.bookchat.oauth.external.model.exception
+package com.example.bookchat.oauth.external.exception
 
 import java.io.IOException
 

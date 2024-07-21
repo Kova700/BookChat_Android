@@ -9,7 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityLoginBinding
-import com.example.bookchat.domain.model.OAuth2Provider
+import com.example.bookchat.oauth.external.model.OAuth2Provider
 import com.example.bookchat.oauth.external.OAuthClient
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.signup.SignUpActivity

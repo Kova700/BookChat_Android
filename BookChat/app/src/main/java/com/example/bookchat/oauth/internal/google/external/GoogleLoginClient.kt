@@ -8,7 +8,7 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
-import com.example.bookchat.domain.model.OAuth2Provider.GOOGLE
+import com.example.bookchat.oauth.external.model.OAuth2Provider.GOOGLE
 import com.example.bookchat.oauth.external.model.IdToken
 import com.example.bookchat.oauth.external.model.IdToken.Companion.ID_TOKEN_PREFIX
 import com.example.bookchat.oauth.internal.google.external.exception.GoogleLoginClientCancelException

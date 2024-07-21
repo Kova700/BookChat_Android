@@ -1,10 +1,10 @@
 package com.example.bookchat.oauth.internal
 
 import android.content.Context
-import com.example.bookchat.domain.model.OAuth2Provider
 import com.example.bookchat.oauth.external.OAuthClient
+import com.example.bookchat.oauth.external.exception.ClientCancelException
 import com.example.bookchat.oauth.external.model.IdToken
-import com.example.bookchat.oauth.external.model.exception.ClientCancelException
+import com.example.bookchat.oauth.external.model.OAuth2Provider
 import com.example.bookchat.oauth.internal.google.external.GoogleLoginClient
 import com.example.bookchat.oauth.internal.google.external.exception.GoogleLoginClientCancelException
 import com.example.bookchat.oauth.internal.kakao.external.KakaoLoginClient
@@ -26,9 +26,7 @@ class OAuthClientManager @Inject constructor(
 				OAuth2Provider.GOOGLE -> googleLoginClient.login(activityContext)
 			}
 		}.getOrElse {
-			if (it is GoogleLoginClientCancelException
-				|| it is KakaoLoginClientCancelException
-			) throw ClientCancelException()
+			if (it.isClientCancelException()) throw ClientCancelException()
 			else throw it
 		}
 	}
@@ -41,5 +39,10 @@ class OAuthClientManager @Inject constructor(
 	override suspend fun withdraw(activityContext: Context) {
 		kakaoLoginClient.withdraw()
 		googleLoginClient.withdraw(activityContext)
+	}
+
+	private fun Throwable.isClientCancelException(): Boolean {
+		return this is GoogleLoginClientCancelException
+						|| this is KakaoLoginClientCancelException
 	}
 }

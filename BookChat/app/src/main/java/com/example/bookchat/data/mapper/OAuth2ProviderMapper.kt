@@ -1,7 +1,7 @@
 package com.example.bookchat.data.mapper
 
 import com.example.bookchat.data.network.model.OAuth2ProviderNetwork
-import com.example.bookchat.domain.model.OAuth2Provider
+import com.example.bookchat.oauth.external.model.OAuth2Provider
 
 fun OAuth2ProviderNetwork.toDomain(): OAuth2Provider {
 	return OAuth2Provider.valueOf(name)
