@@ -15,7 +15,15 @@
 
         <include
             android:id="@+id/bookshelf_empty_layout"
-            layout="@layout/layout_bookshelf_empty" />
+            layout="@layout/layout_bookshelf_empty"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/complete_bookshelf_shimmer_layout"
+            layout="@layout/layout_complete_bookshelf_shimmer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
 
         <com.example.bookchat.ui.customview.ViewPagerInnerRecyclerView
             android:id="@+id/bookshelf_complete_rcv"

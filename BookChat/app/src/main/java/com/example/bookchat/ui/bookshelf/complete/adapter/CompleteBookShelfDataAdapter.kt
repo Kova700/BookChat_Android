@@ -133,8 +133,10 @@ class CompleteBookItemViewHolder(
 	}
 
 	override fun bind(completeBookShelfItem: CompleteBookShelfItem) {
-		val bookShelfListItem = (completeBookShelfItem as CompleteBookShelfItem.Item).bookShelfListItem
-		binding.bookShelfListItem = bookShelfListItem
+		val bookShelfListItem = (completeBookShelfItem as CompleteBookShelfItem.Item)
+		binding.selectedBookTitleTv.text = bookShelfListItem.book.title
+		binding.selectedBookAuthorsTv.text = bookShelfListItem.book.authorsString
+		binding.starRating.rating = bookShelfListItem.star?.value ?: 0F
 		binding.bookImg.loadUrl(bookShelfListItem.book.bookCoverImageUrl)
 		binding.selectedBookTitleTv.isSelected = true
 		binding.selectedBookAuthorsTv.isSelected = true

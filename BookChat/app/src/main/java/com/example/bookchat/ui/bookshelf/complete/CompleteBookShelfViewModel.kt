@@ -6,8 +6,7 @@ import com.example.bookchat.R
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.bookshelf.complete.CompleteBookShelfUiState.UiState
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
+import com.example.bookchat.ui.bookshelf.complete.mapper.toCompleteBookShelfItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,13 +17,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO : EmptyList 인 경우 UI 노출 + 도서 추가 하기 누르면 검색 Fragment로 이동
-// TOOD : 도서 제거시 리스트에서 제거
-// TOOD : 도서 삭제가 완료되었습니다 스낵바노출 (3초뒤 삭제 API 호출 예약)
+// TODO : 도서 삭제가 완료되었습니다 스낵바노출 (3초뒤 삭제 API 호출 예약)
 // TODO : 실행 취소 버튼(호출 예약 취소 + 리스트에 다시 추가)
 @HiltViewModel
 class CompleteBookShelfViewModel @Inject constructor(
-	private val bookShelfRepository: BookShelfRepository
+	private val bookShelfRepository: BookShelfRepository,
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<CompleteBookShelfEvent>()
@@ -47,32 +44,19 @@ class CompleteBookShelfViewModel @Inject constructor(
 			_isSwiped,
 			bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.COMPLETE)
 		) { items, isSwipedMap, totalCount ->
-			groupCompleteItems(
-				listItems = items.map {
-					it.toBookShelfListItem(isSwipedMap[it.bookShelfId] ?: false)
-				},
-				totalItemCount = totalCount
+			items.toCompleteBookShelfItems(
+				totalItemCount = totalCount,
+				isSwipedMap = isSwipedMap
 			)
 		}.collect { newItems -> updateState { copy(completeItems = newItems) } }
 	}
 
-	private fun groupCompleteItems(
-		listItems: List<BookShelfListItem>,
-		totalItemCount: Int
-	): List<CompleteBookShelfItem> {
-		val groupedWishItems = mutableListOf<CompleteBookShelfItem>()
-		groupedWishItems.add(CompleteBookShelfItem.Header(totalItemCount))
-		groupedWishItems.addAll(listItems.map { CompleteBookShelfItem.Item(it) })
-		return groupedWishItems
+	private fun getBookShelfItems() = viewModelScope.launch {
+		updateState { copy(uiState = UiState.LOADING) }
+		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.COMPLETE) }
+			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
+			.onFailure { handleError(it) }
 	}
-
-	private fun getBookShelfItems() =
-		viewModelScope.launch {
-			updateState { copy(uiState = UiState.LOADING) }
-			runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.COMPLETE) }
-				.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-				.onFailure { handleError(it) }
-		}
 
 	fun loadNextBookShelfItems(lastVisibleItemPosition: Int) {
 		if (uiState.value.completeItems.size - 1 > lastVisibleItemPosition ||
@@ -81,7 +65,7 @@ class CompleteBookShelfViewModel @Inject constructor(
 		getBookShelfItems()
 	}
 
-	private fun deleteBookShelfItem(bookShelfListItem: BookShelfListItem) =
+	private fun deleteBookShelfItem(bookShelfListItem: CompleteBookShelfItem.Item) =
 		viewModelScope.launch {
 			runCatching {
 				bookShelfRepository.deleteBookShelfBook(
@@ -91,15 +75,15 @@ class CompleteBookShelfViewModel @Inject constructor(
 			}.onFailure { startEvent(CompleteBookShelfEvent.MakeToast(R.string.bookshelf_delete_fail)) }
 		}
 
-	fun onItemClick(bookShelfListItem: BookShelfListItem) {
+	fun onItemClick(bookShelfListItem: CompleteBookShelfItem.Item) {
 		startEvent(CompleteBookShelfEvent.MoveToCompleteBookDialog(bookShelfListItem))
 	}
 
-	fun onItemLongClick(bookShelfListItem: BookShelfListItem, isSwipe: Boolean) {
+	fun onItemLongClick(bookShelfListItem: CompleteBookShelfItem.Item, isSwipe: Boolean) {
 		_isSwiped.update { _isSwiped.value + (bookShelfListItem.bookShelfId to isSwipe) }
 	}
 
-	fun onItemDeleteClick(bookShelfListItem: BookShelfListItem) {
+	fun onItemDeleteClick(bookShelfListItem: CompleteBookShelfItem.Item) {
 		deleteBookShelfItem(bookShelfListItem)
 	}
 

@@ -16,7 +16,7 @@ import com.example.bookchat.databinding.FragmentCompleteBookshelfBinding
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.bookshelf.complete.adapter.CompleteBookShelfDataAdapter
 import com.example.bookchat.ui.bookshelf.complete.dialog.CompleteBookDialog
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
+import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -32,13 +32,19 @@ class CompleteBookShelfFragment : Fragment() {
 	@Inject
 	lateinit var completeBookShelfDataAdapter: CompleteBookShelfDataAdapter
 
+	@Inject
+	lateinit var bookImgSizeManager: BookImgSizeManager
+
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
 		_binding =
-			DataBindingUtil.inflate(inflater, R.layout.fragment_complete_bookshelf, container, false)
+			DataBindingUtil.inflate(
+				inflater, R.layout.fragment_complete_bookshelf,
+				container, false
+			)
 		binding.lifecycleOwner = this.viewLifecycleOwner
 		binding.viewmodel = completeBookShelfViewModel
 		return binding.root
@@ -73,32 +79,44 @@ class CompleteBookShelfFragment : Fragment() {
 		binding.bookshelfEmptyLayout.addBookBtn.setOnClickListener {
 			(requireActivity() as MainActivity).navigateToSearchFragment()
 		}
+		initShimmerBook()
+	}
+
+	private fun initShimmerBook() {
+		with(binding.completeBookshelfShimmerLayout) {
+			bookImgSizeManager.setBookImgSize(completeBookshelfShimmer1.bookImg)
+			bookImgSizeManager.setBookImgSize(completeBookshelfShimmer2.bookImg)
+			bookImgSizeManager.setBookImgSize(completeBookshelfShimmer3.bookImg)
+		}
 	}
 
 	private fun setViewState(uiState: CompleteBookShelfUiState) {
-		binding.bookshelfEmptyLayout.root.visibility =
-			if (uiState.isEmptyReadingData) View.VISIBLE else View.GONE
-		binding.bookshelfCompleteRcv.visibility =
-			if (uiState.isEmptyReadingData.not()) View.VISIBLE else View.GONE
+		with(binding) {
+			bookshelfEmptyLayout.root.visibility =
+				if (uiState.isEmptyData) View.VISIBLE else View.GONE
+			bookshelfCompleteRcv.visibility =
+				if (uiState.isEmptyDataORLoading.not()) View.VISIBLE else View.GONE
+			completeBookshelfShimmerLayout.root.visibility =
+				if (uiState.isLoading) View.VISIBLE else View.GONE
+					.also { completeBookshelfShimmerLayout.shimmerLayout.stopShimmer() }
+		}
 	}
 
 	private fun initAdapter() {
 		completeBookShelfDataAdapter.onItemClick = { itemPosition ->
 			completeBookShelfViewModel.onItemClick(
 				(completeBookShelfDataAdapter.currentList[itemPosition] as CompleteBookShelfItem.Item)
-					.bookShelfListItem
 			)
 		}
 		completeBookShelfDataAdapter.onLongItemClick = { itemPosition, isSwipe ->
 			completeBookShelfViewModel.onItemLongClick(
-				(completeBookShelfDataAdapter.currentList[itemPosition] as CompleteBookShelfItem.Item)
-					.bookShelfListItem, isSwipe
+				(completeBookShelfDataAdapter.currentList[itemPosition] as CompleteBookShelfItem.Item),
+				isSwipe
 			)
 		}
 		completeBookShelfDataAdapter.onDeleteClick = { itemPosition ->
 			completeBookShelfViewModel.onItemDeleteClick(
 				(completeBookShelfDataAdapter.currentList[itemPosition] as CompleteBookShelfItem.Item)
-					.bookShelfListItem
 			)
 		}
 	}
@@ -121,7 +139,7 @@ class CompleteBookShelfFragment : Fragment() {
 		}
 	}
 
-	private fun moveToCompleteBookDialog(bookShelfListItem: BookShelfListItem) {
+	private fun moveToCompleteBookDialog(bookShelfListItem: CompleteBookShelfItem.Item) {
 		val dialog = CompleteBookDialog()
 		dialog.arguments =
 			bundleOf(
