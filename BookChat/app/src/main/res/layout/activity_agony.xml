@@ -3,19 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <import type="com.example.bookchat.ui.agony.AgonyViewModel" />
-
-        <variable
-            name="viewmodel"
-            type="com.example.bookchat.ui.agony.AgonyViewModel" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.agony.AgonyActivity">
+
+        <include
+            android:id="@+id/agony_shimmer_layout"
+            layout="@layout/layout_agony_shimmer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView12" />
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/editting_state_group"
@@ -31,7 +32,6 @@
             android:layout_marginStart="25dp"
             android:layout_marginTop="27dp"
             android:background="?android:selectableItemBackgroundBorderless"
-            android:onClick="@{() -> viewmodel.onClickBackBtn()}"
             android:padding="5dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -58,7 +58,6 @@
             android:layout_marginEnd="30dp"
             android:padding="5dp"
             android:background="?android:selectableItemBackgroundBorderless"
-            android:onClick="@{() -> viewmodel.onEditBtnClick()}"
             android:src="@drawable/ic_wastebasket_btn"
             app:layout_constraintBottom_toBottomOf="@+id/back_btn"
             app:layout_constraintEnd_toEndOf="parent"
@@ -73,7 +72,6 @@
             android:elegantTextHeight="true"
             android:focusable="true"
             android:fontFamily="@font/notosanskr_medium"
-            android:onClick="@{() -> viewmodel.onClickEditCancelBtn()}"
             android:padding="5dp"
             android:text="@string/cancel"
             android:textColor="#222222"
@@ -104,23 +102,12 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:minHeight="45dp"
-            android:onClick="@{() -> viewmodel.onClickDeleteBtn()}"
             android:text="@string/agony_record_delete_btn_text"
             android:textSize="14sp"
             app:cornerRadius="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
-
-        <ProgressBar
-            android:id="@+id/agony_pg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

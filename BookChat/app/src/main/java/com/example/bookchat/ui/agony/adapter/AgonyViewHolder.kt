@@ -59,10 +59,11 @@ class AgonyDataItemViewHolder(
 	}
 
 	override fun bind(agonyListItem: AgonyListItem) {
-		binding.agonyListItem = (agonyListItem as AgonyListItem.Item)
-		binding.titleAgonyFolderTv.setTextColor(agonyListItem.hexColorCode.getTextColorHexInt())
+		val item = (agonyListItem as AgonyListItem.Item)
+		binding.titleAgonyFolderTv.text = item.title
+		binding.titleAgonyFolderTv.setTextColor(item.hexColorCode.getTextColorHexInt())
 		binding.backgroundAgonyFolderCv.backgroundTintList = ColorStateList.valueOf(
-			Color.parseColor(agonyListItem.hexColorCode.hexcolor)
+			Color.parseColor(item.hexColorCode.hexcolor)
 		)
 	}
 }

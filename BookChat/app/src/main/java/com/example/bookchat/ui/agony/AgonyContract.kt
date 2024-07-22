@@ -32,11 +32,11 @@ sealed class AgonyEvent {
 
 	data class MoveToAgonyRecord(
 		val bookshelfItemId: Long,
-		val agonyListItemId: Long
+		val agonyListItemId: Long,
 	) : AgonyEvent()
 
 	data class MakeToast(
-		val stringId: Int
+		val stringId: Int,
 	) : AgonyEvent()
 
 }

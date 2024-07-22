@@ -12,11 +12,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAgonyBinding
+import com.example.bookchat.ui.agony.AgonyUiState.UiState
 import com.example.bookchat.ui.agony.adapter.AgonyAdapter
 import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordActivity
 import com.example.bookchat.ui.agony.makeagony.MakeAgonyBottomSheetDialog
 import com.example.bookchat.ui.agony.model.AgonyListItem
-import com.example.bookchat.ui.agony.AgonyUiState.UiState
+import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -32,15 +33,18 @@ class AgonyActivity : AppCompatActivity() {
 
 	private val agonyViewModel: AgonyViewModel by viewModels()
 
+	@Inject
+	lateinit var bookImgSizeManager: BookImgSizeManager
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_agony)
 		binding.lifecycleOwner = this
-		binding.viewmodel = agonyViewModel
 		observeUiState()
 		observeUiEvent()
 		initAdapter()
 		initRecyclerView()
+		initViewState()
 	}
 
 	private fun observeUiState() = lifecycleScope.launch {
@@ -55,13 +59,30 @@ class AgonyActivity : AppCompatActivity() {
 		agonyViewModel.eventFlow.collect { event -> handleEvent(event) }
 	}
 
+	private fun initViewState() {
+		binding.backBtn.setOnClickListener { agonyViewModel.onClickBackBtn() }
+		binding.wasteBasketBtn.setOnClickListener { agonyViewModel.onClickEditBtn() }
+		binding.editCancelBtn.setOnClickListener { agonyViewModel.onClickEditCancelBtn() }
+		binding.agonyDeleteBtn.setOnClickListener { agonyViewModel.onClickDeleteBtn() }
+		initShimmerState()
+	}
+
 	private fun setViewState(state: AgonyUiState) {
-		binding.agonyPg.visibility =
-			if (state.uiState == UiState.LOADING) View.VISIBLE else View.GONE
-		binding.edittingStateGroup.visibility =
-		if (state.uiState == UiState.EDITING) View.VISIBLE else View.INVISIBLE
-		binding.wasteBasketBtn.visibility =
-			if (state.uiState == UiState.SUCCESS) View.VISIBLE else View.INVISIBLE
+		with(binding) {
+			edittingStateGroup.visibility =
+				if (state.uiState == UiState.EDITING) View.VISIBLE else View.INVISIBLE
+			wasteBasketBtn.visibility =
+				if (state.uiState == UiState.SUCCESS) View.VISIBLE else View.INVISIBLE
+			agonyRcv.visibility =
+				if (state.uiState == UiState.SUCCESS) View.VISIBLE else View.GONE
+			agonyShimmerLayout.root.visibility =
+				if (state.uiState == UiState.LOADING) View.VISIBLE else View.GONE
+					.also { agonyShimmerLayout.shimmerLayout.stopShimmer() }
+		}
+	}
+
+	private fun initShimmerState() {
+		bookImgSizeManager.setBookImgSize(binding.agonyShimmerLayout.bookImg)
 	}
 
 	private fun initAdapter() {

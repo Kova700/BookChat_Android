@@ -51,16 +51,12 @@ class AgonyViewModel @Inject constructor(
 	}
 
 	private fun observeAgonies() = viewModelScope.launch {
-		agonyRepository.getAgoniesFlow(true).combine(_isSelected) { items, isSelectedMap ->
-			updateState {
-				copy(
-					agonies = items.toAgonyListItem(
-						bookshelfItem = bookshelfItem,
-						isSelectedMap = isSelectedMap
-					)
-				)
-			}
-		}.collect {}
+		combine(agonyRepository.getAgoniesFlow(true), _isSelected) { items, isSelectedMap ->
+			items.toAgonyListItem(
+				bookshelfItem = uiState.value.bookshelfItem,
+				isSelectedMap = isSelectedMap
+			)
+		}.collect { updateState { copy(agonies = it) } }
 	}
 
 	private fun getAgonies() = viewModelScope.launch {
@@ -90,7 +86,7 @@ class AgonyViewModel @Inject constructor(
 			}
 	}
 
-	fun onEditBtnClick() {
+	fun onClickEditBtn() {
 		updateState { copy(uiState = UiState.EDITING) }
 		startEvent(AgonyEvent.RenewItemViewMode)
 	}
