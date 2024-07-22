@@ -2,23 +2,55 @@ package com.example.bookchat.ui.imagecrop
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityImageCropBinding
 import com.example.bookchat.utils.image.bitmap.compressToByteArray
+import kotlinx.coroutines.launch
 
-//TODO : 채팅방 이미지는 1:1 비율로하면 깨짐 (수정 가능하게 수정)
 class ImageCropActivity : AppCompatActivity() {
 
 	private lateinit var binding: ActivityImageCropBinding
 
+	private val imageCropViewModel: ImageCropViewModel by viewModels()
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_image_crop)
-		binding.activity = this
-		galleryActivityResultLauncher.launch(LAUNCHER_INPUT_IMAGE)
+		binding.lifecycleOwner = this
+		moveToGallery()
+		observeUiState()
+		observeUiEvent()
+		initViewState()
+		setBackPressedDispatcher()
+	}
+
+	private fun observeUiState() = lifecycleScope.launch {
+		imageCropViewModel.uiState.collect { uiState ->
+			setViewState(uiState)
+		}
+	}
+
+	private fun observeUiEvent() = lifecycleScope.launch {
+		imageCropViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun setViewState(uiState: ImageCropUiState) {
+		binding.cropImageView.setImageUriAsync(uiState.selectedImageUrl)
+	}
+
+	private fun initViewState() {
+		with(binding) {
+			cancelBtn.setOnClickListener { imageCropViewModel.onClickCancelBtn() }
+			imgRotateBtn.setOnClickListener { imageCropViewModel.onClickRightRotatePictureBtn() }
+			imageSelectBtn.setOnClickListener { imageCropViewModel.onClickMoveToGalleryBtn() }
+			confirmBtn.setOnClickListener { imageCropViewModel.onClickFinishBtn() }
+		}
 	}
 
 	private val galleryActivityResultLauncher =
@@ -27,33 +59,57 @@ class ImageCropActivity : AppCompatActivity() {
 				finish()
 				return@registerForActivityResult
 			}
-			binding.cropImageView.setImageUriAsync(resultUri)
+			imageCropViewModel.onChangeSelectedImageUrl(resultUri)
 		}
 
-	fun onClickFinishBtn() {
+	private fun moveToGallery() {
+		galleryActivityResultLauncher.launch(LAUNCHER_INPUT_IMAGE)
+	}
+
+	private fun rotateImageToTheRight() {
+		binding.cropImageView.rotateImage(90)
+	}
+
+	private fun cropSelectedImageArea(width: Int, height: Int) {
 		val bitmap: Bitmap =
-			binding.cropImageView.getCroppedImage(CROPPED_IMG_SIZE_WIDTH, CROPPED_IMG_SIZE_HEIGHT)!!
-		val byteArray = bitmap.compressToByteArray()
-		intent.putExtra(EXTRA_CROPPED_PROFILE_BYTE_ARRAY, byteArray)
+			binding.cropImageView.getCroppedImage(
+				reqWidth = width,
+				reqHeight = height
+			) ?: return
+		imageCropViewModel.onChangeCroppedImage(bitmap.compressToByteArray())
+	}
+
+	private fun finishWithCroppedImage(croppedImage: ByteArray) {
+		intent.putExtra(EXTRA_CROPPED_PROFILE_BYTE_ARRAY, croppedImage)
 		setResult(RESULT_OK, intent)
 		finish()
 	}
 
-	fun onClickCancelBtn() {
-		finish()
+	private fun setBackPressedDispatcher() {
+		onBackPressedDispatcher.addCallback(this) {
+			if (imageCropViewModel.uiState.value.selectedImageUrl != null) {
+				imageCropViewModel.onBackPressed()
+				return@addCallback
+			}
+			finish()
+		}
 	}
 
-	fun onClickOtherPictureBtn() {
-		galleryActivityResultLauncher.launch(LAUNCHER_INPUT_IMAGE)
-	}
+	private fun handleEvent(event: ImageCropUiEvent) {
+		when (event) {
+			is ImageCropUiEvent.MoveToBack -> finish()
+			is ImageCropUiEvent.MoveToGallery -> moveToGallery()
+			is ImageCropUiEvent.CropSelectedImageArea -> cropSelectedImageArea(
+				width = event.width,
+				height = event.height
+			)
 
-	fun onClickRightRotatePictureBtn() {
-		binding.cropImageView.rotateImage(90)
+			is ImageCropUiEvent.FinishWithCroppedImage -> finishWithCroppedImage(event.croppedImage)
+			ImageCropUiEvent.RotateImageToRight -> rotateImageToTheRight()
+		}
 	}
 
 	companion object {
-		private const val CROPPED_IMG_SIZE_WIDTH = 200 //임시 200
-		private const val CROPPED_IMG_SIZE_HEIGHT = 200 //임시 200
 		const val EXTRA_CROPPED_PROFILE_BYTE_ARRAY = "EXTRA_CROPPED_PROFILE_BYTE_ARRAY"
 		const val LAUNCHER_INPUT_IMAGE = "image/*"
 	}
