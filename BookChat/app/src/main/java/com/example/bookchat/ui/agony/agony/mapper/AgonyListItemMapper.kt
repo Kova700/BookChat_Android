@@ -1,8 +1,8 @@
-package com.example.bookchat.ui.agony.mapper
+package com.example.bookchat.ui.agony.agony.mapper
 
 import com.example.bookchat.domain.model.Agony
 import com.example.bookchat.domain.model.BookShelfItem
-import com.example.bookchat.ui.agony.model.AgonyListItem
+import com.example.bookchat.ui.agony.agony.model.AgonyListItem
 
 fun List<Agony>.toAgonyListItem(
 	bookshelfItem: BookShelfItem,

@@ -135,7 +135,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.agony.AgonyActivity"
+            android:name=".ui.agony.agony.AgonyActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

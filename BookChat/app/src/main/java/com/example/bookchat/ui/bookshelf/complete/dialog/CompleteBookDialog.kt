@@ -13,8 +13,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogCompleteBookTapClickedBinding
-import com.example.bookchat.ui.agony.AgonyActivity
-import com.example.bookchat.ui.agony.AgonyViewModel
+import com.example.bookchat.ui.agony.agony.AgonyActivity
+import com.example.bookchat.ui.agony.agony.AgonyViewModel
 import com.example.bookchat.ui.bookreport.BookReportActivity
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager

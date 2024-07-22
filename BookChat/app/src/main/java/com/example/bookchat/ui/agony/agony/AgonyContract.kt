@@ -1,7 +1,7 @@
-package com.example.bookchat.ui.agony
+package com.example.bookchat.ui.agony.agony
 
 import com.example.bookchat.domain.model.BookShelfItem
-import com.example.bookchat.ui.agony.model.AgonyListItem
+import com.example.bookchat.ui.agony.agony.model.AgonyListItem
 
 data class AgonyUiState(
 	val uiState: UiState,

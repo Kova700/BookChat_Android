@@ -8,7 +8,7 @@ import com.example.bookchat.domain.model.Agony
 import com.example.bookchat.domain.model.AgonyRecord
 import com.example.bookchat.domain.repository.AgonyRecordRepository
 import com.example.bookchat.domain.repository.AgonyRepository
-import com.example.bookchat.ui.agony.AgonyActivity
+import com.example.bookchat.ui.agony.agony.AgonyActivity
 import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordeUiState.UiState
 import com.example.bookchat.ui.agony.agonyrecord.mapper.toAgonyRecord
 import com.example.bookchat.ui.agony.agonyrecord.mapper.toAgonyRecordListItem

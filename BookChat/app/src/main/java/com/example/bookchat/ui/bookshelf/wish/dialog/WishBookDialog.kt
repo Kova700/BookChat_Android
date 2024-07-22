@@ -14,8 +14,8 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogWishBookTapClickedBinding
 import com.example.bookchat.domain.model.BookShelfState
-import com.example.bookchat.ui.agony.AgonyActivity
-import com.example.bookchat.ui.agony.AgonyViewModel
+import com.example.bookchat.ui.agony.agony.AgonyActivity
+import com.example.bookchat.ui.agony.agony.AgonyViewModel
 import com.example.bookchat.ui.bookshelf.wish.WishBookShelfViewModel
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager

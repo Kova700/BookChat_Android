@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.agony.adapter
+package com.example.bookchat.ui.agony.agony.adapter
 
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -10,8 +10,8 @@ import com.example.bookchat.databinding.ItemAgonyDataBinding
 import com.example.bookchat.databinding.ItemAgonyDataEditingBinding
 import com.example.bookchat.databinding.ItemAgonyFirstBinding
 import com.example.bookchat.databinding.ItemAgonyHeaderBinding
+import com.example.bookchat.ui.agony.agony.model.AgonyListItem
 import com.example.bookchat.ui.agony.makeagony.util.getTextColorHexInt
-import com.example.bookchat.ui.agony.model.AgonyListItem
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.image.loadUrl
 
@@ -80,7 +80,7 @@ class AgonyDataEditingItemViewHolder(
 
 	override fun bind(agonyListItem: AgonyListItem) {
 		val item = (agonyListItem as AgonyListItem.Item)
-		binding.agonyListItem = item
+		binding.titleAgonyEditFolderTv.text = item.title
 		binding.agonyFolderCheckIv.visibility = if (item.isSelected) View.VISIBLE else View.INVISIBLE
 		binding.backgroundAgonyEditFolderCv.backgroundTintList =
 			if (item.isSelected) binding.root.context.getColorStateList(R.color.agony_color_selected)

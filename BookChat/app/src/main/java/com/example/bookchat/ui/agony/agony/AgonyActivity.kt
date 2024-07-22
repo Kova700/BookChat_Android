@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.agony
+package com.example.bookchat.ui.agony.agony
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,11 +12,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAgonyBinding
-import com.example.bookchat.ui.agony.AgonyUiState.UiState
-import com.example.bookchat.ui.agony.adapter.AgonyAdapter
+import com.example.bookchat.ui.agony.agony.AgonyUiState.UiState
+import com.example.bookchat.ui.agony.agony.adapter.AgonyAdapter
 import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordActivity
 import com.example.bookchat.ui.agony.makeagony.MakeAgonyBottomSheetDialog
-import com.example.bookchat.ui.agony.model.AgonyListItem
+import com.example.bookchat.ui.agony.agony.model.AgonyListItem
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint

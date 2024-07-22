@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.agony.adapter
+package com.example.bookchat.ui.agony.agony.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -10,8 +10,8 @@ import com.example.bookchat.databinding.ItemAgonyDataBinding
 import com.example.bookchat.databinding.ItemAgonyDataEditingBinding
 import com.example.bookchat.databinding.ItemAgonyFirstBinding
 import com.example.bookchat.databinding.ItemAgonyHeaderBinding
-import com.example.bookchat.ui.agony.AgonyUiState
-import com.example.bookchat.ui.agony.model.AgonyListItem
+import com.example.bookchat.ui.agony.agony.AgonyUiState
+import com.example.bookchat.ui.agony.agony.model.AgonyListItem
 import com.example.bookchat.utils.BookImgSizeManager
 import javax.inject.Inject
 
