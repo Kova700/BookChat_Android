@@ -19,6 +19,7 @@ import com.example.bookchat.ui.channel.channelsetting.authoritymanage.subhost.Su
 import com.example.bookchat.ui.channel.channelsetting.dialog.ChannelCapacitySettingDialog
 import com.example.bookchat.ui.channel.drawer.dialog.ChannelExitWarningDialog
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
+import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
 import com.example.bookchat.ui.mypage.useredit.dialog.ProfileEditDialog
 import com.example.bookchat.utils.MakeChannelImgSizeManager
 import com.example.bookchat.utils.image.loadChangedChannelProfile
@@ -140,6 +141,7 @@ class ChannelSettingActivity : AppCompatActivity() {
 
 	private fun moveToImageCrop() {
 		val intent = Intent(this, ImageCropActivity::class.java)
+		intent.putExtra(ImageCropActivity.EXTRA_CROP_PURPOSE, ImageCropPurpose.CHANNEL_PROFILE)
 		cropActivityResultLauncher.launch(intent)
 	}
 

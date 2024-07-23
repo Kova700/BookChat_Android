@@ -16,8 +16,21 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/default_state_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="back_btn, final_confirm_btn, tool_btn_group_cv" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/image_crop_state_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="crop_cancel_btn, crop_finish_btn" />
+
         <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/cancel_btn"
+            android:id="@+id/crop_cancel_btn"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_marginStart="30dp"
@@ -28,25 +41,23 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/img_rotate_btn"
+            android:id="@+id/back_btn"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_marginEnd="15dp"
+            android:layout_marginStart="30dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/img_right_rotate_icon"
+            android:src="@drawable/ic_back_btn"
             app:layout_constraintBottom_toBottomOf="@+id/image_crop_header"
-            app:layout_constraintEnd_toStartOf="@+id/confirm_btn"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/image_select_btn"
+            android:id="@+id/image_crop_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_bold"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="5dp"
             android:text="@string/select_image"
             android:textColor="#000000"
             android:textSize="15sp"
@@ -56,7 +67,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/confirm_btn"
+            android:id="@+id/final_confirm_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="30dp"
@@ -70,6 +81,54 @@
             app:layout_constraintEnd_toEndOf="@+id/image_crop_header"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
+            android:id="@+id/crop_finish_btn"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="30dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/check_btn"
+            app:layout_constraintBottom_toBottomOf="@+id/image_crop_header"
+            app:layout_constraintEnd_toEndOf="@+id/image_crop_header"
+            app:layout_constraintTop_toTopOf="parent"  />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tool_btn_group_cv"
+            style="@style/CustomCardViewStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardElevation="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/image_crop_header">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="3dp">
+
+                <com.example.bookchat.ui.customview.AntiDupClickImageButton
+                    android:id="@+id/img_crop_btn"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/image_crop_btn"
+                    app:layout_constraintEnd_toStartOf="@+id/img_rotate_btn"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.example.bookchat.ui.customview.AntiDupClickImageButton
+                    android:id="@+id/img_rotate_btn"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/img_right_rotate_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <com.canhub.cropper.CropImageView
             android:id="@+id/cropImageView"
             android:layout_width="match_parent"
@@ -78,6 +137,7 @@
             app:cropBackgroundColor="#CC000000"
             app:cropFixAspectRatio="true"
             app:cropGuidelines="on"
+            app:cropShowCropOverlay="false"
             app:cropInitialCropWindowPaddingRatio="0"
             app:cropScaleType="fitCenter"
             app:cropShape="oval"

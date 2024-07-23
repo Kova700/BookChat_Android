@@ -18,6 +18,7 @@ import com.example.bookchat.ui.channel.chatting.ChannelActivity
 import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_CHANNEL_ID
 import com.example.bookchat.ui.createchannel.dialog.MakeChannelImageSelectDialog
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
+import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
 import com.example.bookchat.utils.MakeChannelImgSizeManager
 import com.example.bookchat.utils.image.loadChangedChannelProfile
@@ -167,6 +168,7 @@ class MakeChannelActivity : AppCompatActivity() {
 
 	private fun moveToImageCrop() {
 		val intent = Intent(this, ImageCropActivity::class.java)
+		intent.putExtra(ImageCropActivity.EXTRA_CROP_PURPOSE, ImageCropPurpose.CHANNEL_PROFILE)
 		cropActivityResultLauncher.launch(intent)
 	}
 

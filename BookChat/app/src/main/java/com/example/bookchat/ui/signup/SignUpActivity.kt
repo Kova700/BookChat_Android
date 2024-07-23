@@ -23,6 +23,7 @@ import com.example.bookchat.databinding.ActivitySignUpBinding
 import com.example.bookchat.domain.model.NicknameCheckState
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROPPED_PROFILE_BYTE_ARRAY
+import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
 import com.example.bookchat.ui.signup.selecttaste.SelectTasteActivity
 import com.example.bookchat.utils.image.loadByteArray
 import com.example.bookchat.utils.makeToast
@@ -167,6 +168,7 @@ class SignUpActivity : AppCompatActivity() {
 
 	private fun moveToImageCrop() {
 		val intent = Intent(this, ImageCropActivity::class.java)
+		intent.putExtra(ImageCropActivity.EXTRA_CROP_PURPOSE, ImageCropPurpose.USER_PROFILE)
 		cropActivityResultLauncher.launch(intent)
 	}
 

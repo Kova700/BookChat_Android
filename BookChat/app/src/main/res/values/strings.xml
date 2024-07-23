@@ -247,6 +247,7 @@
 
     <!--image crop-->
     <string name="select_image">사진 선택</string>
+    <string name="image_crop_title">자르기</string>
 
     <!--util-->
     <string name="confirm">확인</string>
