@@ -18,7 +18,7 @@ fun ChannelDefaultImageType.getResId() =
 		ChannelDefaultImageType.SEVEN -> R.drawable.default_chat_room_img7
 	}
 
-fun ChannelDefaultImageType.getBitmap(
+suspend fun ChannelDefaultImageType.getBitmap(
 	context: Context,
 	imageSizePx: Int = 35.dpToPx(context),
 	roundedCornersRadiusPx: Int = 14.dpToPx(context),

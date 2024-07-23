@@ -19,7 +19,7 @@ fun UserDefaultProfileType?.getResId() =
 		UserDefaultProfileType.FIVE -> R.drawable.default_profile_img5
 	}
 
-fun UserDefaultProfileType?.getBitmap(
+suspend fun UserDefaultProfileType?.getBitmap(
 	context: Context,
 	imageSizePx: Int = 35.dpToPx(context),
 	roundedCornersRadiusPx: Int = 14.dpToPx(context),
