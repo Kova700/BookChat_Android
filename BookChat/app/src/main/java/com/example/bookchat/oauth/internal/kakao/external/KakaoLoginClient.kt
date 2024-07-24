@@ -1,9 +1,9 @@
 package com.example.bookchat.oauth.internal.kakao.external
 
 import android.content.Context
-import com.example.bookchat.oauth.external.model.OAuth2Provider.KAKAO
 import com.example.bookchat.oauth.external.model.IdToken
 import com.example.bookchat.oauth.external.model.IdToken.Companion.ID_TOKEN_PREFIX
+import com.example.bookchat.oauth.external.model.OAuth2Provider.KAKAO
 import com.example.bookchat.oauth.internal.kakao.external.exception.KakaoLoginClientCancelException
 import com.example.bookchat.oauth.internal.kakao.external.exception.KakaoLoginFailException
 import com.kakao.sdk.auth.model.OAuthToken
@@ -12,49 +12,50 @@ import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
+import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class KakaoLoginClient @Inject constructor(
 	private val kakaoUserApiClient: UserApiClient,
 ) {
 
 	suspend fun login(context: Context): IdToken {
-		return if (kakaoUserApiClient.isKakaoTalkLoginAvailable(context)) {
-			loginWithKakaoTalk(context)
+		if (kakaoUserApiClient.isKakaoTalkLoginAvailable(context)) {
+			return runCatching { loginWithKakaoTalk(context) }
 				.getOrElse {
-					if (it.isClientCanceled()) throw KakaoLoginClientCancelException()
+					if (it is KakaoLoginClientCancelException) throw it
 					loginWithKakaoAccount(context)
 				}
-		} else loginWithKakaoAccount(context)
+		}
+		return loginWithKakaoAccount(context)
 	}
 
-	private suspend fun loginWithKakaoTalk(context: Context): Result<IdToken> {
-		return suspendCancellableCoroutine<Result<IdToken>> { continuation ->
+	private suspend fun loginWithKakaoTalk(context: Context): IdToken {
+		return suspendCancellableCoroutine<IdToken> { continuation ->
 			kakaoUserApiClient.loginWithKakaoTalk(context) { token, error ->
-				continuation.resume(getLoginResult(token, error))
+				continuation.getLoginResult(token, error)
 			}
 		}
 	}
 
 	private suspend fun loginWithKakaoAccount(context: Context): IdToken {
-		return suspendCancellableCoroutine<Result<IdToken>> { continuation ->
+		return suspendCancellableCoroutine<IdToken> { continuation ->
 			kakaoUserApiClient.loginWithKakaoAccount(context) { token, error ->
-				continuation.resume(getLoginResult(token, error))
+				continuation.getLoginResult(token, error)
 			}
-		}.getOrElse {
-			if (it.isClientCanceled()) throw KakaoLoginClientCancelException()
-			else throw KakaoLoginFailException(it.message)
 		}
 	}
 
-	private fun getLoginResult(
+	private fun Continuation<IdToken>.getLoginResult(
 		token: OAuthToken?,
 		error: Throwable?,
-	): Result<IdToken> {
-		return when {
-			(token != null) -> Result.success(token.getIdToken())
-			error != null -> Result.failure(error)
-			else -> Result.failure(Exception("token and error is null"))
+	) {
+		when {
+			token != null -> resume(token.getIdToken())
+			error.isClientCanceled() -> resumeWithException(KakaoLoginClientCancelException())
+			error != null -> resumeWithException(error)
+			else -> resumeWithException(Exception("token is null"))
 		}
 	}
 
@@ -68,7 +69,7 @@ class KakaoLoginClient @Inject constructor(
 		kakaoUserApiClient.unlink { _ -> }
 	}
 
-	private fun Throwable.isClientCanceled(): Boolean {
+	private fun Throwable?.isClientCanceled(): Boolean {
 		return this is ClientError && reason == ClientErrorCause.Cancelled
 	}
 
