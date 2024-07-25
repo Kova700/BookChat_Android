@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 //TODO : 도서, 채팅 Room에서 가져오는 로직으로 수정
+//TODO : Home화면도 로딩 중일때는 "없습니다" 표시 안뜨게 수정
 @HiltViewModel
 class HomeViewModel @Inject constructor(
 	private val bookShelfRepository: BookShelfRepository,
