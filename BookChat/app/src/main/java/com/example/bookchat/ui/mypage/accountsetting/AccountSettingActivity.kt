@@ -8,7 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAccountSettingBinding
-import com.example.bookchat.oauth.external.OAuthClient
+import com.example.bookchat.oauth.oauthclient.external.OAuthClient
 import com.example.bookchat.ui.login.LoginActivity
 import com.example.bookchat.ui.mypage.accountsetting.dialog.WithdrawWarningDialog
 import com.example.bookchat.utils.makeToast

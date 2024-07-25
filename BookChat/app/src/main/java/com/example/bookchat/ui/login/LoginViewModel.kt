@@ -9,10 +9,8 @@ import com.example.bookchat.data.network.model.response.NeedToDeviceWarningExcep
 import com.example.bookchat.data.network.model.response.NeedToSignUpException
 import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.repository.OAuthIdTokenRepository
 import com.example.bookchat.domain.usecase.LoginUseCase
-import com.example.bookchat.oauth.external.model.IdToken
-import com.example.bookchat.oauth.external.exception.ClientCancelException
+import com.example.bookchat.oauth.oauthclient.external.exception.ClientCancelException
 import com.example.bookchat.ui.login.LoginUiState.UiState
 import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +25,6 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
 	private val clientRepository: ClientRepository,
-	private val oAuthIdTokenRepository: OAuthIdTokenRepository,
 	private val loginUseCase: LoginUseCase,
 ) : ViewModel() {
 
@@ -51,9 +48,7 @@ class LoginViewModel @Inject constructor(
 			.onFailure { failHandler(it) }
 	}
 
-	fun onChangeIdToken(idToken: IdToken) {
-		updateState { copy(idToken = idToken) }
-		oAuthIdTokenRepository.saveIdToken(idToken)
+	fun onChangeIdToken() {
 		login()
 	}
 

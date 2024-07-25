@@ -4,7 +4,7 @@ import com.example.bookchat.domain.model.BookChatToken
 import com.example.bookchat.fcm.repository.external.model.FCMToken
 import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.model.User
-import com.example.bookchat.oauth.external.model.IdToken
+import com.example.bookchat.oauth.repository.external.model.IdToken
 import kotlinx.coroutines.flow.Flow
 
 interface ClientRepository {

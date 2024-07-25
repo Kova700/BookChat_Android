@@ -2,7 +2,7 @@ package com.example.bookchat.domain.usecase
 
 import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.repository.OAuthIdTokenRepository
+import com.example.bookchat.oauth.repository.external.OAuthIdTokenRepository
 import javax.inject.Inject
 
 class SignUpUseCase @Inject constructor(

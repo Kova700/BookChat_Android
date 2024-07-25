@@ -4,7 +4,7 @@ import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.DeviceIDRepository
 import com.example.bookchat.fcm.repository.external.FCMTokenRepository
-import com.example.bookchat.domain.repository.OAuthIdTokenRepository
+import com.example.bookchat.oauth.repository.external.OAuthIdTokenRepository
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(

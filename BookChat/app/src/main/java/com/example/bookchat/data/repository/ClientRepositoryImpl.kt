@@ -15,7 +15,7 @@ import com.example.bookchat.fcm.repository.external.model.FCMToken
 import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.oauth.external.model.IdToken
+import com.example.bookchat.oauth.repository.external.model.IdToken
 import com.example.bookchat.utils.toMultiPartBody
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
