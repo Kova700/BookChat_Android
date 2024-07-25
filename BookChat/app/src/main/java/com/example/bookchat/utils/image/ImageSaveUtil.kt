@@ -5,22 +5,27 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.example.bookchat.utils.Constants.TAG
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 
-fun Context.saveImage(bitmap: Bitmap) {
-	Log.d(TAG, ": saveImage() - called")
+suspend fun Context.saveImage(bitmap: Bitmap) = withContext(Dispatchers.IO) {
 	if (isAndroidVersionAtLeastQ()) {
 		saveImageToScopedStorage(
 			bitmap = bitmap,
 			fileName = "${System.currentTimeMillis()}$JPEG_EXTENSION",
 			fileType = IMAGE_TYPE_JPEG,
 		)
-		return
+		return@withContext
 	}
 
 	saveImageToLegacyExternalStorage(
@@ -28,6 +33,14 @@ fun Context.saveImage(bitmap: Bitmap) {
 		fileName = "${System.currentTimeMillis()}$JPEG_EXTENSION",
 		fileType = IMAGE_TYPE_JPEG,
 	)
+}
+
+suspend fun Context.saveImageToCache(bitmap: Bitmap): Uri = withContext(Dispatchers.IO) {
+	val file = File(cacheDir, "${System.currentTimeMillis()}$JPEG_EXTENSION")
+	FileOutputStream(file).use { stream ->
+		bitmap.compress(Bitmap.CompressFormat.JPEG, IMAGE_COMPRESSION_RATE, stream)
+	}
+	file.toUri()
 }
 
 private fun Context.saveImageToScopedStorage(
@@ -96,4 +109,4 @@ private const val DCIM = "DCIM"
 private const val JPEG = "jpeg"
 private const val JPEG_EXTENSION = ".$JPEG"
 private const val IMAGE_TYPE_JPEG = "image/$JPEG"
-private const val IMAGE_COMPRESSION_RATE = 95
+private const val IMAGE_COMPRESSION_RATE = 100

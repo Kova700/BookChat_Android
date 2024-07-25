@@ -21,10 +21,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
+import com.example.bookchat.data.stomp.external.model.SocketState
 import com.example.bookchat.databinding.ActivityChannelBinding
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.data.stomp.external.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.channel.channelsetting.ChannelSettingActivity
 import com.example.bookchat.ui.channel.channelsetting.ChannelSettingActivity.Companion.RESULT_CODE_USER_CHANNEL_EXIT
@@ -573,7 +573,7 @@ class ChannelActivity : AppCompatActivity() {
 
 	private fun makeCaptureImage(
 		headerIndex: Int, bottomIndex: Int,
-	) {
+	) = lifecycleScope.launch {
 		runCatching {
 			binding.chattingRcv.captureItems(
 				headerIndex = headerIndex,

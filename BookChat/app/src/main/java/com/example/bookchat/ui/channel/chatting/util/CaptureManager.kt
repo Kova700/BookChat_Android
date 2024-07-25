@@ -9,8 +9,10 @@ import com.example.bookchat.ui.channel.chatting.adapter.ChatItemAdapter
 import com.example.bookchat.ui.channel.chatting.adapter.ChatItemViewHolder
 import com.example.bookchat.utils.image.bitmap.getMergedBitmap
 import com.example.bookchat.utils.image.saveImage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-fun RecyclerView.captureItems(
+suspend fun RecyclerView.captureItems(
 	headerIndex: Int,
 	bottomIndex: Int,
 ) {
@@ -35,30 +37,34 @@ fun RecyclerView.captureItems(
 		)
 		holder.itemView.layout(0, 0, holder.itemView.measuredWidth, holder.itemView.measuredHeight)
 
-		val bitmap = Bitmap.createBitmap(
-			holder.itemView.width,
-			holder.itemView.height,
-			Bitmap.Config.ARGB_8888
-		)
-		val canvas = Canvas(bitmap)
-		holder.itemView.draw(canvas)
+		val recyclerViewWidth = this.measuredWidth
 
-		/** 제한된 메모리 사이즈가 초과된다면 이미지 분할 저장 */
-		if (bitmapCache.canPutBitmapInCache(bitmap).not()) {
-			val mergedBitmap = getMergedBitmap(
-				cacheRange = bottomIndex..headerIndex,
-				bitmapCache = bitmapCache,
-				bigBitmapWidth = this.measuredWidth,
-				bigBitmapHeight = bitmapHeight
+		withContext(Dispatchers.IO) {
+			val bitmap = Bitmap.createBitmap(
+				holder.itemView.width,
+				holder.itemView.height,
+				Bitmap.Config.ARGB_8888
 			)
-			context.saveImage(mergedBitmap)
-			bitmapCache.evictAll()
-			startIndex = index
-			bitmapHeight = 0
-		}
+			val canvas = Canvas(bitmap)
+			holder.itemView.draw(canvas)
 
-		bitmapCache.put(index, bitmap)
-		bitmapHeight += holder.itemView.measuredHeight
+			/** 제한된 메모리 사이즈가 초과된다면 이미지 분할 저장 */
+			if (bitmapCache.canPutBitmapInCache(bitmap).not()) {
+				val mergedBitmap = getMergedBitmap(
+					cacheRange = bottomIndex..headerIndex,
+					bitmapCache = bitmapCache,
+					bigBitmapWidth = recyclerViewWidth,
+					bigBitmapHeight = bitmapHeight
+				)
+				context.saveImage(mergedBitmap)
+				bitmapCache.evictAll()
+				startIndex = index
+				bitmapHeight = 0
+			}
+
+			bitmapCache.put(index, bitmap)
+			bitmapHeight += holder.itemView.measuredHeight
+		}
 	}
 
 	val mergedBitmap = getMergedBitmap(
@@ -70,7 +76,7 @@ fun RecyclerView.captureItems(
 	context.saveImage(mergedBitmap)
 }
 
-fun LruCache<Int, Bitmap>.canPutBitmapInCache(bitmap: Bitmap): Boolean {
+private fun LruCache<Int, Bitmap>.canPutBitmapInCache(bitmap: Bitmap): Boolean {
 	val bitmapKBSize = bitmap.byteCount / 1024
 	val currentCacheSize = this.size()
 	val maxCacheSize = this.maxSize()
