@@ -3,7 +3,7 @@ package com.example.bookchat.domain.usecase
 import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.DeviceIDRepository
-import com.example.bookchat.domain.repository.FCMTokenRepository
+import com.example.bookchat.fcm.repository.external.FCMTokenRepository
 import com.example.bookchat.domain.repository.OAuthIdTokenRepository
 import javax.inject.Inject
 

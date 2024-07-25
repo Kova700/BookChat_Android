@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.repository.FCMTokenRepository
+import com.example.bookchat.fcm.repository.external.FCMTokenRepository
 import com.example.bookchat.domain.usecase.ClearLocalDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay

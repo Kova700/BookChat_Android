@@ -1,8 +1,8 @@
-package com.example.bookchat.data.repository
+package com.example.bookchat.fcm.repository.internal
 
 import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.domain.model.FCMToken
-import com.example.bookchat.domain.repository.FCMTokenRepository
+import com.example.bookchat.fcm.repository.external.model.FCMToken
+import com.example.bookchat.fcm.repository.external.FCMTokenRepository
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject

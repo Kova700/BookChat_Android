@@ -11,7 +11,7 @@ import com.example.bookchat.data.network.model.request.RequestUserSignUp
 import com.example.bookchat.data.network.model.response.NeedToDeviceWarningException
 import com.example.bookchat.data.network.model.response.NeedToSignUpException
 import com.example.bookchat.domain.model.BookChatToken
-import com.example.bookchat.domain.model.FCMToken
+import com.example.bookchat.fcm.repository.external.model.FCMToken
 import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ClientRepository
@@ -127,7 +127,7 @@ class ClientRepositoryImpl @Inject constructor(
 
 	override suspend fun getClientProfile(): User {
 		return client.firstOrNull()
-			?: bookChatApi.getUserProfile().toUser()
+			?: bookChatApi.getUserProfile().toUser() //여까지 401 넘어온다는건 리프레시토큰마저 만료되었다는 뜻
 				.also { client.emit(it) }
 	}
 

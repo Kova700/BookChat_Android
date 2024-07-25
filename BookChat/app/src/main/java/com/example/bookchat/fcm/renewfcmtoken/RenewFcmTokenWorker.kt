@@ -8,9 +8,9 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.example.bookchat.domain.model.FCMToken
+import com.example.bookchat.fcm.repository.external.model.FCMToken
 import com.example.bookchat.domain.repository.BookChatTokenRepository
-import com.example.bookchat.domain.repository.FCMTokenRepository
+import com.example.bookchat.fcm.repository.external.FCMTokenRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 

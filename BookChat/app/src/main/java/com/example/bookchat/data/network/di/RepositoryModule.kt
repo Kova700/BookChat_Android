@@ -14,7 +14,6 @@ import com.example.bookchat.data.repository.ChatRepositoryImpl
 import com.example.bookchat.data.repository.ChattingNotificationInfoRepositoryImpl
 import com.example.bookchat.data.repository.ClientRepositoryImpl
 import com.example.bookchat.data.repository.DeviceIDRepositoryImpl
-import com.example.bookchat.data.repository.FCMTokenRepositoryImpl
 import com.example.bookchat.data.repository.OAuthIdTokenRepositoryImpl
 import com.example.bookchat.data.repository.SearchHistoryRepositoryImpl
 import com.example.bookchat.data.repository.UserRepositoryImpl
@@ -32,7 +31,6 @@ import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ChattingNotificationInfoRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.DeviceIDRepository
-import com.example.bookchat.domain.repository.FCMTokenRepository
 import com.example.bookchat.domain.repository.OAuthIdTokenRepository
 import com.example.bookchat.domain.repository.SearchHistoryRepository
 import com.example.bookchat.domain.repository.UserRepository
@@ -57,12 +55,6 @@ interface RepositoryModule {
 	fun bindBookChatTokenRepository(
 		repository: BookChatTokenRepositoryImpl,
 	): BookChatTokenRepository
-
-	@Binds
-	@Singleton
-	fun bindFCMTokenRepository(
-		repository: FCMTokenRepositoryImpl,
-	): FCMTokenRepository
 
 	@Binds
 	@Singleton

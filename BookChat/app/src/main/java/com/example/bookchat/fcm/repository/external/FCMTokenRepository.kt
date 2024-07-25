@@ -1,6 +1,6 @@
-package com.example.bookchat.domain.repository
+package com.example.bookchat.fcm.repository.external
 
-import com.example.bookchat.domain.model.FCMToken
+import com.example.bookchat.fcm.repository.external.model.FCMToken
 
 interface FCMTokenRepository {
 	suspend fun renewFCMToken(fcmToken: FCMToken)
