@@ -2,8 +2,6 @@ package com.example.bookchat.ui.splash
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -14,6 +12,7 @@ import com.example.bookchat.ui.splash.SplashViewModel.SplashEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+//TODO : SplashScreen 적용
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 	private val splashViewModel: SplashViewModel by viewModels()
@@ -21,10 +20,7 @@ class SplashActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_splash)
-
-		Handler(Looper.getMainLooper()).postDelayed({
-			observeUiEvent()
-		}, SPLASH_DURATION)
+		observeUiEvent()
 	}
 
 	private fun observeUiEvent() = lifecycleScope.launch {
@@ -44,9 +40,5 @@ class SplashActivity : AppCompatActivity() {
 	private fun handleEvent(event: SplashEvent) = when (event) {
 		is SplashEvent.MoveToMain -> moveToMain()
 		is SplashEvent.MoveToLogin -> moveToLogin()
-	}
-
-	companion object {
-		const val SPLASH_DURATION = 1500L
 	}
 }

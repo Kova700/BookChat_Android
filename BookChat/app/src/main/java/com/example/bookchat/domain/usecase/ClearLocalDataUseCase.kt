@@ -18,7 +18,7 @@ import com.example.bookchat.domain.repository.UserRepository
 import com.example.bookchat.notification.chat.ChatNotificationHandler
 import javax.inject.Inject
 
-class ClearAllDataUseCase @Inject constructor(
+class ClearLocalDataUseCase @Inject constructor(
 	private val agonyRecordRepository: AgonyRecordRepository,
 	private val agonyRepository: AgonyRepository,
 	private val bookChatTokenRepository: BookChatTokenRepository,

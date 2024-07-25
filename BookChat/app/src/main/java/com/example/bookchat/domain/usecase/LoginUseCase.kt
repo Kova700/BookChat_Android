@@ -17,7 +17,8 @@ class LoginUseCase @Inject constructor(
 	suspend operator fun invoke(isDeviceChangeApproved: Boolean = false) {
 		val bookchatToken = clientRepository.login(
 			idToken = oAuthIdTokenRepository.getIdToken(),
-			fcmToken = fcmTokenRepository.getFCMToken(),
+			fcmToken = if (isDeviceChangeApproved) fcmTokenRepository.getNewFCMToken()
+			else fcmTokenRepository.getFCMToken(),
 			deviceUUID = deviceIdRepository.getDeviceID(),
 			isDeviceChangeApproved = isDeviceChangeApproved
 		)
