@@ -152,7 +152,7 @@
             android:background="#B3272727"
             android:clickable="false"
             android:elevation="-50dp"
-            android:scaleType="fitXY"
+            android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"

@@ -94,7 +94,7 @@
                 android:id="@+id/channel_img"
                 android:layout_width="@dimen/make_chat_room_img_width_default"
                 android:layout_height="@dimen/make_chat_room_img_height_default"
-                android:scaleType="fitXY"
+                android:scaleType="centerCrop"
                 android:src="@drawable/default_chat_room_img1" />
         </androidx.cardview.widget.CardView>
 

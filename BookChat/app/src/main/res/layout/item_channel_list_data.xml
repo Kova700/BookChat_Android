@@ -48,9 +48,9 @@
                 android:id="@+id/channel_img_cv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="10dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
+                android:layout_marginVertical="10dp"
                 app:cardCornerRadius="30dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start"
@@ -60,7 +60,7 @@
                     android:id="@+id/channel_img_iv"
                     android:layout_width="75dp"
                     android:layout_height="75dp"
-                    android:scaleType="fitXY"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/loading_img" />
             </androidx.cardview.widget.CardView>
 

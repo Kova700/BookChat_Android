@@ -139,7 +139,6 @@
             app:cropGuidelines="on"
             app:cropShowCropOverlay="false"
             app:cropInitialCropWindowPaddingRatio="0"
-            app:cropScaleType="fitCenter"
             app:cropShape="oval"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

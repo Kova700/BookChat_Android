@@ -46,7 +46,7 @@
                 android:id="@+id/channel_image_iv"
                 android:layout_width="75dp"
                 android:layout_height="75dp"
-                android:scaleType="fitXY"
+                android:scaleType="centerCrop"
                 android:src="@drawable/loading_img" />
         </androidx.cardview.widget.CardView>
 

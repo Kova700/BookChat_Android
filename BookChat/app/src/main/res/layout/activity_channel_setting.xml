@@ -80,8 +80,8 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/channel_img_iv_cv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/make_chat_room_img_width_default"
+            android:layout_height="@dimen/make_chat_room_img_height_default"
             android:layout_gravity="center"
             android:layout_marginTop="60dp"
             app:cardCornerRadius="10dp"
@@ -92,9 +92,9 @@
 
             <ImageView
                 android:id="@+id/channel_img_iv"
-                android:layout_width="@dimen/make_chat_room_img_width_default"
-                android:layout_height="@dimen/make_chat_room_img_height_default"
-                android:scaleType="fitXY"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
                 android:src="@drawable/default_chat_room_img1" />
         </androidx.cardview.widget.CardView>
 
