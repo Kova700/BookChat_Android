@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.mypage.useredit
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +10,7 @@ import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedExc
 import com.example.bookchat.domain.model.NicknameCheckState
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.image.bitmap.compressToByteArray
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,6 +45,16 @@ class UserEditViewModel @Inject constructor(
 		}
 	}
 
+	private fun verifyNickname() {
+		val nickName = uiState.value.newNickname
+		val userProfile = uiState.value.clientNewImage
+
+		when {
+			uiState.value.isNeedDuplicatesNicknameCheck -> checkNicknameDuplication(nickName)
+			else -> changeClientProfile(nickName, userProfile)
+		}
+	}
+
 	//TODO : 사용할 수 없는 이름이거나 중복된 경우 UI노출이 나와야하는데 나오지 않고 있음
 	private fun checkNicknameDuplication(nickName: String) = viewModelScope.launch {
 		runCatching { clientRepository.isDuplicatedUserNickName(nickName) }
@@ -62,29 +74,20 @@ class UserEditViewModel @Inject constructor(
 			|| uiState.value.nicknameCheckState == NicknameCheckState.IsShort
 			|| uiState.value.newNickname.length < 2
 		) return
-
-		val nickName = uiState.value.newNickname
-		val userProfile = uiState.value.clientNewImage
-
-		if (uiState.value.isNeedDuplicatesNicknameCheck) {
-			checkNicknameDuplication(nickName)
-			return
-		}
-
-		changeClientProfile(nickName, userProfile)
+		verifyNickname()
 	}
 
 	//TODO : userProfile = null로 보내면 null로 설정이 안됨 (서버 수정 대기중)
 	private fun changeClientProfile(
 		newNickName: String,
-		userProfile: ByteArray?,
+		userProfile: Bitmap?,
 	) = viewModelScope.launch {
 		updateState { copy(uiState = UserEditUiState.UiState.LOADING) }
 
 		runCatching {
 			clientRepository.changeClientProfile(
 				newNickname = newNickName,
-				userProfile = userProfile
+				userProfile = userProfile?.compressToByteArray()
 			)
 		}
 			.onSuccess { newClient ->
@@ -108,7 +111,7 @@ class UserEditViewModel @Inject constructor(
 		updateState { copy(nicknameCheckState = NicknameCheckState.IsSpecialCharInText) }
 	}
 
-	fun onChangeUserProfile(profile: ByteArray) {
+	fun onChangeUserProfile(profile: Bitmap) {
 		updateState {
 			copy(
 				clientNewImage = profile,

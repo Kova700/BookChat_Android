@@ -21,6 +21,8 @@ import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
 import com.example.bookchat.utils.MakeChannelImgSizeManager
+import com.example.bookchat.utils.image.bitmap.getImageBitmap
+import com.example.bookchat.utils.image.deleteImageCache
 import com.example.bookchat.utils.image.loadChangedChannelProfile
 import com.example.bookchat.utils.image.loadUrl
 import com.example.bookchat.utils.makeToast
@@ -114,7 +116,7 @@ class MakeChannelActivity : AppCompatActivity() {
 		binding.channelImg.loadChangedChannelProfile(
 			imageUrl = null,
 			channelDefaultImageType = uiState.defaultProfileImageType,
-			byteArray = uiState.channelProfileImage,
+			bitmap = uiState.channelProfileImage,
 		)
 	}
 
@@ -150,12 +152,17 @@ class MakeChannelActivity : AppCompatActivity() {
 	private val cropActivityResultLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 			if (result.resultCode == RESULT_OK) {
-				val intent = result.data
-				val bitmapByteArray =
-					intent?.getByteArrayExtra(ImageCropActivity.EXTRA_CROPPED_PROFILE_BYTE_ARRAY)
-				bitmapByteArray?.let { makeChannelViewModel.onChangeChannelImg(it) }
+				val uri = result.data?.getStringExtra(ImageCropActivity.EXTRA_CROPPED_IMAGE_CACHE_URI)
+					?: return@registerForActivityResult
+				getCroppedImageBitmap(uri)
 			}
 		}
+
+	private fun getCroppedImageBitmap(uri: String) = lifecycleScope.launch {
+		val croppedImageBitmap = uri.getImageBitmap(this@MakeChannelActivity) ?: return@launch
+		makeChannelViewModel.onChangeChannelImg(croppedImageBitmap)
+		deleteImageCache(uri)
+	}
 
 	private val selectBookResultLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->

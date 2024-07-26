@@ -21,9 +21,10 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityUserEditBinding
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
-import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROPPED_PROFILE_BYTE_ARRAY
 import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
 import com.example.bookchat.ui.mypage.useredit.dialog.ProfileEditDialog
+import com.example.bookchat.utils.image.bitmap.getImageBitmap
+import com.example.bookchat.utils.image.deleteImageCache
 import com.example.bookchat.utils.image.loadChangedUserProfile
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.namecheck.MAX_NICKNAME_LENGTH
@@ -112,7 +113,7 @@ class UserEditActivity : AppCompatActivity() {
 		binding.userProfileIv.loadChangedUserProfile(
 			imageUrl = state.client.profileImageUrl,
 			userDefaultProfileType = state.client.defaultProfileImageType,
-			byteArray = state.clientNewImage
+			bitmap = state.clientNewImage
 		)
 	}
 
@@ -201,12 +202,17 @@ class UserEditActivity : AppCompatActivity() {
 	private val cropActivityResultLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 			if (result.resultCode == RESULT_OK) {
-				val intent = result.data
-				val bitmapByteArray =
-					intent?.getByteArrayExtra(EXTRA_CROPPED_PROFILE_BYTE_ARRAY)
-				bitmapByteArray?.let { userEditViewModel.onChangeUserProfile(it) }
+				val uri = result.data?.getStringExtra(ImageCropActivity.EXTRA_CROPPED_IMAGE_CACHE_URI)
+					?: return@registerForActivityResult
+				getCroppedImageBitmap(uri)
 			}
 		}
+
+	private fun getCroppedImageBitmap(uri: String) = lifecycleScope.launch {
+		val croppedImageBitmap = uri.getImageBitmap(this@UserEditActivity) ?: return@launch
+		userEditViewModel.onChangeUserProfile(croppedImageBitmap)
+		deleteImageCache(uri)
+	}
 
 	private fun handleUiEvent(event: UserEditUiEvent) {
 		when (event) {

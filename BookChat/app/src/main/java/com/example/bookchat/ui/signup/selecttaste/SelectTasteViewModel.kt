@@ -10,8 +10,7 @@ import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.usecase.LoginUseCase
 import com.example.bookchat.domain.usecase.SignUpUseCase
-import com.example.bookchat.ui.signup.SignUpActivity.Companion.EXTRA_SIGNUP_USER_NICKNAME
-import com.example.bookchat.ui.signup.SignUpActivity.Companion.EXTRA_USER_PROFILE_BYTE_ARRAY
+import com.example.bookchat.ui.signup.selecttaste.SelectTasteActivity.Companion.EXTRA_SIGNUP_USER_NICKNAME
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,17 +28,12 @@ class SelectTasteViewModel @Inject constructor(
 	private val signUpUseCase: SignUpUseCase,
 ) : ViewModel() {
 	private val userNickname = savedStateHandle.get<String>(EXTRA_SIGNUP_USER_NICKNAME)!!
-	private val userProfile = savedStateHandle.get<ByteArray?>(EXTRA_USER_PROFILE_BYTE_ARRAY)!!
 
 	private val _eventFlow = MutableSharedFlow<SelectTasteEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
 
 	private val _uiState = MutableStateFlow<SelectTasteState>(SelectTasteState.DEFAULT)
 	val uiState get() = _uiState.asStateFlow()
-
-	/** UiState변경 시 깜빡임 때문에 따로 분리 */
-	private val _userProfileImage = MutableStateFlow<ByteArray?>(null)
-	val userProfileImage get() = _userProfileImage.asStateFlow()
 
 	// TODO : 서버 수정 대기 중
 	//  4.독서 취향 누르고 시작하기 누르면 토큰은 넘어오는데 사용자를 확일 할 수없습니다 아래에 스낵바 뜸
@@ -52,8 +46,6 @@ class SelectTasteViewModel @Inject constructor(
 
 	private fun initUiState() {
 		updateState { copy(nickname = userNickname) }
-		_userProfileImage.value = if (userProfile.isEmpty()) null else userProfile
-
 	}
 
 	private fun signUp() = viewModelScope.launch {
@@ -61,7 +53,7 @@ class SelectTasteViewModel @Inject constructor(
 			signUpUseCase(
 				nickname = uiState.value.nickname,
 				readingTastes = uiState.value.readingTastes,
-				userProfile = userProfileImage.value
+				userProfile = uiState.value.userProfile
 			)
 		}.onSuccess { signIn() }
 			.onFailure { failHandler(it) }
@@ -81,6 +73,10 @@ class SelectTasteViewModel @Inject constructor(
 
 	fun onClickSignUpBtn() {
 		signUp()
+	}
+
+	fun onUpdatedUserProfileImage(byteArray: ByteArray?) {
+		updateState { copy(userProfile = byteArray) }
 	}
 
 	fun onClickTasteBtn(pickedReadingTaste: ReadingTaste) {

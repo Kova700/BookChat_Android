@@ -22,10 +22,11 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySignUpBinding
 import com.example.bookchat.domain.model.NicknameCheckState
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
-import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROPPED_PROFILE_BYTE_ARRAY
 import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
 import com.example.bookchat.ui.signup.selecttaste.SelectTasteActivity
-import com.example.bookchat.utils.image.loadByteArray
+import com.example.bookchat.ui.signup.selecttaste.SelectTasteActivity.Companion.EXTRA_SIGNUP_USER_NICKNAME
+import com.example.bookchat.ui.signup.selecttaste.SelectTasteActivity.Companion.EXTRA_USER_PROFILE_URI
+import com.example.bookchat.utils.image.loadUserProfile
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.namecheck.MAX_NICKNAME_LENGTH
 import com.example.bookchat.utils.namecheck.NAME_CHECK_REGULAR_EXPRESSION
@@ -103,9 +104,7 @@ class SignUpActivity : AppCompatActivity() {
 	}
 
 	private fun setUserProfileImage(state: SignUpState) {
-		binding.userProfileIv.loadByteArray(
-			byteArray = state.clientNewImage
-		)
+		binding.userProfileIv.loadUserProfile(imageUrl = state.clientNewImageUri)
 	}
 
 	private fun setNickNameEditTextState(state: SignUpState) {
@@ -175,17 +174,22 @@ class SignUpActivity : AppCompatActivity() {
 	private val cropActivityResultLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 			if (result.resultCode == RESULT_OK) {
-				val intent = result.data
-				val bitmapByteArray =
-					intent?.getByteArrayExtra(EXTRA_CROPPED_PROFILE_BYTE_ARRAY)
-				bitmapByteArray?.let { signUpViewModel.onChangeUserProfile(it) }
+				val uri = result.data?.getStringExtra(ImageCropActivity.EXTRA_CROPPED_IMAGE_CACHE_URI)
+					?: return@registerForActivityResult
+				getCroppedImageBitmap(uri)
 			}
 		}
+
+	private fun getCroppedImageBitmap(uri: String) = lifecycleScope.launch {
+		signUpViewModel.onChangeUserProfile(uri)
+//		deleteImageCache(uri)
+	}
 
 	private fun moveToSelectTaste(event: SignUpEvent.MoveToSelectTaste) {
 		val intent = Intent(this, SelectTasteActivity::class.java)
 		intent.putExtra(EXTRA_SIGNUP_USER_NICKNAME, event.userNickname)
-		intent.putExtra(EXTRA_USER_PROFILE_BYTE_ARRAY, event.userProfilByteArray)
+//		intent.putExtra(EXTRA_USER_PROFILE_BYTE_ARRAY, event.userProfile)
+		intent.putExtra(EXTRA_USER_PROFILE_URI, event.userProfileUri)
 		startActivity(intent)
 	}
 
@@ -199,8 +203,6 @@ class SignUpActivity : AppCompatActivity() {
 
 	companion object {
 		const val KEYBOARD_DELAY_TIME = 200L
-		const val EXTRA_SIGNUP_USER_NICKNAME = "EXTRA_SIGNUP_USER_NICKNAME"
-		const val EXTRA_USER_PROFILE_BYTE_ARRAY = "EXTRA_USER_PROFILE_BYTE_ARRAY"
 		private const val SCHEME_PACKAGE = "package"
 	}
 }

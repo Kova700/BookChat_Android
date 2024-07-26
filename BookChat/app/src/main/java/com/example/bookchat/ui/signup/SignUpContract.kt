@@ -6,7 +6,7 @@ data class SignUpState(
 	val uiState: UiState,
 	val nickname: String,
 	val nicknameCheckState: NicknameCheckState,
-	val clientNewImage: ByteArray?,
+	val clientNewImageUri: String?,
 ) {
 
 	enum class UiState {
@@ -20,7 +20,7 @@ data class SignUpState(
 			uiState = UiState.SUCCESS,
 			nickname = "",
 			nicknameCheckState = NicknameCheckState.Default,
-			clientNewImage = null
+			clientNewImageUri = null
 		)
 	}
 
@@ -30,7 +30,7 @@ data class SignUpState(
 sealed class SignUpEvent {
 	data class MoveToSelectTaste(
 		val userNickname: String,
-		val userProfilByteArray: ByteArray?,
+		val userProfileUri: String?,
 	) : SignUpEvent()
 
 	object PermissionCheck : SignUpEvent()

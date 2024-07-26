@@ -1,11 +1,13 @@
 package com.example.bookchat.ui.channel.channelsetting
 
+import android.graphics.Bitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.ui.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
+import com.example.bookchat.utils.image.bitmap.compressToByteArray
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -59,7 +61,7 @@ class ChannelSettingViewModel @Inject constructor(
 				channelTitle = uiState.value.newTitle,
 				channelTags = uiState.value.tagList,
 				channelCapacity = uiState.value.newCapacity,
-				channelImage = uiState.value.newProfileImage
+				channelImage = uiState.value.newProfileImage?.compressToByteArray()
 			)
 		}
 			.onSuccess {
@@ -97,7 +99,7 @@ class ChannelSettingViewModel @Inject constructor(
 		startEvent(ChannelSettingUiEvent.MoveBack)
 	}
 
-	fun onChangeChannelProfile(profile: ByteArray) {
+	fun onChangeChannelProfile(profile: Bitmap) {
 		updateState {
 			copy(
 				newProfileImage = profile,

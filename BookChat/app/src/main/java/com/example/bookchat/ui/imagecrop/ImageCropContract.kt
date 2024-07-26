@@ -43,6 +43,6 @@ sealed class ImageCropUiEvent {
 	) : ImageCropUiEvent()
 
 	data class FinishWithCroppedImage(
-		val croppedImage: ByteArray,
+		val croppedImageBitmap: Bitmap,
 	) : ImageCropUiEvent()
 }

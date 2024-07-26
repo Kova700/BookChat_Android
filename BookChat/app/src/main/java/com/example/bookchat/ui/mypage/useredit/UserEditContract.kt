@@ -1,12 +1,13 @@
 package com.example.bookchat.ui.mypage.useredit
 
+import android.graphics.Bitmap
 import com.example.bookchat.domain.model.NicknameCheckState
 import com.example.bookchat.domain.model.User
 
 data class UserEditUiState(
 	val uiState: UiState,
 	val newNickname: String,
-	val clientNewImage: ByteArray?,
+	val clientNewImage: Bitmap?,
 	val nicknameCheckState: NicknameCheckState,
 	val client: User,
 	val isSelectedDefaultImage: Boolean,

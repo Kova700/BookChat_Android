@@ -22,6 +22,8 @@ import com.example.bookchat.ui.imagecrop.ImageCropActivity
 import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
 import com.example.bookchat.ui.mypage.useredit.dialog.ProfileEditDialog
 import com.example.bookchat.utils.MakeChannelImgSizeManager
+import com.example.bookchat.utils.image.bitmap.getImageBitmap
+import com.example.bookchat.utils.image.deleteImageCache
 import com.example.bookchat.utils.image.loadChangedChannelProfile
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.permissions.galleryPermissions
@@ -131,7 +133,7 @@ class ChannelSettingActivity : AppCompatActivity() {
 		binding.channelImgIv.loadChangedChannelProfile(
 			imageUrl = uiState.channel.roomImageUri,
 			channelDefaultImageType = uiState.channel.defaultRoomImageType,
-			byteArray = uiState.newProfileImage,
+			bitmap = uiState.newProfileImage,
 		)
 	}
 
@@ -148,12 +150,17 @@ class ChannelSettingActivity : AppCompatActivity() {
 	private val cropActivityResultLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 			if (result.resultCode == RESULT_OK) {
-				val intent = result.data
-				val bitmapByteArray =
-					intent?.getByteArrayExtra(ImageCropActivity.EXTRA_CROPPED_PROFILE_BYTE_ARRAY)
-				bitmapByteArray?.let { channelSettingViewModel.onChangeChannelProfile(it) }
+				val uri = result.data?.getStringExtra(ImageCropActivity.EXTRA_CROPPED_IMAGE_CACHE_URI)
+					?: return@registerForActivityResult
+				getCroppedImageBitmap(uri)
 			}
 		}
+
+	private fun getCroppedImageBitmap(uri: String) = lifecycleScope.launch {
+		val croppedImageBitmap = uri.getImageBitmap(this@ChannelSettingActivity) ?: return@launch
+		channelSettingViewModel.onChangeChannelProfile(croppedImageBitmap)
+		deleteImageCache(uri)
+	}
 
 	private val manageActivityResultLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->

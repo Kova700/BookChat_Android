@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.createchannel
 
+import android.graphics.Bitmap
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.ChannelDefaultImageType
 
@@ -7,9 +8,9 @@ data class MakeChannelUiState(
 	val uiState: UiState,
 	val channelTitle: String,
 	val channelTag: String,
-	val channelProfileImage: ByteArray?,
+	val channelProfileImage: Bitmap?,
 	val defaultProfileImageType: ChannelDefaultImageType,
-	val selectedBook: Book?
+	val selectedBook: Book?,
 ) {
 	val channelTagList
 		get() = channelTag.trim().split(" ").filter { it.isNotBlank() }
@@ -48,6 +49,6 @@ sealed class MakeChannelEvent {
 	object OpenGallery : MakeChannelEvent()
 	object ShowChannelImageSelectDialog : MakeChannelEvent()
 	data class MakeToast(
-		val stringId: Int
+		val stringId: Int,
 	) : MakeChannelEvent()
 }

@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.imagecrop
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -12,6 +13,7 @@ import com.canhub.cropper.CropImageView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityImageCropBinding
 import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
+import com.example.bookchat.utils.image.saveImageToCacheAndGetUri
 import kotlinx.coroutines.launch
 
 //TODO : 이미지 다 자르고 반환할떄, 돌려받은 곳 이미지가 꽉차게 안보임
@@ -20,7 +22,12 @@ import kotlinx.coroutines.launch
 // (채팅방의 경우는 동그라미(크롭 안내선) 안띄움 그냥 사각형만 있음
 // + 여기도 centerCrop인거 같긴함)
 
-//TODO : 채널 프로피 지정하고 확인 누르면 터짐 체크 필요함
+//동그라미 크기를 고정시킬 수 있지 않은이상, 동그라미 쓰는 경우(유저 프로필 수정)에는 1대1을 강제해야할듯
+//TODO : 채널 이미지 centerCrop으로 하고 있는데, 좌우는 centerCrop이 되고 있으나, 위 아래가 centerCrop이 안됨
+//    추청 이유 1: xml에서 크기 설정에 문제가 있다.
+//    추정 이유 2: xml은 잘 그려지고 있으나 이미지 좌우 너비 설정에 있어서 이미 찌그러진 채로 설정되어서 이미 centerCrop이 된 화면일 수도 잇음
+//TODO : 채널 프로필 지정하고 확인 누르면 터짐 체크 필요함 (용량 초과) (파일으로 저장하고 불러오는 방식으로 권장됨)
+//TODO : 비율에 맞는 이미지 자르기 UI 제공 (채널 이미지인 경우에만)
 class ImageCropActivity : AppCompatActivity() {
 
 	private lateinit var binding: ActivityImageCropBinding
@@ -130,8 +137,13 @@ class ImageCropActivity : AppCompatActivity() {
 		imageCropViewModel.onChangeCroppedImage(bitmap)
 	}
 
-	private fun finishWithCroppedImage(croppedImage: ByteArray) {
-		intent.putExtra(EXTRA_CROPPED_PROFILE_BYTE_ARRAY, croppedImage)
+	private fun finishWithCroppedImage(
+		croppedImageBitmap: Bitmap,
+	) = lifecycleScope.launch {
+		intent.putExtra(
+			EXTRA_CROPPED_IMAGE_CACHE_URI,
+			saveImageToCacheAndGetUri(croppedImageBitmap).toString()
+		)
 		setResult(RESULT_OK, intent)
 		finish()
 	}
@@ -171,16 +183,16 @@ class ImageCropActivity : AppCompatActivity() {
 				height = event.height
 			)
 
-			is ImageCropUiEvent.FinishWithCroppedImage -> finishWithCroppedImage(event.croppedImage)
+			is ImageCropUiEvent.FinishWithCroppedImage -> finishWithCroppedImage(event.croppedImageBitmap)
 			ImageCropUiEvent.RotateImageToRight -> rotateImageToRight()
 			ImageCropUiEvent.CaptureWholeImage -> captureWholeImage()
 		}
 	}
 
 	companion object {
-		const val EXTRA_CROPPED_PROFILE_BYTE_ARRAY = "EXTRA_CROPPED_PROFILE_BYTE_ARRAY"
+		private const val LAUNCHER_INPUT_IMAGE = "image/*"
+		private const val ANGLE_90 = 90
+		const val EXTRA_CROPPED_IMAGE_CACHE_URI = "EXTRA_CROPPED_IMAGE_CACHE_URI"
 		const val EXTRA_CROP_PURPOSE = "EXTRA_CROP_PURPOSE"
-		const val LAUNCHER_INPUT_IMAGE = "image/*"
-		const val ANGLE_90 = 90
 	}
 }

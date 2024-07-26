@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.channel.channelsetting
 
+import android.graphics.Bitmap
 import com.example.bookchat.domain.model.Channel
 
 data class ChannelSettingUiState(
@@ -8,7 +9,7 @@ data class ChannelSettingUiState(
 	val newTitle: String,
 	val newTags: String,
 	val newCapacity: Int,
-	val newProfileImage: ByteArray?,
+	val newProfileImage: Bitmap?,
 	val isSelectedDefaultImage: Boolean,
 ) {
 	private val isExistsChange

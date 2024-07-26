@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.createchannel
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
@@ -8,6 +9,7 @@ import com.example.bookchat.domain.model.ChannelDefaultImageType
 import com.example.bookchat.domain.repository.BookSearchRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.ui.createchannel.MakeChannelUiState.UiState
+import com.example.bookchat.utils.image.bitmap.compressToByteArray
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +48,7 @@ class MakeChannelViewModel @Inject constructor(
 				defaultRoomImageType = uiState.value.defaultProfileImageType,
 				channelTags = uiState.value.channelTagList,
 				selectedBook = uiState.value.selectedBook!!,
-				channelImage = uiState.value.channelProfileImage
+				channelImage = uiState.value.channelProfileImage?.compressToByteArray()
 			)
 		}
 			.onSuccess { channel ->
@@ -78,8 +80,8 @@ class MakeChannelViewModel @Inject constructor(
 		text?.let { updateState { copy(channelTitle = it) } }
 	}
 
-	fun onChangeChannelImg(byteArray: ByteArray) {
-		updateState { copy(channelProfileImage = byteArray) }
+	fun onChangeChannelImg(bitmap: Bitmap) {
+		updateState { copy(channelProfileImage = bitmap) }
 	}
 
 	fun onChangeSelectedBook(bookIsbn: String) {
