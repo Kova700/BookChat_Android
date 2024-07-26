@@ -4,8 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import com.example.bookchat.R
 import com.example.bookchat.domain.model.ChannelDefaultImageType
-import com.example.bookchat.utils.image.bitmap.getImageBitmap
 import com.example.bookchat.utils.dpToPx
+import com.example.bookchat.utils.image.bitmap.getImageBitmap
 
 fun ChannelDefaultImageType.getResId() =
 	when (this) {
@@ -25,7 +25,8 @@ suspend fun ChannelDefaultImageType.getBitmap(
 ): Bitmap {
 	return getResId().getImageBitmap(
 		context = context,
-		imageSizePx = imageSizePx,
+		imageWidthPx = imageSizePx,
+		imageHeightPx = imageSizePx,
 		roundedCornersRadiusPx = roundedCornersRadiusPx
 	)!!
 }

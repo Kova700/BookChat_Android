@@ -19,7 +19,8 @@ class IconBuilderImpl @Inject constructor(
 
 		return imageUrl.getImageBitmap(
 			context = context,
-			imageSizePx = 35.dpToPx(context),
+			imageWidthPx = 35.dpToPx(context),
+			imageHeightPx = 35.dpToPx(context),
 			roundedCornersRadiusPx = 14.dpToPx(context)
 		)?.let(IconCompat::createWithBitmap)
 			?: IconCompat.createWithBitmap(defaultImage)

@@ -4,8 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import com.example.bookchat.R
 import com.example.bookchat.domain.model.UserDefaultProfileType
-import com.example.bookchat.utils.image.bitmap.getImageBitmap
 import com.example.bookchat.utils.dpToPx
+import com.example.bookchat.utils.image.bitmap.getImageBitmap
 
 fun UserDefaultProfileType?.getResId() =
 	when (this) {
@@ -26,7 +26,8 @@ suspend fun UserDefaultProfileType?.getBitmap(
 ): Bitmap {
 	return getResId().getImageBitmap(
 		context = context,
-		imageSizePx = imageSizePx,
+		imageWidthPx = imageSizePx,
+		imageHeightPx = imageSizePx,
 		roundedCornersRadiusPx = roundedCornersRadiusPx
 	)!!
 }
