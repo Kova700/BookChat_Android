@@ -103,7 +103,9 @@ class ImageCropActivity : AppCompatActivity() {
 			cropCancelBtn.setOnClickListener { imageCropViewModel.onClickCropCancelBtn() }
 			cropFinishBtn.setOnClickListener { imageCropViewModel.onClickCropFinishBtn() }
 			finalConfirmBtn.setOnClickListener { imageCropViewModel.onClickFinalConfirmBtn() }
-			imgCropBtn.setOnClickListener { imageCropViewModel.onClickImageCropBtn() }
+			imgCropBtn.setOnClickListener {
+				cropImageView.wholeImageRect?.let { rect -> imageCropViewModel.onClickImageCropBtn(rect) }
+			}
 			imgRotateBtn.setOnClickListener { imageCropViewModel.onClickRightRotatePictureBtn() }
 			cropImageView.setOnSetCropOverlayMovedListener { rect ->
 				rect?.let {

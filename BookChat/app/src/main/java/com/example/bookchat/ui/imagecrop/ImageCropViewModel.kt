@@ -1,14 +1,14 @@
 package com.example.bookchat.ui.imagecrop
 
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROP_PURPOSE
 import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
-import com.example.bookchat.utils.image.bitmap.compressToByteArray
-import com.example.bookchat.utils.image.bitmap.scaleDownWithAspectRatioForWidth
+import com.example.bookchat.utils.image.bitmap.scaleDownWithAspectRatio
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -48,8 +48,7 @@ class ImageCropViewModel @Inject constructor(
 	private fun finishImageCrop(croppedImage: Bitmap) = viewModelScope.launch {
 		val finalImage = croppedImage
 			.scaleDownToFinalSize(cropPurpose)
-			.compressToByteArray()
-		startEvent(ImageCropUiEvent.FinishWithCroppedImage(finalImage))
+		startEvent(ImageCropUiEvent.FinishWithCroppedImage(croppedImageBitmap = finalImage))
 	}
 
 	fun onCapturedWholeImage(wholeImage: Bitmap) {
@@ -69,8 +68,9 @@ class ImageCropViewModel @Inject constructor(
 		cropOverlayWidthAndHeight.update { width to height }
 	}
 
-	fun onClickImageCropBtn() {
+	fun onClickImageCropBtn(wholeImageRect: Rect) {
 		updateState { copy(uiState = ImageCropUiState.UiState.IMAGE_CROP) }
+		cropOverlayWidthAndHeight.update { wholeImageRect.width() to wholeImageRect.height() }
 	}
 
 	fun onClickCropFinishBtn() {
@@ -123,14 +123,14 @@ class ImageCropViewModel @Inject constructor(
 	private suspend fun Bitmap.scaleDownToFinalSize(purpose: ImageCropPurpose): Bitmap {
 		return when (purpose) {
 			ImageCropPurpose.USER_PROFILE ->
-				scaleDownWithAspectRatioForWidth(
-					targetWidth = USER_PROFILE_IMG_WIDTH,
+				scaleDownWithAspectRatio(
+					maxWidth = USER_PROFILE_IMG_MAX_WIDTH,
 					maxHeight = USER_PROFILE_IMG_MAX_HEIGHT
 				)
 
 			ImageCropPurpose.CHANNEL_PROFILE ->
-				scaleDownWithAspectRatioForWidth(
-					targetWidth = CHANNEL_PROFILE_IMG_WIDTH,
+				scaleDownWithAspectRatio(
+					maxWidth = CHANNEL_PROFILE_IMG_MAX_WIDTH,
 					maxHeight = CHANNEL_PROFILE_IMG_MAX_HEIGHT
 				)
 		}
@@ -145,10 +145,10 @@ class ImageCropViewModel @Inject constructor(
 	}
 
 	companion object {
-		private const val USER_PROFILE_IMG_WIDTH = 200
-		private const val USER_PROFILE_IMG_MAX_HEIGHT = 400
-		private const val CHANNEL_PROFILE_IMG_WIDTH = 700
-		private const val CHANNEL_PROFILE_IMG_MAX_HEIGHT = 1600
+		private const val USER_PROFILE_IMG_MAX_WIDTH = 256
+		private const val USER_PROFILE_IMG_MAX_HEIGHT = 256
+		private const val CHANNEL_PROFILE_IMG_MAX_WIDTH = 720
+		private const val CHANNEL_PROFILE_IMG_MAX_HEIGHT = 1280
 	}
 
 }
