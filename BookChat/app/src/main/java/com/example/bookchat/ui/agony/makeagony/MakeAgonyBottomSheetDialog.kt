@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogMakeAgonyBottomSheetBinding
+import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.ui.agony.makeagony.util.getTextColorHexInt
 import com.example.bookchat.utils.makeToast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -37,7 +38,6 @@ class MakeAgonyBottomSheetDialog : BottomSheetDialogFragment() {
 				inflater, R.layout.dialog_make_agony_bottom_sheet,
 				container, false
 			)
-		binding.viewmodel = makeAgonyDialogViewModel
 		binding.lifecycleOwner = this
 		return binding.root
 	}
@@ -47,6 +47,7 @@ class MakeAgonyBottomSheetDialog : BottomSheetDialogFragment() {
 		observeUiState()
 		observeUiEvent()
 		observeEnteredTitle()
+		initViewState()
 	}
 
 	override fun onDestroyView() {
@@ -70,12 +71,71 @@ class MakeAgonyBottomSheetDialog : BottomSheetDialogFragment() {
 		}
 	}
 
+	private fun initViewState() {
+		with(binding) {
+			submitBtn.setOnClickListener {
+				makeAgonyDialogViewModel.onRegisterBtnClick()
+			}
+			whiteColorToggle.setOnClickListener {
+				makeAgonyDialogViewModel.onColorBtnClick(AgonyFolderHexColor.WHITE)
+			}
+			blackColorToggle.setOnClickListener {
+				makeAgonyDialogViewModel.onColorBtnClick(AgonyFolderHexColor.BLACK)
+			}
+			purpleColorToggle.setOnClickListener {
+				makeAgonyDialogViewModel.onColorBtnClick(AgonyFolderHexColor.PURPLE)
+			}
+			mintColorToggle.setOnClickListener {
+				makeAgonyDialogViewModel.onColorBtnClick(AgonyFolderHexColor.MINT)
+			}
+			greenColorToggle.setOnClickListener {
+				makeAgonyDialogViewModel.onColorBtnClick(AgonyFolderHexColor.GREEN)
+			}
+			yellowColorToggle.setOnClickListener {
+				makeAgonyDialogViewModel.onColorBtnClick(AgonyFolderHexColor.YELLOW)
+			}
+			orangeColorToggle.setOnClickListener {
+				makeAgonyDialogViewModel.onColorBtnClick(AgonyFolderHexColor.ORANGE)
+			}
+		}
+	}
+
 	private fun setViewState(uiState: MakeAgonyUiState) {
 		binding.makeAgonyFolderCv.backgroundTintList =
 			ColorStateList.valueOf(Color.parseColor(uiState.selectedColor.hexcolor))
 		with(binding.agonyFolderTitleEt) {
 			setTextColor(uiState.selectedColor.getTextColorHexInt())
 			setHintTextColor(uiState.selectedColor.getTextColorHexInt())
+		}
+		with(binding) {
+			with(whiteColorToggle) {
+				isChecked = uiState.selectedColor == AgonyFolderHexColor.WHITE
+				isEnabled = isChecked.not()
+			}
+			with(blackColorToggle) {
+				isChecked = uiState.selectedColor == AgonyFolderHexColor.BLACK
+				isEnabled = isChecked.not()
+			}
+			with(purpleColorToggle) {
+				isChecked = uiState.selectedColor == AgonyFolderHexColor.PURPLE
+				isEnabled = isChecked.not()
+			}
+			with(mintColorToggle) {
+				isChecked = uiState.selectedColor == AgonyFolderHexColor.MINT
+				isEnabled = isChecked.not()
+			}
+			with(greenColorToggle) {
+				isChecked = uiState.selectedColor == AgonyFolderHexColor.GREEN
+				isEnabled = isChecked.not()
+			}
+			with(yellowColorToggle) {
+				isChecked = uiState.selectedColor == AgonyFolderHexColor.YELLOW
+				isEnabled = isChecked.not()
+			}
+			with(orangeColorToggle) {
+				isChecked = uiState.selectedColor == AgonyFolderHexColor.ORANGE
+				isEnabled = isChecked.not()
+			}
 		}
 	}
 
