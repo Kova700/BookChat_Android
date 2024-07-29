@@ -7,6 +7,8 @@ fun List<BookShelfItem>.toCompleteBookShelfItems(
 	totalItemCount: Int,
 	isSwipedMap: Map<Long, Boolean>,
 ): List<CompleteBookShelfItem> {
+	if (isEmpty()) return emptyList()
+
 	val items = mutableListOf<CompleteBookShelfItem>()
 	items.add(CompleteBookShelfItem.Header(totalItemCount))
 	items.addAll(map { it.toCompleteBookShelfItem(isSwipedMap[it.bookShelfId] ?: false) })

@@ -7,6 +7,8 @@ fun List<BookShelfItem>.toWishBookShelfItems(
 	totalItemCount: Int,
 	dummyItemCount: Int,
 ): List<WishBookShelfItem> {
+	if (isEmpty()) return emptyList()
+
 	val items = mutableListOf<WishBookShelfItem>()
 	items.add(WishBookShelfItem.Header(totalItemCount))
 	items.addAll(map { it.toWishBookShelfItem() })

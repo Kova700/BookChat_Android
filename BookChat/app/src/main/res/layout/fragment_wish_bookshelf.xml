@@ -9,22 +9,43 @@
         <include
             android:id="@+id/bookshelf_empty_layout"
             layout="@layout/layout_bookshelf_empty"
-            android:visibility="gone" />
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <include
             android:id="@+id/wish_bookshelf_shimmer_layout"
             layout="@layout/layout_wish_bookshelf_shimmer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.example.bookchat.ui.customview.ViewPagerInnerRecyclerView
             android:id="@+id/bookshelf_wish_rcv"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="#F9F9F9"
-            app:layout_constraintBottom_toBottomOf="@+id/bookshelf_empty_layout"
-            app:layout_constraintEnd_toEndOf="@+id/bookshelf_empty_layout"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/progressbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

@@ -98,11 +98,13 @@ class WishBookBookShelfFragment : Fragment() {
 	private fun setViewState(uiState: WishBookShelfUiState) {
 		with(binding) {
 			bookshelfEmptyLayout.root.visibility =
-				if (uiState.isEmptyData) View.VISIBLE else View.GONE
+				if (uiState.isEmpty) View.VISIBLE else View.GONE
 			bookshelfWishRcv.visibility =
-				if (uiState.isSuccess) View.VISIBLE else View.GONE
-			wishBookshelfShimmerLayout.root.visibility =
+				if (uiState.isSuccess || uiState.isLoading) View.VISIBLE else View.GONE
+			progressbar.visibility =
 				if (uiState.isLoading) View.VISIBLE else View.GONE
+			wishBookshelfShimmerLayout.root.visibility =
+				if (uiState.isInitLoading) View.VISIBLE else View.GONE
 					.also { wishBookshelfShimmerLayout.shimmerLayout.stopShimmer() }
 		}
 	}

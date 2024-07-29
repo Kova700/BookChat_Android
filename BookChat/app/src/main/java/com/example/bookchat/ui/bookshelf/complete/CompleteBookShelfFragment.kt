@@ -47,7 +47,6 @@ class CompleteBookShelfFragment : Fragment() {
 				container, false
 			)
 		binding.lifecycleOwner = this.viewLifecycleOwner
-		binding.viewmodel = completeBookShelfViewModel
 		return binding.root
 	}
 
@@ -94,11 +93,13 @@ class CompleteBookShelfFragment : Fragment() {
 	private fun setViewState(uiState: CompleteBookShelfUiState) {
 		with(binding) {
 			bookshelfEmptyLayout.root.visibility =
-				if (uiState.isEmptyData) View.VISIBLE else View.GONE
+				if (uiState.isEmpty) View.VISIBLE else View.GONE
 			bookshelfCompleteRcv.visibility =
-				if (uiState.isSuccess) View.VISIBLE else View.GONE
-			completeBookshelfShimmerLayout.root.visibility =
+				if (uiState.isSuccess || uiState.isLoading) View.VISIBLE else View.GONE
+			progressbar.visibility =
 				if (uiState.isLoading) View.VISIBLE else View.GONE
+			completeBookshelfShimmerLayout.root.visibility =
+				if (uiState.isInitLoading) View.VISIBLE else View.GONE
 					.also { completeBookshelfShimmerLayout.shimmerLayout.stopShimmer() }
 		}
 	}

@@ -5,31 +5,31 @@ import com.example.bookchat.ui.bookshelf.complete.model.CompleteBookShelfItem
 data class CompleteBookShelfUiState(
 	val uiState: UiState,
 	val completeItems: List<CompleteBookShelfItem>,
-	val totalItemCount: Int,
 ) {
-
-	val isEmptyData: Boolean
-		get() = isLoading.not()
-						&& completeItems.filterIsInstance<CompleteBookShelfItem.Item>().isEmpty()
-
 	val isLoading: Boolean
 		get() = uiState == UiState.LOADING
 
+	val isInitLoading: Boolean
+		get() = uiState == UiState.INIT_LOADING
+
 	val isSuccess: Boolean
 		get() = uiState == UiState.SUCCESS
+						&& isEmpty.not()
+
+	val isEmpty: Boolean
+		get() = completeItems.isEmpty()
 
 	enum class UiState {
 		SUCCESS,
-		LOADING,
 		ERROR,
-		EMPTY,
+		LOADING,
+		INIT_LOADING
 	}
 
 	companion object {
 		val DEFAULT = CompleteBookShelfUiState(
-			uiState = UiState.EMPTY,
+			uiState = UiState.INIT_LOADING,
 			completeItems = emptyList(),
-			totalItemCount = 0
 		)
 	}
 }

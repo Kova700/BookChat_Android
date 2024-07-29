@@ -7,25 +7,29 @@ data class WishBookShelfUiState(
 	val uiState: UiState,
 	val wishItems: List<WishBookShelfItem>,
 ) {
-	val isEmptyData: Boolean
-		get() = isLoading.not()
-						&& wishItems.filterIsInstance<WishBookShelfItem.Item>().isEmpty()
-
 	val isLoading: Boolean
 		get() = uiState == UiState.LOADING
 
+	val isInitLoading: Boolean
+		get() = uiState == UiState.INIT_LOADING
+
 	val isSuccess: Boolean
 		get() = uiState == UiState.SUCCESS
+						&& isEmpty.not()
+
+	val isEmpty: Boolean
+		get() = wishItems.isEmpty()
+
 	enum class UiState {
 		SUCCESS,
-		LOADING,
 		ERROR,
-		EMPTY,
+		LOADING,
+		INIT_LOADING
 	}
 
 	companion object {
 		val DEFAULT = WishBookShelfUiState(
-			uiState = UiState.EMPTY,
+			uiState = UiState.INIT_LOADING,
 			wishItems = emptyList(),
 		)
 	}

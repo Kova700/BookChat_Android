@@ -31,7 +31,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ReadingBookShelfFragment : Fragment() {
-
 	private var _binding: FragmentReadingBookshelfBinding? = null
 	private val binding get() = _binding!!
 	private val readingBookShelfViewModel: ReadingBookShelfViewModel by viewModels()
@@ -99,12 +98,15 @@ class ReadingBookShelfFragment : Fragment() {
 	private fun setViewState(uiState: ReadingBookShelfUiState) {
 		with(binding) {
 			bookshelfEmptyLayout.root.visibility =
-				if (uiState.isEmptyData) View.VISIBLE else View.GONE
+				if (uiState.isEmpty) View.VISIBLE else View.GONE
 			bookshelfReadingRcv.visibility =
-				if (uiState.isSuccess) View.VISIBLE else View.GONE
-			readingBookshelfShimmerLayout.root.visibility =
+				if (uiState.isSuccess || uiState.isLoading) View.VISIBLE else View.GONE
+			progressbar.visibility =
 				if (uiState.isLoading) View.VISIBLE else View.GONE
+			readingBookshelfShimmerLayout.root.visibility =
+				if (uiState.isInitLoading) View.VISIBLE else View.GONE
 					.also { readingBookshelfShimmerLayout.shimmerLayout.stopShimmer() }
+
 		}
 	}
 
