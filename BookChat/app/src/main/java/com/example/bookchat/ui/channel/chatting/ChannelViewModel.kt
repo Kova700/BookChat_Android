@@ -6,17 +6,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.data.networkmanager.external.NetworkManager
+import com.example.bookchat.data.networkmanager.external.model.NetworkState
+import com.example.bookchat.data.stomp.external.StompHandler
+import com.example.bookchat.data.stomp.external.model.SocketState
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatType
-import com.example.bookchat.data.networkmanager.external.model.NetworkState
-import com.example.bookchat.data.stomp.external.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChannelTempMessageRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.data.stomp.external.StompHandler
 import com.example.bookchat.domain.usecase.GetChatsFlowUseCase
 import com.example.bookchat.domain.usecase.SyncChannelChatsUseCase
 import com.example.bookchat.notification.chat.ChatNotificationHandler
@@ -224,9 +224,8 @@ class ChannelViewModel @Inject constructor(
 		val newestChats = getNewestChats().await() ?: emptyList()
 		if (uiState.value.needToScrollToLastReadChat.not()) return@launch
 		val originalLastReadChatId = uiState.value.originalLastReadChatId ?: return@launch
-
 		val shouldCallGetChatsAroundId =
-			newestChats.map(Chat::chatId).contains(originalLastReadChatId).not()
+			newestChats.any { it.chatId == originalLastReadChatId }.not()
 		if (shouldCallGetChatsAroundId) getChatsAroundId(originalLastReadChatId)
 	}
 
@@ -437,7 +436,6 @@ class ChannelViewModel @Inject constructor(
 		scrollToBottom()
 	}
 
-	//TODO : 서재에 도서 등록 안되어있으면 등록 경고 다이얼로그
 	fun onClickCaptureBtn() {
 		if (uiState.value.channel.isAvailableChannel.not()
 			|| uiState.value.chats.isEmpty()
