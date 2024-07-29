@@ -43,11 +43,11 @@ class MyPageViewModel @Inject constructor(
 		startEvent(MyPageEvent.MoveToNotice)
 	}
 
-	fun onClickAccountSetBtn() {
+	fun onClickAccountSettingBtn() {
 		startEvent(MyPageEvent.MoveToAccountSetting)
 	}
 
-	fun onClickAppSetBtn() {
+	fun onClickAppSettingBtn() {
 		startEvent(MyPageEvent.MoveToAppSetting)
 	}
 

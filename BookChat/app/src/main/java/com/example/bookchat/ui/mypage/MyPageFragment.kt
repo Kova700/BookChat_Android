@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import com.example.bookchat.BuildConfig
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentMyPageBinding
 import com.example.bookchat.domain.model.User
@@ -17,6 +18,7 @@ import com.example.bookchat.ui.mypage.accountsetting.AccountSettingActivity
 import com.example.bookchat.ui.mypage.appsetting.AppSettingActivity
 import com.example.bookchat.ui.mypage.useredit.UserEditActivity
 import com.example.bookchat.utils.image.loadUserProfile
+import com.mikepenz.aboutlibraries.LibsBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -35,7 +37,6 @@ class MyPageFragment : Fragment() {
 			inflater, R.layout.fragment_my_page, container, false
 		)
 		binding.lifecycleOwner = this
-		binding.viewmodel = myPageViewModel
 		return binding.root
 	}
 
@@ -43,6 +44,7 @@ class MyPageFragment : Fragment() {
 		super.onViewCreated(view, savedInstanceState)
 		observeUiState()
 		observeUiEvent()
+		initViewState()
 	}
 
 	override fun onDestroyView() {
@@ -60,11 +62,32 @@ class MyPageFragment : Fragment() {
 		myPageViewModel.eventFlow.collect { handleEvent(it) }
 	}
 
+	private fun initViewState() {
+		with(binding) {
+			wishBtn.setOnClickListener { myPageViewModel.onClickWishBtn() }
+			noticeBtn.setOnClickListener { myPageViewModel.onClickNoticeBtn() }
+			inviteBtn.setOnClickListener { }
+			accountSettingBtn.setOnClickListener { myPageViewModel.onClickAccountSettingBtn() }
+			appSettingBtn.setOnClickListener { myPageViewModel.onClickAppSettingBtn() }
+			openSourceLicenseBtn.setOnClickListener { moveToOpenSourceLicensesMenu() }
+			userEditBtn.setOnClickListener { myPageViewModel.onClickUserEditBtn() }
+			appVersionTv.text = BuildConfig.VERSION_NAME
+		}
+	}
+
 	private fun setViewState(uiState: User) {
 		binding.userProfileIv.loadUserProfile(
 			imageUrl = uiState.profileImageUrl,
 			userDefaultProfileType = uiState.defaultProfileImageType
 		)
+		binding.nicknameTv.text = uiState.nickname
+	}
+
+	private fun moveToOpenSourceLicensesMenu() {
+		LibsBuilder()
+			.withAboutIconShown(true)
+			.withAboutVersionShown(true)
+			.start(requireContext())
 	}
 
 	private fun moveToUserEditActivity() {

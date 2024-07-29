@@ -161,6 +161,10 @@
     <string name="account_setting">계정 설정</string>
     <string name="app_setting">앱 설정</string>
     <string name="app_version">앱 버전</string>
+    <string name="open_source_license">오픈 라이선스</string>
+    <string name="terms_and_policy">약관 및 정책</string>
+    <string name="terms_of_service">서비스 이용약관</string>
+    <string name="privacy_policy">개인정보 처리방침</string>
     <string name="my_page_profile_edit_success">프로필이 수정되었습니다.</string>
     <string name="my_page_profile_edit_fail">프로필 수정을 실패했습니다.</string>
     <string name="my_page_profile_need_name_dup_check">닉네임 중복확인이 필요합니다.</string>

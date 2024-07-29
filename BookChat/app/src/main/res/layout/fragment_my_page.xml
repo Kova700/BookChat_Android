@@ -1,38 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <data>
-        <variable
-            name="viewmodel"
-            type="com.example.bookchat.ui.mypage.MyPageViewModel" />
-        <variable
-            name="buildConfig"
-            type="com.example.bookchat.BuildConfig" />
-    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_top"
-            app:layout_constraintGuide_begin="30dp"
-            android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="30dp" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintGuide_begin="30dp"
-            android:orientation="vertical" />
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="30dp" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintGuide_end="30dp"
-            android:orientation="vertical" />
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="30dp" />
 
         <TextView
             android:id="@+id/mypage_title"
@@ -77,22 +70,21 @@
             android:fontFamily="@font/notosanskr_bold"
             android:maxLength="20"
             android:maxLines="1"
-            android:text="@{viewmodel.uiState.nickname}"
             android:textColor="#373737"
             android:textSize="20sp"
             app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toStartOf="@+id/antiDupClickImageButton7"
+            app:layout_constraintEnd_toStartOf="@+id/user_edit_btn"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
             app:layout_constraintTop_toBottomOf="@+id/cardView6" />
 
         <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/antiDupClickImageButton7"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:id="@+id/user_edit_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:onClick="@{() -> viewmodel.onClickUserEditBtn()}"
             android:background="?android:selectableItemBackgroundBorderless"
+            android:padding="3dp"
             android:src="@drawable/caret_left_btn"
             app:layout_constraintBottom_toBottomOf="@+id/nickname_tv"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
@@ -103,40 +95,38 @@
             android:id="@+id/wish_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?android:selectableItemBackgroundBorderless"
             android:drawableTop="@drawable/mypage_heart_btn"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:paddingHorizontal="1dp"
             android:paddingVertical="0dp"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:textColor="#373737"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_regular"
-            android:onClick="@{() -> viewmodel.onClickWishBtn()}"
             android:text="@string/heart_list"
+            android:textColor="#373737"
             app:layout_constraintBottom_toBottomOf="@+id/notice_btn"
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toTopOf="@+id/notice_btn"/>
+            app:layout_constraintTop_toTopOf="@+id/notice_btn" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/notice_btn"
-            android:layout_marginTop="30dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:background="?android:selectableItemBackgroundBorderless"
             android:drawableTop="@drawable/mypage_notice"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:paddingHorizontal="1dp"
             android:paddingVertical="0dp"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:textColor="#373737"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_regular"
-            android:onClick="@{() -> viewmodel.onClickNoticeBtn()}"
             android:text="@string/notice"
+            android:textColor="#373737"
             app:layout_constraintEnd_toEndOf="@+id/cardView6"
             app:layout_constraintStart_toStartOf="@+id/cardView6"
-            app:layout_constraintTop_toBottomOf="@+id/nickname_tv"/>
+            app:layout_constraintTop_toBottomOf="@+id/nickname_tv" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/invite_btn"
@@ -157,7 +147,7 @@
             app:layout_constraintTop_toTopOf="@+id/notice_btn" />
 
         <TextView
-            android:id="@+id/user_setting_btn"
+            android:id="@+id/account_setting_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
@@ -165,9 +155,8 @@
             android:focusable="true"
             android:fontFamily="@font/notosanskr_regular"
             android:foreground="?android:selectableItemBackground"
-            android:onClick="@{() -> viewmodel.onClickAccountSetBtn()}"
-            android:paddingStart="30dp"
             android:paddingVertical="10dp"
+            android:paddingStart="30dp"
             android:text="@string/account_setting"
             android:textColor="#373737"
             android:textSize="14sp"
@@ -176,47 +165,60 @@
             app:layout_constraintTop_toBottomOf="@+id/notice_btn" />
 
         <TextView
-            android:id="@+id/app_settting_btn"
+            android:id="@+id/app_setting_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="true"
             android:fontFamily="@font/notosanskr_regular"
             android:foreground="?android:selectableItemBackground"
-            android:onClick="@{() -> viewmodel.onClickAppSetBtn()}"
-            android:paddingStart="30dp"
             android:paddingVertical="10dp"
+            android:paddingStart="30dp"
             android:text="@string/app_setting"
             android:textColor="#373737"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/user_setting_btn" />
+            app:layout_constraintTop_toBottomOf="@+id/account_setting_btn" />
 
         <TextView
-            android:id="@+id/app_version_btn"
+            android:id="@+id/open_source_license_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="true"
             android:fontFamily="@font/notosanskr_regular"
             android:foreground="?android:selectableItemBackground"
-            android:paddingStart="30dp"
             android:paddingVertical="10dp"
+            android:paddingStart="30dp"
+            android:text="@string/open_source_license"
+            android:textColor="#373737"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/app_setting_btn" />
+
+        <TextView
+            android:id="@+id/app_version_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/notosanskr_regular"
+            android:foreground="?android:selectableItemBackground"
+            android:paddingVertical="10dp"
+            android:paddingStart="30dp"
             android:text="@string/app_version"
             android:textColor="#373737"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/app_settting_btn" />
+            app:layout_constraintTop_toBottomOf="@+id/open_source_license_btn" />
 
         <TextView
-            android:id="@+id/app_version_text"
+            android:id="@+id/app_version_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
             android:fontFamily="@font/notosanskr_regular"
-            android:text="@{buildConfig.VERSION_NAME}"
             android:textColor="#373737"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/app_version_btn"
