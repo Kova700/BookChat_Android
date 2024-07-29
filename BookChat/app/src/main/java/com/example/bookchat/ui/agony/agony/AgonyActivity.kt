@@ -14,9 +14,9 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAgonyBinding
 import com.example.bookchat.ui.agony.agony.AgonyUiState.UiState
 import com.example.bookchat.ui.agony.agony.adapter.AgonyAdapter
+import com.example.bookchat.ui.agony.agony.model.AgonyListItem
 import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordActivity
 import com.example.bookchat.ui.agony.makeagony.MakeAgonyBottomSheetDialog
-import com.example.bookchat.ui.agony.agony.model.AgonyListItem
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -74,7 +74,7 @@ class AgonyActivity : AppCompatActivity() {
 			wasteBasketBtn.visibility =
 				if (state.uiState == UiState.SUCCESS) View.VISIBLE else View.INVISIBLE
 			agonyRcv.visibility =
-				if (state.uiState == UiState.SUCCESS) View.VISIBLE else View.GONE
+				if (state.isSuccessOrEditing) View.VISIBLE else View.GONE
 			agonyShimmerLayout.root.visibility =
 				if (state.uiState == UiState.LOADING) View.VISIBLE else View.GONE
 					.also { agonyShimmerLayout.shimmerLayout.stopShimmer() }

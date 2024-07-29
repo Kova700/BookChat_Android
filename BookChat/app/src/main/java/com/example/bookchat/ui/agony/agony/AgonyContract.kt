@@ -6,8 +6,12 @@ import com.example.bookchat.ui.agony.agony.model.AgonyListItem
 data class AgonyUiState(
 	val uiState: UiState,
 	val bookshelfItem: BookShelfItem,
-	val agonies: List<AgonyListItem>
+	val agonies: List<AgonyListItem>,
 ) {
+	val isSuccessOrEditing: Boolean
+		get() = uiState == UiState.SUCCESS
+						|| uiState == UiState.EDITING
+
 	enum class UiState {
 		SUCCESS,
 		LOADING,

@@ -13,6 +13,7 @@
             layout="@layout/layout_agony_shimmer"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -84,13 +85,13 @@
         <!-- TODO : 그리드뷰 Item Spacing 설정해야함 -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/agonyRcv"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="5dp"
             app:layout_constraintBottom_toTopOf="@+id/agony_delete_btn"
-            app:layout_constraintTop_toBottomOf="@+id/textView12"
-            app:layout_constraintVertical_bias="0.0"
-            tools:layout_editor_absoluteX="0dp" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView12" />
 
         <com.example.bookchat.ui.customview.AntiDupClickButton
             android:id="@+id/agony_delete_btn"
