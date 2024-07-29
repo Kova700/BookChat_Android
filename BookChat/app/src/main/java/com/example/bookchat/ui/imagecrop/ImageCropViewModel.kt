@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROP_PURPOSE
+import com.example.bookchat.ui.imagecrop.model.ImageCropAspectRatio
 import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
 import com.example.bookchat.utils.image.bitmap.scaleDownWithAspectRatio
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,12 +18,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO : 이미지 가로 세로 비율 1대1 강제 해제
-
-//TODO : 유저가 자른 이미지 비율 그대로 하고
-// 픽셀 축소, 압축 하는 방향으로 구현
-// + 1대1비율 같이 비율도 정할 수 있게 기능 추가 (like 카카오톡)
-//TODO : 채팅방 이미지는 1:1 비율로하면 깨짐 (수정 가능하게 수정)
 class ImageCropViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -55,13 +50,12 @@ class ImageCropViewModel @Inject constructor(
 		finishImageCrop(wholeImage)
 	}
 
+	fun onClickCaptureImageAspectRatioBtn(aspectRatio: ImageCropAspectRatio) {
+		updateState { copy(imageCropAspectRatio = aspectRatio) }
+	}
+
 	fun onClickFinalConfirmBtn() {
-		val croppedImage = _uiState.value.croppedImage
-		if (croppedImage == null) {
-			startEvent(ImageCropUiEvent.CaptureWholeImage)
-			return
-		}
-		finishImageCrop(croppedImage)
+		startEvent(ImageCropUiEvent.CaptureWholeImage)
 	}
 
 	fun onChangeCropOverlayWidthAndHeight(width: Int, height: Int) {
@@ -109,7 +103,12 @@ class ImageCropViewModel @Inject constructor(
 	}
 
 	fun onClickCropCancelBtn() {
-		updateState { copy(uiState = ImageCropUiState.UiState.DEFAULT) }
+		updateState {
+			copy(
+				uiState = ImageCropUiState.UiState.DEFAULT,
+				imageCropAspectRatio = ImageCropAspectRatio.RATIO_1_1
+			)
+		}
 	}
 
 	fun onClickBackBtn() {

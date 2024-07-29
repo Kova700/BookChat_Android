@@ -2,6 +2,7 @@ package com.example.bookchat.ui.imagecrop
 
 import android.graphics.Bitmap
 import android.net.Uri
+import com.example.bookchat.ui.imagecrop.model.ImageCropAspectRatio
 import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
 
 data class ImageCropUiState(
@@ -9,6 +10,7 @@ data class ImageCropUiState(
 	val selectedImageUrl: Uri?,
 	val croppedImage: Bitmap?,
 	val cropPurpose: ImageCropPurpose,
+	val imageCropAspectRatio: ImageCropAspectRatio,
 ) {
 	val isDefault
 		get() = uiState == UiState.DEFAULT
@@ -29,6 +31,7 @@ data class ImageCropUiState(
 			selectedImageUrl = null,
 			croppedImage = null,
 			cropPurpose = ImageCropPurpose.USER_PROFILE,
+			imageCropAspectRatio = ImageCropAspectRatio.RATIO_1_1,
 		)
 	}
 }

@@ -9,25 +9,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import com.canhub.cropper.CropImageView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityImageCropBinding
-import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
+import com.example.bookchat.ui.imagecrop.model.ImageCropAspectRatio
 import com.example.bookchat.utils.image.saveImageToCacheAndGetUri
 import kotlinx.coroutines.launch
 
-//TODO : 이미지 다 자르고 반환할떄, 돌려받은 곳 이미지가 꽉차게 안보임
-//  fitCenter 혹은 fitXY해야할듯..?
-//centerCrop사용해야 카톡처럼 됨 (프로필 띄우는 곳 전부 수정해야함)
-// (채팅방의 경우는 동그라미(크롭 안내선) 안띄움 그냥 사각형만 있음
-// + 여기도 centerCrop인거 같긴함)
-
-//동그라미 크기를 고정시킬 수 있지 않은이상, 동그라미 쓰는 경우(유저 프로필 수정)에는 1대1을 강제해야할듯
-//TODO : 채널 이미지 centerCrop으로 하고 있는데, 좌우는 centerCrop이 되고 있으나, 위 아래가 centerCrop이 안됨
-//    추청 이유 1: xml에서 크기 설정에 문제가 있다.
-//    추정 이유 2: xml은 잘 그려지고 있으나 이미지 좌우 너비 설정에 있어서 이미 찌그러진 채로 설정되어서 이미 centerCrop이 된 화면일 수도 잇음
-//TODO : 채널 프로필 지정하고 확인 누르면 터짐 체크 필요함 (용량 초과) (파일으로 저장하고 불러오는 방식으로 권장됨)
-//TODO : 비율에 맞는 이미지 자르기 UI 제공 (채널 이미지인 경우에만)
 class ImageCropActivity : AppCompatActivity() {
 
 	private lateinit var binding: ActivityImageCropBinding
@@ -66,14 +53,49 @@ class ImageCropActivity : AppCompatActivity() {
 			else getString(R.string.select_image)
 	}
 
-	//	setAspectRatio
-	// clearAspectRatio
 	private fun setCropImageViewState(uiState: ImageCropUiState) {
-		setCropImageViewImage(uiState)
-		setCropImageViewCropOverlay(uiState)
+		setCropImageViewSize(uiState)
+		setCropImageViewImageState(uiState)
+		setCropImageViewCropOverlayState(uiState)
+		setCropImageViewCropOverlayAspectRatio(uiState)
+		setCaptureImageAspectRatioBtnState(uiState)
 	}
 
-	private fun setCropImageViewImage(uiState: ImageCropUiState) {
+	/**imgAspectRatioBtnLayout의 Visibility 상태를 gone -> visible 상태로 변경시
+	 * CropImageView의 height가 자동 resizing 되지 않아서 수동으로 조절*/
+	private fun setCropImageViewSize(uiState: ImageCropUiState) {
+		val deviceHeightPx: Int = resources.displayMetrics.heightPixels
+		val headerHeight = binding.imageCropHeader.height
+		val footerHeight = if (uiState.isImageCropping.not()) 0 else
+			resources.getDimension(R.dimen.image_crop_aspect_ratio_btn_layout_height).toInt()
+		val newCropImageViewHeight = deviceHeightPx - (headerHeight + footerHeight)
+		binding.cropImageView.layoutParams.height = newCropImageViewHeight
+	}
+
+	private fun setCaptureImageAspectRatioBtnState(uiState: ImageCropUiState) {
+		with(binding) {
+			imgAspectRatioBtnLayout.visibility =
+				if (uiState.isImageCropping) View.VISIBLE else View.GONE
+			with(imgAspectRatioBtn11) {
+				isChecked = uiState.imageCropAspectRatio == ImageCropAspectRatio.RATIO_1_1
+				isEnabled = isChecked.not()
+			}
+			with(imgAspectRatioBtn34) {
+				isChecked = uiState.imageCropAspectRatio == ImageCropAspectRatio.RATIO_3_4
+				isEnabled = isChecked.not()
+			}
+			with(imgAspectRatioBtn43) {
+				isChecked = uiState.imageCropAspectRatio == ImageCropAspectRatio.RATIO_4_3
+				isEnabled = isChecked.not()
+			}
+			with(imgAspectRatioBtnFree) {
+				isChecked = uiState.imageCropAspectRatio == ImageCropAspectRatio.RATIO_FREE
+				isEnabled = isChecked.not()
+			}
+		}
+	}
+
+	private fun setCropImageViewImageState(uiState: ImageCropUiState) {
 		with(binding.cropImageView) {
 			if (uiState.croppedImage != null) {
 				setImageBitmap(uiState.croppedImage)
@@ -86,17 +108,25 @@ class ImageCropActivity : AppCompatActivity() {
 		}
 	}
 
-	private fun setCropImageViewCropOverlay(uiState: ImageCropUiState) {
+	/** OverlayShape 스쿼클 모양으로 추후 업데이트
+	 * (Oval 사용시 동그라미 크가 1대1 종횡비가 아니면 원 모양이 늘어나는 현상 때문에 Rectangle로 임시 통일) */
+	private fun setCropImageViewCropOverlayState(uiState: ImageCropUiState) {
 		with(binding.cropImageView) {
 			isShowCropOverlay = uiState.isImageCropping
-			cropShape = when (uiState.cropPurpose) {
-				ImageCropPurpose.USER_PROFILE -> CropImageView.CropShape.OVAL
-				ImageCropPurpose.CHANNEL_PROFILE -> CropImageView.CropShape.RECTANGLE
+		}
+	}
+
+	private fun setCropImageViewCropOverlayAspectRatio(uiState: ImageCropUiState) {
+		with(binding.cropImageView) {
+			when (uiState.imageCropAspectRatio) {
+				ImageCropAspectRatio.RATIO_FREE -> clearAspectRatio()
+				ImageCropAspectRatio.RATIO_1_1 -> setAspectRatio(1, 1)
+				ImageCropAspectRatio.RATIO_3_4 -> setAspectRatio(3, 4)
+				ImageCropAspectRatio.RATIO_4_3 -> setAspectRatio(4, 3)
 			}
 		}
 	}
 
-	//TODO  : CropOverlay 모양 바꿀 수 있거나 사각형의 connerRadius 바꿀 수 있으면 스쿼클 모양 설정
 	private fun initViewState() {
 		with(binding) {
 			backBtn.setOnClickListener { imageCropViewModel.onClickBackBtn() }
@@ -105,6 +135,18 @@ class ImageCropActivity : AppCompatActivity() {
 			finalConfirmBtn.setOnClickListener { imageCropViewModel.onClickFinalConfirmBtn() }
 			imgCropBtn.setOnClickListener {
 				cropImageView.wholeImageRect?.let { rect -> imageCropViewModel.onClickImageCropBtn(rect) }
+			}
+			imgAspectRatioBtn11.setOnClickListener {
+				imageCropViewModel.onClickCaptureImageAspectRatioBtn(ImageCropAspectRatio.RATIO_1_1)
+			}
+			imgAspectRatioBtn34.setOnClickListener {
+				imageCropViewModel.onClickCaptureImageAspectRatioBtn(ImageCropAspectRatio.RATIO_3_4)
+			}
+			imgAspectRatioBtn43.setOnClickListener {
+				imageCropViewModel.onClickCaptureImageAspectRatioBtn(ImageCropAspectRatio.RATIO_4_3)
+			}
+			imgAspectRatioBtnFree.setOnClickListener {
+				imageCropViewModel.onClickCaptureImageAspectRatioBtn(ImageCropAspectRatio.RATIO_FREE)
 			}
 			imgRotateBtn.setOnClickListener { imageCropViewModel.onClickRightRotatePictureBtn() }
 			cropImageView.setOnSetCropOverlayMovedListener { rect ->

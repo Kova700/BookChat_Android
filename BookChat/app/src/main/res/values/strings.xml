@@ -248,6 +248,10 @@
     <!--image crop-->
     <string name="select_image">사진 선택</string>
     <string name="image_crop_title">자르기</string>
+    <string name="image_crop_aspect_ratio_free">자유롭게</string>
+    <string name="image_crop_aspect_ratio_1_1">1 : 1</string>
+    <string name="image_crop_aspect_ratio_3_4">3 : 4</string>
+    <string name="image_crop_aspect_ratio_4_3">4 : 3</string>
 
     <!--util-->
     <string name="confirm">확인</string>

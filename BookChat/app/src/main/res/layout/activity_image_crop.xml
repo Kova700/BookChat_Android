@@ -12,6 +12,7 @@
             android:id="@+id/image_crop_header"
             android:layout_width="0dp"
             android:layout_height="50dp"
+            android:backgroundTint="#FFFFFF"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -90,13 +91,14 @@
             android:src="@drawable/check_btn"
             app:layout_constraintBottom_toBottomOf="@+id/image_crop_header"
             app:layout_constraintEnd_toEndOf="@+id/image_crop_header"
-            app:layout_constraintTop_toTopOf="parent"  />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/tool_btn_group_cv"
             style="@style/CustomCardViewStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
             app:cardElevation="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/image_crop_header">
@@ -131,20 +133,108 @@
 
         <com.canhub.cropper.CropImageView
             android:id="@+id/cropImageView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="#CC000000"
+            android:background="#121212"
+            app:cropAutoZoomEnabled="false"
             app:cropBackgroundColor="#CC000000"
             app:cropFixAspectRatio="true"
             app:cropGuidelines="on"
-            app:cropShowCropOverlay="false"
             app:cropInitialCropWindowPaddingRatio="0"
-            app:cropShape="oval"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:cropShape="rectangle"
+            app:cropShowCropOverlay="false"
+            app:layout_constraintBottom_toTopOf="@+id/img_aspect_ratio_btn_layout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/image_crop_header"
-            app:layout_constraintVertical_weight="1" />
+            app:layout_constraintTop_toBottomOf="@+id/image_crop_header" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/img_aspect_ratio_btn_layout"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:background="#121212"
+            android:paddingTop="10dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ToggleButton
+                android:id="@+id/img_aspect_ratio_btn_free"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@android:color/transparent"
+                android:drawableTop="@drawable/selector_aspect_ratio_free"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_medium"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textColor="#FFFFFF"
+                android:textOff="@string/image_crop_aspect_ratio_free"
+                android:textOn="@string/image_crop_aspect_ratio_free"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/img_aspect_ratio_btn_1_1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ToggleButton
+                android:id="@+id/img_aspect_ratio_btn_1_1"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@android:color/transparent"
+                android:drawableTop="@drawable/selector_aspect_ratio_1_1"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_medium"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textColor="#FFFFFF"
+                android:textOff="@string/image_crop_aspect_ratio_1_1"
+                android:textOn="@string/image_crop_aspect_ratio_1_1"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/img_aspect_ratio_btn_3_4"
+                app:layout_constraintStart_toEndOf="@+id/img_aspect_ratio_btn_free"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ToggleButton
+                android:id="@+id/img_aspect_ratio_btn_3_4"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@android:color/transparent"
+                android:drawableTop="@drawable/selector_aspect_ratio_3_4"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_medium"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textColor="#FFFFFF"
+                android:textOff="@string/image_crop_aspect_ratio_3_4"
+                android:textOn="@string/image_crop_aspect_ratio_3_4"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/img_aspect_ratio_btn_4_3"
+                app:layout_constraintStart_toEndOf="@+id/img_aspect_ratio_btn_1_1"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ToggleButton
+                android:id="@+id/img_aspect_ratio_btn_4_3"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@android:color/transparent"
+                android:drawableTop="@drawable/selector_aspect_ratio_4_3"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_medium"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textColor="#FFFFFF"
+                android:textOff="@string/image_crop_aspect_ratio_4_3"
+                android:textOn="@string/image_crop_aspect_ratio_4_3"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/img_aspect_ratio_btn_3_4"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
