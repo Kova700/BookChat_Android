@@ -1,14 +1,12 @@
 package com.example.bookchat.ui.mypage.appsetting
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAppSettingBinding
-import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -30,7 +28,6 @@ class AppSettingActivity : AppCompatActivity() {
 		appSettingViewModel.uiState.collect { uiState ->
 			setViewState(uiState)
 		}
-		//존나 깜빡이는거 왜 이러지
 	}
 
 	private fun initViewState() {
@@ -41,7 +38,6 @@ class AppSettingActivity : AppCompatActivity() {
 	}
 
 	private fun setViewState(uiState: AppSettingUiState) {
-		Log.d(TAG, "AppSettingActivity: setViewState() - isPushNotificationEnabled : ${uiState.isPushNotificationEnabled}")
 		binding.notificationSwitch.isChecked = uiState.isPushNotificationEnabled
 	}
 

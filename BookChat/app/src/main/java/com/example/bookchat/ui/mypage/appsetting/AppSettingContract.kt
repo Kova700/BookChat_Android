@@ -13,7 +13,7 @@ data class AppSettingUiState(
 
 	companion object {
 		val DEFAULT = AppSettingUiState(
-			isPushNotificationEnabled = true
+			isPushNotificationEnabled = false,
 		)
 	}
 }
