@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.mypage
+package com.example.bookchat.ui.mypage.mypage
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,9 +13,8 @@ import com.example.bookchat.BuildConfig
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentMyPageBinding
 import com.example.bookchat.domain.model.User
-import com.example.bookchat.ui.mypage.MyPageViewModel.MyPageEvent
-import com.example.bookchat.ui.mypage.accountsetting.AccountSettingActivity
-import com.example.bookchat.ui.mypage.appsetting.AppSettingActivity
+import com.example.bookchat.ui.mypage.NoticeActivity
+import com.example.bookchat.ui.mypage.setting.setting.SettingActivity
 import com.example.bookchat.ui.mypage.useredit.UserEditActivity
 import com.example.bookchat.utils.image.loadUserProfile
 import com.mikepenz.aboutlibraries.LibsBuilder
@@ -64,11 +63,9 @@ class MyPageFragment : Fragment() {
 
 	private fun initViewState() {
 		with(binding) {
-			wishBtn.setOnClickListener { myPageViewModel.onClickWishBtn() }
+			settingBtn.setOnClickListener { myPageViewModel.onClickSettingBtn() }
 			noticeBtn.setOnClickListener { myPageViewModel.onClickNoticeBtn() }
 			inviteBtn.setOnClickListener { }
-			accountSettingBtn.setOnClickListener { myPageViewModel.onClickAccountSettingBtn() }
-			appSettingBtn.setOnClickListener { myPageViewModel.onClickAppSettingBtn() }
 			openSourceLicenseBtn.setOnClickListener { moveToOpenSourceLicensesMenu() }
 			userEditBtn.setOnClickListener { myPageViewModel.onClickUserEditBtn() }
 			appVersionTv.text = BuildConfig.VERSION_NAME
@@ -95,33 +92,21 @@ class MyPageFragment : Fragment() {
 		startActivity(intent)
 	}
 
-	private fun moveToWishActivity() {
-		val intent = Intent(requireContext(), WishActivity::class.java)
+	private fun moveToSetting() {
+		val intent = Intent(requireContext(), SettingActivity::class.java)
 		startActivity(intent)
 	}
 
-	private fun moveToNoticeActivity() {
+	private fun moveToNotice() {
 		val intent = Intent(requireContext(), NoticeActivity::class.java)
-		startActivity(intent)
-	}
-
-	private fun moveToAccountSettingActivity() {
-		val intent = Intent(requireContext(), AccountSettingActivity::class.java)
-		startActivity(intent)
-	}
-
-	private fun moveToAppSettingActivity() {
-		val intent = Intent(requireContext(), AppSettingActivity::class.java)
 		startActivity(intent)
 	}
 
 	private fun handleEvent(event: MyPageEvent) {
 		when (event) {
 			is MyPageEvent.MoveToUserEditPage -> moveToUserEditActivity()
-			is MyPageEvent.MoveToWish -> moveToWishActivity()
-			is MyPageEvent.MoveToNotice -> moveToNoticeActivity()
-			is MyPageEvent.MoveToAccountSetting -> moveToAccountSettingActivity()
-			is MyPageEvent.MoveToAppSetting -> moveToAppSettingActivity()
+			is MyPageEvent.MoveToSetting -> moveToSetting()
+			is MyPageEvent.MoveToNotice -> moveToNotice()
 		}
 	}
 

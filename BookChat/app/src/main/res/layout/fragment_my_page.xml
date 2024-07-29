@@ -92,20 +92,26 @@
             app:layout_constraintTop_toTopOf="@+id/nickname_tv" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/wish_btn"
+            android:id="@+id/setting_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?android:selectableItemBackgroundBorderless"
-            android:drawableTop="@drawable/mypage_heart_btn"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:paddingHorizontal="1dp"
+            android:paddingHorizontal="15dp"
             android:paddingVertical="0dp"
-            android:text="@string/heart_list"
+            android:text="@string/setting"
             android:textColor="#373737"
+            app:iconPadding="15dp"
+            app:icon="@drawable/setting_rounded_btn"
+            app:iconGravity="textTop"
+            app:iconSize="25dp"
+            app:iconTint="@color/black"
             app:layout_constraintBottom_toBottomOf="@+id/notice_btn"
+            app:layout_constraintEnd_toStartOf="@+id/notice_btn"
+            app:layout_constraintHorizontal_bias="0.2"
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
             app:layout_constraintTop_toTopOf="@+id/notice_btn" />
 
@@ -115,7 +121,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:background="?android:selectableItemBackgroundBorderless"
-            android:drawableTop="@drawable/mypage_notice"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"
             android:minWidth="0dp"
@@ -123,7 +128,12 @@
             android:paddingHorizontal="1dp"
             android:paddingVertical="0dp"
             android:text="@string/notice"
+            app:iconPadding="15dp"
             android:textColor="#373737"
+            app:icon="@drawable/mypage_notice"
+            app:iconGravity="textTop"
+            app:iconSize="25dp"
+            app:iconTint="@color/black"
             app:layout_constraintEnd_toEndOf="@+id/cardView6"
             app:layout_constraintStart_toStartOf="@+id/cardView6"
             app:layout_constraintTop_toBottomOf="@+id/nickname_tv" />
@@ -133,7 +143,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?android:selectableItemBackgroundBorderless"
-            android:drawableTop="@drawable/mypage_invite"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"
             android:minWidth="0dp"
@@ -142,12 +151,56 @@
             android:paddingVertical="0dp"
             android:text="@string/invite"
             android:textColor="#373737"
+            app:iconPadding="15dp"
+            app:icon="@drawable/mypage_invite"
+            app:iconGravity="textTop"
+            app:iconSize="25dp"
+            app:iconTint="@color/black"
             app:layout_constraintBottom_toBottomOf="@+id/notice_btn"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintHorizontal_bias="0.8"
+            app:layout_constraintStart_toEndOf="@+id/notice_btn"
             app:layout_constraintTop_toTopOf="@+id/notice_btn" />
+        <!--
+
+                <TextView
+                    android:id="@+id/account_setting_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="40dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="@font/notosanskr_regular"
+                    android:foreground="?android:selectableItemBackground"
+                    android:paddingVertical="10dp"
+                    android:paddingStart="30dp"
+                    android:text="@string/account_setting"
+                    android:textColor="#373737"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/notice_btn" />
+
+                <TextView
+                    android:id="@+id/app_setting_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="@font/notosanskr_regular"
+                    android:foreground="?android:selectableItemBackground"
+                    android:paddingVertical="10dp"
+                    android:paddingStart="30dp"
+                    android:text="@string/app_setting"
+                    android:textColor="#373737"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/account_setting_btn" />
+        -->
 
         <TextView
-            android:id="@+id/account_setting_btn"
+            android:id="@+id/terms_of_service_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
@@ -157,7 +210,7 @@
             android:foreground="?android:selectableItemBackground"
             android:paddingVertical="10dp"
             android:paddingStart="30dp"
-            android:text="@string/account_setting"
+            android:text="@string/terms_of_service"
             android:textColor="#373737"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -165,7 +218,7 @@
             app:layout_constraintTop_toBottomOf="@+id/notice_btn" />
 
         <TextView
-            android:id="@+id/app_setting_btn"
+            android:id="@+id/privacy_policy_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:clickable="true"
@@ -174,12 +227,12 @@
             android:foreground="?android:selectableItemBackground"
             android:paddingVertical="10dp"
             android:paddingStart="30dp"
-            android:text="@string/app_setting"
+            android:text="@string/privacy_policy"
             android:textColor="#373737"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/account_setting_btn" />
+            app:layout_constraintTop_toBottomOf="@+id/terms_of_service_btn" />
 
         <TextView
             android:id="@+id/open_source_license_btn"
@@ -196,7 +249,7 @@
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/app_setting_btn" />
+            app:layout_constraintTop_toBottomOf="@+id/privacy_policy_btn" />
 
         <TextView
             android:id="@+id/app_version_btn"

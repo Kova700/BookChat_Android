@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.mypage.accountsetting.dialog
+package com.example.bookchat.ui.mypage.setting.accountsetting.dialog
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable

@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.mypage.accountsetting
+package com.example.bookchat.ui.mypage.setting.accountsetting
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,7 +10,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAccountSettingBinding
 import com.example.bookchat.oauth.oauthclient.external.OAuthClient
 import com.example.bookchat.ui.login.LoginActivity
-import com.example.bookchat.ui.mypage.accountsetting.dialog.WithdrawWarningDialog
+import com.example.bookchat.ui.mypage.setting.accountsetting.dialog.WithdrawWarningDialog
 import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

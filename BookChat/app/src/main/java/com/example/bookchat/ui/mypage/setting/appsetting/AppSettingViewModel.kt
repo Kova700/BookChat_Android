@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.mypage.appsetting
+package com.example.bookchat.ui.mypage.setting.appsetting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

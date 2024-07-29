@@ -103,15 +103,15 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.mypage.WishActivity"
+            android:name=".ui.mypage.setting.setting.SettingActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.mypage.appsetting.AppSettingActivity"
+            android:name=".ui.mypage.setting.appsetting.AppSettingActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.mypage.accountsetting.AccountSettingActivity"
+            android:name=".ui.mypage.setting.accountsetting.AccountSettingActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

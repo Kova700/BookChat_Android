@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.mypage
+package com.example.bookchat.ui.mypage.mypage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -35,31 +35,15 @@ class MyPageViewModel @Inject constructor(
 		startEvent(MyPageEvent.MoveToUserEditPage)
 	}
 
-	fun onClickWishBtn() {
-		startEvent(MyPageEvent.MoveToWish)
+	fun onClickSettingBtn() {
+		startEvent(MyPageEvent.MoveToSetting)
 	}
 
 	fun onClickNoticeBtn() {
 		startEvent(MyPageEvent.MoveToNotice)
 	}
 
-	fun onClickAccountSettingBtn() {
-		startEvent(MyPageEvent.MoveToAccountSetting)
-	}
-
-	fun onClickAppSettingBtn() {
-		startEvent(MyPageEvent.MoveToAppSetting)
-	}
-
 	private fun startEvent(event: MyPageEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
-	}
-
-	sealed class MyPageEvent {
-		object MoveToUserEditPage : MyPageEvent()
-		object MoveToWish : MyPageEvent()
-		object MoveToNotice : MyPageEvent()
-		object MoveToAccountSetting : MyPageEvent()
-		object MoveToAppSetting : MyPageEvent()
 	}
 }
