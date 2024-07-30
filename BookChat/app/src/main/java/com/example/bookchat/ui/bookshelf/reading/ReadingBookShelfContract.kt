@@ -13,16 +13,13 @@ data class ReadingBookShelfUiState(
 	val isInitLoading: Boolean
 		get() = uiState == UiState.INIT_LOADING
 
-	val isSuccess: Boolean
-		get() = uiState == UiState.SUCCESS
-						&& isEmpty.not()
-
 	val isEmpty: Boolean
 		get() = readingItems.isEmpty()
+						&& isLoading.not()
+						&& isInitLoading.not()
 
 	enum class UiState {
 		SUCCESS,
-		ERROR,
 		LOADING,
 		INIT_LOADING
 	}
@@ -48,7 +45,7 @@ sealed class ReadingBookShelfEvent {
 		val targetState: BookShelfState,
 	) : ReadingBookShelfEvent()
 
-	data class MakeToast(
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : ReadingBookShelfEvent()
 

@@ -40,15 +40,15 @@ class MakeAgonyDialogViewModel @Inject constructor(
 	private fun initUiState() {
 		updateState {
 			copy(
-				bookshelfItem = bookShelfRepository
-					.getCachedBookShelfItem(bookShelfItemId)
+				uiState = UiState.SUCCESS,
+				bookshelfItem = bookShelfRepository.getCachedBookShelfItem(bookShelfItemId)
 			)
 		}
 	}
 
 	fun onRegisterBtnClick() {
 		if (uiState.value.agonyTitle.isBlank()) {
-			startEvent(MakeAgonyUiEvent.MakeToast(R.string.agony_make_empty))
+			startEvent(MakeAgonyUiEvent.ShowSnackBar(R.string.agony_make_empty))
 			return
 		}
 		registerAgony(
@@ -84,7 +84,8 @@ class MakeAgonyDialogViewModel @Inject constructor(
 				startEvent(MakeAgonyUiEvent.MoveToBack)
 			}
 			.onFailure {
-				startEvent(MakeAgonyUiEvent.MakeToast(R.string.agony_make_fail))
+				updateState { copy(uiState = UiState.ERROR) }
+				startEvent(MakeAgonyUiEvent.ShowSnackBar(R.string.agony_make_fail))
 			}
 	}
 

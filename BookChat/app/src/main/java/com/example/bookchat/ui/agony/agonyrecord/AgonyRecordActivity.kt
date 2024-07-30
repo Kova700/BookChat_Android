@@ -16,7 +16,7 @@ import com.example.bookchat.ui.agony.agonyedit.AgonyEditActivity
 import com.example.bookchat.ui.agony.agonyrecord.adapter.AgonyRecordAdapter
 import com.example.bookchat.ui.agony.agonyrecord.dialog.AgonyRecordWarningDialog
 import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -143,7 +143,7 @@ class AgonyRecordActivity : AppCompatActivity() {
 			)
 
 			is AgonyRecordEvent.ShowEditCancelWarning -> showEditCancelWarning()
-			is AgonyRecordEvent.MakeToast -> makeToast(event.stringId)
+			is AgonyRecordEvent.ShowSnackBar -> binding.root.showSnackBar(textId = event.stringId)
 		}
 	}
 

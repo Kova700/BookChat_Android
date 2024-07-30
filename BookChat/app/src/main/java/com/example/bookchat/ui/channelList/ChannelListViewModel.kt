@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.data.networkmanager.external.NetworkManager
-import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.data.networkmanager.external.model.NetworkState
+import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.ui.channelList.ChannelListUiState.UiState
 import com.example.bookchat.ui.channelList.mapper.toChannelListItem
@@ -81,27 +81,27 @@ class ChannelListViewModel @Inject constructor(
 
 	private fun muteChannel(channelId: Long) = viewModelScope.launch {
 		runCatching { channelRepository.muteChannel(channelId) }
-			.onSuccess { _isSwiped.update { _isSwiped.value + (channelId to false) } }
+			.onSuccess { _isSwiped.update { _isSwiped.value - channelId } }
 	}
 
 	private fun unMuteChannel(channelId: Long) = viewModelScope.launch {
 		runCatching { channelRepository.unMuteChannel(channelId) }
-			.onSuccess { _isSwiped.update { _isSwiped.value + (channelId to false) } }
+			.onSuccess { _isSwiped.update { _isSwiped.value - channelId } }
 	}
 
 	private fun topPinChannel(channelId: Long) = viewModelScope.launch {
 		runCatching { channelRepository.topPinChannel(channelId) }
-			.onSuccess { _isSwiped.update { _isSwiped.value + (channelId to false) } }
+			.onSuccess { _isSwiped.update { _isSwiped.value - channelId } }
 	}
 
 	private fun unPinChannel(channelId: Long) = viewModelScope.launch {
 		runCatching { channelRepository.unPinChannel(channelId) }
-			.onSuccess { _isSwiped.update { _isSwiped.value + (channelId to false) } }
+			.onSuccess { _isSwiped.update { _isSwiped.value - channelId } }
 	}
 
 	private fun exitChannel(channelId: Long) = viewModelScope.launch {
 		runCatching { channelRepository.leaveChannel(channelId) }
-			.onFailure { startEvent(ChannelListUiEvent.MakeToast(R.string.channel_exit_fail)) }
+			.onFailure { startEvent(ChannelListUiEvent.ShowSnackBar(R.string.channel_exit_fail)) }
 	}
 
 	fun onClickPlusBtn() {
@@ -120,6 +120,10 @@ class ChannelListViewModel @Inject constructor(
 				channel = channel
 			)
 		)
+	}
+
+	fun onClickChannelSearchBtn() {
+		startEvent(ChannelListUiEvent.MoveToSearchChannelPage)
 	}
 
 	fun onSwipeChannelItem(channel: ChannelListItem.ChannelItem, isSwiped: Boolean) {

@@ -1,19 +1,19 @@
 package com.example.bookchat.ui.channel.channelsetting.authoritymanage.host
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityHostManageBinding
 import com.example.bookchat.ui.channel.channelsetting.authoritymanage.adapter.MemberItemAdapter
 import com.example.bookchat.ui.channel.channelsetting.authoritymanage.host.dialog.HostChangeSuccessDialog
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,11 +28,14 @@ class HostManageActivity : AppCompatActivity() {
 	@Inject
 	lateinit var memberItemAdapter: MemberItemAdapter
 
+	private val imm by lazy {
+		getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+	}
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_host_manage)
-		binding.viewmodel = hostManageViewModel
-		binding.lifecycleOwner = this
+		binding = ActivityHostManageBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		observeUiState()
 		observeUiEvent()
 		initRcv()
@@ -73,6 +76,11 @@ class HostManageActivity : AppCompatActivity() {
 				hostManageViewModel.onChangeSearchKeyWord(keyword)
 			}
 		}
+		with(binding) {
+			xBtn.setOnClickListener { hostManageViewModel.onClickXBtn() }
+			applyBtn.setOnClickListener { hostManageViewModel.onClickApplyBtn() }
+			searchKeywordClearBtn.setOnClickListener { hostManageViewModel.onClickKeywordClearBtn() }
+		}
 	}
 
 	private fun setViewState(state: HostManageUiState) {
@@ -90,14 +98,21 @@ class HostManageActivity : AppCompatActivity() {
 		}
 	}
 
+	private fun closeKeyboard() {
+		imm.hideSoftInputFromWindow(
+			binding.root.windowToken,
+			InputMethodManager.HIDE_NOT_ALWAYS
+		)
+	}
+
 	private fun setSearchKeywordClearBtnState(state: HostManageUiState) {
-		with(binding.searchDeleteBtn) {
+		with(binding.searchKeywordClearBtn) {
 			visibility = if (state.searchKeyword.isBlank()) View.INVISIBLE else View.VISIBLE
 		}
 	}
 
 	private fun setApplyBtnState(state: HostManageUiState) {
-		with(binding.applyChannelChangeTv) {
+		with(binding.applyBtn) {
 			if (state.isExistSelectedMember) {
 				setTextColor(Color.parseColor("#000000"))
 				isEnabled = true
@@ -112,17 +127,22 @@ class HostManageActivity : AppCompatActivity() {
 		val existingFragment =
 			supportFragmentManager.findFragmentByTag(DIALOG_TAG_HOST_CHANGE_SUCCESS)
 		if (existingFragment != null) return
-		val dialog = HostChangeSuccessDialog(onClickOk = {
-			setResult(RESULT_OK, intent)
-			finish()
-		})
+		val dialog = HostChangeSuccessDialog(
+			onClickOk = {
+				setResult(RESULT_OK, intent)
+				finish()
+			}
+		)
 		dialog.show(supportFragmentManager, DIALOG_TAG_HOST_CHANGE_SUCCESS)
 	}
 
-	private fun handleEvent(event: HostManageUiEvent) = when (event) {
-		is HostManageUiEvent.MakeToast -> makeToast(event.stringId)
-		HostManageUiEvent.MoveBack -> finish()
-		HostManageUiEvent.ShowHostChangeSuccessDialog -> showHostChangeSuccessDialog()
+	private fun handleEvent(event: HostManageUiEvent) {
+		when (event) {
+			is HostManageUiEvent.ShowSnackBar -> binding.root.showSnackBar(textId = event.stringId)
+			HostManageUiEvent.MoveBack -> finish()
+			HostManageUiEvent.ShowHostChangeSuccessDialog -> showHostChangeSuccessDialog()
+			HostManageUiEvent.CloseKeyboard -> closeKeyboard()
+		}
 	}
 
 	companion object {

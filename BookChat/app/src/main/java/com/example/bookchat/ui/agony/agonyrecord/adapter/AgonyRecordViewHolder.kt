@@ -135,6 +135,7 @@ class AgonyRecordItemViewHolder(
 				with(binding.editLayout) {
 					agonyRecordEditTitleEt.setText(state.titleBeingEdited)
 					agonyRecordEditContentEt.setText(state.contentBeingEdited)
+					agonyRecordEditContentEt.setSelection(state.contentBeingEdited.length)
 					agonyRecordEditTitleEt.addTextChangedListener { text: Editable? ->
 						state.titleBeingEdited = text.toString()
 					}

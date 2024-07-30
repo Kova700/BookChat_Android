@@ -110,7 +110,7 @@ sealed class ChannelEvent {
 		val chat: Chat,
 	) : ChannelEvent()
 
-	data class MakeToast(
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : ChannelEvent()
 }

@@ -32,17 +32,16 @@ data class BookReportUiState(
 }
 
 sealed class BookReportEvent {
-	object MoveBack : BookReportEvent()
+	data object MoveBack : BookReportEvent()
 	data class ShowDeleteWarningDialog(
 		val stringId: Int,
-		val onOkClick: () -> Unit
+		val onOkClick: () -> Unit,
 	) : BookReportEvent()
 
-	data class MakeToast(
-		val stringId: Int
+	data class ShowSnackBar(
+		val stringId: Int,
 	) : BookReportEvent()
 
 	data class ErrorEvent(val stringId: Int) : BookReportEvent()
 	data class UnknownErrorEvent(val message: String) : BookReportEvent()
-
 }

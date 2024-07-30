@@ -5,14 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentReadingBookshelfBinding
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.ui.MainActivity
@@ -24,7 +22,7 @@ import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog.Companion.EXTRA_READING_BOOKSHELF_ITEM_ID
 import com.example.bookchat.ui.bookshelf.reading.model.ReadingBookShelfItem
 import com.example.bookchat.utils.BookImgSizeManager
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -46,12 +44,7 @@ class ReadingBookShelfFragment : Fragment() {
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding =
-			DataBindingUtil.inflate(
-				inflater, R.layout.fragment_reading_bookshelf,
-				container, false
-			)
-		binding.lifecycleOwner = viewLifecycleOwner
+		_binding = FragmentReadingBookshelfBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -100,7 +93,7 @@ class ReadingBookShelfFragment : Fragment() {
 			bookshelfEmptyLayout.root.visibility =
 				if (uiState.isEmpty) View.VISIBLE else View.GONE
 			bookshelfReadingRcv.visibility =
-				if (uiState.isSuccess || uiState.isLoading) View.VISIBLE else View.GONE
+				if (uiState.isInitLoading.not()) View.VISIBLE else View.GONE
 			progressbar.visibility =
 				if (uiState.isLoading) View.VISIBLE else View.GONE
 			readingBookshelfShimmerLayout.root.visibility =
@@ -179,7 +172,10 @@ class ReadingBookShelfFragment : Fragment() {
 			is ReadingBookShelfEvent.ChangeBookShelfTab ->
 				changeBookShelfTab(bookShelfState = event.targetState)
 
-			is ReadingBookShelfEvent.MakeToast -> makeToast(event.stringId)
+			is ReadingBookShelfEvent.ShowSnackBar -> binding.root.showSnackBar(
+				textId = event.stringId,
+				anchor = binding.snackbarPoint
+			)
 		}
 	}
 

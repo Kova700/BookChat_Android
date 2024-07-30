@@ -6,11 +6,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.text.Editable
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityMakeChannelBinding
@@ -28,6 +28,7 @@ import com.example.bookchat.utils.image.loadUrl
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.permissions.galleryPermissions
 import com.example.bookchat.utils.permissions.getPermissionsLauncher
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -58,12 +59,11 @@ class MakeChannelActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_make_channel)
-		binding.viewmodel = makeChannelViewModel
-		binding.lifecycleOwner = this
+		binding = ActivityMakeChannelBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		observeUiState()
 		observeUiEvent()
-		initView()
+		initViewState()
 	}
 
 	private fun observeUiState() = lifecycleScope.launch {
@@ -80,10 +80,18 @@ class MakeChannelActivity : AppCompatActivity() {
 		permissionsLauncher.launch(galleryPermissions)
 	}
 
-	private fun initView() {
+	private fun initViewState() {
 		initChannelHashTagBar()
 		initChannelTitleInputBar()
 		makeChannelImgSizeManager.setMakeChannelImgSize(binding.channelImg)
+		with(binding) {
+			xBtn.setOnClickListener { makeChannelViewModel.onClickXBtn() }
+			makeChannelFinishBtn.setOnClickListener { makeChannelViewModel.onClickFinishBtn() }
+			textClearBtn.setOnClickListener { makeChannelViewModel.onClickTextClearBtn() }
+			selectBootBtn.setOnClickListener { makeChannelViewModel.onClickSelectBookBtn() }
+			deleteSelectedBookBtn.setOnClickListener { makeChannelViewModel.onClickDeleteSelectedBookBtn() }
+			cameraBtn.setOnClickListener { makeChannelViewModel.onClickCameraBtn() }
+		}
 	}
 
 	private fun initChannelHashTagBar() {
@@ -104,8 +112,23 @@ class MakeChannelActivity : AppCompatActivity() {
 		setChannelTitleEditTextState(uiState)
 		setChannelTagEditTextState(uiState)
 		setSelectBookImage(uiState)
-		binding.selectedBookTitleTv.isSelected = true
-		binding.selectedBookAuthorsTv.isSelected = true
+		with(binding) {
+			selectedBookTitleTv.isSelected = true
+			selectedBookAuthorsTv.isSelected = true
+			selectedBookAuthorsTv.text = uiState.selectedBook?.authorsString
+			selectedBookTitleTv.text = uiState.selectedBook?.title
+			textClearBtn.visibility = if (uiState.channelTitle.isNotEmpty()) View.VISIBLE else View.GONE
+			channelTitleCountTv.text =
+				getString(R.string.make_chat_room_title_length, uiState.channelTitle.length)
+			channelTagCountTv.text =
+				getString(R.string.make_chat_room_tags_length, uiState.channelTag.length)
+			selectedBookCv.visibility =
+				if (uiState.selectedBook != null) View.VISIBLE else View.GONE //TODO : INVISIBLE 해야되는지 테스트
+			selectBootBtn.visibility =
+				if (uiState.selectedBook == null) View.VISIBLE else View.GONE //TODO : INVISIBLE 해야되는지 테스트
+			deleteSelectedBookBtn.visibility =
+				if (uiState.selectedBook != null) View.VISIBLE else View.GONE //TODO : INVISIBLE 해야되는지 테스트
+		}
 	}
 
 	private fun setSelectBookImage(uiState: MakeChannelUiState) {
@@ -208,7 +231,7 @@ class MakeChannelActivity : AppCompatActivity() {
 		is MakeChannelEvent.MoveToBookSelect -> moveToBookSelect()
 		is MakeChannelEvent.OpenGallery -> startImageEdit()
 		is MakeChannelEvent.MoveToChannel -> moveToChannel(event.channelId)
-		is MakeChannelEvent.MakeToast -> makeToast(event.stringId)
+		is MakeChannelEvent.ShowSnackBar -> binding.root.showSnackBar(event.stringId)
 		MakeChannelEvent.ShowChannelImageSelectDialog -> showChannelImageSelectDialog()
 	}
 

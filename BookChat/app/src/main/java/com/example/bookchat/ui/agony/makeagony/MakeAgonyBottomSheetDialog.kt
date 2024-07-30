@@ -8,14 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogMakeAgonyBottomSheetBinding
 import com.example.bookchat.domain.model.AgonyFolderHexColor
+import com.example.bookchat.ui.agony.makeagony.MakeAgonyUiState.UiState
 import com.example.bookchat.ui.agony.makeagony.util.getTextColorHexInt
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -33,12 +32,7 @@ class MakeAgonyBottomSheetDialog : BottomSheetDialogFragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding =
-			DataBindingUtil.inflate(
-				inflater, R.layout.dialog_make_agony_bottom_sheet,
-				container, false
-			)
-		binding.lifecycleOwner = this
+		_binding = DialogMakeAgonyBottomSheetBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -101,6 +95,8 @@ class MakeAgonyBottomSheetDialog : BottomSheetDialogFragment() {
 	}
 
 	private fun setViewState(uiState: MakeAgonyUiState) {
+		binding.progressBar.visibility =
+			if (uiState.uiState == UiState.LOADING) View.VISIBLE else View.GONE
 		binding.makeAgonyFolderCv.backgroundTintList =
 			ColorStateList.valueOf(Color.parseColor(uiState.selectedColor.hexcolor))
 		with(binding.agonyFolderTitleEt) {
@@ -142,7 +138,10 @@ class MakeAgonyBottomSheetDialog : BottomSheetDialogFragment() {
 	private fun handleEvent(event: MakeAgonyUiEvent) {
 		when (event) {
 			is MakeAgonyUiEvent.MoveToBack -> dismiss()
-			is MakeAgonyUiEvent.MakeToast -> makeToast(event.stringId)
+			is MakeAgonyUiEvent.ShowSnackBar -> binding.root.showSnackBar(
+				textId = event.stringId,
+				anchor = binding.root
+			)
 		}
 	}
 }

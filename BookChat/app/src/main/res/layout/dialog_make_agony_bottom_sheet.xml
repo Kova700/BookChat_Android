@@ -1,187 +1,195 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="400dp"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minHeight="400dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+        android:elevation="1dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/make_agony_folder_cv"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="70dp"
-            android:layout_marginEnd="15dp"
-            android:layout_marginBottom="60dp"
-            android:minHeight="260dp"
-            app:cardCornerRadius="22dp"
-            app:cardElevation="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <androidx.cardview.widget.CardView
+        android:id="@+id/make_agony_folder_cv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="70dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="60dp"
+        android:minHeight="260dp"
+        app:cardCornerRadius="22dp"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/submit_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="20dp"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:elegantTextHeight="true"
-            android:focusable="true"
-            android:fontFamily="@font/notosanskr_medium"
-            android:text="등록"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/submit_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="20dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:padding="3dp"
+        android:elegantTextHeight="true"
+        android:focusable="true"
+        android:fontFamily="@font/notosanskr_medium"
+        android:text="등록"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
-            android:id="@+id/agony_folder_title_et"
+    <EditText
+        android:id="@+id/agony_folder_title_et"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="15dp"
+        android:background="@null"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:gravity="start"
+        android:hint="@string/agony_make_input_hint"
+        android:maxLength="30"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/color_select_layout"
+        app:layout_constraintEnd_toEndOf="@+id/make_agony_folder_cv"
+        app:layout_constraintStart_toStartOf="@+id/make_agony_folder_cv"
+        app:layout_constraintTop_toTopOf="@+id/make_agony_folder_cv" />
+
+    <LinearLayout
+        android:id="@+id/color_select_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="@+id/make_agony_folder_cv"
+        app:layout_constraintEnd_toEndOf="@+id/make_agony_folder_cv"
+        app:layout_constraintStart_toStartOf="@+id/make_agony_folder_cv">
+
+        <View
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="15dp"
-            android:layout_marginBottom="15dp"
-            android:background="@null"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_regular"
-            android:gravity="start"
-            android:hint="@string/agony_make_input_hint"
-            android:maxLength="30"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toTopOf="@+id/color_select_layout"
-            app:layout_constraintEnd_toEndOf="@+id/make_agony_folder_cv"
-            app:layout_constraintStart_toStartOf="@+id/make_agony_folder_cv"
-            app:layout_constraintTop_toTopOf="@+id/make_agony_folder_cv" />
+            android:layout_weight="1" />
 
-        <LinearLayout
-            android:id="@+id/color_select_layout"
+        <ToggleButton
+            android:id="@+id/white_color_toggle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/selector_white_color_circle_btn"
+            android:textOff=""
+            android:textOn="" />
+
+        <View
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            app:layout_constraintBottom_toBottomOf="@+id/make_agony_folder_cv"
-            app:layout_constraintEnd_toEndOf="@+id/make_agony_folder_cv"
-            app:layout_constraintStart_toStartOf="@+id/make_agony_folder_cv">
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+        <ToggleButton
+            android:id="@+id/black_color_toggle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/selector_black_color_circle_btn"
+            android:textOff=""
+            android:textOn="" />
 
-            <ToggleButton
-                android:id="@+id/white_color_toggle"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/selector_white_color_circle_btn"
-                android:textOff=""
-                android:textOn="" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+        <ToggleButton
+            android:id="@+id/purple_color_toggle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/selector_purple_color_circle_btn"
+            android:textOff=""
+            android:textOn="" />
 
-            <ToggleButton
-                android:id="@+id/black_color_toggle"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/selector_black_color_circle_btn"
-                android:textOff=""
-                android:textOn="" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+        <ToggleButton
+            android:id="@+id/mint_color_toggle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/selector_mint_color_circle_btn"
+            android:textOff=""
+            android:textOn="" />
 
-            <ToggleButton
-                android:id="@+id/purple_color_toggle"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/selector_purple_color_circle_btn"
-                android:textOff=""
-                android:textOn="" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+        <ToggleButton
+            android:id="@+id/green_color_toggle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/selector_green_color_circle_btn"
+            android:textOff=""
+            android:textOn="" />
 
-            <ToggleButton
-                android:id="@+id/mint_color_toggle"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/selector_mint_color_circle_btn"
-                android:textOff=""
-                android:textOn="" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+        <ToggleButton
+            android:id="@+id/yellow_color_toggle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/selector_yellow_color_circle_btn"
+            android:textOff=""
+            android:textOn="" />
 
-            <ToggleButton
-                android:id="@+id/green_color_toggle"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/selector_green_color_circle_btn"
-                android:textOff=""
-                android:textOn="" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+        <ToggleButton
+            android:id="@+id/orange_color_toggle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/selector_orange_color_circle_btn"
+            android:textOff=""
+            android:textOn="" />
 
-            <ToggleButton
-                android:id="@+id/yellow_color_toggle"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/selector_yellow_color_circle_btn"
-                android:textOff=""
-                android:textOn="" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <ToggleButton
-                android:id="@+id/orange_color_toggle"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/selector_orange_color_circle_btn"
-                android:textOff=""
-                android:textOn="" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

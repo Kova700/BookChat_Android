@@ -1,162 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <data>
-
-        <variable
-            name="viewmodel"
-            type="com.example.bookchat.ui.channelList.ChannelListViewModel" />
-    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/empty_channel_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:minHeight="135dp"
-            android:elevation="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/channel_list_header_layout">
-
-            <TextView
-                android:id="@+id/chatroom_empty_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:elegantTextHeight="true"
-                android:fontFamily="@font/notosanskr_bold"
-                android:text="@string/chat_room_is_empty"
-                android:textColor="#222222"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/chatroom_empty_tv2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:elegantTextHeight="true"
-                android:fontFamily="@font/notosanskr_regular"
-                android:gravity="center"
-                android:text="@string/chat_room_is_empty_sub_text"
-                android:textColor="#222222"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/chatroom_empty_tv" />
-
-            <com.example.bookchat.ui.customview.AntiDupClickButton
-                android:id="@+id/empty_channel_add_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:backgroundTint="#FFFFFF"
-                android:elegantTextHeight="true"
-                android:fontFamily="@font/notosanskr_regular"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:minWidth="75dp"
-                android:minHeight="35dp"
-                android:stateListAnimator="@null"
-                android:text="@string/add"
-                android:textColor="#5648FF"
-                android:textSize="12sp"
-                app:cornerRadius="30dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/chatroom_empty_tv2"
-                app:strokeColor="#5648FF"
-                app:strokeWidth="1dp"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        android:id="@+id/empty_channel_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:elevation="10dp"
+        android:minHeight="135dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/channel_list_header_layout">
 
         <TextView
-            android:id="@+id/network_state_bar"
-            android:layout_width="0dp"
-            android:layout_height="18dp"
-            android:background="#666666"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="10sp"
-            android:visibility="gone"
+            android:id="@+id/chatroom_empty_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_bold"
+            android:text="@string/chat_room_is_empty"
+            android:textColor="#222222"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/channel_list_header_layout"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/chatroom_empty_tv2"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="20dp"
-            android:paddingBottom="10dp"
+            android:layout_marginTop="15dp"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:gravity="center"
+            android:text="@string/chat_room_is_empty_sub_text"
+            android:textColor="#222222"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/network_state_bar">
+            app:layout_constraintTop_toBottomOf="@+id/chatroom_empty_tv" />
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_start"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_begin="30dp" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_end"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_end="30dp" />
-
-            <TextView
-                android:id="@+id/channel_list_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:elegantTextHeight="true"
-                android:fontFamily="@font/notosanskr_bold"
-                android:text="@string/chat"
-                android:textColor="#222222"
-                android:textSize="18sp"
-                app:layout_constraintStart_toStartOf="@+id/guideline_start"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.example.bookchat.ui.customview.AntiDupClickImageButton
-                android:id="@+id/channel_add_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?android:selectableItemBackgroundBorderless"
-                android:padding="5dp"
-                android:layout_marginEnd="10dp"
-                android:src="@drawable/ic_plus_btn_black"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/channel_search_btn" />
-
-            <com.example.bookchat.ui.customview.AntiDupClickImageButton
-                android:id="@+id/channel_search_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:background="?android:selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_search_btn"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/guideline_end"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/channel_list_rcv"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <com.example.bookchat.ui.customview.AntiDupClickButton
+            android:id="@+id/empty_channel_add_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:backgroundTint="#FFFFFF"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minWidth="75dp"
+            android:minHeight="35dp"
+            android:stateListAnimator="@null"
+            android:text="@string/add"
+            android:textColor="#5648FF"
+            android:textSize="12sp"
+            app:cornerRadius="30dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/channel_list_header_layout" />
+            app:layout_constraintTop_toBottomOf="@+id/chatroom_empty_tv2"
+            app:strokeColor="#5648FF"
+            app:strokeWidth="1dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+
+    <TextView
+        android:id="@+id/network_state_bar"
+        android:layout_width="0dp"
+        android:layout_height="18dp"
+        android:background="#666666"
+        android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:textSize="10sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/channel_list_header_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingTop="20dp"
+        android:paddingBottom="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/network_state_bar">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="30dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="30dp" />
+
+        <TextView
+            android:id="@+id/channel_list_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_bold"
+            android:text="@string/chat"
+            android:textColor="#222222"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
+            android:id="@+id/channel_add_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:padding="5dp"
+            android:src="@drawable/ic_plus_btn_black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/channel_search_btn" />
+
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
+            android:id="@+id/channel_search_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:padding="5dp"
+            android:src="@drawable/ic_search_btn"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/channel_list_rcv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/channel_list_header_layout" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.bookshelf.reading.dialog.PageInputBottomSheetDialog.Companion.EXTRA_PAGE_INPUT_ITEM_ID
+import com.example.bookchat.ui.bookshelf.reading.dialog.PageInputDialogUiState.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,59 +26,67 @@ class PageInputDialogViewModel @Inject constructor(
 	private val _eventFlow = MutableSharedFlow<PageInputDialogEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
 
-	private val _uiState =
-		MutableStateFlow<PageInputDialogUiState>(PageInputDialogUiState.DEFAULT)
+	private val _uiState = MutableStateFlow<PageInputDialogUiState>(PageInputDialogUiState.DEFAULT)
 	val uiState = _uiState.asStateFlow()
 
-	val inputPage = MutableStateFlow<String>("")
-
 	init {
-		getItem()
+		initUiState()
 	}
 
-	private fun getItem() {
+	private fun initUiState() {
 		val item = bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)
-		updateState { copy(targetItem = item) }
-		inputPage.update { item.pages.toString() }
+		updateState {
+			copy(
+				uiState = UiState.SUCCESS,
+				targetItem = item,
+				inputPage = item.pages.toString()
+			)
+		}
 	}
 
 	private fun registerReadingPage() = viewModelScope.launch {
-		val newBookShelfItem = uiState.value.targetItem.copy(pages = inputPage.value.trim().toInt())
+		if (uiState.value.uiState == UiState.LOADING) return@launch
+		updateState { copy(uiState = UiState.LOADING) }
+		val newBookShelfItem = uiState.value.targetItem.copy(pages = uiState.value.inputPage.toInt())
 		runCatching {
 			bookShelfRepository.changeBookShelfBookStatus(
 				bookShelfItemId = uiState.value.targetItem.bookShelfId,
 				newBookShelfItem = newBookShelfItem
 			)
-		}.onSuccess { startEvent(PageInputDialogEvent.CloseDialog) }
-			.onFailure { startEvent(PageInputDialogEvent.MakeToast(R.string.bookshelf_page_input_fail)) }
+		}
+			.onSuccess {
+				updateState { copy(uiState = UiState.SUCCESS) }
+				startEvent(PageInputDialogEvent.CloseDialog)
+			}
+			.onFailure {
+				updateState { copy(uiState = UiState.ERROR) }
+				startEvent(PageInputDialogEvent.ShowSnackBar(R.string.bookshelf_page_input_fail))
+			}
 	}
 
 	fun onClickSubmit() {
-		if (uiState.value.targetItem.pages.toString() == inputPage.value.trim()) {
+		if (uiState.value.targetItem.pages.toString() == uiState.value.inputPage) {
 			startEvent(PageInputDialogEvent.CloseDialog)
 			return
 		}
-
 		registerReadingPage()
 	}
 
-	fun inputNumber(num: Int) {
-		if (inputPage.value == "0") inputPage.value = ""
-		inputPage.value += num.toString()
+	fun onClickNumberBtn(num: Int) {
+		if (uiState.value.inputPage == "0") updateState { copy(inputPage = "") }
+		updateState { copy(inputPage = inputPage + num.toString()) }
 	}
 
-	fun deleteNumber() {
-		if (inputPage.value.length == 1) {
-			inputPage.value = "0"
+	fun onClickDeleteNumberBtn() {
+		if (uiState.value.inputPage.length == 1) {
+			updateState { copy(inputPage = "0") }
 			return
 		}
-		inputPage.value = inputPage.value.substring(0, inputPage.value.lastIndex)
+		updateState { copy(inputPage = inputPage.substring(0, inputPage.lastIndex)) }
 	}
 
 	private inline fun updateState(block: PageInputDialogUiState.() -> PageInputDialogUiState) {
-		_uiState.update {
-			_uiState.value.block()
-		}
+		_uiState.update { _uiState.value.block() }
 	}
 
 	fun startEvent(event: PageInputDialogEvent) = viewModelScope.launch {

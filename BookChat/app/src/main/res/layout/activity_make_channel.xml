@@ -1,349 +1,323 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/make_chat_room_screen"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.createchannel.MakeChannelActivity">
 
-    <data>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="30dp" />
 
-        <import type="android.view.View" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="30dp" />
 
-        <variable
-            name="viewmodel"
-            type="com.example.bookchat.ui.createchannel.MakeChannelViewModel" />
-    </data>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="30dp" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/make_chat_room_screen"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".ui.createchannel.MakeChannelActivity">
+    <com.example.bookchat.ui.customview.AntiDupClickImageButton
+        android:id="@+id/x_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:padding="5dp"
+        android:src="@drawable/x_icon"
+        app:layout_constraintStart_toStartOf="@+id/guideline_start"
+        app:layout_constraintTop_toTopOf="@+id/guideline_top" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_begin="30dp" />
+    <TextView
+        android:id="@+id/textView30"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_bold"
+        android:text="@string/make_chat_room"
+        android:textColor="#000000"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="@+id/x_btn"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+        app:layout_constraintStart_toStartOf="@+id/guideline_start"
+        app:layout_constraintTop_toTopOf="@+id/guideline_top" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_end="30dp" />
+    <TextView
+        android:id="@+id/make_channel_finish_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:padding="4dp"
+        android:text="@string/finish"
+        android:textColor="#B5B7BB"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/textView30"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+        app:layout_constraintTop_toTopOf="@+id/textView30" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_top"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_begin="30dp" />
+    <androidx.cardview.widget.CardView
+        android:id="@+id/channel_img_cv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="60dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+        app:layout_constraintStart_toStartOf="@+id/guideline_start"
+        app:layout_constraintTop_toBottomOf="@+id/textView30">
 
-        <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/antiDupClickImageButton6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:onClick="@{() -> viewmodel.onClickXBtn()}"
-            android:src="@drawable/x_icon"
-            app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toTopOf="@+id/guideline_top" />
+        <ImageView
+            android:id="@+id/channel_img"
+            android:layout_width="@dimen/make_chat_room_img_width_default"
+            android:layout_height="@dimen/make_chat_room_img_height_default"
+            android:scaleType="centerCrop"
+            android:src="@drawable/default_chat_room_img1" />
+    </androidx.cardview.widget.CardView>
 
-        <TextView
-            android:id="@+id/textView30"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_bold"
-            android:text="@string/make_chat_room"
-            android:textColor="#000000"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="@+id/antiDupClickImageButton6"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-            app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toTopOf="@+id/guideline_top" />
+    <ImageButton
+        android:id="@+id/camera_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:background="@drawable/getpicture_btn_back"
+        android:baselineAlignBottom="true"
+        android:elevation="3dp"
+        app:layout_constraintBottom_toBottomOf="@+id/channel_img_cv"
+        app:layout_constraintEnd_toEndOf="@+id/channel_img_cv"
+        app:layout_constraintStart_toEndOf="@+id/channel_img_cv"
+        app:layout_constraintTop_toBottomOf="@+id/channel_img_cv"
+        app:srcCompat="@drawable/ic_getpicture_btn" />
 
-        <TextView
-            android:id="@+id/make_channel_finish_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:onClick="@{() -> viewmodel.onClickFinishBtn()}"
-            android:padding="4dp"
-            android:text="@string/finish"
-            android:textColor="#B5B7BB"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/textView30"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-            app:layout_constraintTop_toTopOf="@+id/textView30" />
+    <EditText
+        android:id="@+id/channel_title_et"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="10dp"
+        android:background="@null"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/roboto_bold"
+        android:hint="@string/make_chat_room_title_hint"
+        android:maxLength="30"
+        android:singleLine="true"
+        android:textColor="#222222"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@+id/text_clear_btn"
+        app:layout_constraintStart_toStartOf="@+id/guideline_start"
+        app:layout_constraintTop_toBottomOf="@+id/channel_img_cv" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/channel_img_cv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="60dp"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="0dp"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-            app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@+id/textView30">
+    <ImageButton
+        android:id="@+id/text_clear_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_text_delete_btn"
+        app:layout_constraintBottom_toTopOf="@+id/underlineView"
+        app:layout_constraintEnd_toStartOf="@+id/channel_title_count_tv"
+        app:layout_constraintTop_toTopOf="@+id/channel_title_et" />
 
-            <ImageView
-                android:id="@+id/channel_img"
-                android:layout_width="@dimen/make_chat_room_img_width_default"
-                android:layout_height="@dimen/make_chat_room_img_height_default"
-                android:scaleType="centerCrop"
-                android:src="@drawable/default_chat_room_img1" />
-        </androidx.cardview.widget.CardView>
+    <TextView
+        android:id="@+id/channel_title_count_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:textColor="#303030"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/underlineView"
+        app:layout_constraintEnd_toEndOf="@+id/underlineView"
+        app:layout_constraintTop_toTopOf="@+id/channel_title_et" />
 
-        <ImageButton
-            android:id="@+id/imageButton2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:background="@drawable/getpicture_btn_back"
-            android:baselineAlignBottom="true"
-            android:elevation="3dp"
-            android:onClick="@{() -> viewmodel.onClickCameraBtn()}"
-            app:layout_constraintBottom_toBottomOf="@+id/channel_img_cv"
-            app:layout_constraintEnd_toEndOf="@+id/channel_img_cv"
-            app:layout_constraintStart_toEndOf="@+id/channel_img_cv"
-            app:layout_constraintTop_toBottomOf="@+id/channel_img_cv"
-            app:srcCompat="@drawable/ic_getpicture_btn" />
+    <View
+        android:id="@+id/underlineView"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="7dp"
+        android:background="#373737"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+        app:layout_constraintStart_toStartOf="@+id/guideline_start"
+        app:layout_constraintTop_toBottomOf="@+id/channel_title_et" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/hash_tag_background"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="40dp"
+        android:backgroundTint="#F5F5F5"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="0dp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@+id/channel_tag_count_tv"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="@+id/guideline_start"
+        app:layout_constraintTop_toBottomOf="@+id/underlineView">
 
         <EditText
-            android:id="@+id/channel_title_et"
-            android:layout_width="0dp"
+            android:id="@+id/hash_tag_et"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="10dp"
             android:background="@null"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/roboto_bold"
-            android:hint="@string/make_chat_room_title_hint"
-            android:maxLength="30"
-            android:singleLine="true"
-            android:textColor="#222222"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toStartOf="@+id/imageButton5"
-            app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@+id/channel_img_cv" />
+            android:fontFamily="@font/roboto_regular"
+            android:hint="@string/make_chat_room_tag_hint"
+            android:maxLength="50"
+            android:minWidth="200dp"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="5dp"
+            android:textColor="#373737"
+            android:textColorHint="#B1B3B8"
+            android:textSize="12sp" />
+    </androidx.cardview.widget.CardView>
 
-        <ImageButton
-            android:id="@+id/imageButton5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:onClick="@{() -> viewmodel.onClickTextDeleteBtn()}"
-            android:src="@drawable/ic_text_delete_btn"
-            android:visibility="@{viewmodel.uiState.channelTitle.length() == 0 ? View.GONE : View.VISIBLE}"
-            app:layout_constraintBottom_toTopOf="@+id/underlineView"
-            app:layout_constraintEnd_toStartOf="@+id/text_count_tv"
-            app:layout_constraintTop_toTopOf="@+id/channel_title_et" />
+    <TextView
+        android:id="@+id/channel_tag_count_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:textColor="#303030"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="@+id/hash_tag_background"
+        app:layout_constraintEnd_toEndOf="@+id/underlineView"
+        app:layout_constraintStart_toEndOf="@+id/hash_tag_background"
+        app:layout_constraintTop_toTopOf="@+id/hash_tag_background" />
 
-        <TextView
-            android:id="@+id/text_count_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_regular"
-            android:text="@{String.valueOf(viewmodel.uiState.channelTitle.length()) + '/' + String.valueOf(30)}"
-            android:textColor="#303030"
-            android:textSize="10sp"
-            app:layout_constraintBottom_toTopOf="@+id/underlineView"
-            app:layout_constraintEnd_toEndOf="@+id/underlineView"
-            app:layout_constraintTop_toTopOf="@+id/channel_title_et" />
+    <com.example.bookchat.ui.customview.AntiDupClickButton
+        android:id="@+id/select_boot_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="#FFFFFF"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:minWidth="75dp"
+        android:minHeight="40dp"
+        android:stateListAnimator="@null"
+        android:text="@string/make_chat_room_book_select"
+        android:textColor="#5648FF"
+        android:textSize="12sp"
+        app:cornerRadius="30dp"
+        app:layout_constraintStart_toStartOf="@+id/guideline_start"
+        app:layout_constraintTop_toBottomOf="@+id/hash_tag_background"
+        app:strokeColor="#5648FF"
+        app:strokeWidth="1dp" />
 
-        <View
-            android:id="@+id/underlineView"
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_marginTop="7dp"
-            android:background="#373737"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-            app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@+id/channel_title_et" />
+    <androidx.cardview.widget.CardView
+        android:id="@+id/selected_book_cv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:minHeight="80dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="2dp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="@+id/channel_img_cv"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline_start"
+        app:layout_constraintTop_toTopOf="@+id/select_boot_btn">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/hash_tag_background"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="40dp"
-            android:backgroundTint="#F5F5F5"
-            app:cardCornerRadius="5dp"
-            app:cardElevation="0dp"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toStartOf="@+id/text_count_tv2"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@+id/underlineView">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/selected_book_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <EditText
-                android:id="@+id/hash_tag_et"
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/card_view_guideline_half_horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@null"
-                android:fontFamily="@font/roboto_regular"
-                android:hint="@string/make_chat_room_tag_hint"
-                android:maxLength="50"
-                android:minWidth="200dp"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="5dp"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.5" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
+                app:cardCornerRadius="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/selected_book_img_iv"
+                    android:layout_width="51dp"
+                    android:layout_height="81dp"
+                    android:scaleType="fitXY" />
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/selected_book_title_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="5dp"
+                android:elegantTextHeight="true"
+                android:ellipsize="marquee"
+                android:fontFamily="@font/notosanskr_bold"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="true"
+                android:textColor="#222222"
+                android:textSize="14sp"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toTopOf="@+id/card_view_guideline_half_horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/cardView8"
+                app:layout_constraintTop_toTopOf="@+id/cardView8"
+                app:layout_constraintVertical_bias="1.0" />
+
+            <TextView
+                android:id="@+id/selected_book_authors_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="20dp"
+                android:elegantTextHeight="true"
+                android:ellipsize="marquee"
+                android:fontFamily="@font/notosanskr_regular"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="true"
                 android:textColor="#373737"
-                android:textColorHint="#B1B3B8"
-                android:textSize="12sp" />
-        </androidx.cardview.widget.CardView>
+                android:textSize="11sp"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/selected_book_title_tv"
+                app:layout_constraintTop_toBottomOf="@+id/card_view_guideline_half_horizontal" />
 
-        <TextView
-            android:id="@+id/text_count_tv2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_regular"
-            android:text="@{String.valueOf(viewmodel.uiState.channelTag.length()) + '/' + String.valueOf(50)}"
-            android:textColor="#303030"
-            android:textSize="10sp"
-            app:layout_constraintBottom_toBottomOf="@+id/hash_tag_background"
-            app:layout_constraintEnd_toEndOf="@+id/underlineView"
-            app:layout_constraintStart_toEndOf="@+id/hash_tag_background"
-            app:layout_constraintTop_toTopOf="@+id/hash_tag_background" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
-        <com.example.bookchat.ui.customview.AntiDupClickButton
-            android:id="@+id/antiDupClickButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="#FFFFFF"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_regular"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:minWidth="75dp"
-            android:minHeight="40dp"
-            android:onClick="@{() -> viewmodel.onClickSelectBookBtn()}"
-            android:stateListAnimator="@null"
-            android:text="@string/make_chat_room_book_select"
-            android:textColor="#5648FF"
-            android:textSize="12sp"
-            android:visibility="@{viewmodel.uiState.selectedBook == null ? View.VISIBLE : View.INVISIBLE}"
-            app:cornerRadius="30dp"
-            app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@+id/hash_tag_background"
-            app:strokeColor="#5648FF"
-            app:strokeWidth="1dp" />
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardView9"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:minHeight="80dp"
-            android:visibility="@{viewmodel.uiState.selectedBook != null ? View.VISIBLE : View.INVISIBLE}"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="2dp"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toEndOf="@+id/channel_img_cv"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toTopOf="@+id/antiDupClickButton">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/selected_book_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/card_view_guideline_half_horizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintGuide_percent="0.5" />
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardView8"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginBottom="15dp"
-                    app:cardCornerRadius="4dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <ImageView
-                        android:id="@+id/selected_book_img_iv"
-                        android:layout_width="51dp"
-                        android:layout_height="81dp"
-                        android:scaleType="fitXY" />
-                </androidx.cardview.widget.CardView>
-
-                <TextView
-                    android:id="@+id/selected_book_title_tv"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginEnd="20dp"
-                    android:layout_marginBottom="5dp"
-                    android:elegantTextHeight="true"
-                    android:ellipsize="marquee"
-                    android:fontFamily="@font/notosanskr_bold"
-                    android:marqueeRepeatLimit="marquee_forever"
-                    android:singleLine="true"
-                    android:text="@{viewmodel.uiState.selectedBook.title}"
-                    android:textColor="#222222"
-                    android:textSize="14sp"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintBottom_toTopOf="@+id/card_view_guideline_half_horizontal"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/cardView8"
-                    app:layout_constraintTop_toTopOf="@+id/cardView8"
-                    app:layout_constraintVertical_bias="1.0" />
-
-                <TextView
-                    android:id="@+id/selected_book_authors_tv"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="20dp"
-                    android:elegantTextHeight="true"
-                    android:ellipsize="marquee"
-                    android:fontFamily="@font/notosanskr_regular"
-                    android:marqueeRepeatLimit="marquee_forever"
-                    android:singleLine="true"
-                    android:text="@{viewmodel.uiState.selectedBook.authors[0]}"
-                    android:textColor="#373737"
-                    android:textSize="11sp"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="@+id/selected_book_title_tv"
-                    app:layout_constraintTop_toBottomOf="@+id/card_view_guideline_half_horizontal" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.cardview.widget.CardView>
-
-        <ImageButton
-            android:layout_width="21dp"
-            android:layout_height="21dp"
-            android:layout_marginStart="-17dp"
-            android:layout_marginTop="-5dp"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:elevation="5dp"
-            android:onClick="@{() -> viewmodel.onClickDeleteSelectedBookBtn()}"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_text_delete_btn"
-            android:visibility="@{viewmodel.uiState.selectedBook != null ? View.VISIBLE : View.INVISIBLE}"
-            app:layout_constraintStart_toEndOf="@+id/cardView9"
-            app:layout_constraintTop_toTopOf="@+id/cardView9" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+    <ImageButton
+        android:id="@+id/delete_selected_book_btn"
+        android:layout_width="21dp"
+        android:layout_height="21dp"
+        android:layout_marginStart="-17dp"
+        android:layout_marginTop="-5dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:elevation="5dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_text_delete_btn"
+        app:layout_constraintStart_toEndOf="@+id/selected_book_cv"
+        app:layout_constraintTop_toTopOf="@+id/selected_book_cv" />
+</androidx.constraintlayout.widget.ConstraintLayout>

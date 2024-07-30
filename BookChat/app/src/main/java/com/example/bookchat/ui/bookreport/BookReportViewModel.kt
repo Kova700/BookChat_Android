@@ -82,7 +82,7 @@ class BookReportViewModel @Inject constructor(
 			}
 			.onFailure {
 				updateState { copy(uiState = UiState.EMPTY) }
-				startEvent(BookReportEvent.MakeToast(R.string.book_report_make_fail))
+				startEvent(BookReportEvent.ShowSnackBar(R.string.book_report_make_fail))
 			}
 	}
 
@@ -107,7 +107,7 @@ class BookReportViewModel @Inject constructor(
 			}
 			.onFailure {
 				updateState { copy(uiState = UiState.REVISE) }
-				startEvent(BookReportEvent.MakeToast(R.string.book_report_revise_fail))
+				startEvent(BookReportEvent.ShowSnackBar(R.string.book_report_revise_fail))
 			}
 	}
 
@@ -115,18 +115,18 @@ class BookReportViewModel @Inject constructor(
 		updateState { copy(uiState = UiState.LOADING) }
 		runCatching { bookReportRepository.deleteBookReport(bookShelfItemId) }
 			.onSuccess {
-				startEvent(BookReportEvent.MakeToast(R.string.book_report_delete_success))
+				startEvent(BookReportEvent.ShowSnackBar(R.string.book_report_delete_success))
 				startEvent(BookReportEvent.MoveBack)
 			}
 			.onFailure {
 				updateState { copy(uiState = UiState.SUCCESS) }
-				startEvent(BookReportEvent.MakeToast(R.string.book_report_delete_fail))
+				startEvent(BookReportEvent.ShowSnackBar(R.string.book_report_delete_fail))
 			}
 	}
 
 	fun onClickRegisterBtn() {
 		if (isEnteredTextEmpty()) {
-			startEvent(BookReportEvent.MakeToast(R.string.title_content_empty))
+			startEvent(BookReportEvent.ShowSnackBar(R.string.title_content_empty))
 			return
 		}
 

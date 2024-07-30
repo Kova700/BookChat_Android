@@ -20,6 +20,7 @@ import javax.inject.Inject
 
 // TODO : 도서 삭제가 완료되었습니다 스낵바노출 (3초뒤 삭제 API 호출 예약)
 // TODO : 실행 취소 버튼(호출 예약 취소 + 리스트에 다시 추가)
+// TODO : Error 상태라면 인터넷 재연결시 다시 데이터 호출되게 구현
 @HiltViewModel
 class CompleteBookShelfViewModel @Inject constructor(
 	private val bookShelfRepository: BookShelfRepository,
@@ -53,10 +54,10 @@ class CompleteBookShelfViewModel @Inject constructor(
 	}
 
 	private fun getBookShelfItems() = viewModelScope.launch {
-		updateState { copy(uiState = UiState.LOADING) }
+		if (uiState.value.uiState != UiState.INIT_LOADING) updateState { copy(uiState = UiState.LOADING) }
 		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.COMPLETE) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { handleError(it) }
+			.onFailure { startEvent(CompleteBookShelfEvent.ShowSnackBar(R.string.error_else)) }
 	}
 
 	fun loadNextBookShelfItems(lastVisibleItemPosition: Int) {
@@ -73,7 +74,8 @@ class CompleteBookShelfViewModel @Inject constructor(
 					bookShelfListItem.bookShelfId,
 					BookShelfState.COMPLETE
 				)
-			}.onFailure { startEvent(CompleteBookShelfEvent.MakeToast(R.string.bookshelf_delete_fail)) }
+			}.onSuccess { startEvent(CompleteBookShelfEvent.ShowSnackBar(R.string.bookshelf_delete_success)) }
+				.onFailure { startEvent(CompleteBookShelfEvent.ShowSnackBar(R.string.bookshelf_delete_fail)) }
 		}
 
 	fun onItemClick(bookShelfListItem: CompleteBookShelfItem.Item) {
@@ -89,16 +91,10 @@ class CompleteBookShelfViewModel @Inject constructor(
 	}
 
 	private inline fun updateState(block: CompleteBookShelfUiState.() -> CompleteBookShelfUiState) {
-		_uiState.update {
-			_uiState.value.block()
-		}
+		_uiState.update { _uiState.value.block() }
 	}
 
 	private fun startEvent(event: CompleteBookShelfEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
-	}
-
-	private fun handleError(throwable: Throwable) {
-		updateState { copy(uiState = UiState.ERROR) }
 	}
 }

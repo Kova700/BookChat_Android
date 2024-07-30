@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
-import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.SearchFilter
 import com.example.bookchat.domain.model.SearchPurpose
 import com.example.bookchat.domain.repository.BookSearchRepository
@@ -87,11 +86,12 @@ class SearchDetailViewModel @Inject constructor(
 	}
 
 	private fun getSearchItems() = viewModelScope.launch {
-		updateState { copy(uiState = UiState.LOADING) }
-		when (searchTarget) {
-			SearchTarget.BOOK -> searchBooks()
-			SearchTarget.CHANNEL -> searchChannels()
-		}
+		startEvent(SearchDetailEvent.ShowSnackBar(R.string.error_else))
+//		updateState { copy(uiState = UiState.LOADING) }
+//		when (searchTarget) {
+//			SearchTarget.BOOK -> searchBooks()
+//			SearchTarget.CHANNEL -> searchChannels()
+//		}
 	}
 
 	private fun searchBooks() = viewModelScope.launch {
@@ -148,11 +148,8 @@ class SearchDetailViewModel @Inject constructor(
 	private fun failHandler(exception: Throwable) {
 		updateState { copy(uiState = UiState.ERROR) }
 		when (exception) {
-			is NetworkIsNotConnectedException ->
-				startEvent(SearchDetailEvent.MakeToast(R.string.error_network_not_connected))
-
 			else ->
-				startEvent(SearchDetailEvent.MakeToast(R.string.error_else))
+				startEvent(SearchDetailEvent.ShowSnackBar(R.string.error_else))
 		}
 	}
 

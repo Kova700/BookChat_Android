@@ -6,7 +6,6 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,7 +17,7 @@ import com.example.bookchat.ui.agony.agony.model.AgonyListItem
 import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordActivity
 import com.example.bookchat.ui.agony.makeagony.MakeAgonyBottomSheetDialog
 import com.example.bookchat.utils.BookImgSizeManager
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,8 +37,8 @@ class AgonyActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_agony)
-		binding.lifecycleOwner = this
+		binding = ActivityAgonyBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		observeUiState()
 		observeUiEvent()
 		initAdapter()
@@ -74,10 +73,12 @@ class AgonyActivity : AppCompatActivity() {
 			wasteBasketBtn.visibility =
 				if (state.uiState == UiState.SUCCESS) View.VISIBLE else View.INVISIBLE
 			agonyRcv.visibility =
-				if (state.isSuccessOrEditing) View.VISIBLE else View.GONE
+				if (state.uiState != UiState.INIT_LOADING) View.VISIBLE else View.GONE
 			agonyShimmerLayout.root.visibility =
-				if (state.uiState == UiState.LOADING) View.VISIBLE else View.GONE
+				if (state.uiState == UiState.INIT_LOADING) View.VISIBLE else View.GONE
 					.also { agonyShimmerLayout.shimmerLayout.stopShimmer() }
+			progressbar.visibility =
+				if (state.uiState == UiState.LOADING) View.VISIBLE else View.GONE
 		}
 	}
 
@@ -158,7 +159,10 @@ class AgonyActivity : AppCompatActivity() {
 
 			is AgonyEvent.OpenBottomSheetDialog -> openBottomSheetDialog(event.bookshelfItemId)
 			is AgonyEvent.RenewItemViewMode -> renewItemViewMode()
-			is AgonyEvent.MakeToast -> makeToast(event.stringId)
+			is AgonyEvent.ShowSnackBar -> binding.root.showSnackBar(
+				textId = event.stringId,
+				anchor = binding.agonyDeleteBtn
+			)
 		}
 	}
 

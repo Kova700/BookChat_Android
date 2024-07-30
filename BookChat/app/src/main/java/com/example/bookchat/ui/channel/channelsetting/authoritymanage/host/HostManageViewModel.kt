@@ -71,7 +71,7 @@ class HostManageViewModel @Inject constructor(
 				updateState { copy(uiState = HostManageUiState.UiState.SUCCESS) }
 				startEvent(HostManageUiEvent.ShowHostChangeSuccessDialog)
 			}
-			.onFailure { startEvent(HostManageUiEvent.MakeToast(R.string.change_channel_host_fail)) }
+			.onFailure { startEvent(HostManageUiEvent.ShowSnackBar(R.string.change_channel_host_fail)) }
 	}
 
 	fun onClickXBtn() {
@@ -80,6 +80,7 @@ class HostManageViewModel @Inject constructor(
 
 	fun onClickApplyBtn() {
 		val selectedMember = uiState.value.selectedMember ?: return
+		startEvent(HostManageUiEvent.CloseKeyboard)
 		updateChannelHost(selectedMember.id)
 	}
 

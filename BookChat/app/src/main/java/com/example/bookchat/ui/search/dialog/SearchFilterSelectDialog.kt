@@ -69,10 +69,22 @@ class SearchFilterSelectDialog(
 	private fun initViewState() {
 		dialogSizeManager.setDialogSize(binding.root)
 		with(binding) {
-			searchFilterBookTitleBtn.setOnClickListener { onSelectFilter.invoke(SearchFilter.BOOK_TITLE) }
-			searchFilterBookIsbnBtn.setOnClickListener { onSelectFilter.invoke(SearchFilter.BOOK_ISBN) }
-			searchFilterChannelTitleBtn.setOnClickListener { onSelectFilter.invoke(SearchFilter.ROOM_NAME) }
-			searchFilterChannelTagBtn.setOnClickListener { onSelectFilter.invoke(SearchFilter.ROOM_TAGS) }
+			searchFilterBookTitleBtn.setOnClickListener {
+				onSelectFilter.invoke(SearchFilter.BOOK_TITLE)
+				dismiss()
+			}
+			searchFilterBookIsbnBtn.setOnClickListener {
+				onSelectFilter.invoke(SearchFilter.BOOK_ISBN)
+				dismiss()
+			}
+			searchFilterChannelTitleBtn.setOnClickListener {
+				onSelectFilter.invoke(SearchFilter.ROOM_NAME)
+				dismiss()
+			}
+			searchFilterChannelTagBtn.setOnClickListener {
+				onSelectFilter.invoke(SearchFilter.ROOM_TAGS)
+				dismiss()
+			}
 		}
 	}
 

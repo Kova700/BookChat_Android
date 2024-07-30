@@ -5,13 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentWishBookshelfBinding
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.ui.MainActivity
@@ -21,6 +19,7 @@ import com.example.bookchat.ui.bookshelf.wish.dialog.WishBookDialog
 import com.example.bookchat.ui.bookshelf.wish.dialog.WishBookDialog.Companion.EXTRA_WISH_BOOKSHELF_ITEM_ID
 import com.example.bookchat.ui.bookshelf.wish.model.WishBookShelfItem
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.showSnackBar
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -47,9 +46,7 @@ class WishBookBookShelfFragment : Fragment() {
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding =
-			DataBindingUtil.inflate(inflater, R.layout.fragment_wish_bookshelf, container, false)
-		binding.lifecycleOwner = viewLifecycleOwner
+		_binding = FragmentWishBookshelfBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -100,7 +97,7 @@ class WishBookBookShelfFragment : Fragment() {
 			bookshelfEmptyLayout.root.visibility =
 				if (uiState.isEmpty) View.VISIBLE else View.GONE
 			bookshelfWishRcv.visibility =
-				if (uiState.isSuccess || uiState.isLoading) View.VISIBLE else View.GONE
+				if (uiState.isInitLoading.not()) View.VISIBLE else View.GONE
 			progressbar.visibility =
 				if (uiState.isLoading) View.VISIBLE else View.GONE
 			wishBookshelfShimmerLayout.root.visibility =
@@ -156,6 +153,11 @@ class WishBookBookShelfFragment : Fragment() {
 
 			is WishBookShelfEvent.ChangeBookShelfTab ->
 				changeBookShelfTab(bookShelfState = event.targetState)
+
+			is WishBookShelfEvent.ShowSnackBar -> binding.root.showSnackBar(
+				textId = event.stringId,
+				anchor = binding.snackbarPoint
+			)
 		}
 	}
 

@@ -13,16 +13,13 @@ data class WishBookShelfUiState(
 	val isInitLoading: Boolean
 		get() = uiState == UiState.INIT_LOADING
 
-	val isSuccess: Boolean
-		get() = uiState == UiState.SUCCESS
-						&& isEmpty.not()
-
 	val isEmpty: Boolean
 		get() = wishItems.isEmpty()
+						&& isLoading.not()
+						&& isInitLoading.not()
 
 	enum class UiState {
 		SUCCESS,
-		ERROR,
 		LOADING,
 		INIT_LOADING
 	}
@@ -43,6 +40,10 @@ sealed class WishBookShelfEvent {
 
 	data class ChangeBookShelfTab(
 		val targetState: BookShelfState,
+	) : WishBookShelfEvent()
+
+	data class ShowSnackBar(
+		val stringId: Int,
 	) : WishBookShelfEvent()
 
 }

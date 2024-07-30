@@ -49,7 +49,7 @@ data class UserProfileUiState(
 sealed class UserProfileUiEvent {
 	object MoveBack : UserProfileUiEvent()
 	object ShowUserBanWarningDialog : UserProfileUiEvent()
-	data class MakeToast(
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : UserProfileUiEvent()
 }

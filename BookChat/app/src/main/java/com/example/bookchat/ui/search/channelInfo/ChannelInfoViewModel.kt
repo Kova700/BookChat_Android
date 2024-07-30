@@ -1,6 +1,5 @@
 package com.example.bookchat.ui.search.channelInfo
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,7 +9,6 @@ import com.example.bookchat.data.network.model.response.ChannelIsFullException
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChannelSearchRepository
 import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_CLICKED_CHANNEL_ID
-import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,7 +45,7 @@ class ChannelInfoViewModel @Inject constructor(
 			.onSuccess { startEvent(ChannelInfoEvent.MoveToChannel(uiState.value.channel.roomId)) }
 			.onFailure {
 				failHandler(it)
-				startEvent(ChannelInfoEvent.MakeToast(R.string.enter_chat_room_fail))
+				startEvent(ChannelInfoEvent.ShowSnackBar(R.string.enter_chat_room_fail))
 			}
 	}
 
@@ -68,7 +66,6 @@ class ChannelInfoViewModel @Inject constructor(
 	}
 
 	private fun failHandler(throwable: Throwable) {
-		Log.d(TAG, "ChannelInfoViewModel: failHandler() - throwable : $throwable")
 		when (throwable) {
 			is ChannelIsFullException -> startEvent(ChannelInfoEvent.ShowFullChannelDialog)
 		}

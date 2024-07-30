@@ -23,13 +23,13 @@ class AccountSettingViewModel @Inject constructor(
 	private fun logout() = viewModelScope.launch {
 		runCatching { logoutUseCase() }
 			.onSuccess { startEvent(AccountSettingUiEvent.StartOAuthLogout) }
-			.onFailure { startEvent(AccountSettingUiEvent.MakeToast(R.string.sign_out_fail)) }
+			.onFailure { startEvent(AccountSettingUiEvent.ShowSnackBar(R.string.sign_out_fail)) }
 	}
 
 	private fun withdraw() = viewModelScope.launch {
 		runCatching { withdrawUseCase() }
 			.onSuccess { startEvent(AccountSettingUiEvent.StartOAuthWithdraw) }
-			.onFailure { startEvent(AccountSettingUiEvent.MakeToast(R.string.withdraw_fail)) }
+			.onFailure { startEvent(AccountSettingUiEvent.ShowSnackBar(R.string.withdraw_fail)) }
 	}
 
 	fun onSuccessOAuthLogout() {
@@ -37,7 +37,6 @@ class AccountSettingViewModel @Inject constructor(
 	}
 
 	fun onSuccessOAuthWithdraw() {
-		startEvent(AccountSettingUiEvent.MakeToast(R.string.withdraw_success))
 		startEvent(AccountSettingUiEvent.MoveToLoginPage)
 	}
 

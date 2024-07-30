@@ -8,21 +8,16 @@ data class AgonyUiState(
 	val bookshelfItem: BookShelfItem,
 	val agonies: List<AgonyListItem>,
 ) {
-	val isSuccessOrEditing: Boolean
-		get() = uiState == UiState.SUCCESS
-						|| uiState == UiState.EDITING
-
 	enum class UiState {
 		SUCCESS,
 		LOADING,
-		ERROR,
-		EMPTY,
+		INIT_LOADING,
 		EDITING
 	}
 
 	companion object {
 		val DEFAULT = AgonyUiState(
-			uiState = UiState.LOADING,
+			uiState = UiState.INIT_LOADING,
 			bookshelfItem = BookShelfItem.DEFAULT,
 			agonies = emptyList()
 		)
@@ -30,8 +25,8 @@ data class AgonyUiState(
 }
 
 sealed class AgonyEvent {
-	object MoveToBack : AgonyEvent()
-	object RenewItemViewMode : AgonyEvent()
+	data object MoveToBack : AgonyEvent()
+	data object RenewItemViewMode : AgonyEvent()
 	data class OpenBottomSheetDialog(val bookshelfItemId: Long) : AgonyEvent()
 
 	data class MoveToAgonyRecord(
@@ -39,7 +34,7 @@ sealed class AgonyEvent {
 		val agonyListItemId: Long,
 	) : AgonyEvent()
 
-	data class MakeToast(
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : AgonyEvent()
 

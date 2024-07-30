@@ -36,7 +36,7 @@ import com.example.bookchat.ui.search.dialog.SearchFilterSelectDialog
 import com.example.bookchat.ui.search.model.SearchTarget
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -300,17 +300,25 @@ class SearchFragment : Fragment() {
 				showMakeChannelSelectBookDialog(event.book)
 
 			is SearchEvent.MoveToChannelInfo -> moveToChannelInfo(event.channelId)
-			is SearchEvent.MakeToast -> makeToast(event.stringId)
+			is SearchEvent.ShowSnackBar -> binding.root.showSnackBar(
+				textId = event.stringId,
+				anchor = binding.snackbarPoint
+			)
+
 			is SearchEvent.ShowSearchFilterSelectDialog -> showSearchFilterSelectDialog()
 			SearchEvent.MoveToMakeChannel -> moveToMakeChannel()
+			is SearchEvent.ShowSearchFilterChangeSnackBar -> binding.root.showSnackBar(
+				text = "${getString(R.string.selected_search_filter)} ${getString(event.stringId)}",
+				anchor = binding.snackbarPoint
+			)
 		}
 	}
 
 	companion object {
 		const val EXTRA_SEARCH_KEYWORD = "EXTRA_SEARCH_KEYWORD"
 		const val EXTRA_SEARCH_PURPOSE = "EXTRA_SEARCH_PURPOSE"
-		const val EXTRA_SEARCH_TARGET = "EXTRA_NECESSARY_DATA"
-		const val EXTRA_SEARCH_FILTER = "EXTRA_CHAT_SEARCH_FILTER"
+		const val EXTRA_SEARCH_TARGET = "EXTRA_SEARCH_TARGET"
+		const val EXTRA_SEARCH_FILTER = "EXTRA_SEARCH_FILTER"
 
 		const val EXTRA_SEARCHED_BOOK_ITEM_ID = "EXTRA_SEARCHED_BOOK_ITEM_ID"
 		const val EXTRA_CLICKED_CHANNEL_ID = "EXTRA_CLICKED_CHANNEL_ID"

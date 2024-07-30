@@ -4,14 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAccountSettingBinding
 import com.example.bookchat.oauth.oauthclient.external.OAuthClient
 import com.example.bookchat.ui.login.LoginActivity
 import com.example.bookchat.ui.mypage.setting.accountsetting.dialog.WithdrawWarningDialog
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,8 +25,8 @@ class AccountSettingActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_account_setting)
-		binding.lifecycleOwner = this
+		binding = ActivityAccountSettingBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		initViewState()
 		observeUiEvent()
 	}
@@ -74,7 +72,7 @@ class AccountSettingActivity : AppCompatActivity() {
 	private fun handleEvent(event: AccountSettingUiEvent) {
 		when (event) {
 			is AccountSettingUiEvent.MoveToLoginPage -> moveToLoginActivity()
-			is AccountSettingUiEvent.MakeToast -> makeToast(event.stringId)
+			is AccountSettingUiEvent.ShowSnackBar -> binding.root.showSnackBar(textId = event.stringId)
 			AccountSettingUiEvent.ShowWithdrawWarningDialog -> showWithdrawWarningDialog()
 			AccountSettingUiEvent.StartOAuthLogout -> startOAuthLogout()
 			AccountSettingUiEvent.StartOAuthWithdraw -> startOAuthWithdraw()

@@ -75,7 +75,7 @@ class SubHostManageViewModel @Inject constructor(
 			)
 		}
 			.onSuccess { onSuccess?.invoke() }
-			.onFailure { startEvent(SubHostManageUiEvent.MakeToast(R.string.change_channel_sub_host_fail)) }
+			.onFailure { startEvent(SubHostManageUiEvent.ShowSnackBar(R.string.change_channel_sub_host_fail)) }
 	}
 
 	fun onClickSubHostDeleteBtn(user: User) {

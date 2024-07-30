@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -14,9 +13,9 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
+import com.example.bookchat.data.networkmanager.external.model.NetworkState
 import com.example.bookchat.databinding.FragmentChannelListBinding
 import com.example.bookchat.domain.model.ChannelMemberAuthority
-import com.example.bookchat.data.networkmanager.external.model.NetworkState
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.channel.chatting.ChannelActivity
 import com.example.bookchat.ui.channel.drawer.dialog.ChannelExitWarningDialog
@@ -24,7 +23,7 @@ import com.example.bookchat.ui.channelList.adpater.ChannelListAdapter
 import com.example.bookchat.ui.channelList.dialog.ChannelSettingDialog
 import com.example.bookchat.ui.channelList.model.ChannelListItem
 import com.example.bookchat.ui.createchannel.MakeChannelActivity
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -47,11 +46,7 @@ class ChannelListFragment : Fragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.fragment_channel_list, container, false
-		)
-		binding.lifecycleOwner = viewLifecycleOwner
-		binding.viewmodel = channelListViewModel
+		_binding = FragmentChannelListBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -83,11 +78,7 @@ class ChannelListFragment : Fragment() {
 	private fun initViewState() {
 		binding.channelAddBtn.setOnClickListener { channelListViewModel.onClickPlusBtn() }
 		binding.emptyChannelAddBtn.setOnClickListener { channelListViewModel.onClickPlusBtn() }
-		binding.channelSearchBtn.setOnClickListener { moveBottomNavToSearch() }
-	}
-
-	private fun moveBottomNavToSearch() {
-		(requireActivity() as MainActivity).navigateToSearchFragment()
+		binding.channelSearchBtn.setOnClickListener { channelListViewModel.onClickChannelSearchBtn() }
 	}
 
 	private fun setViewState(uiState: ChannelListUiState) {
@@ -176,7 +167,7 @@ class ChannelListFragment : Fragment() {
 	}
 
 	private fun moveToSearchChannelPage() {
-		//TODO : 검색 Fragment로 이동
+		(requireActivity() as MainActivity).navigateToSearchFragment()
 	}
 
 	private fun showChannelSettingDialog(
@@ -221,7 +212,7 @@ class ChannelListFragment : Fragment() {
 				channel = event.channel
 			)
 
-			is ChannelListUiEvent.MakeToast -> makeToast(event.stringId)
+			is ChannelListUiEvent.ShowSnackBar -> binding.root.showSnackBar(event.stringId)
 		}
 	}
 

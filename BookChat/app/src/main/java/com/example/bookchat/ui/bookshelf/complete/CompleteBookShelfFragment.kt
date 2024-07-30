@@ -5,20 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentCompleteBookshelfBinding
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.bookshelf.complete.adapter.CompleteBookShelfAdapter
 import com.example.bookchat.ui.bookshelf.complete.dialog.CompleteBookDialog
 import com.example.bookchat.ui.bookshelf.complete.model.CompleteBookShelfItem
 import com.example.bookchat.utils.BookImgSizeManager
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -41,12 +39,7 @@ class CompleteBookShelfFragment : Fragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding =
-			DataBindingUtil.inflate(
-				inflater, R.layout.fragment_complete_bookshelf,
-				container, false
-			)
-		binding.lifecycleOwner = this.viewLifecycleOwner
+		_binding = FragmentCompleteBookshelfBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -95,7 +88,7 @@ class CompleteBookShelfFragment : Fragment() {
 			bookshelfEmptyLayout.root.visibility =
 				if (uiState.isEmpty) View.VISIBLE else View.GONE
 			bookshelfCompleteRcv.visibility =
-				if (uiState.isSuccess || uiState.isLoading) View.VISIBLE else View.GONE
+				if (uiState.isInitLoading.not()) View.VISIBLE else View.GONE
 			progressbar.visibility =
 				if (uiState.isLoading) View.VISIBLE else View.GONE
 			completeBookshelfShimmerLayout.root.visibility =
@@ -155,7 +148,10 @@ class CompleteBookShelfFragment : Fragment() {
 			is CompleteBookShelfEvent.MoveToCompleteBookDialog ->
 				moveToCompleteBookDialog(event.bookShelfListItem)
 
-			is CompleteBookShelfEvent.MakeToast -> makeToast(event.stringId)
+			is CompleteBookShelfEvent.ShowSnackBar -> binding.root.showSnackBar(
+				textId = event.stringId,
+				anchor = binding.snackbarPoint
+			)
 		}
 	}
 

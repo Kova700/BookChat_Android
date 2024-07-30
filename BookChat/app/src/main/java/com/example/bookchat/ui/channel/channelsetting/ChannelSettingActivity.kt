@@ -1,15 +1,17 @@
 package com.example.bookchat.ui.channel.channelsetting
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityChannelSettingBinding
@@ -28,6 +30,7 @@ import com.example.bookchat.utils.image.loadChangedChannelProfile
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.permissions.galleryPermissions
 import com.example.bookchat.utils.permissions.getPermissionsLauncher
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -37,6 +40,9 @@ class ChannelSettingActivity : AppCompatActivity() {
 	private lateinit var binding: ActivityChannelSettingBinding
 
 	private val channelSettingViewModel by viewModels<ChannelSettingViewModel>()
+	private val imm by lazy {
+		getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+	}
 
 	private val permissionsLauncher = this.getPermissionsLauncher(
 		onSuccess = { moveToImageCrop() },
@@ -58,9 +64,8 @@ class ChannelSettingActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_channel_setting)
-		binding.lifecycleOwner = this
-		binding.viewmodel = channelSettingViewModel
+		binding = ActivityChannelSettingBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		observeUiState()
 		observeUiEvent()
 		initViewState()
@@ -90,6 +95,16 @@ class ChannelSettingActivity : AppCompatActivity() {
 			}
 		}
 		makeChannelImgSizeManager.setMakeChannelImgSize(binding.channelImgIv)
+		with(binding) {
+			xBtn.setOnClickListener { channelSettingViewModel.onClickXBtn() }
+			applyChannelChangeBtn.setOnClickListener { channelSettingViewModel.onClickApplyBtn() }
+			cameraBtn.setOnClickListener { channelSettingViewModel.onClickCameraBtn() }
+			channelTitleClearBtn.setOnClickListener { channelSettingViewModel.onClickChannelTitleClearBtn() }
+			changeMaxChannelMembersCountBtn.setOnClickListener { channelSettingViewModel.onClickChannelCapacityBtn() }
+			changeChannelHostBtn.setOnClickListener { channelSettingViewModel.onClickHostChangeBtn() }
+			changeChannelSubHostBtn.setOnClickListener { channelSettingViewModel.onClickSubHostChangeBtn() }
+			leaveChannelBtn.setOnClickListener { channelSettingViewModel.onClickExitChannelBtn() }
+		}
 	}
 
 	private fun setViewState(uiState: ChannelSettingUiState) {
@@ -97,6 +112,15 @@ class ChannelSettingActivity : AppCompatActivity() {
 		setChannelTagEditTextState(uiState)
 		setApplyChannelChangeBtnState(uiState)
 		setChannelImage(uiState)
+		with(binding) {
+			changeMaxChannelMembersCountTv.text = uiState.newCapacity.toString()
+			channelTitleClearBtn.visibility =
+				if (uiState.newTitle.isEmpty()) View.GONE else View.VISIBLE
+			channelTitleCountTv.text =
+				getString(R.string.channel_setting_new_title_length, uiState.newTitle.length)
+			channelTagsCountTv.text =
+				getString(R.string.channel_setting_new_tags_length, uiState.newTags.length)
+		}
 	}
 
 	private fun setChannelTitleEditTextState(uiState: ChannelSettingUiState) {
@@ -226,17 +250,28 @@ class ChannelSettingActivity : AppCompatActivity() {
 		finish()
 	}
 
+	private fun closeKeyboard() {
+		imm.hideSoftInputFromWindow(
+			binding.root.windowToken,
+			InputMethodManager.HIDE_NOT_ALWAYS
+		)
+	}
+
 	private fun handleEvent(event: ChannelSettingUiEvent) {
 		when (event) {
 			ChannelSettingUiEvent.MoveBack -> finish()
 			ChannelSettingUiEvent.MoveToGallery -> startChannelProfileEdit()
 			ChannelSettingUiEvent.ShowChannelExitWarningDialog -> showChannelExitWarningDialog()
-			is ChannelSettingUiEvent.MakeToast -> makeToast(event.stringId)
+			is ChannelSettingUiEvent.ShowSnackBar -> binding.root.showSnackBar(
+				textId = event.stringId
+			)
+
 			ChannelSettingUiEvent.ShowChannelCapacityDialog -> showChannelCapacityDialog()
 			ChannelSettingUiEvent.MoveHostManage -> moveToHostManage()
 			ChannelSettingUiEvent.MoveSubHostManage -> moveToSubHostManage()
 			ChannelSettingUiEvent.ExitChannel -> exitChannel()
 			ChannelSettingUiEvent.ShowProfileEditDialog -> showProfileEditDialog()
+			ChannelSettingUiEvent.CloseKeyboard -> closeKeyboard()
 		}
 	}
 

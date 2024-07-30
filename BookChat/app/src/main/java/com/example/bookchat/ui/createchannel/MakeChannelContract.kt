@@ -48,7 +48,7 @@ sealed class MakeChannelEvent {
 	data class MoveToChannel(val channelId: Long) : MakeChannelEvent()
 	object OpenGallery : MakeChannelEvent()
 	object ShowChannelImageSelectDialog : MakeChannelEvent()
-	data class MakeToast(
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : MakeChannelEvent()
 }

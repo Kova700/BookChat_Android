@@ -32,6 +32,10 @@ class MakeChannelViewModel @Inject constructor(
 	val uiState get() = _uiState.asStateFlow()
 
 	init {
+		initUiState()
+	}
+
+	private fun initUiState() {
 		updateState {
 			copy(
 				defaultProfileImageType = ChannelDefaultImageType.getNewRandomType(defaultProfileImageType)
@@ -55,13 +59,13 @@ class MakeChannelViewModel @Inject constructor(
 				updateState { copy(uiState = UiState.SUCCESS) }
 				enterChannel(channel)
 			}
-			.onFailure { startEvent(MakeChannelEvent.MakeToast(R.string.make_chat_room_fail)) }
+			.onFailure { startEvent(MakeChannelEvent.ShowSnackBar(R.string.make_chat_room_fail)) }
 	}
 
 	private fun enterChannel(channel: Channel) = viewModelScope.launch {
 		runCatching { channelRepository.enterChannel(channel) }
 			.onSuccess { startEvent(MakeChannelEvent.MoveToChannel(channel.roomId)) }
-			.onFailure { startEvent(MakeChannelEvent.MakeToast(R.string.enter_chat_room_fail)) }
+			.onFailure { startEvent(MakeChannelEvent.ShowSnackBar(R.string.enter_chat_room_fail)) }
 	}
 
 	fun onClickFinishBtn() {
@@ -89,7 +93,7 @@ class MakeChannelViewModel @Inject constructor(
 		updateState { copy(selectedBook = book) }
 	}
 
-	fun onClickTextDeleteBtn() {
+	fun onClickTextClearBtn() {
 		updateState { copy(channelTitle = "") }
 	}
 

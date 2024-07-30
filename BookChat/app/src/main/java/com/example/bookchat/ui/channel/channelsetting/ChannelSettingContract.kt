@@ -58,15 +58,16 @@ data class ChannelSettingUiState(
 }
 
 sealed class ChannelSettingUiEvent {
-	object MoveBack : ChannelSettingUiEvent()
-	object ExitChannel : ChannelSettingUiEvent()
-	object MoveToGallery : ChannelSettingUiEvent()
-	object ShowProfileEditDialog : ChannelSettingUiEvent()
-	object ShowChannelExitWarningDialog : ChannelSettingUiEvent()
-	object ShowChannelCapacityDialog : ChannelSettingUiEvent()
-	object MoveHostManage : ChannelSettingUiEvent()
-	object MoveSubHostManage : ChannelSettingUiEvent()
-	data class MakeToast(
+	data object MoveBack : ChannelSettingUiEvent()
+	data object ExitChannel : ChannelSettingUiEvent()
+	data object MoveToGallery : ChannelSettingUiEvent()
+	data object ShowProfileEditDialog : ChannelSettingUiEvent()
+	data object ShowChannelExitWarningDialog : ChannelSettingUiEvent()
+	data object ShowChannelCapacityDialog : ChannelSettingUiEvent()
+	data object MoveHostManage : ChannelSettingUiEvent()
+	data object MoveSubHostManage : ChannelSettingUiEvent()
+	data object CloseKeyboard : ChannelSettingUiEvent()
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : ChannelSettingUiEvent()
 }

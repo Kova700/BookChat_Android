@@ -43,11 +43,9 @@ class WishBookDialogViewModel @Inject constructor(
 	fun onHeartToggleClick() {
 		if (uiState.value.isToggleChecked) {
 			onItemDeleteClick()
-			updateState { copy(isToggleChecked = false) }
 			return
 		}
 		onItemAddClick()
-		updateState { copy(isToggleChecked = true) }
 	}
 
 	fun onChangeToReadingClick() {
@@ -86,7 +84,8 @@ class WishBookDialogViewModel @Inject constructor(
 					bookShelfState = BookShelfState.WISH,
 				)
 			}
-				.onFailure { startEvent(WishBookDialogEvent.MakeToast(R.string.wish_bookshelf_register_fail)) }
+				.onSuccess { updateState { copy(isToggleChecked = true) } }
+				.onFailure { startEvent(WishBookDialogEvent.ShowSnackBar(R.string.wish_bookshelf_register_fail)) }
 				.also { updateState { copy(uiState = UiState.SUCCESS) } }
 		}
 	}
@@ -99,8 +98,8 @@ class WishBookDialogViewModel @Inject constructor(
 					bookShelfItem.bookShelfId,
 					BookShelfState.WISH
 				)
-			}
-				.onFailure { startEvent(WishBookDialogEvent.MakeToast(R.string.bookshelf_delete_fail)) }
+			}.onSuccess { updateState { copy(isToggleChecked = false) } }
+				.onFailure { startEvent(WishBookDialogEvent.ShowSnackBar(R.string.bookshelf_delete_fail)) }
 				.also { updateState { copy(uiState = UiState.SUCCESS) } }
 		}
 	}
@@ -123,15 +122,13 @@ class WishBookDialogViewModel @Inject constructor(
 					)
 				)
 			}
-				.onFailure { startEvent(WishBookDialogEvent.MakeToast(R.string.bookshelf_state_change_fail)) }
+				.onFailure { startEvent(WishBookDialogEvent.ShowSnackBar(R.string.bookshelf_state_change_fail)) }
 				.also { updateState { copy(uiState = UiState.SUCCESS) } }
 		}
 	}
 
 	private inline fun updateState(block: WishBookDialogUiState.() -> WishBookDialogUiState) {
-		_uiState.update {
-			_uiState.value.block()
-		}
+		_uiState.update { _uiState.value.block() }
 	}
 
 	private fun startEvent(event: WishBookDialogEvent) = viewModelScope.launch {

@@ -181,7 +181,7 @@ class SearchViewModel @Inject constructor(
 	fun onClickSearchBtn() = viewModelScope.launch {
 		val keyword = uiState.value.searchKeyword.trim()
 		if (keyword.isBlank()) {
-			startEvent(SearchEvent.MakeToast(R.string.search_book_keyword_empty))
+			startEvent(SearchEvent.ShowSnackBar(R.string.search_book_keyword_empty))
 			return@launch
 		}
 		searchHistoryRepository.addHistory(keyword)
@@ -237,6 +237,13 @@ class SearchViewModel @Inject constructor(
 
 	fun onClickSearchFilter(selectedFilter: SearchFilter) {
 		updateState { copy(searchFilter = selectedFilter) }
+		val resId = when (selectedFilter) {
+			SearchFilter.BOOK_TITLE -> R.string.book_title
+			SearchFilter.BOOK_ISBN -> R.string.isbn
+			SearchFilter.ROOM_NAME -> R.string.channel_title
+			SearchFilter.ROOM_TAGS -> R.string.channel_tag
+		}
+		startEvent(SearchEvent.ShowSearchFilterChangeSnackBar(resId))
 	}
 
 	fun onClickSearchFilterBtn() {
@@ -271,9 +278,9 @@ class SearchViewModel @Inject constructor(
 		updateState { copy(searchResultState = SearchResultState.Error) }
 		when (exception) {
 			is NetworkIsNotConnectedException ->
-				startEvent(SearchEvent.MakeToast(R.string.error_network_not_connected))
+				startEvent(SearchEvent.ShowSnackBar(R.string.error_network_not_connected))
 
-			else -> startEvent(SearchEvent.MakeToast(R.string.error_else))
+			else -> startEvent(SearchEvent.ShowSnackBar(R.string.error_else))
 		}
 	}
 

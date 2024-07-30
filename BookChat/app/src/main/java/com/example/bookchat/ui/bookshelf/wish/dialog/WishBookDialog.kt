@@ -7,11 +7,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogWishBookTapClickedBinding
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.ui.agony.agony.AgonyActivity
@@ -20,7 +18,7 @@ import com.example.bookchat.ui.bookshelf.wish.WishBookShelfViewModel
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager
 import com.example.bookchat.utils.image.loadUrl
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -46,11 +44,8 @@ class WishBookDialog : DialogFragment() {
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
-	): View? {
-		_binding =
-			DataBindingUtil.inflate(inflater, R.layout.dialog_wish_book_tap_clicked, container, false)
-		binding.lifecycleOwner = this.viewLifecycleOwner
-		binding.viewmodel = wishBookDialogViewModel
+	): View {
+		_binding = DialogWishBookTapClickedBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -78,15 +73,29 @@ class WishBookDialog : DialogFragment() {
 	}
 
 	private fun setViewState(uiState: WishBookDialogUiState) {
-		binding.bookImg.loadUrl(uiState.wishItem.book.bookCoverImageUrl)
-		binding.selectedBookTitleTv.isSelected = true
-		binding.selectedBookAuthorsTv.isSelected = true
-		binding.selectedBookPublishAtTv.isSelected = true
+		with(binding) {
+			bookImg.loadUrl(uiState.wishItem.book.bookCoverImageUrl)
+			selectedBookTitleTv.text = uiState.wishItem.book.title
+			selectedBookTitleTv.isSelected = true
+			selectedBookAuthorsTv.text = uiState.wishItem.book.authorsString
+			selectedBookAuthorsTv.isSelected = true
+			selectedBookPublishAtTv.text = uiState.wishItem.book.publishAt
+			selectedBookPublishAtTv.isSelected = true
+			wishHeartToggleBtn.isChecked = uiState.isToggleChecked
+		}
 	}
 
 	private fun initViewState() {
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
 		dialogSizeManager.setDialogSize(binding.wishDialogLayout)
+		with(binding) {
+			wishHeartToggleBtn.setOnClickListener {
+				wishHeartToggleBtn.isChecked = wishBookDialogViewModel.uiState.value.isToggleChecked
+				wishBookDialogViewModel.onHeartToggleClick()
+			}
+			moveToAgonyBtn.setOnClickListener { wishBookDialogViewModel.onMoveToAgonyClick() }
+			changeStatusToReadingBtn.setOnClickListener { wishBookDialogViewModel.onChangeToReadingClick() }
+		}
 	}
 
 	private fun moveToOtherTab(targetState: BookShelfState) {
@@ -102,7 +111,11 @@ class WishBookDialog : DialogFragment() {
 
 	private fun handleEvent(event: WishBookDialogEvent) = when (event) {
 		is WishBookDialogEvent.ChangeBookShelfTab -> moveToOtherTab(event.targetState)
-		is WishBookDialogEvent.MakeToast -> makeToast(event.stringId)
+		is WishBookDialogEvent.ShowSnackBar -> binding.root.showSnackBar(
+			textId = event.stringId,
+			anchor = binding.moveToAgonyBtn
+		)
+
 		is WishBookDialogEvent.MoveToAgony -> moveToAgony(event.bookShelfListItemId)
 	}
 

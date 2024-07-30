@@ -6,7 +6,7 @@
     <string name="error_kakao_login">Kakao 로그인을 실패했습니다.</string>
     <string name="error_google_login">Google 로그인을 실패했습니다.</string>
     <string name="error_socket_connect">서버와의 연결을 실패했습니다. 잠시 후 다시 시도해주세요.</string>
-    <string name="error_else">일시적인 현상이거나 네트워크 문제일 수 있으니,\n잠시 후 다시 시도해 주세요.\n계속해서 문제가 발생하는 경우 문의를 부탁드립니다.</string>
+    <string name="error_else">데이터 가져오기를 실패했습니다. 잠시 후 다시 시도해주세요.\n계속해서 문제가 발생하는 경우 문의를 부탁드립니다.</string>
 
     <!--permission-->
     <string name="gallery_permission_denied">[사진 및 동영상]\n권한을 허용해주세요.</string>
@@ -73,7 +73,19 @@
     <string name="bookshelf_delete_snack_bar">3초 뒤 도서가 삭제됩니다.</string>
     <string name="bookshelf_delete_snack_bar_cancel">실행취소</string>
     <string name="bookshelf_page_text">%1$dp</string>
+    <string name="bookshelf_page_input_title">책갈피</string>
     <string name="bookshelf_page_input_fail">페이지 등록을 실패했습니다.</string>
+    <string name="bookshelf_page_input_page">p</string>
+    <string name="bookshelf_page_input_one">1</string>
+    <string name="bookshelf_page_input_two">2</string>
+    <string name="bookshelf_page_input_three">3</string>
+    <string name="bookshelf_page_input_four">4</string>
+    <string name="bookshelf_page_input_five">5</string>
+    <string name="bookshelf_page_input_six">6</string>
+    <string name="bookshelf_page_input_seven">7</string>
+    <string name="bookshelf_page_input_eight">8</string>
+    <string name="bookshelf_page_input_nine">9</string>
+    <string name="bookshelf_page_input_zero">0</string>
     <string name="bookshelf_change_to_complete_success">독서완료로 변경되었습니다.</string>
     <string name="bookshelf_change_to_complete_fail">독서완료로 변경을 실패했습니다.</string>
     <string name="bookshelf_change_to_reading_success">독서중으로 변경되었습니다.</string>
@@ -89,6 +101,7 @@
     <string name="channel_title">채팅방 제목</string>
     <string name="channel_tag">채팅방 TAG</string>
     <string name="search_filter">검색 필터</string>
+    <string name="selected_search_filter">선택된 필터:</string>
     <string name="recommend_keyword">추천 검색어</string>
     <string name="recent_search_keyword">최근 검색어</string>
     <string name="related_book_name">관련 도서명</string>
@@ -124,6 +137,7 @@
     <string name="agony_delete_fail">고민 삭제를 실패했습니다.</string>
 
     <!--agony title edit-->
+    <string name="agony_title_new_title_length">%1$d / 20</string>
     <string name="agony_title">고민 제목</string>
     <string name="agony_title_empty">제목을 입력해주세요.</string>
     <string name="agony_title_edit_success">제목이 수정되었습니다.</string>
@@ -139,7 +153,7 @@
     <string name="agony_record_delete_success">고민기록이 삭제되었습니다.</string>
     <string name="agony_record_delete_fail">고민기록 삭제를 실패했습니다.</string>
 
-    <!--make chat room-->
+    <!--make channel-->
     <string name="chat">채팅</string>
     <string name="make_chat_room_set_cover_image">커버 이미지 설정</string>
     <string name="make_chat_room_default_image_change">기본 이미지 변경</string>
@@ -147,6 +161,8 @@
     <string name="my_chat_room">나의 채팅방</string>
     <string name="make_chat_room">채팅방 만들기</string>
     <string name="make_chat_room_select">선택하기</string>
+    <string name="make_chat_room_title_length">%1$d / 30</string>
+    <string name="make_chat_room_tags_length">%1$d / 50</string>
     <string name="make_chat_room_title_hint">채팅방 제목을 작성해 주세요.</string>
     <string name="make_chat_room_tag_hint">#해시태그로 채팅방을 소개해 주세요.</string>
     <string name="make_chat_room_book_select">도서 선택</string>
@@ -176,7 +192,6 @@
     <string name="select_picture_from_gallery">앨범에서 사진 선택</string>
     <string name="select_picture_default_image">기본 이미지 적용</string>
 
-    <!--notice-->
     <!--app setting-->
     <string name="push_notification">푸시알림</string>
 
@@ -236,6 +251,8 @@
     <!--channel setting-->
     <string name="channel_setting_title">채팅방 설정</string>
     <string name="change_channel_capacity">최대 인원 수</string>
+    <string name="channel_setting_new_title_length">%1$d / 30</string>
+    <string name="channel_setting_new_tags_length">%1$d / 50</string>
     <string name="channel_capacity_setting">최대 인원 설정</string>
     <string name="change_channel_host">방장 변경하기</string>
     <string name="change_channel_host_success">방장이 변경되었습니다.</string>

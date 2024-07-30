@@ -50,7 +50,7 @@ class ChannelSettingViewModel @Inject constructor(
 	private fun exitChannel() = viewModelScope.launch {
 		runCatching { channelRepository.leaveChannel(channelId) }
 			.onSuccess { startEvent(ChannelSettingUiEvent.ExitChannel) }
-			.onFailure { startEvent(ChannelSettingUiEvent.MakeToast(R.string.channel_exit_fail)) }
+			.onFailure { startEvent(ChannelSettingUiEvent.ShowSnackBar(R.string.channel_exit_fail)) }
 	}
 
 	//TODO :{"errorCode":"500","message":"예상치 못한 예외가 발생했습니다."} 서버 수정 대기중
@@ -64,11 +64,11 @@ class ChannelSettingViewModel @Inject constructor(
 				channelImage = uiState.value.newProfileImage?.compressToByteArray()
 			)
 		}
-			.onSuccess {
-				startEvent(ChannelSettingUiEvent.MoveBack)
-				startEvent(ChannelSettingUiEvent.MakeToast(R.string.change_channel_setting_success))
+			.onSuccess { startEvent(ChannelSettingUiEvent.MoveBack) }
+			.onFailure {
+				startEvent(ChannelSettingUiEvent.CloseKeyboard)
+				startEvent(ChannelSettingUiEvent.ShowSnackBar(R.string.change_channel_setting_fail))
 			}
-			.onFailure { startEvent(ChannelSettingUiEvent.MakeToast(R.string.change_channel_setting_fail)) }
 	}
 
 	fun onClickChannelCapacityBtn() {

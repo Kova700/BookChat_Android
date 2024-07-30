@@ -5,26 +5,27 @@ import com.example.bookchat.domain.model.BookShelfItem
 data class PageInputDialogUiState(
 	val uiState: UiState,
 	val targetItem: BookShelfItem,
+	val inputPage: String,
 ) {
 
 	enum class UiState {
 		SUCCESS,
 		LOADING,
 		ERROR,
-		EMPTY,
 	}
 
 	companion object {
 		val DEFAULT = PageInputDialogUiState(
-			uiState = UiState.EMPTY,
+			uiState = UiState.LOADING,
 			targetItem = BookShelfItem.DEFAULT,
+			inputPage = 0.toString(),
 		)
 	}
 }
 
 sealed class PageInputDialogEvent {
-	object CloseDialog : PageInputDialogEvent()
-	data class MakeToast(
+	data object CloseDialog : PageInputDialogEvent()
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : PageInputDialogEvent()
 }

@@ -276,7 +276,7 @@ class ChannelViewModel @Inject constructor(
 
 	private fun onChannelConnectFail() = viewModelScope.launch {
 		updateState { copy(uiState = UiState.ERROR) }
-		startEvent(ChannelEvent.MakeToast(R.string.error_socket_connect))
+		startEvent(ChannelEvent.ShowSnackBar(R.string.error_socket_connect))
 	}
 
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트 간의 데이터 불일치를 메우기 위해서 임시로
@@ -330,7 +330,7 @@ class ChannelViewModel @Inject constructor(
 	private fun exitChannel() = viewModelScope.launch {
 		runCatching { channelRepository.leaveChannel(channelId) }
 			.onSuccess { onClickBackBtn() }
-			.onFailure { startEvent(ChannelEvent.MakeToast(R.string.channel_exit_fail)) }
+			.onFailure { startEvent(ChannelEvent.ShowSnackBar(R.string.channel_exit_fail)) }
 	}
 
 	/** "여기까지 읽으셨습니다" 공지가 화면 상에 나타나는 순간 호출*/
@@ -463,6 +463,15 @@ class ChannelViewModel @Inject constructor(
 		_captureIds.update { null }
 	}
 
+	fun onFailedCapture() {
+		startEvent(ChannelEvent.ShowSnackBar(R.string.channel_scrap_fail))
+	}
+
+	fun onCompletedCapture() {
+		onClickCancelCapture()
+		startEvent(ChannelEvent.ShowSnackBar(R.string.channel_scrap_success))
+	}
+
 	fun onClickCompleteCapture() {
 		val (headerId, bottomId) = captureIds.value ?: return
 		val chatMessages = uiState.value.chats
@@ -520,7 +529,7 @@ class ChannelViewModel @Inject constructor(
 		val selectedItemsCount = abs(newHeaderIndex - newBottomIndex) + 1
 
 		if (selectedItemsCount > 30) {
-			startEvent(ChannelEvent.MakeToast(R.string.channel_scrap_selected_count_over))
+			startEvent(ChannelEvent.ShowSnackBar(R.string.channel_scrap_selected_count_over))
 			return
 		}
 		if (newHeaderId == null || newBottomId == null) _captureIds.update { null }
@@ -566,7 +575,7 @@ class ChannelViewModel @Inject constructor(
 			//ChannelViewModel: handleError(caller : connectSocket) -
 			// throwable: java.lang.NullPointerException: Parameter specified as non-null is null:
 			// method com.example.bookchat.domain.model.Chat.<init>, parameter dispatchTime
-			else -> startEvent(ChannelEvent.MakeToast(R.string.error_network_error))
+			else -> startEvent(ChannelEvent.ShowSnackBar(R.string.error_network_error))
 		}
 	}
 

@@ -104,7 +104,7 @@ class AgonyRecordViewModel @Inject constructor(
 			updateFirstItemState(ItemState.Success())
 			updateState { copy(isEditing = false) }
 		}.onFailure {
-			startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_make_fail))
+			startEvent(AgonyRecordEvent.ShowSnackBar(R.string.agony_record_make_fail))
 			updateFirstItemState(
 				ItemState.Editing(
 					titleBeingEdited = title,
@@ -134,7 +134,7 @@ class AgonyRecordViewModel @Inject constructor(
 				_itemState.update { _itemState.value + (recordItem.recordId to ItemState.Success()) }
 				updateState { copy(isEditing = false) }
 			}
-			.onFailure { startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_revise_fail)) }
+			.onFailure { startEvent(AgonyRecordEvent.ShowSnackBar(R.string.agony_record_revise_fail)) }
 	}
 
 	private fun deleteAgonyRecord(
@@ -147,10 +147,8 @@ class AgonyRecordViewModel @Inject constructor(
 				recordId = recordItem.recordId
 			)
 		}
-			.onSuccess {
-				_itemState.update { _itemState.value - recordItem.recordId }
-			}
-			.onFailure { startEvent(AgonyRecordEvent.MakeToast(R.string.agony_record_delete_fail)) }
+			.onSuccess { _itemState.update { _itemState.value - recordItem.recordId } }
+			.onFailure { startEvent(AgonyRecordEvent.ShowSnackBar(R.string.agony_record_delete_fail)) }
 	}
 
 	fun onItemClick(recordItem: AgonyRecordListItem.Item) {
@@ -189,7 +187,7 @@ class AgonyRecordViewModel @Inject constructor(
 		val contentWithSpacesRemoved = itemState.contentBeingEdited.trim()
 
 		if (titleWithSpacesRemoved.isBlank() || contentWithSpacesRemoved.isBlank()) {
-			startEvent(AgonyRecordEvent.MakeToast(R.string.title_content_empty))
+			startEvent(AgonyRecordEvent.ShowSnackBar(R.string.title_content_empty))
 			return
 		}
 
@@ -234,7 +232,7 @@ class AgonyRecordViewModel @Inject constructor(
 		val contentWithSpacesRemoved = recordItem.state.contentBeingEdited.trim()
 
 		if (titleWithSpacesRemoved.isBlank() || contentWithSpacesRemoved.isBlank()) {
-			startEvent(AgonyRecordEvent.MakeToast(R.string.title_content_empty))
+			startEvent(AgonyRecordEvent.ShowSnackBar(R.string.title_content_empty))
 			return
 		}
 

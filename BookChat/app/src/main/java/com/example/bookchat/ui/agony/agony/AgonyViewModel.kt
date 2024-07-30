@@ -60,15 +60,18 @@ class AgonyViewModel @Inject constructor(
 	}
 
 	private fun getAgonies() = viewModelScope.launch {
-		updateState { copy(uiState = UiState.LOADING) }
+		if (uiState.value.uiState != UiState.INIT_LOADING) updateState { copy(uiState = UiState.LOADING) }
 		runCatching { agonyRepository.getAgonies(bookShelfItemId) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { handleError(it) }
+			.onFailure {
+				handleError(it)
+				startEvent(AgonyEvent.ShowSnackBar(R.string.error_else))
+			}
 	}
 
 	fun loadNextAgonies(lastVisibleItemPosition: Int) {
-		if (uiState.value.agonies.size - 1 > lastVisibleItemPosition ||
-			uiState.value.uiState == UiState.LOADING
+		if (uiState.value.agonies.size - 1 > lastVisibleItemPosition
+			|| uiState.value.uiState == UiState.LOADING
 		) return
 		getAgonies()
 	}
@@ -82,7 +85,7 @@ class AgonyViewModel @Inject constructor(
 			.onSuccess { onClickEditCancelBtn() }
 			.onFailure {
 				updateState { copy(uiState = UiState.EDITING) }
-				startEvent(AgonyEvent.MakeToast(R.string.agony_delete_fail))
+				startEvent(AgonyEvent.ShowSnackBar(R.string.agony_delete_fail))
 			}
 	}
 
@@ -142,7 +145,6 @@ class AgonyViewModel @Inject constructor(
 	}
 
 	private fun handleError(throwable: Throwable) {
-		updateState { copy(uiState = UiState.ERROR) }
 	}
 
 	companion object {

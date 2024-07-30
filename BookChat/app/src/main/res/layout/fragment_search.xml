@@ -4,15 +4,12 @@
 
     <data>
 
-        <import type="android.view.View" />
-
         <variable
             name="viewModel"
             type="com.example.bookchat.ui.search.SearchViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layout_test"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FFFFFF">
@@ -96,9 +93,9 @@
             android:layout_marginEnd="27dp"
             android:background="#00ff0000"
             android:elevation="10dp"
-            android:visibility="invisible"
             android:onClick="@{() -> viewModel.onClickKeywordClearBtn()}"
             android:src="@drawable/ic_text_delete_btn"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="@+id/search_window"
             app:layout_constraintEnd_toEndOf="@+id/search_window"
             app:layout_constraintTop_toTopOf="@+id/search_window" />
@@ -108,11 +105,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="27dp"
-            android:translationZ="40dp"
-            android:padding="5dp"
             android:background="?android:selectableItemBackgroundBorderless"
             android:onClick="@{() -> viewModel.onClickSearchFilterBtn()}"
+            android:padding="5dp"
             android:src="@drawable/search_filter_black_icon"
+            android:translationZ="40dp"
             app:layout_constraintBottom_toBottomOf="@+id/search_window"
             app:layout_constraintEnd_toEndOf="@+id/search_window"
             app:layout_constraintTop_toTopOf="@+id/search_window" />
@@ -129,6 +126,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/search_window"
             app:navGraph="@navigation/nav_graph_search" />
+
+        <View
+            android:id="@+id/snackbar_point"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

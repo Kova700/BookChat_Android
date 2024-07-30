@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityChannelInfoBinding
@@ -18,7 +17,7 @@ import com.example.bookchat.utils.getFormattedAbstractDateTimeText
 import com.example.bookchat.utils.image.loadChannelProfile
 import com.example.bookchat.utils.image.loadUrl
 import com.example.bookchat.utils.image.loadUserProfile
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,9 +33,8 @@ class ChannelInfoActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_channel_info)
-		binding.lifecycleOwner = this
-		binding.viewmodel = channelInfoViewModel
+		binding = ActivityChannelInfoBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		observeUiState()
 		observeUiEvent()
 		initViewState()
@@ -53,6 +51,10 @@ class ChannelInfoActivity : AppCompatActivity() {
 	}
 
 	private fun initViewState() {
+		with(binding) {
+			backBtn.setOnClickListener { channelInfoViewModel.onClickBackBtn() }
+			enterChannelBtn.setOnClickListener { channelInfoViewModel.onClickEnterBtn() }
+		}
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
 	}
 
@@ -63,6 +65,11 @@ class ChannelInfoActivity : AppCompatActivity() {
 		setDateTimeText(uiState)
 		setRoomMemberCountText(uiState)
 		setChannelEnterBtnState(uiState)
+		binding.bookAuthorTv.text = uiState.channel.bookAuthorsString
+		binding.bookTitleTv.text = uiState.channel.bookTitle
+		binding.channelTitle.text = uiState.channel.roomName
+		binding.channelTagsTv.text = uiState.channel.tagsString
+		binding.channelHostNickNameTv.text = uiState.channel.host.nickname
 		if (uiState.channel.isBanned) showBannedChannelNoticeDialog()
 	}
 
@@ -146,7 +153,11 @@ class ChannelInfoActivity : AppCompatActivity() {
 		when (event) {
 			is ChannelInfoEvent.MoveToBack -> finish()
 			is ChannelInfoEvent.MoveToChannel -> moveToChannel(event.channelId)
-			is ChannelInfoEvent.MakeToast -> makeToast(event.stringId)
+			is ChannelInfoEvent.ShowSnackBar -> binding.root.showSnackBar(
+				textId = event.stringId,
+				anchor = binding.enterChannelBtn
+			)
+
 			ChannelInfoEvent.ShowFullChannelDialog -> showFullChannelNoticeDialog()
 		}
 	}

@@ -11,10 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentSubHostDeleteBinding
-import com.example.bookchat.ui.channel.channelsetting.authoritymanage.subhost.SubHostManageUiEvent
 import com.example.bookchat.ui.channel.channelsetting.authoritymanage.subhost.SubHostManageViewModel
 import com.example.bookchat.ui.channel.channelsetting.authoritymanage.subhost.subhostdelete.adapter.SubHostDeleteItemAdapter
-import com.example.bookchat.utils.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject

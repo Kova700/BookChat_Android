@@ -17,7 +17,7 @@ data class MakeAgonyUiState(
 
 	companion object {
 		val DEFAULT = MakeAgonyUiState(
-			uiState = UiState.SUCCESS,
+			uiState = UiState.LOADING,
 			bookshelfItem = BookShelfItem.DEFAULT,
 			selectedColor = AgonyFolderHexColor.WHITE,
 			agonyTitle = ""
@@ -26,10 +26,9 @@ data class MakeAgonyUiState(
 }
 
 sealed class MakeAgonyUiEvent {
-	object MoveToBack : MakeAgonyUiEvent()
+	data object MoveToBack : MakeAgonyUiEvent()
 
-	data class MakeToast(
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : MakeAgonyUiEvent()
-
 }

@@ -5,7 +5,7 @@ sealed class AccountSettingUiEvent {
 	data object ShowWithdrawWarningDialog : AccountSettingUiEvent()
 	data object StartOAuthLogout : AccountSettingUiEvent()
 	data object StartOAuthWithdraw : AccountSettingUiEvent()
-	data class MakeToast(
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : AccountSettingUiEvent()
 }

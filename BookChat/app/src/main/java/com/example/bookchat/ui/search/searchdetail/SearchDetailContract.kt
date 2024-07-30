@@ -36,7 +36,7 @@ data class SearchDetailUiState(
 
 sealed class SearchDetailEvent {
 
-	object MoveToBack : SearchDetailEvent()
+	data object MoveToBack : SearchDetailEvent()
 
 	data class MoveToSearchBookDialog(
 		val book: Book
@@ -50,7 +50,7 @@ sealed class SearchDetailEvent {
 		val channelId: Long
 	) : SearchDetailEvent()
 
-	data class MakeToast(
+	data class ShowSnackBar(
 		val stringId: Int
 	) : SearchDetailEvent()
 }

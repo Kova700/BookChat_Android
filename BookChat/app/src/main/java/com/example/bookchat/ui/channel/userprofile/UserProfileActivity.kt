@@ -4,14 +4,12 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityUserProfileBinding
 import com.example.bookchat.ui.channel.userprofile.dialog.UserBanWarningDialog
 import com.example.bookchat.utils.image.loadChannelProfile
 import com.example.bookchat.utils.image.loadUserProfile
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -23,11 +21,11 @@ class UserProfileActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_user_profile)
-		binding.lifecycleOwner = this
-		binding.viewmodel = userProfileViewModel
+		binding = ActivityUserProfileBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		observeUiState()
 		observeUiEvent()
+		initViewState()
 	}
 
 	fun observeUiState() = lifecycleScope.launch {
@@ -38,6 +36,13 @@ class UserProfileActivity : AppCompatActivity() {
 
 	fun observeUiEvent() = lifecycleScope.launch {
 		userProfileViewModel.eventFlow.collect { handleEvent(it) }
+	}
+
+	private fun initViewState() {
+		with(binding) {
+			backBtn.setOnClickListener { userProfileViewModel.onClickBackBtn() }
+			banBtn.setOnClickListener { userProfileViewModel.onClickUserBanBtn() }
+		}
 	}
 
 	private fun setViewState(uiState: UserProfileUiState) {
@@ -57,6 +62,7 @@ class UserProfileActivity : AppCompatActivity() {
 				imageUrl = uiState.channel.roomImageUri,
 				channelDefaultImageType = uiState.channel.defaultRoomImageType
 			)
+			nicknameTv.text = uiState.targetUser.nickname
 			userProfileIv.loadUserProfile(
 				imageUrl = uiState.targetUser.profileImageUrl,
 				userDefaultProfileType = uiState.targetUser.defaultProfileImageType
@@ -68,7 +74,10 @@ class UserProfileActivity : AppCompatActivity() {
 		when (event) {
 			UserProfileUiEvent.MoveBack -> finish()
 			UserProfileUiEvent.ShowUserBanWarningDialog -> showUserBanDialog()
-			is UserProfileUiEvent.MakeToast -> makeToast(event.stringId)
+			is UserProfileUiEvent.ShowSnackBar -> binding.root.showSnackBar(
+				textId = event.stringId,
+				anchor = binding.bottomDivider
+			)
 		}
 	}
 

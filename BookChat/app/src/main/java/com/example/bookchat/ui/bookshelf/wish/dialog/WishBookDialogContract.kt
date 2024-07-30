@@ -30,7 +30,7 @@ sealed class WishBookDialogEvent {
 		val targetState: BookShelfState,
 	) : WishBookDialogEvent()
 
-	data class MakeToast(
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : WishBookDialogEvent()
 

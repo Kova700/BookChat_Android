@@ -27,8 +27,8 @@ data class ChannelListUiState(
 }
 
 sealed class ChannelListUiEvent {
-	object MoveToMakeChannelPage : ChannelListUiEvent()
-	object MoveToSearchChannelPage : ChannelListUiEvent()
+	data object MoveToMakeChannelPage : ChannelListUiEvent()
+	data object MoveToSearchChannelPage : ChannelListUiEvent()
 	data class MoveToChannel(
 		val channelId: Long,
 	) : ChannelListUiEvent()
@@ -38,7 +38,7 @@ sealed class ChannelListUiEvent {
 		val channel: ChannelListItem.ChannelItem,
 	) : ChannelListUiEvent()
 
-	data class MakeToast(
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : ChannelListUiEvent()
 }

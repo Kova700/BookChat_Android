@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
@@ -19,7 +18,7 @@ import com.example.bookchat.ui.search.channelInfo.ChannelInfoActivity
 import com.example.bookchat.ui.search.dialog.SearchBookDialog
 import com.example.bookchat.ui.search.model.SearchResultItem
 import com.example.bookchat.ui.search.model.SearchTarget
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -39,12 +38,11 @@ class SearchDetailActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding =
-			DataBindingUtil.setContentView(this, R.layout.activity_search_tap_result_detail)
-		binding.lifecycleOwner = this
-		binding.viewmodel = searchDetailViewModel
+		binding = ActivitySearchTapResultDetailBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		initAdapter()
 		initRecyclerView()
+		initViewState()
 		initHeaderTitle()
 		observeUiState()
 		observeUiEvent()
@@ -59,6 +57,10 @@ class SearchDetailActivity : AppCompatActivity() {
 
 	private fun observeUiEvent() = lifecycleScope.launch {
 		searchDetailViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun initViewState() {
+		binding.backBtn.setOnClickListener { searchDetailViewModel.onClickBackBtn() }
 	}
 
 	private fun setViewState(state: SearchDetailUiState) {
@@ -146,7 +148,7 @@ class SearchDetailActivity : AppCompatActivity() {
 
 			is SearchDetailEvent.MoveToSearchBookDialog -> moveToSearchTapBookDialog(event.book)
 			SearchDetailEvent.MoveToBack -> finish()
-			is SearchDetailEvent.MakeToast -> makeToast(event.stringId)
+			is SearchDetailEvent.ShowSnackBar -> binding.root.showSnackBar(textId = event.stringId)
 		}
 	}
 

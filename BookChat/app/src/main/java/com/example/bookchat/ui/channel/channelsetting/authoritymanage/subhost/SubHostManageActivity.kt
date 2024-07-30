@@ -4,15 +4,13 @@ import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySubHostManageBinding
 import com.example.bookchat.ui.channel.channelsetting.authoritymanage.subhost.adapter.SubHostManageViewPagerAdapter
 import com.example.bookchat.ui.channel.channelsetting.authoritymanage.subhost.subhostadd.SubHostAddFragment
 import com.example.bookchat.ui.channel.channelsetting.authoritymanage.subhost.subhostdelete.SubHostDeleteFragment
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -30,17 +28,23 @@ class SubHostManageActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_sub_host_manage)
+		binding = ActivitySubHostManageBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		viewPagerAdapter = SubHostManageViewPagerAdapter(fragments, this)
-		binding.viewmodel = subHostManageViewModel
-		binding.lifecycleOwner = this
-		binding.subHostManageVp.adapter = viewPagerAdapter
 		setBackPressedDispatcher()
+		initViewState()
 		observeUiEvent()
 	}
 
 	private fun observeUiEvent() = lifecycleScope.launch {
 		subHostManageViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun initViewState() {
+		with(binding) {
+			subHostManageVp.adapter = viewPagerAdapter
+			subHostManageVp.isUserInputEnabled = false
+		}
 	}
 
 	private fun changeTab(tabIndex: Int) {
@@ -59,7 +63,7 @@ class SubHostManageActivity : AppCompatActivity() {
 
 	private fun handleEvent(event: SubHostManageUiEvent) {
 		when (event) {
-			is SubHostManageUiEvent.MakeToast -> makeToast(event.stringId)
+			is SubHostManageUiEvent.ShowSnackBar -> binding.root.showSnackBar(textId = event.stringId)
 			SubHostManageUiEvent.MoveAddSubHost -> changeTab(SUB_HOST_ADD_INDEX)
 			SubHostManageUiEvent.MoveBack -> finish()
 			SubHostManageUiEvent.MoveDeleteSubHost -> changeTab(SUB_HOST_DELETE_INDEX)
