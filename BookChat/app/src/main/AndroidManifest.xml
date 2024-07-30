@@ -115,7 +115,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.mypage.NoticeActivity"
+            android:name=".ui.mypage.notice.NoticeActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

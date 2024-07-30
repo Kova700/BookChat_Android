@@ -44,7 +44,8 @@ android {
 		jvmTarget = JavaVersion.VERSION_17.toString()
 	}
 	buildFeatures {
-		dataBinding = true
+		dataBinding = true //viewBinding으로 이전 예정
+		viewBinding = true
 		buildConfig = true
 	}
 }

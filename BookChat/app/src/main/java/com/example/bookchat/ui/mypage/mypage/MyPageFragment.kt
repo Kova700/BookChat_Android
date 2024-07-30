@@ -13,7 +13,7 @@ import com.example.bookchat.BuildConfig
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentMyPageBinding
 import com.example.bookchat.domain.model.User
-import com.example.bookchat.ui.mypage.NoticeActivity
+import com.example.bookchat.ui.mypage.notice.NoticeActivity
 import com.example.bookchat.ui.mypage.setting.setting.SettingActivity
 import com.example.bookchat.ui.mypage.useredit.UserEditActivity
 import com.example.bookchat.utils.image.loadUserProfile
