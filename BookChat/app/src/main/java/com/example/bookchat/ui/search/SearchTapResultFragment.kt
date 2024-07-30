@@ -44,10 +44,11 @@ class SearchTapResultFragment : Fragment() {
 	): View {
 		_binding =
 			DataBindingUtil.inflate(
-				inflater, R.layout.fragment_search_tap_result, container, false
+				inflater, R.layout.fragment_search_tap_result,
+				container, false
 			)
 		binding.viewmodel = searchViewModel
-		binding.lifecycleOwner = this
+		binding.lifecycleOwner = viewLifecycleOwner
 		return binding.root
 	}
 
@@ -106,7 +107,7 @@ class SearchTapResultFragment : Fragment() {
 
 	private fun setViewVisibility(uiState: SearchUiState) {
 		with(binding) {
-			resultEmptyLayout.visibility =
+			resultEmptyLayout.root.visibility =
 				if (isResultBothEmpty(uiState)) View.VISIBLE else View.GONE
 			resultShimmerLayout.shimmerLayout.visibility =
 				if (isVisibleSkeleton(uiState)) View.VISIBLE else View.GONE

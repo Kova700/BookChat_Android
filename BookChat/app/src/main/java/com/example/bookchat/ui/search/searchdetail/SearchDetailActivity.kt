@@ -64,7 +64,7 @@ class SearchDetailActivity : AppCompatActivity() {
 	private fun setViewState(state: SearchDetailUiState) {
 		binding.searchResultRcv.visibility =
 			if (state.searchItems.isNotEmpty()) RecyclerView.VISIBLE else RecyclerView.GONE
-		binding.resultEmptyLayout.visibility =
+		binding.resultEmptyLayout.root.visibility =
 			if (state.searchItems.isEmpty()) RecyclerView.VISIBLE else RecyclerView.GONE
 	}
 

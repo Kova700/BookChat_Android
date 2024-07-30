@@ -27,7 +27,7 @@ class CompleteBookItemViewHolder(
 			onLongItemClickWithAnimation(binding.swipeView, onLongItemClick, bindingAdapterPosition)
 			true
 		}
-		binding.swipeBackground.setOnClickListener {
+		binding.swipeBackground.root.setOnClickListener {
 			onDeleteClick?.invoke(bindingAdapterPosition)
 		}
 		bookImgSizeManager.setBookImgSize(binding.bookImg)

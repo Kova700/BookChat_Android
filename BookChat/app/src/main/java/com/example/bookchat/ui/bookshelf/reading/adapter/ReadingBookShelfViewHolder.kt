@@ -49,7 +49,7 @@ class ReadingBookItemViewHolder(
 		binding.pageBtn.setOnClickListener {
 			onPageInputBtnClick?.invoke(bindingAdapterPosition)
 		}
-		binding.swipeBackground.setOnClickListener {
+		binding.swipeBackground.root.setOnClickListener {
 			onDeleteClick?.invoke(bindingAdapterPosition)
 		}
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
