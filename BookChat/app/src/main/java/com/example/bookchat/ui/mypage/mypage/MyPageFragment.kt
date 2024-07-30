@@ -14,7 +14,9 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentMyPageBinding
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.mypage.notice.NoticeActivity
+import com.example.bookchat.ui.mypage.policy.PolicyActivity
 import com.example.bookchat.ui.mypage.setting.setting.SettingActivity
+import com.example.bookchat.ui.mypage.terms.TermsActivity
 import com.example.bookchat.ui.mypage.useredit.UserEditActivity
 import com.example.bookchat.utils.image.loadUserProfile
 import com.mikepenz.aboutlibraries.LibsBuilder
@@ -66,7 +68,9 @@ class MyPageFragment : Fragment() {
 			settingBtn.setOnClickListener { myPageViewModel.onClickSettingBtn() }
 			noticeBtn.setOnClickListener { myPageViewModel.onClickNoticeBtn() }
 			inviteBtn.setOnClickListener { }
-			openSourceLicenseBtn.setOnClickListener { moveToOpenSourceLicensesMenu() }
+			termsOfServiceBtn.setOnClickListener { myPageViewModel.onClickTermsBtn() }
+			privacyPolicyBtn.setOnClickListener { myPageViewModel.onClickPolicyBtn() }
+			openSourceLicenseBtn.setOnClickListener { myPageViewModel.onClickOpenSourceLicense() }
 			userEditBtn.setOnClickListener { myPageViewModel.onClickUserEditBtn() }
 			appVersionTv.text = BuildConfig.VERSION_NAME
 		}
@@ -102,11 +106,24 @@ class MyPageFragment : Fragment() {
 		startActivity(intent)
 	}
 
+	private fun moveToTerms() {
+		val intent = Intent(requireContext(), TermsActivity::class.java)
+		startActivity(intent)
+	}
+
+	private fun moveToPolicy() {
+		val intent = Intent(requireContext(), PolicyActivity::class.java)
+		startActivity(intent)
+	}
+
 	private fun handleEvent(event: MyPageEvent) {
 		when (event) {
-			is MyPageEvent.MoveToUserEditPage -> moveToUserEditActivity()
-			is MyPageEvent.MoveToSetting -> moveToSetting()
-			is MyPageEvent.MoveToNotice -> moveToNotice()
+			MyPageEvent.MoveToUserEditPage -> moveToUserEditActivity()
+			MyPageEvent.MoveToSetting -> moveToSetting()
+			MyPageEvent.MoveToNotice -> moveToNotice()
+			MyPageEvent.MoveToTerms -> moveToTerms()
+			MyPageEvent.MoveToPrivacyPolicy -> moveToPolicy()
+			MyPageEvent.MoveToOpenSourceLicense -> moveToOpenSourceLicensesMenu()
 		}
 	}
 

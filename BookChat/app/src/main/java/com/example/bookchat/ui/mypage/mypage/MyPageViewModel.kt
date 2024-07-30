@@ -43,6 +43,18 @@ class MyPageViewModel @Inject constructor(
 		startEvent(MyPageEvent.MoveToNotice)
 	}
 
+	fun onClickOpenSourceLicense() {
+		startEvent(MyPageEvent.MoveToOpenSourceLicense)
+	}
+
+	fun onClickTermsBtn() {
+		startEvent(MyPageEvent.MoveToTerms)
+	}
+
+	fun onClickPolicyBtn() {
+		startEvent(MyPageEvent.MoveToPrivacyPolicy)
+	}
+
 	private fun startEvent(event: MyPageEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
 	}
