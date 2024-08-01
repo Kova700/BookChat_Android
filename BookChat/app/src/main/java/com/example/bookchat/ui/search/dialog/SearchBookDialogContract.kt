@@ -2,6 +2,9 @@ package com.example.bookchat.ui.search.dialog
 
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.BookShelfState
+import com.example.bookchat.domain.model.SearchFilter
+import com.example.bookchat.domain.model.SearchPurpose
+import com.example.bookchat.ui.search.model.SearchTarget
 
 data class SearchDialogUiState(
 	val uiState: SearchDialogState,
@@ -9,9 +12,13 @@ data class SearchDialogUiState(
 	val starRating: Float,
 ) {
 
+	val isAlreadyInWishBookShelf: Boolean
+		get() = uiState is SearchDialogState.AlreadyInBookShelf
+						&& uiState.bookShelfState == BookShelfState.WISH
+
 	sealed class SearchDialogState {
-		object Default : SearchDialogState()
-		object Loading : SearchDialogState()
+		data object Default : SearchDialogState()
+		data object Loading : SearchDialogState()
 		data class AlreadyInBookShelf(val bookShelfState: BookShelfState) : SearchDialogState()
 	}
 
@@ -25,8 +32,15 @@ data class SearchDialogUiState(
 }
 
 sealed class SearchTapDialogEvent {
-	object MoveToStarSetDialog : SearchTapDialogEvent()
-	data class MakeToast(
-		val stringId: Int
+	data object MoveToStarSetDialog : SearchTapDialogEvent()
+	data class ShowSnackBar(
+		val stringId: Int,
+	) : SearchTapDialogEvent()
+
+	data class MoveToChannelSearchWithSelectedBook(
+		val searchKeyword: String,
+		val searchTarget: SearchTarget,
+		val searchPurpose: SearchPurpose,
+		val searchFilter: SearchFilter,
 	) : SearchTapDialogEvent()
 }

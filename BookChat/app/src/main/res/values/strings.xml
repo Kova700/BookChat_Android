@@ -108,6 +108,9 @@
     <string name="search_book_keyword_empty">검색어를 입력해주세요.</string>
     <string name="search_book_result_empty">검색어가 존재하지 않습니다.</string>
     <string name="search_window_hint">검색어를 입력해주세요.</string>
+    <string name="bookshelf_register_success">[서재]에 도서가 등록되었습니다.</string>
+    <string name="bookshelf_register_fail">[서재]에 도서 등록을 실패했습니다..</string>
+
     <string name="complete_bookshelf_register_success">[서재] - [독서완료]에\n도서가 등록되었습니다.</string>
     <string name="complete_bookshelf_register_fail">독서완료 등록을 실패했습니다.</string>
     <string name="complete_bookshelf_star_set_dialog">독서완료 별점</string>

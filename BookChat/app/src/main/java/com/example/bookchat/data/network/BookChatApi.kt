@@ -105,7 +105,7 @@ interface BookChatApi {
 	suspend fun checkAlreadyInBookShelf(
 		@Query("isbn") isbn: String,
 		@Query("publishAt") publishAt: String,
-	): BookStateInBookShelfResponse
+	): Response<BookStateInBookShelfResponse>
 
 	/**------------독후감------------*/
 

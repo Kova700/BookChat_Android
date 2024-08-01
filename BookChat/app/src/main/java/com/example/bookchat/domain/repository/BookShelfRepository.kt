@@ -21,7 +21,7 @@ interface BookShelfRepository {
 		newBookShelfItem: BookShelfItem,
 	)
 
-	suspend fun checkAlreadyInBookShelf(book: Book): BookStateInBookShelf
+	suspend fun checkAlreadyInBookShelf(book: Book): BookStateInBookShelf?
 
 	fun getBookShelfFlow(bookShelfState: BookShelfState): Flow<List<BookShelfItem>>
 	suspend fun getBookShelfItems(

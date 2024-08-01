@@ -159,8 +159,13 @@ class BookShelfRepositoryImpl @Inject constructor(
 		)
 	}
 
-	override suspend fun checkAlreadyInBookShelf(book: Book): BookStateInBookShelf {
-		return bookChatApi.checkAlreadyInBookShelf(book.isbn, book.publishAt).toDomain()
+	override suspend fun checkAlreadyInBookShelf(book: Book): BookStateInBookShelf? {
+		val response = bookChatApi.checkAlreadyInBookShelf(book.isbn, book.publishAt)
+		if (response.isSuccessful) return response.body()?.toDomain()
+		when (response.code()) {
+			404 -> return null
+			else -> throw Exception("Unexpected response code: ${response.code()}")
+		}
 	}
 
 	override fun clear() {
