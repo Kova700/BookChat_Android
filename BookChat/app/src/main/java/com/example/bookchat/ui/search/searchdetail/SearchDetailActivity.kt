@@ -121,6 +121,9 @@ class SearchDetailActivity : AppCompatActivity() {
 	}
 
 	private fun moveToSearchTapBookDialog(book: Book) {
+		val existingFragment =
+			supportFragmentManager.findFragmentByTag(SearchFragment.DIALOG_TAG_SEARCH_BOOK)
+		if (existingFragment != null) return
 		val dialog = SearchBookDialog()
 		dialog.arguments = bundleOf(SearchFragment.EXTRA_SEARCHED_BOOK_ITEM_ID to book.isbn)
 		dialog.show(supportFragmentManager, SearchFragment.DIALOG_TAG_SEARCH_BOOK)

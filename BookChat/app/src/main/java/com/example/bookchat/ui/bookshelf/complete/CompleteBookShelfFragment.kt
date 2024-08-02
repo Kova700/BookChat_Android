@@ -135,12 +135,13 @@ class CompleteBookShelfFragment : Fragment() {
 	}
 
 	private fun moveToCompleteBookDialog(bookShelfListItem: CompleteBookShelfItem.Item) {
+		val existingFragment = childFragmentManager.findFragmentByTag(DIALOG_TAG_COMPLETE)
+		if (existingFragment != null) return
 		val dialog = CompleteBookDialog()
-		dialog.arguments =
-			bundleOf(
-				CompleteBookDialog.EXTRA_COMPLETE_BOOKSHELF_ITEM_ID to bookShelfListItem.bookShelfId
-			)
-		dialog.show(this.childFragmentManager, DIALOG_TAG_COMPLETE)
+		dialog.arguments = bundleOf(
+			CompleteBookDialog.EXTRA_COMPLETE_BOOKSHELF_ITEM_ID to bookShelfListItem.bookShelfId
+		)
+		dialog.show(childFragmentManager, DIALOG_TAG_COMPLETE)
 	}
 
 	private fun handleEvent(event: CompleteBookShelfEvent) {

@@ -146,12 +146,16 @@ class ReadingBookShelfFragment : Fragment() {
 	}
 
 	private fun moveToReadingBookDialog(bookShelfListItem: ReadingBookShelfItem.Item) {
+		val existingFragment = childFragmentManager.findFragmentByTag(DIALOG_TAG_READING)
+		if (existingFragment != null) return
 		val dialog = ReadingBookDialog()
 		dialog.arguments = bundleOf(EXTRA_READING_BOOKSHELF_ITEM_ID to bookShelfListItem.bookShelfId)
 		dialog.show(this.childFragmentManager, DIALOG_TAG_READING)
 	}
 
 	private fun moveToPageInputDialog(bookShelfListItem: ReadingBookShelfItem.Item) {
+		val existingFragment = childFragmentManager.findFragmentByTag(DIALOG_TAG_PAGE_INPUT)
+		if (existingFragment != null) return
 		val dialog = PageInputBottomSheetDialog()
 		dialog.arguments = bundleOf(EXTRA_PAGE_INPUT_ITEM_ID to bookShelfListItem.bookShelfId)
 		dialog.show(childFragmentManager, DIALOG_TAG_PAGE_INPUT)

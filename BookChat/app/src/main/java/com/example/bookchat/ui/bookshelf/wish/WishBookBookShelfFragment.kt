@@ -137,9 +137,11 @@ class WishBookBookShelfFragment : Fragment() {
 	}
 
 	private fun moveToWishBookDialog(bookShelfListItem: WishBookShelfItem.Item) {
+		val existingFragment = childFragmentManager.findFragmentByTag(DIALOG_TAG_WISH)
+		if (existingFragment != null) return
 		val dialog = WishBookDialog()
 		dialog.arguments = bundleOf(EXTRA_WISH_BOOKSHELF_ITEM_ID to bookShelfListItem.bookShelfId)
-		dialog.show(this.childFragmentManager, DIALOG_TAG_WISH)
+		dialog.show(childFragmentManager, DIALOG_TAG_WISH)
 	}
 
 	private fun changeBookShelfTab(bookShelfState: BookShelfState) {
