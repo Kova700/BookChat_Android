@@ -15,12 +15,11 @@ data class ReadingBookDialogUiState(
 		SUCCESS,
 		LOADING,
 		ERROR,
-		EMPTY,
 	}
 
 	companion object {
 		val DEFAULT = ReadingBookDialogUiState(
-			uiState = UiState.EMPTY,
+			uiState = UiState.SUCCESS,
 			readingItem = BookShelfItem.DEFAULT,
 			starRating = 0.0f
 		)
@@ -36,7 +35,7 @@ sealed class ReadingBookDialogEvent {
 		val targetState: BookShelfState,
 	) : ReadingBookDialogEvent()
 
-	data class MakeToast(
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : ReadingBookDialogEvent()
 }
