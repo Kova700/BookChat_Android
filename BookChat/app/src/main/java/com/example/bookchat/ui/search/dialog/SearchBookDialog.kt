@@ -28,8 +28,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO : Wish 누르면 로딩 화면 안나옴 다른 상태랑 같이 확인해보는 게 좋을 듯
-//+ API 실패하면 API 하트 채워지면 안됨
 @AndroidEntryPoint
 class SearchBookDialog : DialogFragment() {
 
