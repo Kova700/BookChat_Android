@@ -93,7 +93,7 @@ class ReadingBookShelfFragment : Fragment() {
 			bookshelfEmptyLayout.root.visibility =
 				if (uiState.isEmpty) View.VISIBLE else View.GONE
 			bookshelfReadingRcv.visibility =
-				if (uiState.isInitLoading.not()) View.VISIBLE else View.GONE
+				if (uiState.isEmpty.not()) View.VISIBLE else View.GONE
 			progressbar.visibility =
 				if (uiState.isLoading) View.VISIBLE else View.GONE
 			readingBookshelfShimmerLayout.root.visibility =
