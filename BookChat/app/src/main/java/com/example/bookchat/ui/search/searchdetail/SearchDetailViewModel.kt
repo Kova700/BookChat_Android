@@ -86,12 +86,11 @@ class SearchDetailViewModel @Inject constructor(
 	}
 
 	private fun getSearchItems() = viewModelScope.launch {
-		startEvent(SearchDetailEvent.ShowSnackBar(R.string.error_else))
-//		updateState { copy(uiState = UiState.LOADING) }
-//		when (searchTarget) {
-//			SearchTarget.BOOK -> searchBooks()
-//			SearchTarget.CHANNEL -> searchChannels()
-//		}
+		updateState { copy(uiState = UiState.LOADING) }
+		when (searchTarget) {
+			SearchTarget.BOOK -> searchBooks()
+			SearchTarget.CHANNEL -> searchChannels()
+		}
 	}
 
 	private fun searchBooks() = viewModelScope.launch {
