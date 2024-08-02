@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//TODO : 하트 풀었다 다시 누르고 상태이동하면 실패함 체크 필요 (ID가 변경되어서 그럼)
 @HiltViewModel
 class WishBookDialogViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
@@ -32,50 +33,24 @@ class WishBookDialogViewModel @Inject constructor(
 	val uiState = _uiState.asStateFlow()
 
 	init {
-		getItem()
+		initUiState()
 	}
 
-	private fun getItem() {
+	private fun initUiState() {
 		val item = bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)
 		updateState { copy(wishItem = item) }
 	}
 
 	fun onHeartToggleClick() {
 		if (uiState.value.isToggleChecked) {
-			onItemDeleteClick()
+			deleteWishBookShelfItem(uiState.value.wishItem)
 			return
 		}
-		onItemAddClick()
-	}
-
-	fun onChangeToReadingClick() {
-		onChangeStateClick(BookShelfState.READING)
-	}
-
-	fun onChangeToCompleteClick() {
-		onChangeStateClick(BookShelfState.COMPLETE)
-	}
-
-	private fun onItemDeleteClick() {
-		if (uiState.value.uiState == UiState.LOADING) return
-		deleteWishBookShelfItem(uiState.value.wishItem)
-	}
-
-	fun onMoveToAgonyClick() {
-		startEvent(WishBookDialogEvent.MoveToAgony(bookShelfListItemId))
-	}
-
-	private fun onItemAddClick() {
-		if (uiState.value.uiState == UiState.LOADING) return
 		addWishBookShelfItem(uiState.value.wishItem)
 	}
 
-	private fun onChangeStateClick(newState: BookShelfState) {
-		if (uiState.value.uiState == UiState.LOADING) return
-		changeBookShelfItemStatus(uiState.value.wishItem, newState)
-	}
-
 	private fun addWishBookShelfItem(bookShelfItem: BookShelfItem) {
+		if (uiState.value.uiState == UiState.LOADING) return
 		updateState { copy(uiState = UiState.LOADING) }
 		viewModelScope.launch {
 			runCatching {
@@ -91,14 +66,11 @@ class WishBookDialogViewModel @Inject constructor(
 	}
 
 	private fun deleteWishBookShelfItem(bookShelfItem: BookShelfItem) {
+		if (uiState.value.uiState == UiState.LOADING) return
 		updateState { copy(uiState = UiState.LOADING) }
 		viewModelScope.launch {
-			runCatching {
-				bookShelfRepository.deleteBookShelfBook(
-					bookShelfItem.bookShelfId,
-					BookShelfState.WISH
-				)
-			}.onSuccess { updateState { copy(isToggleChecked = false) } }
+			runCatching { bookShelfRepository.deleteBookShelfBook(bookShelfItem.bookShelfId) }
+				.onSuccess { updateState { copy(isToggleChecked = false) } }
 				.onFailure { startEvent(WishBookDialogEvent.ShowSnackBar(R.string.bookshelf_delete_fail)) }
 				.also { updateState { copy(uiState = UiState.SUCCESS) } }
 		}
@@ -108,6 +80,7 @@ class WishBookDialogViewModel @Inject constructor(
 		bookShelfItem: BookShelfItem,
 		newState: BookShelfState,
 	) {
+		if (uiState.value.uiState == UiState.LOADING) return
 		updateState { copy(uiState = UiState.LOADING) }
 		viewModelScope.launch {
 			runCatching {
@@ -115,16 +88,27 @@ class WishBookDialogViewModel @Inject constructor(
 					bookShelfItemId = bookShelfItem.bookShelfId,
 					newBookShelfItem = bookShelfItem.copy(state = newState),
 				)
-			}.onSuccess {
-				startEvent(
-					WishBookDialogEvent.ChangeBookShelfTab(
-						targetState = newState
-					)
-				)
 			}
+				.onSuccess { startEvent(WishBookDialogEvent.ChangeBookShelfTab(targetState = newState)) }
 				.onFailure { startEvent(WishBookDialogEvent.ShowSnackBar(R.string.bookshelf_state_change_fail)) }
 				.also { updateState { copy(uiState = UiState.SUCCESS) } }
 		}
+	}
+
+	fun onChangeToReadingClick() {
+		onChangeStateClick(BookShelfState.READING)
+	}
+
+	fun onChangeToCompleteClick() {
+		onChangeStateClick(BookShelfState.COMPLETE)
+	}
+
+	fun onMoveToAgonyClick() {
+		startEvent(WishBookDialogEvent.MoveToAgony(bookShelfListItemId))
+	}
+
+	private fun onChangeStateClick(newState: BookShelfState) {
+		changeBookShelfItemStatus(uiState.value.wishItem, newState)
 	}
 
 	private inline fun updateState(block: WishBookDialogUiState.() -> WishBookDialogUiState) {

@@ -73,15 +73,24 @@ class WishBookDialog : DialogFragment() {
 	}
 
 	private fun setViewState(uiState: WishBookDialogUiState) {
+		setViewVisibility(uiState)
 		with(binding) {
 			bookImg.loadUrl(uiState.wishItem.book.bookCoverImageUrl)
-			selectedBookTitleTv.text = uiState.wishItem.book.title
-			selectedBookTitleTv.isSelected = true
-			selectedBookAuthorsTv.text = uiState.wishItem.book.authorsString
-			selectedBookAuthorsTv.isSelected = true
-			selectedBookPublishAtTv.text = uiState.wishItem.book.publishAt
-			selectedBookPublishAtTv.isSelected = true
+			bookTitleTv.text = uiState.wishItem.book.title
+			bookTitleTv.isSelected = true
+			bookAuthorsTv.text = uiState.wishItem.book.authorsString
+			bookAuthorsTv.isSelected = true
+			bookPublishAtTv.text = uiState.wishItem.book.publishAt
+			bookPublishAtTv.isSelected = true
 			wishHeartToggleBtn.isChecked = uiState.isToggleChecked
+		}
+	}
+
+	private fun setViewVisibility(uiState: WishBookDialogUiState) {
+		with(binding) {
+			progressBar.visibility = if (uiState.isLoading) View.VISIBLE else View.GONE
+			notLoadingStateGroup.visibility =
+				if (uiState.isLoading.not()) View.VISIBLE else View.INVISIBLE
 		}
 	}
 

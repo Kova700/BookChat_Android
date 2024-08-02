@@ -118,10 +118,6 @@ class ReadingBookDialog : DialogFragment() {
 				if (uiState.uiState == UiState.LOADING) View.VISIBLE else View.INVISIBLE
 			notLoadingStateGroup.visibility =
 				if (uiState.uiState != UiState.LOADING) View.VISIBLE else View.INVISIBLE
-			moveToAgonyBtn.visibility =
-				if (uiState.uiState == UiState.SUCCESS) View.VISIBLE else View.INVISIBLE
-			changeStatusToCompleteBtn.visibility =
-				if (uiState.uiState == UiState.SUCCESS) View.VISIBLE else View.INVISIBLE
 		}
 	}
 

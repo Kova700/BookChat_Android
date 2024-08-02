@@ -9,16 +9,18 @@ data class WishBookDialogUiState(
 	val isToggleChecked: Boolean,
 ) {
 
+	val isLoading
+		get() = uiState == UiState.LOADING
+
 	enum class UiState {
 		SUCCESS,
 		LOADING,
 		ERROR,
-		EMPTY,
 	}
 
 	companion object {
 		val DEFAULT = WishBookDialogUiState(
-			uiState = UiState.EMPTY,
+			uiState = UiState.SUCCESS,
 			wishItem = BookShelfItem.DEFAULT,
 			isToggleChecked = true
 		)

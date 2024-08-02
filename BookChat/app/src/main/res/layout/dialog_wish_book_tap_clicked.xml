@@ -9,8 +9,25 @@
     android:paddingTop="@dimen/bookshelf_dialog_white_padding_top"
     android:paddingBottom="@dimen/bookshelf_dialog_white_padding_bottom">
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="3dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/not_loading_state_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="sub_background_layout, move_to_agony_btn, change_status_to_reading_btn" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/sub_background_wish"
+        android:id="@+id/sub_background_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/view_round_beige"
@@ -19,15 +36,15 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardView2"
+            android:id="@+id/bookImg_cv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/bookshelf_dialog_beige_area_top_margin"
             app:cardCornerRadius="@dimen/book_img_corner_radius"
             app:cardElevation="@dimen/book_img_elevation"
-            app:layout_constraintEnd_toEndOf="@+id/sub_background_wish"
-            app:layout_constraintStart_toStartOf="@+id/sub_background_wish"
-            app:layout_constraintTop_toTopOf="@+id/sub_background_wish">
+            app:layout_constraintEnd_toEndOf="@+id/sub_background_layout"
+            app:layout_constraintStart_toStartOf="@+id/sub_background_layout"
+            app:layout_constraintTop_toTopOf="@+id/sub_background_layout">
 
             <ImageView
                 android:id="@+id/bookImg"
@@ -38,7 +55,7 @@
         </androidx.cardview.widget.CardView>
 
         <TextView
-            android:id="@+id/selected_book_title_tv"
+            android:id="@+id/book_title_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="17dp"
@@ -50,12 +67,12 @@
             android:singleLine="true"
             android:textColor="#222222"
             android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@+id/sub_background_wish"
-            app:layout_constraintStart_toStartOf="@+id/sub_background_wish"
-            app:layout_constraintTop_toBottomOf="@+id/cardView2" />
+            app:layout_constraintEnd_toEndOf="@+id/sub_background_layout"
+            app:layout_constraintStart_toStartOf="@+id/sub_background_layout"
+            app:layout_constraintTop_toBottomOf="@+id/bookImg_cv" />
 
         <TextView
-            android:id="@+id/selected_book_authors_tv"
+            android:id="@+id/book_authors_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
@@ -67,12 +84,12 @@
             android:singleLine="true"
             android:textColor="#373737"
             android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="@+id/sub_background_wish"
-            app:layout_constraintStart_toStartOf="@+id/sub_background_wish"
-            app:layout_constraintTop_toBottomOf="@+id/selected_book_title_tv" />
+            app:layout_constraintEnd_toEndOf="@+id/sub_background_layout"
+            app:layout_constraintStart_toStartOf="@+id/sub_background_layout"
+            app:layout_constraintTop_toBottomOf="@+id/book_title_tv" />
 
         <TextView
-            android:id="@+id/selected_book_publish_at_tv"
+            android:id="@+id/book_publish_at_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
@@ -84,9 +101,9 @@
             android:singleLine="true"
             android:textColor="#373737"
             android:textSize="10sp"
-            app:layout_constraintEnd_toEndOf="@+id/sub_background_wish"
-            app:layout_constraintStart_toStartOf="@+id/sub_background_wish"
-            app:layout_constraintTop_toBottomOf="@+id/selected_book_authors_tv" />
+            app:layout_constraintEnd_toEndOf="@+id/sub_background_layout"
+            app:layout_constraintStart_toStartOf="@+id/sub_background_layout"
+            app:layout_constraintTop_toBottomOf="@+id/book_authors_tv" />
 
         <com.example.bookchat.ui.customview.AntiDupClickToggleButton
             android:id="@+id/wish_heart_toggle_btn"
@@ -98,10 +115,10 @@
             android:scaleType="fitXY"
             android:textOff=""
             android:textOn=""
-            app:layout_constraintBottom_toBottomOf="@+id/sub_background_wish"
-            app:layout_constraintEnd_toEndOf="@+id/cardView2"
-            app:layout_constraintStart_toStartOf="@+id/cardView2"
-            app:layout_constraintTop_toBottomOf="@+id/selected_book_publish_at_tv" />
+            app:layout_constraintBottom_toBottomOf="@+id/sub_background_layout"
+            app:layout_constraintEnd_toEndOf="@+id/bookImg_cv"
+            app:layout_constraintStart_toStartOf="@+id/bookImg_cv"
+            app:layout_constraintTop_toBottomOf="@+id/book_publish_at_tv" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.button.MaterialButton
@@ -122,7 +139,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/change_status_to_reading_btn"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sub_background_wish"
+        app:layout_constraintTop_toBottomOf="@+id/sub_background_layout"
         app:layout_constraintVertical_bias="0.0"
         app:strokeColor="#5648FF"
         app:strokeWidth="1dp" />
@@ -145,7 +162,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/move_to_agony_btn"
-        app:layout_constraintTop_toBottomOf="@+id/sub_background_wish"
+        app:layout_constraintTop_toBottomOf="@+id/sub_background_layout"
         app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
