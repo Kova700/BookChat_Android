@@ -7,11 +7,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogCompleteBookTapClickedBinding
 import com.example.bookchat.ui.agony.agony.AgonyActivity
 import com.example.bookchat.ui.agony.agony.AgonyViewModel
@@ -42,12 +40,7 @@ class CompleteBookDialog : DialogFragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.dialog_complete_book_tap_clicked,
-			container, false
-		)
-		binding.lifecycleOwner = this.viewLifecycleOwner
-		binding.viewmodel = completeBookTapDialogViewModel
+		_binding = DialogCompleteBookTapClickedBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -73,15 +66,27 @@ class CompleteBookDialog : DialogFragment() {
 	}
 
 	private fun setViewState(uiState: CompleteBookDialogUiState) {
-		binding.bookImg.loadUrl(uiState.completeItem.book.bookCoverImageUrl)
+		with(binding) {
+			bookImg.loadUrl(uiState.completeItem.book.bookCoverImageUrl)
+			selectedBookTitleTv.text = uiState.completeItem.book.title
+			selectedBookAuthorsTv.text = uiState.completeItem.book.authorsString
+			selectedBookPublishAtTv.text = uiState.completeItem.book.publishAt
+			completeBookRatingBar.rating = uiState.completeItem.star?.value ?: 0f
+		}
 	}
 
 	private fun initViewState() {
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
 		dialogSizeManager.setDialogSize(binding.completeDialogLayout)
-		binding.selectedBookTitleTv.isSelected = true
-		binding.selectedBookAuthorsTv.isSelected = true
-		binding.selectedBookPublishAtTv.isSelected = true
+		with(binding) {
+			moveToAgonyBtn.setOnClickListener { completeBookTapDialogViewModel.onMoveToAgonyClick() }
+			moveToBookReportBtn.setOnClickListener {
+				completeBookTapDialogViewModel.onMoveToBookReportClick()
+			}
+			selectedBookTitleTv.isSelected = true
+			selectedBookAuthorsTv.isSelected = true
+			selectedBookPublishAtTv.isSelected = true
+		}
 	}
 
 	private fun moveToAgony(bookShelfItemId: Long) {
