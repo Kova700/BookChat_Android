@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// TODO : Error 상태라면 인터넷 재연결시 다시 데이터 호출되게 구현
 @HiltViewModel
 class ReadingBookShelfViewModel @Inject constructor(
 	private val bookShelfRepository: BookShelfRepository,
@@ -67,12 +66,7 @@ class ReadingBookShelfViewModel @Inject constructor(
 
 	private fun deleteBookShelfItem(bookShelfListItem: ReadingBookShelfItem.Item) =
 		viewModelScope.launch {
-			runCatching {
-				bookShelfRepository.deleteBookShelfBook(
-					bookShelfListItem.bookShelfId,
-					BookShelfState.READING
-				)
-			}
+			runCatching { bookShelfRepository.deleteBookShelfBook(bookShelfListItem.bookShelfId) }
 				.onSuccess { startEvent(ReadingBookShelfEvent.ShowSnackBar(R.string.bookshelf_delete_success)) }
 				.onFailure { startEvent(ReadingBookShelfEvent.ShowSnackBar(R.string.bookshelf_delete_fail)) }
 		}

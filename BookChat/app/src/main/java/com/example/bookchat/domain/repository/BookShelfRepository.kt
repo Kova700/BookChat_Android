@@ -15,7 +15,8 @@ interface BookShelfRepository {
 		starRating: StarRating? = null,
 	)
 
-	suspend fun deleteBookShelfBook(bookShelfItemId: Long, bookShelfState: BookShelfState)
+	suspend fun deleteBookShelfBook(bookShelfItemId: Long)
+
 	suspend fun changeBookShelfBookStatus(
 		bookShelfItemId: Long,
 		newBookShelfItem: BookShelfItem,
