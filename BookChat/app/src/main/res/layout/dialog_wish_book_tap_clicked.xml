@@ -113,6 +113,7 @@
             android:layout_marginBottom="20dp"
             android:background="@drawable/selector_wish_btn"
             android:scaleType="fitXY"
+            android:checked="true"
             android:textOff=""
             android:textOn=""
             app:layout_constraintBottom_toBottomOf="@+id/sub_background_layout"

@@ -6,7 +6,6 @@ import com.example.bookchat.domain.model.BookShelfState
 data class WishBookDialogUiState(
 	val uiState: UiState,
 	val wishItem: BookShelfItem,
-	val isToggleChecked: Boolean,
 ) {
 
 	val isLoading
@@ -22,12 +21,12 @@ data class WishBookDialogUiState(
 		val DEFAULT = WishBookDialogUiState(
 			uiState = UiState.SUCCESS,
 			wishItem = BookShelfItem.DEFAULT,
-			isToggleChecked = true
 		)
 	}
 }
 
 sealed class WishBookDialogEvent {
+	data object MoveToBack : WishBookDialogEvent()
 	data class ChangeBookShelfTab(
 		val targetState: BookShelfState,
 	) : WishBookDialogEvent()

@@ -82,7 +82,6 @@ class WishBookDialog : DialogFragment() {
 			bookAuthorsTv.isSelected = true
 			bookPublishAtTv.text = uiState.wishItem.book.publishAt
 			bookPublishAtTv.isSelected = true
-			wishHeartToggleBtn.isChecked = uiState.isToggleChecked
 		}
 	}
 
@@ -99,7 +98,7 @@ class WishBookDialog : DialogFragment() {
 		dialogSizeManager.setDialogSize(binding.wishDialogLayout)
 		with(binding) {
 			wishHeartToggleBtn.setOnClickListener {
-				wishHeartToggleBtn.isChecked = wishBookDialogViewModel.uiState.value.isToggleChecked
+				wishHeartToggleBtn.isChecked = true
 				wishBookDialogViewModel.onHeartToggleClick()
 			}
 			moveToAgonyBtn.setOnClickListener { wishBookDialogViewModel.onMoveToAgonyClick() }
@@ -118,14 +117,17 @@ class WishBookDialog : DialogFragment() {
 		startActivity(intent)
 	}
 
-	private fun handleEvent(event: WishBookDialogEvent) = when (event) {
-		is WishBookDialogEvent.ChangeBookShelfTab -> moveToOtherTab(event.targetState)
-		is WishBookDialogEvent.ShowSnackBar -> binding.root.showSnackBar(
-			textId = event.stringId,
-			anchor = binding.moveToAgonyBtn
-		)
+	private fun handleEvent(event: WishBookDialogEvent) {
+		when (event) {
+			is WishBookDialogEvent.ChangeBookShelfTab -> moveToOtherTab(event.targetState)
+			is WishBookDialogEvent.ShowSnackBar -> binding.root.showSnackBar(
+				textId = event.stringId,
+				anchor = binding.moveToAgonyBtn
+			)
 
-		is WishBookDialogEvent.MoveToAgony -> moveToAgony(event.bookShelfListItemId)
+			is WishBookDialogEvent.MoveToAgony -> moveToAgony(event.bookShelfListItemId)
+			WishBookDialogEvent.MoveToBack -> dismiss()
+		}
 	}
 
 	companion object {

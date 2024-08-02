@@ -18,7 +18,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO : 하트 풀었다 다시 누르고 상태이동하면 실패함 체크 필요 (ID가 변경되어서 그럼)
+//TODO : 하트 풀었다 다시 누르고 상태이동, 하트 누르면면 실패함 체크 필요 (ID가 변경되어서 그럼) (2번정도하면 발생함)
+//TODO : 하트 지워진 채로 고민기록 이동 누르면 터짐
+//TODO : 걍 하트 비우면 바로 다이얼로그 끌까
 @HiltViewModel
 class WishBookDialogViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
@@ -42,27 +44,7 @@ class WishBookDialogViewModel @Inject constructor(
 	}
 
 	fun onHeartToggleClick() {
-		if (uiState.value.isToggleChecked) {
-			deleteWishBookShelfItem(uiState.value.wishItem)
-			return
-		}
-		addWishBookShelfItem(uiState.value.wishItem)
-	}
-
-	private fun addWishBookShelfItem(bookShelfItem: BookShelfItem) {
-		if (uiState.value.uiState == UiState.LOADING) return
-		updateState { copy(uiState = UiState.LOADING) }
-		viewModelScope.launch {
-			runCatching {
-				bookShelfRepository.registerBookShelfBook(
-					book = bookShelfItem.book,
-					bookShelfState = BookShelfState.WISH,
-				)
-			}
-				.onSuccess { updateState { copy(isToggleChecked = true) } }
-				.onFailure { startEvent(WishBookDialogEvent.ShowSnackBar(R.string.wish_bookshelf_register_fail)) }
-				.also { updateState { copy(uiState = UiState.SUCCESS) } }
-		}
+		deleteWishBookShelfItem(uiState.value.wishItem)
 	}
 
 	private fun deleteWishBookShelfItem(bookShelfItem: BookShelfItem) {
@@ -70,7 +52,7 @@ class WishBookDialogViewModel @Inject constructor(
 		updateState { copy(uiState = UiState.LOADING) }
 		viewModelScope.launch {
 			runCatching { bookShelfRepository.deleteBookShelfBook(bookShelfItem.bookShelfId) }
-				.onSuccess { updateState { copy(isToggleChecked = false) } }
+				.onSuccess { startEvent(WishBookDialogEvent.MoveToBack) }
 				.onFailure { startEvent(WishBookDialogEvent.ShowSnackBar(R.string.bookshelf_delete_fail)) }
 				.also { updateState { copy(uiState = UiState.SUCCESS) } }
 		}
