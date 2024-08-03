@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
-import android.os.IBinder
 import android.os.Looper
 import android.provider.Settings
 import android.text.Editable
@@ -16,7 +15,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityUserEditBinding
@@ -63,9 +61,8 @@ class UserEditActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_user_edit)
-		binding.lifecycleOwner = this
-		binding.viewmodel = userEditViewModel
+		binding = ActivityUserEditBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		setFocus()
 		initViewState()
 		observeUiState()
@@ -89,6 +86,10 @@ class UserEditActivity : AppCompatActivity() {
 		setProfileImageViewState(state)
 		setNameCheckResultTextViewState(state)
 		setNameCheckResultLayoutState(state)
+		with(binding) {
+			textClearBtn.visibility = if (state.newNickname.isEmpty()) View.GONE else View.VISIBLE
+			textLengthTv.text = getString(R.string.user_nickname_length, state.newNickname.length)
+		}
 	}
 
 	private fun setNameCheckResultLayoutState(state: UserEditUiState) {
@@ -147,7 +148,12 @@ class UserEditActivity : AppCompatActivity() {
 
 	private fun initViewState() {
 		initNickNameEditText()
-		binding.cameraBtn.setOnClickListener { userEditViewModel.onClickCameraBtn() }
+		with(binding) {
+			cameraBtn.setOnClickListener { userEditViewModel.onClickCameraBtn() }
+			nicknameSubmitBtn.setOnClickListener { userEditViewModel.onClickSubmitBtn() }
+			textClearBtn.setOnClickListener { userEditViewModel.onClickClearNickNameBtn() }
+			backBtn.setOnClickListener { userEditViewModel.onClickBackBtn() }
+		}
 	}
 
 	private val maxLengthFilter = InputFilter.LengthFilter(MAX_NICKNAME_LENGTH)
@@ -172,12 +178,8 @@ class UserEditActivity : AppCompatActivity() {
 		}, KEYBOARD_DELAY_TIME)
 	}
 
-	private fun closeKeyboard(windowToken: IBinder) {
-		imm.hideSoftInputFromWindow(windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
-	}
-
 	private fun startUserProfileEdit() {
-		closeKeyboard(binding.nickNameEt.windowToken)
+		closeKeyboard()
 		permissionsLauncher.launch(galleryPermissions)
 	}
 
@@ -214,13 +216,17 @@ class UserEditActivity : AppCompatActivity() {
 		deleteImageCache(uri)
 	}
 
+	private fun closeKeyboard() {
+		imm.hideSoftInputFromWindow(binding.nickNameEt.windowToken, 0)
+	}
+
 	private fun handleUiEvent(event: UserEditUiEvent) {
 		when (event) {
 			UserEditUiEvent.MoveToBack -> finish()
 			UserEditUiEvent.MoveToGallery -> startUserProfileEdit()
-			is UserEditUiEvent.ErrorEvent -> binding.root.showSnackBar(event.stringId)
-			is UserEditUiEvent.UnknownErrorEvent -> binding.root.showSnackBar(event.message)
 			UserEditUiEvent.ShowProfileEditDialog -> showProfileEditDialog()
+			UserEditUiEvent.CloseKeyboard -> closeKeyboard()
+			is UserEditUiEvent.ShowSnackBar -> binding.root.showSnackBar(event.stringId)
 		}
 	}
 

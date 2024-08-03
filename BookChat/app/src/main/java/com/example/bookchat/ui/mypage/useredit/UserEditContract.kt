@@ -48,9 +48,9 @@ data class UserEditUiState(
 }
 
 sealed class UserEditUiEvent {
-	object MoveToGallery : UserEditUiEvent()
-	object MoveToBack : UserEditUiEvent()
-	object ShowProfileEditDialog : UserEditUiEvent()
-	data class ErrorEvent(val stringId: Int) : UserEditUiEvent()
-	data class UnknownErrorEvent(val message: String) : UserEditUiEvent()
+	data object MoveToGallery : UserEditUiEvent()
+	data object MoveToBack : UserEditUiEvent()
+	data object ShowProfileEditDialog : UserEditUiEvent()
+	data object CloseKeyboard : UserEditUiEvent()
+	data class ShowSnackBar(val stringId: Int) : UserEditUiEvent()
 }
