@@ -6,7 +6,8 @@
     <string name="error_kakao_login">Kakao 로그인을 실패했습니다.</string>
     <string name="error_google_login">Google 로그인을 실패했습니다.</string>
     <string name="error_socket_connect">서버와의 연결을 실패했습니다. 잠시 후 다시 시도해주세요.</string>
-    <string name="error_else">데이터 가져오기를 실패했습니다. 잠시 후 다시 시도해주세요.\n계속해서 문제가 발생하는 경우 문의를 부탁드립니다.</string>
+    <string name="error_else">데이터 가져오기를 실패했습니다. 잠시 후 다시 시도해주세요.</string>
+    <string name="error_else_2_line">데이터 가져오기를 실패했습니다.\n잠시 후 다시 시도해주세요.</string>
 
     <!--permission-->
     <string name="gallery_permission_denied">[사진 및 동영상]\n권한을 허용해주세요.</string>
@@ -52,14 +53,16 @@
     <string name="religion">종교</string>
     <string name="character">인물</string>
 
-    <!--main-->
+    <!--home-->
     <string name="main_hello">안녕하세요</string>
+    <string name="user_nickname">%s 님</string>
     <string name="main_book">독서 중인 도서</string>
     <string name="main_chat">참여 중인 채팅방</string>
     <string name="book_is_empty">도서가 없어요!</string>
     <string name="book_is_empty_sub_text">새로운 도서를 추가하고\n북챗을 사용해 보세요.</string>
     <string name="chat_room_is_empty">채팅방이 없어요!</string>
     <string name="chat_room_is_empty_sub_text">새로운 채팅방을 추가하고\n북챗을 나눠보세요.</string>
+    <string name="channel_member_count">%1$d명</string>
 
     <!--bookshelf-->
     <string name="bookshelf">서재</string>
