@@ -5,12 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.domain.model.BookShelfState
+import com.example.bookchat.domain.model.SearchFilter
+import com.example.bookchat.domain.model.SearchPurpose
+import com.example.bookchat.domain.model.StarRating
 import com.example.bookchat.domain.model.toStarRating
 import com.example.bookchat.domain.repository.BookSearchRepository
 import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_SEARCHED_BOOK_ITEM_ID
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState.AlreadyInBookShelf
+import com.example.bookchat.ui.search.model.SearchTarget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +28,7 @@ import javax.inject.Inject
 class SearchBookDialogViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val bookShelfRepository: BookShelfRepository,
-	private val bookSearchRepository: BookSearchRepository
+	private val bookSearchRepository: BookSearchRepository,
 ) : ViewModel() {
 	private val bookIsbn = savedStateHandle.get<String>(EXTRA_SEARCHED_BOOK_ITEM_ID)!!
 
@@ -41,80 +45,54 @@ class SearchBookDialogViewModel @Inject constructor(
 
 	private fun initUiState() {
 		updateState {
-			copy(
-				uiState = SearchDialogState.Default,
-				book = bookSearchRepository.getCachedBook(bookIsbn)
-			)
+			copy(book = bookSearchRepository.getCachedBook(bookIsbn))
 		}
 	}
 
 	private fun checkAlreadyInBookShelf() = viewModelScope.launch {
-		runCatching {
-			bookShelfRepository.checkAlreadyInBookShelf(
-				bookSearchRepository.getCachedBook(bookIsbn)
-			)
-		}.onSuccess {
-			updateState { copy(uiState = AlreadyInBookShelf(it.bookShelfState)) }
-		}
+		runCatching { bookShelfRepository.checkAlreadyInBookShelf(uiState.value.book) }
+			.onSuccess {
+				if (it == null) updateState { copy(uiState = SearchDialogState.Default) }
+				else updateState { copy(uiState = AlreadyInBookShelf(it.bookShelfState)) }
+			}
+			.onFailure { startEvent(SearchTapDialogEvent.ShowSnackBar(R.string.error_else)) }
 	}
 
-	private fun registerWishBook() = viewModelScope.launch {
+	private fun registerBookshelf(
+		bookShelfState: BookShelfState,
+		starRating: StarRating? = null,
+	) = viewModelScope.launch {
+		if (uiState.value.uiState is SearchDialogState.Loading) return@launch
+		updateState { copy(uiState = SearchDialogState.Loading) }
+
 		runCatching {
 			bookShelfRepository.registerBookShelfBook(
 				book = uiState.value.book,
-				bookShelfState = BookShelfState.WISH
+				bookShelfState = bookShelfState,
+				starRating = starRating
 			)
 		}
 			.onSuccess {
-				startEvent(SearchTapDialogEvent.MakeToast(R.string.wish_bookshelf_register_success))
-				updateState { copy(uiState = AlreadyInBookShelf(BookShelfState.WISH)) }
+				startEvent(SearchTapDialogEvent.ShowSnackBar(R.string.bookshelf_register_success))
+				updateState { copy(uiState = AlreadyInBookShelf(bookShelfState)) }
 			}
-			.onFailure { startEvent(SearchTapDialogEvent.MakeToast(R.string.wish_bookshelf_register_fail)) }
+			.onFailure {
+				startEvent(SearchTapDialogEvent.ShowSnackBar(R.string.bookshelf_register_fail))
+				updateState { copy(uiState = SearchDialogState.Default) }
+			}
 	}
 
-	private fun registerReadingBook() = viewModelScope.launch {
-		runCatching {
-			bookShelfRepository.registerBookShelfBook(
-				book = uiState.value.book,
-				bookShelfState = BookShelfState.READING
-			)
-		}
-			.onSuccess {
-				startEvent(SearchTapDialogEvent.MakeToast(R.string.reading_bookshelf_register_success))
-				updateState { copy(uiState = AlreadyInBookShelf(BookShelfState.READING)) }
-			}
-			.onFailure { startEvent(SearchTapDialogEvent.MakeToast(R.string.reading_bookshelf_register_fail)) }
-	}
-
-	private fun registerCompleteBook() = viewModelScope.launch {
-		runCatching {
-			bookShelfRepository.registerBookShelfBook(
-				book = uiState.value.book,
-				bookShelfState = BookShelfState.COMPLETE,
-				starRating = uiState.value.starRating.toStarRating()
-			)
-		}
-			.onSuccess {
-				startEvent(SearchTapDialogEvent.MakeToast(R.string.complete_bookshelf_register_success))
-				updateState { copy(uiState = AlreadyInBookShelf(BookShelfState.COMPLETE)) }
-			}
-			.onFailure { startEvent(SearchTapDialogEvent.MakeToast(R.string.complete_bookshelf_register_fail)) }
-	}
-
-	private fun isAlreadyInWishBookShelf(state: SearchDialogState) =
-		state is AlreadyInBookShelf && (state.bookShelfState == BookShelfState.WISH)
-
-	fun onStarRatingChange(rating: Float) {
+	fun onChangeStarRating(rating: Float) {
 		updateState { copy(starRating = rating) }
 	}
 
 	fun onClickWishToggleBtn() {
-		if (isAlreadyInWishBookShelf(uiState.value.uiState)) return
-		registerWishBook()
+		if (uiState.value.uiState is AlreadyInBookShelf) return
+		registerBookshelf(BookShelfState.WISH)
 	}
 
 	fun onClickReadingBtn() {
-		registerReadingBook()
+		registerBookshelf(BookShelfState.READING)
 	}
 
 	fun onClickCompleteBtn() {
@@ -123,10 +101,24 @@ class SearchBookDialogViewModel @Inject constructor(
 
 	fun onClickCompleteOkBtn() {
 		if (uiState.value.starRating == 0F) {
-			startEvent(SearchTapDialogEvent.MakeToast(R.string.complete_bookshelf_star_set_empty))
+			startEvent(SearchTapDialogEvent.ShowSnackBar(R.string.complete_bookshelf_star_set_empty))
 			return
 		}
-		registerCompleteBook()
+		registerBookshelf(
+			bookShelfState = BookShelfState.COMPLETE,
+			starRating = uiState.value.starRating.toStarRating()
+		)
+	}
+
+	fun onClickChatBtn() {
+		startEvent(
+			SearchTapDialogEvent.MoveToChannelSearchWithSelectedBook(
+				searchKeyword = uiState.value.book.title,
+				searchTarget = SearchTarget.CHANNEL,
+				searchPurpose = SearchPurpose.SEARCH_CHANNEL,
+				searchFilter = SearchFilter.BOOK_ISBN
+			)
+		)
 	}
 
 	private inline fun updateState(block: SearchDialogUiState.() -> SearchDialogUiState) {

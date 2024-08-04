@@ -18,13 +18,14 @@ import com.example.bookchat.utils.BookImgSizeManager
 import javax.inject.Inject
 
 class SearchItemAdapter @Inject constructor(
-	private val bookImgSizeManager: BookImgSizeManager
+	private val bookImgSizeManager: BookImgSizeManager,
 ) : ListAdapter<SearchResultItem, SearchItemViewHolder>(SEARCH_ITEM_COMPARATOR) {
 
 	var onBookHeaderBtnClick: (() -> Unit)? = null
 	var onBookItemClick: ((Int) -> Unit)? = null
 	var onChannelHeaderBtnClick: (() -> Unit)? = null
 	var onChannelItemClick: ((Int) -> Unit)? = null
+	var onClickMakeChannelBtn: (() -> Unit)? = null
 
 	override fun getItemViewType(position: Int): Int {
 		return when (getItem(position)) {
@@ -85,7 +86,7 @@ class SearchItemAdapter @Inject constructor(
 					LayoutInflater.from(parent.context), R.layout.item_search_channel_empty,
 					parent, false
 				)
-				return ChannelEmptyViewHolder(binding)
+				return ChannelEmptyViewHolder(binding, onClickMakeChannelBtn)
 			}
 
 			R.layout.item_search_channel_data -> {

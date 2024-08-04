@@ -1,10 +1,7 @@
 package com.example.bookchat.ui.login
 
-import com.example.bookchat.domain.model.IdToken
-
 data class LoginUiState(
 	val uiState: UiState,
-	val idToken: IdToken?,
 ) {
 
 	enum class UiState {
@@ -16,7 +13,6 @@ data class LoginUiState(
 	companion object {
 		val DEFAULT = LoginUiState(
 			uiState = UiState.SUCCESS,
-			idToken = null
 		)
 	}
 }

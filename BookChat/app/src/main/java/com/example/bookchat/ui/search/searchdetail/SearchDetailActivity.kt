@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
@@ -19,7 +18,7 @@ import com.example.bookchat.ui.search.channelInfo.ChannelInfoActivity
 import com.example.bookchat.ui.search.dialog.SearchBookDialog
 import com.example.bookchat.ui.search.model.SearchResultItem
 import com.example.bookchat.ui.search.model.SearchTarget
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -27,8 +26,6 @@ import com.google.android.flexbox.JustifyContent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-//TODO : Empty UI 연결 필요
 
 @AndroidEntryPoint
 class SearchDetailActivity : AppCompatActivity() {
@@ -41,12 +38,11 @@ class SearchDetailActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding =
-			DataBindingUtil.setContentView(this, R.layout.activity_search_tap_result_detail)
-		binding.lifecycleOwner = this
-		binding.viewmodel = searchDetailViewModel
+		binding = ActivitySearchTapResultDetailBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		initAdapter()
 		initRecyclerView()
+		initViewState()
 		initHeaderTitle()
 		observeUiState()
 		observeUiEvent()
@@ -55,11 +51,23 @@ class SearchDetailActivity : AppCompatActivity() {
 	private fun observeUiState() = lifecycleScope.launch {
 		searchDetailViewModel.uiState.collect { state ->
 			searchItemAdapter.submitList(state.searchItems)
+			setViewState(state)
 		}
 	}
 
 	private fun observeUiEvent() = lifecycleScope.launch {
 		searchDetailViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun initViewState() {
+		binding.backBtn.setOnClickListener { searchDetailViewModel.onClickBackBtn() }
+	}
+
+	private fun setViewState(state: SearchDetailUiState) {
+		binding.searchResultRcv.visibility =
+			if (state.searchItems.isNotEmpty()) RecyclerView.VISIBLE else RecyclerView.GONE
+		binding.resultEmptyLayout.root.visibility =
+			if (state.searchItems.isEmpty()) RecyclerView.VISIBLE else RecyclerView.GONE
 	}
 
 	private fun initAdapter() {
@@ -113,6 +121,9 @@ class SearchDetailActivity : AppCompatActivity() {
 	}
 
 	private fun moveToSearchTapBookDialog(book: Book) {
+		val existingFragment =
+			supportFragmentManager.findFragmentByTag(SearchFragment.DIALOG_TAG_SEARCH_BOOK)
+		if (existingFragment != null) return
 		val dialog = SearchBookDialog()
 		dialog.arguments = bundleOf(SearchFragment.EXTRA_SEARCHED_BOOK_ITEM_ID to book.isbn)
 		dialog.show(supportFragmentManager, SearchFragment.DIALOG_TAG_SEARCH_BOOK)
@@ -140,7 +151,7 @@ class SearchDetailActivity : AppCompatActivity() {
 
 			is SearchDetailEvent.MoveToSearchBookDialog -> moveToSearchTapBookDialog(event.book)
 			SearchDetailEvent.MoveToBack -> finish()
-			is SearchDetailEvent.MakeToast -> makeToast(event.stringId)
+			is SearchDetailEvent.ShowSnackBar -> binding.root.showSnackBar(textId = event.stringId)
 		}
 	}
 

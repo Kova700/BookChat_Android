@@ -32,12 +32,12 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 	private val channels = mapChannels.map { it.values.toList() }.filterNotNull()
 
 	private var cachedSearchKeyword = ""
-	private var cachedSearchFilter = SearchFilter.BOOK_TITLE
+	private var cachedSearchFilter = BOOK_TITLE
 	private var currentPage: Long? = null
 	private var isEndPage = false
 
 	override fun getChannelsFLow(initFlag: Boolean): Flow<List<ChannelSearchResult>> {
-		if (initFlag) clearCachedData()
+		if (initFlag) clear()
 		return channels
 	}
 
@@ -48,7 +48,7 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 	): List<ChannelSearchResult> {
 		if (cachedSearchKeyword != keyword
 			|| cachedSearchFilter != searchFilter
-		) clearCachedData()
+		) clear()
 		if (isEndPage) return channels.firstOrNull() ?: emptyList()
 
 		val requestGetSearchedChannels = getRequestGetSearchedChannels(
@@ -97,8 +97,9 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 		return mapChannels.value[channelId]!!
 	}
 
-	private fun clearCachedData() {
+	override fun clear() {
 		mapChannels.update { emptyMap() }
+		cachedSearchFilter = BOOK_TITLE
 		cachedSearchKeyword = ""
 		currentPage = null
 		isEndPage = false

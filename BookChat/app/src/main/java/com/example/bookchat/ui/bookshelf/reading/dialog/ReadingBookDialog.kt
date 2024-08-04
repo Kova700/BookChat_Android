@@ -7,19 +7,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogReadingBookTapClickedBinding
 import com.example.bookchat.domain.model.BookShelfState
-import com.example.bookchat.ui.agony.AgonyActivity
+import com.example.bookchat.ui.agony.agony.AgonyActivity
+import com.example.bookchat.ui.agony.agony.AgonyViewModel
 import com.example.bookchat.ui.bookshelf.reading.ReadingBookShelfViewModel
+import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialogUiState.UiState
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager
 import com.example.bookchat.utils.image.loadUrl
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -45,11 +46,8 @@ class ReadingBookDialog : DialogFragment() {
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
-	): View? {
-		_binding =
-			DataBindingUtil.inflate(inflater, R.layout.dialog_reading_book_tap_clicked, container, false)
-		binding.lifecycleOwner = viewLifecycleOwner
-		binding.viewmodel = readingBookDialogViewModel
+	): View {
+		_binding = DialogReadingBookTapClickedBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -77,37 +75,55 @@ class ReadingBookDialog : DialogFragment() {
 	}
 
 	private fun initViewState() {
-		binding.readingBookRatingBar.setOnRatingChangeListener { ratingBar, rating, fromUser ->
-			readingBookDialogViewModel.onChangeStarRating(rating)
-		}
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
 		dialogSizeManager.setDialogSize(binding.readingDialogLayout)
+		with(binding) {
+			readingBookRatingBar.setOnRatingChangeListener { ratingBar, rating, fromUser ->
+				readingBookDialogViewModel.onChangeStarRating(rating)
+			}
+			changeStatusToCompleteBtn.setOnClickListener { readingBookDialogViewModel.onChangeToCompleteClick() }
+			moveToAgonyBtn.setOnClickListener { readingBookDialogViewModel.onClickMoveToAgony() }
+		}
 	}
 
 	private fun setViewState(state: ReadingBookDialogUiState) {
+		setViewVisibility(state)
 		if (binding.readingBookRatingBar.rating != state.starRating) {
 			binding.readingBookRatingBar.rating = state.starRating
 		}
 
-		with(binding.changeStatusToReadingBtn) {
+		with(binding.changeStatusToCompleteBtn) {
 			if (state.haveStar) {
-				setBackgroundColor(Color.parseColor("#5648FF"))
+				setBackgroundColor(requireActivity().getColor(R.color.bookchat_blue))
 				isEnabled = true
 				return
 			}
-			setBackgroundColor(Color.parseColor("#D9D9D9"))
+			setBackgroundColor(requireActivity().getColor(R.color.bookchat_white_gray))
 			isEnabled = false
 		}
+		with(binding) {
+			bookImg.loadUrl(state.readingItem.book.bookCoverImageUrl)
+			bookTitleTv.isSelected = true
+			bookTitleTv.text = state.readingItem.book.title
+			bookAuthorsTv.isSelected = true
+			bookAuthorsTv.text = state.readingItem.book.authorsString
+			bookPublishAtTv.isSelected = true
+			bookPublishAtTv.text = state.readingItem.book.publishAt
+		}
+	}
 
-		binding.bookImg.loadUrl(state.readingItem.book.bookCoverImageUrl)
-		binding.selectedBookTitleTv.isSelected = true
-		binding.selectedBookAuthorsTv.isSelected = true
-		binding.selectedBookPublishAtTv.isSelected = true
+	private fun setViewVisibility(uiState: ReadingBookDialogUiState) {
+		with(binding) {
+			progressBar.visibility =
+				if (uiState.uiState == UiState.LOADING) View.VISIBLE else View.INVISIBLE
+			notLoadingStateGroup.visibility =
+				if (uiState.uiState != UiState.LOADING) View.VISIBLE else View.INVISIBLE
+		}
 	}
 
 	private fun moveToAgony(bookShelfListItemId: Long) {
 		val intent = Intent(requireContext(), AgonyActivity::class.java)
-			.putExtra(EXTRA_AGONY_BOOKSHELF_ITEM_ID, bookShelfListItemId)
+			.putExtra(AgonyViewModel.EXTRA_AGONY_BOOKSHELF_ITEM_ID, bookShelfListItemId)
 		startActivity(intent)
 	}
 
@@ -119,11 +135,13 @@ class ReadingBookDialog : DialogFragment() {
 	private fun handleEvent(event: ReadingBookDialogEvent) = when (event) {
 		is ReadingBookDialogEvent.MoveToAgony -> moveToAgony(event.bookShelfListItemId)
 		is ReadingBookDialogEvent.ChangeBookShelfTab -> moveToOtherTab(event.targetState)
-		is ReadingBookDialogEvent.MakeToast -> makeToast(event.stringId)
+		is ReadingBookDialogEvent.ShowSnackBar -> binding.root.showSnackBar(
+			textId = event.stringId,
+			anchor = binding.moveToAgonyBtn
+		)
 	}
 
 	companion object {
-		const val EXTRA_AGONY_BOOKSHELF_ITEM_ID = "EXTRA_AGONIZE_BOOK"
 		const val EXTRA_READING_BOOKSHELF_ITEM_ID = "EXTRA_READING_BOOKSHELF_ITEM_ID"
 	}
 }

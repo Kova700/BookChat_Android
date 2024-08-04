@@ -71,7 +71,7 @@ fun ImageView.loadResId(
 
 fun ImageView.loadUserProfile(
 	imageUrl: String?,
-	userDefaultProfileType: UserDefaultProfileType?,
+	userDefaultProfileType: UserDefaultProfileType? = null,
 ) {
 	if (imageUrl.isNullOrBlank().not()) {
 		loadUrl(imageUrl)
@@ -83,10 +83,10 @@ fun ImageView.loadUserProfile(
 fun ImageView.loadChangedUserProfile(
 	imageUrl: String?,
 	userDefaultProfileType: UserDefaultProfileType?,
-	byteArray: ByteArray?,
+	bitmap: Bitmap?,
 ) {
-	if (byteArray != null) {
-		loadByteArray(byteArray)
+	if (bitmap != null) {
+		loadBitmap(bitmap)
 		return
 	}
 	loadUserProfile(imageUrl, userDefaultProfileType)
@@ -106,10 +106,10 @@ fun ImageView.loadChannelProfile(
 fun ImageView.loadChangedChannelProfile(
 	imageUrl: String?,
 	channelDefaultImageType: ChannelDefaultImageType,
-	byteArray: ByteArray?,
+	bitmap: Bitmap?,
 ) {
-	if (byteArray != null) {
-		loadByteArray(byteArray)
+	if (bitmap != null) {
+		loadBitmap(bitmap)
 		return
 	}
 	loadChannelProfile(imageUrl, channelDefaultImageType)

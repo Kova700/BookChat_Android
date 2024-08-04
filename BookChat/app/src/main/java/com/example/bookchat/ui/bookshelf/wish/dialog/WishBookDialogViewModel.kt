@@ -4,11 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
+import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.repository.BookShelfRepository
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfItem
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.bookshelf.wish.dialog.WishBookDialog.Companion.EXTRA_WISH_BOOKSHELF_ITEM_ID
 import com.example.bookchat.ui.bookshelf.wish.dialog.WishBookDialogUiState.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +18,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//TODO : 하트 풀었다 다시 누르고 상태이동, 하트 누르면면 실패함 체크 필요 (ID가 변경되어서 그럼) (2번정도하면 발생함)
+//TODO : 하트 지워진 채로 고민기록 이동 누르면 터짐
+//TODO : 걍 하트 비우면 바로 다이얼로그 끌까
 @HiltViewModel
 class WishBookDialogViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
@@ -34,23 +35,46 @@ class WishBookDialogViewModel @Inject constructor(
 	val uiState = _uiState.asStateFlow()
 
 	init {
-		getItem()
+		initUiState()
 	}
 
-	private fun getItem() {
-		val item =
-			bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)?.toBookShelfListItem()
-		item?.let { updateState { copy(wishItem = item) } }
+	private fun initUiState() {
+		val item = bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)
+		updateState { copy(wishItem = item) }
 	}
 
 	fun onHeartToggleClick() {
-		if (uiState.value.isToggleChecked) {
-			onItemDeleteClick()
-			updateState { copy(isToggleChecked = false) }
-			return
+		deleteWishBookShelfItem(uiState.value.wishItem)
+	}
+
+	private fun deleteWishBookShelfItem(bookShelfItem: BookShelfItem) {
+		if (uiState.value.uiState == UiState.LOADING) return
+		updateState { copy(uiState = UiState.LOADING) }
+		viewModelScope.launch {
+			runCatching { bookShelfRepository.deleteBookShelfBook(bookShelfItem.bookShelfId) }
+				.onSuccess { startEvent(WishBookDialogEvent.MoveToBack) }
+				.onFailure { startEvent(WishBookDialogEvent.ShowSnackBar(R.string.bookshelf_delete_fail)) }
+				.also { updateState { copy(uiState = UiState.SUCCESS) } }
 		}
-		onItemAddClick()
-		updateState { copy(isToggleChecked = true) }
+	}
+
+	private fun changeBookShelfItemStatus(
+		bookShelfItem: BookShelfItem,
+		newState: BookShelfState,
+	) {
+		if (uiState.value.uiState == UiState.LOADING) return
+		updateState { copy(uiState = UiState.LOADING) }
+		viewModelScope.launch {
+			runCatching {
+				bookShelfRepository.changeBookShelfBookStatus(
+					bookShelfItemId = bookShelfItem.bookShelfId,
+					newBookShelfItem = bookShelfItem.copy(state = newState),
+				)
+			}
+				.onSuccess { startEvent(WishBookDialogEvent.ChangeBookShelfTab(targetState = newState)) }
+				.onFailure { startEvent(WishBookDialogEvent.ShowSnackBar(R.string.bookshelf_state_change_fail)) }
+				.also { updateState { copy(uiState = UiState.SUCCESS) } }
+		}
 	}
 
 	fun onChangeToReadingClick() {
@@ -61,76 +85,16 @@ class WishBookDialogViewModel @Inject constructor(
 		onChangeStateClick(BookShelfState.COMPLETE)
 	}
 
-	private fun onItemDeleteClick() {
-		if (uiState.value.uiState == UiState.LOADING) return
-		deleteWishBookShelfItem(uiState.value.wishItem)
-	}
-
-	private fun onItemAddClick() {
-		if (uiState.value.uiState == UiState.LOADING) return
-		addWishBookShelfItem(uiState.value.wishItem)
+	fun onMoveToAgonyClick() {
+		startEvent(WishBookDialogEvent.MoveToAgony(bookShelfListItemId))
 	}
 
 	private fun onChangeStateClick(newState: BookShelfState) {
-		if (uiState.value.uiState == UiState.LOADING) return
 		changeBookShelfItemStatus(uiState.value.wishItem, newState)
 	}
 
-	private fun addWishBookShelfItem(bookShelfListItem: BookShelfListItem) {
-		updateState { copy(uiState = UiState.LOADING) }
-		viewModelScope.launch {
-			runCatching {
-				bookShelfRepository.registerBookShelfBook(
-					book = bookShelfListItem.book,
-					bookShelfState = BookShelfState.WISH,
-				)
-			}
-				.onFailure { startEvent(WishBookDialogEvent.MakeToast(R.string.wish_bookshelf_register_fail)) }
-				.also { updateState { copy(uiState = UiState.SUCCESS) } }
-		}
-	}
-
-	private fun deleteWishBookShelfItem(bookShelfListItem: BookShelfListItem) {
-		updateState { copy(uiState = UiState.LOADING) }
-		viewModelScope.launch {
-			runCatching {
-				bookShelfRepository.deleteBookShelfBook(
-					bookShelfListItem.bookShelfId,
-					BookShelfState.WISH
-				)
-			}
-				.onFailure { startEvent(WishBookDialogEvent.MakeToast(R.string.bookshelf_delete_fail)) }
-				.also { updateState { copy(uiState = UiState.SUCCESS) } }
-		}
-	}
-
-	private fun changeBookShelfItemStatus(
-		bookShelfItem: BookShelfListItem,
-		newState: BookShelfState
-	) {
-		updateState { copy(uiState = UiState.LOADING) }
-		viewModelScope.launch {
-			runCatching {
-				bookShelfRepository.changeBookShelfBookStatus(
-					bookShelfItemId = bookShelfItem.bookShelfId,
-					newBookShelfItem = bookShelfItem.copy(state = newState).toBookShelfItem(),
-				)
-			}.onSuccess {
-				startEvent(
-					WishBookDialogEvent.ChangeBookShelfTab(
-						targetState = newState
-					)
-				)
-			}
-				.onFailure { startEvent(WishBookDialogEvent.MakeToast(R.string.bookshelf_state_change_fail)) }
-				.also { updateState { copy(uiState = UiState.SUCCESS) } }
-		}
-	}
-
 	private inline fun updateState(block: WishBookDialogUiState.() -> WishBookDialogUiState) {
-		_uiState.update {
-			_uiState.value.block()
-		}
+		_uiState.update { _uiState.value.block() }
 	}
 
 	private fun startEvent(event: WishBookDialogEvent) = viewModelScope.launch {

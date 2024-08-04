@@ -2,27 +2,30 @@ package com.example.bookchat.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bookchat.R
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.repository.BookShelfRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import com.example.bookchat.ui.home.HomeUiState.UiState
+import com.example.bookchat.ui.home.mapper.groupItems
+import com.example.bookchat.utils.BookImgSizeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO : 도서, 채팅 Room에서 가져오는 로직으로 수정
 @HiltViewModel
 class HomeViewModel @Inject constructor(
 	private val bookShelfRepository: BookShelfRepository,
 	private val clientRepository: ClientRepository,
 	private val channelRepository: ChannelRepository,
+	private val bookImgSizeManager: BookImgSizeManager,
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<HomeUiEvent>()
@@ -32,67 +35,79 @@ class HomeViewModel @Inject constructor(
 	val uiState = _uiState.asStateFlow()
 
 	init {
-		observeClientFlow()
-		getReadingBookShelfItems()
-		observeChannels()
+		observeClient()
+		observeItems()
+		getReadingBooks()
 		getChannels()
-		observeReadingBookShelfItems()
 	}
 
-	private fun observeClientFlow() = viewModelScope.launch {
+	private fun observeClient() = viewModelScope.launch {
 		clientRepository.getClientFlow().collect { updateState { copy(client = it) } }
 	}
 
-	private fun observeReadingBookShelfItems() = viewModelScope.launch {
-		bookShelfRepository.getBookShelfFlow(BookShelfState.READING).collect { bookShelfItems ->
-			updateState { copy(readingBookShelfBooks = bookShelfItems.take(3).toBookShelfListItem()) }
-		}
+	private fun observeItems() = viewModelScope.launch {
+		combine(
+			bookShelfRepository.getBookShelfFlow(BookShelfState.READING),
+			channelRepository.getChannelsFlow(),
+			_uiState
+		) { bookshelfItems, channels, uiState ->
+			groupItems(
+				bookshelfItems = bookshelfItems,
+				channels = channels,
+				bookImgSizeManager = bookImgSizeManager,
+				bookUiState = uiState.bookUiState,
+				channelUiState = uiState.channelUiState
+			)
+		}.collect { updateState { copy(items = it) } }
 	}
 
-	private fun getReadingBookShelfItems() = viewModelScope.launch {
-		updateState { copy(bookUiState = UiState.LOADING) }
+	private fun getReadingBooks() = viewModelScope.launch {
 		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.READING) }
-			.onSuccess {
-				updateState { copy(bookUiState = UiState.SUCCESS) }
-			}
+			.onSuccess { updateState { copy(bookUiState = UiState.SUCCESS) } }
 			.onFailure {
-				handleError(it)
+				startEvent(HomeUiEvent.ShowSnackBar(R.string.error_else))
 				updateState { copy(bookUiState = UiState.ERROR) }
 			}
 	}
 
-	private fun observeChannels() = viewModelScope.launch {
-		channelRepository.getChannelsFlow().collect { channels ->
-			updateState { copy(channels = channels.take(3)) }
-		}
-	}
-
 	private fun getChannels() = viewModelScope.launch {
-		updateState { copy(channelUiState = UiState.LOADING) }
 		runCatching { channelRepository.getChannels() }
 			.onSuccess { updateState { copy(channelUiState = UiState.SUCCESS) } }
 			.onFailure {
-				handleError(it)
+				startEvent(HomeUiEvent.ShowSnackBar(R.string.error_else))
+				updateState { copy(channelUiState = UiState.ERROR) }
 			}
 	}
 
-	fun onBookItemClick(bookShelfListItemId: Long) {
-		startEvent(HomeUiEvent.MoveToReadingBookShelf(bookShelfListItemId))
+	fun onBookItemClick() {
+		startEvent(HomeUiEvent.MoveToReadingBookShelf)
 	}
 
 	fun onChannelItemClick(channelId: Long) {
 		startEvent(HomeUiEvent.MoveToChannel(channelId))
 	}
 
-	fun startEvent(event: HomeUiEvent) = viewModelScope.launch {
-		_eventFlow.emit(event)
+	fun onClickMoveToSearch() {
+		startEvent(HomeUiEvent.MoveToSearch)
 	}
 
-	private fun handleError(throwable: Throwable) {
-		updateState { copy(channelUiState = UiState.ERROR) }
+	fun onClickMakeChannel() {
+		startEvent(HomeUiEvent.MoveToMakeChannel)
+	}
+
+	fun onClickRetryBookLoadBtn() {
+		getReadingBooks()
+	}
+
+	fun onClickRetryChannelLoadBtn() {
+		getChannels()
 	}
 
 	private inline fun updateState(block: HomeUiState.() -> HomeUiState) {
 		_uiState.update { _uiState.value.block() }
+	}
+
+	fun startEvent(event: HomeUiEvent) = viewModelScope.launch {
+		_eventFlow.emit(event)
 	}
 }

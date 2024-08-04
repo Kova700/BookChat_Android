@@ -1,14 +1,13 @@
 package com.example.bookchat.ui.mypage.useredit
 
-import android.util.Log
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
-import com.example.bookchat.data.network.model.response.ForbiddenException
-import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
 import com.example.bookchat.domain.model.NicknameCheckState
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.ui.mypage.useredit.UserEditUiState.UiState
+import com.example.bookchat.utils.image.bitmap.compressToByteArray
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +16,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-//TODO : 유저 프로필 기본 프로필로 변경하는 DIalog와 같은 UI가 필요함
 
 @HiltViewModel
 class UserEditViewModel @Inject constructor(
@@ -43,73 +40,92 @@ class UserEditViewModel @Inject constructor(
 		}
 	}
 
-	//TODO : 사용할 수 없는 이름이거나 중복된 경우 UI노출이 나와야하는데 나오지 않고 있음
-	private fun checkNicknameDuplication(nickName: String) = viewModelScope.launch {
-		runCatching { clientRepository.isDuplicatedUserNickName(nickName) }
-			.onSuccess { isDuplicated ->
-				updateState {
-					copy(
-						nicknameCheckState =
-						if (isDuplicated) NicknameCheckState.IsDuplicate else NicknameCheckState.IsPerfect,
-					)
-				}
-			}
-			.onFailure { handleError(it) }
-	}
-
-	fun onClickSubmitBtn() {
-		if (uiState.value.uiState == UserEditUiState.UiState.LOADING
-			|| uiState.value.nicknameCheckState == NicknameCheckState.IsShort
-			|| uiState.value.newNickname.length < 2
-		) return
-
+	private fun verifyNickname() {
 		val nickName = uiState.value.newNickname
 		val userProfile = uiState.value.clientNewImage
 
-		if (uiState.value.isNeedDuplicatesNicknameCheck) {
-			checkNicknameDuplication(nickName)
-			return
+		when {
+			uiState.value.isNeedDuplicatesNicknameCheck -> checkNicknameDuplication(nickName)
+			else -> changeClientProfile(nickName, userProfile)
 		}
+	}
 
-		changeClientProfile(nickName, userProfile)
+	private fun checkNicknameDuplication(nickName: String) {
+		if (uiState.value.uiState == UiState.LOADING) return
+		updateState { copy(uiState = UiState.LOADING) }
+
+		viewModelScope.launch {
+			runCatching { clientRepository.isDuplicatedUserNickName(nickName) }
+				.onSuccess { isDuplicated ->
+					updateState {
+						copy(
+							uiState = UiState.SUCCESS,
+							nicknameCheckState =
+							if (isDuplicated) NicknameCheckState.IsDuplicate else NicknameCheckState.IsPerfect,
+						)
+					}
+				}
+				.onFailure {
+					updateState { copy(uiState = UiState.ERROR) }
+					startEvent(UserEditUiEvent.ShowSnackBar(R.string.error_else))
+					handleError(it)
+				}
+		}
+	}
+
+	fun onClickSubmitBtn() {
+		if (uiState.value.uiState == UiState.LOADING
+			|| uiState.value.nicknameCheckState == NicknameCheckState.IsShort
+			|| uiState.value.newNickname.length < 2
+		) return
+		startEvent(UserEditUiEvent.CloseKeyboard)
+		verifyNickname()
 	}
 
 	//TODO : userProfile = null로 보내면 null로 설정이 안됨 (서버 수정 대기중)
 	private fun changeClientProfile(
 		newNickName: String,
-		userProfile: ByteArray?,
-	) = viewModelScope.launch {
-		updateState { copy(uiState = UserEditUiState.UiState.LOADING) }
+		userProfile: Bitmap?,
+	) {
+		if (uiState.value.uiState == UiState.LOADING) return
+		updateState { copy(uiState = UiState.LOADING) }
 
-		runCatching {
-			clientRepository.changeClientProfile(
-				newNickname = newNickName,
-				userProfile = userProfile
-			)
-		}
-			.onSuccess { newClient ->
-				updateState {
-					copy(
-						client = newClient,
-						clientNewImage = null,
-						uiState = UserEditUiState.UiState.SUCCESS
-					)
+		viewModelScope.launch {
+			runCatching {
+				clientRepository.changeClientProfile(
+					newNickname = newNickName,
+					userProfile = userProfile?.compressToByteArray()
+				)
+			}
+				.onSuccess { newClient ->
+					updateState {
+						copy(
+							client = newClient,
+							clientNewImage = null,
+							uiState = UiState.SUCCESS
+						)
+					}
+					startEvent(UserEditUiEvent.MoveToBack)
 				}
-				startEvent(UserEditUiEvent.MoveToBack)
-			}
-			.onFailure {
-				handleError(it)
-				startEvent(UserEditUiEvent.ErrorEvent(R.string.my_page_profile_edit_fail))
-				updateState { copy(uiState = UserEditUiState.UiState.ERROR) }
-			}
+				.onFailure {
+					handleError(it)
+					startEvent(UserEditUiEvent.ShowSnackBar(R.string.my_page_profile_edit_fail))
+					updateState { copy(uiState = UiState.ERROR) }
+				}
+		}
 	}
 
 	fun onEnteredSpecialChar() {
 		updateState { copy(nicknameCheckState = NicknameCheckState.IsSpecialCharInText) }
 	}
 
-	fun onChangeUserProfile(profile: ByteArray) {
-		updateState { copy(clientNewImage = profile) }
+	fun onChangeUserProfile(profile: Bitmap) {
+		updateState {
+			copy(
+				clientNewImage = profile,
+				isSelectedDefaultImage = false
+			)
+		}
 	}
 
 	fun onClickBackBtn() {
@@ -121,7 +137,7 @@ class UserEditViewModel @Inject constructor(
 	}
 
 	fun onClickCameraBtn() {
-		startEvent(UserEditUiEvent.ShowUserProfileEditDialog)
+		startEvent(UserEditUiEvent.ShowProfileEditDialog)
 	}
 
 	fun onSelectGallery() {
@@ -169,16 +185,5 @@ class UserEditViewModel @Inject constructor(
 		_eventFlow.emit(event)
 	}
 
-	private fun handleError(exception: Throwable) {
-		Log.d(TAG, "UserEditViewModel: handleError() - exception :$exception")
-		when (exception) {
-			is ForbiddenException -> startEvent(UserEditUiEvent.ErrorEvent(R.string.login_forbidden_user))
-			is NetworkIsNotConnectedException -> startEvent(UserEditUiEvent.ErrorEvent(R.string.error_network_not_connected))
-			else -> {
-				val errorMessage = exception.message
-				if (errorMessage.isNullOrBlank()) startEvent(UserEditUiEvent.ErrorEvent(R.string.error_else))
-				else startEvent(UserEditUiEvent.UnknownErrorEvent(errorMessage))
-			}
-		}
-	}
+	private fun handleError(exception: Throwable) {}
 }

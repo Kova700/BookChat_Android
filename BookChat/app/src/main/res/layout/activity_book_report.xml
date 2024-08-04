@@ -190,7 +190,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:isIndicator="false"
                 android:rating="@{viewmodel.uiState.bookshelfItem.star.value}"
                 app:layout_constraintEnd_toEndOf="@+id/bookCardView_agonize"
                 app:layout_constraintStart_toStartOf="@+id/bookCardView_agonize"
@@ -198,6 +197,7 @@
                 app:srb_drawableEmpty="@drawable/ic_star_not_fill"
                 app:srb_drawableFilled="@drawable/ic_star_fill"
                 app:srb_isIndicator="true"
+                app:srb_numStars="5"
                 app:srb_starPadding="2dp"
                 app:srb_stepSize="0.5" />
 

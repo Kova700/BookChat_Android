@@ -6,6 +6,7 @@ data class SelectTasteState(
 	val uiState: UiState,
 	val readingTastes: List<ReadingTaste>,
 	val nickname: String,
+	val userProfile: ByteArray?,
 ) {
 
 	enum class UiState {
@@ -19,6 +20,7 @@ data class SelectTasteState(
 			uiState = UiState.SUCCESS,
 			readingTastes = emptyList(),
 			nickname = "",
+			userProfile = null
 		)
 	}
 }

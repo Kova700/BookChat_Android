@@ -6,10 +6,12 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
         tools:ignore="ScopedStorage" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -103,19 +105,27 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.mypage.WishActivity"
+            android:name=".ui.mypage.setting.setting.SettingActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.mypage.AppSettingActivity"
+            android:name=".ui.mypage.setting.appsetting.AppSettingActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.mypage.AccountSettingActivity"
+            android:name=".ui.mypage.setting.accountsetting.AccountSettingActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.mypage.NoticeActivity"
+            android:name=".ui.mypage.notice.NoticeActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.mypage.terms.TermsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.mypage.policy.PolicyActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -135,7 +145,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.agony.AgonyActivity"
+            android:name=".ui.agony.agony.AgonyActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -215,8 +225,7 @@
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
-            tools:node="remove">
-        </provider>
+            tools:node="remove"></provider>
 
     </application>
 

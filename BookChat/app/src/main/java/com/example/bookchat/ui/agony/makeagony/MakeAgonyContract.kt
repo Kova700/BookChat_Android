@@ -1,13 +1,13 @@
 package com.example.bookchat.ui.agony.makeagony
 
 import com.example.bookchat.domain.model.AgonyFolderHexColor
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
+import com.example.bookchat.domain.model.BookShelfItem
 
 data class MakeAgonyUiState(
 	val uiState: UiState,
-	val bookshelfItem: BookShelfListItem,
+	val bookshelfItem: BookShelfItem,
 	val selectedColor: AgonyFolderHexColor,
-	val agonyTitle: String
+	val agonyTitle: String,
 ) {
 	enum class UiState {
 		SUCCESS,
@@ -17,8 +17,8 @@ data class MakeAgonyUiState(
 
 	companion object {
 		val DEFAULT = MakeAgonyUiState(
-			uiState = UiState.SUCCESS,
-			bookshelfItem = BookShelfListItem.DEFAULT,
+			uiState = UiState.LOADING,
+			bookshelfItem = BookShelfItem.DEFAULT,
 			selectedColor = AgonyFolderHexColor.WHITE,
 			agonyTitle = ""
 		)
@@ -26,10 +26,9 @@ data class MakeAgonyUiState(
 }
 
 sealed class MakeAgonyUiEvent {
-	object MoveToBack : MakeAgonyUiEvent()
+	data object MoveToBack : MakeAgonyUiEvent()
 
-	data class MakeToast(
-		val stringId: Int
+	data class ShowSnackBar(
+		val stringId: Int,
 	) : MakeAgonyUiEvent()
-
 }

@@ -44,6 +44,8 @@ interface AgonyRecordRepository {
 		recordId: Long,
 	)
 
+	fun clear()
+
 	companion object {
 		const val AGONY_RECORD_LOAD_SIZE = 4
 	}

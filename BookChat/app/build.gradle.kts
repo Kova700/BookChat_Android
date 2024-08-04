@@ -11,6 +11,7 @@ plugins {
 	id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 	id("com.google.dagger.hilt.android")
 	id("com.google.gms.google-services")
+	id("com.mikepenz.aboutlibraries.plugin")
 }
 
 android {
@@ -24,7 +25,6 @@ android {
 		versionCode = 1
 		versionName = "1.0"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-//		buildConfigField("String", "UNSPLASH_ACCESS_KEY", properties.getProperty("UNSPLASH_ACCESS_KEY"))
 	}
 
 	buildTypes {
@@ -44,7 +44,8 @@ android {
 		jvmTarget = JavaVersion.VERSION_17.toString()
 	}
 	buildFeatures {
-		dataBinding = true
+		dataBinding = true //viewBinding으로 이전 예정
+		viewBinding = true
 		buildConfig = true
 	}
 }
@@ -66,7 +67,9 @@ dependencies {
 	// Kakao Login
 	implementation("com.kakao.sdk:v2-user:2.11.0")
 	// Google Login
-	implementation("com.google.android.gms:play-services-auth:21.2.0")
+	implementation("androidx.credentials:credentials:1.2.2")
+	implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
+	implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 	//Firebase BoM(Bill of Materials)
 	implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
 	//Firebase Analytics
@@ -81,10 +84,10 @@ dependencies {
 	implementation("com.github.bumptech.glide:glide:4.16.0")
 	kapt("com.github.bumptech.glide:compiler:4.13.0")
 	// ViewModel
-	implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3")
+	implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
 	//activity-ktx
-	implementation("androidx.fragment:fragment-ktx:1.8.1")
-	implementation("androidx.activity:activity-ktx:1.9.0")
+	implementation("androidx.fragment:fragment-ktx:1.8.2")
+	implementation("androidx.activity:activity-ktx:1.9.1")
 	//Image Cropper
 	implementation("com.github.CanHub:Android-Image-Cropper:4.3.1")
 	//Preferences DataStore
@@ -115,6 +118,8 @@ dependencies {
 	// WorkManager
 	implementation("androidx.work:work-runtime-ktx:2.9.0")
 	implementation("androidx.hilt:hilt-work:1.2.0")
+	//aboutlibraries-License
+	implementation("com.mikepenz:aboutlibraries:11.2.2")
 }
 
 kapt {

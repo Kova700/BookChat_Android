@@ -1,15 +1,17 @@
 package com.example.bookchat.ui.channel.channelsetting
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityChannelSettingBinding
@@ -19,11 +21,16 @@ import com.example.bookchat.ui.channel.channelsetting.authoritymanage.subhost.Su
 import com.example.bookchat.ui.channel.channelsetting.dialog.ChannelCapacitySettingDialog
 import com.example.bookchat.ui.channel.drawer.dialog.ChannelExitWarningDialog
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
+import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
+import com.example.bookchat.ui.mypage.useredit.dialog.ProfileEditDialog
 import com.example.bookchat.utils.MakeChannelImgSizeManager
+import com.example.bookchat.utils.image.bitmap.getImageBitmap
+import com.example.bookchat.utils.image.deleteImageCache
 import com.example.bookchat.utils.image.loadChangedChannelProfile
 import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.permissions.galleryPermissions
 import com.example.bookchat.utils.permissions.getPermissionsLauncher
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,6 +40,9 @@ class ChannelSettingActivity : AppCompatActivity() {
 	private lateinit var binding: ActivityChannelSettingBinding
 
 	private val channelSettingViewModel by viewModels<ChannelSettingViewModel>()
+	private val imm by lazy {
+		getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+	}
 
 	private val permissionsLauncher = this.getPermissionsLauncher(
 		onSuccess = { moveToImageCrop() },
@@ -54,9 +64,8 @@ class ChannelSettingActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_channel_setting)
-		binding.lifecycleOwner = this
-		binding.viewmodel = channelSettingViewModel
+		binding = ActivityChannelSettingBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		observeUiState()
 		observeUiEvent()
 		initViewState()
@@ -86,6 +95,16 @@ class ChannelSettingActivity : AppCompatActivity() {
 			}
 		}
 		makeChannelImgSizeManager.setMakeChannelImgSize(binding.channelImgIv)
+		with(binding) {
+			xBtn.setOnClickListener { channelSettingViewModel.onClickXBtn() }
+			applyChannelChangeBtn.setOnClickListener { channelSettingViewModel.onClickApplyBtn() }
+			cameraBtn.setOnClickListener { channelSettingViewModel.onClickCameraBtn() }
+			channelTitleClearBtn.setOnClickListener { channelSettingViewModel.onClickChannelTitleClearBtn() }
+			changeMaxChannelMembersCountBtn.setOnClickListener { channelSettingViewModel.onClickChannelCapacityBtn() }
+			changeChannelHostBtn.setOnClickListener { channelSettingViewModel.onClickHostChangeBtn() }
+			changeChannelSubHostBtn.setOnClickListener { channelSettingViewModel.onClickSubHostChangeBtn() }
+			leaveChannelBtn.setOnClickListener { channelSettingViewModel.onClickExitChannelBtn() }
+		}
 	}
 
 	private fun setViewState(uiState: ChannelSettingUiState) {
@@ -93,6 +112,15 @@ class ChannelSettingActivity : AppCompatActivity() {
 		setChannelTagEditTextState(uiState)
 		setApplyChannelChangeBtnState(uiState)
 		setChannelImage(uiState)
+		with(binding) {
+			changeMaxChannelMembersCountTv.text = uiState.newCapacity.toString()
+			channelTitleClearBtn.visibility =
+				if (uiState.newTitle.isEmpty()) View.GONE else View.VISIBLE
+			channelTitleCountTv.text =
+				getString(R.string.channel_setting_new_title_length, uiState.newTitle.length)
+			channelTagsCountTv.text =
+				getString(R.string.channel_setting_new_tags_length, uiState.newTags.length)
+		}
 	}
 
 	private fun setChannelTitleEditTextState(uiState: ChannelSettingUiState) {
@@ -129,7 +157,7 @@ class ChannelSettingActivity : AppCompatActivity() {
 		binding.channelImgIv.loadChangedChannelProfile(
 			imageUrl = uiState.channel.roomImageUri,
 			channelDefaultImageType = uiState.channel.defaultRoomImageType,
-			byteArray = uiState.newProfileImage,
+			bitmap = uiState.newProfileImage,
 		)
 	}
 
@@ -139,18 +167,24 @@ class ChannelSettingActivity : AppCompatActivity() {
 
 	private fun moveToImageCrop() {
 		val intent = Intent(this, ImageCropActivity::class.java)
+		intent.putExtra(ImageCropActivity.EXTRA_CROP_PURPOSE, ImageCropPurpose.CHANNEL_PROFILE)
 		cropActivityResultLauncher.launch(intent)
 	}
 
 	private val cropActivityResultLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 			if (result.resultCode == RESULT_OK) {
-				val intent = result.data
-				val bitmapByteArray =
-					intent?.getByteArrayExtra(ImageCropActivity.EXTRA_CROPPED_PROFILE_BYTE_ARRAY)
-				bitmapByteArray?.let { channelSettingViewModel.onChangeChannelProfile(it) }
+				val uri = result.data?.getStringExtra(ImageCropActivity.EXTRA_CROPPED_IMAGE_CACHE_URI)
+					?: return@registerForActivityResult
+				getCroppedImageBitmap(uri)
 			}
 		}
+
+	private fun getCroppedImageBitmap(uri: String) = lifecycleScope.launch {
+		val croppedImageBitmap = uri.getImageBitmap(this@ChannelSettingActivity) ?: return@launch
+		channelSettingViewModel.onChangeChannelProfile(croppedImageBitmap)
+		deleteImageCache(uri)
+	}
 
 	private val manageActivityResultLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -171,6 +205,18 @@ class ChannelSettingActivity : AppCompatActivity() {
 		val intent = Intent(this, SubHostManageActivity::class.java)
 			.putExtra(EXTRA_CHANNEL_ID, channelId)
 		manageActivityResultLauncher.launch(intent)
+	}
+
+	private fun showProfileEditDialog() {
+		val existingFragment =
+			supportFragmentManager.findFragmentByTag(DIALOG_TAG_PROFILE_EDIT)
+		if (existingFragment != null) return
+
+		val dialog = ProfileEditDialog(
+			onSelectDefaultImage = { channelSettingViewModel.onSelectDefaultProfileImage() },
+			onSelectGallery = { channelSettingViewModel.onSelectGallery() }
+		)
+		dialog.show(supportFragmentManager, DIALOG_TAG_PROFILE_EDIT)
 	}
 
 	private fun showChannelExitWarningDialog() {
@@ -204,22 +250,35 @@ class ChannelSettingActivity : AppCompatActivity() {
 		finish()
 	}
 
+	private fun closeKeyboard() {
+		imm.hideSoftInputFromWindow(
+			binding.root.windowToken,
+			InputMethodManager.HIDE_NOT_ALWAYS
+		)
+	}
+
 	private fun handleEvent(event: ChannelSettingUiEvent) {
 		when (event) {
 			ChannelSettingUiEvent.MoveBack -> finish()
-			ChannelSettingUiEvent.PermissionCheck -> startChannelProfileEdit()
+			ChannelSettingUiEvent.MoveToGallery -> startChannelProfileEdit()
 			ChannelSettingUiEvent.ShowChannelExitWarningDialog -> showChannelExitWarningDialog()
-			is ChannelSettingUiEvent.MakeToast -> makeToast(event.stringId)
+			is ChannelSettingUiEvent.ShowSnackBar -> binding.root.showSnackBar(
+				textId = event.stringId
+			)
+
 			ChannelSettingUiEvent.ShowChannelCapacityDialog -> showChannelCapacityDialog()
 			ChannelSettingUiEvent.MoveHostManage -> moveToHostManage()
 			ChannelSettingUiEvent.MoveSubHostManage -> moveToSubHostManage()
 			ChannelSettingUiEvent.ExitChannel -> exitChannel()
+			ChannelSettingUiEvent.ShowProfileEditDialog -> showProfileEditDialog()
+			ChannelSettingUiEvent.CloseKeyboard -> closeKeyboard()
 		}
 	}
 
 	companion object {
 		private const val DIALOG_TAG_CHANNEL_EXIT_WARNING = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
 		private const val DIALOG_TAG_CHANNEL_CAPACITY_DIALOG = "DIALOG_TAG_CHANNEL_CAPACITY_DIALOG"
+		private const val DIALOG_TAG_PROFILE_EDIT = "DIALOG_TAG_USER_PROFILE_EDIT"
 		const val RESULT_CODE_USER_CHANNEL_EXIT = 100
 		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
 		private const val SCHEME_PACKAGE = "package"

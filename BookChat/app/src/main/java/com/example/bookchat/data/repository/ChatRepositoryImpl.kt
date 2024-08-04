@@ -359,16 +359,6 @@ class ChatRepositoryImpl @Inject constructor(
 		setChats(mapChats.value + (newChat.chatId to newChat))
 	}
 
-	private fun clearCachedData() {
-		mapChats.update { emptyMap() }
-		cachedChannelId = null
-
-		currentOlderChatPage = null
-		currentNewerChatPage = null
-		_isOlderChatFullyLoaded.value = false
-		_isNewerChatFullyLoaded.value = true
-	}
-
 	override suspend fun deleteChat(chatId: Long) {
 		chatDAO.deleteChat(chatId)
 		setChats(mapChats.value - (chatId))
@@ -377,6 +367,15 @@ class ChatRepositoryImpl @Inject constructor(
 	override suspend fun deleteChannelAllChat(channelId: Long) {
 		Log.d(TAG, "ChatRepositoryImpl: deleteChannelAllChat() - called")
 		chatDAO.deleteChannelAllChat(channelId)
+	}
+
+	private fun clearCachedData() {
+		mapChats.update { emptyMap() }
+		cachedChannelId = null
+		currentOlderChatPage = null
+		currentNewerChatPage = null
+		_isOlderChatFullyLoaded.value = false
+		_isNewerChatFullyLoaded.value = true
 	}
 
 	/** 로그아웃 + 회원탈퇴시에 모든 repository 일괄 호출 */

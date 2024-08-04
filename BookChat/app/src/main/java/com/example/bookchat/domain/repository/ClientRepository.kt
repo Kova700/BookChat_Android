@@ -1,25 +1,25 @@
 package com.example.bookchat.domain.repository
 
 import com.example.bookchat.domain.model.BookChatToken
-import com.example.bookchat.domain.model.FCMToken
-import com.example.bookchat.domain.model.IdToken
+import com.example.bookchat.fcm.repository.external.model.FCMToken
 import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.model.User
+import com.example.bookchat.oauth.repository.external.model.IdToken
 import kotlinx.coroutines.flow.Flow
 
 interface ClientRepository {
 
 	fun getClientFlow(): Flow<User>
 
-	suspend fun isSignedIn(): Boolean
-
-	suspend fun signIn(
-		approveChangingDevice: Boolean = false,
-	)
-
-	suspend fun renewBookChatToken(): BookChatToken?
+	suspend fun login(
+		idToken: IdToken,
+		fcmToken: FCMToken,
+		deviceUUID: String,
+		isDeviceChangeApproved: Boolean,
+	): BookChatToken
 
 	suspend fun signUp(
+		idToken: IdToken,
 		nickname: String,
 		readingTastes: List<ReadingTaste>,
 		userProfile: ByteArray?,
@@ -30,11 +30,11 @@ interface ClientRepository {
 		userProfile: ByteArray?,
 	): User
 
+	suspend fun renewBookChatToken(currentToken: BookChatToken): BookChatToken
+
 	suspend fun getClientProfile(): User
-	suspend fun signOut(needAServer: Boolean = false)
+	suspend fun logout()
 	suspend fun withdraw()
 	suspend fun isDuplicatedUserNickName(nickName: String): Boolean
-	suspend fun renewFCMToken(fcmToken: FCMToken)
-	fun getCachedIdToken(): IdToken
-	fun saveIdToken(token: IdToken)
+	suspend fun clear()
 }

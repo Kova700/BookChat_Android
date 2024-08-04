@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
-import android.os.IBinder
 import android.os.Looper
 import android.provider.Settings
 import android.text.Editable
@@ -16,15 +15,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityUserEditBinding
 import com.example.bookchat.ui.imagecrop.ImageCropActivity
-import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROPPED_PROFILE_BYTE_ARRAY
-import com.example.bookchat.ui.mypage.useredit.dialog.UserProfileEditDialog
+import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
+import com.example.bookchat.ui.mypage.useredit.dialog.ProfileEditDialog
+import com.example.bookchat.utils.image.bitmap.getImageBitmap
+import com.example.bookchat.utils.image.deleteImageCache
 import com.example.bookchat.utils.image.loadChangedUserProfile
 import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.namecheck.MAX_NICKNAME_LENGTH
+import com.example.bookchat.utils.namecheck.NAME_CHECK_REGULAR_EXPRESSION
 import com.example.bookchat.utils.namecheck.getNameCheckResultBackgroundResId
 import com.example.bookchat.utils.namecheck.getNameCheckResultHexInt
 import com.example.bookchat.utils.namecheck.getNameCheckResultText
@@ -59,9 +61,8 @@ class UserEditActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_user_edit)
-		binding.lifecycleOwner = this
-		binding.viewmodel = userEditViewModel
+		binding = ActivityUserEditBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		setFocus()
 		initViewState()
 		observeUiState()
@@ -85,6 +86,10 @@ class UserEditActivity : AppCompatActivity() {
 		setProfileImageViewState(state)
 		setNameCheckResultTextViewState(state)
 		setNameCheckResultLayoutState(state)
+		with(binding) {
+			textClearBtn.visibility = if (state.newNickname.isEmpty()) View.GONE else View.VISIBLE
+			textLengthTv.text = getString(R.string.user_nickname_length, state.newNickname.length)
+		}
 	}
 
 	private fun setNameCheckResultLayoutState(state: UserEditUiState) {
@@ -109,7 +114,7 @@ class UserEditActivity : AppCompatActivity() {
 		binding.userProfileIv.loadChangedUserProfile(
 			imageUrl = state.client.profileImageUrl,
 			userDefaultProfileType = state.client.defaultProfileImageType,
-			byteArray = state.clientNewImage
+			bitmap = state.clientNewImage
 		)
 	}
 
@@ -143,7 +148,12 @@ class UserEditActivity : AppCompatActivity() {
 
 	private fun initViewState() {
 		initNickNameEditText()
-		binding.cameraBtn.setOnClickListener { userEditViewModel.onClickCameraBtn() }
+		with(binding) {
+			cameraBtn.setOnClickListener { userEditViewModel.onClickCameraBtn() }
+			nicknameSubmitBtn.setOnClickListener { userEditViewModel.onClickSubmitBtn() }
+			textClearBtn.setOnClickListener { userEditViewModel.onClickClearNickNameBtn() }
+			backBtn.setOnClickListener { userEditViewModel.onClickBackBtn() }
+		}
 	}
 
 	private val maxLengthFilter = InputFilter.LengthFilter(MAX_NICKNAME_LENGTH)
@@ -168,59 +178,62 @@ class UserEditActivity : AppCompatActivity() {
 		}, KEYBOARD_DELAY_TIME)
 	}
 
-	private fun closeKeyboard(windowToken: IBinder) {
-		imm.hideSoftInputFromWindow(windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
-	}
-
 	private fun startUserProfileEdit() {
-		closeKeyboard(binding.nickNameEt.windowToken)
+		closeKeyboard()
 		permissionsLauncher.launch(galleryPermissions)
 	}
 
 	private fun moveToImageCrop() {
 		val intent = Intent(this, ImageCropActivity::class.java)
+		intent.putExtra(ImageCropActivity.EXTRA_CROP_PURPOSE, ImageCropPurpose.USER_PROFILE)
 		cropActivityResultLauncher.launch(intent)
 	}
 
-	private fun showUserProfileEditDialog() {
+	private fun showProfileEditDialog() {
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_USER_PROFILE_EDIT)
+			supportFragmentManager.findFragmentByTag(DIALOG_TAG_PROFILE_EDIT)
 		if (existingFragment != null) return
 
-		val dialog = UserProfileEditDialog(
+		val dialog = ProfileEditDialog(
 			onSelectDefaultImage = { userEditViewModel.onSelectDefaultProfileImage() },
 			onSelectGallery = { userEditViewModel.onSelectGallery() }
 		)
-		dialog.show(supportFragmentManager, DIALOG_TAG_USER_PROFILE_EDIT)
+		dialog.show(supportFragmentManager, DIALOG_TAG_PROFILE_EDIT)
 	}
 
 	private val cropActivityResultLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 			if (result.resultCode == RESULT_OK) {
-				val intent = result.data
-				val bitmapByteArray =
-					intent?.getByteArrayExtra(EXTRA_CROPPED_PROFILE_BYTE_ARRAY)
-				bitmapByteArray?.let { userEditViewModel.onChangeUserProfile(it) }
+				val uri = result.data?.getStringExtra(ImageCropActivity.EXTRA_CROPPED_IMAGE_CACHE_URI)
+					?: return@registerForActivityResult
+				getCroppedImageBitmap(uri)
 			}
 		}
+
+	private fun getCroppedImageBitmap(uri: String) = lifecycleScope.launch {
+		val croppedImageBitmap = uri.getImageBitmap(this@UserEditActivity) ?: return@launch
+		userEditViewModel.onChangeUserProfile(croppedImageBitmap)
+		deleteImageCache(uri)
+	}
+
+	private fun closeKeyboard() {
+		imm.hideSoftInputFromWindow(binding.nickNameEt.windowToken, 0)
+	}
 
 	private fun handleUiEvent(event: UserEditUiEvent) {
 		when (event) {
 			UserEditUiEvent.MoveToBack -> finish()
 			UserEditUiEvent.MoveToGallery -> startUserProfileEdit()
-			is UserEditUiEvent.ErrorEvent -> binding.root.showSnackBar(event.stringId)
-			is UserEditUiEvent.UnknownErrorEvent -> binding.root.showSnackBar(event.message)
-			UserEditUiEvent.ShowUserProfileEditDialog -> showUserProfileEditDialog()
+			UserEditUiEvent.ShowProfileEditDialog -> showProfileEditDialog()
+			UserEditUiEvent.CloseKeyboard -> closeKeyboard()
+			is UserEditUiEvent.ShowSnackBar -> binding.root.showSnackBar(event.stringId)
 		}
 	}
 
 	companion object {
 		private const val KEYBOARD_DELAY_TIME = 200L
-		private const val NAME_CHECK_REGULAR_EXPRESSION =
-			"^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ\\u318D\\u119E\\u11A2\\u2022\\u2025a\\u00B7\\uFE55\\uFF1A]+$"
-		private const val MAX_NICKNAME_LENGTH = 20
 		private const val SCHEME_PACKAGE = "package"
-		private const val DIALOG_TAG_USER_PROFILE_EDIT = "DIALOG_TAG_USER_PROFILE_EDIT"
+		private const val DIALOG_TAG_PROFILE_EDIT = "DIALOG_TAG_USER_PROFILE_EDIT"
 
 	}
 

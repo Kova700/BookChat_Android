@@ -7,6 +7,9 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="bookchat_gray">#FF4D4D4D</color>
+    <color name="bookchat_white_gray">#FFD9D9D9</color>
     <color name="viewpager_indicator_color">#FF5648FF</color>
     <color name="bookchat_default_black">#FF222222</color>
     <color name="bookchat_blue">#FF5648FF</color>

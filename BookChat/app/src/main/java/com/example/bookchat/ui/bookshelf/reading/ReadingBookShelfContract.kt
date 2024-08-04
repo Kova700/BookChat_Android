@@ -1,24 +1,32 @@
 package com.example.bookchat.ui.bookshelf.reading
 
 import com.example.bookchat.domain.model.BookShelfState
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
-
+import com.example.bookchat.ui.bookshelf.reading.model.ReadingBookShelfItem
 
 data class ReadingBookShelfUiState(
 	val uiState: UiState,
 	val readingItems: List<ReadingBookShelfItem>,
 ) {
+	val isLoading: Boolean
+		get() = uiState == UiState.LOADING
+
+	val isInitLoading: Boolean
+		get() = uiState == UiState.INIT_LOADING
+
+	val isEmpty: Boolean
+		get() = readingItems.isEmpty()
+						&& isLoading.not()
+						&& isInitLoading.not()
 
 	enum class UiState {
 		SUCCESS,
 		LOADING,
-		ERROR,
-		EMPTY,
+		INIT_LOADING
 	}
 
 	companion object {
 		val DEFAULT = ReadingBookShelfUiState(
-			uiState = UiState.EMPTY,
+			uiState = UiState.INIT_LOADING,
 			readingItems = emptyList(),
 		)
 	}
@@ -26,37 +34,19 @@ data class ReadingBookShelfUiState(
 
 sealed class ReadingBookShelfEvent {
 	data class MoveToReadingBookDialog(
-		val bookShelfListItem: BookShelfListItem
+		val bookShelfListItem: ReadingBookShelfItem.Item,
 	) : ReadingBookShelfEvent()
 
 	data class MoveToPageInputDialog(
-		val bookShelfListItem: BookShelfListItem
+		val bookShelfListItem: ReadingBookShelfItem.Item,
 	) : ReadingBookShelfEvent()
 
 	data class ChangeBookShelfTab(
-		val targetState: BookShelfState
+		val targetState: BookShelfState,
 	) : ReadingBookShelfEvent()
 
-	data class MakeToast(
-		val stringId: Int
+	data class ShowSnackBar(
+		val stringId: Int,
 	) : ReadingBookShelfEvent()
 
-}
-
-sealed interface ReadingBookShelfItem {
-
-	fun getCategoryId(): Long {
-		return when (this) {
-			is Header -> HEADER_ITEM_STABLE_ID
-			is Item -> bookShelfListItem.bookShelfId
-		}
-	}
-
-	data class Header(val totalItemCount: Int) : ReadingBookShelfItem
-	data class Item(val bookShelfListItem: BookShelfListItem) : ReadingBookShelfItem
-
-	private companion object {
-		private const val HEADER_ITEM_STABLE_ID = -1L
-		private const val DUMMY_ITEM_STABLE_ID = -2L
-	}
 }

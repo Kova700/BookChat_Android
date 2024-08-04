@@ -86,7 +86,12 @@ class ChannelHeaderViewHolder(
 
 class ChannelEmptyViewHolder(
 	private val binding: ItemSearchChannelEmptyBinding,
+	private val onClickMakeChannelBtn: (() -> Unit)?,
 ) : SearchItemViewHolder(binding) {
+	init {
+		binding.makeChannelBtn.setOnClickListener { onClickMakeChannelBtn?.invoke() }
+	}
+
 	override fun bind(searchResultItem: SearchResultItem) {}
 }
 

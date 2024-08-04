@@ -3,9 +3,11 @@
     <!--error-->
     <string name="error_network_not_connected">네트워크가 연결되어 있지 않습니다.\n네트워크를 연결해주세요.</string>
     <string name="error_network_error">네트워크가 불안정합니다.\n잠시 후 다시 시도해주세요.</string>
-    <string name="error_kakao_login">카카오 로그인에 문제가 발생하였습니다. 잠시 후 다시 시도해 주세요.</string>
+    <string name="error_kakao_login">Kakao 로그인을 실패했습니다.</string>
+    <string name="error_google_login">Google 로그인을 실패했습니다.</string>
     <string name="error_socket_connect">서버와의 연결을 실패했습니다. 잠시 후 다시 시도해주세요.</string>
-    <string name="error_else">일시적인 현상이거나 네트워크 문제일 수 있으니,\n잠시 후 다시 시도해 주세요.\n계속해서 문제가 발생하는 경우 문의를 부탁드립니다.</string>
+    <string name="error_else">데이터 가져오기를 실패했습니다. 잠시 후 다시 시도해주세요.</string>
+    <string name="error_else_2_line">데이터 가져오기를 실패했습니다.\n잠시 후 다시 시도해주세요.</string>
 
     <!--permission-->
     <string name="gallery_permission_denied">[사진 및 동영상]\n권한을 허용해주세요.</string>
@@ -51,14 +53,16 @@
     <string name="religion">종교</string>
     <string name="character">인물</string>
 
-    <!--main-->
+    <!--home-->
     <string name="main_hello">안녕하세요</string>
+    <string name="user_nickname">%s 님</string>
     <string name="main_book">독서 중인 도서</string>
     <string name="main_chat">참여 중인 채팅방</string>
     <string name="book_is_empty">도서가 없어요!</string>
     <string name="book_is_empty_sub_text">새로운 도서를 추가하고\n북챗을 사용해 보세요.</string>
     <string name="chat_room_is_empty">채팅방이 없어요!</string>
     <string name="chat_room_is_empty_sub_text">새로운 채팅방을 추가하고\n북챗을 나눠보세요.</string>
+    <string name="channel_member_count">%1$d명</string>
 
     <!--bookshelf-->
     <string name="bookshelf">서재</string>
@@ -71,7 +75,20 @@
     <string name="bookshelf_delete_fail">도서 삭제를 실패했습니다.</string>
     <string name="bookshelf_delete_snack_bar">3초 뒤 도서가 삭제됩니다.</string>
     <string name="bookshelf_delete_snack_bar_cancel">실행취소</string>
+    <string name="bookshelf_page_text">%1$dp</string>
+    <string name="bookshelf_page_input_title">책갈피</string>
     <string name="bookshelf_page_input_fail">페이지 등록을 실패했습니다.</string>
+    <string name="bookshelf_page_input_page">p</string>
+    <string name="bookshelf_page_input_one">1</string>
+    <string name="bookshelf_page_input_two">2</string>
+    <string name="bookshelf_page_input_three">3</string>
+    <string name="bookshelf_page_input_four">4</string>
+    <string name="bookshelf_page_input_five">5</string>
+    <string name="bookshelf_page_input_six">6</string>
+    <string name="bookshelf_page_input_seven">7</string>
+    <string name="bookshelf_page_input_eight">8</string>
+    <string name="bookshelf_page_input_nine">9</string>
+    <string name="bookshelf_page_input_zero">0</string>
     <string name="bookshelf_change_to_complete_success">독서완료로 변경되었습니다.</string>
     <string name="bookshelf_change_to_complete_fail">독서완료로 변경을 실패했습니다.</string>
     <string name="bookshelf_change_to_reading_success">독서중으로 변경되었습니다.</string>
@@ -87,12 +104,16 @@
     <string name="channel_title">채팅방 제목</string>
     <string name="channel_tag">채팅방 TAG</string>
     <string name="search_filter">검색 필터</string>
+    <string name="selected_search_filter">선택된 필터:</string>
     <string name="recommend_keyword">추천 검색어</string>
     <string name="recent_search_keyword">최근 검색어</string>
     <string name="related_book_name">관련 도서명</string>
     <string name="search_book_keyword_empty">검색어를 입력해주세요.</string>
     <string name="search_book_result_empty">검색어가 존재하지 않습니다.</string>
     <string name="search_window_hint">검색어를 입력해주세요.</string>
+    <string name="bookshelf_register_success">[서재]에 도서가 등록되었습니다.</string>
+    <string name="bookshelf_register_fail">[서재]에 도서 등록을 실패했습니다..</string>
+
     <string name="complete_bookshelf_register_success">[서재] - [독서완료]에\n도서가 등록되었습니다.</string>
     <string name="complete_bookshelf_register_fail">독서완료 등록을 실패했습니다.</string>
     <string name="complete_bookshelf_star_set_dialog">독서완료 별점</string>
@@ -122,6 +143,7 @@
     <string name="agony_delete_fail">고민 삭제를 실패했습니다.</string>
 
     <!--agony title edit-->
+    <string name="agony_title_new_title_length">%1$d / 20</string>
     <string name="agony_title">고민 제목</string>
     <string name="agony_title_empty">제목을 입력해주세요.</string>
     <string name="agony_title_edit_success">제목이 수정되었습니다.</string>
@@ -137,12 +159,16 @@
     <string name="agony_record_delete_success">고민기록이 삭제되었습니다.</string>
     <string name="agony_record_delete_fail">고민기록 삭제를 실패했습니다.</string>
 
-    <!--make chat room-->
+    <!--make channel-->
     <string name="chat">채팅</string>
+    <string name="make_chat_room_set_cover_image">커버 이미지 설정</string>
+    <string name="make_chat_room_default_image_change">기본 이미지 변경</string>
     <string name="chat_room">채팅방</string>
     <string name="my_chat_room">나의 채팅방</string>
     <string name="make_chat_room">채팅방 만들기</string>
     <string name="make_chat_room_select">선택하기</string>
+    <string name="make_chat_room_title_length">%1$d / 30</string>
+    <string name="make_chat_room_tags_length">%1$d / 50</string>
     <string name="make_chat_room_title_hint">채팅방 제목을 작성해 주세요.</string>
     <string name="make_chat_room_tag_hint">#해시태그로 채팅방을 소개해 주세요.</string>
     <string name="make_chat_room_book_select">도서 선택</string>
@@ -156,26 +182,35 @@
     <string name="invite">친구초대</string>
     <string name="account_setting">계정 설정</string>
     <string name="app_setting">앱 설정</string>
+    <string name="terms_of_service">서비스 이용약관</string>
+    <string name="privacy_policy">개인정보 처리방침</string>
+    <string name="open_source_license">오픈 라이선스</string>
     <string name="app_version">앱 버전</string>
     <string name="my_page_profile_edit_success">프로필이 수정되었습니다.</string>
     <string name="my_page_profile_edit_fail">프로필 수정을 실패했습니다.</string>
     <string name="my_page_profile_need_name_dup_check">닉네임 중복확인이 필요합니다.</string>
 
     <!--user edit-->
-    <string name="uesr_edit_title">프로필 수정</string>
+    <string name="user_edit_title">프로필 수정</string>
     <string name="duplicate_check">중복확인</string>
+    <string name="user_nickname_length">%1$d / 20</string>
     <string name="submit_changed_profile">변경하기</string>
     <string name="user_profile_picture_setting">프로필 사진 설정</string>
     <string name="select_picture_from_gallery">앨범에서 사진 선택</string>
     <string name="select_picture_default_image">기본 이미지 적용</string>
 
-    <!--notice-->
     <!--app setting-->
     <string name="push_notification">푸시알림</string>
+
     <!--user setting-->
     <string name="sign_out">로그아웃</string>
     <string name="withdraw">회원탈퇴</string>
+    <string name="sign_out_fail">로그아웃을 실패했습니다.</string>
     <string name="withdraw_success">정상적으로 탈퇴되었습니다.</string>
+    <string name="withdraw_fail">회원탈퇴를 실패했습니다.</string>
+    <string name="logout_notice_other_device_login">다른 기기에서 로그인이 시도되었습니다.\n북챗을 이용하시려면\n다시 로그인을 진행해주세요.</string>
+    <string name="withdraw_warning_content">회원탈퇴를 진행하시면\n참여 중인 모든 채팅방에서 나가게 되며,\n서재에 저장된 도서들, 독후감, 고민기록 등\n모든 정보가 삭제되며 복구가 불가능합니다.</string>
+    <string name="withdraw_warning_channel_host_warning_content">*방장을 위임하지 않고 탈퇴 진행 시,\n방장으로 관리하셨던 채팅방은 삭제처리됩니다.</string>
 
     <!--channel list-->
     <string name="channel_name">채팅방 이름</string>
@@ -223,6 +258,8 @@
     <!--channel setting-->
     <string name="channel_setting_title">채팅방 설정</string>
     <string name="change_channel_capacity">최대 인원 수</string>
+    <string name="channel_setting_new_title_length">%1$d / 30</string>
+    <string name="channel_setting_new_tags_length">%1$d / 50</string>
     <string name="channel_capacity_setting">최대 인원 설정</string>
     <string name="change_channel_host">방장 변경하기</string>
     <string name="change_channel_host_success">방장이 변경되었습니다.</string>
@@ -235,7 +272,16 @@
     <string name="leave_channel">채팅방 나가기</string>
     <string name="channel_member_search_by_name">이름으로 검색</string>
 
+    <!--image crop-->
+    <string name="select_image">사진 선택</string>
+    <string name="image_crop_title">자르기</string>
+    <string name="image_crop_aspect_ratio_free">자유롭게</string>
+    <string name="image_crop_aspect_ratio_1_1">1 : 1</string>
+    <string name="image_crop_aspect_ratio_3_4">3 : 4</string>
+    <string name="image_crop_aspect_ratio_4_3">4 : 3</string>
+
     <!--util-->
+    <string name="setting">설정</string>
     <string name="confirm">확인</string>
     <string name="cancel">취소</string>
     <string name="finish">완료</string>

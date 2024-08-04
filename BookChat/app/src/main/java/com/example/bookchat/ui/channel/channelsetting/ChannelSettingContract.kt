@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.channel.channelsetting
 
+import android.graphics.Bitmap
 import com.example.bookchat.domain.model.Channel
 
 data class ChannelSettingUiState(
@@ -8,11 +9,13 @@ data class ChannelSettingUiState(
 	val newTitle: String,
 	val newTags: String,
 	val newCapacity: Int,
-	val newProfileImage: ByteArray?,
+	val newProfileImage: Bitmap?,
+	val isSelectedDefaultImage: Boolean,
 ) {
 	private val isExistsChange
 		get() = isTitleChanged || isTagsChanged
 						|| isProfileChanged || isCapacityChanged
+						|| isSelectedDefaultImage
 
 	private val isTitleChanged
 		get() = newTitle != channel.roomName
@@ -49,19 +52,22 @@ data class ChannelSettingUiState(
 			newTags = "",
 			newCapacity = 0,
 			newProfileImage = null,
+			isSelectedDefaultImage = false
 		)
 	}
 }
 
 sealed class ChannelSettingUiEvent {
-	object MoveBack : ChannelSettingUiEvent()
-	object ExitChannel : ChannelSettingUiEvent()
-	object PermissionCheck : ChannelSettingUiEvent()
-	object ShowChannelExitWarningDialog : ChannelSettingUiEvent()
-	object ShowChannelCapacityDialog : ChannelSettingUiEvent()
-	object MoveHostManage : ChannelSettingUiEvent()
-	object MoveSubHostManage : ChannelSettingUiEvent()
-	data class MakeToast(
+	data object MoveBack : ChannelSettingUiEvent()
+	data object ExitChannel : ChannelSettingUiEvent()
+	data object MoveToGallery : ChannelSettingUiEvent()
+	data object ShowProfileEditDialog : ChannelSettingUiEvent()
+	data object ShowChannelExitWarningDialog : ChannelSettingUiEvent()
+	data object ShowChannelCapacityDialog : ChannelSettingUiEvent()
+	data object MoveHostManage : ChannelSettingUiEvent()
+	data object MoveSubHostManage : ChannelSettingUiEvent()
+	data object CloseKeyboard : ChannelSettingUiEvent()
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : ChannelSettingUiEvent()
 }

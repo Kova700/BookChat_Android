@@ -23,16 +23,14 @@ data class AgonyRecordeUiState(
 }
 
 sealed class AgonyRecordEvent {
-	object MoveToBack : AgonyRecordEvent()
+	data object MoveToBack : AgonyRecordEvent()
 	data class MoveToAgonyTitleEdit(
 		val agonyId: Long,
-		val bookshelfItemId: Long
+		val bookshelfItemId: Long,
 	) : AgonyRecordEvent()
 
-	object ShowEditCancelWarning : AgonyRecordEvent()
-	object OpenChattingScrapDialog : AgonyRecordEvent()
-
-	data class MakeToast(
-		val stringId: Int
+	data object ShowEditCancelWarning : AgonyRecordEvent()
+	data class ShowSnackBar(
+		val stringId: Int,
 	) : AgonyRecordEvent()
 }

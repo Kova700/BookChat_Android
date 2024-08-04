@@ -23,7 +23,7 @@ data class ChannelSearchResult(
 		get() = bookAuthors.joinToString(",")
 
 	val tagsString
-		get() = roomTags.joinToString(" ") { "# $it" }
+		get() = roomTags.joinToString(" ") { "#$it" }
 
 	companion object {
 		val DEFAULT = ChannelSearchResult(

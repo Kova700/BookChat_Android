@@ -4,8 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
-import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
-import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.SearchFilter
 import com.example.bookchat.domain.model.SearchPurpose
 import com.example.bookchat.domain.repository.BookSearchRepository
@@ -15,7 +13,6 @@ import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_SEARCH_KEYW
 import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_SEARCH_PURPOSE
 import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_SEARCH_TARGET
 import com.example.bookchat.ui.search.mapper.toBook
-import com.example.bookchat.ui.search.mapper.toBookItem
 import com.example.bookchat.ui.search.mapper.toBookSearchResultItem
 import com.example.bookchat.ui.search.mapper.toChannelSearchResultItem
 import com.example.bookchat.ui.search.model.SearchResultItem
@@ -32,9 +29,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO: 페이징 결과가 이상함
-// (이전 코드에서는 계속 페이징 되는데 현재 코드는 페이징이 더 이상 이어지지 않음)
-//  페이징 size 키워보는거 추천
 @HiltViewModel
 class SearchDetailViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
@@ -76,9 +70,9 @@ class SearchDetailViewModel @Inject constructor(
 				bookSearchRepository.getBooksFLow().map {
 					it.toBookSearchResultItem(bookImgSizeManager.getFlexBoxDummyItemCount(it.size))
 				}.collect { items ->
-						if (items.isEmpty()) updateState { copy(uiState = UiState.EMPTY) }
-						else updateState { copy(searchItems = items) }
-					}
+					if (items.isEmpty()) updateState { copy(uiState = UiState.EMPTY) }
+					else updateState { copy(searchItems = items) }
+				}
 			}
 
 			SearchTarget.CHANNEL -> {
@@ -88,7 +82,6 @@ class SearchDetailViewModel @Inject constructor(
 						else updateState { copy(searchItems = items) }
 					}
 			}
-
 		}
 	}
 
@@ -101,12 +94,7 @@ class SearchDetailViewModel @Inject constructor(
 	}
 
 	private fun searchBooks() = viewModelScope.launch {
-		runCatching {
-			bookSearchRepository.search(
-				keyword = searchKeyword,
-				loadSize = bookImgSizeManager.flexBoxBookSpanSize * 10
-			)
-		}
+		runCatching { bookSearchRepository.search(searchKeyword) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 			.onFailure { failHandler(it) }
 	}
@@ -123,8 +111,8 @@ class SearchDetailViewModel @Inject constructor(
 	}
 
 	fun loadNextData(lastVisibleItemPosition: Int) {
-		if (uiState.value.searchItems.size - 1 > lastVisibleItemPosition ||
-			uiState.value.uiState == UiState.LOADING
+		if (uiState.value.searchItems.size - 1 > lastVisibleItemPosition
+			|| uiState.value.uiState == UiState.LOADING
 		) return
 		getSearchItems()
 	}
@@ -159,11 +147,8 @@ class SearchDetailViewModel @Inject constructor(
 	private fun failHandler(exception: Throwable) {
 		updateState { copy(uiState = UiState.ERROR) }
 		when (exception) {
-			is NetworkIsNotConnectedException ->
-				startEvent(SearchDetailEvent.MakeToast(R.string.error_network_not_connected))
-
 			else ->
-				startEvent(SearchDetailEvent.MakeToast(R.string.error_else))
+				startEvent(SearchDetailEvent.ShowSnackBar(R.string.error_else))
 		}
 	}
 

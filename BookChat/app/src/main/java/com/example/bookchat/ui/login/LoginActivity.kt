@@ -3,15 +3,14 @@ package com.example.bookchat.ui.login
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityLoginBinding
-import com.example.bookchat.oauth.google.GoogleLoginClient
-import com.example.bookchat.oauth.kakao.KakaoLoginClient
+import com.example.bookchat.oauth.oauthclient.external.model.OAuth2Provider
+import com.example.bookchat.oauth.oauthclient.external.OAuthClient
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.signup.SignUpActivity
 import com.example.bookchat.utils.showSnackBar
@@ -25,10 +24,7 @@ class LoginActivity : AppCompatActivity() {
 	private val loginViewModel: LoginViewModel by viewModels()
 
 	@Inject
-	lateinit var kakaoLoginClient: KakaoLoginClient
-
-	@Inject
-	lateinit var googleLoginClient: GoogleLoginClient
+	lateinit var oauthClient: OAuthClient
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -55,28 +51,16 @@ class LoginActivity : AppCompatActivity() {
 	}
 
 	private fun startKakaoLogin() = lifecycleScope.launch {
-		runCatching { kakaoLoginClient.login(this@LoginActivity) }
-			.onSuccess {
-				loginViewModel.onChangeIdToken(it)
-				loginViewModel.login()
-			}
-			.onFailure { handleEvent(LoginEvent.UnknownErrorEvent("Kakao 로그인을 실패했습니다.")) }
+		runCatching { oauthClient.login(this@LoginActivity, OAuth2Provider.KAKAO) }
+			.onSuccess { loginViewModel.onChangeIdToken() }
+			.onFailure { loginViewModel.onFailKakaoLogin(it) }
 	}
 
 	private fun startGoogleLogin() = lifecycleScope.launch {
-		googleLoginClient.login(this@LoginActivity, googleLoginResultLauncher)
+		runCatching { oauthClient.login(this@LoginActivity, OAuth2Provider.GOOGLE) }
+			.onSuccess { loginViewModel.onChangeIdToken() }
+			.onFailure { loginViewModel.onFailGoogleLogin(it) }
 	}
-
-	private val googleLoginResultLauncher =
-		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-			if (result.resultCode != RESULT_OK) {
-				handleEvent(LoginEvent.UnknownErrorEvent("Google 로그인을 실패했습니다."))
-				return@registerForActivityResult
-			}
-			val idToken = googleLoginClient.getIdTokenFromResultIntent(result.data)
-			loginViewModel.onChangeIdToken(idToken)
-			loginViewModel.login()
-		}
 
 	private fun moveToMain() {
 		startActivity(Intent(this, MainActivity::class.java))
@@ -85,7 +69,6 @@ class LoginActivity : AppCompatActivity() {
 
 	private fun moveToSignUp() {
 		startActivity(Intent(this, SignUpActivity::class.java))
-		finish()
 	}
 
 	private fun showDeviceChangeWarning() {

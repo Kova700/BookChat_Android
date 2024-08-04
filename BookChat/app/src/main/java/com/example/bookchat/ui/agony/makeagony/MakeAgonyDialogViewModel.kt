@@ -7,9 +7,8 @@ import com.example.bookchat.R
 import com.example.bookchat.domain.model.AgonyFolderHexColor
 import com.example.bookchat.domain.repository.AgonyRepository
 import com.example.bookchat.domain.repository.BookShelfRepository
-import com.example.bookchat.ui.agony.AgonyActivity
+import com.example.bookchat.ui.agony.agony.AgonyActivity
 import com.example.bookchat.ui.agony.makeagony.MakeAgonyUiState.UiState
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,16 +40,15 @@ class MakeAgonyDialogViewModel @Inject constructor(
 	private fun initUiState() {
 		updateState {
 			copy(
-				bookshelfItem = bookShelfRepository
-					.getCachedBookShelfItem(bookShelfItemId)
-					.toBookShelfListItem()
+				uiState = UiState.SUCCESS,
+				bookshelfItem = bookShelfRepository.getCachedBookShelfItem(bookShelfItemId)
 			)
 		}
 	}
 
 	fun onRegisterBtnClick() {
 		if (uiState.value.agonyTitle.isBlank()) {
-			startEvent(MakeAgonyUiEvent.MakeToast(R.string.agony_make_empty))
+			startEvent(MakeAgonyUiEvent.ShowSnackBar(R.string.agony_make_empty))
 			return
 		}
 		registerAgony(
@@ -86,7 +84,8 @@ class MakeAgonyDialogViewModel @Inject constructor(
 				startEvent(MakeAgonyUiEvent.MoveToBack)
 			}
 			.onFailure {
-				startEvent(MakeAgonyUiEvent.MakeToast(R.string.agony_make_fail))
+				updateState { copy(uiState = UiState.ERROR) }
+				startEvent(MakeAgonyUiEvent.ShowSnackBar(R.string.agony_make_fail))
 			}
 	}
 

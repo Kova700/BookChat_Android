@@ -28,10 +28,12 @@ data class AgonyEditUiState(
 }
 
 sealed class AgonyEditUiEvent {
-	object MoveToBack : AgonyEditUiEvent()
+	data object MoveToBack : AgonyEditUiEvent()
 
-	data class MakeToast(
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : AgonyEditUiEvent()
+
+	data object CloseKeyboard : AgonyEditUiEvent()
 
 }

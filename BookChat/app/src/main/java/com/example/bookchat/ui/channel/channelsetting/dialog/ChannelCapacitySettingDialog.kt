@@ -68,6 +68,7 @@ class ChannelCapacitySettingDialog(
 		initNumberPickerState()
 	}
 
+	//TODO : 현재 방 최대 용량 말고 현재 인원 수 보다 적은 용량으로 선택한다면 "현재 인원보다 적은 인원으로는 설정할 수 없습니다" 알림
 	//TODO : binding.channelCapacityNp.value = currentCapacity //기본값으로 0 넘어오는데 수정해야될듯
 	private fun initNumberPickerState() {
 		binding.channelCapacityNp.minValue = 0

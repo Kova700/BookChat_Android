@@ -27,7 +27,7 @@
         tools:layout="@layout/fragment_channel_list" />
     <fragment
         android:id="@+id/MyPageFragment"
-        android:name="com.example.bookchat.ui.mypage.MyPageFragment"
+        android:name="com.example.bookchat.ui.mypage.mypage.MyPageFragment"
         android:label="fragment_my_page"
         tools:layout="@layout/fragment_my_page" />
 </navigation>

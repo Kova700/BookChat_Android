@@ -5,12 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.data.network.model.response.ForbiddenException
-import com.example.bookchat.data.network.model.response.KakaoLoginFailException
 import com.example.bookchat.data.network.model.response.NeedToDeviceWarningException
 import com.example.bookchat.data.network.model.response.NeedToSignUpException
 import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
-import com.example.bookchat.domain.model.IdToken
 import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.domain.usecase.LoginUseCase
+import com.example.bookchat.oauth.oauthclient.external.exception.ClientCancelException
 import com.example.bookchat.ui.login.LoginUiState.UiState
 import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +24,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-	private val clientRepository: ClientRepository
+	private val clientRepository: ClientRepository,
+	private val loginUseCase: LoginUseCase,
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<LoginEvent>()
@@ -33,11 +34,9 @@ class LoginViewModel @Inject constructor(
 	private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.DEFAULT)
 	val uiState get() = _uiState.asStateFlow()
 
-	fun login(
-		isApproveChangingDevice: Boolean = false
-	) = viewModelScope.launch {
+	private fun login(isDeviceChangeApproved: Boolean = false) = viewModelScope.launch {
 		updateState { copy(uiState = UiState.LOADING) }
-		runCatching { clientRepository.signIn(isApproveChangingDevice) }
+		runCatching { loginUseCase(isDeviceChangeApproved) }
 			.onSuccess { getClientProfile() }
 			.onFailure { failHandler(it) }
 			.also { updateState { copy(uiState = UiState.SUCCESS) } }
@@ -49,9 +48,18 @@ class LoginViewModel @Inject constructor(
 			.onFailure { failHandler(it) }
 	}
 
-	fun onChangeIdToken(idToken: IdToken) {
-		updateState { copy(idToken = idToken) }
-		clientRepository.saveIdToken(idToken)
+	fun onChangeIdToken() {
+		login()
+	}
+
+	fun onFailKakaoLogin(throwable: Throwable) {
+		if (throwable is ClientCancelException) return
+		startEvent(LoginEvent.ErrorEvent(R.string.error_kakao_login))
+	}
+
+	fun onFailGoogleLogin(throwable: Throwable) {
+		if (throwable is ClientCancelException) return
+		startEvent(LoginEvent.ErrorEvent(R.string.error_google_login))
 	}
 
 	fun onClickKakaoLoginBtn() {
@@ -63,7 +71,7 @@ class LoginViewModel @Inject constructor(
 	}
 
 	fun onClickDeviceWarningOk() {
-		login(isApproveChangingDevice = true)
+		login(isDeviceChangeApproved = true)
 	}
 
 	private fun startEvent(event: LoginEvent) = viewModelScope.launch {
@@ -82,7 +90,6 @@ class LoginViewModel @Inject constructor(
 			is NeedToDeviceWarningException -> startEvent(LoginEvent.ShowDeviceWarning)
 			is ForbiddenException -> startEvent(LoginEvent.ErrorEvent(R.string.login_forbidden_user))
 			is NetworkIsNotConnectedException -> startEvent(LoginEvent.ErrorEvent(R.string.error_network_not_connected))
-			is KakaoLoginFailException -> startEvent(LoginEvent.ErrorEvent(R.string.error_kakao_login))
 			else -> {
 				val errorMessage = exception.message
 				if (errorMessage.isNullOrBlank()) startEvent(LoginEvent.ErrorEvent(R.string.error_else))

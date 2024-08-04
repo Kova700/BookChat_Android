@@ -5,21 +5,21 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
-import com.example.bookchat.data.database.dao.TempMessageDAO
-import com.example.bookchat.domain.NetworkManager
+import com.example.bookchat.data.networkmanager.external.NetworkManager
+import com.example.bookchat.data.networkmanager.external.model.NetworkState
+import com.example.bookchat.data.stomp.external.StompHandler
+import com.example.bookchat.data.stomp.external.model.SocketState
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatType
-import com.example.bookchat.domain.model.NetworkState
-import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.domain.repository.ChannelRepository
+import com.example.bookchat.domain.repository.ChannelTempMessageRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.repository.StompHandler
 import com.example.bookchat.domain.usecase.GetChatsFlowUseCase
 import com.example.bookchat.domain.usecase.SyncChannelChatsUseCase
-import com.example.bookchat.notification.NotificationHandler
+import com.example.bookchat.notification.chat.ChatNotificationHandler
 import com.example.bookchat.ui.channel.chatting.ChannelUiState.LoadState
 import com.example.bookchat.ui.channel.chatting.ChannelUiState.UiState
 import com.example.bookchat.ui.channel.chatting.mapper.toChatItems
@@ -51,15 +51,15 @@ import kotlin.math.abs
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
-	private val tempMessageDAO: TempMessageDAO, //개선 필요(+ 레이어 구분도 필요)
 	private val stompHandler: StompHandler,
 	private val getChatsFlowUserCase: GetChatsFlowUseCase,
 	private val syncChannelChatsUseCase: SyncChannelChatsUseCase,
+	private val channelTempMessageRepository: ChannelTempMessageRepository,
 	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
 	private val networkManager: NetworkManager,
-	private val chatNotificationHandler: NotificationHandler,
+	private val chatNotificationHandler: ChatNotificationHandler,
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
 
@@ -224,9 +224,8 @@ class ChannelViewModel @Inject constructor(
 		val newestChats = getNewestChats().await() ?: emptyList()
 		if (uiState.value.needToScrollToLastReadChat.not()) return@launch
 		val originalLastReadChatId = uiState.value.originalLastReadChatId ?: return@launch
-
 		val shouldCallGetChatsAroundId =
-			newestChats.map(Chat::chatId).contains(originalLastReadChatId).not()
+			newestChats.any { it.chatId == originalLastReadChatId }.not()
 		if (shouldCallGetChatsAroundId) getChatsAroundId(originalLastReadChatId)
 	}
 
@@ -277,7 +276,7 @@ class ChannelViewModel @Inject constructor(
 
 	private fun onChannelConnectFail() = viewModelScope.launch {
 		updateState { copy(uiState = UiState.ERROR) }
-		startEvent(ChannelEvent.MakeToast(R.string.error_socket_connect))
+		startEvent(ChannelEvent.ShowSnackBar(R.string.error_socket_connect))
 	}
 
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트 간의 데이터 불일치를 메우기 위해서 임시로
@@ -331,7 +330,7 @@ class ChannelViewModel @Inject constructor(
 	private fun exitChannel() = viewModelScope.launch {
 		runCatching { channelRepository.leaveChannel(channelId) }
 			.onSuccess { onClickBackBtn() }
-			.onFailure { startEvent(ChannelEvent.MakeToast(R.string.channel_exit_fail)) }
+			.onFailure { startEvent(ChannelEvent.ShowSnackBar(R.string.channel_exit_fail)) }
 	}
 
 	/** "여기까지 읽으셨습니다" 공지가 화면 상에 나타나는 순간 호출*/
@@ -380,19 +379,21 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun getTempSavedMessage(channelId: Long) = viewModelScope.launch {
-		runCatching { tempMessageDAO.getTempMessage(channelId)?.message }
-			.onSuccess {
-				updateState { copy(enteredMessage = it ?: "") }
-			}
+		channelTempMessageRepository.getTempMessage(channelId)?.let { message ->
+			updateState { copy(enteredMessage = message) }
+		}
 	}
 
 	private fun saveTempSavedMessage(text: String) = viewModelScope.launch {
 		if (text.isBlank()) return@launch
-		tempMessageDAO.insertOrUpdateTempMessage(channelId, text)
+		channelTempMessageRepository.saveTempMessage(
+			channelId = channelId,
+			message = text
+		)
 	}
 
 	private fun clearTempSavedMessage() = viewModelScope.launch {
-		tempMessageDAO.setTempSavedMessage(channelId, "")
+		channelTempMessageRepository.deleteTempMessage(channelId)
 	}
 
 	fun onChangeEnteredMessage(text: String) {
@@ -435,7 +436,6 @@ class ChannelViewModel @Inject constructor(
 		scrollToBottom()
 	}
 
-	//TODO : 서재에 도서 등록 안되어있으면 등록 경고 다이얼로그
 	fun onClickCaptureBtn() {
 		if (uiState.value.channel.isAvailableChannel.not()
 			|| uiState.value.chats.isEmpty()
@@ -461,6 +461,15 @@ class ChannelViewModel @Inject constructor(
 	fun onClickCancelCapture() {
 		updateState { copy(isCaptureMode = false) }
 		_captureIds.update { null }
+	}
+
+	fun onFailedCapture() {
+		startEvent(ChannelEvent.ShowSnackBar(R.string.channel_scrap_fail))
+	}
+
+	fun onCompletedCapture() {
+		onClickCancelCapture()
+		startEvent(ChannelEvent.ShowSnackBar(R.string.channel_scrap_success))
 	}
 
 	fun onClickCompleteCapture() {
@@ -520,7 +529,7 @@ class ChannelViewModel @Inject constructor(
 		val selectedItemsCount = abs(newHeaderIndex - newBottomIndex) + 1
 
 		if (selectedItemsCount > 30) {
-			startEvent(ChannelEvent.MakeToast(R.string.channel_scrap_selected_count_over))
+			startEvent(ChannelEvent.ShowSnackBar(R.string.channel_scrap_selected_count_over))
 			return
 		}
 		if (newHeaderId == null || newBottomId == null) _captureIds.update { null }
@@ -566,7 +575,7 @@ class ChannelViewModel @Inject constructor(
 			//ChannelViewModel: handleError(caller : connectSocket) -
 			// throwable: java.lang.NullPointerException: Parameter specified as non-null is null:
 			// method com.example.bookchat.domain.model.Chat.<init>, parameter dispatchTime
-			else -> startEvent(ChannelEvent.MakeToast(R.string.error_network_error))
+			else -> startEvent(ChannelEvent.ShowSnackBar(R.string.error_network_error))
 		}
 	}
 

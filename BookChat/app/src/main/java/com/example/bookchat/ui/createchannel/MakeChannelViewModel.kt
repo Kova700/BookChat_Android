@@ -1,12 +1,15 @@
 package com.example.bookchat.ui.createchannel
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.ChannelDefaultImageType
 import com.example.bookchat.domain.repository.BookSearchRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.ui.createchannel.MakeChannelUiState.UiState
+import com.example.bookchat.utils.image.bitmap.compressToByteArray
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MakeChannelViewModel @Inject constructor(
 	private val channelRepository: ChannelRepository,
-	private val bookSearchRepository: BookSearchRepository
+	private val bookSearchRepository: BookSearchRepository,
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<MakeChannelEvent>()
@@ -27,6 +30,18 @@ class MakeChannelViewModel @Inject constructor(
 
 	private val _uiState = MutableStateFlow<MakeChannelUiState>(MakeChannelUiState.DEFAULT)
 	val uiState get() = _uiState.asStateFlow()
+
+	init {
+		initUiState()
+	}
+
+	private fun initUiState() {
+		updateState {
+			copy(
+				defaultProfileImageType = ChannelDefaultImageType.getNewRandomType(defaultProfileImageType)
+			)
+		}
+	}
 
 	private fun makeChannel() = viewModelScope.launch {
 		updateState { copy(uiState = UiState.LOADING) }
@@ -37,20 +52,20 @@ class MakeChannelViewModel @Inject constructor(
 				defaultRoomImageType = uiState.value.defaultProfileImageType,
 				channelTags = uiState.value.channelTagList,
 				selectedBook = uiState.value.selectedBook!!,
-				channelImage = uiState.value.channelProfileImage
+				channelImage = uiState.value.channelProfileImage?.compressToByteArray()
 			)
 		}
 			.onSuccess { channel ->
 				updateState { copy(uiState = UiState.SUCCESS) }
 				enterChannel(channel)
 			}
-			.onFailure { startEvent(MakeChannelEvent.MakeToast(R.string.make_chat_room_fail)) }
+			.onFailure { startEvent(MakeChannelEvent.ShowSnackBar(R.string.make_chat_room_fail)) }
 	}
 
 	private fun enterChannel(channel: Channel) = viewModelScope.launch {
 		runCatching { channelRepository.enterChannel(channel) }
 			.onSuccess { startEvent(MakeChannelEvent.MoveToChannel(channel.roomId)) }
-			.onFailure { startEvent(MakeChannelEvent.MakeToast(R.string.enter_chat_room_fail)) }
+			.onFailure { startEvent(MakeChannelEvent.ShowSnackBar(R.string.enter_chat_room_fail)) }
 	}
 
 	fun onClickFinishBtn() {
@@ -69,8 +84,8 @@ class MakeChannelViewModel @Inject constructor(
 		text?.let { updateState { copy(channelTitle = it) } }
 	}
 
-	fun onChangeChannelImg(byteArray: ByteArray) {
-		updateState { copy(channelProfileImage = byteArray) }
+	fun onChangeChannelImg(bitmap: Bitmap) {
+		updateState { copy(channelProfileImage = bitmap) }
 	}
 
 	fun onChangeSelectedBook(bookIsbn: String) {
@@ -78,7 +93,7 @@ class MakeChannelViewModel @Inject constructor(
 		updateState { copy(selectedBook = book) }
 	}
 
-	fun onClickTextDeleteBtn() {
+	fun onClickTextClearBtn() {
 		updateState { copy(channelTitle = "") }
 	}
 
@@ -94,7 +109,22 @@ class MakeChannelViewModel @Inject constructor(
 		updateState { copy(selectedBook = null) }
 	}
 
-	fun onClickImgEditBtn() {
+	fun onClickCameraBtn() {
+		startEvent(MakeChannelEvent.ShowChannelImageSelectDialog)
+	}
+
+	fun onClickChangeDefaultImage() {
+		updateState {
+			copy(
+				defaultProfileImageType = ChannelDefaultImageType.getNewRandomType(
+					defaultProfileImageType
+				),
+				channelProfileImage = null
+			)
+		}
+	}
+
+	fun onClickGallery() {
 		startEvent(MakeChannelEvent.OpenGallery)
 	}
 

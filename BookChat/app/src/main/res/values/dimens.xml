@@ -26,4 +26,6 @@
     <!--make_chat_room-->
     <dimen name="make_chat_room_img_width_default">100dp</dimen>
     <dimen name="make_chat_room_img_height_default">150dp</dimen>
+    <!--image_crop-->
+    <dimen name="image_crop_aspect_ratio_btn_layout_height">70dp</dimen>
 </resources>

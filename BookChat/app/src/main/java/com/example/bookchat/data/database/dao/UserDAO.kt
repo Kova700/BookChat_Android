@@ -4,6 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.bookchat.data.database.model.CHAT_ENTITY_TABLE_NAME
+import com.example.bookchat.data.database.model.USER_ENTITY_TABLE_NAME
 import com.example.bookchat.data.database.model.UserEntity
 import com.example.bookchat.domain.model.UserDefaultProfileType
 
@@ -48,4 +50,7 @@ interface UserDAO {
                 "WHERE id = :userId"
     )
     suspend fun getUser(userId: Long): UserEntity?
+
+    @Query("DELETE FROM $USER_ENTITY_TABLE_NAME")
+    suspend fun deleteAll()
 }

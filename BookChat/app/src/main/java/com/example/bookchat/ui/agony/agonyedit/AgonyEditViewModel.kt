@@ -56,7 +56,7 @@ class AgonyEditViewModel @Inject constructor(
 			)
 		}
 			.onSuccess { startEvent(AgonyEditUiEvent.MoveToBack) }
-			.onFailure { startEvent(AgonyEditUiEvent.MakeToast(R.string.agony_title_edit_fail)) }
+			.onFailure { startEvent(AgonyEditUiEvent.ShowSnackBar(R.string.agony_title_edit_fail)) }
 	}
 
 	fun onClickXBtn() {
@@ -73,6 +73,7 @@ class AgonyEditViewModel @Inject constructor(
 
 	fun onClickConfirmBtn() {
 		if (uiState.value.isPossibleChangeAgony.not()) return
+		startEvent(AgonyEditUiEvent.CloseKeyboard)
 		reviseAgony(uiState.value.newTitle.trim())
 	}
 

@@ -1,35 +1,35 @@
 package com.example.bookchat.ui.home
 
-import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.User
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
+import com.example.bookchat.ui.home.model.HomeItem
 
 data class HomeUiState(
 	val client: User,
 	val bookUiState: UiState,
 	val channelUiState: UiState,
-	val readingBookShelfBooks: List<BookShelfListItem>,
-	val channels: List<Channel>,
+	val items: List<HomeItem>,
 ) {
 
 	enum class UiState {
 		SUCCESS,
-		LOADING,
+		INIT_LOADING,
 		ERROR,
 	}
 
 	companion object {
 		val DEFAULT = HomeUiState(
 			client = User.Default,
-			bookUiState = UiState.SUCCESS,
-			channelUiState = UiState.SUCCESS,
-			readingBookShelfBooks = emptyList(),
-			channels = emptyList()
+			bookUiState = UiState.INIT_LOADING,
+			channelUiState = UiState.INIT_LOADING,
+			items = emptyList()
 		)
 	}
 }
 
 sealed class HomeUiEvent {
+	data object MoveToReadingBookShelf : HomeUiEvent()
 	data class MoveToChannel(val channelId: Long) : HomeUiEvent()
-	data class MoveToReadingBookShelf(val bookShelfListItemId: Long) : HomeUiEvent()
+	data class ShowSnackBar(val stringId: Int) : HomeUiEvent()
+	data object MoveToSearch : HomeUiEvent()
+	data object MoveToMakeChannel : HomeUiEvent()
 }

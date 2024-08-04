@@ -24,18 +24,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_back_btn" />
 
-        <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/folder_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="27dp"
-            android:layout_marginEnd="25dp"
-            android:onClick="@{() -> viewmodel.onFolderBtnClick()}"
-            android:background="?android:selectableItemBackgroundBorderless"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/folder_icon" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/agonyRecordRcv"
             android:layout_width="match_parent"

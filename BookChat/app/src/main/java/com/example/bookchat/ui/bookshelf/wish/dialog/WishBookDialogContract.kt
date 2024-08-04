@@ -1,36 +1,41 @@
 package com.example.bookchat.ui.bookshelf.wish.dialog
 
+import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.model.BookShelfState
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 
 data class WishBookDialogUiState(
 	val uiState: UiState,
-	val wishItem: BookShelfListItem,
-	val isToggleChecked: Boolean,
+	val wishItem: BookShelfItem,
 ) {
+
+	val isLoading
+		get() = uiState == UiState.LOADING
 
 	enum class UiState {
 		SUCCESS,
 		LOADING,
 		ERROR,
-		EMPTY,
 	}
 
 	companion object {
 		val DEFAULT = WishBookDialogUiState(
-			uiState = UiState.EMPTY,
-			wishItem = BookShelfListItem.DEFAULT,
-			isToggleChecked = true
+			uiState = UiState.SUCCESS,
+			wishItem = BookShelfItem.DEFAULT,
 		)
 	}
 }
 
 sealed class WishBookDialogEvent {
+	data object MoveToBack : WishBookDialogEvent()
 	data class ChangeBookShelfTab(
-		val targetState: BookShelfState
+		val targetState: BookShelfState,
 	) : WishBookDialogEvent()
 
-	data class MakeToast(
-		val stringId: Int
+	data class ShowSnackBar(
+		val stringId: Int,
+	) : WishBookDialogEvent()
+
+	data class MoveToAgony(
+		val bookShelfListItemId: Long,
 	) : WishBookDialogEvent()
 }

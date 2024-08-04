@@ -9,14 +9,13 @@ import com.example.bookchat.domain.repository.BookSearchRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class BookSearchRepositoryImpl @Inject constructor(
-	private val bookChatApi: BookChatApi
+	private val bookChatApi: BookChatApi,
 ) : BookSearchRepository {
 	private val mapBooks = MutableStateFlow<Map<String, Book>>(emptyMap())//(isbn, Book)
 	private val books = mapBooks.map { it.values.toList() }.filterNotNull()
@@ -26,7 +25,7 @@ class BookSearchRepositoryImpl @Inject constructor(
 	private var isEndPage = false
 
 	override fun getBooksFLow(initFlag: Boolean): Flow<List<Book>> {
-		if (initFlag) clearCachedData()
+		if (initFlag) clear()
 		return books
 	}
 
@@ -36,7 +35,7 @@ class BookSearchRepositoryImpl @Inject constructor(
 		sort: BookSearchSortOption,
 	): List<Book> {
 		if (cachedSearchKeyword != keyword) {
-			clearCachedData()
+			clear()
 		}
 		if (isEndPage) return books.firstOrNull() ?: emptyList()
 
@@ -48,18 +47,18 @@ class BookSearchRepositoryImpl @Inject constructor(
 		)
 		cachedSearchKeyword = keyword
 		isEndPage = response.searchingMeta.isEnd
-		currentPage += loadSize
+		currentPage += 1
 
 		val newBooks = response.bookSearchResponse.map { it.toBook() }
 		mapBooks.update { mapBooks.value + newBooks.associateBy { it.isbn } }
-		return books.first()
+		return books.firstOrNull() ?: emptyList()
 	}
 
 	override fun getCachedBook(isbn: String): Book {
 		return mapBooks.value[isbn]!!
 	}
 
-	private fun clearCachedData() {
+	override fun clear() {
 		mapBooks.update { emptyMap() }
 		cachedSearchKeyword = ""
 		currentPage = 1

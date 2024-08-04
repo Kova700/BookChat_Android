@@ -31,10 +31,10 @@ data class SubHostManageUiState(
 }
 
 sealed class SubHostManageUiEvent {
-	object MoveBack : SubHostManageUiEvent()
-	object MoveAddSubHost : SubHostManageUiEvent()
-	object MoveDeleteSubHost : SubHostManageUiEvent()
-	data class MakeToast(
+	data object MoveBack : SubHostManageUiEvent()
+	data object MoveAddSubHost : SubHostManageUiEvent()
+	data object MoveDeleteSubHost : SubHostManageUiEvent()
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : SubHostManageUiEvent()
 }

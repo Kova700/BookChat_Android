@@ -31,9 +31,10 @@ data class HostManageUiState(
 }
 
 sealed class HostManageUiEvent {
-	object MoveBack : HostManageUiEvent()
-	object ShowHostChangeSuccessDialog : HostManageUiEvent()
-	data class MakeToast(
+	data object MoveBack : HostManageUiEvent()
+	data object ShowHostChangeSuccessDialog : HostManageUiEvent()
+	data object CloseKeyboard : HostManageUiEvent()
+	data class ShowSnackBar(
 		val stringId: Int,
 	) : HostManageUiEvent()
 }

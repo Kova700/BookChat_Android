@@ -1,23 +1,24 @@
 package com.example.bookchat.ui.bookshelf.wish.dialog
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogWishBookTapClickedBinding
 import com.example.bookchat.domain.model.BookShelfState
+import com.example.bookchat.ui.agony.agony.AgonyActivity
+import com.example.bookchat.ui.agony.agony.AgonyViewModel
 import com.example.bookchat.ui.bookshelf.wish.WishBookShelfViewModel
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager
 import com.example.bookchat.utils.image.loadUrl
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -43,11 +44,8 @@ class WishBookDialog : DialogFragment() {
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
-	): View? {
-		_binding =
-			DataBindingUtil.inflate(inflater, R.layout.dialog_wish_book_tap_clicked, container, false)
-		binding.lifecycleOwner = this.viewLifecycleOwner
-		binding.viewmodel = wishBookDialogViewModel
+	): View {
+		_binding = DialogWishBookTapClickedBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -75,15 +73,37 @@ class WishBookDialog : DialogFragment() {
 	}
 
 	private fun setViewState(uiState: WishBookDialogUiState) {
-		binding.bookImg.loadUrl(uiState.wishItem.book.bookCoverImageUrl)
-		binding.selectedBookTitleTv.isSelected = true
-		binding.selectedBookAuthorsTv.isSelected = true
-		binding.selectedBookPublishAtTv.isSelected = true
+		setViewVisibility(uiState)
+		with(binding) {
+			bookImg.loadUrl(uiState.wishItem.book.bookCoverImageUrl)
+			bookTitleTv.text = uiState.wishItem.book.title
+			bookTitleTv.isSelected = true
+			bookAuthorsTv.text = uiState.wishItem.book.authorsString
+			bookAuthorsTv.isSelected = true
+			bookPublishAtTv.text = uiState.wishItem.book.publishAt
+			bookPublishAtTv.isSelected = true
+		}
+	}
+
+	private fun setViewVisibility(uiState: WishBookDialogUiState) {
+		with(binding) {
+			progressBar.visibility = if (uiState.isLoading) View.VISIBLE else View.GONE
+			notLoadingStateGroup.visibility =
+				if (uiState.isLoading.not()) View.VISIBLE else View.INVISIBLE
+		}
 	}
 
 	private fun initViewState() {
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
 		dialogSizeManager.setDialogSize(binding.wishDialogLayout)
+		with(binding) {
+			wishHeartToggleBtn.setOnClickListener {
+				wishHeartToggleBtn.isChecked = true
+				wishBookDialogViewModel.onHeartToggleClick()
+			}
+			moveToAgonyBtn.setOnClickListener { wishBookDialogViewModel.onMoveToAgonyClick() }
+			changeStatusToReadingBtn.setOnClickListener { wishBookDialogViewModel.onChangeToReadingClick() }
+		}
 	}
 
 	private fun moveToOtherTab(targetState: BookShelfState) {
@@ -91,9 +111,23 @@ class WishBookDialog : DialogFragment() {
 		dismiss()
 	}
 
-	private fun handleEvent(event: WishBookDialogEvent) = when (event) {
-		is WishBookDialogEvent.ChangeBookShelfTab -> moveToOtherTab(event.targetState)
-		is WishBookDialogEvent.MakeToast -> makeToast(event.stringId)
+	private fun moveToAgony(bookShelfListItemId: Long) {
+		val intent = Intent(requireContext(), AgonyActivity::class.java)
+			.putExtra(AgonyViewModel.EXTRA_AGONY_BOOKSHELF_ITEM_ID, bookShelfListItemId)
+		startActivity(intent)
+	}
+
+	private fun handleEvent(event: WishBookDialogEvent) {
+		when (event) {
+			is WishBookDialogEvent.ChangeBookShelfTab -> moveToOtherTab(event.targetState)
+			is WishBookDialogEvent.ShowSnackBar -> binding.root.showSnackBar(
+				textId = event.stringId,
+				anchor = binding.moveToAgonyBtn
+			)
+
+			is WishBookDialogEvent.MoveToAgony -> moveToAgony(event.bookShelfListItemId)
+			WishBookDialogEvent.MoveToBack -> dismiss()
+		}
 	}
 
 	companion object {

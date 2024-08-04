@@ -1,25 +1,29 @@
 package com.example.bookchat.ui.search.dialog
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogSearchBookClickedBinding
+import com.example.bookchat.domain.model.SearchFilter
+import com.example.bookchat.domain.model.SearchPurpose
+import com.example.bookchat.ui.search.SearchFragment
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState.AlreadyInBookShelf
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState.Default
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState.Loading
+import com.example.bookchat.ui.search.model.SearchTarget
+import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.DialogSizeManager
 import com.example.bookchat.utils.image.loadUrl
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -43,10 +47,7 @@ class SearchBookDialog : DialogFragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding =
-			DataBindingUtil.inflate(inflater, R.layout.dialog_search_book_clicked, container, false)
-		binding.lifecycleOwner = this.viewLifecycleOwner
-		binding.viewmodel = searchBookDialogViewModel
+		_binding = DialogSearchBookClickedBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -76,13 +77,27 @@ class SearchBookDialog : DialogFragment() {
 	private fun initViewState() {
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
 		dialogSizeManager.setDialogSize(binding.dialogLayout)
+		with(binding) {
+			channelSearchBtn.setOnClickListener { searchBookDialogViewModel.onClickChatBtn() }
+			heartBtn.setOnClickListener {
+				heartBtn.isChecked = searchBookDialogViewModel.uiState.value.isAlreadyInWishBookShelf
+				searchBookDialogViewModel.onClickWishToggleBtn()
+			}
+			changeStatusToCompleteBtn.setOnClickListener { searchBookDialogViewModel.onClickCompleteBtn() }
+			changeStatusToReadingBtn.setOnClickListener { searchBookDialogViewModel.onClickReadingBtn() }
+		}
 	}
 
 	private fun setViewState(uiState: SearchDialogUiState) {
-		binding.bookImg.loadUrl(uiState.book.bookCoverImageUrl)
-		binding.bookTitleTv.isSelected = true
-		binding.bookAuthorsTv.isSelected = true
-		binding.bookPublishATv.isSelected = true
+		with(binding) {
+			bookImg.loadUrl(uiState.book.bookCoverImageUrl)
+			bookTitleTv.isSelected = true
+			bookTitleTv.text = uiState.book.title
+			bookAuthorsTv.isSelected = true
+			bookAuthorsTv.text = uiState.book.authorsString
+			bookPublishATv.isSelected = true
+			bookPublishATv.text = uiState.book.publishAt
+		}
 		setViewVisibility(uiState.uiState)
 	}
 
@@ -91,7 +106,7 @@ class SearchBookDialog : DialogFragment() {
 			loadingProgressbar.visibility =
 				if (uiState == Loading) View.VISIBLE else View.INVISIBLE
 			notLoadingStateGroup.visibility =
-				if (uiState == Loading) View.INVISIBLE else View.VISIBLE
+				if (uiState != Loading) View.VISIBLE else View.INVISIBLE
 			alreadyInBookshelfBtn.visibility =
 				if (uiState is AlreadyInBookShelf) View.VISIBLE else View.INVISIBLE
 			changeStatusToCompleteBtn.visibility =
@@ -100,7 +115,23 @@ class SearchBookDialog : DialogFragment() {
 				if (uiState is Default) View.VISIBLE else View.INVISIBLE
 			heartBtn.visibility =
 				if (uiState is Default) View.VISIBLE else View.INVISIBLE
+			heartBtn.isChecked = searchBookDialogViewModel.uiState.value.isAlreadyInWishBookShelf
 		}
+	}
+
+	//TODO : ISBN으로 채팅방 검색하기 서버 API 수정 대기중
+	private fun moveToChannelSearchWithSelectedBook(
+		searchKeyword: String,
+		searchTarget: SearchTarget,
+		searchPurpose: SearchPurpose,
+		searchFilter: SearchFilter,
+	) {
+		val intent = Intent(requireActivity(), SearchDetailActivity::class.java)
+		intent.putExtra(SearchFragment.EXTRA_SEARCH_KEYWORD, searchKeyword)
+		intent.putExtra(SearchFragment.EXTRA_SEARCH_PURPOSE, searchPurpose)
+		intent.putExtra(SearchFragment.EXTRA_SEARCH_TARGET, searchTarget)
+		intent.putExtra(SearchFragment.EXTRA_SEARCH_FILTER, searchFilter)
+		startActivity(intent)
 	}
 
 	private fun moveToStarSetDialog() {
@@ -110,7 +141,17 @@ class SearchBookDialog : DialogFragment() {
 
 	private fun handleEvent(event: SearchTapDialogEvent) = when (event) {
 		is SearchTapDialogEvent.MoveToStarSetDialog -> moveToStarSetDialog()
-		is SearchTapDialogEvent.MakeToast -> makeToast(event.stringId)
+		is SearchTapDialogEvent.ShowSnackBar -> binding.root.showSnackBar(
+			textId = event.stringId,
+			anchor = binding.changeStatusToReadingBtn
+		)
+
+		is SearchTapDialogEvent.MoveToChannelSearchWithSelectedBook, -> moveToChannelSearchWithSelectedBook(
+			searchKeyword = event.searchKeyword,
+			searchTarget = event.searchTarget,
+			searchPurpose = event.searchPurpose,
+			searchFilter = event.searchFilter
+		)
 	}
 
 	companion object {

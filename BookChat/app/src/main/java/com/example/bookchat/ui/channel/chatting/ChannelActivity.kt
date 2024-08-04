@@ -21,10 +21,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
+import com.example.bookchat.data.stomp.external.model.SocketState
 import com.example.bookchat.databinding.ActivityChannelBinding
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.channel.channelsetting.ChannelSettingActivity
 import com.example.bookchat.ui.channel.channelsetting.ChannelSettingActivity.Companion.RESULT_CODE_USER_CHANNEL_EXIT
@@ -44,7 +44,7 @@ import com.example.bookchat.utils.isOnHigherPosition
 import com.example.bookchat.utils.isOnListBottom
 import com.example.bookchat.utils.isOnListTop
 import com.example.bookchat.utils.isVisiblePosition
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -551,43 +551,40 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun changeToCaptureMode() {
-		with(binding.chatInputEt) {
-			clearFocus()
-			isEnabled = false
+		with(binding) {
+			chatInputEt.clearFocus()
+			chatInputEt.isEnabled = false
+			captureBtn.isEnabled = false
+			chatSendBtn.isEnabled = false
+			channelCaptureLayout.layout.visibility = View.VISIBLE
+			captureModeBottomShadow.visibility = View.VISIBLE
 		}
-		binding.captureBtn.isEnabled = false
-		binding.chatSendBtn.isEnabled = false
 		chatItemAdapter.changeToCaptureMode()
-		binding.channelCaptureLayout.layout.visibility = View.VISIBLE
-		binding.captureModeBottomShadow.visibility = View.VISIBLE
 	}
 
 	private fun changeToDefaultMode() {
-		binding.chatInputEt.isEnabled = true
-		binding.captureBtn.isEnabled = true
-		binding.chatSendBtn.isEnabled = true
+		with(binding) {
+			chatInputEt.isEnabled = true
+			captureBtn.isEnabled = true
+			chatSendBtn.isEnabled = true
+			channelCaptureLayout.layout.visibility = View.GONE
+			captureModeBottomShadow.visibility = View.GONE
+		}
 		chatItemAdapter.changeToDefaultMode()
-		binding.channelCaptureLayout.layout.visibility = View.GONE
-		binding.captureModeBottomShadow.visibility = View.GONE
 	}
 
 	private fun makeCaptureImage(
-		headerIndex: Int, bottomIndex: Int,
-	) {
+		headerIndex: Int,
+		bottomIndex: Int,
+	) = lifecycleScope.launch {
 		runCatching {
 			binding.chattingRcv.captureItems(
 				headerIndex = headerIndex,
 				bottomIndex = bottomIndex
 			)
 		}
-			.onSuccess {
-				channelViewModel.onClickCancelCapture()
-				makeToast(R.string.channel_scrap_success) //TODO : Toast 말고 커스텀 UI로 구성
-			}
-			.onFailure {
-				Log.d(TAG, "ChannelActivity: makeCaptureImage() - throwable : $it")
-				makeToast(R.string.channel_scrap_fail)
-			}
+			.onSuccess { channelViewModel.onCompletedCapture() }
+			.onFailure { channelViewModel.onFailedCapture() }
 	}
 
 	private fun handleEvent(event: ChannelEvent) {
@@ -597,7 +594,11 @@ class ChannelActivity : AppCompatActivity() {
 			ChannelEvent.ScrollToBottom -> scrollToBottom()
 			ChannelEvent.MoveChannelSetting -> moveChannelSetting()
 			is ChannelEvent.MoveUserProfile -> moveToUserProfile(event.user)
-			is ChannelEvent.MakeToast -> makeToast(event.stringId)
+			is ChannelEvent.ShowSnackBar -> binding.root.showSnackBar(
+				textId = event.stringId,
+				anchor = binding.bottomDivider
+			)
+
 			is ChannelEvent.NewChatOccurEvent -> checkIfNewChatNoticeIsRequired(event.chat)
 			is ChannelEvent.ShowChannelExitWarningDialog ->
 				showChannelExitWarningDialog(event.clientAuthority)

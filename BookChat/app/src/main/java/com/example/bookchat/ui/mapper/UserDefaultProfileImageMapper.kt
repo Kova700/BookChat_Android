@@ -4,8 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import com.example.bookchat.R
 import com.example.bookchat.domain.model.UserDefaultProfileType
-import com.example.bookchat.utils.image.bitmap.getImageBitmap
 import com.example.bookchat.utils.dpToPx
+import com.example.bookchat.utils.image.bitmap.getImageBitmap
 
 fun UserDefaultProfileType?.getResId() =
 	when (this) {
@@ -19,14 +19,15 @@ fun UserDefaultProfileType?.getResId() =
 		UserDefaultProfileType.FIVE -> R.drawable.default_profile_img5
 	}
 
-fun UserDefaultProfileType?.getBitmap(
+suspend fun UserDefaultProfileType?.getBitmap(
 	context: Context,
 	imageSizePx: Int = 35.dpToPx(context),
 	roundedCornersRadiusPx: Int = 14.dpToPx(context),
 ): Bitmap {
 	return getResId().getImageBitmap(
 		context = context,
-		imageSizePx = imageSizePx,
+		imageWidthPx = imageSizePx,
+		imageHeightPx = imageSizePx,
 		roundedCornersRadiusPx = roundedCornersRadiusPx
 	)!!
 }

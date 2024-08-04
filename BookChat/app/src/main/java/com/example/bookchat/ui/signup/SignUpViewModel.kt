@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.signup
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
@@ -27,6 +28,22 @@ class SignUpViewModel @Inject constructor(
 	private val _uiState = MutableStateFlow<SignUpState>(SignUpState.DEFAULT)
 	val uiState = _uiState.asStateFlow()
 
+	private fun verifyNickname() = viewModelScope.launch {
+		val nickName = uiState.value.nickname
+		val userProfile = uiState.value.clientNewImageUri
+		val nameCheckStatus = uiState.value.nicknameCheckState
+
+		when {
+			nameCheckStatus != NicknameCheckState.IsPerfect -> checkNicknameDuplication(nickName)
+			nameCheckStatus == NicknameCheckState.IsPerfect -> startEvent(
+				SignUpEvent.MoveToSelectTaste(
+					userNickname = nickName,
+					userProfileUri = userProfile
+				)
+			)
+		}
+	}
+
 	private fun checkNicknameDuplication(nickName: String) = viewModelScope.launch {
 		runCatching { clientRepository.isDuplicatedUserNickName(nickName) }
 			.onSuccess { isDuplicated ->
@@ -40,31 +57,16 @@ class SignUpViewModel @Inject constructor(
 			.onFailure { failHandler(it) }
 	}
 
-	fun onClickCameraBtn() {
-		startEvent(SignUpEvent.PermissionCheck)
-	}
-
 	fun onClickStartBtn() {
 		if (uiState.value.uiState == SignUpState.UiState.LOADING
 			|| uiState.value.nicknameCheckState == NicknameCheckState.IsShort
 			|| uiState.value.nickname.length < 2
 		) return
+		verifyNickname()
+	}
 
-		val nickName = uiState.value.nickname
-		val userProfile = uiState.value.clientNewImage
-		val nameCheckStatus = uiState.value.nicknameCheckState
-
-		if (nameCheckStatus != NicknameCheckState.IsPerfect) {
-			checkNicknameDuplication(nickName)
-			return
-		}
-
-		startEvent(
-			SignUpEvent.MoveToSelectTaste(
-				userNickname = nickName,
-				userProfilByteArray = userProfile
-			)
-		)
+	fun onClickCameraBtn() {
+		startEvent(SignUpEvent.PermissionCheck)
 	}
 
 	fun onChangeNickname(text: String) {
@@ -95,8 +97,8 @@ class SignUpViewModel @Inject constructor(
 		updateState { copy(nicknameCheckState = NicknameCheckState.IsSpecialCharInText) }
 	}
 
-	fun onChangeUserProfile(profile: ByteArray) {
-		updateState { copy(clientNewImage = profile) }
+	fun onChangeUserProfile(profileUri: String) {
+		updateState { copy(clientNewImageUri = profileUri) }
 	}
 
 	fun onClickBackBtn() {

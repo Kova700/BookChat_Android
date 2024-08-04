@@ -9,10 +9,15 @@ interface BookSearchRepository {
 
 	suspend fun search(
 		keyword: String,
-		loadSize: Int,
-		sort: BookSearchSortOption = BookSearchSortOption.ACCURACY
+		loadSize: Int = SEARCH_BOOKS_LOAD_SIZE,
+		sort: BookSearchSortOption = BookSearchSortOption.ACCURACY,
 	): List<Book>
 
 	fun getCachedBook(isbn: String): Book
 
+	companion object {
+		private const val SEARCH_BOOKS_LOAD_SIZE = 30
+	}
+
+	fun clear()
 }

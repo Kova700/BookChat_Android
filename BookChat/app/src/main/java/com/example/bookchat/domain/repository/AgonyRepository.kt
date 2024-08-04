@@ -38,6 +38,8 @@ interface AgonyRepository {
 		agonyIds: List<Long>,
 	)
 
+	fun clear()
+
 	companion object {
 		const val AGONY_LOAD_SIZE = 6
 	}

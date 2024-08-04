@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentSearchTapResultBinding
+import com.example.bookchat.domain.model.SearchPurpose
 import com.example.bookchat.ui.search.SearchUiState.SearchResultState
 import com.example.bookchat.ui.search.adapter.SearchItemAdapter
 import com.example.bookchat.ui.search.model.SearchResultItem
@@ -39,14 +40,15 @@ class SearchTapResultFragment : Fragment() {
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
+		savedInstanceState: Bundle?,
 	): View {
 		_binding =
 			DataBindingUtil.inflate(
-				inflater, R.layout.fragment_search_tap_result, container, false
+				inflater, R.layout.fragment_search_tap_result,
+				container, false
 			)
 		binding.viewmodel = searchViewModel
-		binding.lifecycleOwner = this
+		binding.lifecycleOwner = viewLifecycleOwner
 		return binding.root
 	}
 
@@ -73,6 +75,7 @@ class SearchTapResultFragment : Fragment() {
 	private fun initViewState() {
 		initShimmerGridLayout()
 		initShimmerBook()
+		initShimmerChannel()
 	}
 
 	private fun initShimmerGridLayout() {
@@ -93,9 +96,18 @@ class SearchTapResultFragment : Fragment() {
 		}
 	}
 
+	private fun initShimmerChannel() {
+		val isMakeChannelPurpose =
+			searchViewModel.uiState.value.searchPurpose == SearchPurpose.MAKE_CHANNEL
+		with(binding.resultShimmerLayout) {
+			channelShimmerGroup.visibility =
+				if (isMakeChannelPurpose) View.GONE else View.VISIBLE
+		}
+	}
+
 	private fun setViewVisibility(uiState: SearchUiState) {
 		with(binding) {
-			resultEmptyLayout.visibility =
+			resultEmptyLayout.root.visibility =
 				if (isResultBothEmpty(uiState)) View.VISIBLE else View.GONE
 			resultShimmerLayout.shimmerLayout.visibility =
 				if (isVisibleSkeleton(uiState)) View.VISIBLE else View.GONE
@@ -134,6 +146,9 @@ class SearchTapResultFragment : Fragment() {
 			searchViewModel.onChannelItemClick(
 				((searchItemAdapter.currentList[position]) as SearchResultItem.ChannelItem).roomId
 			)
+		}
+		searchItemAdapter.onClickMakeChannelBtn = {
+			searchViewModel.onClickMakeChannelBtn()
 		}
 	}
 

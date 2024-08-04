@@ -14,7 +14,6 @@ import com.example.bookchat.databinding.ActivityBookReportBinding
 import com.example.bookchat.ui.bookreport.BookReportUiState.UiState
 import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.image.loadUrl
-import com.example.bookchat.utils.makeToast
 import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -108,7 +107,7 @@ class BookReportActivity : AppCompatActivity() {
 				onOkClick = event.onOkClick
 			)
 
-			is BookReportEvent.MakeToast -> makeToast(event.stringId)
+			is BookReportEvent.ShowSnackBar -> binding.bookReportLayout.showSnackBar(event.stringId)
 			is BookReportEvent.ErrorEvent -> binding.bookReportLayout.showSnackBar(event.stringId)
 			is BookReportEvent.UnknownErrorEvent -> binding.bookReportLayout.showSnackBar(event.message)
 		}

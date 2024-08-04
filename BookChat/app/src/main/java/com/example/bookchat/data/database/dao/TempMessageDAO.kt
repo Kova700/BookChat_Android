@@ -4,45 +4,27 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.bookchat.data.database.model.TEMP_MESSAGE_TABLE_NAME
 import com.example.bookchat.data.database.model.TempMessageEntity
 
 @Dao
 interface TempMessageDAO {
 
-    @Query(
-        "SELECT * FROM TempMessage " +
-                "WHERE chat_room_id = :roomId"
-    )
-    suspend fun getTempMessage(roomId: Long): TempMessageEntity?
+	@Query(
+		"SELECT * FROM TempMessage " +
+						"WHERE chat_room_id = :roomId"
+	)
+	suspend fun getTempMessage(roomId: Long): TempMessageEntity?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertIgnore(tempMessageEntity: TempMessageEntity): Long
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	suspend fun insert(tempMessageEntity: TempMessageEntity): Long
 
-    suspend fun insertOrUpdateTempMessage(
-        roomId: Long,
-        message: String
-    ) {
-        val id = insertIgnore(
-            TempMessageEntity(
-                chatRoomId = roomId,
-                message = message
-            )
-        )
-        if (id != -1L) return
+	@Query(
+		"DELETE FROM TempMessage " +
+						"WHERE chat_room_id = :channelId"
+	)
+	suspend fun deleteChannelTempMessage(channelId: Long)
 
-        setTempSavedMessage(
-            roomId = roomId,
-            message = message
-        )
-    }
-
-    @Query(
-        "UPDATE TempMessage SET " +
-                "message = :message " +
-                "WHERE chat_room_id = :roomId"
-    )
-    suspend fun setTempSavedMessage(
-        roomId: Long,
-        message: String
-    )
+	@Query("DELETE FROM $TEMP_MESSAGE_TABLE_NAME")
+	suspend fun deleteAll()
 }

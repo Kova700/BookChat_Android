@@ -1,12 +1,13 @@
 package com.example.bookchat.ui.mypage.useredit
 
+import android.graphics.Bitmap
 import com.example.bookchat.domain.model.NicknameCheckState
 import com.example.bookchat.domain.model.User
 
 data class UserEditUiState(
 	val uiState: UiState,
 	val newNickname: String,
-	val clientNewImage: ByteArray?,
+	val clientNewImage: Bitmap?,
 	val nicknameCheckState: NicknameCheckState,
 	val client: User,
 	val isSelectedDefaultImage: Boolean,
@@ -47,9 +48,9 @@ data class UserEditUiState(
 }
 
 sealed class UserEditUiEvent {
-	object MoveToGallery : UserEditUiEvent()
-	object MoveToBack : UserEditUiEvent()
-	object ShowUserProfileEditDialog : UserEditUiEvent()
-	data class ErrorEvent(val stringId: Int) : UserEditUiEvent()
-	data class UnknownErrorEvent(val message: String) : UserEditUiEvent()
+	data object MoveToGallery : UserEditUiEvent()
+	data object MoveToBack : UserEditUiEvent()
+	data object ShowProfileEditDialog : UserEditUiEvent()
+	data object CloseKeyboard : UserEditUiEvent()
+	data class ShowSnackBar(val stringId: Int) : UserEditUiEvent()
 }

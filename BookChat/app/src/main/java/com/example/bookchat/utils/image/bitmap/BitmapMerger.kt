@@ -5,13 +5,15 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.LruCache
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-fun getMergedBitmap(
+suspend fun getMergedBitmap(
 	cacheRange: IntRange,
 	bitmapCache: LruCache<Int, Bitmap>,
 	bigBitmapWidth: Int,
 	bigBitmapHeight: Int,
-): Bitmap {
+): Bitmap = withContext(Dispatchers.IO) {
 	val bigBitmap = Bitmap.createBitmap(
 		bigBitmapWidth,
 		bigBitmapHeight,
@@ -29,6 +31,5 @@ fun getMergedBitmap(
 		heightPosition += bitmap.height
 		bitmap.recycle()
 	}
-
-	return bigBitmap
+	bigBitmap
 }

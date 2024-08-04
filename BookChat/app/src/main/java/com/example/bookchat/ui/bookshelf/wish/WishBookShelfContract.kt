@@ -1,23 +1,32 @@
 package com.example.bookchat.ui.bookshelf.wish
 
 import com.example.bookchat.domain.model.BookShelfState
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
+import com.example.bookchat.ui.bookshelf.wish.model.WishBookShelfItem
 
 data class WishBookShelfUiState(
 	val uiState: UiState,
 	val wishItems: List<WishBookShelfItem>,
 ) {
+	val isLoading: Boolean
+		get() = uiState == UiState.LOADING
+
+	val isInitLoading: Boolean
+		get() = uiState == UiState.INIT_LOADING
+
+	val isEmpty: Boolean
+		get() = wishItems.isEmpty()
+						&& isLoading.not()
+						&& isInitLoading.not()
 
 	enum class UiState {
 		SUCCESS,
 		LOADING,
-		ERROR,
-		EMPTY,
+		INIT_LOADING
 	}
 
 	companion object {
 		val DEFAULT = WishBookShelfUiState(
-			uiState = UiState.EMPTY,
+			uiState = UiState.INIT_LOADING,
 			wishItems = emptyList(),
 		)
 	}
@@ -26,31 +35,15 @@ data class WishBookShelfUiState(
 sealed class WishBookShelfEvent {
 
 	data class MoveToWishBookDialog(
-		val item: BookShelfListItem
+		val item: WishBookShelfItem.Item,
 	) : WishBookShelfEvent()
 
 	data class ChangeBookShelfTab(
-		val targetState: BookShelfState
+		val targetState: BookShelfState,
 	) : WishBookShelfEvent()
 
-}
+	data class ShowSnackBar(
+		val stringId: Int,
+	) : WishBookShelfEvent()
 
-sealed interface WishBookShelfItem {
-
-	fun getCategoryId(): Long {
-		return when (this) {
-			is Header -> HEADER_ITEM_STABLE_ID
-			is Item -> bookShelfListItem.bookShelfId
-			is Dummy -> hashCode().toLong()
-		}
-	}
-
-	data class Header(val totalItemCount: Int) : WishBookShelfItem
-	data class Item(val bookShelfListItem: BookShelfListItem) : WishBookShelfItem
-	data class Dummy(val id: Int) : WishBookShelfItem
-
-	private companion object {
-		private const val HEADER_ITEM_STABLE_ID = -1L
-		private const val DUMMY_ITEM_STABLE_ID = -2L
-	}
 }

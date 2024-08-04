@@ -7,5 +7,5 @@ interface ChattingNotificationInfoRepository {
 	suspend fun getNotificationLastTimestamp(notificationId: Int): Long?
 	suspend fun updateShownNotificationInfo(notificationId: Int, lastTimestamp: Long)
 	suspend fun removeShownNotificationInfo(notificationId: Int)
-	suspend fun clearShownNotificationInfos()
+	suspend fun clear()
 }

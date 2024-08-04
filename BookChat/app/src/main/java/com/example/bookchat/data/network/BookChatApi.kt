@@ -30,6 +30,11 @@ interface BookChatApi {
 		@Part("userSignUpRequest") requestUserSignUp: RequestUserSignUp,
 	)
 
+	@PUT("/v1/api/devices/fcm-token")
+	suspend fun renewFcmToken(
+		@Body fcmToken: String,
+	)
+
 	@Multipart
 	@POST("/v1/api/users/profile")
 	suspend fun changeUserProfile(
@@ -38,10 +43,13 @@ interface BookChatApi {
 	)
 
 	@POST("/v1/api/users/signin")
-	suspend fun signIn(
+	suspend fun login(
 		@Header("OIDC") idToken: String,
-		@Body requestUserSignIn: RequestUserSignIn,
+		@Body requestUserLogin: RequestUserLogin,
 	): Response<BookChatTokenResponse>
+
+	@POST("/v1/api/users/logout")
+	suspend fun logout()
 
 	@POST("/v1/api/auth/token")
 	suspend fun renewBookChatToken(
@@ -97,7 +105,7 @@ interface BookChatApi {
 	suspend fun checkAlreadyInBookShelf(
 		@Query("isbn") isbn: String,
 		@Query("publishAt") publishAt: String,
-	): BookStateInBookShelfResponse
+	): Response<BookStateInBookShelfResponse>
 
 	/**------------독후감------------*/
 

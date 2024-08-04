@@ -4,12 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
+import com.example.bookchat.domain.model.BookShelfItem
 import com.example.bookchat.domain.model.BookShelfState
 import com.example.bookchat.domain.model.toStarRating
 import com.example.bookchat.domain.repository.BookShelfRepository
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfItem
-import com.example.bookchat.ui.bookshelf.mapper.toBookShelfListItem
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialog.Companion.EXTRA_READING_BOOKSHELF_ITEM_ID
 import com.example.bookchat.ui.bookshelf.reading.dialog.ReadingBookDialogUiState.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,13 +35,39 @@ class ReadingBookDialogViewModel @Inject constructor(
 	val uiState = _uiState.asStateFlow()
 
 	init {
-		getItem()
+		initUiState()
 	}
 
-	private fun getItem() {
-		val item =
-			bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)?.toBookShelfListItem()
-		item?.let { updateState { copy(readingItem = item) } }
+	private fun initUiState() {
+		val item = bookShelfRepository.getCachedBookShelfItem(bookShelfListItemId)
+		updateState { copy(readingItem = item) }
+	}
+
+	private fun changeBookShelfItemStatus(
+		bookShelfItem: BookShelfItem,
+		newState: BookShelfState,
+	) {
+		if (uiState.value.uiState == UiState.LOADING) return
+		updateState { copy(uiState = UiState.LOADING) }
+
+		viewModelScope.launch {
+			runCatching {
+				bookShelfRepository.changeBookShelfBookStatus(
+					bookShelfItemId = bookShelfItem.bookShelfId,
+					newBookShelfItem = bookShelfItem.copy(
+						state = newState,
+						star = uiState.value.starRating.toStarRating()
+					)
+				)
+			}
+				.onSuccess {
+					startEvent(ReadingBookDialogEvent.ChangeBookShelfTab(targetState = newState))
+				}
+				.onFailure {
+					startEvent(ReadingBookDialogEvent.ShowSnackBar(R.string.bookshelf_state_change_fail))
+				}
+				.also { updateState { copy(uiState = UiState.SUCCESS) } }
+		}
 	}
 
 	fun onChangeStarRating(rating: Float) {
@@ -56,45 +80,15 @@ class ReadingBookDialogViewModel @Inject constructor(
 	}
 
 	private fun onChangeStateClick(newState: BookShelfState) {
-		if (uiState.value.uiState == UiState.LOADING) return
 		changeBookShelfItemStatus(uiState.value.readingItem, newState)
 	}
 
-	private fun changeBookShelfItemStatus(
-		bookShelfItem: BookShelfListItem,
-		newState: BookShelfState
-	) {
-		updateState { copy(uiState = UiState.LOADING) }
-		viewModelScope.launch {
-			runCatching {
-				bookShelfRepository.changeBookShelfBookStatus(
-					bookShelfItemId = bookShelfItem.bookShelfId,
-					newBookShelfItem = bookShelfItem.copy(
-						state = newState,
-						star = uiState.value.starRating.toStarRating()
-					).toBookShelfItem(),
-				)
-			}.onSuccess {
-				startEvent(
-					ReadingBookDialogEvent.ChangeBookShelfTab(
-						targetState = newState
-					)
-				)
-			}.onFailure {
-				startEvent(ReadingBookDialogEvent.MakeToast(R.string.bookshelf_state_change_fail))
-			}
-				.also { updateState { copy(uiState = UiState.SUCCESS) } }
-		}
-	}
-
-	fun onMoveToAgonyClick() {
+	fun onClickMoveToAgony() {
 		startEvent(ReadingBookDialogEvent.MoveToAgony(bookShelfListItemId))
 	}
 
 	private inline fun updateState(block: ReadingBookDialogUiState.() -> ReadingBookDialogUiState) {
-		_uiState.update {
-			_uiState.value.block()
-		}
+		_uiState.update { _uiState.value.block() }
 	}
 
 	private fun startEvent(event: ReadingBookDialogEvent) = viewModelScope.launch {

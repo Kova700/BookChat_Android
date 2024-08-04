@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogSearchFilterSelectBinding
 import com.example.bookchat.domain.model.SearchFilter
+import com.example.bookchat.domain.model.SearchPurpose
 import com.example.bookchat.ui.search.SearchUiState
 import com.example.bookchat.utils.DialogSizeManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -68,14 +69,34 @@ class SearchFilterSelectDialog(
 	private fun initViewState() {
 		dialogSizeManager.setDialogSize(binding.root)
 		with(binding) {
-			searchFilterBookTitleBtn.setOnClickListener { onSelectFilter.invoke(SearchFilter.BOOK_TITLE) }
-			searchFilterBookIsbnBtn.setOnClickListener { onSelectFilter.invoke(SearchFilter.BOOK_ISBN) }
-			searchFilterChannelTitleBtn.setOnClickListener { onSelectFilter.invoke(SearchFilter.ROOM_NAME) }
-			searchFilterChannelTagBtn.setOnClickListener { onSelectFilter.invoke(SearchFilter.ROOM_TAGS) }
+			searchFilterBookTitleBtn.setOnClickListener {
+				onSelectFilter.invoke(SearchFilter.BOOK_TITLE)
+				dismiss()
+			}
+			searchFilterBookIsbnBtn.setOnClickListener {
+				onSelectFilter.invoke(SearchFilter.BOOK_ISBN)
+				dismiss()
+			}
+			searchFilterChannelTitleBtn.setOnClickListener {
+				onSelectFilter.invoke(SearchFilter.ROOM_NAME)
+				dismiss()
+			}
+			searchFilterChannelTagBtn.setOnClickListener {
+				onSelectFilter.invoke(SearchFilter.ROOM_TAGS)
+				dismiss()
+			}
 		}
 	}
 
 	private fun setViewState(state: SearchUiState) {
+		if (state.searchPurpose == SearchPurpose.MAKE_CHANNEL) {
+			binding.searchFilterChannelTitleBtn.visibility = View.GONE
+			binding.searchFilterChannelTagBtn.visibility = View.GONE
+		}
+		setBtnColor(state)
+	}
+
+	private fun setBtnColor(state: SearchUiState) {
 		fun TextView.setColor(targetFilter: SearchFilter) {
 			if (state.searchFilter == targetFilter) setTextColor(Color.parseColor("#5648FF"))
 			else setTextColor(Color.parseColor("#000000"))

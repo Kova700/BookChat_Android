@@ -2,12 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
-
-        <variable
-            name="agonyListItem"
-            type="com.example.bookchat.ui.agony.model.AgonyListItem.Item" />
-    </data>
+    <data></data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -43,7 +38,6 @@
             android:fontFamily="@font/notosanskr_bold"
             android:gravity="start"
             android:maxLines="3"
-            android:text="@{agonyListItem.title}"
             android:textColor="#222222"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/background_agony_edit_folder_cv"

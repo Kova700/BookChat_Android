@@ -18,6 +18,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.example.bookchat.R
@@ -25,6 +26,7 @@ import com.example.bookchat.databinding.FragmentSearchBinding
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.domain.model.SearchFilter
 import com.example.bookchat.domain.model.SearchPurpose
+import com.example.bookchat.ui.createchannel.MakeChannelActivity
 import com.example.bookchat.ui.createchannel.MakeChannelBookSelectDialog
 import com.example.bookchat.ui.createchannel.MakeChannelSelectBookActivity
 import com.example.bookchat.ui.search.SearchUiState.SearchTapState
@@ -34,7 +36,7 @@ import com.example.bookchat.ui.search.dialog.SearchFilterSelectDialog
 import com.example.bookchat.ui.search.model.SearchTarget
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -47,6 +49,7 @@ class SearchFragment : Fragment() {
 	private val searchViewModel by activityViewModels<SearchViewModel>()
 
 	private lateinit var navHostFragment: NavHostFragment
+	private lateinit var navController: NavController
 
 	private val imm by lazy {
 		requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -92,6 +95,7 @@ class SearchFragment : Fragment() {
 	private fun initNavHost() {
 		navHostFragment =
 			childFragmentManager.findFragmentById(R.id.container_search) as NavHostFragment
+		navController = navHostFragment.findNavController()
 	}
 
 	private fun initSearchBar() {
@@ -149,26 +153,26 @@ class SearchFragment : Fragment() {
 		if (searchTapState.fragmentId == currentDestinationId) return
 
 		if (currentDestinationId != null) {
-			navHostFragment.findNavController().popBackStack(currentDestinationId, true)
+			navController.popBackStack(currentDestinationId, true)
 		}
 		when (searchTapState) {
 			is SearchTapState.Default -> {
 				expandSearchWindowAnimation()
-				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
+				navController.navigate(searchTapState.fragmentId)
 			}
 
 			is SearchTapState.History -> {
 				foldSearchWindowAnimation()
-				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
+				navController.navigate(searchTapState.fragmentId)
 			}
 
 			is SearchTapState.Searching -> {
-				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
+				navController.navigate(searchTapState.fragmentId)
 			}
 
 			is SearchTapState.Result -> {
 				closeKeyboard()
-				navHostFragment.findNavController().navigate(searchTapState.fragmentId)
+				navController.navigate(searchTapState.fragmentId)
 			}
 		}
 	}
@@ -267,14 +271,18 @@ class SearchFragment : Fragment() {
 	}
 
 	private fun finishWithSelectedChannelBook(bookIsbn: String) {
-		when (val parentActivity = requireActivity()) {
-			is MakeChannelSelectBookActivity -> parentActivity.finishBookSelect(bookIsbn)
-		}
+		val parentActivity = requireActivity() as? MakeChannelSelectBookActivity ?: return
+		parentActivity.finishBookSelect(bookIsbn)
 	}
 
 	private fun moveToChannelInfo(channelId: Long) {
 		val intent = Intent(requireContext(), ChannelInfoActivity::class.java)
 		intent.putExtra(EXTRA_CLICKED_CHANNEL_ID, channelId)
+		startActivity(intent)
+	}
+
+	private fun moveToMakeChannel() {
+		val intent = Intent(requireContext(), MakeChannelActivity::class.java)
 		startActivity(intent)
 	}
 
@@ -292,16 +300,25 @@ class SearchFragment : Fragment() {
 				showMakeChannelSelectBookDialog(event.book)
 
 			is SearchEvent.MoveToChannelInfo -> moveToChannelInfo(event.channelId)
-			is SearchEvent.MakeToast -> makeToast(event.stringId)
+			is SearchEvent.ShowSnackBar -> binding.root.showSnackBar(
+				textId = event.stringId,
+				anchor = binding.snackbarPoint
+			)
+
 			is SearchEvent.ShowSearchFilterSelectDialog -> showSearchFilterSelectDialog()
+			SearchEvent.MoveToMakeChannel -> moveToMakeChannel()
+			is SearchEvent.ShowSearchFilterChangeSnackBar -> binding.root.showSnackBar(
+				text = "${getString(R.string.selected_search_filter)} ${getString(event.stringId)}",
+				anchor = binding.snackbarPoint
+			)
 		}
 	}
 
 	companion object {
 		const val EXTRA_SEARCH_KEYWORD = "EXTRA_SEARCH_KEYWORD"
 		const val EXTRA_SEARCH_PURPOSE = "EXTRA_SEARCH_PURPOSE"
-		const val EXTRA_SEARCH_TARGET = "EXTRA_NECESSARY_DATA"
-		const val EXTRA_SEARCH_FILTER = "EXTRA_CHAT_SEARCH_FILTER"
+		const val EXTRA_SEARCH_TARGET = "EXTRA_SEARCH_TARGET"
+		const val EXTRA_SEARCH_FILTER = "EXTRA_SEARCH_FILTER"
 
 		const val EXTRA_SEARCHED_BOOK_ITEM_ID = "EXTRA_SEARCHED_BOOK_ITEM_ID"
 		const val EXTRA_CLICKED_CHANNEL_ID = "EXTRA_CLICKED_CHANNEL_ID"

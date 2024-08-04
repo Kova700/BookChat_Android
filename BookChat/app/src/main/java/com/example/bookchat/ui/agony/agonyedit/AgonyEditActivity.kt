@@ -1,7 +1,6 @@
 package com.example.bookchat.ui.agony.agonyedit
 
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,11 +9,10 @@ import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAgonyEditBinding
-import com.example.bookchat.utils.makeToast
+import com.example.bookchat.utils.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -26,10 +24,8 @@ class AgonyEditActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_agony_edit)
-		binding.lifecycleOwner = this
-		binding.viewmodel = agonyEditViewModel
-		setFocus()
+		binding = ActivityAgonyEditBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		observeUiState()
 		observeUiEvent()
 		initViewState()
@@ -46,22 +42,47 @@ class AgonyEditActivity : AppCompatActivity() {
 	}
 
 	private fun initViewState() {
+		initAgonyTitleEt()
+		with(binding) {
+			xBtn.setOnClickListener { agonyEditViewModel.onClickXBtn() }
+			agonyEditConfirmBtn.setOnClickListener { agonyEditViewModel.onClickConfirmBtn() }
+			clearTitleBtn.setOnClickListener { agonyEditViewModel.onClickClearTitleBtn() }
+		}
+	}
+
+	private fun initAgonyTitleEt() {
 		with(binding.agonyTitleEt) {
+			setFocus()
 			addTextChangedListener { text ->
-				val newTitle = text?.toString() ?: return@addTextChangedListener
-				agonyEditViewModel.onChangeNewTitle(newTitle)
+				agonyEditViewModel.onChangeNewTitle(text?.toString() ?: return@addTextChangedListener)
 			}
 		}
 	}
 
 	private fun setViewState(state: AgonyEditUiState) {
+		setAgonyEditConfirmBtnState(state)
+		setAgonyTitleEtState(state)
+		binding.newTitleLengthTv.text =
+			getString(R.string.agony_title_new_title_length, state.newTitle.length)
+	}
+
+	private fun setAgonyEditConfirmBtnState(state: AgonyEditUiState) {
 		with(binding.agonyEditConfirmBtn) {
 			if (state.isPossibleChangeAgony) {
-				setTextColor(Color.parseColor("#000000"))
 				isEnabled = true
+				setTextColor(context.getColor(R.color.black))
 			} else {
-				setTextColor(Color.parseColor("#D9D9D9"))
 				isEnabled = false
+				setTextColor(context.getColor(R.color.bookchat_white_gray))
+			}
+		}
+	}
+
+	private fun setAgonyTitleEtState(state: AgonyEditUiState) {
+		with(binding.agonyTitleEt) {
+			if (state.newTitle != text.toString()) {
+				setText(state.newTitle)
+				setSelection(state.newTitle.length)
 			}
 		}
 	}
@@ -77,10 +98,19 @@ class AgonyEditActivity : AppCompatActivity() {
 		}, KEYBOARD_DELAY_TIME)
 	}
 
+	private fun closeKeyboard() {
+		binding.agonyTitleEt.clearFocus()
+		imm.hideSoftInputFromWindow(
+			binding.agonyTitleEt.windowToken,
+			InputMethodManager.HIDE_NOT_ALWAYS
+		)
+	}
+
 	private fun handleEvent(event: AgonyEditUiEvent) {
 		when (event) {
-			is AgonyEditUiEvent.MakeToast -> makeToast(event.stringId)
+			is AgonyEditUiEvent.ShowSnackBar -> binding.root.showSnackBar(textId = event.stringId)
 			AgonyEditUiEvent.MoveToBack -> finish()
+			AgonyEditUiEvent.CloseKeyboard -> closeKeyboard()
 		}
 	}
 

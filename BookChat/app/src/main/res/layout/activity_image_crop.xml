@@ -3,13 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="activity"
-            type="com.example.bookchat.ui.imagecrop.ImageCropActivity" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,44 +12,54 @@
             android:id="@+id/image_crop_header"
             android:layout_width="0dp"
             android:layout_height="50dp"
+            android:backgroundTint="#FFFFFF"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/default_state_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="back_btn, final_confirm_btn, tool_btn_group_cv" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/image_crop_state_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="crop_cancel_btn, crop_finish_btn" />
+
         <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/cancel_btn"
+            android:id="@+id/crop_cancel_btn"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_marginStart="30dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:onClick="@{() -> activity.onClickCancelBtn()}"
             android:src="@drawable/x_icon"
             app:layout_constraintBottom_toBottomOf="@+id/image_crop_header"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/img_rotate_btn"
+            android:id="@+id/back_btn"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_marginEnd="15dp"
+            android:layout_marginStart="30dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:onClick="@{() -> activity.onClickRightRotatePictureBtn()}"
-            android:src="@drawable/img_right_rotate_icon"
+            android:src="@drawable/ic_back_btn"
             app:layout_constraintBottom_toBottomOf="@+id/image_crop_header"
-            app:layout_constraintEnd_toStartOf="@+id/textView10"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView9"
+            android:id="@+id/image_crop_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_bold"
-            android:onClick="@{() -> activity.onClickOtherPictureBtn()}"
-            android:padding="5dp"
-            android:text="사진 선택"
+            android:text="@string/select_image"
             android:textColor="#000000"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="@+id/image_crop_header"
@@ -65,37 +68,173 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView10"
+            android:id="@+id/final_confirm_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="30dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_medium"
-            android:onClick="@{() -> activity.onClickFinishBtn()}"
-            android:text="확인"
+            android:text="@string/confirm"
             android:textColor="#000000"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/image_crop_header"
             app:layout_constraintEnd_toEndOf="@+id/image_crop_header"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <com.example.bookchat.ui.customview.AntiDupClickImageButton
+            android:id="@+id/crop_finish_btn"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="30dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/check_btn"
+            app:layout_constraintBottom_toBottomOf="@+id/image_crop_header"
+            app:layout_constraintEnd_toEndOf="@+id/image_crop_header"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tool_btn_group_cv"
+            style="@style/CustomCardViewStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            app:cardElevation="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/image_crop_header">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="3dp">
+
+                <com.example.bookchat.ui.customview.AntiDupClickImageButton
+                    android:id="@+id/img_crop_btn"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/image_crop_btn"
+                    app:layout_constraintEnd_toStartOf="@+id/img_rotate_btn"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.example.bookchat.ui.customview.AntiDupClickImageButton
+                    android:id="@+id/img_rotate_btn"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/img_right_rotate_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <com.canhub.cropper.CropImageView
             android:id="@+id/cropImageView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="#CC000000"
+            android:background="#121212"
+            app:cropAutoZoomEnabled="false"
             app:cropBackgroundColor="#CC000000"
             app:cropFixAspectRatio="true"
             app:cropGuidelines="on"
             app:cropInitialCropWindowPaddingRatio="0"
-            app:cropScaleType="fitCenter"
-            app:cropShape="oval"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:cropShape="rectangle"
+            app:cropShowCropOverlay="false"
+            app:layout_constraintBottom_toTopOf="@+id/img_aspect_ratio_btn_layout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/image_crop_header"
-            app:layout_constraintVertical_weight="1" />
+            app:layout_constraintTop_toBottomOf="@+id/image_crop_header" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/img_aspect_ratio_btn_layout"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:background="#121212"
+            android:paddingTop="10dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ToggleButton
+                android:id="@+id/img_aspect_ratio_btn_free"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@android:color/transparent"
+                android:drawableTop="@drawable/selector_aspect_ratio_free"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_medium"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textColor="#FFFFFF"
+                android:textOff="@string/image_crop_aspect_ratio_free"
+                android:textOn="@string/image_crop_aspect_ratio_free"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/img_aspect_ratio_btn_1_1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ToggleButton
+                android:id="@+id/img_aspect_ratio_btn_1_1"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@android:color/transparent"
+                android:drawableTop="@drawable/selector_aspect_ratio_1_1"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_medium"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textColor="#FFFFFF"
+                android:textOff="@string/image_crop_aspect_ratio_1_1"
+                android:textOn="@string/image_crop_aspect_ratio_1_1"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/img_aspect_ratio_btn_3_4"
+                app:layout_constraintStart_toEndOf="@+id/img_aspect_ratio_btn_free"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ToggleButton
+                android:id="@+id/img_aspect_ratio_btn_3_4"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@android:color/transparent"
+                android:drawableTop="@drawable/selector_aspect_ratio_3_4"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_medium"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textColor="#FFFFFF"
+                android:textOff="@string/image_crop_aspect_ratio_3_4"
+                android:textOn="@string/image_crop_aspect_ratio_3_4"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/img_aspect_ratio_btn_4_3"
+                app:layout_constraintStart_toEndOf="@+id/img_aspect_ratio_btn_1_1"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ToggleButton
+                android:id="@+id/img_aspect_ratio_btn_4_3"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@android:color/transparent"
+                android:drawableTop="@drawable/selector_aspect_ratio_4_3"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_medium"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textColor="#FFFFFF"
+                android:textOff="@string/image_crop_aspect_ratio_4_3"
+                android:textOn="@string/image_crop_aspect_ratio_4_3"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/img_aspect_ratio_btn_3_4"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

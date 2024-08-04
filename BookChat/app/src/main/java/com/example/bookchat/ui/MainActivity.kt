@@ -58,6 +58,14 @@ class MainActivity : AppCompatActivity() {
 		binding.bnvMain.setupWithNavController(navController)
 	}
 
+	fun navigateToBookShelfFragment() {
+		binding.bnvMain.selectedItemId = R.id.bookShelfFragment
+	}
+
+	fun navigateToSearchFragment() {
+		binding.bnvMain.selectedItemId = R.id.searchFragment
+	}
+
 	private fun moveToChannelIfNeed() {
 		if (intent.hasExtra(EXTRA_CHANNEL_ID).not()) return
 
@@ -77,6 +85,5 @@ class MainActivity : AppCompatActivity() {
 
 	companion object {
 		private const val SCHEME_PACKAGE = "package"
-
 	}
 }

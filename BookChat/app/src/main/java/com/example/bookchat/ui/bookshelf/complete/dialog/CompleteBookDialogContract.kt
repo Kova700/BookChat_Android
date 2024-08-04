@@ -1,10 +1,10 @@
 package com.example.bookchat.ui.bookshelf.complete.dialog
 
-import com.example.bookchat.ui.bookshelf.model.BookShelfListItem
+import com.example.bookchat.domain.model.BookShelfItem
 
 data class CompleteBookDialogUiState(
 	val uiState: UiState,
-	val completeItem: BookShelfListItem,
+	val completeItem: BookShelfItem,
 ) {
 
 	enum class UiState {
@@ -17,17 +17,17 @@ data class CompleteBookDialogUiState(
 	companion object {
 		val DEFAULT = CompleteBookDialogUiState(
 			uiState = UiState.EMPTY,
-			completeItem = BookShelfListItem.DEFAULT,
+			completeItem = BookShelfItem.DEFAULT,
 		)
 	}
 }
 
 sealed class CompleteBookDialogEvent {
 	data class MoveToAgony(
-		val bookShelfItemId: Long
+		val bookShelfItemId: Long,
 	) : CompleteBookDialogEvent()
 
 	data class MoveToBookReport(
-		val bookShelfItemId: Long
+		val bookShelfItemId: Long,
 	) : CompleteBookDialogEvent()
 }

@@ -29,6 +29,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//TODO : 검색필터 채팅방 제목으로하고 자바 검색하면 타임아웃나옴 +
+// 채팅방 검색 결과가 있는경우 시간이 너무 오래걸림 (없는 경우는 빨리 끝남)
+
 @HiltViewModel
 class SearchViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
@@ -101,7 +104,6 @@ class SearchViewModel @Inject constructor(
 		}
 	}
 
-	//TODO : 현재 도서명으로만 검색되고 있는거 같음 , 채팅방 명으로 검색안되고 있음
 	private fun search(keyword: String) = viewModelScope.launch {
 		updateState {
 			copy(
@@ -119,10 +121,7 @@ class SearchViewModel @Inject constructor(
 
 	private fun searchBooksAndChannels(searchKeyword: String) = viewModelScope.launch {
 		runCatching {
-			val books = bookSearchRepository.search(
-				keyword = searchKeyword.trim(),
-				loadSize = bookImgSizeManager.flexBoxBookSpanSize * 6
-			)
+			val books = bookSearchRepository.search(searchKeyword.trim())
 			val channels = channelSearchRepository.search(
 				keyword = searchKeyword.trim(),
 				searchFilter = uiState.value.searchFilter,
@@ -134,12 +133,7 @@ class SearchViewModel @Inject constructor(
 	}
 
 	private fun searchBooks(searchKeyword: String) = viewModelScope.launch {
-		runCatching {
-			bookSearchRepository.search(
-				keyword = searchKeyword.trim(),
-				loadSize = bookImgSizeManager.flexBoxBookSpanSize * 6
-			)
-		}
+		runCatching { bookSearchRepository.search(searchKeyword.trim()) }
 			.onSuccess { books -> searchSuccessCallBack(books.isEmpty()) }
 			.onFailure { failHandler(it) }
 	}
@@ -155,7 +149,7 @@ class SearchViewModel @Inject constructor(
 			.onFailure { failHandler(it) }
 	}
 
-	private suspend fun searchSuccessCallBack(isEmpty: Boolean) {
+	private fun searchSuccessCallBack(isEmpty: Boolean) {
 		if (isEmpty) updateState { copy(searchResultState = SearchResultState.Empty) }
 		else updateState { copy(searchResultState = SearchResultState.Success) }
 	}
@@ -187,7 +181,7 @@ class SearchViewModel @Inject constructor(
 	fun onClickSearchBtn() = viewModelScope.launch {
 		val keyword = uiState.value.searchKeyword.trim()
 		if (keyword.isBlank()) {
-			startEvent(SearchEvent.MakeToast(R.string.search_book_keyword_empty))
+			startEvent(SearchEvent.ShowSnackBar(R.string.search_book_keyword_empty))
 			return@launch
 		}
 		searchHistoryRepository.addHistory(keyword)
@@ -205,7 +199,7 @@ class SearchViewModel @Inject constructor(
 	}
 
 	fun onClickHistoryClearBtn() = viewModelScope.launch {
-		searchHistoryRepository.clearHistory()
+		searchHistoryRepository.clear()
 	}
 
 	fun onBookHeaderBtnClick() {
@@ -243,6 +237,13 @@ class SearchViewModel @Inject constructor(
 
 	fun onClickSearchFilter(selectedFilter: SearchFilter) {
 		updateState { copy(searchFilter = selectedFilter) }
+		val resId = when (selectedFilter) {
+			SearchFilter.BOOK_TITLE -> R.string.book_title
+			SearchFilter.BOOK_ISBN -> R.string.isbn
+			SearchFilter.ROOM_NAME -> R.string.channel_title
+			SearchFilter.ROOM_TAGS -> R.string.channel_tag
+		}
+		startEvent(SearchEvent.ShowSearchFilterChangeSnackBar(resId))
 	}
 
 	fun onClickSearchFilterBtn() {
@@ -261,6 +262,10 @@ class SearchViewModel @Inject constructor(
 		clearSearchBar()
 	}
 
+	fun onClickMakeChannelBtn() {
+		startEvent(SearchEvent.MoveToMakeChannel)
+	}
+
 	private fun startEvent(event: SearchEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
 	}
@@ -273,9 +278,9 @@ class SearchViewModel @Inject constructor(
 		updateState { copy(searchResultState = SearchResultState.Error) }
 		when (exception) {
 			is NetworkIsNotConnectedException ->
-				startEvent(SearchEvent.MakeToast(R.string.error_network_not_connected))
+				startEvent(SearchEvent.ShowSnackBar(R.string.error_network_not_connected))
 
-			else -> startEvent(SearchEvent.MakeToast(R.string.error_else))
+			else -> startEvent(SearchEvent.ShowSnackBar(R.string.error_else))
 		}
 	}
 

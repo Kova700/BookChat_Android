@@ -66,8 +66,8 @@ class UserProfileViewModel @Inject constructor(
 				needServer = true
 			)
 		}
-			.onSuccess { onClickBackBtn() }
-			.onFailure { startEvent(UserProfileUiEvent.MakeToast(R.string.user_ban_fail)) }
+			.onSuccess { startEvent(UserProfileUiEvent.MoveBack) }
+			.onFailure { startEvent(UserProfileUiEvent.ShowSnackBar(R.string.user_ban_fail)) }
 	}
 
 	fun onClickUserBanDialogBtn() {

@@ -1,11 +1,13 @@
 package com.example.bookchat.ui.channel.channelsetting
 
+import android.graphics.Bitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.ui.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
+import com.example.bookchat.utils.image.bitmap.compressToByteArray
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,7 +50,7 @@ class ChannelSettingViewModel @Inject constructor(
 	private fun exitChannel() = viewModelScope.launch {
 		runCatching { channelRepository.leaveChannel(channelId) }
 			.onSuccess { startEvent(ChannelSettingUiEvent.ExitChannel) }
-			.onFailure { startEvent(ChannelSettingUiEvent.MakeToast(R.string.channel_exit_fail)) }
+			.onFailure { startEvent(ChannelSettingUiEvent.ShowSnackBar(R.string.channel_exit_fail)) }
 	}
 
 	//TODO :{"errorCode":"500","message":"예상치 못한 예외가 발생했습니다."} 서버 수정 대기중
@@ -59,14 +61,14 @@ class ChannelSettingViewModel @Inject constructor(
 				channelTitle = uiState.value.newTitle,
 				channelTags = uiState.value.tagList,
 				channelCapacity = uiState.value.newCapacity,
-				channelImage = uiState.value.newProfileImage
+				channelImage = uiState.value.newProfileImage?.compressToByteArray()
 			)
 		}
-			.onSuccess {
-				startEvent(ChannelSettingUiEvent.MoveBack)
-				startEvent(ChannelSettingUiEvent.MakeToast(R.string.change_channel_setting_success))
+			.onSuccess { startEvent(ChannelSettingUiEvent.MoveBack) }
+			.onFailure {
+				startEvent(ChannelSettingUiEvent.CloseKeyboard)
+				startEvent(ChannelSettingUiEvent.ShowSnackBar(R.string.change_channel_setting_fail))
 			}
-			.onFailure { startEvent(ChannelSettingUiEvent.MakeToast(R.string.change_channel_setting_fail)) }
 	}
 
 	fun onClickChannelCapacityBtn() {
@@ -97,12 +99,17 @@ class ChannelSettingViewModel @Inject constructor(
 		startEvent(ChannelSettingUiEvent.MoveBack)
 	}
 
-	fun onChangeChannelProfile(profile: ByteArray) {
-		updateState { copy(newProfileImage = profile) }
+	fun onChangeChannelProfile(profile: Bitmap) {
+		updateState {
+			copy(
+				newProfileImage = profile,
+				isSelectedDefaultImage = false
+			)
+		}
 	}
 
 	fun onClickCameraBtn() {
-		startEvent(ChannelSettingUiEvent.PermissionCheck)
+		startEvent(ChannelSettingUiEvent.ShowProfileEditDialog)
 	}
 
 	fun onClickApplyBtn() = viewModelScope.launch {
@@ -112,6 +119,20 @@ class ChannelSettingViewModel @Inject constructor(
 
 	fun onClickChannelExitDialogBtn() {
 		exitChannel()
+	}
+
+	fun onSelectGallery() {
+		startEvent(ChannelSettingUiEvent.MoveToGallery)
+	}
+
+	fun onSelectDefaultProfileImage() {
+		updateState {
+			copy(
+				channel = channel.copy(roomImageUri = null),
+				newProfileImage = null,
+				isSelectedDefaultImage = true
+			)
+		}
 	}
 
 	fun onClickChannelCapacityDialogBtn(newCapacity: Int) {
