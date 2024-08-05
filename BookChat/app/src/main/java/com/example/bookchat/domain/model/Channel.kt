@@ -40,7 +40,7 @@ data class Channel(
 		get() = bookAuthors?.joinToString(",")
 
 	val tagsString
-		get() = roomTags?.joinToString(" ") { "# $it" }
+		get() = roomTags?.joinToString(" ") { "#$it" }
 
 	val participantIds
 		get() = participants?.map { it.id }
