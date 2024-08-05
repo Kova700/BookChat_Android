@@ -52,12 +52,12 @@ class LoginViewModel @Inject constructor(
 		login()
 	}
 
-	fun onFailKakaoLogin(throwable: Throwable) {
+	fun onFailedKakaoLogin(throwable: Throwable) {
 		if (throwable is ClientCancelException) return
 		startEvent(LoginEvent.ErrorEvent(R.string.error_kakao_login))
 	}
 
-	fun onFailGoogleLogin(throwable: Throwable) {
+	fun onFailedGoogleLogin(throwable: Throwable) {
 		if (throwable is ClientCancelException) return
 		startEvent(LoginEvent.ErrorEvent(R.string.error_google_login))
 	}

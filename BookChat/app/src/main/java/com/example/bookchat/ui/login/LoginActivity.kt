@@ -5,12 +5,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityLoginBinding
-import com.example.bookchat.oauth.oauthclient.external.model.OAuth2Provider
 import com.example.bookchat.oauth.oauthclient.external.OAuthClient
+import com.example.bookchat.oauth.oauthclient.external.model.OAuth2Provider
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.ui.signup.SignUpActivity
 import com.example.bookchat.utils.showSnackBar
@@ -28,9 +26,9 @@ class LoginActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
-		binding.lifecycleOwner = this
-		binding.viewmodel = loginViewModel
+		binding = ActivityLoginBinding.inflate(layoutInflater)
+		setContentView(binding.root)
+		initViewState()
 		observeUiState()
 		observeUiEvent()
 	}
@@ -45,6 +43,13 @@ class LoginActivity : AppCompatActivity() {
 		loginViewModel.eventFlow.collect { event -> handleEvent(event) }
 	}
 
+	private fun initViewState() {
+		with(binding) {
+			kakaoLoginBtn.setOnClickListener { loginViewModel.onClickKakaoLoginBtn() }
+			googleLoginBtn.setOnClickListener { loginViewModel.onClickGoogleLoginBtn() }
+		}
+	}
+
 	private fun setViewState(uiState: LoginUiState) {
 		binding.progressbar.visibility =
 			if (uiState.uiState == LoginUiState.UiState.LOADING) View.VISIBLE else View.GONE
@@ -53,13 +58,13 @@ class LoginActivity : AppCompatActivity() {
 	private fun startKakaoLogin() = lifecycleScope.launch {
 		runCatching { oauthClient.login(this@LoginActivity, OAuth2Provider.KAKAO) }
 			.onSuccess { loginViewModel.onChangeIdToken() }
-			.onFailure { loginViewModel.onFailKakaoLogin(it) }
+			.onFailure { loginViewModel.onFailedKakaoLogin(it) }
 	}
 
 	private fun startGoogleLogin() = lifecycleScope.launch {
 		runCatching { oauthClient.login(this@LoginActivity, OAuth2Provider.GOOGLE) }
 			.onSuccess { loginViewModel.onChangeIdToken() }
-			.onFailure { loginViewModel.onFailGoogleLogin(it) }
+			.onFailure { loginViewModel.onFailedGoogleLogin(it) }
 	}
 
 	private fun moveToMain() {
@@ -72,6 +77,8 @@ class LoginActivity : AppCompatActivity() {
 	}
 
 	private fun showDeviceChangeWarning() {
+		val existingFragment = supportFragmentManager.findFragmentByTag(DIALOG_TAG_DEVICE_WARNING)
+		if (existingFragment != null) return
 		val deviceWarningDialog = DeviceWarningDialog()
 		deviceWarningDialog.show(supportFragmentManager, DIALOG_TAG_DEVICE_WARNING)
 	}
