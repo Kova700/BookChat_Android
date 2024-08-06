@@ -91,7 +91,6 @@
         app:layout_constraintStart_toStartOf="@+id/waste_basket_btn"
         app:layout_constraintTop_toTopOf="@+id/waste_basket_btn" />
 
-    <!-- TODO : 그리드뷰 Item Spacing 설정해야함 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/agonyRcv"
         android:layout_width="0dp"

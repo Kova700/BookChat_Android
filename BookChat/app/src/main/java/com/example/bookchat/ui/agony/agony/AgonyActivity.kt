@@ -13,6 +13,7 @@ import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAgonyBinding
 import com.example.bookchat.ui.agony.agony.AgonyUiState.UiState
 import com.example.bookchat.ui.agony.agony.adapter.AgonyAdapter
+import com.example.bookchat.ui.agony.agony.adapter.AgonyItemDecorator
 import com.example.bookchat.ui.agony.agony.model.AgonyListItem
 import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordActivity
 import com.example.bookchat.ui.agony.makeagony.MakeAgonyBottomSheetDialog
@@ -34,6 +35,9 @@ class AgonyActivity : AppCompatActivity() {
 
 	@Inject
 	lateinit var bookImgSizeManager: BookImgSizeManager
+
+	@Inject
+	lateinit var agonyItemDecorator: AgonyItemDecorator
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -132,6 +136,7 @@ class AgonyActivity : AppCompatActivity() {
 				}
 			}
 		}
+
 		val rcvScrollListener = object : RecyclerView.OnScrollListener() {
 			override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
 				super.onScrolled(recyclerView, dx, dy)
@@ -144,6 +149,7 @@ class AgonyActivity : AppCompatActivity() {
 			adapter = agonyAdapter
 			layoutManager = gridLayoutManager
 			addOnScrollListener(rcvScrollListener)
+			addItemDecoration(agonyItemDecorator)
 		}
 	}
 

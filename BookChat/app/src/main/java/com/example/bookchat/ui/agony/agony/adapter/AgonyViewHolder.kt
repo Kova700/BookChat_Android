@@ -28,10 +28,14 @@ class AgonyHeaderItemViewHolder(
 	}
 
 	override fun bind(agonyListItem: AgonyListItem) {
-		binding.bookShelfItem = (agonyListItem as AgonyListItem.Header).bookShelfItem
-		binding.bookImg.loadUrl(binding.bookShelfItem?.book?.bookCoverImageUrl)
-		binding.selectedBookTitleTv.isSelected = true
-		binding.selectedBookAuthorsTv.isSelected = true
+		val item = (agonyListItem as AgonyListItem.Header)
+		with(binding) {
+			selectedBookTitleTv.text = item.bookShelfItem.book.title
+			selectedBookTitleTv.isSelected = true
+			selectedBookAuthorsTv.text = item.bookShelfItem.book.authorsString
+			selectedBookAuthorsTv.isSelected = true
+			bookImg.loadUrl(item.bookShelfItem.book.bookCoverImageUrl)
+		}
 	}
 }
 
@@ -60,11 +64,13 @@ class AgonyDataItemViewHolder(
 
 	override fun bind(agonyListItem: AgonyListItem) {
 		val item = (agonyListItem as AgonyListItem.Item)
-		binding.titleAgonyFolderTv.text = item.title
-		binding.titleAgonyFolderTv.setTextColor(item.hexColorCode.getTextColorHexInt())
-		binding.backgroundAgonyFolderCv.backgroundTintList = ColorStateList.valueOf(
-			Color.parseColor(item.hexColorCode.hexcolor)
-		)
+		with(binding) {
+			titleAgonyFolderTv.text = item.title
+			titleAgonyFolderTv.setTextColor(item.hexColorCode.getTextColorHexInt())
+			backgroundAgonyFolderCv.backgroundTintList = ColorStateList.valueOf(
+				Color.parseColor(item.hexColorCode.hexcolor)
+			)
+		}
 	}
 }
 
@@ -80,10 +86,12 @@ class AgonyDataEditingItemViewHolder(
 
 	override fun bind(agonyListItem: AgonyListItem) {
 		val item = (agonyListItem as AgonyListItem.Item)
-		binding.titleAgonyEditFolderTv.text = item.title
-		binding.agonyFolderCheckIv.visibility = if (item.isSelected) View.VISIBLE else View.INVISIBLE
-		binding.backgroundAgonyEditFolderCv.backgroundTintList =
-			if (item.isSelected) binding.root.context.getColorStateList(R.color.agony_color_selected)
-			else binding.root.context.getColorStateList(R.color.agony_color_white)
+		with(binding) {
+			titleAgonyEditFolderTv.text = item.title
+			agonyFolderCheckIv.visibility = if (item.isSelected) View.VISIBLE else View.INVISIBLE
+			backgroundAgonyEditFolderCv.backgroundTintList =
+				if (item.isSelected) root.context.getColorStateList(R.color.agony_color_selected)
+				else root.context.getColorStateList(R.color.agony_color_white)
+		}
 	}
 }

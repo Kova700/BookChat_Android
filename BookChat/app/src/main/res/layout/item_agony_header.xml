@@ -1,119 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <data>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="20dp" />
 
-        <variable
-            name="bookShelfItem"
-            type="com.example.bookchat.domain.model.BookShelfItem" />
-    </data>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="20dp" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="10dp" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_begin="20dp" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="10dp" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_end="20dp" />
+    <androidx.cardview.widget.CardView
+        android:id="@+id/bookBackground_agonize"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:backgroundTint="#F6F6F6"
+        android:minHeight="150dp"
+        app:cardCornerRadius="22dp"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline_bottom"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+        app:layout_constraintStart_toStartOf="@+id/guideline_start"
+        app:layout_constraintTop_toTopOf="@+id/guideline_top" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_top"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_begin="10dp" />
+    <androidx.cardview.widget.CardView
+        android:id="@+id/bookCardView_agonize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginVertical="30dp"
+        android:layout_marginStart="40dp"
+        app:cardCornerRadius="@dimen/book_img_corner_radius"
+        app:cardElevation="@dimen/book_img_elevation"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/bookBackground_agonize"
+        app:layout_constraintTop_toTopOf="@+id/bookBackground_agonize">
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_bottom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_end="10dp" />
+        <ImageView
+            android:id="@+id/book_img"
+            android:layout_width="@dimen/book_img_width_default"
+            android:layout_height="@dimen/book_img_height_default"
+            android:scaleType="fitXY"
+            android:src="@drawable/empty_img" />
+    </androidx.cardview.widget.CardView>
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/bookBackground_agonize"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:backgroundTint="#F6F6F6"
-            android:minHeight="150dp"
-            app:cardCornerRadius="22dp"
-            app:cardElevation="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/guideline_bottom"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-            app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toTopOf="@+id/guideline_top" />
+    <TextView
+        android:id="@+id/selected_book_title_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="35dp"
+        android:elegantTextHeight="true"
+        android:elevation="10dp"
+        android:ellipsize="marquee"
+        android:fontFamily="@font/notosanskr_bold"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:textColor="#222222"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/bookBackground_agonize"
+        app:layout_constraintStart_toEndOf="@+id/bookCardView_agonize"
+        app:layout_constraintTop_toTopOf="@+id/bookCardView_agonize" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/bookCardView_agonize"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginVertical="30dp"
-            android:layout_marginStart="40dp"
-            app:cardCornerRadius="@dimen/book_img_corner_radius"
-            app:cardElevation="@dimen/book_img_elevation"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/bookBackground_agonize"
-            app:layout_constraintTop_toTopOf="@+id/bookBackground_agonize">
+    <TextView
+        android:id="@+id/selected_book_authors_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="35dp"
+        android:elegantTextHeight="true"
+        android:elevation="10dp"
+        android:ellipsize="marquee"
+        android:fontFamily="@font/notosanskr_regular"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:textColor="#373737"
+        android:textSize="11sp"
+        app:layout_constraintEnd_toEndOf="@+id/bookBackground_agonize"
+        app:layout_constraintStart_toEndOf="@+id/bookCardView_agonize"
+        app:layout_constraintTop_toBottomOf="@+id/selected_book_title_tv" />
 
-            <ImageView
-                android:id="@+id/book_img"
-                android:layout_width="@dimen/book_img_width_default"
-                android:layout_height="@dimen/book_img_height_default"
-                android:scaleType="fitXY"
-                android:src="@drawable/empty_img" />
-        </androidx.cardview.widget.CardView>
-
-        <TextView
-            android:id="@+id/selected_book_title_tv"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="35dp"
-            android:elegantTextHeight="true"
-            android:elevation="10dp"
-            android:ellipsize="marquee"
-            android:fontFamily="@font/notosanskr_bold"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:singleLine="true"
-            android:text="@{bookShelfItem.book.title}"
-            android:textColor="#222222"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="@+id/bookBackground_agonize"
-            app:layout_constraintStart_toEndOf="@+id/bookCardView_agonize"
-            app:layout_constraintTop_toTopOf="@+id/bookCardView_agonize" />
-
-        <TextView
-            android:id="@+id/selected_book_authors_tv"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="35dp"
-            android:elegantTextHeight="true"
-            android:elevation="10dp"
-            android:ellipsize="marquee"
-            android:fontFamily="@font/notosanskr_regular"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:singleLine="true"
-            android:text="@{bookShelfItem.book.authors[0]}"
-            android:textColor="#373737"
-            android:textSize="11sp"
-            app:layout_constraintEnd_toEndOf="@+id/bookBackground_agonize"
-            app:layout_constraintStart_toEndOf="@+id/bookCardView_agonize"
-            app:layout_constraintTop_toBottomOf="@+id/selected_book_title_tv" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,7 +2,6 @@ package com.example.bookchat.ui.agony.agony.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.bookchat.R
@@ -42,33 +41,29 @@ class AgonyAdapter @Inject constructor(
 
 		when (viewType) {
 			R.layout.item_agony_header -> {
-				val binding: ItemAgonyHeaderBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_agony_header,
-					parent, false
+				val binding = ItemAgonyHeaderBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return AgonyHeaderItemViewHolder(binding, bookImgSizeManager)
 			}
 
 			R.layout.item_agony_first -> {
-				val binding: ItemAgonyFirstBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_agony_first,
-					parent, false
+				val binding = ItemAgonyFirstBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return AgonyFirstItemViewHolder(binding, onFirstItemClick)
 			}
 
 			R.layout.item_agony_data_editing -> {
-				val binding: ItemAgonyDataEditingBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_agony_data_editing,
-					parent, false
+				val binding = ItemAgonyDataEditingBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return AgonyDataEditingItemViewHolder(binding, onItemSelect)
 			}
 
 			else -> {
-				val binding: ItemAgonyDataBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_agony_data,
-					parent, false
+				val binding = ItemAgonyDataBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return AgonyDataItemViewHolder(binding, onItemClick)
 			}
