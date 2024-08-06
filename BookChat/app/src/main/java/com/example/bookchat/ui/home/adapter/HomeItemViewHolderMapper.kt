@@ -12,6 +12,7 @@ import com.example.bookchat.databinding.ItemHomeChannelBinding
 import com.example.bookchat.databinding.ItemHomeChannelEmptyBinding
 import com.example.bookchat.databinding.ItemHomeChannelHeaderBinding
 import com.example.bookchat.databinding.ItemHomeChannelRetryBinding
+import com.example.bookchat.databinding.ItemHomeHeaderBinding
 import com.example.bookchat.databinding.LayoutHomeBookShimmerBinding
 import com.example.bookchat.databinding.LayoutHomeChannelShimmerBinding
 import com.example.bookchat.utils.BookImgSizeManager
@@ -28,6 +29,15 @@ fun getHomeItemViewHolder(
 	onClickRetryChannelLoadBtn: (() -> Unit)? = null,
 ): HomeItemViewHolder {
 	when (itemViewType) {
+		R.layout.item_home_header -> {
+			val binding = ItemHomeHeaderBinding.inflate(
+				LayoutInflater.from(parent.context),
+				parent,
+				false
+			)
+			return HomeHeaderViewHolder(binding)
+		}
+
 		R.layout.item_home_book_header -> {
 			val binding = ItemHomeBookHeaderBinding.inflate(
 				LayoutInflater.from(parent.context),

@@ -20,6 +20,7 @@ class HomeItemAdapter @Inject constructor(
 
 	override fun getItemViewType(position: Int): Int {
 		return when (getItem(position)) {
+			is HomeItem.Header -> R.layout.item_home_header
 			is HomeItem.BookHeader -> R.layout.item_home_book_header
 			is HomeItem.BookItem -> R.layout.item_home_book
 			is HomeItem.ChannelHeader -> R.layout.item_home_channel_header

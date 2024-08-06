@@ -52,6 +52,7 @@ class HomeViewModel @Inject constructor(
 			_uiState
 		) { bookshelfItems, channels, uiState ->
 			groupItems(
+				clientNickname = uiState.client.nickname,
 				bookshelfItems = bookshelfItems,
 				channels = channels,
 				bookImgSizeManager = bookImgSizeManager,

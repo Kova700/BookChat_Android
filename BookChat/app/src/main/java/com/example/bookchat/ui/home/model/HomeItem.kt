@@ -11,19 +11,24 @@ import java.util.Date
 sealed interface HomeItem {
 	fun getCategoryId(): Long {
 		return when (this) {
-			is BookHeader -> BOOK_HEADER_ITEM_STABLE_ID
+			is Header -> HEADER_ITEM_STABLE_ID
+			BookHeader -> BOOK_HEADER_ITEM_STABLE_ID
 			is BookItem -> bookShelfId
 			is BookDummy -> hashCode().toLong()
 			BookEmpty -> BOOK_EMPTY_ITEM_STABLE_ID
 			BookRetry -> BOOK_RETRY_ITEM_STABLE_ID
 			BookLoading -> BOOK_LOADING_ITEM_STABLE_ID
-			is ChannelHeader -> CHANNEL_HEADER_ITEM_STABLE_ID
+			ChannelHeader -> CHANNEL_HEADER_ITEM_STABLE_ID
 			is ChannelItem -> roomId
 			ChannelEmpty -> CHANNEL_EMPTY_ITEM_STABLE_ID
 			ChannelRetry -> CHANNEL_RETRY_ITEM_STABLE_ID
 			ChannelLoading -> CHANNEL_LOADING_ITEM_STABLE_ID
 		}
 	}
+
+	data class Header(
+		val clientNickname: String,
+	) : HomeItem
 
 	data object BookHeader : HomeItem
 	data object BookEmpty : HomeItem
@@ -55,14 +60,7 @@ sealed interface HomeItem {
 		val lastReadChatId: Long? = null,
 		val lastChat: Chat? = null,
 		val host: User? = null,
-		val participants: List<User>? = null,
-		val participantAuthorities: Map<Long, ChannelMemberAuthority>? = null,
-		val roomTags: List<String>? = null,
-		val roomCapacity: Int? = null,
-		val bookTitle: String? = null,
-		val bookAuthors: List<String>? = null,
-		val bookCoverImageUrl: String? = null,
-	) : HomeItem{
+	) : HomeItem {
 		val isTopPined
 			get() = topPinNum != 0
 
@@ -77,29 +75,17 @@ sealed interface HomeItem {
 		val isAvailableChannel
 			get() = isBanned.not() && isExploded.not()
 
-		val bookAuthorsString
-			get() = bookAuthors?.joinToString(",")
-
-		val tagsString
-			get() = roomTags?.joinToString(" ") { "#$it" }
-
-		val participantIds
-			get() = participants?.map { it.id }
-
-		val subHosts
-			get() = participants?.filter {
-				participantAuthorities?.get(it.id) == ChannelMemberAuthority.SUB_HOST
-			} ?: emptyList()
 	}
 
 	companion object {
-		const val BOOK_HEADER_ITEM_STABLE_ID = -1L
-		const val BOOK_EMPTY_ITEM_STABLE_ID = -2L
-		const val BOOK_RETRY_ITEM_STABLE_ID = -3L
-		const val BOOK_LOADING_ITEM_STABLE_ID = -4L
-		const val CHANNEL_HEADER_ITEM_STABLE_ID = -5L
-		const val CHANNEL_EMPTY_ITEM_STABLE_ID = -6L
-		const val CHANNEL_RETRY_ITEM_STABLE_ID = -7L
-		const val CHANNEL_LOADING_ITEM_STABLE_ID = -8L
+		const val HEADER_ITEM_STABLE_ID = -1L
+		const val BOOK_HEADER_ITEM_STABLE_ID = -2L
+		const val BOOK_EMPTY_ITEM_STABLE_ID = -3L
+		const val BOOK_RETRY_ITEM_STABLE_ID = -4L
+		const val BOOK_LOADING_ITEM_STABLE_ID = -5L
+		const val CHANNEL_HEADER_ITEM_STABLE_ID = -6L
+		const val CHANNEL_EMPTY_ITEM_STABLE_ID = -7L
+		const val CHANNEL_RETRY_ITEM_STABLE_ID = -8L
+		const val CHANNEL_LOADING_ITEM_STABLE_ID = -9L
 	}
 }

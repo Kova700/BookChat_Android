@@ -13,6 +13,7 @@ import com.example.bookchat.databinding.ItemHomeChannelBinding
 import com.example.bookchat.databinding.ItemHomeChannelEmptyBinding
 import com.example.bookchat.databinding.ItemHomeChannelHeaderBinding
 import com.example.bookchat.databinding.ItemHomeChannelRetryBinding
+import com.example.bookchat.databinding.ItemHomeHeaderBinding
 import com.example.bookchat.databinding.LayoutHomeBookShimmerBinding
 import com.example.bookchat.databinding.LayoutHomeChannelShimmerBinding
 import com.example.bookchat.ui.home.model.HomeItem
@@ -25,6 +26,18 @@ sealed class HomeItemViewHolder(
 	binding: ViewBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 	abstract fun bind(homeItem: HomeItem)
+}
+
+class HomeHeaderViewHolder(
+	private val binding: ItemHomeHeaderBinding,
+) : HomeItemViewHolder(binding) {
+	override fun bind(homeItem: HomeItem) {
+		val item = homeItem as HomeItem.Header
+		with(binding) {
+			nicknameTv.text =
+				root.context.getString(R.string.user_nickname, item.clientNickname)
+		}
+	}
 }
 
 class HomeBookHeaderViewHolder(

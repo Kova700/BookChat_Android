@@ -7,6 +7,7 @@ import com.example.bookchat.ui.home.model.HomeItem
 import com.example.bookchat.utils.BookImgSizeManager
 
 fun groupItems(
+	clientNickname: String,
 	bookshelfItems: List<BookShelfItem>? = null,
 	channels: List<Channel>? = null,
 	bookImgSizeManager: BookImgSizeManager,
@@ -14,6 +15,8 @@ fun groupItems(
 	channelUiState: UiState,
 ): List<HomeItem> {
 	val groupedItems = mutableListOf<HomeItem>()
+	groupedItems.add(HomeItem.Header(clientNickname = clientNickname))
+
 	if (bookUiState != UiState.INIT_LOADING) groupedItems.add(HomeItem.BookHeader)
 	when {
 		bookUiState == UiState.ERROR -> groupedItems.add(HomeItem.BookRetry)
@@ -71,12 +74,5 @@ private fun Channel.toHomeItem(): HomeItem.ChannelItem {
 		lastReadChatId = lastReadChatId,
 		lastChat = lastChat,
 		host = host,
-		participants = participants,
-		participantAuthorities = participantAuthorities,
-		roomTags = roomTags,
-		roomCapacity = roomCapacity,
-		bookTitle = bookTitle,
-		bookAuthors = bookAuthors,
-		bookCoverImageUrl = bookCoverImageUrl,
 	)
 }

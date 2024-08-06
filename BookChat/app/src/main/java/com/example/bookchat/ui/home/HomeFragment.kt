@@ -65,7 +65,7 @@ class HomeFragment : Fragment() {
 	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
 		homeViewModel.uiState.collect { uiState ->
 			homeItemAdapter.submitList(uiState.items)
-			setViewState(uiState)
+//			setViewState(uiState)
 		}
 	}
 
@@ -73,9 +73,9 @@ class HomeFragment : Fragment() {
 
 	}
 
-	private fun setViewState(uiState: HomeUiState) {
-		binding.nicknameTv.text = getString(R.string.user_nickname, uiState.client.nickname)
-	}
+//	private fun setViewState(uiState: HomeUiState) {
+//		binding.nicknameTv.text = getString(R.string.user_nickname, uiState.client.nickname)
+//	}
 
 	private fun initAdapter() {
 		homeItemAdapter.onClickBookItem = { itemPosition ->
