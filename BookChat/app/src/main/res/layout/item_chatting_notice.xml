@@ -58,6 +58,7 @@
                 android:background="@drawable/chat_notice_background"
                 android:paddingHorizontal="15dp"
                 android:paddingVertical="5dp"
+                android:gravity="center"
                 android:text="@{chat.message}"
                 android:textColor="#4D4D4D"
                 android:textSize="10sp"
