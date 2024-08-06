@@ -1,105 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <data>
-        <variable
-            name="firstItem"
-            type="com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem.FirstItem" />
-    </data>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <EditText
+        android:id="@+id/agony_record_first_item_title_et"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@null"
+        android:elegantTextHeight="true"
+        android:elevation="2dp"
+        android:fontFamily="@font/notosanskr_regular"
+        android:gravity="top"
+        android:hint="@string/title"
+        android:maxLength="20"
+        android:textColor="#222222"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toStartOf="@+id/agony_record_first_item_edit_cancel_btn"
+        app:layout_constraintStart_toStartOf="@+id/cardView4"
+        app:layout_constraintTop_toTopOf="@+id/cardView4" />
 
-        <EditText
-            android:id="@+id/agony_record_first_item_title_et"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="15dp"
-            android:elegantTextHeight="true"
-            android:elevation="2dp"
-            android:fontFamily="@font/notosanskr_regular"
-            android:hint="@string/title"
-            android:maxLength="20"
-            android:gravity="top"
-            android:background="@null"
-            android:textColor="#222222"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toStartOf="@+id/agony_record_first_item_edit_cancel_btn"
-            app:layout_constraintStart_toStartOf="@+id/cardView4"
-            app:layout_constraintTop_toTopOf="@+id/cardView4" />
+    <com.example.bookchat.ui.customview.AntiDupClickImageButton
+        android:id="@+id/agony_record_first_item_edit_cancel_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="15dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:elevation="10dp"
+        android:src="@drawable/x_icon_round_small"
+        app:layout_constraintBottom_toBottomOf="@+id/agony_record_first_item_title_et"
+        app:layout_constraintEnd_toEndOf="@+id/cardView4"
+        app:layout_constraintTop_toTopOf="@+id/agony_record_first_item_title_et" />
 
-        <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/agony_record_first_item_edit_cancel_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="15dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:elevation="10dp"
-            android:src="@drawable/x_icon_round_small"
-            app:layout_constraintBottom_toBottomOf="@+id/agony_record_first_item_title_et"
-            app:layout_constraintEnd_toEndOf="@+id/cardView4"
-            app:layout_constraintTop_toTopOf="@+id/agony_record_first_item_title_et" />
+    <EditText
+        android:id="@+id/agony_record_first_item_content_et"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="10dp"
+        android:background="@null"
+        android:elegantTextHeight="true"
+        android:elevation="2dp"
+        android:fontFamily="@font/notosanskr_regular"
+        android:gravity="top"
+        android:hint="@string/content"
+        android:maxLength="100"
+        android:textColor="#373737"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@+id/agony_record_first_item_edit_submit_btn"
+        app:layout_constraintEnd_toEndOf="@+id/cardView4"
+        app:layout_constraintStart_toStartOf="@+id/cardView4"
+        app:layout_constraintTop_toBottomOf="@+id/agony_record_first_item_title_et" />
 
-        <EditText
-            android:id="@+id/agony_record_first_item_content_et"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="15dp"
-            android:layout_marginBottom="10dp"
-            android:background="@null"
-            android:elegantTextHeight="true"
-            android:elevation="2dp"
-            android:fontFamily="@font/notosanskr_regular"
-            android:gravity="top"
-            android:maxLength="100"
-            android:hint="@string/content"
-            android:textColor="#373737"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toTopOf="@+id/agony_record_first_item_edit_submit_btn"
-            app:layout_constraintEnd_toEndOf="@+id/cardView4"
-            app:layout_constraintStart_toStartOf="@+id/cardView4"
-            app:layout_constraintTop_toBottomOf="@+id/agony_record_first_item_title_et" />
+    <TextView
+        android:id="@+id/agony_record_first_item_edit_submit_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="15dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:elegantTextHeight="true"
+        android:elevation="2dp"
+        android:focusable="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:padding="5dp"
+        android:text="@string/make_confirm"
+        android:textColor="#5648FF"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/cardView4"
+        app:layout_constraintEnd_toEndOf="@+id/cardView4" />
 
-        <TextView
-            android:id="@+id/agony_record_first_item_edit_submit_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="25dp"
-            android:layout_marginBottom="15dp"
-            android:padding="5dp"
-            android:elegantTextHeight="true"
-            android:elevation="2dp"
-            android:fontFamily="@font/notosanskr_regular"
-            android:text="@string/make_confirm"
-            android:textColor="#5648FF"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?android:attr/selectableItemBackground"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/cardView4"
-            app:layout_constraintEnd_toEndOf="@+id/cardView4" />
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#F6F6F6"
+        android:minHeight="190dp"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardView4"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="30dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="30dp"
-            android:layout_marginBottom="10dp"
-            android:backgroundTint="#F6F6F6"
-            android:minHeight="190dp"
-            app:cardCornerRadius="15dp"
-            app:cardElevation="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+</androidx.constraintlayout.widget.ConstraintLayout>

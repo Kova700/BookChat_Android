@@ -28,7 +28,7 @@
         android:ellipsize="end"
         android:fontFamily="@font/notosanskr_bold"
         android:gravity="start"
-        android:maxLines="3"
+        android:maxLength="30"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="@+id/background_agony_folder_cv"
         app:layout_constraintEnd_toEndOf="@+id/background_agony_folder_cv"

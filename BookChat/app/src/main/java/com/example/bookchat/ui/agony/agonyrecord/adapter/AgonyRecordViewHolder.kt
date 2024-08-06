@@ -3,8 +3,8 @@ package com.example.bookchat.ui.agony.agonyrecord.adapter
 import android.text.Editable
 import android.view.View
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.example.bookchat.databinding.ItemAgonyRecordDataBinding
 import com.example.bookchat.databinding.ItemAgonyRecordFirstBinding
 import com.example.bookchat.databinding.ItemAgonyRecordHeaderBinding
@@ -12,7 +12,7 @@ import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordSwipeHelper
 import com.example.bookchat.ui.agony.agonyrecord.model.AgonyRecordListItem
 
 sealed class AgonyRecordViewHolder(
-	binding: ViewDataBinding,
+	binding: ViewBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 	abstract fun bind(agonyRecordListItem: AgonyRecordListItem)
 }
@@ -23,14 +23,16 @@ class AgonyRecordHeaderViewHolder(
 ) : AgonyRecordViewHolder(binding) {
 
 	init {
-		binding.agonyTitleEidtBtn.setOnClickListener {
+		binding.agonyTitleEditBtn.setOnClickListener {
 			onHeaderEditBtnClick?.invoke()
 		}
 	}
 
 	override fun bind(agonyRecordListItem: AgonyRecordListItem) {
 		val item = agonyRecordListItem as AgonyRecordListItem.Header
-		binding.agony = item.agony
+		with(binding) {
+			agonyTitleTv.text = item.agony.title
+		}
 	}
 }
 
@@ -42,32 +44,33 @@ class AgonyRecordFirstItemViewHolder(
 ) : AgonyRecordViewHolder(binding) {
 
 	init {
-		binding.agonyRecordFirstItemCv.setOnClickListener {
-			onFirstItemClick?.invoke()
-		}
-		binding.editLayout.agonyRecordFirstItemEditCancelBtn.setOnClickListener {
-			onFirstItemEditCancelBtnClick?.invoke()
-		}
-		binding.editLayout.agonyRecordFirstItemEditSubmitBtn.setOnClickListener {
-			onFirstItemEditFinishBtnClick?.invoke()
+		with(binding) {
+			agonyRecordFirstItemCv.setOnClickListener {
+				onFirstItemClick?.invoke()
+			}
+			editLayout.agonyRecordFirstItemEditCancelBtn.setOnClickListener {
+				onFirstItemEditCancelBtnClick?.invoke()
+			}
+			editLayout.agonyRecordFirstItemEditSubmitBtn.setOnClickListener {
+				onFirstItemEditFinishBtnClick?.invoke()
+			}
 		}
 	}
 
 	override fun bind(agonyRecordListItem: AgonyRecordListItem) {
 		val item = agonyRecordListItem as AgonyRecordListItem.FirstItem
-		binding.firstItem = item
-		binding.editLayout.agonyRecordFirstItemTitleEt
 		setViewState(item.state)
-
 	}
 
 	private fun setViewState(state: AgonyRecordListItem.ItemState) {
-		binding.progressbar.visibility =
-			if (state is AgonyRecordListItem.ItemState.Loading) View.VISIBLE else View.GONE
-		binding.editLayout.root.visibility =
-			if (state is AgonyRecordListItem.ItemState.Editing) View.VISIBLE else View.INVISIBLE
-		binding.agonyRecordFirstItemCv.visibility =
-			if (state is AgonyRecordListItem.ItemState.Success) View.VISIBLE else View.INVISIBLE
+		with(binding) {
+			progressbar.visibility =
+				if (state is AgonyRecordListItem.ItemState.Loading) View.VISIBLE else View.GONE
+			editLayout.root.visibility =
+				if (state is AgonyRecordListItem.ItemState.Editing) View.VISIBLE else View.INVISIBLE
+			agonyRecordFirstItemCv.visibility =
+				if (state is AgonyRecordListItem.ItemState.Success) View.VISIBLE else View.INVISIBLE
+		}
 
 		if (state is AgonyRecordListItem.ItemState.Editing) {
 			with(binding.editLayout) {
@@ -99,36 +102,43 @@ class AgonyRecordItemViewHolder(
 	private var isSwiped: Boolean = false
 
 	init {
-		binding.swipeView.setOnClickListener {
-			onItemClick?.invoke(absoluteAdapterPosition)
-		}
-		binding.editLayout.agonyRecordEditCancelBtn.setOnClickListener {
-			onItemEditCancelBtnClick?.invoke(absoluteAdapterPosition)
-		}
-		binding.editLayout.agonyRecordEditFinishTv.setOnClickListener {
-			onItemEditFinishBtnClick?.invoke(absoluteAdapterPosition)
-		}
-		binding.swipeBackground.background.setOnClickListener {
-			onItemDeleteBtnClick?.invoke(absoluteAdapterPosition)
+		with(binding) {
+			swipeView.setOnClickListener {
+				onItemClick?.invoke(absoluteAdapterPosition)
+			}
+			editLayout.agonyRecordEditCancelBtn.setOnClickListener {
+				onItemEditCancelBtnClick?.invoke(absoluteAdapterPosition)
+			}
+			editLayout.agonyRecordEditFinishTv.setOnClickListener {
+				onItemEditFinishBtnClick?.invoke(absoluteAdapterPosition)
+			}
+			swipeBackground.background.setOnClickListener {
+				onItemDeleteBtnClick?.invoke(absoluteAdapterPosition)
+			}
 		}
 	}
 
 	override fun bind(agonyRecordListItem: AgonyRecordListItem) {
 		val item = agonyRecordListItem as AgonyRecordListItem.Item
-		binding.record = item
+		with(binding) {
+			agonyRecordTitle.text = item.title
+			agonyRecordContent.text = item.content
+			agonyRecordCreatedAt.text = item.createdAt
+		}
 		setViewState(item.state)
 	}
 
 	private fun setViewState(state: AgonyRecordListItem.ItemState) {
-		binding.progressbar.visibility =
-			if (state is AgonyRecordListItem.ItemState.Loading) View.VISIBLE else View.GONE
-		binding.editLayout.root.visibility =
-			if (state is AgonyRecordListItem.ItemState.Editing) View.VISIBLE else View.INVISIBLE
-		binding.swipeView.visibility =
-			if (state is AgonyRecordListItem.ItemState.Success) View.VISIBLE else View.INVISIBLE
-		binding.swipeBackground.root.visibility =
-			if (state is AgonyRecordListItem.ItemState.Success) View.VISIBLE else View.INVISIBLE
-
+		with(binding) {
+			progressbar.visibility =
+				if (state is AgonyRecordListItem.ItemState.Loading) View.VISIBLE else View.GONE
+			editLayout.root.visibility =
+				if (state is AgonyRecordListItem.ItemState.Editing) View.VISIBLE else View.INVISIBLE
+			swipeView.visibility =
+				if (state is AgonyRecordListItem.ItemState.Success) View.VISIBLE else View.INVISIBLE
+			swipeBackground.root.visibility =
+				if (state is AgonyRecordListItem.ItemState.Success) View.VISIBLE else View.INVISIBLE
+		}
 
 		when (state) {
 			is AgonyRecordListItem.ItemState.Editing -> {

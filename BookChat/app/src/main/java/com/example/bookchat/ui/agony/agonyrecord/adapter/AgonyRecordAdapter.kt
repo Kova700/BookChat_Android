@@ -2,7 +2,6 @@ package com.example.bookchat.ui.agony.agonyrecord.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.bookchat.R
@@ -37,43 +36,49 @@ class AgonyRecordAdapter @Inject constructor() :
 
 	override fun onCreateViewHolder(
 		parent: ViewGroup,
-		viewType: Int
+		viewType: Int,
 	): AgonyRecordViewHolder {
 
 		when (viewType) {
 			R.layout.item_agony_record_header -> {
-				val binding: ItemAgonyRecordHeaderBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_agony_record_header,
-					parent, false
+				val binding = ItemAgonyRecordHeaderBinding.inflate(
+					LayoutInflater.from(parent.context),
+					parent,
+					false
 				)
-				return AgonyRecordHeaderViewHolder(binding, onHeaderEditBtnClick)
+				return AgonyRecordHeaderViewHolder(
+					binding = binding,
+					onHeaderEditBtnClick = onHeaderEditBtnClick
+				)
 			}
 
 			R.layout.item_agony_record_first -> {
-				val binding: ItemAgonyRecordFirstBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_agony_record_first,
-					parent, false
+				val binding = ItemAgonyRecordFirstBinding.inflate(
+					LayoutInflater.from(parent.context),
+					parent,
+					false
 				)
 				return AgonyRecordFirstItemViewHolder(
-					binding,
-					onFirstItemClick,
-					onFirstItemEditCancelBtnClick,
-					onFirstItemEditFinishBtnClick,
+					binding = binding,
+					onFirstItemClick = onFirstItemClick,
+					onFirstItemEditCancelBtnClick = onFirstItemEditCancelBtnClick,
+					onFirstItemEditFinishBtnClick = onFirstItemEditFinishBtnClick,
 				)
 			}
 
 			else -> {
-				val binding: ItemAgonyRecordDataBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_agony_record_data,
-					parent, false
+				val binding = ItemAgonyRecordDataBinding.inflate(
+					LayoutInflater.from(parent.context),
+					parent,
+					false
 				)
 				return AgonyRecordItemViewHolder(
-					binding,
-					onItemClick,
-					onItemSwipe,
-					onItemEditCancelBtnClick,
-					onItemEditFinishBtnClick,
-					onItemDeleteBtnClick,
+					binding = binding,
+					onItemClick = onItemClick,
+					onItemSwipe = onItemSwipe,
+					onItemEditCancelBtnClick = onItemEditCancelBtnClick,
+					onItemEditFinishBtnClick = onItemEditFinishBtnClick,
+					onItemDeleteBtnClick = onItemDeleteBtnClick,
 				)
 			}
 		}

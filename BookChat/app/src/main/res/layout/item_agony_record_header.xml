@@ -1,45 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <data>
+    <TextView
+        android:id="@+id/agony_title_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_bold"
+        android:maxLength="30"
+        android:textColor="#222222"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/agony_title_edit_btn"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <variable
-            name="agony"
-            type="com.example.bookchat.domain.model.Agony" />
-    </data>
+    <com.example.bookchat.ui.customview.AntiDupClickImageButton
+        android:id="@+id/agony_title_edit_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="30dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_pencil_btn"
+        app:layout_constraintBottom_toBottomOf="@+id/agony_title_tv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/agony_title_tv"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <!--TODO : 최대 길이 설정 필요함-->
-        <TextView
-            android:id="@+id/agony_title_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="30dp"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_bold"
-            android:text="@{agony.title}"
-            android:textColor="#222222"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/agonyTitleEidtBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="30dp"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_pencil_btn"
-            app:layout_constraintBottom_toBottomOf="@+id/agony_title_tv"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/agony_title_tv"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+</androidx.constraintlayout.widget.ConstraintLayout>

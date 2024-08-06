@@ -143,7 +143,7 @@
     <string name="agony_delete_fail">고민 삭제를 실패했습니다.</string>
 
     <!--agony title edit-->
-    <string name="agony_title_new_title_length">%1$d / 20</string>
+    <string name="agony_title_new_title_length">%1$d / 30</string>
     <string name="agony_title">고민 제목</string>
     <string name="agony_title_empty">제목을 입력해주세요.</string>
     <string name="agony_title_edit_success">제목이 수정되었습니다.</string>
