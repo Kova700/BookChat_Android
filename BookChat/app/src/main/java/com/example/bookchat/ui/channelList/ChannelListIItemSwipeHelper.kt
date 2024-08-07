@@ -67,12 +67,10 @@ class ChannelListIItemSwipeHelper @Inject constructor() : ItemTouchHelper.Callba
 		isSwiped: Boolean,
 		isCurrentlyActive: Boolean,
 	): Float {
-		val x =
-			if (isSwiped) {
-				if (isCurrentlyActive) max(0F, limitTranslationX + dX) else limitTranslationX
-			} else {
-				if (dX > 0F) dX else 0F
-			}
+		val x = when {
+			isSwiped -> if (isCurrentlyActive) max(0F, limitTranslationX + dX) else limitTranslationX
+			else -> if (dX > 0F) dX else 0F
+		}
 		return min(x, limitTranslationX)
 	}
 

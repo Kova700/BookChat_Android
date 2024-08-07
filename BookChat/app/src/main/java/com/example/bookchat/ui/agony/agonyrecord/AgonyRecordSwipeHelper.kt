@@ -32,7 +32,7 @@ class AgonyRecordSwipeHelper @Inject constructor() : ItemTouchHelper.Callback() 
 
 	override fun getMovementFlags(
 		recyclerView: RecyclerView,
-		viewHolder: RecyclerView.ViewHolder
+		viewHolder: RecyclerView.ViewHolder,
 	): Int {
 		val swipeView = getSwipeView(viewHolder)
 		setLimitTranslationX(swipeView.width.toFloat() * SWIPE_VIEW_PERCENT)
@@ -50,7 +50,7 @@ class AgonyRecordSwipeHelper @Inject constructor() : ItemTouchHelper.Callback() 
 		dX: Float,
 		dY: Float,
 		actionState: Int,
-		isCurrentlyActive: Boolean
+		isCurrentlyActive: Boolean,
 	) {
 		if (actionState != ACTION_STATE_SWIPE) return
 
@@ -64,14 +64,12 @@ class AgonyRecordSwipeHelper @Inject constructor() : ItemTouchHelper.Callback() 
 	private fun getSwipeViewXPosition(
 		dX: Float,
 		isSwiped: Boolean,
-		isCurrentlyActive: Boolean
+		isCurrentlyActive: Boolean,
 	): Float {
-		val x =
-			if (isSwiped) {
-				if (isCurrentlyActive) max(0F, limitTranslationX + dX) else limitTranslationX
-			} else {
-				if (dX > 0F) dX else 0F
-			}
+		val x = when {
+			isSwiped -> if (isCurrentlyActive) max(0F, limitTranslationX + dX) else limitTranslationX
+			else -> if (dX > 0F) dX else 0F
+		}
 		return min(x, limitTranslationX)
 	}
 
@@ -86,7 +84,7 @@ class AgonyRecordSwipeHelper @Inject constructor() : ItemTouchHelper.Callback() 
 
 	override fun clearView(
 		recyclerView: RecyclerView,
-		viewHolder: RecyclerView.ViewHolder
+		viewHolder: RecyclerView.ViewHolder,
 	) {
 		currentTranslationX = 0f
 		getDefaultUIUtil().clearView(getSwipeView(viewHolder))
@@ -95,7 +93,7 @@ class AgonyRecordSwipeHelper @Inject constructor() : ItemTouchHelper.Callback() 
 	override fun onMove(
 		recyclerView: RecyclerView,
 		viewHolder: RecyclerView.ViewHolder,
-		target: RecyclerView.ViewHolder
+		target: RecyclerView.ViewHolder,
 	): Boolean = false
 
 	override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = Unit
