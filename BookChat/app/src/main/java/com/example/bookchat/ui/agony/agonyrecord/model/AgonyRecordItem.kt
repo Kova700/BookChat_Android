@@ -29,7 +29,7 @@ sealed interface AgonyRecordListItem {
 
 	sealed interface ItemState {
 		data class Success(val isSwiped: Boolean = false) : ItemState
-		object Loading : ItemState
+		data object Loading : ItemState
 
 		/** 타이핑 입력시 마다 새로운 ItemList submit함을 방지하기 위해 가변 프로퍼티 사용*/
 		data class Editing(

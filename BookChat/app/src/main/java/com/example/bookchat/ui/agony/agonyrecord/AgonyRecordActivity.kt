@@ -5,12 +5,10 @@ import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAgonyRecordBinding
 import com.example.bookchat.ui.agony.agonyedit.AgonyEditActivity
 import com.example.bookchat.ui.agony.agonyrecord.adapter.AgonyRecordAdapter
@@ -24,6 +22,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AgonyRecordActivity : AppCompatActivity() {
 
+	//TODO: AgonyRecord 생성 시, Content 내용이 엄청 길다면 400 넘어오는 현상이 있음
+	// {"errorCode":"500","message":"예상치 못한 예외가 발생했습니다."}
+	// 길이 문제인줄 알았지만 수정시에는 더 긴 길이도 등록됨으로 길이 문제는 아닌 듯 (등록 API측에 문제가 있나봄)
 	private lateinit var binding: ActivityAgonyRecordBinding
 
 	@Inject
@@ -36,13 +37,13 @@ class AgonyRecordActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_agony_record)
-		binding.viewmodel = agonyRecordViewModel
-		binding.lifecycleOwner = this
+		binding = ActivityAgonyRecordBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		observeUiState()
 		observeUiEvent()
 		initAdapter()
 		initRecyclerView()
+		initViewState()
 		setBackPressedDispatcher()
 	}
 
@@ -54,6 +55,10 @@ class AgonyRecordActivity : AppCompatActivity() {
 
 	private fun observeUiEvent() = lifecycleScope.launch {
 		agonyRecordViewModel.eventFlow.collect { event -> handleEvent(event) }
+	}
+
+	private fun initViewState() {
+		binding.backBtn.setOnClickListener { agonyRecordViewModel.onBackBtnClick() }
 	}
 
 	private fun initAdapter() {
@@ -113,7 +118,7 @@ class AgonyRecordActivity : AppCompatActivity() {
 		}
 		with(binding.agonyRecordRcv) {
 			adapter = agonyRecordAdapter
-			setHasFixedSize(true)
+			setHasFixedSize(false)
 			layoutManager = linearLayoutManager
 			initSwipeHelper(this)
 			addOnScrollListener(rcvScrollListener)
@@ -126,8 +131,10 @@ class AgonyRecordActivity : AppCompatActivity() {
 	}
 
 	private fun showEditCancelWarning() {
-		val warningDialog = AgonyRecordWarningDialog()
-		warningDialog.show(this.supportFragmentManager, DIALOG_TAG_WARNING_EDIT_CANCEL)
+		val warningDialog = AgonyRecordWarningDialog(
+			onClickOkBtn = { agonyRecordViewModel.clearEditingState() }
+		)
+		warningDialog.show(supportFragmentManager, DIALOG_TAG_WARNING_EDIT_CANCEL)
 	}
 
 	private fun setBackPressedDispatcher() {
@@ -138,8 +145,8 @@ class AgonyRecordActivity : AppCompatActivity() {
 		when (event) {
 			is AgonyRecordEvent.MoveToBack -> finish()
 			is AgonyRecordEvent.MoveToAgonyTitleEdit -> moveToAgonyTitleEdit(
-				event.agonyId,
-				event.bookshelfItemId
+				agonyId = event.agonyId,
+				bookshelfItemId = event.bookshelfItemId
 			)
 
 			is AgonyRecordEvent.ShowEditCancelWarning -> showEditCancelWarning()

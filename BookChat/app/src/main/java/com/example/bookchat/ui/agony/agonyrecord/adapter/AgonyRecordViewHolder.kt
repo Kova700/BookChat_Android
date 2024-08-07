@@ -120,24 +120,23 @@ class AgonyRecordItemViewHolder(
 
 	override fun bind(agonyRecordListItem: AgonyRecordListItem) {
 		val item = agonyRecordListItem as AgonyRecordListItem.Item
+		setViewState(item)
+	}
+
+	private fun setViewState(item: AgonyRecordListItem.Item) {
+		val state = item.state
 		with(binding) {
 			agonyRecordTitle.text = item.title
 			agonyRecordContent.text = item.content
 			agonyRecordCreatedAt.text = item.createdAt
-		}
-		setViewState(item.state)
-	}
-
-	private fun setViewState(state: AgonyRecordListItem.ItemState) {
-		with(binding) {
 			progressbar.visibility =
 				if (state is AgonyRecordListItem.ItemState.Loading) View.VISIBLE else View.GONE
 			editLayout.root.visibility =
-				if (state is AgonyRecordListItem.ItemState.Editing) View.VISIBLE else View.INVISIBLE
+				if (state is AgonyRecordListItem.ItemState.Editing) View.VISIBLE else View.GONE
 			swipeView.visibility =
-				if (state is AgonyRecordListItem.ItemState.Success) View.VISIBLE else View.INVISIBLE
-			swipeBackground.root.visibility =
-				if (state is AgonyRecordListItem.ItemState.Success) View.VISIBLE else View.INVISIBLE
+				if (state is AgonyRecordListItem.ItemState.Success) View.VISIBLE else View.GONE
+			swipeBackground.background.visibility =
+				if (state is AgonyRecordListItem.ItemState.Success) View.VISIBLE else View.GONE
 		}
 
 		when (state) {

@@ -6,35 +6,29 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
-import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogAgonyRecordWarningBinding
-import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordViewModel
 
-class AgonyRecordWarningDialog : DialogFragment() {
+class AgonyRecordWarningDialog(
+	private val onClickOkBtn: () -> Unit,
+) : DialogFragment() {
 
 	private var _binding: DialogAgonyRecordWarningBinding? = null
 	private val binding get() = _binding!!
 
-	private val agonyRecordViewModel: AgonyRecordViewModel by activityViewModels()
-
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
+		savedInstanceState: Bundle?,
 	): View {
-		_binding =
-			DataBindingUtil.inflate(inflater, R.layout.dialog_agony_record_warning, container, false)
-		binding.lifecycleOwner = this
-		binding.dialog = this
+		_binding = DialogAgonyRecordWarningBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+		initViewState()
 	}
 
 	override fun onDestroyView() {
@@ -42,12 +36,19 @@ class AgonyRecordWarningDialog : DialogFragment() {
 		_binding = null
 	}
 
+	private fun initViewState() {
+		with(binding) {
+			cancelBtn.setOnClickListener { onClickCancelBtn() }
+			okBtn.setOnClickListener { onClickOkBtn() }
+		}
+	}
+
 	fun onClickCancelBtn() {
-		this.dismiss()
+		dismiss()
 	}
 
 	fun onClickOkBtn() {
-		agonyRecordViewModel.clearEditingState()
-		this.dismiss()
+		onClickOkBtn.invoke()
+		dismiss()
 	}
 }
