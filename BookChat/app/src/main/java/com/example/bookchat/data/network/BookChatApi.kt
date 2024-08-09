@@ -1,15 +1,51 @@
 package com.example.bookchat.data.network
 
-import com.example.bookchat.data.*
 import com.example.bookchat.data.network.model.BookSearchSortOptionNetWork
 import com.example.bookchat.data.network.model.BookSearchSortOptionNetWork.ACCURACY
 import com.example.bookchat.data.network.model.ChannelMemberAuthorityNetwork
 import com.example.bookchat.data.network.model.SearchSortOptionNetwork
-import com.example.bookchat.data.network.model.request.*
-import com.example.bookchat.data.network.model.response.*
+import com.example.bookchat.data.network.model.request.RequestChangeBookStatus
+import com.example.bookchat.data.network.model.request.RequestChangeChannelSetting
+import com.example.bookchat.data.network.model.request.RequestChangeUserNickname
+import com.example.bookchat.data.network.model.request.RequestMakeAgony
+import com.example.bookchat.data.network.model.request.RequestMakeAgonyRecord
+import com.example.bookchat.data.network.model.request.RequestMakeChannel
+import com.example.bookchat.data.network.model.request.RequestRegisterBookReport
+import com.example.bookchat.data.network.model.request.RequestRegisterBookShelfBook
+import com.example.bookchat.data.network.model.request.RequestReviseAgony
+import com.example.bookchat.data.network.model.request.RequestReviseAgonyRecord
+import com.example.bookchat.data.network.model.request.RequestUserLogin
+import com.example.bookchat.data.network.model.request.RequestUserSignUp
+import com.example.bookchat.data.network.model.response.AgonyRecordResponse
+import com.example.bookchat.data.network.model.response.AgonyResponse
+import com.example.bookchat.data.network.model.response.BookChatTokenResponse
+import com.example.bookchat.data.network.model.response.BookReportResponse
+import com.example.bookchat.data.network.model.response.BookShelfItemResponse
+import com.example.bookchat.data.network.model.response.BookStateInBookShelfResponse
+import com.example.bookchat.data.network.model.response.ChannelSingleSearchResponse
+import com.example.bookchat.data.network.model.response.GetUserChannelResponse
+import com.example.bookchat.data.network.model.response.RespondGetChat
+import com.example.bookchat.data.network.model.response.RespondGetChats
+import com.example.bookchat.data.network.model.response.ResponseChannelInfo
+import com.example.bookchat.data.network.model.response.ResponseGetAgony
+import com.example.bookchat.data.network.model.response.ResponseGetAgonyRecord
+import com.example.bookchat.data.network.model.response.ResponseGetBookSearch
+import com.example.bookchat.data.network.model.response.ResponseGetBookShelfBooks
+import com.example.bookchat.data.network.model.response.ResponseGetChannelSearch
+import com.example.bookchat.data.network.model.response.UserResponse
 import okhttp3.MultipartBody
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Multipart
+import retrofit2.http.PATCH
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Part
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface BookChatApi {
 	//API 테스트
@@ -129,7 +165,7 @@ interface BookChatApi {
 	suspend fun reviseBookReport(
 		@Path("bookShelfId") bookShelfId: Long,
 		@Body requestRegisterBookReport: RequestRegisterBookReport,
-	): Response<Unit>
+	)
 
 	/**------------고민 ------------*/
 

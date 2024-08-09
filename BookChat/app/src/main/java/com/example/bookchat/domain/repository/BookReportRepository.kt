@@ -1,15 +1,17 @@
 package com.example.bookchat.domain.repository
 
 import com.example.bookchat.domain.model.BookReport
+import kotlinx.coroutines.flow.Flow
 
 interface BookReportRepository {
-	suspend fun getBookReport(bookShelfId: Long): BookReport
+	fun getBookReportFlow(bookShelfId: Long): Flow<BookReport>
+	suspend fun getBookReport(bookShelfId: Long)
 	suspend fun registerBookReport(
 		bookShelfId: Long,
 		reportTitle: String,
 		reportContent: String,
 		reportCreatedAt: String,
-	): BookReport
+	)
 
 	suspend fun deleteBookReport(bookShelfId: Long)
 	suspend fun reviseBookReport(
@@ -17,5 +19,5 @@ interface BookReportRepository {
 		reportTitle: String,
 		reportContent: String,
 		reportCreatedAt: String,
-	): BookReport
+	)
 }

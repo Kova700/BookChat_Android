@@ -11,12 +11,23 @@ data class BookReportUiState(
 	val enteredTitle: String,
 	val enteredContent: String,
 ) {
+	val isEditOrEmpty
+		get() = uiState == UiState.EDITING
+						|| uiState == UiState.EMPTY
+
+	val isExistChanges
+		get() = existingBookReport.reportTitle != enteredTitle
+						|| existingBookReport.reportContent != enteredContent
+
+	val isEnteredTextEmpty
+		get() = enteredTitle.isEmpty()
+						|| enteredContent.isEmpty()
 
 	enum class UiState {
 		SUCCESS,
 		LOADING,
 		EMPTY,
-		REVISE,
+		EDITING,
 		ERROR,
 	}
 
@@ -42,6 +53,5 @@ sealed class BookReportEvent {
 		val stringId: Int,
 	) : BookReportEvent()
 
-	data class ErrorEvent(val stringId: Int) : BookReportEvent()
 	data class UnknownErrorEvent(val message: String) : BookReportEvent()
 }

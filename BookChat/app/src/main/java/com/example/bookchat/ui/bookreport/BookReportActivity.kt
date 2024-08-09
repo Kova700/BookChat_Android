@@ -7,9 +7,7 @@ import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityBookReportBinding
 import com.example.bookchat.ui.bookreport.BookReportUiState.UiState
 import com.example.bookchat.utils.BookImgSizeManager
@@ -31,9 +29,8 @@ class BookReportActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_book_report)
-		binding.lifecycleOwner = this
-		binding.viewmodel = bookReportViewModel
+		binding = ActivityBookReportBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		setBackPressedDispatcher()
 		observeUiState()
 		observeUiEvent()
@@ -52,13 +49,19 @@ class BookReportActivity : AppCompatActivity() {
 	}
 
 	private fun initViewState() {
-		binding.bookReportEditLayout.bookReportTitleEt.addTextChangedListener { text: Editable? ->
-			text.let { bookReportViewModel.onChangeTitle(it.toString()) }
-		}
-		binding.bookReportEditLayout.bookReportContentEt.addTextChangedListener { text: Editable? ->
-			text.let { bookReportViewModel.onChangeContent(it.toString()) }
-		}
 		bookImgSizeManager.setBookImgSize(binding.bookImg)
+		with(binding) {
+			backBtn.setOnClickListener { bookReportViewModel.onClickBackBtn() }
+			reviseBtn.setOnClickListener { bookReportViewModel.onClickReviseBtn() }
+			deleteBtn.setOnClickListener { bookReportViewModel.onClickDeleteBtn() }
+			registerBtn.setOnClickListener { bookReportViewModel.onClickRegisterBtn() }
+			bookReportEditLayout.bookReportTitleEt.addTextChangedListener { text: Editable? ->
+				text.let { bookReportViewModel.onChangeTitle(it.toString()) }
+			}
+			bookReportEditLayout.bookReportContentEt.addTextChangedListener { text: Editable? ->
+				text.let { bookReportViewModel.onChangeContent(it.toString()) }
+			}
+		}
 	}
 
 	private fun setViewState(uiState: BookReportUiState) {
@@ -74,18 +77,30 @@ class BookReportActivity : AppCompatActivity() {
 				setSelection(uiState.enteredContent.length)
 			}
 		}
-		binding.bookImg.loadUrl(uiState.bookshelfItem.book.bookCoverImageUrl)
-		binding.bookReportBookTitleTv.isSelected = true
-		binding.bookReportBookAuthorsTv.isSelected = true
+		with(binding.bookReportDefaultLayout) {
+			bookReportTitleTv.text = uiState.existingBookReport.reportTitle
+			bookReportContentTv.text = uiState.existingBookReport.reportContent
+			bookReportCreatedDateTv.text = uiState.existingBookReport.reportCreatedAt
+		}
+		with(binding) {
+			bookImg.loadUrl(uiState.bookshelfItem.book.bookCoverImageUrl)
+			bookTitleTv.text = uiState.bookshelfItem.book.title
+			bookTitleTv.isSelected = true
+			bookAuthorsTv.text = uiState.bookshelfItem.book.authorsString
+			bookAuthorsTv.isSelected = true
+			starRatingBar.rating = uiState.bookshelfItem.star?.value ?: 0F
+		}
 	}
 
 	private fun setViewVisibility(uiState: BookReportUiState) {
-		binding.editStateGroup.visibility =
-			if (uiState.uiState == UiState.REVISE || uiState.uiState == UiState.EMPTY) View.VISIBLE else View.INVISIBLE
-		binding.successStateGroup.visibility =
-			if (uiState.uiState == UiState.SUCCESS) View.VISIBLE else View.INVISIBLE
-		binding.bookReportLoading.visibility =
-			if (uiState.uiState == UiState.LOADING) View.VISIBLE else View.INVISIBLE
+		with(binding) {
+			editStateGroup.visibility =
+				if (uiState.isEditOrEmpty) View.VISIBLE else View.GONE
+			successStateGroup.visibility =
+				if (uiState.uiState == UiState.SUCCESS) View.VISIBLE else View.GONE
+			progressbar.visibility =
+				if (uiState.uiState == UiState.LOADING) View.VISIBLE else View.GONE
+		}
 	}
 
 	private fun showWarningDialog(
@@ -107,9 +122,8 @@ class BookReportActivity : AppCompatActivity() {
 				onOkClick = event.onOkClick
 			)
 
-			is BookReportEvent.ShowSnackBar -> binding.bookReportLayout.showSnackBar(event.stringId)
-			is BookReportEvent.ErrorEvent -> binding.bookReportLayout.showSnackBar(event.stringId)
-			is BookReportEvent.UnknownErrorEvent -> binding.bookReportLayout.showSnackBar(event.message)
+			is BookReportEvent.ShowSnackBar -> binding.root.showSnackBar(event.stringId)
+			is BookReportEvent.UnknownErrorEvent -> binding.root.showSnackBar(event.message)
 		}
 	}
 

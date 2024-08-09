@@ -285,6 +285,7 @@
     <string name="confirm">확인</string>
     <string name="cancel">취소</string>
     <string name="finish">완료</string>
+    <string name="registration">등록</string>
     <string name="apply">적용</string>
     <string name="title">제목</string>
     <string name="content">내용</string>
