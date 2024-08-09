@@ -45,12 +45,12 @@ class ReadingBookShelfDataAdapter @Inject constructor(
 					LayoutInflater.from(parent.context), parent, false
 				)
 				return ReadingBookItemViewHolder(
-					binding,
-					bookImgSizeManager,
-					onItemClick,
-					onLongItemClick,
-					onPageInputBtnClick,
-					onDeleteClick
+					binding = binding,
+					bookImgSizeManager = bookImgSizeManager,
+					onItemClick = onItemClick,
+					onLongItemClick = onLongItemClick,
+					onPageInputBtnClick = onPageInputBtnClick,
+					onDeleteClick = onDeleteClick
 				)
 			}
 		}

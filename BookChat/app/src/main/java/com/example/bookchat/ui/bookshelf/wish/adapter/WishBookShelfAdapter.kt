@@ -2,7 +2,6 @@ package com.example.bookchat.ui.bookshelf.wish.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.bookchat.R
@@ -29,27 +28,31 @@ class WishBookShelfAdapter @Inject constructor(
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WishBookViewHolder {
 		when (viewType) {
 			R.layout.item_wish_bookshelf_header -> {
-				val binding: ItemWishBookshelfHeaderBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_wish_bookshelf_header,
-					parent, false
+				val binding = ItemWishBookshelfHeaderBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return WishBookHeaderViewHolder(binding)
 			}
 
 			R.layout.item_wish_bookshelf_data -> {
-				val binding: ItemWishBookshelfDataBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_wish_bookshelf_data,
-					parent, false
+				val binding = ItemWishBookshelfDataBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
-				return WishBookItemViewHolder(binding, bookImgSizeManager, onItemClick)
+				return WishBookItemViewHolder(
+					binding = binding,
+					bookImgSizeManager = bookImgSizeManager,
+					onItemClick = onItemClick
+				)
 			}
 
 			else -> {
-				val binding: ItemSearchBookDummyBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_search_book_dummy,
-					parent, false
+				val binding = ItemSearchBookDummyBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
-				return WishBookDummyViewHolder(binding, bookImgSizeManager)
+				return WishBookDummyViewHolder(
+					binding = binding,
+					bookImgSizeManager = bookImgSizeManager
+				)
 			}
 		}
 

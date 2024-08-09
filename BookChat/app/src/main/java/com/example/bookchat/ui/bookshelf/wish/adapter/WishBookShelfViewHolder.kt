@@ -1,7 +1,8 @@
 package com.example.bookchat.ui.bookshelf.wish.adapter
 
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
+import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemSearchBookDummyBinding
 import com.example.bookchat.databinding.ItemWishBookshelfDataBinding
 import com.example.bookchat.databinding.ItemWishBookshelfHeaderBinding
@@ -10,7 +11,7 @@ import com.example.bookchat.utils.BookImgSizeManager
 import com.example.bookchat.utils.image.loadUrl
 
 sealed class WishBookViewHolder(
-	binding: ViewDataBinding,
+	binding: ViewBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 	abstract fun bind(wishBookShelfItem: WishBookShelfItem)
 }
@@ -19,7 +20,13 @@ class WishBookHeaderViewHolder(
 	val binding: ItemWishBookshelfHeaderBinding,
 ) : WishBookViewHolder(binding) {
 	override fun bind(wishBookShelfItem: WishBookShelfItem) {
-		binding.totalItemCount = (wishBookShelfItem as WishBookShelfItem.Header).totalItemCount
+		val item = wishBookShelfItem as WishBookShelfItem.Header
+		with(binding) {
+			totalItemCountTv.text = root.context.getString(
+				R.string.bookshelf_total_item_count_text,
+				item.totalItemCount
+			)
+		}
 	}
 }
 
@@ -30,10 +37,12 @@ class WishBookItemViewHolder(
 ) : WishBookViewHolder(binding) {
 
 	init {
-		binding.root.setOnClickListener {
-			onItemClick?.invoke(bindingAdapterPosition)
+		with(binding) {
+			root.setOnClickListener {
+				onItemClick?.invoke(bindingAdapterPosition)
+			}
+			bookImgSizeManager.setBookImgSize(bookImg)
 		}
-		bookImgSizeManager.setBookImgSize(binding.bookImg)
 	}
 
 	override fun bind(wishBookShelfItem: WishBookShelfItem) {
