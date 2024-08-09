@@ -1,8 +1,8 @@
 package com.example.bookchat.ui.bookshelf.reading.adapter
 
 import android.view.View
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemReadingBookshelfDataBinding
 import com.example.bookchat.databinding.ItemReadingBookshelfHeaderBinding
@@ -16,7 +16,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 sealed class ReadingBookViewHolder(
-	binding: ViewDataBinding,
+	binding: ViewBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 	abstract fun bind(readingBookShelfItem: ReadingBookShelfItem)
 }
@@ -25,7 +25,14 @@ class ReadingBookHeaderViewHolder(
 	val binding: ItemReadingBookshelfHeaderBinding,
 ) : ReadingBookViewHolder(binding) {
 	override fun bind(readingBookShelfItem: ReadingBookShelfItem) {
-		binding.totalItemCount = (readingBookShelfItem as ReadingBookShelfItem.Header).totalItemCount
+		val item = readingBookShelfItem as ReadingBookShelfItem.Header
+		with(binding) {
+			totalItemCountTv.text =
+				root.context.getString(
+					R.string.bookshelf_total_item_count_text,
+					item.totalItemCount
+				)
+		}
 	}
 }
 
@@ -39,32 +46,36 @@ class ReadingBookItemViewHolder(
 ) : ReadingBookViewHolder(binding) {
 
 	init {
-		binding.swipeView.setOnClickListener {
-			onItemClick?.invoke(bindingAdapterPosition)
+		with(binding) {
+			swipeView.setOnClickListener {
+				onItemClick?.invoke(bindingAdapterPosition)
+			}
+			swipeView.setOnLongClickListener {
+				onLongItemClickWithAnimation(swipeView, onLongItemClick, bindingAdapterPosition)
+				true
+			}
+			pageBtn.setOnClickListener {
+				onPageInputBtnClick?.invoke(bindingAdapterPosition)
+			}
+			swipeBackground.root.setOnClickListener {
+				onDeleteClick?.invoke(bindingAdapterPosition)
+			}
+			bookImgSizeManager.setBookImgSize(bookImg)
 		}
-		binding.swipeView.setOnLongClickListener {
-			onLongItemClickWithAnimation(binding.swipeView, onLongItemClick, bindingAdapterPosition)
-			true
-		}
-		binding.pageBtn.setOnClickListener {
-			onPageInputBtnClick?.invoke(bindingAdapterPosition)
-		}
-		binding.swipeBackground.root.setOnClickListener {
-			onDeleteClick?.invoke(bindingAdapterPosition)
-		}
-		bookImgSizeManager.setBookImgSize(binding.bookImg)
 	}
 
 	override fun bind(readingBookShelfItem: ReadingBookShelfItem) {
 		val bookShelfListItem = (readingBookShelfItem as ReadingBookShelfItem.Item)
-		binding.selectedBookTitleTv.text = bookShelfListItem.book.title
-		binding.selectedBookAuthorsTv.text = bookShelfListItem.book.authorsString
-		binding.readingPageTv.text =
-			binding.root.context.getString(R.string.bookshelf_page_text, bookShelfListItem.pages)
-		binding.bookImg.loadUrl(bookShelfListItem.book.bookCoverImageUrl)
-		binding.selectedBookTitleTv.isSelected = true
-		binding.selectedBookAuthorsTv.isSelected = true
-		setViewHolderSwipeState(binding.swipeView, bookShelfListItem.isSwiped)
+		with(binding) {
+			selectedBookTitleTv.text = bookShelfListItem.book.title
+			selectedBookAuthorsTv.text = bookShelfListItem.book.authorsString
+			readingPageTv.text =
+				binding.root.context.getString(R.string.bookshelf_page_text, bookShelfListItem.pages)
+			bookImg.loadUrl(bookShelfListItem.book.bookCoverImageUrl)
+			selectedBookTitleTv.isSelected = true
+			selectedBookAuthorsTv.isSelected = true
+			setViewHolderSwipeState(swipeView, bookShelfListItem.isSwiped)
+		}
 	}
 
 	private fun setViewHolderSwipeState(swipeableView: View, isSwiped: Boolean) {

@@ -69,6 +69,7 @@
     <string name="wish_book">독서예정</string>
     <string name="complete_book">독서완료</string>
     <string name="reading_book">독서중</string>
+    <string name="bookshelf_total_item_count_text">%1$d 권</string>
     <string name="already_in_bookshelf">이미 서재에 등록된 도서</string>
     <string name="bookshelf_delete_success">도서가 삭제되었습니다.</string>
     <string name="bookshelf_delete_wish_book">독서예정에서 삭제되었습니다.</string>

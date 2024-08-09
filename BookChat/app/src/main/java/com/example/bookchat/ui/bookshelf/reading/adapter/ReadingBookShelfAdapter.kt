@@ -2,7 +2,6 @@ package com.example.bookchat.ui.bookshelf.reading.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.bookchat.R
@@ -35,17 +34,15 @@ class ReadingBookShelfDataAdapter @Inject constructor(
 
 		when (viewType) {
 			R.layout.item_reading_bookshelf_header -> {
-				val binding: ItemReadingBookshelfHeaderBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_reading_bookshelf_header,
-					parent, false
+				val binding = ItemReadingBookshelfHeaderBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return ReadingBookHeaderViewHolder(binding)
 			}
 
 			else -> {
-				val binding: ItemReadingBookshelfDataBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_reading_bookshelf_data,
-					parent, false
+				val binding = ItemReadingBookshelfDataBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return ReadingBookItemViewHolder(
 					binding,
