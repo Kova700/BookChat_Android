@@ -1,7 +1,11 @@
 package com.example.bookchat.ui.bookshelf.complete.adapter
 
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
+import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemCompleteBookshelfDataBinding
+import com.example.bookchat.databinding.ItemCompleteBookshelfHeaderBinding
 import com.example.bookchat.ui.agony.agonyrecord.AgonyRecordSwipeHelper
 import com.example.bookchat.ui.bookshelf.complete.model.CompleteBookShelfItem
 import com.example.bookchat.utils.BookImgSizeManager
@@ -10,6 +14,27 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+sealed class CompleteBookViewHolder(
+	binding: ViewBinding,
+) : RecyclerView.ViewHolder(binding.root) {
+	abstract fun bind(completeBookShelfItem: CompleteBookShelfItem)
+}
+
+class CompleteBookHeaderViewHolder(
+	val binding: ItemCompleteBookshelfHeaderBinding,
+) : CompleteBookViewHolder(binding) {
+	override fun bind(completeBookShelfItem: CompleteBookShelfItem) {
+		val item = completeBookShelfItem as CompleteBookShelfItem.Header
+		with(binding) {
+			totalItemCountTv.text =
+				root.context.getString(
+					R.string.bookshelf_total_item_count_text,
+					item.totalItemCount
+				)
+		}
+	}
+}
 
 class CompleteBookItemViewHolder(
 	private val binding: ItemCompleteBookshelfDataBinding,
@@ -20,28 +45,32 @@ class CompleteBookItemViewHolder(
 ) : CompleteBookViewHolder(binding) {
 
 	init {
-		binding.swipeView.setOnClickListener {
-			onItemClick?.invoke(bindingAdapterPosition)
+		with(binding) {
+			swipeView.setOnClickListener {
+				onItemClick?.invoke(bindingAdapterPosition)
+			}
+			swipeView.setOnLongClickListener {
+				onLongItemClickWithAnimation(swipeView, onLongItemClick, bindingAdapterPosition)
+				true
+			}
+			swipeBackground.root.setOnClickListener {
+				onDeleteClick?.invoke(bindingAdapterPosition)
+			}
+			bookImgSizeManager.setBookImgSize(bookImg)
 		}
-		binding.swipeView.setOnLongClickListener {
-			onLongItemClickWithAnimation(binding.swipeView, onLongItemClick, bindingAdapterPosition)
-			true
-		}
-		binding.swipeBackground.root.setOnClickListener {
-			onDeleteClick?.invoke(bindingAdapterPosition)
-		}
-		bookImgSizeManager.setBookImgSize(binding.bookImg)
 	}
 
 	override fun bind(completeBookShelfItem: CompleteBookShelfItem) {
 		val bookShelfListItem = (completeBookShelfItem as CompleteBookShelfItem.Item)
-		binding.selectedBookTitleTv.text = bookShelfListItem.book.title
-		binding.selectedBookAuthorsTv.text = bookShelfListItem.book.authorsString
-		binding.starRating.rating = bookShelfListItem.star?.value ?: 0F
-		binding.bookImg.loadUrl(bookShelfListItem.book.bookCoverImageUrl)
-		binding.selectedBookTitleTv.isSelected = true
-		binding.selectedBookAuthorsTv.isSelected = true
-		setViewHolderSwipeState(binding.swipeView, bookShelfListItem.isSwiped)
+		with(binding) {
+			selectedBookTitleTv.text = bookShelfListItem.book.title
+			selectedBookAuthorsTv.text = bookShelfListItem.book.authorsString
+			starRating.rating = bookShelfListItem.star?.value ?: 0F
+			bookImg.loadUrl(bookShelfListItem.book.bookCoverImageUrl)
+			selectedBookTitleTv.isSelected = true
+			selectedBookAuthorsTv.isSelected = true
+			setViewHolderSwipeState(swipeView, bookShelfListItem.isSwiped)
+		}
 	}
 
 	private fun setViewHolderSwipeState(swipeableView: View, isSwiped: Boolean) {

@@ -2,11 +2,8 @@ package com.example.bookchat.ui.bookshelf.complete.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemCompleteBookshelfDataBinding
 import com.example.bookchat.databinding.ItemCompleteBookshelfHeaderBinding
@@ -31,24 +28,22 @@ class CompleteBookShelfAdapter @Inject constructor(
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CompleteBookViewHolder {
 		when (viewType) {
 			R.layout.item_complete_bookshelf_header -> {
-				val binding: ItemCompleteBookshelfHeaderBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_complete_bookshelf_header,
-					parent, false
+				val binding = ItemCompleteBookshelfHeaderBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return CompleteBookHeaderViewHolder(binding)
 			}
 
 			else -> {
-				val binding: ItemCompleteBookshelfDataBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_complete_bookshelf_data,
-					parent, false
+				val binding = ItemCompleteBookshelfDataBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return CompleteBookItemViewHolder(
-					binding,
-					bookImgSizeManager,
-					onItemClick,
-					onLongItemClick,
-					onDeleteClick
+					binding = binding,
+					bookImgSizeManager = bookImgSizeManager,
+					onItemClick = onItemClick,
+					onLongItemClick = onLongItemClick,
+					onDeleteClick = onDeleteClick
 				)
 			}
 		}
@@ -71,34 +66,9 @@ class CompleteBookShelfAdapter @Inject constructor(
 				oldItem: CompleteBookShelfItem,
 				newItem: CompleteBookShelfItem,
 			): Boolean {
-				return when (oldItem) {
-					is CompleteBookShelfItem.Header -> {
-						newItem as CompleteBookShelfItem.Header
-						oldItem == newItem
-					}
-
-					is CompleteBookShelfItem.Item -> {
-						newItem as CompleteBookShelfItem.Item
-						oldItem == newItem
-					}
-				}
-
+				return oldItem == newItem
 			}
+
 		}
-	}
-
-}
-
-sealed class CompleteBookViewHolder(
-	binding: ViewDataBinding,
-) : RecyclerView.ViewHolder(binding.root) {
-	abstract fun bind(completeBookShelfItem: CompleteBookShelfItem)
-}
-
-class CompleteBookHeaderViewHolder(
-	val binding: ItemCompleteBookshelfHeaderBinding,
-) : CompleteBookViewHolder(binding) {
-	override fun bind(completeBookShelfItem: CompleteBookShelfItem) {
-		binding.totalItemCount = (completeBookShelfItem as CompleteBookShelfItem.Header).totalItemCount
 	}
 }
