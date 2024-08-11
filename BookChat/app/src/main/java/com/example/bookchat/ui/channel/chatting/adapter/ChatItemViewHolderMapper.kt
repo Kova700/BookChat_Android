@@ -2,7 +2,6 @@ package com.example.bookchat.ui.channel.chatting.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemChattingDateBinding
 import com.example.bookchat.databinding.ItemChattingLastReadNoticeBinding
@@ -17,13 +16,13 @@ fun getChatItemViewHolder(
 	onClickFailedChatRetryBtn: ((Int) -> Unit)? = null,
 	onClickFailedChatDeleteBtn: ((Int) -> Unit)? = null,
 	onSelectCaptureChat: ((Int) -> Unit)? = null,
+	onClickMoveToWholeText: ((Int) -> Unit)? = null,
 ): ChatItemViewHolder {
 
 	return when (itemViewType) {
 		R.layout.item_chatting_mine -> {
-			val binding: ItemChattingMineBinding = DataBindingUtil.inflate(
+			val binding = ItemChattingMineBinding.inflate(
 				LayoutInflater.from(parent.context),
-				R.layout.item_chatting_mine,
 				parent, false
 			)
 			MyChatViewHolder(
@@ -31,26 +30,26 @@ fun getChatItemViewHolder(
 				onClickFailedChatRetryBtn = onClickFailedChatRetryBtn,
 				onClickFailedChatDeleteBtn = onClickFailedChatDeleteBtn,
 				onSelectCaptureChat = onSelectCaptureChat,
+				onClickMoveToWholeText = onClickMoveToWholeText
 			)
 		}
 
 		R.layout.item_chatting_other -> {
-			val binding: ItemChattingOtherBinding = DataBindingUtil.inflate(
+			val binding = ItemChattingOtherBinding.inflate(
 				LayoutInflater.from(parent.context),
-				R.layout.item_chatting_other,
 				parent, false
 			)
 			AnotherUserChatViewHolder(
 				binding = binding,
 				onClickUserProfile = onClickUserProfile,
 				onSelectCaptureChat = onSelectCaptureChat,
+				onClickMoveToWholeText = onClickMoveToWholeText
 			)
 		}
 
 		R.layout.item_chatting_notice -> {
-			val binding: ItemChattingNoticeBinding = DataBindingUtil.inflate(
+			val binding = ItemChattingNoticeBinding.inflate(
 				LayoutInflater.from(parent.context),
-				R.layout.item_chatting_notice,
 				parent, false
 			)
 			NoticeChatViewHolder(
@@ -60,9 +59,8 @@ fun getChatItemViewHolder(
 		}
 
 		R.layout.item_chatting_date -> {
-			val binding: ItemChattingDateBinding = DataBindingUtil.inflate(
+			val binding = ItemChattingDateBinding.inflate(
 				LayoutInflater.from(parent.context),
-				R.layout.item_chatting_date,
 				parent, false
 			)
 			DateSeparatorViewHolder(
@@ -72,9 +70,8 @@ fun getChatItemViewHolder(
 		}
 
 		R.layout.item_chatting_last_read_notice -> {
-			val binding: ItemChattingLastReadNoticeBinding = DataBindingUtil.inflate(
+			val binding = ItemChattingLastReadNoticeBinding.inflate(
 				LayoutInflater.from(parent.context),
-				R.layout.item_chatting_last_read_notice,
 				parent, false
 			)
 			LastReadNoticeViewHolder(
@@ -82,6 +79,7 @@ fun getChatItemViewHolder(
 				onSelectCaptureChat = onSelectCaptureChat,
 			)
 		}
+
 		else -> throw RuntimeException("Received unknown ViewHolderType")
 	}
 }

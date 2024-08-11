@@ -93,6 +93,10 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".ui.channel.chatting.wholetext.ChatWholeTextActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.search.channelInfo.ChannelInfoActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

@@ -88,10 +88,10 @@ data class ChannelUiState(
 }
 
 sealed class ChannelEvent {
-	object MoveBack : ChannelEvent()
-	object MoveChannelSetting : ChannelEvent()
-	object ScrollToBottom : ChannelEvent()
-	object OpenOrCloseDrawer : ChannelEvent()
+	data object MoveBack : ChannelEvent()
+	data object MoveChannelSetting : ChannelEvent()
+	data object ScrollToBottom : ChannelEvent()
+	data object OpenOrCloseDrawer : ChannelEvent()
 
 	data class MakeCaptureImage(
 		val headerIndex: Int,
@@ -100,6 +100,10 @@ sealed class ChannelEvent {
 
 	data class MoveUserProfile(
 		val user: User,
+	) : ChannelEvent()
+
+	data class MoveToWholeText(
+		val chatId: Long,
 	) : ChannelEvent()
 
 	data class ShowChannelExitWarningDialog(

@@ -255,6 +255,7 @@
     <string name="channel_scrap_success">채팅방 스크랩이 완료되었습니다.</string>
     <string name="channel_scrap_fail">채팅 캡처를 실패했습니다.</string>
     <string name="new_message">새로운 메세지</string>
+    <string name="view_whole_message">전체보기</string>
 
     <!--channel setting-->
     <string name="channel_setting_title">채팅방 설정</string>
@@ -299,5 +300,6 @@
     <string name="title_content_empty">제목, 내용을 입력해주세요.</string>
     <string name="features_not_yet_supported">아직 지원하지 않는 기능입니다</string>
     <string name="exit">나가기</string>
+    <string name="unknown">(알 수 없음)</string>
 
 </resources>

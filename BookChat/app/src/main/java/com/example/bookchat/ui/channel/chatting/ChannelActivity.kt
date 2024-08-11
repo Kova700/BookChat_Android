@@ -15,7 +15,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,6 +30,8 @@ import com.example.bookchat.ui.channel.channelsetting.ChannelSettingActivity.Com
 import com.example.bookchat.ui.channel.chatting.adapter.ChatItemAdapter
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
 import com.example.bookchat.ui.channel.chatting.util.captureItems
+import com.example.bookchat.ui.channel.chatting.wholetext.ChatWholeTextActivity
+import com.example.bookchat.ui.channel.chatting.wholetext.ChatWholeTextViewmodel
 import com.example.bookchat.ui.channel.drawer.adapter.ChannelDrawerAdapter
 import com.example.bookchat.ui.channel.drawer.dialog.ChannelBannedUserNoticeDialog
 import com.example.bookchat.ui.channel.drawer.dialog.ChannelExitWarningDialog
@@ -72,13 +73,9 @@ class ChannelActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_channel)
-		binding.lifecycleOwner = this
-		binding.viewmodel = channelViewModel
+		binding = ActivityChannelBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		setBackPressedDispatcher()
-		initLayoutManager()
-		initAdapter()
-		initRcv()
 		initViewState()
 		observeUiState()
 		observeUiEvent()
@@ -139,6 +136,9 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun initViewState() {
+		initLayoutManager()
+		initAdapter()
+		initRcv()
 		with(binding.chatInputEt) {
 			if (channelViewModel.uiState.value.channel.isAvailableChannel) isEnabled = true
 			addTextChangedListener { text ->
@@ -146,9 +146,28 @@ class ChannelActivity : AppCompatActivity() {
 				channelViewModel.onChangeEnteredMessage(message)
 			}
 		}
-		binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-		binding.chatInputEt.setOnFocusChangeListener { _, hasFocus ->
-			binding.chatInputEt.maxLines = if (hasFocus) 4 else 1
+		with(binding) {
+			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+			chatInputEt.setOnFocusChangeListener { _, hasFocus ->
+				chatInputEt.maxLines = if (hasFocus) 4 else 1
+			}
+			backBtn.setOnClickListener { channelViewModel.onClickBackBtn() }
+			menuBtn.setOnClickListener { channelViewModel.onClickMenuBtn() }
+			bottomScrollBtn.setOnClickListener { channelViewModel.onClickScrollToBottomBtn() }
+			captureBtn.setOnClickListener { channelViewModel.onClickCaptureBtn() }
+			chatSendBtn.setOnClickListener { channelViewModel.onClickSendMessageBtn() }
+		}
+		with(binding.newChatNoticeLayout) {
+			bottomNewChatNoticeCv.setOnClickListener { channelViewModel.onClickNewChatNotice() }
+		}
+		with(binding.channelCaptureLayout) {
+			backBtn.setOnClickListener { channelViewModel.onClickCancelCapture() }
+			channelScrapSelectCancelBtn.setOnClickListener { channelViewModel.onClickCancelCaptureSelection() }
+			channelScrapConfirmBtn.setOnClickListener { channelViewModel.onClickCompleteCapture() }
+		}
+		with(binding.channelDrawerLayout) {
+			channelExitBtn.setOnClickListener { channelViewModel.onClickChannelExitBtn() }
+			channelSettingBtn.setOnClickListener { channelViewModel.onClickChannelSettingBtn() }
 		}
 	}
 
@@ -160,6 +179,10 @@ class ChannelActivity : AppCompatActivity() {
 		setBannedClientUIState(uiState)
 		setChannelSettingBtnUiState(uiState)
 		setCaptureMode(uiState)
+		with(binding) {
+			channelTitle.text = uiState.channel.roomName
+			roomMemberCount.text = uiState.channel.roomMemberCount.toString()
+		}
 	}
 
 	private fun setCaptureMode(uiState: ChannelUiState) {
@@ -239,19 +262,27 @@ class ChannelActivity : AppCompatActivity() {
 				setSelection(uiState.enteredMessage.length)
 			}
 		}
+		with(binding.chatSendBtn) {
+			visibility =
+				if (uiState.enteredMessage.isBlank()) View.GONE else View.VISIBLE //TODO : GONE OR INVISIBLE 테스트 필요
+		}
 	}
 
 	private fun setNewChatNoticeState(uiState: ChannelUiState) {
-		binding.newChatNoticeLayout.layout.visibility =
-			if (uiState.newChatNotice != null) View.VISIBLE else View.INVISIBLE
-		binding.newChatNoticeLayout.userProfileIv.loadUserProfile(
-			imageUrl = uiState.newChatNotice?.sender?.profileImageUrl,
-			userDefaultProfileType = uiState.newChatNotice?.sender?.defaultProfileImageType
-		)
+		with(binding.newChatNoticeLayout) {
+			root.visibility =
+				if (uiState.newChatNotice != null) View.VISIBLE else View.INVISIBLE
+			userProfileIv.loadUserProfile(
+				imageUrl = uiState.newChatNotice?.sender?.profileImageUrl,
+				userDefaultProfileType = uiState.newChatNotice?.sender?.defaultProfileImageType
+			)
+			userNicknameTv.text = uiState.newChatNotice?.sender?.nickname
+			messageTv.text = uiState.newChatNotice?.message
+		}
 	}
 
 	private fun setChannelSettingBtnUiState(uiState: ChannelUiState) {
-		with(binding.chatDrawerLayout.channelSettingBtn) {
+		with(binding.channelDrawerLayout.channelSettingBtn) {
 			visibility = if (uiState.isClientHost) View.VISIBLE else View.GONE
 		}
 	}
@@ -273,6 +304,10 @@ class ChannelActivity : AppCompatActivity() {
 		chatItemAdapter.onClickFailedChatDeleteBtn = { position ->
 			val item = (chatItemAdapter.currentList[position] as ChatItem.MyChat)
 			channelViewModel.onClickFailedChatDeleteBtn(item.chatId)
+		}
+		chatItemAdapter.onClickMoveToWholeText = { position ->
+			val item = (chatItemAdapter.currentList[position] as ChatItem.Message)
+			channelViewModel.onClickMoveToWholeText(item.chatId)
 		}
 		chatItemAdapter.onClickFailedChatRetryBtn = { position ->
 			val item = (chatItemAdapter.currentList[position] as ChatItem.MyChat)
@@ -321,7 +356,7 @@ class ChannelActivity : AppCompatActivity() {
 	private var isGoneAnimatingBottomScrollBtn = false
 	private fun setBottomScrollBtnState() {
 		fun setVisible() {
-			with(binding.chatBottomScrollBtn) {
+			with(binding.bottomScrollBtn) {
 				if (isGoneAnimatingBottomScrollBtn.not() && visibility == View.VISIBLE) return
 				isGoneAnimatingBottomScrollBtn = false
 				bottomScrollBtnAnimation?.cancel()
@@ -342,7 +377,7 @@ class ChannelActivity : AppCompatActivity() {
 		}
 
 		fun setGone() {
-			with(binding.chatBottomScrollBtn) {
+			with(binding.bottomScrollBtn) {
 				if (visibility != View.VISIBLE) return
 				isGoneAnimatingBottomScrollBtn = true
 				bottomScrollBtnAnimation?.cancel()
@@ -393,7 +428,7 @@ class ChannelActivity : AppCompatActivity() {
 			addOnScrollListener(rcvScrollListener)
 		}
 
-		binding.chatDrawerLayout.chatroomDrawerRcv.apply {
+		binding.channelDrawerLayout.chatroomDrawerRcv.apply {
 			adapter = channelDrawerAdapter
 			layoutManager = LinearLayoutManager(this@ChannelActivity)
 			setHasFixedSize(true)
@@ -587,6 +622,12 @@ class ChannelActivity : AppCompatActivity() {
 			.onFailure { channelViewModel.onFailedCapture() }
 	}
 
+	private fun moveToWholeText(chatId: Long) {
+		val intent = Intent(this, ChatWholeTextActivity::class.java)
+			.putExtra(ChatWholeTextViewmodel.EXTRA_CHAT_ID, chatId)
+		startActivity(intent)
+	}
+
 	private fun handleEvent(event: ChannelEvent) {
 		when (event) {
 			ChannelEvent.MoveBack -> finish()
@@ -606,6 +647,8 @@ class ChannelActivity : AppCompatActivity() {
 			is ChannelEvent.MakeCaptureImage -> makeCaptureImage(
 				headerIndex = event.headerIndex, bottomIndex = event.bottomIndex
 			)
+
+			is ChannelEvent.MoveToWholeText -> moveToWholeText(event.chatId)
 		}
 	}
 

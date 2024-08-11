@@ -1,8 +1,9 @@
 package com.example.bookchat.ui.channel.chatting.adapter
 
 import android.view.View
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
+import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemChattingDateBinding
 import com.example.bookchat.databinding.ItemChattingLastReadNoticeBinding
 import com.example.bookchat.databinding.ItemChattingMineBinding
@@ -14,12 +15,16 @@ import com.example.bookchat.utils.getFormattedTimeText
 import com.example.bookchat.utils.image.loadUserProfile
 
 sealed class ChatItemViewHolder(
-	binding: ViewDataBinding,
+	binding: ViewBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 	abstract fun bind(
 		chatItem: ChatItem,
 		isCaptureMode: Boolean,
 	)
+
+	companion object {
+		const val MAX_MESSAGE_LENGTH = 500
+	}
 }
 
 class MyChatViewHolder(
@@ -27,17 +32,23 @@ class MyChatViewHolder(
 	private val onClickFailedChatRetryBtn: ((Int) -> Unit)?,
 	private val onClickFailedChatDeleteBtn: ((Int) -> Unit)?,
 	private val onSelectCaptureChat: ((Int) -> Unit)?,
+	private val onClickMoveToWholeText: ((Int) -> Unit)?,
 ) : ChatItemViewHolder(binding) {
 
 	init {
-		binding.failedChatRetryBtn.setOnClickListener {
-			onClickFailedChatRetryBtn?.invoke(absoluteAdapterPosition)
-		}
-		binding.failedChatDeleteBtn.setOnClickListener {
-			onClickFailedChatDeleteBtn?.invoke(absoluteAdapterPosition)
-		}
-		binding.root.setOnClickListener {
-			onSelectCaptureChat?.invoke(absoluteAdapterPosition)
+		with(binding) {
+			failedChatRetryBtn.setOnClickListener {
+				onClickFailedChatRetryBtn?.invoke(absoluteAdapterPosition)
+			}
+			failedChatDeleteBtn.setOnClickListener {
+				onClickFailedChatDeleteBtn?.invoke(absoluteAdapterPosition)
+			}
+			root.setOnClickListener {
+				onSelectCaptureChat?.invoke(absoluteAdapterPosition)
+			}
+			moveToWholeTextBtn.setOnClickListener {
+				onClickMoveToWholeText?.invoke(absoluteAdapterPosition)
+			}
 		}
 	}
 
@@ -57,7 +68,12 @@ class MyChatViewHolder(
 		isCaptureMode: Boolean,
 	) {
 		with(binding) {
-			chat = item
+			chatTv.text =
+				if (item.message.length > MAX_MESSAGE_LENGTH)
+					item.message.substring(0, MAX_MESSAGE_LENGTH) + "..."
+				else item.message
+			moveToWholeTextBtn.visibility =
+				if (item.message.length > MAX_MESSAGE_LENGTH) View.VISIBLE else View.GONE
 			failedChatRetryBtn.isClickable = isCaptureMode.not()
 			failedChatDeleteBtn.isClickable = isCaptureMode.not()
 			failedChatBtnLayout.visibility =
@@ -76,7 +92,7 @@ class MyChatViewHolder(
 				captureLayoutView = chatCaptureLayoutView,
 				rootLayout = root
 			)
-			executePendingBindings()
+//			executePendingBindings()
 		}
 	}
 }
@@ -85,13 +101,19 @@ class AnotherUserChatViewHolder(
 	private val binding: ItemChattingOtherBinding,
 	private val onClickUserProfile: ((Int) -> Unit)?,
 	private val onSelectCaptureChat: ((Int) -> Unit)?,
+	private val onClickMoveToWholeText: ((Int) -> Unit)?,
 ) : ChatItemViewHolder(binding) {
 	init {
-		binding.userProfileIv.setOnClickListener {
-			onClickUserProfile?.invoke(absoluteAdapterPosition)
-		}
-		binding.root.setOnClickListener {
-			onSelectCaptureChat?.invoke(absoluteAdapterPosition)
+		with(binding) {
+			userProfileIv.setOnClickListener {
+				onClickUserProfile?.invoke(absoluteAdapterPosition)
+			}
+			root.setOnClickListener {
+				onSelectCaptureChat?.invoke(absoluteAdapterPosition)
+			}
+			moveToWholeTextBtn.setOnClickListener {
+				onClickMoveToWholeText?.invoke(absoluteAdapterPosition)
+			}
 		}
 	}
 
@@ -111,7 +133,6 @@ class AnotherUserChatViewHolder(
 		isCaptureMode: Boolean,
 	) {
 		with(binding) {
-			chat = item
 			setAdminItemView(item)
 			setCaptureViewState(
 				isCaptureMode = isCaptureMode,
@@ -119,17 +140,23 @@ class AnotherUserChatViewHolder(
 				captureLayoutView = binding.chatCaptureLayoutView,
 				rootLayout = binding.root
 			)
+			chatTv.text =
+				if (item.message.length > MAX_MESSAGE_LENGTH)
+					item.message.substring(0, MAX_MESSAGE_LENGTH) + "..."
+				else item.message
+			moveToWholeTextBtn.visibility =
+				if (item.message.length > MAX_MESSAGE_LENGTH) View.VISIBLE else View.GONE
 			uesrNicknameTv.text =
-				if (item.sender?.nickname.isNullOrBlank()) "(알 수 없음)" else item.sender?.nickname
+				if (item.sender?.nickname.isNullOrBlank()) root.context.getString(R.string.unknown)
+				else item.sender?.nickname
 			chatDispatchTimeTv.text =
-				if (item.dispatchTime.isNotBlank()) getFormattedTimeText(item.dispatchTime)
-				else ""
+				if (item.dispatchTime.isNotBlank()) getFormattedTimeText(item.dispatchTime) else ""
 			userProfileIv.loadUserProfile(
 				imageUrl = item.sender?.profileImageUrl,
 				userDefaultProfileType = item.sender?.defaultProfileImageType
 			)
 			userProfileIv.isClickable = isCaptureMode.not()
-			executePendingBindings()
+//			executePendingBindings()
 		}
 	}
 
@@ -156,14 +183,14 @@ class NoticeChatViewHolder(
 		isCaptureMode: Boolean,
 	) {
 		val item = chatItem as ChatItem.Notification
-		binding.chat = item
 		setCaptureViewState(
 			isCaptureMode = isCaptureMode,
 			chatItem = chatItem,
 			captureLayoutView = binding.chatCaptureLayoutView,
 			rootLayout = binding.root
 		)
-		binding.executePendingBindings()
+		binding.noticeTv.text = item.message
+//		binding.executePendingBindings()
 	}
 }
 
@@ -182,14 +209,14 @@ class DateSeparatorViewHolder(
 		isCaptureMode: Boolean,
 	) {
 		val item = chatItem as ChatItem.DateSeparator
-		binding.dateString = item.date
 		setCaptureViewState(
 			isCaptureMode = isCaptureMode,
 			chatItem = chatItem,
 			captureLayoutView = binding.chatCaptureLayoutView,
 			rootLayout = binding.root
 		)
-		binding.executePendingBindings()
+		binding.noticeTv.text = item.date
+//		binding.executePendingBindings()
 	}
 }
 
@@ -213,6 +240,6 @@ class LastReadNoticeViewHolder(
 			captureLayoutView = binding.chatCaptureLayoutView,
 			rootLayout = binding.root
 		)
-		binding.executePendingBindings()
+//		binding.executePendingBindings()
 	}
 }

@@ -401,7 +401,7 @@ class ChannelViewModel @Inject constructor(
 		saveTempSavedMessage(text.trim())
 	}
 
-	fun onClickSendMessage() {
+	fun onClickSendMessageBtn() {
 		if (uiState.value.isCaptureMode) return
 		sendMessage()
 	}
@@ -428,7 +428,7 @@ class ChannelViewModel @Inject constructor(
 		updateState { copy(newChatNotice = null) }
 	}
 
-	fun onClickScrollToBottom() {
+	fun onClickScrollToBottomBtn() {
 		scrollToBottom()
 	}
 
@@ -554,6 +554,11 @@ class ChannelViewModel @Inject constructor(
 	fun onClickFailedChatDeleteBtn(chatId: Long) {
 		if (uiState.value.isCaptureMode) return
 		deleteFailedChat(chatId)
+	}
+
+	fun onClickMoveToWholeText(chatId: Long) {
+		if (uiState.value.isCaptureMode) return
+		startEvent(ChannelEvent.MoveToWholeText(chatId))
 	}
 
 	fun onClickFailedChatRetryBtn(chatId: Long) {
