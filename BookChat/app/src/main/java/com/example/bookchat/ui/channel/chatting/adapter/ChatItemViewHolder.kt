@@ -13,6 +13,7 @@ import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
 import com.example.bookchat.utils.getFormattedTimeText
 import com.example.bookchat.utils.image.loadUserProfile
+import com.example.bookchat.utils.isSingleTextOrEmoji
 
 sealed class ChatItemViewHolder(
 	binding: ViewBinding,
@@ -68,10 +69,7 @@ class MyChatViewHolder(
 		isCaptureMode: Boolean,
 	) {
 		with(binding) {
-			chatTv.text =
-				if (item.message.length > MAX_MESSAGE_LENGTH)
-					item.message.substring(0, MAX_MESSAGE_LENGTH) + "..."
-				else item.message
+			setMessageTextState(item.message)
 			moveToWholeTextBtn.visibility =
 				if (item.message.length > MAX_MESSAGE_LENGTH) View.VISIBLE else View.GONE
 			failedChatRetryBtn.isClickable = isCaptureMode.not()
@@ -92,7 +90,17 @@ class MyChatViewHolder(
 				captureLayoutView = chatCaptureLayoutView,
 				rootLayout = root
 			)
-//			executePendingBindings()
+		}
+	}
+
+	private fun setMessageTextState(message: String) {
+		with(binding) {
+			chattingLayout.background =
+				if (message.isSingleTextOrEmoji()) null else root.context.getDrawable(R.drawable.chat_bubble_blue)
+			chatTv.textSize = if (message.isSingleTextOrEmoji()) 70f else 12f
+			chatTv.text =
+				if (message.length > MAX_MESSAGE_LENGTH) message.substring(0, MAX_MESSAGE_LENGTH) + "..."
+				else message
 		}
 	}
 }
@@ -140,10 +148,7 @@ class AnotherUserChatViewHolder(
 				captureLayoutView = binding.chatCaptureLayoutView,
 				rootLayout = binding.root
 			)
-			chatTv.text =
-				if (item.message.length > MAX_MESSAGE_LENGTH)
-					item.message.substring(0, MAX_MESSAGE_LENGTH) + "..."
-				else item.message
+			setMessageTextState(item.message)
 			moveToWholeTextBtn.visibility =
 				if (item.message.length > MAX_MESSAGE_LENGTH) View.VISIBLE else View.GONE
 			uesrNicknameTv.text =
@@ -156,7 +161,17 @@ class AnotherUserChatViewHolder(
 				userDefaultProfileType = item.sender?.defaultProfileImageType
 			)
 			userProfileIv.isClickable = isCaptureMode.not()
-//			executePendingBindings()
+		}
+	}
+
+	private fun setMessageTextState(message: String) {
+		with(binding) {
+			chattingLayout.background =
+				if (message.isSingleTextOrEmoji()) null else root.context.getDrawable(R.drawable.chat_bubble_gray)
+			chatTv.textSize = if (message.isSingleTextOrEmoji()) 70f else 12f
+			chatTv.text =
+				if (message.length > MAX_MESSAGE_LENGTH) message.substring(0, MAX_MESSAGE_LENGTH) + "..."
+				else message
 		}
 	}
 
@@ -190,7 +205,6 @@ class NoticeChatViewHolder(
 			rootLayout = binding.root
 		)
 		binding.noticeTv.text = item.message
-//		binding.executePendingBindings()
 	}
 }
 
@@ -216,7 +230,6 @@ class DateSeparatorViewHolder(
 			rootLayout = binding.root
 		)
 		binding.noticeTv.text = item.date
-//		binding.executePendingBindings()
 	}
 }
 
@@ -240,6 +253,5 @@ class LastReadNoticeViewHolder(
 			captureLayoutView = binding.chatCaptureLayoutView,
 			rootLayout = binding.root
 		)
-//		binding.executePendingBindings()
 	}
 }

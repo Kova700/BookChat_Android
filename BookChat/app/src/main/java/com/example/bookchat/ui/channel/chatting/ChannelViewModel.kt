@@ -41,11 +41,9 @@ import javax.inject.Inject
 import kotlin.math.abs
 
 //TODO : 점검 중 , 새로운 업데이트 RemoteConfig 구성해서 출시 + Crashtics
-//TODO : 장문의 긴 채팅 길이 접기 구현해야함, 누르면 전체보기 가능하게
 //TODO : 채팅 꾹 누르면 복사
 //TODO : 채팅방 정보 조회 실패 시 예외 처리
 //TODO : 채팅 로딩 전체 화면 UI 구현
-//TODO : 카톡처럼 이모지 한 개이면 이모지 크기 확대
 //TODO : 출시 전 북챗 문의 방 만들기
 
 @HiltViewModel
