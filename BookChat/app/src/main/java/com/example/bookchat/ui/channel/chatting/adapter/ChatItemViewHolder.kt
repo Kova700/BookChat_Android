@@ -34,6 +34,7 @@ class MyChatViewHolder(
 	private val onClickFailedChatDeleteBtn: ((Int) -> Unit)?,
 	private val onSelectCaptureChat: ((Int) -> Unit)?,
 	private val onClickMoveToWholeText: ((Int) -> Unit)?,
+	private val onLongClickChatItem: ((Int) -> Unit)?,
 ) : ChatItemViewHolder(binding) {
 
 	init {
@@ -49,6 +50,10 @@ class MyChatViewHolder(
 			}
 			moveToWholeTextBtn.setOnClickListener {
 				onClickMoveToWholeText?.invoke(absoluteAdapterPosition)
+			}
+			chattingLayout.setOnLongClickListener {
+				onLongClickChatItem?.invoke(absoluteAdapterPosition)
+				true
 			}
 		}
 	}
@@ -110,6 +115,7 @@ class AnotherUserChatViewHolder(
 	private val onClickUserProfile: ((Int) -> Unit)?,
 	private val onSelectCaptureChat: ((Int) -> Unit)?,
 	private val onClickMoveToWholeText: ((Int) -> Unit)?,
+	private val onLongClickChatItem: ((Int) -> Unit)?,
 ) : ChatItemViewHolder(binding) {
 	init {
 		with(binding) {
@@ -121,6 +127,10 @@ class AnotherUserChatViewHolder(
 			}
 			moveToWholeTextBtn.setOnClickListener {
 				onClickMoveToWholeText?.invoke(absoluteAdapterPosition)
+			}
+			chattingLayout.setOnLongClickListener {
+				onLongClickChatItem?.invoke(absoluteAdapterPosition)
+				true
 			}
 		}
 	}

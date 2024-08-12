@@ -41,7 +41,6 @@ import javax.inject.Inject
 import kotlin.math.abs
 
 //TODO : 점검 중 , 새로운 업데이트 RemoteConfig 구성해서 출시 + Crashtics
-//TODO : 채팅 꾹 누르면 복사
 //TODO : 채팅방 정보 조회 실패 시 예외 처리
 //TODO : 채팅 로딩 전체 화면 UI 구현
 //TODO : 출시 전 북챗 문의 방 만들기
@@ -562,6 +561,15 @@ class ChannelViewModel @Inject constructor(
 	fun onClickFailedChatRetryBtn(chatId: Long) {
 		if (uiState.value.isCaptureMode) return
 		retryFailedChat(chatId)
+	}
+
+	fun onLongClickChatItem(message: String) {
+		if (uiState.value.isCaptureMode) return
+		startEvent(ChannelEvent.CopyChatToClipboard(message))
+	}
+
+	fun onCopiedToClipboard() {
+		startEvent(ChannelEvent.ShowSnackBar(R.string.channel_chatting_copied_to_clipboard))
 	}
 
 	private fun startEvent(event: ChannelEvent) = viewModelScope.launch {

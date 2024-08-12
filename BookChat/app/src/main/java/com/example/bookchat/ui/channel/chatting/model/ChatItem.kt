@@ -19,6 +19,7 @@ sealed class ChatItem(
 
 	sealed class Message(
 		open val chatId: Long,
+		open val message: String,
 		override val isCaptureHeader: Boolean,
 		override val isCaptureMiddle: Boolean,
 		override val isCaptureBottom: Boolean,
@@ -26,27 +27,27 @@ sealed class ChatItem(
 
 	data class MyChat(
 		override val chatId: Long,
+		override val message: String,
 		val chatRoomId: Long,
-		val message: String,
 		val status: ChatStatus,
 		val dispatchTime: String,
 		val sender: User?,
 		override val isCaptureHeader: Boolean,
 		override val isCaptureMiddle: Boolean,
 		override val isCaptureBottom: Boolean,
-	) : Message(chatId, isCaptureHeader, isCaptureMiddle, isCaptureBottom)
+	) : Message(chatId, message, isCaptureHeader, isCaptureMiddle, isCaptureBottom)
 
 	data class AnotherUser(
 		override val chatId: Long,
+		override val message: String,
 		val chatRoomId: Long,
-		val message: String,
 		val dispatchTime: String,
 		val sender: User?,
 		val authority: ChannelMemberAuthority,
 		override val isCaptureHeader: Boolean,
 		override val isCaptureMiddle: Boolean,
 		override val isCaptureBottom: Boolean,
-	) : Message(chatId, isCaptureHeader, isCaptureMiddle, isCaptureBottom) {
+	) : Message(chatId, message, isCaptureHeader, isCaptureMiddle, isCaptureBottom) {
 		val isTargetUserHost
 			get() = authority == ChannelMemberAuthority.HOST
 
@@ -56,13 +57,13 @@ sealed class ChatItem(
 
 	data class Notification(
 		override val chatId: Long,
+		override val message: String,
 		val chatRoomId: Long,
-		val message: String,
 		val dispatchTime: String,
 		override val isCaptureHeader: Boolean,
 		override val isCaptureMiddle: Boolean,
 		override val isCaptureBottom: Boolean,
-	) : Message(chatId, isCaptureHeader, isCaptureMiddle, isCaptureBottom)
+	) : Message(chatId, message, isCaptureHeader, isCaptureMiddle, isCaptureBottom)
 
 	data class LastReadChatNotice(
 		override val isCaptureHeader: Boolean,

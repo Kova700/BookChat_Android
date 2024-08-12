@@ -17,6 +17,7 @@ fun getChatItemViewHolder(
 	onClickFailedChatDeleteBtn: ((Int) -> Unit)? = null,
 	onSelectCaptureChat: ((Int) -> Unit)? = null,
 	onClickMoveToWholeText: ((Int) -> Unit)? = null,
+	onLongClickChatItem: ((Int) -> Unit)? = null,
 ): ChatItemViewHolder {
 
 	return when (itemViewType) {
@@ -30,7 +31,8 @@ fun getChatItemViewHolder(
 				onClickFailedChatRetryBtn = onClickFailedChatRetryBtn,
 				onClickFailedChatDeleteBtn = onClickFailedChatDeleteBtn,
 				onSelectCaptureChat = onSelectCaptureChat,
-				onClickMoveToWholeText = onClickMoveToWholeText
+				onClickMoveToWholeText = onClickMoveToWholeText,
+				onLongClickChatItem = onLongClickChatItem
 			)
 		}
 
@@ -43,7 +45,8 @@ fun getChatItemViewHolder(
 				binding = binding,
 				onClickUserProfile = onClickUserProfile,
 				onSelectCaptureChat = onSelectCaptureChat,
-				onClickMoveToWholeText = onClickMoveToWholeText
+				onClickMoveToWholeText = onClickMoveToWholeText,
+				onLongClickChatItem = onLongClickChatItem
 			)
 		}
 

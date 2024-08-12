@@ -1,10 +1,10 @@
 package com.example.bookchat.ui.channel.chatting
 
+import com.example.bookchat.data.networkmanager.external.model.NetworkState
+import com.example.bookchat.data.stomp.external.model.SocketState
 import com.example.bookchat.domain.model.Channel
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.data.networkmanager.external.model.NetworkState
-import com.example.bookchat.data.stomp.external.model.SocketState
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.channel.chatting.model.ChatItem
 import com.example.bookchat.ui.channel.drawer.model.ChannelDrawerItem
@@ -92,6 +92,10 @@ sealed class ChannelEvent {
 	data object MoveChannelSetting : ChannelEvent()
 	data object ScrollToBottom : ChannelEvent()
 	data object OpenOrCloseDrawer : ChannelEvent()
+
+	data class CopyChatToClipboard(
+		val message: String,
+	) : ChannelEvent()
 
 	data class MakeCaptureImage(
 		val headerIndex: Int,

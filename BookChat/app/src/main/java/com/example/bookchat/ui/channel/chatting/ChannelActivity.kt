@@ -1,5 +1,7 @@
 package com.example.bookchat.ui.channel.chatting
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -66,6 +68,10 @@ class ChannelActivity : AppCompatActivity() {
 	lateinit var channelDrawerAdapter: ChannelDrawerAdapter
 
 	private lateinit var linearLayoutManager: LinearLayoutManager
+
+	private val clipboardManager by lazy {
+		getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+	}
 
 	private val imm by lazy {
 		getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -312,6 +318,10 @@ class ChannelActivity : AppCompatActivity() {
 		chatItemAdapter.onClickFailedChatRetryBtn = { position ->
 			val item = (chatItemAdapter.currentList[position] as ChatItem.MyChat)
 			channelViewModel.onClickFailedChatRetryBtn(item.chatId)
+		}
+		chatItemAdapter.onLongClickChatItem = { position ->
+			val item = (chatItemAdapter.currentList[position] as ChatItem.Message)
+			channelViewModel.onLongClickChatItem(item.message)
 		}
 		channelDrawerAdapter.onClickUserProfile = { itemPosition ->
 			val userItem = (channelDrawerAdapter.currentList[itemPosition] as ChannelDrawerItem.UserItem)
@@ -628,6 +638,12 @@ class ChannelActivity : AppCompatActivity() {
 		startActivity(intent)
 	}
 
+	private fun copyTextToClipboard(text: String) {
+		val clipData = ClipData.newPlainText(CLIPBOARD_LABEL, text)
+		clipboardManager.setPrimaryClip(clipData)
+		channelViewModel.onCopiedToClipboard()
+	}
+
 	private fun handleEvent(event: ChannelEvent) {
 		when (event) {
 			ChannelEvent.MoveBack -> finish()
@@ -649,6 +665,7 @@ class ChannelActivity : AppCompatActivity() {
 			)
 
 			is ChannelEvent.MoveToWholeText -> moveToWholeText(event.chatId)
+			is ChannelEvent.CopyChatToClipboard -> copyTextToClipboard(event.message)
 		}
 	}
 
@@ -674,6 +691,7 @@ class ChannelActivity : AppCompatActivity() {
 	companion object {
 		const val EXTRA_USER_ID = "EXTRA_USER_ID"
 		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
+		private const val CLIPBOARD_LABEL = "CLIPBOARD_LABEL"
 		private const val DIALOG_TAG_CHANNEL_EXIT_WARNING = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
 		private const val DIALOG_TAG_EXPLODED_CHANNEL_NOTICE = "DIALOG_TAG_EXPLODED_CHANNEL_NOTICE"
 		private const val DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE =

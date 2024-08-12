@@ -17,6 +17,7 @@ class ChatItemAdapter @Inject constructor() :
 	var onClickFailedChatRetryBtn: ((Int) -> Unit)? = null
 	var onClickFailedChatDeleteBtn: ((Int) -> Unit)? = null
 	var onClickMoveToWholeText: ((Int) -> Unit)? = null
+	var onLongClickChatItem: ((Int) -> Unit)? = null
 
 	val lastReadChatNoticeIndex
 		get() = currentList.indexOfFirst { chatItem ->
@@ -57,6 +58,7 @@ class ChatItemAdapter @Inject constructor() :
 			onClickFailedChatDeleteBtn = onClickFailedChatDeleteBtn,
 			onSelectCaptureChat = onSelectCaptureChat,
 			onClickMoveToWholeText = onClickMoveToWholeText,
+			onLongClickChatItem = onLongClickChatItem,
 		)
 	}
 

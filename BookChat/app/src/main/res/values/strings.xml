@@ -256,6 +256,7 @@
     <string name="channel_scrap_fail">채팅 캡처를 실패했습니다.</string>
     <string name="new_message">새로운 메세지</string>
     <string name="view_whole_message">전체보기</string>
+    <string name="channel_chatting_copied_to_clipboard">채팅이 클립보드에 복사되었습니다.</string>
 
     <!--channel setting-->
     <string name="channel_setting_title">채팅방 설정</string>
