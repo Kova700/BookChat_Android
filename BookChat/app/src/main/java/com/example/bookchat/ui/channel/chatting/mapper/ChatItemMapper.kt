@@ -11,6 +11,7 @@ import com.example.bookchat.utils.isSameDate
 
 fun List<Chat>.toChatItems(
 	channel: Channel?,
+	clientId: Long,
 	captureHeaderItemId: Long?,
 	captureBottomItemId: Long?,
 	focusTargetId: Long?,
@@ -48,11 +49,11 @@ fun List<Chat>.toChatItems(
 		isFindCaptureBottom = isFindCaptureBottom || isCaptureBottom
 		isFindCaptureHeader = isFindCaptureHeader || isCaptureHeader
 
-		when (chat.chatType) {
+		when (chat.getChatType(clientId)) {
 			ChatType.Mine -> items.add(
 				ChatItem.MyChat(
 					chatId = chat.chatId,
-					chatRoomId = chat.chatRoomId,
+					channelId = chat.channelId,
 					message = chat.message,
 					status = chat.status,
 					dispatchTime = chat.dispatchTime,
@@ -69,7 +70,7 @@ fun List<Chat>.toChatItems(
 			ChatType.Other -> items.add(
 				ChatItem.AnotherUser(
 					chatId = chat.chatId,
-					chatRoomId = chat.chatRoomId,
+					channelId = chat.channelId,
 					message = chat.message,
 					dispatchTime = chat.dispatchTime,
 					sender = chat.sender,
@@ -87,7 +88,7 @@ fun List<Chat>.toChatItems(
 			ChatType.Notice -> items.add(
 				ChatItem.Notification(
 					chatId = chat.chatId,
-					chatRoomId = chat.chatRoomId,
+					channelId = chat.channelId,
 					message = chat.message,
 					dispatchTime = chat.dispatchTime,
 					isCaptureBottom = isCaptureBottom,

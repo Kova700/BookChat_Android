@@ -1,6 +1,5 @@
 package com.example.bookchat.data.network.model.response
 
-import com.example.bookchat.data.mapper.getChatType
 import com.example.bookchat.data.mapper.toDomain
 import com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork
 import com.example.bookchat.data.network.model.UserDefaultProfileTypeNetwork
@@ -49,9 +48,9 @@ data class ChannelSearchResponse(
 	@SerializedName("lastChatDispatchTime")
 	val lastChatDispatchTime: String? = null,
 	@SerializedName("isEntered")
-	val isEntered :Boolean,
+	val isEntered: Boolean,
 	@SerializedName("isBanned")
-	val isBanned :Boolean
+	val isBanned: Boolean,
 ) {
 	val host
 		get() = User(
@@ -62,19 +61,14 @@ data class ChannelSearchResponse(
 		)
 
 	suspend fun getLastChat(
-		clientId: Long,
-		getUser: suspend (Long) -> User
+		getUser: suspend (Long) -> User,
 	): Chat? {
 		if (lastChatId == null) return null
 
 		return Chat(
 			chatId = lastChatId,
-			chatRoomId = roomId,
+			channelId = roomId,
 			message = lastChatMessage!!,
-			chatType = getChatType(
-				senderId = lastChatSenderId,
-				clientId = clientId
-			),
 			dispatchTime = lastChatDispatchTime!!,
 			sender = lastChatSenderId?.let { getUser(it) }
 		)

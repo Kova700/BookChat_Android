@@ -4,10 +4,17 @@ import com.example.bookchat.domain.model.ChatStatus.SUCCESS
 
 data class Chat(
 	val chatId: Long,
-	val chatRoomId: Long,
+	val channelId: Long,
 	val message: String,
-	val chatType: ChatType,
 	val status: ChatStatus = SUCCESS,
 	val dispatchTime: String,
-	val sender: User?
-)
+	val sender: User?,
+) {
+	fun getChatType(clientId: Long): ChatType {
+		return when (sender?.id) {
+			clientId -> ChatType.Mine
+			null -> ChatType.Notice
+			else -> ChatType.Other
+		}
+	}
+}

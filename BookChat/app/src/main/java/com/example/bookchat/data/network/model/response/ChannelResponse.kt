@@ -1,6 +1,5 @@
 package com.example.bookchat.data.network.model.response
 
-import com.example.bookchat.data.mapper.getChatType
 import com.example.bookchat.data.mapper.toDomain
 import com.example.bookchat.data.network.model.ChannelDefaultImageTypeNetwork
 import com.example.bookchat.data.network.model.UserDefaultProfileTypeNetwork
@@ -52,12 +51,8 @@ data class ChannelResponse(
 		if (lastChatId == null) return null
 		return Chat(
 			chatId = lastChatId,
-			chatRoomId = roomId,
+			channelId = roomId,
 			message = lastChatContent!!,
-			chatType = getChatType(
-				senderId = senderId,
-				clientId = clientId
-			),
 			dispatchTime = lastChatDispatchTime!!,
 			sender = senderId?.let { id ->
 				User(

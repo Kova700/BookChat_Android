@@ -13,6 +13,7 @@ import com.example.bookchat.domain.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ChannelRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ClientRepository
+import com.example.bookchat.domain.usecase.GetChatUseCase
 import com.example.bookchat.notification.chat.ChatNotificationHandler
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -27,6 +28,7 @@ class ChatNotificationWorker @AssistedInject constructor(
 	private val clientRepository: ClientRepository,
 	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val chatNotificationHandler: ChatNotificationHandler,
+	private val getChatUseCase: GetChatUseCase,
 ) : CoroutineWorker(appContext, workerParams) {
 
 	override suspend fun doWork(): Result {
@@ -41,9 +43,9 @@ class ChatNotificationWorker @AssistedInject constructor(
 		//TODO : SenderId를 함께 넘겨 받아서 만약 Sender가 클라이언트라면 아래 API호출하지 않게 수정
 		runCatching {
 			val channel = channelRepository.getChannel(channelId)
-			val chat = chatRepository.getChat(chatId)
+			val chat = getChatUseCase(chatId)
 			val client = clientRepository.getClientProfile()
-			channelRepository.updateChannelLastChatIfValid(chat.chatRoomId, chat.chatId)
+			channelRepository.updateChannelLastChatIfValid(chat.channelId, chat.chatId)
 			Triple(channel, chat, client)
 		}
 			.onSuccess {

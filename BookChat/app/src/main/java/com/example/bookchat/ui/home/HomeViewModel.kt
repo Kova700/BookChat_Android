@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookchat.R
@@ -10,6 +11,7 @@ import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.ui.home.HomeUiState.UiState
 import com.example.bookchat.ui.home.mapper.groupItems
 import com.example.bookchat.utils.BookImgSizeManager
+import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,6 +77,7 @@ class HomeViewModel @Inject constructor(
 		runCatching { channelRepository.getChannels() }
 			.onSuccess { updateState { copy(channelUiState = UiState.SUCCESS) } }
 			.onFailure {
+				Log.d(TAG, "HomeViewModel: getChannels() - error: $it")
 				startEvent(HomeUiEvent.ShowSnackBar(R.string.error_else))
 				updateState { copy(channelUiState = UiState.ERROR) }
 			}

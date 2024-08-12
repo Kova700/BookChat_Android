@@ -9,7 +9,6 @@ import com.example.bookchat.data.database.model.CHAT_ENTITY_TABLE_NAME
 import com.example.bookchat.data.database.model.ChatEntity
 import com.example.bookchat.data.database.model.combined.ChatWithUser
 import com.example.bookchat.domain.model.ChatStatus
-import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.domain.model.SUCCESS_CHAT_STATUS_CODE
 import com.example.bookchat.utils.getCurrentDateTimeString
 
@@ -29,7 +28,7 @@ interface ChatDAO {
 
 	@Query(
 		"SELECT * FROM Chat " +
-						"WHERE chat_room_id = :channelId " +
+						"WHERE channel_id = :channelId " +
 						"ORDER BY status ASC, chat_id DESC " +
 						"LIMIT :size"
 	)
@@ -53,7 +52,7 @@ interface ChatDAO {
 
 	@Query(
 		"SELECT * FROM Chat " +
-						"WHERE chat_room_id = :channelId " +
+						"WHERE channel_id = :channelId " +
 						"AND status < $SUCCESS_CHAT_STATUS_CODE " +
 						"ORDER BY status ASC, chat_id DESC"
 	)
@@ -67,19 +66,18 @@ interface ChatDAO {
 	): Long {
 		val chat = ChatEntity(
 			chatId = getMaxWaitingChatId()?.plus(1) ?: WAITING_CHAT_MIN_ID,
-			chatRoomId = channelId,
+			channelId = channelId,
 			senderId = clientId,
 			dispatchTime = getCurrentDateTimeString(),
 			status = chatStatus.code,
 			message = message,
-			chatType = ChatType.Mine,
 		)
 		return insertChat(chat)
 	}
 
 	@Query(
 		"DELETE FROM Chat " +
-						"WHERE chat_room_id = :channelId"
+						"WHERE channel_id = :channelId"
 	)
 	suspend fun deleteChannelAllChat(channelId: Long)
 

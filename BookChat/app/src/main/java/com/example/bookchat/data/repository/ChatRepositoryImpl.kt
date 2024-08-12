@@ -1,6 +1,5 @@
 package com.example.bookchat.data.repository
 
-import android.util.Log
 import com.example.bookchat.data.database.dao.ChatDAO
 import com.example.bookchat.data.mapper.toChat
 import com.example.bookchat.data.mapper.toChatEntity
@@ -8,11 +7,7 @@ import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.model.SearchSortOptionNetwork
 import com.example.bookchat.domain.model.Chat
 import com.example.bookchat.domain.model.ChatStatus
-import com.example.bookchat.domain.model.ChatType
 import com.example.bookchat.domain.repository.ChatRepository
-import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.repository.UserRepository
-import com.example.bookchat.utils.Constants.TAG
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,13 +23,10 @@ import kotlin.time.Duration.Companion.seconds
 class ChatRepositoryImpl @Inject constructor(
 	private val bookChatApi: BookChatApi,
 	private val chatDAO: ChatDAO,
-	private val clientRepository: ClientRepository,
-	private val userRepository: UserRepository,
 ) : ChatRepository {
 	private val mapChats =
 		MutableStateFlow<Map<Long, Chat>>(emptyMap()) //(chatId, Chat)
 	private val sortedChats = mapChats.map { it.values }
-		.map { chats -> chats.map { it.attachUser() } }
 		.map { chats ->
 			//ORDER BY status ASC, chat_id DESC
 			chats.sortedWith(
@@ -100,12 +92,7 @@ class ChatRepositoryImpl @Inject constructor(
 				)
 			}.onSuccess { response ->
 				val newChats = response.chatResponseList
-					.map {
-						it.toChat(
-							chatRoomId = channelId,
-							clientId = clientRepository.getClientProfile().id
-						)
-					}
+					.map { it.toChat(channelId = channelId) }
 
 				cachedChannelId = channelId
 				chatDAO.insertChats(newChats.toChatEntity())
@@ -132,12 +119,7 @@ class ChatRepositoryImpl @Inject constructor(
 				)
 			}.onSuccess { response ->
 				val newChats = response.chatResponseList
-					.map {
-						it.toChat(
-							chatRoomId = channelId,
-							clientId = clientRepository.getClientProfile().id
-						)
-					}
+					.map { it.toChat(channelId = channelId) }
 
 				clearCachedData()
 				_isOlderChatFullyLoaded.value = newChats.size < size
@@ -193,12 +175,7 @@ class ChatRepositoryImpl @Inject constructor(
 			sort = SearchSortOptionNetwork.ID_ASC,
 		)
 
-		val newChats = response.chatResponseList.map {
-			it.toChat(
-				chatRoomId = channelId,
-				clientId = clientRepository.getClientProfile().id
-			)
-		}
+		val newChats = response.chatResponseList.map { it.toChat(channelId = channelId) }
 
 		clearCachedData()
 		cachedChannelId = channelId
@@ -224,12 +201,7 @@ class ChatRepositoryImpl @Inject constructor(
 			size = size,
 			sort = SearchSortOptionNetwork.ID_ASC,
 		)
-		val newChats = response.chatResponseList.map {
-			it.toChat(
-				chatRoomId = channelId,
-				clientId = clientRepository.getClientProfile().id
-			)
-		}
+		val newChats = response.chatResponseList.map { it.toChat(channelId = channelId) }
 
 		cachedChannelId = channelId
 		_isNewerChatFullyLoaded.value = response.cursorMeta.last
@@ -256,12 +228,7 @@ class ChatRepositoryImpl @Inject constructor(
 			sort = SearchSortOptionNetwork.ID_DESC,
 		)
 
-		val newChats = response.chatResponseList.map {
-			it.toChat(
-				chatRoomId = channelId,
-				clientId = clientRepository.getClientProfile().id
-			)
-		}
+		val newChats = response.chatResponseList.map { it.toChat(channelId = channelId) }
 
 		cachedChannelId = channelId
 		_isOlderChatFullyLoaded.value = response.cursorMeta.last
@@ -279,10 +246,9 @@ class ChatRepositoryImpl @Inject constructor(
 
 	/** 로컬에 있는 채팅 우선적으로 쿼리 */
 	override suspend fun getChat(chatId: Long): Chat {
-		val chat = mapChats.value[chatId]
+		return mapChats.value[chatId]
 			?: getOfflineChat(chatId)
 			?: getOnlineChat(chatId)
-		return chat.attachUser()
 	}
 
 	private suspend fun getOfflineChat(chatId: Long): Chat? {
@@ -290,16 +256,14 @@ class ChatRepositoryImpl @Inject constructor(
 	}
 
 	private suspend fun getOnlineChat(chatId: Long): Chat {
-		Log.d(TAG, "ChatRepositoryImpl: getOnlineChat() - called")
-		return bookChatApi.getChat(chatId)
-			.toChat(clientId = clientRepository.getClientProfile().id)
+		return bookChatApi.getChat(chatId).toChat()
 			.also { insertChat(it) }
 	}
 
 	override suspend fun insertChat(chat: Chat) {
 		val chatId = chatDAO.insertChat(chat.toChatEntity())
 
-		if ((chat.chatRoomId != cachedChannelId)
+		if ((chat.channelId != cachedChannelId)
 			|| _isNewerChatFullyLoaded.value.not()
 		) return
 
@@ -350,10 +314,6 @@ class ChatRepositoryImpl @Inject constructor(
 		newChat: Chat,
 		receiptId: Long,
 	) {
-		Log.d(
-			TAG,
-			"ChatRepositoryImpl: updateWaitingChaft() - receiptId :$receiptId, newChat :$newChat"
-		)
 		deleteChat(receiptId)
 		chatDAO.insertChat(newChat.toChatEntity())
 		setChats(mapChats.value + (newChat.chatId to newChat))
@@ -365,7 +325,6 @@ class ChatRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun deleteChannelAllChat(channelId: Long) {
-		Log.d(TAG, "ChatRepositoryImpl: deleteChannelAllChat() - called")
 		chatDAO.deleteChannelAllChat(channelId)
 	}
 
@@ -382,24 +341,6 @@ class ChatRepositoryImpl @Inject constructor(
 	override suspend fun clear() {
 		clearCachedData()
 		chatDAO.deleteAll()
-	}
-
-	private suspend fun Chat.attachUser(): Chat {
-		val sender = sender?.id?.let { userRepository.getUser(it) }
-		val message =
-			if (chatType != ChatType.Notice) this.message
-			else {
-				if (message.contains("#").not()) this.message
-				else {
-					val noticeTextList = message.split("#")
-					val targetUserId = noticeTextList[1].toLong()
-					userRepository.getUser(targetUserId).nickname + noticeTextList.lastOrNull()
-				}
-			}
-		return copy(
-			sender = sender,
-			message = message
-		)
 	}
 
 	companion object {

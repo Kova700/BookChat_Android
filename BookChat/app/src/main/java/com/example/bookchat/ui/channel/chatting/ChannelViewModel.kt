@@ -41,8 +41,8 @@ import javax.inject.Inject
 import kotlin.math.abs
 
 //TODO : 점검 중 , 새로운 업데이트 RemoteConfig 구성해서 출시 + Crashtics
-//TODO : 채팅방 정보 조회 실패 시 예외 처리
-//TODO : 채팅 로딩 전체 화면 UI 구현
+//TODO : 채팅방 정보 조회 실패 시 예외 처리 (필요한가?)
+//TODO : 채팅 로딩 전체 화면 UI 구현  (필요한가?)
 //TODO : 출시 전 북챗 문의 방 만들기
 
 @HiltViewModel
@@ -139,7 +139,7 @@ class ChannelViewModel @Inject constructor(
 		val channelLastChat = channel.lastChat ?: return
 		if (channel.isExistNewChat.not()) return
 
-		when (channelLastChat.chatType) {
+		when (channelLastChat.getChatType(uiState.value.client.id)) {
 			ChatType.Mine -> scrollToBottom()
 			ChatType.Notice, //TODO : Notice타입의 NewChatNotice UI 만들기
 			ChatType.Other,
@@ -161,6 +161,7 @@ class ChannelViewModel @Inject constructor(
 		) { chats, captureHeaderBottomIds ->
 			chats.toChatItems(
 				channel = uiState.value.channel,
+				clientId = uiState.value.client.id,
 				captureHeaderItemId = captureHeaderBottomIds?.first,
 				captureBottomItemId = captureHeaderBottomIds?.second,
 				focusTargetId = uiState.value.originalLastReadChatId,

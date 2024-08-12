@@ -73,7 +73,6 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 		val newChannels = response.channels
 			.map {
 				it.toChannelSearchResult(
-					clientId = clientRepository.getClientProfile().id,
 					getUser = { userId -> userRepository.getUser(userId) }
 				)
 			}

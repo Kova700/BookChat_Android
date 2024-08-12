@@ -91,7 +91,6 @@ suspend fun ChannelEntity.toChannel(
 }
 
 suspend fun ChannelSearchResponse.toChannelSearchResult(
-	clientId: Long,
 	getUser: suspend (Long) -> User,
 ): ChannelSearchResult {
 	return ChannelSearchResult(
@@ -105,7 +104,6 @@ suspend fun ChannelSearchResponse.toChannelSearchResult(
 		roomCapacity = roomSize,
 		host = host,
 		lastChat = this.getLastChat(
-			clientId = clientId,
 			getUser = getUser
 		),
 		bookTitle = bookTitle,

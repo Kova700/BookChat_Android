@@ -8,7 +8,6 @@ class SyncChannelChatsUseCase @Inject constructor(
 	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository
 ) {
-
 	suspend operator fun invoke(channelId: Long) {
 		val newestChat = chatRepository.syncChats(channelId).firstOrNull() ?: return
 		channelRepository.updateChannelLastChatIfValid(channelId, newestChat.chatId)

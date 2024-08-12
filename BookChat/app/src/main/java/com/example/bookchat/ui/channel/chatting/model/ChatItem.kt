@@ -28,7 +28,7 @@ sealed class ChatItem(
 	data class MyChat(
 		override val chatId: Long,
 		override val message: String,
-		val chatRoomId: Long,
+		val channelId: Long,
 		val status: ChatStatus,
 		val dispatchTime: String,
 		val sender: User?,
@@ -40,7 +40,7 @@ sealed class ChatItem(
 	data class AnotherUser(
 		override val chatId: Long,
 		override val message: String,
-		val chatRoomId: Long,
+		val channelId: Long,
 		val dispatchTime: String,
 		val sender: User?,
 		val authority: ChannelMemberAuthority,
@@ -58,7 +58,7 @@ sealed class ChatItem(
 	data class Notification(
 		override val chatId: Long,
 		override val message: String,
-		val chatRoomId: Long,
+		val channelId: Long,
 		val dispatchTime: String,
 		override val isCaptureHeader: Boolean,
 		override val isCaptureMiddle: Boolean,

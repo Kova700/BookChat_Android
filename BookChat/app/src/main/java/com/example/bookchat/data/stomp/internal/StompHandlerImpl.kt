@@ -2,17 +2,8 @@ package com.example.bookchat.data.stomp.internal
 
 import android.util.Log
 import com.example.bookchat.BuildConfig
-import com.example.bookchat.data.stomp.internal.mapper.toChat
 import com.example.bookchat.data.networkmanager.external.NetworkManager
-import com.example.bookchat.domain.model.Channel
-import com.example.bookchat.domain.model.ChannelMemberAuthority
-import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.model.ChatStatus
 import com.example.bookchat.data.networkmanager.external.model.NetworkState
-import com.example.bookchat.domain.repository.BookChatTokenRepository
-import com.example.bookchat.domain.repository.ChannelRepository
-import com.example.bookchat.domain.repository.ChatRepository
-import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.data.stomp.external.StompHandler
 import com.example.bookchat.data.stomp.external.model.CommonMessage
 import com.example.bookchat.data.stomp.external.model.NotificationMessage
@@ -20,7 +11,17 @@ import com.example.bookchat.data.stomp.external.model.NotificationMessageType
 import com.example.bookchat.data.stomp.external.model.RequestSendChat
 import com.example.bookchat.data.stomp.external.model.SocketMessage
 import com.example.bookchat.data.stomp.external.model.SocketState
+import com.example.bookchat.data.stomp.internal.mapper.toChat
+import com.example.bookchat.domain.model.Channel
+import com.example.bookchat.domain.model.ChannelMemberAuthority
+import com.example.bookchat.domain.model.Chat
+import com.example.bookchat.domain.model.ChatStatus
+import com.example.bookchat.domain.repository.BookChatTokenRepository
+import com.example.bookchat.domain.repository.ChannelRepository
+import com.example.bookchat.domain.repository.ChatRepository
+import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.UserRepository
+import com.example.bookchat.domain.usecase.GetChatUseCase
 import com.example.bookchat.domain.usecase.RenewBookChatTokenUseCase
 import com.example.bookchat.utils.Constants.TAG
 import com.google.gson.Gson
@@ -66,6 +67,7 @@ class StompHandlerImpl @Inject constructor(
 	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val userRepository: UserRepository,
 	private val renewBookChatTokenUseCase: RenewBookChatTokenUseCase,
+	private val getChatUserCase: GetChatUseCase,
 	private val networkManager: NetworkManager,
 	private val gson: Gson,
 ) : StompHandler {
@@ -180,10 +182,10 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	override suspend fun retrySendMessage(chatId: Long) {
-		val chat = chatRepository.getChat(chatId)
+		val chat = getChatUserCase(chatId)
 		runCatching {
 			stompSession.sendText(
-				destination = "$SEND_MESSAGE_DESTINATION${chat.chatRoomId}",
+				destination = "$SEND_MESSAGE_DESTINATION${chat.channelId}",
 				body = gson.toJson(
 					RequestSendChat(
 						receiptId = chat.chatId,
@@ -273,7 +275,6 @@ class StompHandlerImpl @Inject constructor(
 
 		val chat = socketMessage.toChat(
 			channelId = channelId,
-			clientId = clientId,
 			sender = userRepository.getUser(socketMessage.senderId)
 		)
 
@@ -292,10 +293,8 @@ class StompHandlerImpl @Inject constructor(
 		socketMessage: NotificationMessage,
 		channelId: Long,
 	) {
-		val clientId = clientRepository.getClientProfile().id
 		val chat = socketMessage.toChat(
 			channelId = channelId,
-			clientId = clientId
 		)
 
 		when (socketMessage.notificationMessageType) {
@@ -385,7 +384,7 @@ class StompHandlerImpl @Inject constructor(
 
 	private suspend fun updateChannelLastChat(chat: Chat) {
 		channelRepository.updateChannelLastChatIfValid(
-			channelId = chat.chatRoomId,
+			channelId = chat.channelId,
 			chatId = chat.chatId
 		)
 	}
