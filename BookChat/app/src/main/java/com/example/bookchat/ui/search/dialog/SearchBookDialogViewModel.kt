@@ -1,5 +1,6 @@
 package com.example.bookchat.ui.search.dialog
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +16,7 @@ import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_SEARCHED_BO
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState
 import com.example.bookchat.ui.search.dialog.SearchDialogUiState.SearchDialogState.AlreadyInBookShelf
 import com.example.bookchat.ui.search.model.SearchTarget
+import com.example.bookchat.utils.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,7 +57,7 @@ class SearchBookDialogViewModel @Inject constructor(
 				if (it == null) updateState { copy(uiState = SearchDialogState.Default) }
 				else updateState { copy(uiState = AlreadyInBookShelf(it.bookShelfState)) }
 			}
-			.onFailure { startEvent(SearchTapDialogEvent.ShowSnackBar(R.string.error_else)) }
+			.onFailure { startEvent(SearchTapDialogEvent.ShowSnackBar(R.string.error_else_2_line)) }
 	}
 
 	private fun registerBookshelf(
@@ -77,6 +79,7 @@ class SearchBookDialogViewModel @Inject constructor(
 				updateState { copy(uiState = AlreadyInBookShelf(bookShelfState)) }
 			}
 			.onFailure {
+				Log.d(TAG, "SearchBookDialogViewModel: registerBookshelf() - cause :$it")
 				startEvent(SearchTapDialogEvent.ShowSnackBar(R.string.bookshelf_register_fail))
 				updateState { copy(uiState = SearchDialogState.Default) }
 			}
