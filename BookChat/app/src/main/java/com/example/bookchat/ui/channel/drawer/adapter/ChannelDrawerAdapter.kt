@@ -2,7 +2,6 @@ package com.example.bookchat.ui.channel.drawer.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.bookchat.R
@@ -30,20 +29,18 @@ class ChannelDrawerAdapter @Inject constructor(
 	): ChatDrawerItemViewHolder {
 		when (viewType) {
 			R.layout.item_chat_drawer_header -> {
-				val binding: ItemChatDrawerHeaderBinding =
-					DataBindingUtil.inflate(
-						LayoutInflater.from(parent.context), R.layout.item_chat_drawer_header,
-						parent, false
-					)
+				val binding = ItemChatDrawerHeaderBinding.inflate(
+					LayoutInflater.from(parent.context),
+					parent, false
+				)
 				return ChannelDrawerHeaderItemViewHolder(binding, bookImgSizeManager)
 			}
 
 			R.layout.item_chat_drawer_data -> {
-				val binding: ItemChatDrawerDataBinding =
-					DataBindingUtil.inflate(
-						LayoutInflater.from(parent.context), R.layout.item_chat_drawer_data,
-						parent, false
-					)
+				val binding = ItemChatDrawerDataBinding.inflate(
+					LayoutInflater.from(parent.context),
+					parent, false
+				)
 				return ChannelDrawerDataItemViewHolder(binding, onClickUserProfile)
 			}
 

@@ -5,12 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.BuildConfig
-import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentMyPageBinding
 import com.example.bookchat.domain.model.User
 import com.example.bookchat.ui.mypage.notice.NoticeActivity
@@ -34,10 +32,7 @@ class MyPageFragment : Fragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.fragment_my_page, container, false
-		)
-		binding.lifecycleOwner = this
+		_binding = FragmentMyPageBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 

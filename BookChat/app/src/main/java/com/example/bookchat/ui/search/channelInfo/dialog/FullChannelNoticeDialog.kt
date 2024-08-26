@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogFullChannelNoticeBinding
 import com.example.bookchat.utils.DialogSizeManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,12 +26,7 @@ class FullChannelNoticeDialog : DialogFragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.dialog_banned_channel_notice,
-			container, false
-		)
-		binding.lifecycleOwner = viewLifecycleOwner
-		binding.dialog = this
+		_binding = DialogFullChannelNoticeBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -54,5 +47,6 @@ class FullChannelNoticeDialog : DialogFragment() {
 
 	private fun initViewState() {
 		dialogSizeManager.setDialogSize(binding.root)
+		binding.okBtn.setOnClickListener { onClickOkBtn() }
 	}
 }

@@ -2,7 +2,6 @@ package com.example.bookchat.ui.channelList.adpater
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.bookchat.R
@@ -31,17 +30,15 @@ class ChannelListAdapter @Inject constructor() :
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChannelListItemViewHolder {
 		when (viewType) {
 			R.layout.item_channel_list_header -> {
-				val binding: ItemChannelListHeaderBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context),
-					R.layout.item_channel_list_header, parent, false
+				val binding = ItemChannelListHeaderBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return ChannelListHeaderViewHolder(binding)
 			}
 
 			R.layout.item_channel_list_data -> {
-				val binding: ItemChannelListDataBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_channel_list_data,
-					parent, false
+				val binding = ItemChannelListDataBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return ChannelListDataViewHolder(
 					binding = binding,

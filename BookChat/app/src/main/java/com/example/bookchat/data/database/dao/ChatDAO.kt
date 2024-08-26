@@ -32,6 +32,9 @@ interface ChatDAO {
 						"ORDER BY status ASC, chat_id DESC " +
 						"LIMIT :size"
 	)
+	@Transaction
+	//warning: The return value includes a POJO with a @Relation. It is usually desired to annotate this method with @Transaction to avoid possibility of inconsistent results between the POJO and its relations. See https://developer.android.com/reference/androidx/room/Transaction.html for details.
+	//    public abstract java.lang.Object getNewestChats(long channelId, int size, @org.jetbrains.annotations.NotNull()
 	suspend fun getNewestChats(channelId: Long, size: Int): List<ChatWithUser>
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)

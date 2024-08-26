@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogUserBanWarningBinding
 import com.example.bookchat.utils.DialogSizeManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,12 +28,7 @@ class UserBanWarningDialog(
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.dialog_user_ban_warning,
-			container, false
-		)
-		binding.lifecycleOwner = viewLifecycleOwner
-		binding.dialog = this
+		_binding = DialogUserBanWarningBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -50,10 +43,6 @@ class UserBanWarningDialog(
 		_binding = null
 	}
 
-	fun onClickCancelBtn() {
-		dismiss()
-	}
-
 	fun onClickOkBtn() {
 		onClickOkBtn.invoke()
 		dismiss()
@@ -61,5 +50,9 @@ class UserBanWarningDialog(
 
 	private fun initViewState() {
 		dialogSizeManager.setDialogSize(binding.root)
+		with(binding) {
+			cancelBtn.setOnClickListener { dismiss() }
+			okBtn.setOnClickListener { onClickOkBtn() }
+		}
 	}
 }

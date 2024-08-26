@@ -1,7 +1,7 @@
 package com.example.bookchat.ui.search.adapter
 
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemSearchBookDataBinding
 import com.example.bookchat.databinding.ItemSearchBookDummyBinding
@@ -17,7 +17,7 @@ import com.example.bookchat.utils.image.loadChannelProfile
 import com.example.bookchat.utils.image.loadUrl
 
 sealed class SearchItemViewHolder(
-	binding: ViewDataBinding,
+	binding: ViewBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 	abstract fun bind(searchResultItem: SearchResultItem)
 }
@@ -55,7 +55,6 @@ class BookItemViewHolder(
 
 	override fun bind(searchResultItem: SearchResultItem) {
 		val item = (searchResultItem as SearchResultItem.BookItem)
-		binding.book = item
 		binding.bookImg.loadUrl(item.bookCoverImageUrl)
 	}
 }
@@ -106,20 +105,27 @@ class ChannelItemViewHolder(
 	}
 
 	override fun bind(searchResultItem: SearchResultItem) {
-		val item = (searchResultItem as SearchResultItem.ChannelItem)
-		binding.channel = item
-		item.lastChat?.let {
-			binding.lastChatDispatchTimeTv.text =
-				getFormattedAbstractDateTimeText(it.dispatchTime)
-		}
-		binding.channelImageIv.loadChannelProfile(
-			imageUrl = item.roomImageUri,
-			channelDefaultImageType = item.defaultRoomImageType
-		)
+		initViewState(searchResultItem)
+	}
 
-		binding.roommemberCountTv.text = itemView.context.getString(
-			R.string.room_member_count,
-			item.roomMemberCount
-		)
+	private fun initViewState(searchResultItem: SearchResultItem) {
+		val item = (searchResultItem as SearchResultItem.ChannelItem)
+		with(binding) {
+			item.lastChat?.let {
+				lastChatDispatchTimeTv.text =
+					getFormattedAbstractDateTimeText(it.dispatchTime)
+			}
+			channelImageIv.loadChannelProfile(
+				imageUrl = item.roomImageUri,
+				channelDefaultImageType = item.defaultRoomImageType
+			)
+
+			roommemberCountTv.text = itemView.context.getString(
+				R.string.room_member_count,
+				item.roomMemberCount
+			)
+			channelTitleTv.text = item.roomName
+			channelTagsTv.text = item.tagsString
+		}
 	}
 }

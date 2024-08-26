@@ -6,12 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentSubHostAddBinding
 import com.example.bookchat.ui.channel.channelsetting.authoritymanage.adapter.MemberItemAdapter
 import com.example.bookchat.ui.channel.channelsetting.authoritymanage.subhost.SubHostManageUiState
@@ -36,11 +34,7 @@ class SubHostAddFragment : Fragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.fragment_sub_host_add, container, false
-		)
-		binding.lifecycleOwner = viewLifecycleOwner
-		binding.viewmodel = subHostManageViewModel
+		_binding = FragmentSubHostAddBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -85,6 +79,11 @@ class SubHostAddFragment : Fragment() {
 				val keyword = text?.toString() ?: return@addTextChangedListener
 				subHostManageViewModel.onChangeSearchKeyWord(keyword)
 			}
+		}
+		with(binding){
+			xBtn.setOnClickListener { subHostManageViewModel.onClickMoveDeleteSubHost() }
+			applyChannelChange.setOnClickListener { subHostManageViewModel.onClickApplyBtn() }
+			searchDeleteBtn.setOnClickListener { subHostManageViewModel.onClickKeywordClearBtn() }
 		}
 	}
 

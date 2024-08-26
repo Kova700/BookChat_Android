@@ -3,8 +3,8 @@ package com.example.bookchat.ui.channel.drawer.adapter
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemChatDrawerDataBinding
 import com.example.bookchat.databinding.ItemChatDrawerHeaderBinding
@@ -14,7 +14,7 @@ import com.example.bookchat.utils.image.loadUrl
 import com.example.bookchat.utils.image.loadUserProfile
 
 sealed class ChatDrawerItemViewHolder(
-	binding: ViewDataBinding,
+	binding: ViewBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 	abstract fun bind(channelDrawerItem: ChannelDrawerItem)
 }
@@ -29,8 +29,12 @@ class ChannelDrawerHeaderItemViewHolder(
 
 	override fun bind(channelDrawerItem: ChannelDrawerItem) {
 		val item = (channelDrawerItem as ChannelDrawerItem.Header)
-		binding.headerItem = item
-		binding.bookImg.loadUrl(item.bookCoverImageUrl)
+		with(binding) {
+			bookImg.loadUrl(item.bookCoverImageUrl)
+			bookTitleTv.text = item.bookTitle
+			bookAuthorTv.text = item.bookAuthors
+			channelTitleTv.text = item.roomName
+		}
 	}
 }
 
@@ -46,36 +50,44 @@ class ChannelDrawerDataItemViewHolder(
 
 	override fun bind(channelDrawerItem: ChannelDrawerItem) {
 		val item = (channelDrawerItem as ChannelDrawerItem.UserItem)
-		binding.userItem = item
-		binding.userProfileIv.loadUserProfile(
-			imageUrl = item.profileImageUrl,
-			userDefaultProfileType = item.defaultProfileImageType
-		)
+		with(binding) {
+			userProfileIv.loadUserProfile(
+				imageUrl = item.profileImageUrl,
+				userDefaultProfileType = item.defaultProfileImageType
+			)
+			userNicknameTv.text = item.nickname
+		}
 		setClientItemView(item)
 		setAdminItemView(item)
 	}
 
 	private fun setClientItemView(item: ChannelDrawerItem.UserItem) {
 		if (item.isClientItem) {
-			val drawable =
-				ContextCompat.getDrawable(binding.root.context, R.drawable.my_profile_text_icon)
-			binding.userNicknameTv.setCompoundDrawablesWithIntrinsicBounds(
-				drawable, null, null, null
-			)
-			binding.userNicknameTv.typeface =
-				ResourcesCompat.getFont(binding.root.context, R.font.notosanskr_bold)
+			with(binding) {
+				val drawable =
+					ContextCompat.getDrawable(root.context, R.drawable.my_profile_text_icon)
+				userNicknameTv.setCompoundDrawablesWithIntrinsicBounds(
+					drawable, null, null, null
+				)
+				userNicknameTv.typeface =
+					ResourcesCompat.getFont(binding.root.context, R.font.notosanskr_bold)
+			}
 			return
 		}
 
-		binding.userNicknameTv.setCompoundDrawablesWithIntrinsicBounds(
-			null, null, null, null
-		)
-		binding.userNicknameTv.typeface =
-			ResourcesCompat.getFont(binding.root.context, R.font.notosanskr_regular)
+		with(binding) {
+			userNicknameTv.setCompoundDrawablesWithIntrinsicBounds(
+				null, null, null, null
+			)
+			userNicknameTv.typeface =
+				ResourcesCompat.getFont(binding.root.context, R.font.notosanskr_regular)
+		}
 	}
 
 	private fun setAdminItemView(item: ChannelDrawerItem.UserItem) {
-		binding.hostCrown.visibility = if (item.isTargetUserHost) View.VISIBLE else View.GONE
-		binding.subHostCrown.visibility = if (item.isTargetUserSubHost) View.VISIBLE else View.GONE
+		with(binding) {
+			hostCrown.visibility = if (item.isTargetUserHost) View.VISIBLE else View.GONE
+			subHostCrown.visibility = if (item.isTargetUserSubHost) View.VISIBLE else View.GONE
+		}
 	}
 }

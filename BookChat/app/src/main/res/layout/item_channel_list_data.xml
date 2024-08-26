@@ -1,202 +1,189 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <data>
-
-        <variable
-            name="channel"
-            type="com.example.bookchat.ui.channelList.model.ChannelListItem.ChannelItem" />
-    </data>
+    <include
+        android:id="@+id/channel_list_swipe_background"
+        layout="@layout/item_channel_list_data_swipe_background" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/channel_list_swipe_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <include
-            android:id="@+id/channel_list_swipe_background"
-            layout="@layout/item_channel_list_data_swipe_background" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/channel_list_swipe_view"
-            android:layout_width="match_parent"
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_start"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackgroundBorderless"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="30dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="30dp" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/channel_img_cv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginVertical="10dp"
+            app:cardCornerRadius="30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline_start"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/channel_img_iv"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/loading_img" />
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/channel_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"
+            android:elegantTextHeight="true"
+            android:ellipsize="end"
+            android:fontFamily="@font/notosanskr_bold"
+            android:maxLines="1"
+            android:textColor="#222222"
+            android:textSize="14sp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toStartOf="@+id/unchecked_chat_count_tv"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toEndOf="@+id/channel_img_cv"
+            app:layout_constraintTop_toTopOf="@+id/channel_img_cv" />
+
+        <TextView
+            android:id="@+id/unchecked_chat_count_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_bold"
+            android:textColor="#5648FF"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/channel_title_tv"
+            app:layout_constraintEnd_toStartOf="@+id/dispatch_time_tv"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/channel_title_tv"
+            app:layout_constraintTop_toTopOf="@+id/channel_title_tv" />
+
+        <TextView
+            android:id="@+id/dispatch_time_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:textColor="#222222"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/channel_last_chat_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="60dp"
+            android:elegantTextHeight="true"
+            android:ellipsize="end"
+            android:fontFamily="@font/notosanskr_regular"
+            android:maxLines="1"
+            android:textColor="#373737"
+            android:textSize="12sp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toStartOf="@+id/dispatch_time_tv"
+            app:layout_constraintStart_toStartOf="@+id/channel_title_tv"
+            app:layout_constraintTop_toBottomOf="@+id/channel_title_tv" />
+
+        <TextView
+            android:id="@+id/channel_member_count_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:elegantTextHeight="true"
+            android:ellipsize="end"
+            android:fontFamily="@font/notosanskr_regular"
+            android:maxLines="1"
+            android:textColor="#373737"
+            android:textSize="10sp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintStart_toStartOf="@+id/channel_last_chat_tv"
+            app:layout_constraintTop_toBottomOf="@+id/channel_last_chat_tv" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/unavailable_channel_state_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="unavailable_channel_shadow, unavailable_channel_icon" />
+
+        <ImageView
+            android:id="@+id/unavailable_channel_shadow"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#8CFFFFFF"
+            android:elevation="30dp"
+            android:outlineProvider="none"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_start"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_begin="30dp" />
+        <ImageView
+            android:id="@+id/unavailable_channel_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/unavailable_channel_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintTop_toBottomOf="@+id/dispatch_time_tv" />
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_end"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_end="30dp" />
+        <ImageView
+            android:id="@+id/top_pin_channel_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="7dp"
+            android:src="@drawable/top_pin_channel_icon"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            app:layout_constraintStart_toEndOf="@+id/mute_channel_icon"
+            app:layout_constraintTop_toBottomOf="@+id/dispatch_time_tv" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/channel_img_cv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginVertical="10dp"
-                app:cardCornerRadius="30dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/guideline_start"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/channel_img_iv"
-                    android:layout_width="75dp"
-                    android:layout_height="75dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/loading_img" />
-            </androidx.cardview.widget.CardView>
-
-            <TextView
-                android:id="@+id/chat_room_title_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="5dp"
-                android:elegantTextHeight="true"
-                android:ellipsize="end"
-                android:fontFamily="@font/notosanskr_bold"
-                android:maxLines="1"
-                android:text="@{channel.roomName}"
-                android:textColor="#222222"
-                android:textSize="14sp"
-                app:layout_constrainedWidth="true"
-                app:layout_constraintEnd_toStartOf="@+id/unchecked_chat_count_tv"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintStart_toEndOf="@+id/channel_img_cv"
-                app:layout_constraintTop_toTopOf="@+id/channel_img_cv" />
-
-            <TextView
-                android:id="@+id/unchecked_chat_count_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="20dp"
-                android:elegantTextHeight="true"
-                android:fontFamily="@font/notosanskr_bold"
-                android:textColor="#5648FF"
-                android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="@+id/chat_room_title_tv"
-                app:layout_constraintEnd_toStartOf="@+id/dispatch_time_tv"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/chat_room_title_tv"
-                app:layout_constraintTop_toTopOf="@+id/chat_room_title_tv" />
-
-            <TextView
-                android:id="@+id/dispatch_time_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:elegantTextHeight="true"
-                android:fontFamily="@font/notosanskr_regular"
-                android:textColor="#222222"
-                android:textSize="10sp"
-                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/chat_content_tv"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="60dp"
-                android:elegantTextHeight="true"
-                android:ellipsize="end"
-                android:fontFamily="@font/notosanskr_regular"
-                android:maxLines="1"
-                android:text="@{channel.lastChat.message}"
-                android:textColor="#373737"
-                android:textSize="12sp"
-                app:layout_constrainedWidth="true"
-                app:layout_constraintEnd_toStartOf="@+id/dispatch_time_tv"
-                app:layout_constraintStart_toStartOf="@+id/chat_room_title_tv"
-                app:layout_constraintTop_toBottomOf="@+id/chat_room_title_tv" />
-
-            <TextView
-                android:id="@+id/chat_member_count"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:elegantTextHeight="true"
-                android:ellipsize="end"
-                android:fontFamily="@font/notosanskr_regular"
-                android:maxLines="1"
-                android:text="@{String.valueOf(channel.roomMemberCount) + @string/people_count_text}"
-                android:textColor="#373737"
-                android:textSize="10sp"
-                app:layout_constrainedWidth="true"
-                app:layout_constraintStart_toStartOf="@+id/chat_content_tv"
-                app:layout_constraintTop_toBottomOf="@+id/chat_content_tv" />
-
-            <androidx.constraintlayout.widget.Group
-                android:id="@+id/unavailable_channel_state_group"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:constraint_referenced_ids="unavailable_channel_shadow, unavailable_channel_icon" />
-
-            <ImageView
-                android:id="@+id/unavailable_channel_shadow"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:background="#8CFFFFFF"
-                android:elevation="30dp"
-                android:outlineProvider="none"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/unavailable_channel_icon"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/unavailable_channel_icon"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-                app:layout_constraintTop_toBottomOf="@+id/dispatch_time_tv" />
-
-            <ImageView
-                android:id="@+id/top_pin_channel_icon"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_marginStart="7dp"
-                android:src="@drawable/top_pin_channel_icon"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-                app:layout_constraintStart_toEndOf="@+id/mute_channel_icon"
-                app:layout_constraintTop_toBottomOf="@+id/dispatch_time_tv" />
-
-            <ImageView
-                android:id="@+id/mute_channel_icon"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/mute_channel_icon"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/top_pin_channel_icon"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dispatch_time_tv" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
+        <ImageView
+            android:id="@+id/mute_channel_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/mute_channel_icon"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/top_pin_channel_icon"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dispatch_time_tv" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

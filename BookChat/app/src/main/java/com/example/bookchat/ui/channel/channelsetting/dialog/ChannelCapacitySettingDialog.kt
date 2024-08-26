@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogChannelCapacitySettingBinding
 import com.example.bookchat.utils.DialogSizeManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,12 +32,7 @@ class ChannelCapacitySettingDialog(
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.dialog_channel_capacity_setting,
-			container, false
-		)
-		binding.lifecycleOwner = viewLifecycleOwner
-		binding.dialog = this
+		_binding = DialogChannelCapacitySettingBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -54,10 +47,6 @@ class ChannelCapacitySettingDialog(
 		_binding = null
 	}
 
-	fun onClickCancelBtn() {
-		dismiss()
-	}
-
 	fun onClickOkBtn() {
 		onClickOkBtn.invoke(selectableValues[binding.channelCapacityNp.value].toInt())
 		dismiss()
@@ -66,6 +55,10 @@ class ChannelCapacitySettingDialog(
 	private fun initViewState() {
 		dialogSizeManager.setDialogSize(binding.root)
 		initNumberPickerState()
+		with(binding) {
+			cancelBtn.setOnClickListener { dismiss() }
+			okBtn.setOnClickListener { onClickOkBtn() }
+		}
 	}
 
 	//TODO : 현재 방 최대 용량 말고 현재 인원 수 보다 적은 용량으로 선택한다면 "현재 인원보다 적은 인원으로는 설정할 수 없습니다" 알림

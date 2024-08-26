@@ -2,7 +2,6 @@ package com.example.bookchat.ui.channel.channelsetting.authoritymanage.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.bookchat.R
@@ -22,9 +21,8 @@ class MemberItemAdapter @Inject constructor() :
 		parent: ViewGroup,
 		viewType: Int,
 	): MemberItemViewHolder {
-		val binding: ItemChannelMemberManageBinding = DataBindingUtil.inflate(
+		val binding = ItemChannelMemberManageBinding.inflate(
 			LayoutInflater.from(parent.context),
-			R.layout.item_channel_member_manage,
 			parent, false
 		)
 		return MemberItemViewHolder(binding, onClick)

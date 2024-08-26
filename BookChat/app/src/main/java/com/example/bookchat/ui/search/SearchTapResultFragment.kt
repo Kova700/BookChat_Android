@@ -4,14 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
 import com.example.bookchat.databinding.FragmentSearchTapResultBinding
 import com.example.bookchat.domain.model.SearchPurpose
-import com.example.bookchat.ui.search.SearchUiState.SearchResultState
 import com.example.bookchat.ui.search.adapter.SearchItemAdapter
 import com.example.bookchat.ui.search.model.SearchResultItem
 import com.example.bookchat.utils.BookImgSizeManager
@@ -42,13 +39,7 @@ class SearchTapResultFragment : Fragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding =
-			DataBindingUtil.inflate(
-				inflater, R.layout.fragment_search_tap_result,
-				container, false
-			)
-		binding.viewmodel = searchViewModel
-		binding.lifecycleOwner = viewLifecycleOwner
+		_binding = FragmentSearchTapResultBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -108,27 +99,14 @@ class SearchTapResultFragment : Fragment() {
 	private fun setViewVisibility(uiState: SearchUiState) {
 		with(binding) {
 			resultEmptyLayout.root.visibility =
-				if (isResultBothEmpty(uiState)) View.VISIBLE else View.GONE
+				if (uiState.isBothEmptyResult) View.VISIBLE else View.GONE
 			resultShimmerLayout.shimmerLayout.visibility =
-				if (isVisibleSkeleton(uiState)) View.VISIBLE else View.GONE
+				if (uiState.isLoading) View.VISIBLE else View.GONE
 					.also { resultShimmerLayout.shimmerLayout.stopShimmer() }
 			resultRcv.visibility =
-				if (isVisibleRcv(uiState)) View.VISIBLE else View.INVISIBLE
+				if (uiState.isErrorOrSuccessResult) View.VISIBLE else View.INVISIBLE
 		}
 	}
-
-	private fun isResultBothEmpty(uiState: SearchUiState) =
-		(uiState.searchTapState is SearchUiState.SearchTapState.Result) &&
-						(uiState.searchResultState == SearchResultState.Empty)
-
-	private fun isVisibleSkeleton(uiState: SearchUiState) =
-		(uiState.searchTapState is SearchUiState.SearchTapState.Result) &&
-						(uiState.searchResultState == SearchResultState.Loading)
-
-	private fun isVisibleRcv(uiState: SearchUiState) =
-		(uiState.searchTapState is SearchUiState.SearchTapState.Result) &&
-						((uiState.searchResultState == SearchResultState.Success) ||
-										(uiState.searchResultState == SearchResultState.Error))
 
 	private fun initAdapter() {
 		searchItemAdapter.onBookHeaderBtnClick = {
@@ -159,8 +137,10 @@ class SearchTapResultFragment : Fragment() {
 				flexDirection = FlexDirection.ROW
 				flexWrap = FlexWrap.WRAP
 			}
-		binding.resultRcv.adapter = searchItemAdapter
-		binding.resultRcv.layoutManager = flexboxLayoutManager
+		with(binding) {
+			resultRcv.adapter = searchItemAdapter
+			resultRcv.layoutManager = flexboxLayoutManager
+		}
 	}
 
 }

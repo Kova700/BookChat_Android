@@ -12,7 +12,7 @@ fun Channel.toDrawerItems(client: User): List<ChannelDrawerItem> {
 			roomName = roomName,
 			bookTitle = bookTitle,
 			bookCoverImageUrl = bookCoverImageUrl,
-			bookAuthors = bookAuthors
+			bookAuthors = bookAuthorsString
 		)
 	)
 

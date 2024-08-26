@@ -5,10 +5,9 @@ import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySelectTasteBinding
+import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.ui.MainActivity
 import com.example.bookchat.utils.image.bitmap.compressToByteArray
 import com.example.bookchat.utils.image.bitmap.getImageBitmap
@@ -25,12 +24,12 @@ class SelectTasteActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_select_taste)
-		binding.lifecycleOwner = this
-		binding.viewModel = selectTasteViewModel
+		binding = ActivitySelectTasteBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		getCroppedImageBitmap()
 		observeUiState()
 		observeUiEvent()
+		initViewState()
 	}
 
 	private fun observeUiState() = lifecycleScope.launch {
@@ -49,6 +48,29 @@ class SelectTasteActivity : AppCompatActivity() {
 			?.compressToByteArray()
 		selectTasteViewModel.onUpdatedUserProfileImage(userProfileByteArray)
 		deleteImageCache(uri)
+	}
+
+	private fun initViewState() {
+		with(binding) {
+			startBookchatBtn.setOnClickListener { selectTasteViewModel.onClickSignUpBtn() }
+			backBtn.setOnClickListener { selectTasteViewModel.onClickBackBtn() }
+			economyTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.ECONOMY) }
+			philosophyTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.PHILOSOPHY) }
+			historyTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.HISTORY) }
+			travelTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.TRAVEL) }
+			healthTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.HEALTH) }
+			hobbyTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.HOBBY) }
+			humanitiesTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.HUMANITIES) }
+			novelTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.NOVEL) }
+			artTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.ART) }
+			designTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.DESIGN) }
+			developmentTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.DEVELOPMENT) }
+			scienceTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.SCIENCE) }
+			magazineTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.MAGAZINE) }
+			religionTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.RELIGION) }
+			characterTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.CHARACTER) }
+		}
+
 	}
 
 	private fun setViewState(uiState: SelectTasteState) {

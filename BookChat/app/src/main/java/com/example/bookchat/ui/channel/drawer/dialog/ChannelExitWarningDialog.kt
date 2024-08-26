@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogChannelExitWarningBinding
 import com.example.bookchat.domain.model.ChannelMemberAuthority
 import com.example.bookchat.utils.DialogSizeManager
@@ -32,12 +30,7 @@ class ChannelExitWarningDialog(
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.dialog_channel_exit_warning,
-			container, false
-		)
-		binding.lifecycleOwner = viewLifecycleOwner
-		binding.dialog = this
+		_binding = DialogChannelExitWarningBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -52,10 +45,6 @@ class ChannelExitWarningDialog(
 		_binding = null
 	}
 
-	fun onClickCancelBtn() {
-		dismiss()
-	}
-
 	fun onClickOkBtn() {
 		onClickOkBtn.invoke()
 		dismiss()
@@ -63,8 +52,11 @@ class ChannelExitWarningDialog(
 
 	private fun initViewState() {
 		dialogSizeManager.setDialogSize(binding.root)
-		binding.hostWarningContentTv.visibility =
-			if (clientAuthority == ChannelMemberAuthority.HOST) View.VISIBLE else View.GONE
-
+		with(binding) {
+			hostWarningContentTv.visibility =
+				if (clientAuthority == ChannelMemberAuthority.HOST) View.VISIBLE else View.GONE
+			okBtn.setOnClickListener { onClickOkBtn() }
+			cancelBtn.setOnClickListener { dismiss() }
+		}
 	}
 }

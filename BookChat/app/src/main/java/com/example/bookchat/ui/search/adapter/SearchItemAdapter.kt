@@ -2,7 +2,6 @@ package com.example.bookchat.ui.search.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.bookchat.R
@@ -42,57 +41,50 @@ class SearchItemAdapter @Inject constructor(
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchItemViewHolder {
 		when (viewType) {
 			R.layout.item_search_book_header -> {
-				val binding: ItemSearchBookHeaderBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_search_book_header,
-					parent, false
+				val binding = ItemSearchBookHeaderBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return BookHeaderViewHolder(binding, onBookHeaderBtnClick)
 			}
 
 			R.layout.item_search_book_empty -> {
-				val binding: ItemSearchBookEmptyBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_search_book_empty,
-					parent, false
+				val binding = ItemSearchBookEmptyBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return BookEmptyViewHolder(binding)
 			}
 
 			R.layout.item_search_book_data -> {
-				val binding: ItemSearchBookDataBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_search_book_data,
-					parent, false
+				val binding = ItemSearchBookDataBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return BookItemViewHolder(binding, bookImgSizeManager, onBookItemClick)
 			}
 
 			R.layout.item_search_book_dummy -> {
-				val binding: ItemSearchBookDummyBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_search_book_dummy,
-					parent, false
+				val binding = ItemSearchBookDummyBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return BookDummyViewHolder(binding, bookImgSizeManager)
 			}
 
 			R.layout.item_search_channel_header -> {
-				val binding: ItemSearchChannelHeaderBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_search_channel_header,
-					parent, false
+				val binding = ItemSearchChannelHeaderBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return ChannelHeaderViewHolder(binding, onChannelHeaderBtnClick)
 			}
 
 			R.layout.item_search_channel_empty -> {
-				val binding: ItemSearchChannelEmptyBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_search_channel_empty,
-					parent, false
+				val binding = ItemSearchChannelEmptyBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return ChannelEmptyViewHolder(binding, onClickMakeChannelBtn)
 			}
 
 			R.layout.item_search_channel_data -> {
-				val binding: ItemSearchChannelDataBinding = DataBindingUtil.inflate(
-					LayoutInflater.from(parent.context), R.layout.item_search_channel_data,
-					parent, false
+				val binding = ItemSearchChannelDataBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
 				)
 				return ChannelItemViewHolder(binding, onChannelItemClick)
 			}

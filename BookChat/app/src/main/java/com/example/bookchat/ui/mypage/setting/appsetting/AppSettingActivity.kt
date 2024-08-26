@@ -3,9 +3,7 @@ package com.example.bookchat.ui.mypage.setting.appsetting
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityAppSettingBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -18,8 +16,8 @@ class AppSettingActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_app_setting)
-		binding.lifecycleOwner = this
+		binding = ActivityAppSettingBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		initViewState()
 		observeUiState()
 	}

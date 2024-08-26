@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -35,18 +34,14 @@ class BookShelfFragment : Fragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.fragment_bookshelf, container, false
-		)
+		_binding = FragmentBookshelfBinding.inflate(inflater, container, false)
 		viewPagerAdapter = ViewPagerAdapter(fragments, this)
-		binding.lifecycleOwner = viewLifecycleOwner
-		binding.viewPager.adapter = viewPagerAdapter
 		return binding.root
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		initTapLayout()
+		initViewState()
 		inflateFirstTab()
 		observeEvent()
 	}
@@ -54,6 +49,11 @@ class BookShelfFragment : Fragment() {
 	override fun onDestroyView() {
 		super.onDestroyView()
 		_binding = null
+	}
+
+	private fun initViewState() {
+		binding.viewPager.adapter = viewPagerAdapter
+		initTapLayout()
 	}
 
 	private fun inflateFirstTab() {

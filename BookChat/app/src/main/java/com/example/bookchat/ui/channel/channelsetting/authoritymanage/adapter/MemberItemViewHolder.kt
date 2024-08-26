@@ -20,13 +20,14 @@ class MemberItemViewHolder(
 	}
 
 	fun bind(item: MemberItem) {
-		binding.memberItem = item
-		binding.memberSelectRb.isChecked = item.isSelected
-		binding.subHostCrown.visibility = if (item.isTargetUserSubHost) View.VISIBLE else View.GONE
-		binding.userProfileIv.loadUserProfile(
-			imageUrl = item.profileImageUrl,
-			userDefaultProfileType = item.defaultProfileImageType
-		)
-		binding.uesrNicknameTv.text = item.nickname.ifBlank { "(알 수 없음)" }
+		with(binding) {
+			memberSelectRb.isChecked = item.isSelected
+			subHostCrown.visibility = if (item.isTargetUserSubHost) View.VISIBLE else View.GONE
+			userProfileIv.loadUserProfile(
+				imageUrl = item.profileImageUrl,
+				userDefaultProfileType = item.defaultProfileImageType
+			)
+			uesrNicknameTv.text = item.nickname.ifBlank { "(알 수 없음)" }
+		}
 	}
 }

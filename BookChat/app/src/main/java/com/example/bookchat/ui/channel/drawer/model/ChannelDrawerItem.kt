@@ -15,7 +15,7 @@ sealed interface ChannelDrawerItem {
 		val roomName: String,
 		val bookTitle: String?,
 		val bookCoverImageUrl: String?,
-		val bookAuthors: List<String>?,
+		val bookAuthors: String?,
 	) : ChannelDrawerItem {
 		companion object {
 			val DEFAULT = Header(

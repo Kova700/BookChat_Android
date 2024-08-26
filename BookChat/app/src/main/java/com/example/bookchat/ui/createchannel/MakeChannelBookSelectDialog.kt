@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogMakeChannelSelectBookBinding
 import com.example.bookchat.domain.model.Book
 import com.example.bookchat.utils.BookImgSizeManager
@@ -37,11 +35,7 @@ class MakeChannelBookSelectDialog(
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.dialog_make_channel_select_book, container, false
-		)
-		binding.lifecycleOwner = this.viewLifecycleOwner
-		binding.dialog = this
+		_binding = DialogMakeChannelSelectBookBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -57,15 +51,18 @@ class MakeChannelBookSelectDialog(
 	}
 
 	private fun initViewState() {
-		bookImgSizeManager.setBookImgSize(binding.bookImg)
-		dialogSizeManager.setDialogSize(binding.makeChannelSelectBookDialogLayout)
-		binding.bookImg.loadUrl(selectedBook.bookCoverImageUrl)
-		binding.selectedBookTitleTv.isSelected = true
-		binding.selectedBookAuthorsTv.isSelected = true
-		binding.selectedBookPublishAtTv.isSelected = true
+		with(binding) {
+			bookImgSizeManager.setBookImgSize(bookImg)
+			dialogSizeManager.setDialogSize(makeChannelSelectBookDialogLayout)
+			bookImg.loadUrl(selectedBook.bookCoverImageUrl)
+			selectedBookTitleTv.isSelected = true
+			selectedBookAuthorsTv.isSelected = true
+			selectedBookPublishAtTv.isSelected = true
+			makeChannelBtn.setOnClickListener { onClickMakeChannel() }
+		}
 	}
 
-	fun onClickMakeChannel() {
+	private fun onClickMakeChannel() {
 		dismiss()
 		onClickMakeChannel.invoke()
 	}

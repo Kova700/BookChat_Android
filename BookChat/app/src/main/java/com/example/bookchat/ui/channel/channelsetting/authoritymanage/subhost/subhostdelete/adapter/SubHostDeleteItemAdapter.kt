@@ -2,7 +2,6 @@ package com.example.bookchat.ui.channel.channelsetting.authoritymanage.subhost.s
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.bookchat.R
@@ -22,9 +21,8 @@ class SubHostDeleteItemAdapter @Inject constructor() :
 		parent: ViewGroup,
 		viewType: Int,
 	): SubHostManageItemViewHolder {
-		val binding: ItemSubHostDeleteBinding = DataBindingUtil.inflate(
+		val binding = ItemSubHostDeleteBinding.inflate(
 			LayoutInflater.from(parent.context),
-			R.layout.item_sub_host_delete,
 			parent, false
 		)
 		return SubHostManageItemViewHolder(binding, onClickDeleteBtn)

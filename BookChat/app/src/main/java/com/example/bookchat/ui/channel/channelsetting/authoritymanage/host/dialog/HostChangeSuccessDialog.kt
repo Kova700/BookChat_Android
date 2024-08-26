@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogHostChangeSuccessBinding
 import com.example.bookchat.utils.DialogSizeManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,12 +28,7 @@ class HostChangeSuccessDialog(
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.dialog_host_change_success,
-			container, false
-		)
-		binding.lifecycleOwner = viewLifecycleOwner
-		binding.dialog = this
+		_binding = DialogHostChangeSuccessBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -50,12 +43,13 @@ class HostChangeSuccessDialog(
 		_binding = null
 	}
 
-	fun onClickOkBtn() {
+	private fun onClickOkBtn() {
 		dismiss()
 		onClickOk.invoke()
 	}
 
 	private fun initViewState() {
 		dialogSizeManager.setDialogSize(binding.root)
+		binding.okBtn.setOnClickListener { onClickOkBtn() }
 	}
 }

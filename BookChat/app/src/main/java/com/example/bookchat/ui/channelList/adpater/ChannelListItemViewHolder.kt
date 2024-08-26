@@ -1,8 +1,8 @@
 package com.example.bookchat.ui.channelList.adpater
 
 import android.view.View
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemChannelListDataBinding
 import com.example.bookchat.databinding.ItemChannelListHeaderBinding
@@ -12,7 +12,7 @@ import com.example.bookchat.utils.getFormattedDetailDateTimeText
 import com.example.bookchat.utils.image.loadChannelProfile
 
 sealed class ChannelListItemViewHolder(
-	binding: ViewDataBinding,
+	binding: ViewBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 	abstract fun bind(channelListItem: ChannelListItem)
 }
@@ -57,13 +57,23 @@ class ChannelListDataViewHolder(
 		val item = (channelListItem as ChannelListItem.ChannelItem)
 		isSwiped = item.isSwiped
 		setViewHolderSwipeState(binding.channelListSwipeView, item.isSwiped)
+		initViewState(item)
 		setViewState(item)
 	}
 
-	fun setViewState(channelListItem: ChannelListItem) {
+	private fun initViewState(channelListItem: ChannelListItem) {
 		val item = (channelListItem as ChannelListItem.ChannelItem)
 		with(binding) {
-			channel = item
+			channelTitleTv.text = item.roomName
+			channelLastChatTv.text = item.lastChat?.message
+			channelMemberCountTv.text =
+				root.context.getString(R.string.channel_list_item_capacity, item.roomMemberCount)
+		}
+	}
+
+	private fun setViewState(channelListItem: ChannelListItem) {
+		val item = (channelListItem as ChannelListItem.ChannelItem)
+		with(binding) {
 			dispatchTimeTv.text = item.lastChat?.dispatchTime?.let { getFormattedDetailDateTimeText(it) }
 			uncheckedChatCountTv.text = if (item.isExistNewChat) "New+" else ""
 			muteChannelIcon.visibility =

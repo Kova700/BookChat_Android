@@ -6,16 +6,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogBookReportWarningBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class BookReportWarningDialog(
 	private val warningTextStringId: Int,
-	private val onOkClick: () -> Unit
+	private val onOkClick: () -> Unit,
 ) : DialogFragment() {
 
 	private var _binding: DialogBookReportWarningBinding? = null
@@ -24,13 +22,9 @@ class BookReportWarningDialog(
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
+		savedInstanceState: Bundle?,
 	): View {
-		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.dialog_book_report_warning, container, false
-		)
-		binding.dialog = this
-		binding.lifecycleOwner = this
+		_binding = DialogBookReportWarningBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -46,11 +40,11 @@ class BookReportWarningDialog(
 	}
 
 	private fun initViewState() {
-		binding.warningTextView.setText(warningTextStringId)
-	}
-
-	fun onClickCancelBtn() {
-		dismiss()
+		with(binding) {
+			warningTextView.setText(warningTextStringId)
+			cancelBtn.setOnClickListener { dismiss() }
+			okBtn.setOnClickListener { onClickOkBtn() }
+		}
 	}
 
 	fun onClickOkBtn() {

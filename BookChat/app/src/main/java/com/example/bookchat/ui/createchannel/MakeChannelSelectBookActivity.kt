@@ -2,10 +2,9 @@ package com.example.bookchat.ui.createchannel
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.NavHostFragment
 import com.example.bookchat.R
-import com.example.bookchat.databinding.ActivityMakeChatRoomSelectBookBinding
+import com.example.bookchat.databinding.ActivityMakeChannelSelectBookBinding
 import com.example.bookchat.domain.model.SearchPurpose
 import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_SEARCH_PURPOSE
 import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
@@ -14,11 +13,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MakeChannelSelectBookActivity : AppCompatActivity() {
 	private lateinit var navHostFragment: NavHostFragment
-	private lateinit var binding: ActivityMakeChatRoomSelectBookBinding
+	private lateinit var binding: ActivityMakeChannelSelectBookBinding
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_make_chat_room_select_book)
+		binding = ActivityMakeChannelSelectBookBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		initNavHost()
 		intent.putExtra(EXTRA_SEARCH_PURPOSE, SearchPurpose.MAKE_CHANNEL)
 	}

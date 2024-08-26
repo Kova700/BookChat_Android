@@ -6,10 +6,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
-import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogDeviceWarningBinding
 
 class DeviceWarningDialog : DialogFragment() {
@@ -21,19 +19,16 @@ class DeviceWarningDialog : DialogFragment() {
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
-	): View? {
-		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.dialog_device_warning, container, false
-		)
-		binding.lifecycleOwner = this
-		binding.dialog = this
+		savedInstanceState: Bundle?,
+	): View {
+		_binding = DialogDeviceWarningBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+		initViewState()
 	}
 
 	override fun onDestroyView() {
@@ -41,8 +36,11 @@ class DeviceWarningDialog : DialogFragment() {
 		_binding = null
 	}
 
-	fun onClickCancelBtn() {
-		dismiss()
+	private fun initViewState() {
+		with(binding) {
+			cancelBtn.setOnClickListener { dismiss() }
+			okBtn.setOnClickListener { onClickOkBtn() }
+		}
 	}
 
 	fun onClickOkBtn() {

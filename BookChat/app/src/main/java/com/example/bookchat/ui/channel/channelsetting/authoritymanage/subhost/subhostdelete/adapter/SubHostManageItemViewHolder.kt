@@ -16,11 +16,12 @@ class SubHostManageItemViewHolder(
 	}
 
 	fun bind(user: User) {
-		binding.user = user
-		binding.userProfileIv.loadUserProfile(
-			imageUrl = user.profileImageUrl,
-			userDefaultProfileType = user.defaultProfileImageType
-		)
-		binding.uesrNicknameTv.text = user.nickname.ifBlank { "(알 수 없음)" }
+		with(binding) {
+			userProfileIv.loadUserProfile(
+				imageUrl = user.profileImageUrl,
+				userDefaultProfileType = user.defaultProfileImageType
+			)
+			uesrNicknameTv.text = user.nickname.ifBlank { "(알 수 없음)" }
+		}
 	}
 }

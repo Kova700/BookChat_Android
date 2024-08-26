@@ -2,11 +2,9 @@ package com.example.bookchat.ui.search.adapter.searchhistory
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookchat.R
 import com.example.bookchat.databinding.ItemSearchHistoryBinding
 import javax.inject.Inject
 
@@ -17,9 +15,8 @@ class SearchHistoryAdapter @Inject constructor() :
 	var onDeleteBtnClick: ((Int) -> Unit)? = null
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchHistoryViewHolder {
-		val binding: ItemSearchHistoryBinding = DataBindingUtil.inflate(
-			LayoutInflater.from(parent.context), R.layout.item_search_history,
-			parent, false
+		val binding = ItemSearchHistoryBinding.inflate(
+			LayoutInflater.from(parent.context), parent, false
 		)
 		return SearchHistoryViewHolder(binding, onItemClick, onDeleteBtnClick)
 	}
@@ -42,7 +39,7 @@ class SearchHistoryAdapter @Inject constructor() :
 class SearchHistoryViewHolder(
 	private val binding: ItemSearchHistoryBinding,
 	private val onItemClick: ((Int) -> Unit)?,
-	private val onDeleteBtnClick: ((Int) -> Unit)?
+	private val onDeleteBtnClick: ((Int) -> Unit)?,
 ) : RecyclerView.ViewHolder(binding.root) {
 	init {
 		binding.searchHistoryTv.setOnClickListener {
@@ -55,6 +52,6 @@ class SearchHistoryViewHolder(
 	}
 
 	fun bind(historyKeyword: String) {
-		binding.historyKeyword = historyKeyword
+		binding.searchHistoryTv.text = historyKeyword
 	}
 }

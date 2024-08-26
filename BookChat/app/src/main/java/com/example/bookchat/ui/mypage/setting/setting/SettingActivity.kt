@@ -4,9 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySettingBinding
 import com.example.bookchat.ui.mypage.setting.accountsetting.AccountSettingActivity
 import com.example.bookchat.ui.mypage.setting.appsetting.AppSettingActivity
@@ -21,8 +19,8 @@ class SettingActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_setting)
-		binding.lifecycleOwner = this
+		binding = ActivitySettingBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		initViewState()
 		observeUiEvent()
 	}

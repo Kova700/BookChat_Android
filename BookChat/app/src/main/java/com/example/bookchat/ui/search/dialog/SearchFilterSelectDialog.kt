@@ -7,10 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogSearchFilterSelectBinding
 import com.example.bookchat.domain.model.SearchFilter
 import com.example.bookchat.domain.model.SearchPurpose
@@ -38,13 +36,7 @@ class SearchFilterSelectDialog(
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding =
-			DataBindingUtil.inflate(
-				inflater, R.layout.dialog_search_filter_select,
-				container, false
-			)
-		binding.lifecycleOwner = this.viewLifecycleOwner
-		binding.dialog = this
+		_binding = DialogSearchFilterSelectBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -101,10 +93,12 @@ class SearchFilterSelectDialog(
 			if (state.searchFilter == targetFilter) setTextColor(Color.parseColor("#5648FF"))
 			else setTextColor(Color.parseColor("#000000"))
 		}
-		binding.searchFilterBookTitleBtn.setColor(SearchFilter.BOOK_TITLE)
-		binding.searchFilterBookIsbnBtn.setColor(SearchFilter.BOOK_ISBN)
-		binding.searchFilterChannelTitleBtn.setColor(SearchFilter.ROOM_NAME)
-		binding.searchFilterChannelTagBtn.setColor(SearchFilter.ROOM_TAGS)
+		with(binding) {
+			searchFilterBookTitleBtn.setColor(SearchFilter.BOOK_TITLE)
+			searchFilterBookIsbnBtn.setColor(SearchFilter.BOOK_ISBN)
+			searchFilterChannelTitleBtn.setColor(SearchFilter.ROOM_NAME)
+			searchFilterChannelTagBtn.setColor(SearchFilter.ROOM_TAGS)
+		}
 	}
 
 }

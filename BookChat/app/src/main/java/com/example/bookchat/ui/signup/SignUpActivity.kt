@@ -16,7 +16,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivitySignUpBinding
@@ -63,13 +62,12 @@ class SignUpActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up)
-		binding.lifecycleOwner = this
-		binding.viewModel = signUpViewModel
+		binding = ActivitySignUpBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		setFocus()
 		observeUiState()
 		observeUiEvent()
-		initNickNameEditText()
+		initViewState()
 	}
 
 	private fun observeUiState() = lifecycleScope.launch {
@@ -82,12 +80,25 @@ class SignUpActivity : AppCompatActivity() {
 		signUpViewModel.eventFlow.collect { event -> handleEvent(event) }
 	}
 
+	private fun initViewState() {
+		initNickNameEditText()
+		with(binding) {
+			backBtn.setOnClickListener { signUpViewModel.onClickBackBtn() }
+			startBookchatBtn.setOnClickListener { signUpViewModel.onClickStartBtn() }
+			textClearBtn.setOnClickListener { signUpViewModel.onClickClearNickNameBtn() }
+			cameraBtn.setOnClickListener { signUpViewModel.onClickCameraBtn() }
+		}
+	}
+
 	private fun setViewState(state: SignUpState) {
 		setNickNameEditTextState(state)
 		setSubmitBtnState(state)
 		setUserProfileImage(state)
 		setNameCheckResultTextViewState(state)
 		setNameCheckResultLayoutState(state)
+		binding.textLengthTv.text =
+			getString(R.string.sign_up_user_nickname_length, state.nickname.length)
+		binding.textClearBtn.visibility = if (state.nickname.isEmpty()) View.INVISIBLE else View.VISIBLE
 	}
 
 	private fun setNameCheckResultLayoutState(state: SignUpState) {
@@ -108,7 +119,7 @@ class SignUpActivity : AppCompatActivity() {
 	}
 
 	private fun setNickNameEditTextState(state: SignUpState) {
-		with(binding.nickNameEt) {
+		with(binding.nicknameEt) {
 			if (text.toString() != state.nickname) {
 				setText(state.nickname)
 				setSelection(state.nickname.length)
@@ -137,7 +148,7 @@ class SignUpActivity : AppCompatActivity() {
 	private val maxLengthFilter = InputFilter.LengthFilter(MAX_NICKNAME_LENGTH)
 
 	private fun initNickNameEditText() {
-		with(binding.nickNameEt) {
+		with(binding.nicknameEt) {
 			filters = arrayOf(specialCharFilter, maxLengthFilter)
 			addTextChangedListener { text: Editable? ->
 				signUpViewModel.onChangeNickname(text.toString())
@@ -146,8 +157,8 @@ class SignUpActivity : AppCompatActivity() {
 	}
 
 	private fun setFocus() {
-		binding.nickNameEt.requestFocus()
-		openKeyboard(binding.nickNameEt)
+		binding.nicknameEt.requestFocus()
+		openKeyboard(binding.nicknameEt)
 	}
 
 	private fun openKeyboard(view: View) {
@@ -161,7 +172,7 @@ class SignUpActivity : AppCompatActivity() {
 	}
 
 	private fun startUserProfileEdit() {
-		closeKeyboard(binding.nickNameEt.windowToken)
+		closeKeyboard(binding.nicknameEt.windowToken)
 		permissionsLauncher.launch(galleryPermissions)
 	}
 
@@ -188,7 +199,6 @@ class SignUpActivity : AppCompatActivity() {
 	private fun moveToSelectTaste(event: SignUpEvent.MoveToSelectTaste) {
 		val intent = Intent(this, SelectTasteActivity::class.java)
 		intent.putExtra(EXTRA_SIGNUP_USER_NICKNAME, event.userNickname)
-//		intent.putExtra(EXTRA_USER_PROFILE_BYTE_ARRAY, event.userProfile)
 		intent.putExtra(EXTRA_USER_PROFILE_URI, event.userProfileUri)
 		startActivity(intent)
 	}

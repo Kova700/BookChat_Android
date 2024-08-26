@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import com.example.bookchat.R
 import com.example.bookchat.databinding.DialogChannelSettingBinding
@@ -33,12 +32,7 @@ class ChannelSettingDialog(
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.dialog_channel_setting,
-			container, false
-		)
-		binding.lifecycleOwner = viewLifecycleOwner
-		binding.dialog = this
+		_binding = DialogChannelSettingBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -71,10 +65,14 @@ class ChannelSettingDialog(
 	private fun initViewState() {
 		dialogSizeManager.setDialogSize(binding.root)
 		initDialogText()
+		with(binding) {
+			channelMuteTv.setOnClickListener { onClickMuteBtn() }
+			channelTopPinTv.setOnClickListener { onClickTopPinBtn() }
+			channelExitTv.setOnClickListener { onClickOkExitBtn() }
+		}
 	}
 
 	private fun initDialogText() {
-
 		binding.channelMuteTv.setText(
 			if (channel.notificationFlag) R.string.channel_mute
 			else R.string.channel_turn_on_notification

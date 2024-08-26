@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnStart
 import androidx.core.os.bundleOf
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -60,11 +59,7 @@ class SearchFragment : Fragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding = DataBindingUtil.inflate(
-			inflater, R.layout.fragment_search, container, false
-		)
-		binding.lifecycleOwner = this
-		binding.viewModel = searchViewModel
+		_binding = FragmentSearchBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -73,7 +68,7 @@ class SearchFragment : Fragment() {
 		initNavHost()
 		observeUiState()
 		observeEvent()
-		initSearchBar()
+		initViewState()
 	}
 
 	override fun onDestroyView() {
@@ -96,6 +91,17 @@ class SearchFragment : Fragment() {
 		navHostFragment =
 			childFragmentManager.findFragmentById(R.id.container_search) as NavHostFragment
 		navController = navHostFragment.findNavController()
+	}
+
+	private fun initViewState() {
+		initSearchBar()
+		with(binding) {
+			backBtn.setOnClickListener { searchViewModel.onClickBackBtn() }
+			animationTouchEventView.setOnClickListener { searchViewModel.onClickSearchBar() }
+			searchBtn.setOnClickListener { searchViewModel.onClickSearchBtn() }
+			searchKeywordClearBtn.setOnClickListener { searchViewModel.onClickKeywordClearBtn() }
+			searchFilterBtn.setOnClickListener { searchViewModel.onClickSearchFilterBtn() }
+		}
 	}
 
 	private fun initSearchBar() {
@@ -143,7 +149,7 @@ class SearchFragment : Fragment() {
 				if (searchTapState.isDefault) View.VISIBLE else View.INVISIBLE
 			searchFilterBtn.visibility =
 				if (searchTapState.isDefault) View.VISIBLE else View.INVISIBLE
-			searchDeleteBtn.visibility =
+			searchKeywordClearBtn.visibility =
 				if (searchTapState.isDefaultOrHistory) View.INVISIBLE else View.VISIBLE
 		}
 	}

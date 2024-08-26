@@ -16,6 +16,18 @@ data class SearchUiState(
 	val searchResults: List<SearchResultItem>,
 	val searchHistory: List<String>,
 ) {
+	val isBothEmptyResult
+		get() = (searchTapState is SearchTapState.Result)
+						&& (searchResultState == SearchResultState.Empty)
+
+	val isLoading
+		get() = (searchTapState is SearchTapState.Result)
+						&& (searchResultState == SearchResultState.Loading)
+
+	val isErrorOrSuccessResult
+		get() = (searchTapState is SearchTapState.Result)
+						&& ((searchResultState == SearchResultState.Success)
+						|| (searchResultState == SearchResultState.Error))
 
 	sealed class SearchTapState(open val fragmentId: Int) {
 		data class Default(
@@ -39,10 +51,10 @@ data class SearchUiState(
 	}
 
 	sealed class SearchResultState {
-		object Loading : SearchResultState()
-		object Empty : SearchResultState()
-		object Error : SearchResultState()
-		object Success : SearchResultState()
+		data object Loading : SearchResultState()
+		data object Empty : SearchResultState()
+		data object Error : SearchResultState()
+		data object Success : SearchResultState()
 	}
 
 	companion object {

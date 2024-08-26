@@ -1,282 +1,279 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="30dp" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_top"
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="30dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="30dp" />
+
+    <TextView
+        android:id="@+id/mypage_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_bold"
+        android:text="@string/my_page_title"
+        android:textColor="#222222"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@id/guideline_start"
+        app:layout_constraintTop_toTopOf="@id/guideline_top" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView6"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        app:cardCornerRadius="40dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+        app:layout_constraintStart_toStartOf="@+id/guideline_start"
+        app:layout_constraintTop_toBottomOf="@+id/mypage_title">
+
+        <ImageView
+            android:id="@+id/userProfile_iv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_begin="30dp" />
+            android:scaleType="centerCrop"
+            android:src="@drawable/default_profile_img1" />
+    </androidx.cardview.widget.CardView>
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_begin="30dp" />
+    <TextView
+        android:id="@+id/nickname_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="15dp"
+        android:elegantTextHeight="true"
+        android:ellipsize="end"
+        android:fontFamily="@font/notosanskr_bold"
+        android:maxLength="20"
+        android:maxLines="1"
+        android:textColor="#373737"
+        android:textSize="20sp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@+id/user_edit_btn"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="@+id/guideline_start"
+        app:layout_constraintTop_toBottomOf="@+id/cardView6" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_end="30dp" />
+    <com.example.bookchat.ui.customview.AntiDupClickImageButton
+        android:id="@+id/user_edit_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:padding="3dp"
+        android:src="@drawable/caret_left_btn"
+        app:layout_constraintBottom_toBottomOf="@+id/nickname_tv"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+        app:layout_constraintStart_toEndOf="@+id/nickname_tv"
+        app:layout_constraintTop_toTopOf="@+id/nickname_tv" />
 
-        <TextView
-            android:id="@+id/mypage_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_bold"
-            android:text="@string/my_page_title"
-            android:textColor="#222222"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="@id/guideline_start"
-            app:layout_constraintTop_toTopOf="@id/guideline_top" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/setting_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingHorizontal="15dp"
+        android:paddingVertical="0dp"
+        android:text="@string/setting"
+        android:textColor="#373737"
+        app:icon="@drawable/setting_rounded_btn"
+        app:iconGravity="textTop"
+        app:iconPadding="15dp"
+        app:iconSize="25dp"
+        app:iconTint="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/notice_btn"
+        app:layout_constraintEnd_toStartOf="@+id/notice_btn"
+        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintStart_toStartOf="@+id/guideline_start"
+        app:layout_constraintTop_toTopOf="@+id/notice_btn" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardView6"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="20dp"
-            app:cardCornerRadius="40dp"
-            app:cardElevation="0dp"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-            app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@+id/mypage_title">
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/notice_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingHorizontal="1dp"
+        android:paddingVertical="0dp"
+        android:text="@string/notice"
+        android:textColor="#373737"
+        app:icon="@drawable/mypage_notice"
+        app:iconGravity="textTop"
+        app:iconPadding="15dp"
+        app:iconSize="25dp"
+        app:iconTint="@color/black"
+        app:layout_constraintEnd_toEndOf="@+id/cardView6"
+        app:layout_constraintStart_toStartOf="@+id/cardView6"
+        app:layout_constraintTop_toBottomOf="@+id/nickname_tv" />
 
-            <ImageView
-                android:id="@+id/userProfile_iv"
-                android:layout_width="wrap_content"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/invite_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingHorizontal="1dp"
+        android:paddingVertical="0dp"
+        android:text="@string/invite"
+        android:textColor="#373737"
+        app:icon="@drawable/mypage_invite"
+        app:iconGravity="textTop"
+        app:iconPadding="15dp"
+        app:iconSize="25dp"
+        app:iconTint="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/notice_btn"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintStart_toEndOf="@+id/notice_btn"
+        app:layout_constraintTop_toTopOf="@+id/notice_btn" />
+    <!--
+
+            <TextView
+                android:id="@+id/account_setting_btn"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:scaleType="centerCrop"
-                android:src="@drawable/default_profile_img1" />
-        </androidx.cardview.widget.CardView>
+                android:layout_marginTop="40dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/notosanskr_regular"
+                android:foreground="?android:selectableItemBackground"
+                android:paddingVertical="10dp"
+                android:paddingStart="30dp"
+                android:text="@string/account_setting"
+                android:textColor="#373737"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/notice_btn" />
 
-        <TextView
-            android:id="@+id/nickname_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="30dp"
-            android:layout_marginTop="15dp"
-            android:elegantTextHeight="true"
-            android:ellipsize="end"
-            android:fontFamily="@font/notosanskr_bold"
-            android:maxLength="20"
-            android:maxLines="1"
-            android:textColor="#373737"
-            android:textSize="20sp"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toStartOf="@+id/user_edit_btn"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@+id/cardView6" />
+            <TextView
+                android:id="@+id/app_setting_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/notosanskr_regular"
+                android:foreground="?android:selectableItemBackground"
+                android:paddingVertical="10dp"
+                android:paddingStart="30dp"
+                android:text="@string/app_setting"
+                android:textColor="#373737"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/account_setting_btn" />
+    -->
 
-        <com.example.bookchat.ui.customview.AntiDupClickImageButton
-            android:id="@+id/user_edit_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:padding="3dp"
-            android:src="@drawable/caret_left_btn"
-            app:layout_constraintBottom_toBottomOf="@+id/nickname_tv"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-            app:layout_constraintStart_toEndOf="@+id/nickname_tv"
-            app:layout_constraintTop_toTopOf="@+id/nickname_tv" />
+    <TextView
+        android:id="@+id/terms_of_service_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:foreground="?android:selectableItemBackground"
+        android:paddingVertical="10dp"
+        android:paddingStart="30dp"
+        android:text="@string/terms_of_service"
+        android:textColor="#373737"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/notice_btn" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/setting_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_regular"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:paddingHorizontal="15dp"
-            android:paddingVertical="0dp"
-            android:text="@string/setting"
-            android:textColor="#373737"
-            app:iconPadding="15dp"
-            app:icon="@drawable/setting_rounded_btn"
-            app:iconGravity="textTop"
-            app:iconSize="25dp"
-            app:iconTint="@color/black"
-            app:layout_constraintBottom_toBottomOf="@+id/notice_btn"
-            app:layout_constraintEnd_toStartOf="@+id/notice_btn"
-            app:layout_constraintHorizontal_bias="0.2"
-            app:layout_constraintStart_toStartOf="@+id/guideline_start"
-            app:layout_constraintTop_toTopOf="@+id/notice_btn" />
+    <TextView
+        android:id="@+id/privacy_policy_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:foreground="?android:selectableItemBackground"
+        android:paddingVertical="10dp"
+        android:paddingStart="30dp"
+        android:text="@string/privacy_policy"
+        android:textColor="#373737"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/terms_of_service_btn" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/notice_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_regular"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:paddingHorizontal="1dp"
-            android:paddingVertical="0dp"
-            android:text="@string/notice"
-            app:iconPadding="15dp"
-            android:textColor="#373737"
-            app:icon="@drawable/mypage_notice"
-            app:iconGravity="textTop"
-            app:iconSize="25dp"
-            app:iconTint="@color/black"
-            app:layout_constraintEnd_toEndOf="@+id/cardView6"
-            app:layout_constraintStart_toStartOf="@+id/cardView6"
-            app:layout_constraintTop_toBottomOf="@+id/nickname_tv" />
+    <TextView
+        android:id="@+id/open_source_license_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:foreground="?android:selectableItemBackground"
+        android:paddingVertical="10dp"
+        android:paddingStart="30dp"
+        android:text="@string/open_source_license"
+        android:textColor="#373737"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/privacy_policy_btn" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/invite_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:elegantTextHeight="true"
-            android:fontFamily="@font/notosanskr_regular"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:paddingHorizontal="1dp"
-            android:paddingVertical="0dp"
-            android:text="@string/invite"
-            android:textColor="#373737"
-            app:iconPadding="15dp"
-            app:icon="@drawable/mypage_invite"
-            app:iconGravity="textTop"
-            app:iconSize="25dp"
-            app:iconTint="@color/black"
-            app:layout_constraintBottom_toBottomOf="@+id/notice_btn"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-            app:layout_constraintHorizontal_bias="0.8"
-            app:layout_constraintStart_toEndOf="@+id/notice_btn"
-            app:layout_constraintTop_toTopOf="@+id/notice_btn" />
-        <!--
+    <TextView
+        android:id="@+id/app_version_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/notosanskr_regular"
+        android:foreground="?android:selectableItemBackground"
+        android:paddingVertical="10dp"
+        android:paddingStart="30dp"
+        android:text="@string/app_version"
+        android:textColor="#373737"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/open_source_license_btn" />
 
-                <TextView
-                    android:id="@+id/account_setting_btn"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="40dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:fontFamily="@font/notosanskr_regular"
-                    android:foreground="?android:selectableItemBackground"
-                    android:paddingVertical="10dp"
-                    android:paddingStart="30dp"
-                    android:text="@string/account_setting"
-                    android:textColor="#373737"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/notice_btn" />
+    <TextView
+        android:id="@+id/app_version_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:fontFamily="@font/notosanskr_regular"
+        android:textColor="#373737"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/app_version_btn"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+        app:layout_constraintTop_toTopOf="@+id/app_version_btn" />
 
-                <TextView
-                    android:id="@+id/app_setting_btn"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:fontFamily="@font/notosanskr_regular"
-                    android:foreground="?android:selectableItemBackground"
-                    android:paddingVertical="10dp"
-                    android:paddingStart="30dp"
-                    android:text="@string/app_setting"
-                    android:textColor="#373737"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/account_setting_btn" />
-        -->
-
-        <TextView
-            android:id="@+id/terms_of_service_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/notosanskr_regular"
-            android:foreground="?android:selectableItemBackground"
-            android:paddingVertical="10dp"
-            android:paddingStart="30dp"
-            android:text="@string/terms_of_service"
-            android:textColor="#373737"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/notice_btn" />
-
-        <TextView
-            android:id="@+id/privacy_policy_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/notosanskr_regular"
-            android:foreground="?android:selectableItemBackground"
-            android:paddingVertical="10dp"
-            android:paddingStart="30dp"
-            android:text="@string/privacy_policy"
-            android:textColor="#373737"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/terms_of_service_btn" />
-
-        <TextView
-            android:id="@+id/open_source_license_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/notosanskr_regular"
-            android:foreground="?android:selectableItemBackground"
-            android:paddingVertical="10dp"
-            android:paddingStart="30dp"
-            android:text="@string/open_source_license"
-            android:textColor="#373737"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/privacy_policy_btn" />
-
-        <TextView
-            android:id="@+id/app_version_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/notosanskr_regular"
-            android:foreground="?android:selectableItemBackground"
-            android:paddingVertical="10dp"
-            android:paddingStart="30dp"
-            android:text="@string/app_version"
-            android:textColor="#373737"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/open_source_license_btn" />
-
-        <TextView
-            android:id="@+id/app_version_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:fontFamily="@font/notosanskr_regular"
-            android:textColor="#373737"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/app_version_btn"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-            app:layout_constraintTop_toTopOf="@+id/app_version_btn" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+</androidx.constraintlayout.widget.ConstraintLayout>

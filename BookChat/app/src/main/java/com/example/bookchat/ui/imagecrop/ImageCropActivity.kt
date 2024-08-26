@@ -7,7 +7,6 @@ import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.bookchat.R
 import com.example.bookchat.databinding.ActivityImageCropBinding
@@ -23,8 +22,8 @@ class ImageCropActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_image_crop)
-		binding.lifecycleOwner = this
+		binding = ActivityImageCropBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 		moveToGallery()
 		observeUiState()
 		observeUiEvent()
