@@ -8,10 +8,6 @@ var properties = Properties().apply {
 plugins {
 	id("convention.android.application")
 	id("convention.android.hilt")
-//	id("com.android.application")
-//	id("org.jetbrains.kotlin.android")
-//	id("com.google.devtools.ksp")
-//	id("dagger.hilt.android.plugin")
 	alias(libs.plugins.secrets.gradle.plugin)
 	alias(libs.plugins.google.fcm)
 	alias(libs.plugins.aboutlibraries)
@@ -20,8 +16,6 @@ plugins {
 android {
 	namespace = "com.example.bookchat"
 	defaultConfig {
-		targetSdk = 34
-
 		applicationId = "com.example.bookchat"
 		val majorVersion = libs.versions.major.get()
 		val minorVersion = libs.versions.minor.get()
@@ -30,12 +24,12 @@ android {
 		versionName = "$majorVersion.$minorVersion.$hotfixVersion"
 	}
 	buildFeatures {
-		viewBinding = true
 		buildConfig = true
 	}
 }
 
 dependencies {
+	implementation(project(":core:design-system"))
 	implementation(libs.bundles.androidx.default)
 	testImplementation(libs.bundles.unit.test)
 	androidTestImplementation(libs.bundles.android.test)
