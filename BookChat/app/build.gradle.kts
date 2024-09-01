@@ -42,6 +42,11 @@ dependencies {
 	implementation(project(":core:data:searchhistory:internal"))
 	implementation(project(":core:data:searchhistory:external"))
 
+	implementation(project(":core:datastore:deviceinfo"))
+	implementation(project(":core:data:deviceinfo:internal"))
+	implementation(project(":core:data:deviceinfo:external"))
+
+
 	implementation(libs.bundles.androidx.default)
 	testImplementation(libs.bundles.unit.test)
 	androidTestImplementation(libs.bundles.android.test)

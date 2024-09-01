@@ -1,4 +1,4 @@
-package com.example.bookchat.domain.repository
+package com.kova700.bookchat.core.data.deviceinfo.external
 
 interface DeviceIDRepository {
 	suspend fun getDeviceID(): String

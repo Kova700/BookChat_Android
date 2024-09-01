@@ -29,3 +29,7 @@ include(":core:data:appsetting:internal")
 include(":core:datastore:searchhistory")
 include(":core:data:searchhistory:internal")
 include(":core:data:searchhistory:external")
+
+include(":core:datastore:deviceinfo")
+include(":core:data:deviceinfo:internal")
+include(":core:data:deviceinfo:external")

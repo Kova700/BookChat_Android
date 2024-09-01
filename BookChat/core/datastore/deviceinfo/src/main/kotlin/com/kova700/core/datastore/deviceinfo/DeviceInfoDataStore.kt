@@ -1,4 +1,4 @@
-package com.example.bookchat.data.repository
+package com.kova700.core.datastore.deviceinfo
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -6,17 +6,16 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.kova700.bookchat.core.datastore.datastore.clearData
 import com.kova700.bookchat.core.datastore.datastore.getDataFlow
 import com.kova700.bookchat.core.datastore.datastore.setData
-import com.example.bookchat.domain.repository.DeviceIDRepository
 import kotlinx.coroutines.flow.firstOrNull
 import java.util.UUID
 import javax.inject.Inject
 
-class DeviceIDRepositoryImpl @Inject constructor(
+class DeviceInfoDataStore @Inject constructor(
 	private val dataStore: DataStore<Preferences>,
-) : DeviceIDRepository {
+) {
 	private val deviceUUIDKey = stringPreferencesKey(DEVICE_UUID_KEY)
 
-	override suspend fun getDeviceID(): String {
+	suspend fun getDeviceID(): String {
 		return dataStore.getDataFlow(deviceUUIDKey).firstOrNull() ?: getNewDeviceID()
 	}
 
@@ -26,7 +25,7 @@ class DeviceIDRepositoryImpl @Inject constructor(
 		return uuid
 	}
 
-	override suspend fun clear() {
+	suspend fun clear() {
 		dataStore.clearData(deviceUUIDKey)
 	}
 

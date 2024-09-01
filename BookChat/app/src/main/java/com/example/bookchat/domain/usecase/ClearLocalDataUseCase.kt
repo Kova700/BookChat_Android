@@ -11,7 +11,7 @@ import com.example.bookchat.domain.repository.ChannelTempMessageRepository
 import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ChattingNotificationInfoRepository
 import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.repository.DeviceIDRepository
+import com.kova700.bookchat.core.data.deviceinfo.external.DeviceIDRepository
 import com.example.bookchat.oauth.repository.external.OAuthIdTokenRepository
 import com.kova700.core.data.searchhistory.external.SearchHistoryRepository
 import com.example.bookchat.domain.repository.UserRepository
