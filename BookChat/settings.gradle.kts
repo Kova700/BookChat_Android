@@ -19,3 +19,8 @@ dependencyResolutionManagement {
 rootProject.name = "BookChat"
 include(":app")
 include(":core:design-system")
+include(":feature:main")
+include(":core:datastore:datastore")
+include(":core:datastore:appsetting")
+include(":core:data:appsetting:external")
+include(":core:data:appsetting:internal")

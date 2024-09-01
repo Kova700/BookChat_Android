@@ -14,11 +14,7 @@ android {
 
 dependencies {
 	implementation(project(":core:design-system"))
-	implementation(libs.findLibrary("androidx-core").get())
-	implementation(libs.findBundle("androidx-lifecycle").get())
-	implementation(libs.findLibrary("appcompat").get())
-	implementation(libs.findLibrary("material").get())
+	implementation(libs.findBundle("androidx-default").get())
 	testImplementation(libs.findBundle("unit-test").get())
 	androidTestImplementation(libs.findBundle("android-test").get())
-	debugImplementation(libs.findBundle("debug-test").get())
 }

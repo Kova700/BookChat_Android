@@ -31,6 +31,11 @@ android {
 
 dependencies {
 	implementation(project(":core:design-system"))
+	implementation(project(":feature:main"))
+	implementation(project(":core:datastore:datastore"))
+	implementation(project(":core:datastore:appsetting"))
+	implementation(project(":core:data:appsetting:internal"))
+	implementation(project(":core:data:appsetting:external"))
 	implementation(libs.bundles.androidx.default)
 	testImplementation(libs.bundles.unit.test)
 	androidTestImplementation(libs.bundles.android.test)

@@ -3,9 +3,9 @@ package com.example.bookchat.data.repository
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.example.bookchat.data.datastore.clearData
-import com.example.bookchat.data.datastore.getDataFlow
-import com.example.bookchat.data.datastore.setData
+import com.kova700.bookchat.core.datastore.datastore.clearData
+import com.kova700.bookchat.core.datastore.datastore.getDataFlow
+import com.kova700.bookchat.core.datastore.datastore.setData
 import com.example.bookchat.domain.repository.DeviceIDRepository
 import kotlinx.coroutines.flow.firstOrNull
 import java.util.UUID

@@ -1,4 +1,4 @@
-package com.example.bookchat.data.datastore
+package com.kova700.bookchat.core.datastore.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

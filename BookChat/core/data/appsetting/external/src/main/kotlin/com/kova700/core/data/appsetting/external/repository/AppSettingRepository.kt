@@ -1,10 +1,10 @@
-package com.example.bookchat.domain.repository
+package com.kova700.core.data.appsetting.external.repository
 
-import com.example.bookchat.domain.model.AppSetting
+import com.kova700.core.data.appsetting.external.model.AppSetting
 import kotlinx.coroutines.flow.Flow
 
 interface AppSettingRepository {
-	suspend fun observeAppSetting(): Flow<AppSetting>
+	fun getAppSettingFlow(): Flow<AppSetting>
 	suspend fun isPushNotificationEnabled(): Boolean
 	suspend fun getAppSetting(): AppSetting
 	suspend fun setPushNotificationMuteState(isMute: Boolean)

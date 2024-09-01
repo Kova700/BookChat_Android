@@ -1,50 +1,49 @@
-package com.example.bookchat.data.repository
+package com.kova700.core.datastore.appsetting
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.example.bookchat.data.datastore.clearData
-import com.example.bookchat.data.datastore.getDataFlow
-import com.example.bookchat.data.datastore.setData
-import com.example.bookchat.domain.model.AppSetting
-import com.example.bookchat.domain.repository.AppSettingRepository
-import com.google.gson.Gson
+import com.kova700.bookchat.core.datastore.datastore.clearData
+import com.kova700.bookchat.core.datastore.datastore.getDataFlow
+import com.kova700.bookchat.core.datastore.datastore.setData
+import com.kova700.core.data.appsetting.external.model.AppSetting
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
-class AppSettingRepositoryImpl @Inject constructor(
+class AppSettingDataStore @Inject constructor(
 	private val dataStore: DataStore<Preferences>,
-	private val gson: Gson,
-) : AppSettingRepository {
+) {
 	private val appSettingKey = stringPreferencesKey(APP_SETTING_KEY)
 
-	override suspend fun observeAppSetting(): Flow<AppSetting> {
+	fun getAppSettingFlow(): Flow<AppSetting> {
 		return dataStore.getDataFlow(appSettingKey)
 			.map { appSettingString ->
 				appSettingString?.let {
-					gson.fromJson(appSettingString, AppSetting::class.java)
+					Json.decodeFromString<AppSetting>(appSettingString)
 				} ?: AppSetting.DEFAULT
 			}
 	}
 
-	override suspend fun isPushNotificationEnabled(): Boolean {
+	suspend fun isPushNotificationEnabled(): Boolean {
 		return getAppSetting().isPushNotificationEnabled
 	}
 
-	override suspend fun getAppSetting(): AppSetting {
+	suspend fun getAppSetting(): AppSetting {
 		val appSettingString =
 			dataStore.getDataFlow(appSettingKey).firstOrNull() ?: return AppSetting.DEFAULT
-		return gson.fromJson(appSettingString, AppSetting::class.java)
+		return Json.decodeFromString<AppSetting>(appSettingString)
 	}
 
-	override suspend fun setPushNotificationMuteState(isMute: Boolean) {
+	suspend fun setPushNotificationMuteState(isMute: Boolean) {
 		val newAppSetting = getAppSetting().copy(isPushNotificationEnabled = isMute)
-		dataStore.setData(appSettingKey, gson.toJson(newAppSetting))
+		dataStore.setData(appSettingKey, Json.encodeToString(newAppSetting))
 	}
 
-	override suspend fun clear() {
+	suspend fun clear() {
 		dataStore.clearData(appSettingKey)
 	}
 

@@ -2,7 +2,7 @@ package com.example.bookchat.ui.mypage.setting.appsetting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.domain.repository.AppSettingRepository
+import com.kova700.core.data.appsetting.external.repository.AppSettingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,7 +23,7 @@ class AppSettingViewModel @Inject constructor(
 	}
 
 	private fun observeAppSetting() = viewModelScope.launch {
-		appSettingRepository.observeAppSetting().collect { appSetting ->
+		appSettingRepository.getAppSettingFlow().collect { appSetting ->
 			updateState { copy(isPushNotificationEnabled = appSetting.isPushNotificationEnabled) }
 		}
 	}

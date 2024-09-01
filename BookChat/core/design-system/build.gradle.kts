@@ -3,7 +3,7 @@ plugins {
 	id("convention.android.hilt")
 }
 android {
-	namespace = "com.kova700.core.design_system"
+	namespace = "com.kova700.bookchat.core.design_system"
 }
 dependencies {
 	implementation(libs.bundles.androidx.default)

@@ -1,4 +1,4 @@
-package com.example.bookchat.domain.model
+package com.kova700.core.data.appsetting.external.model
 
 data class AppSetting(
 	val isPushNotificationEnabled: Boolean,
