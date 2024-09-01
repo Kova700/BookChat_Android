@@ -1,7 +1,7 @@
 package com.example.bookchat.domain.usecase
 
-import com.example.bookchat.domain.model.BookChatToken
-import com.example.bookchat.domain.repository.BookChatTokenRepository
+import com.kova700.bookchat.core.data.bookchat_token.external.model.BookChatToken
+import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import java.io.IOException
 import javax.inject.Inject

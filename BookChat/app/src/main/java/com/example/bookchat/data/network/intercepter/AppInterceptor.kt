@@ -1,6 +1,6 @@
 package com.example.bookchat.data.network.intercepter
 
-import com.example.bookchat.domain.repository.BookChatTokenRepository
+import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor

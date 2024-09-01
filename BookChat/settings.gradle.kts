@@ -38,3 +38,6 @@ include(":core:datastore:notificationinfo")
 include(":core:data:notificationinfo:internal")
 include(":core:data:notificationinfo:external")
 
+include(":core:datastore:bookchat-token")
+include(":core:data:bookchat-token:internal")
+include(":core:data:bookchat-token:external")

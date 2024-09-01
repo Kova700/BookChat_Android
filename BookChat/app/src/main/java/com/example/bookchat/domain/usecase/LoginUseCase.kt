@@ -1,6 +1,6 @@
 package com.example.bookchat.domain.usecase
 
-import com.example.bookchat.domain.repository.BookChatTokenRepository
+import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.kova700.bookchat.core.data.deviceinfo.external.DeviceIDRepository
 import com.example.bookchat.fcm.repository.external.FCMTokenRepository

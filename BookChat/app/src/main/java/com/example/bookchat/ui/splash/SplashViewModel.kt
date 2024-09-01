@@ -2,7 +2,7 @@ package com.example.bookchat.ui.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.domain.repository.BookChatTokenRepository
+import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.fcm.repository.external.FCMTokenRepository
 import com.example.bookchat.domain.usecase.ClearLocalDataUseCase

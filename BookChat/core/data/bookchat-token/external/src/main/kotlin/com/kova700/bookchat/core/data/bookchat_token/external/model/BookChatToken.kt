@@ -1,4 +1,4 @@
-package com.example.bookchat.domain.model
+package com.kova700.bookchat.core.data.bookchat_token.external.model
 
 data class BookChatToken(
 	val accessToken: String,

@@ -1,6 +1,6 @@
-package com.example.bookchat.domain.repository
+package com.kova700.bookchat.core.data.bookchat_token.external.repository
 
-import com.example.bookchat.domain.model.BookChatToken
+import com.kova700.bookchat.core.data.bookchat_token.external.model.BookChatToken
 
 interface BookChatTokenRepository {
 	suspend fun getBookChatToken(): BookChatToken?

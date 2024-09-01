@@ -50,6 +50,10 @@ dependencies {
 	implementation(project(":core:data:notificationinfo:internal"))
 	implementation(project(":core:data:notificationinfo:external"))
 
+	implementation(project(":core:datastore:bookchat-token"))
+	implementation(project(":core:data:bookchat-token:internal"))
+	implementation(project(":core:data:bookchat-token:external"))
+
 	implementation(libs.bundles.androidx.default)
 	testImplementation(libs.bundles.unit.test)
 	androidTestImplementation(libs.bundles.android.test)

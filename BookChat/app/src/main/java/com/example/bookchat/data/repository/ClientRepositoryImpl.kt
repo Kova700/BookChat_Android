@@ -10,7 +10,7 @@ import com.example.bookchat.data.network.model.request.RequestUserLogin
 import com.example.bookchat.data.network.model.request.RequestUserSignUp
 import com.example.bookchat.data.network.model.response.NeedToDeviceWarningException
 import com.example.bookchat.data.network.model.response.NeedToSignUpException
-import com.example.bookchat.domain.model.BookChatToken
+import com.kova700.bookchat.core.data.bookchat_token.external.model.BookChatToken
 import com.example.bookchat.fcm.repository.external.model.FCMToken
 import com.example.bookchat.domain.model.ReadingTaste
 import com.example.bookchat.domain.model.User

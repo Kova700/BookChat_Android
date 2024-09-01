@@ -3,7 +3,7 @@ package com.example.bookchat.data.network.intercepter
 import com.example.bookchat.BuildConfig
 import com.example.bookchat.data.network.model.response.ForbiddenException
 import com.example.bookchat.data.network.model.response.TokenRenewalFailException
-import com.example.bookchat.domain.model.BookChatToken
+import com.kova700.bookchat.core.data.bookchat_token.external.model.BookChatToken
 import com.google.gson.Gson
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull

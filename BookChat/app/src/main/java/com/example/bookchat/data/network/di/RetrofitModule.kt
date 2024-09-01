@@ -4,7 +4,7 @@ import com.example.bookchat.BuildConfig.DOMAIN
 import com.example.bookchat.data.network.intercepter.AppInterceptor
 import com.example.bookchat.data.network.BookChatApi
 import com.example.bookchat.data.network.EnumConverterFactory
-import com.example.bookchat.domain.repository.BookChatTokenRepository
+import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides

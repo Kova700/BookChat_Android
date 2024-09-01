@@ -9,7 +9,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.example.bookchat.fcm.repository.external.model.FCMToken
-import com.example.bookchat.domain.repository.BookChatTokenRepository
+import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
 import com.example.bookchat.fcm.repository.external.FCMTokenRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
