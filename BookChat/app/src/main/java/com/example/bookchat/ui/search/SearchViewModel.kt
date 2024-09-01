@@ -9,7 +9,7 @@ import com.example.bookchat.domain.model.SearchFilter
 import com.example.bookchat.domain.model.SearchPurpose
 import com.example.bookchat.domain.repository.BookSearchRepository
 import com.example.bookchat.domain.repository.ChannelSearchRepository
-import com.example.bookchat.domain.repository.SearchHistoryRepository
+import com.kova700.core.data.searchhistory.external.SearchHistoryRepository
 import com.example.bookchat.ui.search.SearchFragment.Companion.EXTRA_SEARCH_PURPOSE
 import com.example.bookchat.ui.search.SearchUiState.SearchResultState
 import com.example.bookchat.ui.search.SearchUiState.SearchTapState
@@ -37,7 +37,7 @@ class SearchViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val bookSearchRepository: BookSearchRepository,
 	private val channelSearchRepository: ChannelSearchRepository,
-	private val searchHistoryRepository: SearchHistoryRepository,
+	private val searchHistoryRepository: com.kova700.core.data.searchhistory.external.SearchHistoryRepository,
 	private val bookImgSizeManager: BookImgSizeManager,
 ) : ViewModel() {
 

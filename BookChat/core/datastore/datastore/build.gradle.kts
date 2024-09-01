@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-	namespace = "com.kova700.amazonbookstorepractice.core.datastore.datastore"
+	namespace = "com.kova700.bookchat.core.datastore.datastore"
 }
 
 dependencies {

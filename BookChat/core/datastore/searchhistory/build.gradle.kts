@@ -5,12 +5,12 @@ plugins {
 }
 
 android {
-	namespace = "com.kova700.bookchat.core.datastore.appsetting"
+	namespace = "com.kova700.bookchat.core.datastore.searchhistory"
 }
 
 dependencies {
 	implementation(project(":core:datastore:datastore"))
-	implementation(project(":core:data:appsetting:external"))
+	implementation(project(":core:data:searchhistory:external"))
 	implementation(libs.androidx.datastore.preferences)
 	implementation(libs.kotlinx.serialization.json)
 	testImplementation(libs.bundles.unit.test)

@@ -13,7 +13,6 @@ import com.example.bookchat.data.repository.ChatRepositoryImpl
 import com.example.bookchat.data.repository.ChattingNotificationInfoRepositoryImpl
 import com.example.bookchat.data.repository.ClientRepositoryImpl
 import com.example.bookchat.data.repository.DeviceIDRepositoryImpl
-import com.example.bookchat.data.repository.SearchHistoryRepositoryImpl
 import com.example.bookchat.data.repository.UserRepositoryImpl
 import com.example.bookchat.domain.repository.AgonyRecordRepository
 import com.example.bookchat.domain.repository.AgonyRepository
@@ -28,7 +27,6 @@ import com.example.bookchat.domain.repository.ChatRepository
 import com.example.bookchat.domain.repository.ChattingNotificationInfoRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.DeviceIDRepository
-import com.example.bookchat.domain.repository.SearchHistoryRepository
 import com.example.bookchat.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
@@ -117,12 +115,6 @@ interface RepositoryModule {
 	fun bindChannelSearchRepository(
 		repository: ChannelSearchRepositoryImpl,
 	): ChannelSearchRepository
-
-	@Binds
-	@Singleton
-	fun bindSearchHistoryRepository(
-		repository: SearchHistoryRepositoryImpl,
-	): SearchHistoryRepository
 
 	@Binds
 	@Singleton

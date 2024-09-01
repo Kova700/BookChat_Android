@@ -1,4 +1,4 @@
-package com.example.bookchat.domain.repository
+package com.kova700.core.data.searchhistory.external
 
 import kotlinx.coroutines.flow.Flow
 

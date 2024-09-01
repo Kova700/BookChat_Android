@@ -13,7 +13,7 @@ import com.example.bookchat.domain.repository.ChattingNotificationInfoRepository
 import com.example.bookchat.domain.repository.ClientRepository
 import com.example.bookchat.domain.repository.DeviceIDRepository
 import com.example.bookchat.oauth.repository.external.OAuthIdTokenRepository
-import com.example.bookchat.domain.repository.SearchHistoryRepository
+import com.kova700.core.data.searchhistory.external.SearchHistoryRepository
 import com.example.bookchat.domain.repository.UserRepository
 import com.example.bookchat.notification.chat.ChatNotificationHandler
 import javax.inject.Inject
