@@ -1,6 +1,6 @@
-package com.example.bookchat.domain.repository
+package com.kova700.core.data.notificationinfo.external.repository
 
-import com.example.bookchat.domain.model.ActivatedChatNotificationInfo
+import com.kova700.core.data.notificationinfo.external.model.ActivatedChatNotificationInfo
 
 interface ChattingNotificationInfoRepository {
 	suspend fun getShownNotificationInfos(): List<ActivatedChatNotificationInfo>

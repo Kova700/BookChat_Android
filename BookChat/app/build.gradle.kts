@@ -46,6 +46,9 @@ dependencies {
 	implementation(project(":core:data:deviceinfo:internal"))
 	implementation(project(":core:data:deviceinfo:external"))
 
+	implementation(project(":core:datastore:notificationinfo"))
+	implementation(project(":core:data:notificationinfo:internal"))
+	implementation(project(":core:data:notificationinfo:external"))
 
 	implementation(libs.bundles.androidx.default)
 	testImplementation(libs.bundles.unit.test)

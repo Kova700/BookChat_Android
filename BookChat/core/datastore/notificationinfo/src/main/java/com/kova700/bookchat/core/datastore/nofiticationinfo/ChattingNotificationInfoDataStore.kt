@@ -1,4 +1,4 @@
-package com.example.bookchat.data.repository
+package com.kova700.bookchat.core.datastore.nofiticationinfo
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -6,32 +6,30 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.kova700.bookchat.core.datastore.datastore.clearData
 import com.kova700.bookchat.core.datastore.datastore.getDataFlow
 import com.kova700.bookchat.core.datastore.datastore.setData
-import com.example.bookchat.domain.model.ActivatedChatNotificationInfo
-import com.example.bookchat.domain.repository.ChattingNotificationInfoRepository
-import com.google.gson.Gson
+import com.kova700.core.data.notificationinfo.external.model.ActivatedChatNotificationInfo
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
-class ChattingNotificationInfoRepositoryImpl @Inject constructor(
+class ChattingNotificationInfoDataStore @Inject constructor(
 	private val dataStore: DataStore<Preferences>,
-	private val gson: Gson,
-) : ChattingNotificationInfoRepository {
+) {
 	private val notificationIdKey = stringPreferencesKey(CHATTING_NOTIFICATION_KEY)
 
-	override suspend fun getShownNotificationInfos(): List<ActivatedChatNotificationInfo> {
+	suspend fun getShownNotificationInfos(): List<ActivatedChatNotificationInfo> {
 		val notificationIdsString = dataStore.getDataFlow(notificationIdKey).firstOrNull()
 		if (notificationIdsString.isNullOrBlank()) return emptyList()
-		return gson.fromJson(notificationIdsString, Array<ActivatedChatNotificationInfo>::class.java)
-			.toList()
+		return Json.decodeFromString<List<ActivatedChatNotificationInfo>>(notificationIdsString)
 	}
 
-	override suspend fun getNotificationLastTimestamp(notificationId: Int): Long? {
+	suspend fun getNotificationLastTimestamp(notificationId: Int): Long? {
 		return getShownNotificationInfos()
 			.firstOrNull { it.notificationId == notificationId }
 			?.lastTimestamp
 	}
 
-	override suspend fun updateShownNotificationInfo(notificationId: Int, lastTimestamp: Long) {
+	suspend fun updateShownNotificationInfo(notificationId: Int, lastTimestamp: Long) {
 		val notificationInfos = getShownNotificationInfos()
 			.associateByTo(mutableMapOf()) { it.notificationId }
 
@@ -40,16 +38,16 @@ class ChattingNotificationInfoRepositoryImpl @Inject constructor(
 		if (previousInfo != null && previousInfo.lastTimestamp > currentInfo.lastTimestamp) return
 
 		notificationInfos[notificationId] = currentInfo
-		dataStore.setData(notificationIdKey, gson.toJson(notificationInfos.values))
+		dataStore.setData(notificationIdKey, Json.encodeToString(notificationInfos.values))
 	}
 
-	override suspend fun removeShownNotificationInfo(notificationId: Int) {
+	suspend fun removeShownNotificationInfo(notificationId: Int) {
 		val notificationInfos = getShownNotificationInfos()
 			.filter { it.notificationId != notificationId }
-		dataStore.setData(notificationIdKey, gson.toJson(notificationInfos))
+		dataStore.setData(notificationIdKey, Json.encodeToString(notificationInfos))
 	}
 
-	override suspend fun clear() {
+	suspend fun clear() {
 		dataStore.clearData(notificationIdKey)
 	}
 

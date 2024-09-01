@@ -1,4 +1,4 @@
-package com.example.bookchat.domain.model
+package com.kova700.core.data.notificationinfo.external.model
 
 data class ActivatedChatNotificationInfo(
 	val notificationId: Int,

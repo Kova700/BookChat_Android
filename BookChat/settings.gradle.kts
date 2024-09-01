@@ -33,3 +33,8 @@ include(":core:data:searchhistory:external")
 include(":core:datastore:deviceinfo")
 include(":core:data:deviceinfo:internal")
 include(":core:data:deviceinfo:external")
+
+include(":core:datastore:notificationinfo")
+include(":core:data:notificationinfo:internal")
+include(":core:data:notificationinfo:external")
+
