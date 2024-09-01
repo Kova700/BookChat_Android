@@ -24,6 +24,7 @@ android {
 		versionName = "$majorVersion.$minorVersion.$hotfixVersion"
 	}
 	buildFeatures {
+		viewBinding = true
 		buildConfig = true
 	}
 }

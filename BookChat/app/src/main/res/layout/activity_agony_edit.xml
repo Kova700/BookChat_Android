@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.example.bookchat.ui.customview.AntiDupClickImageButton
+    <com.kova700.core.design_system.customview.AntiDupClickImageButton
         android:id="@+id/x_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

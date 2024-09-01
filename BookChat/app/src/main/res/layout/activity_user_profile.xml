@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.channel.userprofile.UserProfileActivity">
 
-    <com.example.bookchat.ui.customview.AntiDupClickImageButton
+    <com.kova700.core.design_system.customview.AntiDupClickImageButton
         android:id="@+id/back_btn"
         android:layout_width="35dp"
         android:layout_height="35dp"

@@ -53,7 +53,7 @@
         app:layout_constraintStart_toStartOf="@+id/search_window"
         app:layout_constraintTop_toTopOf="@+id/search_window" />
 
-    <com.example.bookchat.ui.customview.BookChatEditText
+    <com.kova700.core.design_system.customview.BookChatEditText
         android:id="@+id/searchEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

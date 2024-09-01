@@ -21,7 +21,7 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="30dp" />
 
-    <com.example.bookchat.ui.customview.AntiDupClickImageButton
+    <com.kova700.core.design_system.customview.AntiDupClickImageButton
         android:id="@+id/back_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -67,7 +67,7 @@
             android:src="@drawable/default_profile_img1" />
     </androidx.cardview.widget.CardView>
 
-    <com.example.bookchat.ui.customview.AntiDupClickImageButton
+    <com.kova700.core.design_system.customview.AntiDupClickImageButton
         android:id="@+id/camera_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -130,7 +130,7 @@
         app:layout_constraintEnd_toEndOf="@+id/nickName_layout"
         app:layout_constraintTop_toTopOf="@+id/nickName_layout" />
 
-    <com.example.bookchat.ui.customview.AntiDupClickButton
+    <com.kova700.core.design_system.customview.AntiDupClickButton
         android:id="@+id/start_bookchat_btn"
         android:layout_width="0dp"
         android:layout_height="45dp"

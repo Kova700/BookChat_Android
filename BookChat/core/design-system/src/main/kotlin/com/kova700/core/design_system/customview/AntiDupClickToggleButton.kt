@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.customview
+package com.kova700.core.design_system.customview
 
 import android.content.Context
 import android.util.AttributeSet

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.agony.agonyrecord.AgonyRecordActivity">
 
-    <com.example.bookchat.ui.customview.AntiDupClickImageButton
+    <com.kova700.core.design_system.customview.AntiDupClickImageButton
         android:id="@+id/back_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

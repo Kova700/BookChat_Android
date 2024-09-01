@@ -36,7 +36,7 @@
             android:visibility="gone"
             app:constraint_referenced_ids="delete_btn, revise_btn, book_report_default_layout" />
 
-        <com.example.bookchat.ui.customview.AntiDupClickImageButton
+        <com.kova700.core.design_system.customview.AntiDupClickImageButton
             android:id="@+id/back_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
             app:layout_constraintStart_toEndOf="@+id/back_btn"
             app:layout_constraintTop_toTopOf="@+id/back_btn" />
 
-        <com.example.bookchat.ui.customview.AntiDupClickImageButton
+        <com.kova700.core.design_system.customview.AntiDupClickImageButton
             android:id="@+id/revise_btn"
             android:layout_width="25dp"
             android:layout_height="25dp"
@@ -72,7 +72,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/back_btn" />
 
-        <com.example.bookchat.ui.customview.AntiDupClickImageButton
+        <com.kova700.core.design_system.customview.AntiDupClickImageButton
             android:id="@+id/delete_btn"
             android:layout_width="25dp"
             android:layout_height="25dp"

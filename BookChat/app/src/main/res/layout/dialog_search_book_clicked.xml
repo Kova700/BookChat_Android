@@ -34,7 +34,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.example.bookchat.ui.customview.AntiDupClickToggleButton
+    <com.kova700.core.design_system.customview.AntiDupClickToggleButton
         android:id="@+id/heart_btn"
         android:layout_width="32dp"
         android:layout_height="32dp"

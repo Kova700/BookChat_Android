@@ -21,7 +21,7 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.4" />
 
-    <com.example.bookchat.ui.customview.AntiDupClickButton
+    <com.kova700.core.design_system.customview.AntiDupClickButton
         android:id="@+id/channel_mute_btn"
         android:layout_width="0dp"
         android:layout_height="75dp"
@@ -37,7 +37,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.example.bookchat.ui.customview.AntiDupClickButton
+    <com.kova700.core.design_system.customview.AntiDupClickButton
         android:id="@+id/channel_top_pin_btn"
         android:layout_width="0dp"
         android:layout_height="75dp"

@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/empty_channel_layout"
         android:layout_width="0dp"
@@ -45,7 +44,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/chatroom_empty_tv" />
 
-        <com.example.bookchat.ui.customview.AntiDupClickButton
+        <com.kova700.core.design_system.customview.AntiDupClickButton
             android:id="@+id/empty_channel_add_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -119,7 +118,7 @@
             app:layout_constraintStart_toStartOf="@+id/guideline_start"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.example.bookchat.ui.customview.AntiDupClickImageButton
+        <com.kova700.core.design_system.customview.AntiDupClickImageButton
             android:id="@+id/channel_add_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -130,7 +129,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/channel_search_btn" />
 
-        <com.example.bookchat.ui.customview.AntiDupClickImageButton
+        <com.kova700.core.design_system.customview.AntiDupClickImageButton
             android:id="@+id/channel_search_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

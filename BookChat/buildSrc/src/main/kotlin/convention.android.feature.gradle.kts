@@ -9,10 +9,11 @@ android {
 	defaultConfig {
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 	}
+	buildFeatures.viewBinding = true
 }
 
 dependencies {
-//	implementation(project(":core:design-system"))
+	implementation(project(":core:design-system"))
 	implementation(libs.findLibrary("androidx-core").get())
 	implementation(libs.findBundle("androidx-lifecycle").get())
 	implementation(libs.findLibrary("appcompat").get())

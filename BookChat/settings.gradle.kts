@@ -18,3 +18,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "BookChat"
 include(":app")
+include(":core:design-system")

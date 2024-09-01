@@ -26,7 +26,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.example.bookchat.ui.customview.ViewPagerInnerRecyclerView
+    <com.kova700.core.design_system.customview.ViewPagerInnerRecyclerView
         android:id="@+id/bookshelf_wish_rcv"
         android:layout_width="0dp"
         android:layout_height="0dp"

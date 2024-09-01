@@ -18,7 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.example.bookchat.ui.customview.AntiDupClickImageButton
+        <com.kova700.core.design_system.customview.AntiDupClickImageButton
             android:id="@+id/back_btn"
             android:layout_width="35dp"
             android:layout_height="35dp"

@@ -28,7 +28,7 @@
         android:visibility="gone"
         app:constraint_referenced_ids="crop_cancel_btn, crop_finish_btn" />
 
-    <com.example.bookchat.ui.customview.AntiDupClickImageButton
+    <com.kova700.core.design_system.customview.AntiDupClickImageButton
         android:id="@+id/crop_cancel_btn"
         android:layout_width="25dp"
         android:layout_height="25dp"
@@ -39,7 +39,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.example.bookchat.ui.customview.AntiDupClickImageButton
+    <com.kova700.core.design_system.customview.AntiDupClickImageButton
         android:id="@+id/back_btn"
         android:layout_width="25dp"
         android:layout_height="25dp"
@@ -80,7 +80,7 @@
         app:layout_constraintEnd_toEndOf="@+id/image_crop_header"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.example.bookchat.ui.customview.AntiDupClickImageButton
+    <com.kova700.core.design_system.customview.AntiDupClickImageButton
         android:id="@+id/crop_finish_btn"
         android:layout_width="25dp"
         android:layout_height="25dp"
@@ -107,7 +107,7 @@
             android:paddingHorizontal="10dp"
             android:paddingVertical="3dp">
 
-            <com.example.bookchat.ui.customview.AntiDupClickImageButton
+            <com.kova700.core.design_system.customview.AntiDupClickImageButton
                 android:id="@+id/img_crop_btn"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
@@ -118,7 +118,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <com.example.bookchat.ui.customview.AntiDupClickImageButton
+            <com.kova700.core.design_system.customview.AntiDupClickImageButton
                 android:id="@+id/img_rotate_btn"
                 android:layout_width="30dp"
                 android:layout_height="30dp"

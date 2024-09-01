@@ -193,7 +193,6 @@ class SignUpActivity : AppCompatActivity() {
 
 	private fun getCroppedImageBitmap(uri: String) = lifecycleScope.launch {
 		signUpViewModel.onChangeUserProfile(uri)
-//		deleteImageCache(uri)
 	}
 
 	private fun moveToSelectTaste(event: SignUpEvent.MoveToSelectTaste) {

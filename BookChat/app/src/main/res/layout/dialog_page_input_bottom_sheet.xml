@@ -228,7 +228,7 @@
         app:layout_constraintTop_toBottomOf="@+id/input_button_six" />
 
 
-    <com.example.bookchat.ui.customview.AntiDupClickButton
+    <com.kova700.core.design_system.customview.AntiDupClickButton
         android:id="@+id/submit_button"
         android:layout_width="0dp"
         android:layout_height="0dp"

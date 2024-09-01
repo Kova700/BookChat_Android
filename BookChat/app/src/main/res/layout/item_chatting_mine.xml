@@ -53,7 +53,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/chatting_layout">
 
-            <com.example.bookchat.ui.customview.AntiDupClickImageButton
+            <com.kova700.core.design_system.customview.AntiDupClickImageButton
                 android:id="@+id/failed_chat_retry_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
                 app:layout_constraintStart_toEndOf="@+id/failed_chat_retry_btn"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <com.example.bookchat.ui.customview.AntiDupClickImageButton
+            <com.kova700.core.design_system.customview.AntiDupClickImageButton
                 android:id="@+id/failed_chat_delete_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -19,7 +19,7 @@
         android:orientation="vertical"
         app:layout_constraintGuide_begin="25dp" />
 
-    <com.example.bookchat.ui.customview.AntiDupClickImageButton
+    <com.kova700.core.design_system.customview.AntiDupClickImageButton
         android:id="@+id/back_btn"
         android:layout_width="35dp"
         android:layout_height="35dp"

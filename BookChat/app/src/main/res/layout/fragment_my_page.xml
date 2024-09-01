@@ -76,7 +76,7 @@
         app:layout_constraintStart_toStartOf="@+id/guideline_start"
         app:layout_constraintTop_toBottomOf="@+id/cardView6" />
 
-    <com.example.bookchat.ui.customview.AntiDupClickImageButton
+    <com.kova700.core.design_system.customview.AntiDupClickImageButton
         android:id="@+id/user_edit_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -159,43 +159,6 @@
         app:layout_constraintHorizontal_bias="0.8"
         app:layout_constraintStart_toEndOf="@+id/notice_btn"
         app:layout_constraintTop_toTopOf="@+id/notice_btn" />
-    <!--
-
-            <TextView
-                android:id="@+id/account_setting_btn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:fontFamily="@font/notosanskr_regular"
-                android:foreground="?android:selectableItemBackground"
-                android:paddingVertical="10dp"
-                android:paddingStart="30dp"
-                android:text="@string/account_setting"
-                android:textColor="#373737"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/notice_btn" />
-
-            <TextView
-                android:id="@+id/app_setting_btn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true"
-                android:fontFamily="@font/notosanskr_regular"
-                android:foreground="?android:selectableItemBackground"
-                android:paddingVertical="10dp"
-                android:paddingStart="30dp"
-                android:text="@string/app_setting"
-                android:textColor="#373737"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/account_setting_btn" />
-    -->
 
     <TextView
         android:id="@+id/terms_of_service_btn"
