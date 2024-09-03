@@ -1,14 +1,12 @@
-package com.example.bookchat.data.networkmanager.internal
+package com.kova700.bookchat.core.network_manager.internal
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.util.Log
-import com.example.bookchat.data.networkmanager.external.NetworkManager
-import com.example.bookchat.data.networkmanager.external.model.NetworkState
-import com.example.bookchat.utils.Constants.TAG
+import com.kova700.bookchat.core.network_manager.external.NetworkManager
+import com.kova700.bookchat.core.network_manager.external.model.NetworkState
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -54,11 +52,7 @@ class NetworkManagerImpl @Inject constructor(
 
 	private fun updateState() {
 		val networkCapabilities =
-			connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-		if (networkCapabilities == null){
-			Log.d(TAG, "NetworkManagerImpl: updateState() - networkCapabilities == null")
-			return
-		}
+			connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork) ?: return
 
 		val currentState = when {
 			networkCapabilities.isWIFIConnected()
@@ -67,10 +61,6 @@ class NetworkManagerImpl @Inject constructor(
 			else -> NetworkState.DISCONNECTED
 		}
 
-		Log.d(
-			TAG, "NetworkManagerImpl: updateState() - isWIFIConnected() : ${networkCapabilities.isWIFIConnected()} \n" +
-							"isDataConnected() : ${networkCapabilities.isMobileDataConnected()}"
-		)
 		_networkState.update { currentState }
 	}
 

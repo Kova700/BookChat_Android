@@ -1,7 +1,7 @@
-package com.example.bookchat.data.networkmanager.internal.di
+package com.kova700.bookchat.core.network_manager.internal.di
 
-import com.example.bookchat.data.networkmanager.external.NetworkManager
-import com.example.bookchat.data.networkmanager.internal.NetworkManagerImpl
+import com.kova700.bookchat.core.network_manager.external.NetworkManager
+import com.kova700.bookchat.core.network_manager.internal.NetworkManagerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
