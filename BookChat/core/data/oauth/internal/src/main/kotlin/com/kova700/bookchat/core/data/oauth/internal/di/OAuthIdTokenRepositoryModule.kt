@@ -1,7 +1,7 @@
-package com.example.bookchat.oauth.repository.internal.di
+package com.kova700.bookchat.core.data.oauth.internal.di
 
-import com.example.bookchat.oauth.repository.external.OAuthIdTokenRepository
-import com.example.bookchat.oauth.repository.internal.OAuthIdTokenRepositoryImpl
+import com.kova700.bookchat.core.data.oauth.external.OAuthIdTokenRepository
+import com.kova700.bookchat.core.data.oauth.internal.OAuthIdTokenRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

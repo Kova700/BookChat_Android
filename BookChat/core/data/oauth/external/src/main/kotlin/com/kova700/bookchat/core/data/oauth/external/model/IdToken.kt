@@ -1,6 +1,6 @@
-package com.example.bookchat.oauth.repository.external.model
+package com.kova700.bookchat.core.data.oauth.external.model
 
-import com.example.bookchat.oauth.oauthclient.external.model.OAuth2Provider
+import com.kova700.bookchat.core.oauth.external.model.OAuth2Provider
 
 data class IdToken(
 	val token: String,

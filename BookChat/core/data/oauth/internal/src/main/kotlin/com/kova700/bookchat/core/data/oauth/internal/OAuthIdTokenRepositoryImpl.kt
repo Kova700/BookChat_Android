@@ -1,7 +1,7 @@
-package com.example.bookchat.oauth.repository.internal
+package com.kova700.bookchat.core.data.oauth.internal
 
-import com.example.bookchat.oauth.repository.external.model.IdToken
-import com.example.bookchat.oauth.repository.external.OAuthIdTokenRepository
+import com.kova700.bookchat.core.data.oauth.external.OAuthIdTokenRepository
+import com.kova700.bookchat.core.data.oauth.external.model.IdToken
 import java.io.IOException
 import javax.inject.Inject
 
