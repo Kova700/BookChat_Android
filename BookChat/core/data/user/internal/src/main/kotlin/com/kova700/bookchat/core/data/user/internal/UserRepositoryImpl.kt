@@ -1,11 +1,11 @@
-package com.example.bookchat.data.repository
+package com.kova700.bookchat.core.data.user.internal
 
-import com.example.bookchat.data.database.dao.UserDAO
-import com.example.bookchat.data.mapper.toUser
-import com.example.bookchat.data.mapper.toUserEntity
-import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.domain.model.User
-import com.example.bookchat.domain.repository.UserRepository
+import com.kova700.bookchat.core.data.user.external.model.User
+import com.kova700.bookchat.core.data.user.external.repository.UserRepository
+import com.kova700.bookchat.core.database.chatting.external.user.UserDAO
+import com.kova700.bookchat.core.network.bookchat.BookChatApi
+import toUser
+import toUserEntity
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(

@@ -1,7 +1,7 @@
-package com.example.bookchat.data.mapper
+package com.kova700.bookchat.core.data.user.internal.mapper
 
-import com.example.bookchat.data.network.model.UserDefaultProfileTypeNetwork
-import com.example.bookchat.domain.model.UserDefaultProfileType
+import com.kova700.bookchat.core.network.bookchat.model.both.UserDefaultProfileTypeNetwork
+import com.kova700.bookchat.core.data.user.external.model.UserDefaultProfileType
 
 fun UserDefaultProfileTypeNetwork.toDomain(): UserDefaultProfileType {
 	return UserDefaultProfileType.valueOf(name)

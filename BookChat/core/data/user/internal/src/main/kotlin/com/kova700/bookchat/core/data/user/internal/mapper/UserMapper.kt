@@ -1,8 +1,7 @@
-package com.example.bookchat.data.mapper
-
-import com.example.bookchat.data.database.model.UserEntity
-import com.example.bookchat.data.network.model.response.UserResponse
-import com.example.bookchat.domain.model.User
+import com.kova700.bookchat.core.data.user.external.model.User
+import com.kova700.bookchat.core.data.user.internal.mapper.toDomain
+import com.kova700.bookchat.core.database.chatting.external.user.model.UserEntity
+import com.kova700.bookchat.core.network.bookchat.model.response.UserResponse
 
 fun User.toUserEntity(): UserEntity {
 	return UserEntity(

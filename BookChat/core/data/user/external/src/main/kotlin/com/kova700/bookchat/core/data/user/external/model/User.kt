@@ -1,10 +1,10 @@
-package com.example.bookchat.domain.model
+package com.kova700.bookchat.core.data.user.external.model
 
 data class User(
 	val id: Long,
 	val nickname: String,
 	val profileImageUrl: String?,
-	val defaultProfileImageType: UserDefaultProfileType
+	val defaultProfileImageType: UserDefaultProfileType,
 ) {
 	companion object {
 		val Default = User(

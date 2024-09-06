@@ -1,6 +1,6 @@
-package com.example.bookchat.domain.repository
+package com.kova700.bookchat.core.data.user.external.repository
 
-import com.example.bookchat.domain.model.User
+import com.kova700.bookchat.core.data.user.external.model.User
 
 interface UserRepository {
 	suspend fun getUser(userId: Long): User
