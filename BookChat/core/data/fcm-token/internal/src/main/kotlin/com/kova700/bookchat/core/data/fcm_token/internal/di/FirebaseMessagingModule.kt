@@ -1,4 +1,4 @@
-package com.example.bookchat.fcm.repository.internal.di
+package com.kova700.bookchat.core.data.fcm_token.internal.di
 
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.Module

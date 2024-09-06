@@ -1,9 +1,8 @@
-package com.example.bookchat.fcm.repository.internal.di
+package com.kova700.bookchat.core.data.fcm_token.internal.di
 
-import com.example.bookchat.fcm.repository.external.FCMTokenRepository
-import com.example.bookchat.fcm.repository.internal.FCMTokenRepositoryImpl
+import com.kova700.bookchat.core.data.fcm_token.external.FCMTokenRepository
+import com.kova700.bookchat.core.data.fcm_token.internal.FCMTokenRepositoryImpl
 import dagger.Binds
-import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
@@ -15,5 +14,5 @@ interface FCMTokenRepositoryModule {
 	@Singleton
 	fun bindFCMTokenRepository(
 		repository: FCMTokenRepositoryImpl,
-	): FCMTokenRepository
+	): com.kova700.bookchat.core.data.fcm_token.external.FCMTokenRepository
 }

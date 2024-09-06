@@ -1,9 +1,9 @@
-package com.example.bookchat.fcm.repository.internal
+package com.kova700.bookchat.core.data.fcm_token.internal
 
-import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.fcm.repository.external.FCMTokenRepository
-import com.example.bookchat.fcm.repository.external.model.FCMToken
 import com.google.firebase.messaging.FirebaseMessaging
+import com.kova700.bookchat.core.data.fcm_token.external.FCMTokenRepository
+import com.kova700.bookchat.core.data.fcm_token.external.model.FCMToken
+import com.kova700.bookchat.core.network.bookchat.BookChatApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
 import kotlin.coroutines.resume
@@ -29,7 +29,11 @@ class FCMTokenRepositoryImpl @Inject constructor(
 				if (task.isSuccessful.not()) continuation.resumeWithException(
 					task.exception ?: Exception("Failed to retrieve FCM token")
 				)
-				else continuation.resume(FCMToken(task.result))
+				else continuation.resume(
+					FCMToken(
+						task.result
+					)
+				)
 			}
 		}
 	}
