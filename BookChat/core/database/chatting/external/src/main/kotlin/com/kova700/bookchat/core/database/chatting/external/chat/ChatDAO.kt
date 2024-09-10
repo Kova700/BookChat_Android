@@ -1,16 +1,16 @@
-package com.example.bookchat.data.database.dao
+package com.kova700.bookchat.core.database.chatting.external.chat
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.example.bookchat.data.database.model.CHAT_ENTITY_TABLE_NAME
-import com.example.bookchat.data.database.model.ChatEntity
-import com.example.bookchat.data.database.model.combined.ChatWithUser
-import com.example.bookchat.domain.model.ChatStatus
-import com.example.bookchat.domain.model.SUCCESS_CHAT_STATUS_CODE
-import com.example.bookchat.utils.getCurrentDateTimeString
+import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
+import com.kova700.bookchat.core.data.chat.external.model.SUCCESS_CHAT_STATUS_CODE
+import com.kova700.bookchat.core.database.chatting.external.chat.model.CHAT_ENTITY_TABLE_NAME
+import com.kova700.bookchat.core.database.chatting.external.chat.model.ChatEntity
+import com.kova700.bookchat.core.database.chatting.external.combined.ChatWithUser
+import com.kova700.bookchat.util.date.getCurrentDateTimeString
 
 @Dao
 interface ChatDAO {

@@ -1,10 +1,10 @@
-package com.example.bookchat.data.database.model
+package com.kova700.bookchat.core.database.chatting.external.chat.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.example.bookchat.domain.model.ChatStatus
+import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
 
 @Entity(
 	tableName = CHAT_ENTITY_TABLE_NAME,

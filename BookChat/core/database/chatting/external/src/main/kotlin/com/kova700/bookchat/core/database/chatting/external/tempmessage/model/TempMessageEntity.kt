@@ -1,9 +1,10 @@
-package com.example.bookchat.data.database.model
+package com.kova700.bookchat.core.database.chatting.external.tempmessage.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.kova700.bookchat.core.database.chatting.external.channel.model.ChannelEntity
 
 @Entity(
 	tableName = TEMP_MESSAGE_TABLE_NAME, foreignKeys = [ForeignKey(

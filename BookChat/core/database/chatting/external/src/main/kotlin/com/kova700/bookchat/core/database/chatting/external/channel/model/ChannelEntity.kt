@@ -1,10 +1,10 @@
-package com.example.bookchat.data.database.model
+package com.kova700.bookchat.core.database.chatting.external.channel.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.bookchat.domain.model.ChannelDefaultImageType
-import com.example.bookchat.domain.model.ChannelMemberAuthority
+import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
+import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 
 // TODO : last_read_chat_id를 이용한 읽지 않은 채팅 수는 추후 업데이트
 @Entity(tableName = CHANNEL_ENTITY_TABLE_NAME)
@@ -32,4 +32,5 @@ data class ChannelEntity(
 	@ColumnInfo(name = "book_authors") val bookAuthors: List<String>? = null,
 	@ColumnInfo(name = "book_cover_image_url") val bookCoverImageUrl: String? = null,
 )
+
 const val CHANNEL_ENTITY_TABLE_NAME = "Channel"

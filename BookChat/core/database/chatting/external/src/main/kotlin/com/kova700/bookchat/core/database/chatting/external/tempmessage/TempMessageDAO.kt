@@ -1,11 +1,11 @@
-package com.example.bookchat.data.database.dao
+package com.kova700.bookchat.core.database.chatting.external.tempmessage
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.bookchat.data.database.model.TEMP_MESSAGE_TABLE_NAME
-import com.example.bookchat.data.database.model.TempMessageEntity
+import com.kova700.bookchat.core.database.chatting.external.tempmessage.model.TEMP_MESSAGE_TABLE_NAME
+import com.kova700.bookchat.core.database.chatting.external.tempmessage.model.TempMessageEntity
 
 @Dao
 interface TempMessageDAO {

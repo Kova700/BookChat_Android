@@ -1,7 +1,7 @@
-package com.example.bookchat.data.database.typeconverter
+package com.kova700.bookchat.database.chatting.internal.typeconverter
 
 import androidx.room.TypeConverter
-import com.example.bookchat.domain.model.ChatStatus
+import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
 
 class ChatStatusTypeConverter {
 	@TypeConverter

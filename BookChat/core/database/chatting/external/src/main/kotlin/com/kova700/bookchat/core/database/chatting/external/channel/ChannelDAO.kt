@@ -1,13 +1,13 @@
-package com.example.bookchat.data.database.dao
+package com.kova700.bookchat.core.database.chatting.external.channel
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.bookchat.data.database.model.CHANNEL_ENTITY_TABLE_NAME
-import com.example.bookchat.data.database.model.ChannelEntity
-import com.example.bookchat.domain.model.ChannelDefaultImageType
-import com.example.bookchat.domain.model.ChannelMemberAuthority
+import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
+import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
+import com.kova700.bookchat.core.database.chatting.external.channel.model.CHANNEL_ENTITY_TABLE_NAME
+import com.kova700.bookchat.core.database.chatting.external.channel.model.ChannelEntity
 
 @Dao
 interface ChannelDAO {
