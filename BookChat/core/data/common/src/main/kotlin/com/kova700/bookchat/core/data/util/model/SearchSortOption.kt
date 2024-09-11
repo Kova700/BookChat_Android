@@ -1,4 +1,4 @@
-package com.example.bookchat.domain.model
+package com.kova700.bookchat.core.data.util.model
 
 enum class SearchSortOption {
 	ID_DESC,            //ID기준 내림차순 (=최신순)

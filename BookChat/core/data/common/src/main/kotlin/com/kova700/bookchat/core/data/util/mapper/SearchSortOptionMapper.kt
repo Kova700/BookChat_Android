@@ -1,7 +1,7 @@
-package com.example.bookchat.data.mapper
+package com.kova700.bookchat.core.data.util.mapper
 
-import com.example.bookchat.data.network.model.SearchSortOptionNetwork
-import com.example.bookchat.domain.model.SearchSortOption
+import com.kova700.bookchat.core.data.util.model.SearchSortOption
+import com.kova700.bookchat.core.network.bookchat.model.both.SearchSortOptionNetwork
 
 fun SearchSortOption.toNetwork(): SearchSortOptionNetwork {
 	return SearchSortOptionNetwork.valueOf(name)
