@@ -1,15 +1,15 @@
-package com.example.bookchat.data.repository
+package com.kova700.bookchat.core.data.agony.internal
 
-import com.example.bookchat.data.mapper.toAgony
-import com.example.bookchat.data.mapper.toNetWork
-import com.example.bookchat.data.mapper.toNetwork
-import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.network.model.request.RequestMakeAgony
-import com.example.bookchat.data.network.model.request.RequestReviseAgony
-import com.example.bookchat.domain.model.Agony
-import com.example.bookchat.domain.model.AgonyFolderHexColor
-import com.example.bookchat.domain.model.SearchSortOption
-import com.example.bookchat.domain.repository.AgonyRepository
+import com.kova700.bookchat.core.data.agony.external.AgonyRepository
+import com.kova700.bookchat.core.data.agony.external.model.Agony
+import com.kova700.bookchat.core.data.agony.external.model.AgonyFolderHexColor
+import com.kova700.bookchat.core.data.agony.internal.mapper.toAgony
+import com.kova700.bookchat.core.data.agony.internal.mapper.toNetWork
+import com.kova700.bookchat.core.data.util.mapper.toNetwork
+import com.kova700.bookchat.core.data.util.model.SearchSortOption
+import com.kova700.bookchat.core.network.bookchat.BookChatApi
+import com.kova700.bookchat.core.network.bookchat.model.request.RequestMakeAgony
+import com.kova700.bookchat.core.network.bookchat.model.request.RequestReviseAgony
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map

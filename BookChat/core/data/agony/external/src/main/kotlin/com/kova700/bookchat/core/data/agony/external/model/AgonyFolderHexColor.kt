@@ -1,4 +1,4 @@
-package com.example.bookchat.domain.model
+package com.kova700.bookchat.core.data.agony.external.model
 
 enum class AgonyFolderHexColor(val hexcolor: String) {
 	WHITE("#F6F6F6"),

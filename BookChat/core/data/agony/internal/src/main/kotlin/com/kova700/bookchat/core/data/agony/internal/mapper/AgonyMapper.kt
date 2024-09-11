@@ -1,9 +1,9 @@
-package com.example.bookchat.data.mapper
+package com.kova700.bookchat.core.data.agony.internal.mapper
 
-import com.example.bookchat.data.network.model.AgonyFolderHexColorNetwork
-import com.example.bookchat.data.network.model.response.AgonyResponse
-import com.example.bookchat.domain.model.Agony
-import com.example.bookchat.domain.model.AgonyFolderHexColor
+import com.kova700.bookchat.core.data.agony.external.model.Agony
+import com.kova700.bookchat.core.data.agony.external.model.AgonyFolderHexColor
+import com.kova700.bookchat.core.network.bookchat.model.both.AgonyFolderHexColorNetwork
+import com.kova700.bookchat.core.network.bookchat.model.response.AgonyResponse
 
 fun AgonyResponse.toAgony(): Agony {
 	return Agony(

@@ -1,8 +1,8 @@
-package com.example.bookchat.domain.repository
+package com.kova700.bookchat.core.data.agony.external
 
-import com.example.bookchat.domain.model.Agony
-import com.example.bookchat.domain.model.AgonyFolderHexColor
-import com.example.bookchat.domain.model.SearchSortOption
+import com.kova700.bookchat.core.data.agony.external.model.Agony
+import com.kova700.bookchat.core.data.agony.external.model.AgonyFolderHexColor
+import com.kova700.bookchat.core.data.util.model.SearchSortOption
 import kotlinx.coroutines.flow.Flow
 
 interface AgonyRepository {
