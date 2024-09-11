@@ -1,6 +1,6 @@
-package com.example.bookchat.domain.repository
+package com.kova700.core.data.bookreport.external
 
-import com.example.bookchat.domain.model.BookReport
+import com.kova700.core.data.bookreport.external.model.BookReport
 import kotlinx.coroutines.flow.Flow
 
 interface BookReportRepository {

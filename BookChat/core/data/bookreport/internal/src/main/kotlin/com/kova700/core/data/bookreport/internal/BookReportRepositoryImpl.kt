@@ -1,12 +1,11 @@
-package com.example.bookchat.data.repository
+package com.kova700.core.data.bookreport.internal
 
-import com.example.bookchat.data.mapper.toDomain
-import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.network.model.request.RequestRegisterBookReport
-import com.example.bookchat.data.network.model.response.BookReportDoseNotExistException
-import com.example.bookchat.data.network.model.response.ResponseBodyEmptyException
-import com.example.bookchat.domain.model.BookReport
-import com.example.bookchat.domain.repository.BookReportRepository
+import com.kova700.bookchat.core.network.bookchat.BookChatApi
+import com.kova700.bookchat.core.network.bookchat.model.request.RequestRegisterBookReport
+import com.kova700.core.data.bookreport.external.BookReportRepository
+import com.kova700.core.data.bookreport.external.model.BookReport
+import com.kova700.core.data.bookreport.external.model.BookReportDoseNotExistException
+import com.kova700.core.data.bookreport.internal.mapper.toDomain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
@@ -31,8 +30,7 @@ class BookReportRepositoryImpl @Inject constructor(
 		val response = bookChatApi.getBookReport(bookShelfId)
 		when (response.code()) {
 			200 -> {
-				val bookReportResult =
-					response.body() ?: throw ResponseBodyEmptyException("response body is null")
+				val bookReportResult = response.body() ?: return
 				val bookReport = bookReportResult.toDomain()
 				setBookReports(bookReports.value + (bookShelfId to bookReport))
 			}

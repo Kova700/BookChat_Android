@@ -1,4 +1,4 @@
-package com.example.bookchat.domain.model
+package com.kova700.core.data.bookreport.external.model
 
 data class BookReport(
 	val reportTitle: String,
