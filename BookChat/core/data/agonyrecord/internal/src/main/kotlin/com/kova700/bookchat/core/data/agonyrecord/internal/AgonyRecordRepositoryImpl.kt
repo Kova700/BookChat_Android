@@ -1,13 +1,13 @@
-package com.example.bookchat.data.repository
+package com.kova700.bookchat.core.data.agonyrecord.internal
 
-import com.example.bookchat.data.mapper.toAgonyRecord
-import com.example.bookchat.data.mapper.toNetwork
-import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.network.model.request.RequestMakeAgonyRecord
-import com.example.bookchat.data.network.model.request.RequestReviseAgonyRecord
-import com.example.bookchat.domain.model.AgonyRecord
-import com.example.bookchat.domain.model.SearchSortOption
-import com.example.bookchat.domain.repository.AgonyRecordRepository
+import com.kova700.bookchat.core.data.agonyrecord.external.AgonyRecordRepository
+import com.kova700.bookchat.core.data.agonyrecord.external.model.AgonyRecord
+import com.kova700.bookchat.core.data.agonyrecord.internal.mapper.toAgonyRecord
+import com.kova700.bookchat.core.data.util.mapper.toNetwork
+import com.kova700.bookchat.core.data.util.model.SearchSortOption
+import com.kova700.bookchat.core.network.bookchat.BookChatApi
+import com.kova700.bookchat.core.network.bookchat.model.request.RequestMakeAgonyRecord
+import com.kova700.bookchat.core.network.bookchat.model.request.RequestReviseAgonyRecord
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map

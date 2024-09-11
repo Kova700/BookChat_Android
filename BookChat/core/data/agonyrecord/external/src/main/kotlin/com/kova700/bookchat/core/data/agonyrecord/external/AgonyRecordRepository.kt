@@ -1,7 +1,7 @@
-package com.example.bookchat.domain.repository
+package com.kova700.bookchat.core.data.agonyrecord.external
 
-import com.example.bookchat.domain.model.AgonyRecord
-import com.example.bookchat.domain.model.SearchSortOption
+import com.kova700.bookchat.core.data.agonyrecord.external.model.AgonyRecord
+import com.kova700.bookchat.core.data.util.model.SearchSortOption
 import kotlinx.coroutines.flow.Flow
 
 interface AgonyRecordRepository {
