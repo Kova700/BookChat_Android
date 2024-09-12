@@ -1,8 +1,8 @@
-package com.example.bookchat.data.mapper
+package com.kova700.bookchat.core.data.search.book.internal.mapper
 
-import com.example.bookchat.data.network.model.request.BookRequest
-import com.example.bookchat.data.network.model.response.BookSearchResponse
-import com.example.bookchat.domain.model.Book
+import com.kova700.bookchat.core.data.search.book.external.model.Book
+import com.kova700.bookchat.core.network.bookchat.model.request.BookRequest
+import com.kova700.bookchat.core.network.bookchat.model.response.BookSearchResponse
 
 fun BookSearchResponse.toBook(): Book {
 	return Book(

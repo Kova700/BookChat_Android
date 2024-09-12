@@ -1,4 +1,4 @@
-package com.example.bookchat.domain.model
+package com.kova700.bookchat.core.data.search.book.external.model
 
 data class Book(
 	val isbn: String,

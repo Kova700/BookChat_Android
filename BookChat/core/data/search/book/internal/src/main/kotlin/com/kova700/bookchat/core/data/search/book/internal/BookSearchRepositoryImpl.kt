@@ -1,11 +1,11 @@
-package com.example.bookchat.data.repository
+package com.kova700.bookchat.core.data.search.book.internal
 
-import com.example.bookchat.data.mapper.toBook
-import com.example.bookchat.data.mapper.toNetWork
-import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.domain.model.Book
-import com.example.bookchat.domain.model.BookSearchSortOption
-import com.example.bookchat.domain.repository.BookSearchRepository
+import com.kova700.bookchat.core.data.search.book.external.BookSearchRepository
+import com.kova700.bookchat.core.data.search.book.external.model.Book
+import com.kova700.bookchat.core.data.search.book.external.model.BookSearchSortOption
+import com.kova700.bookchat.core.data.search.book.internal.mapper.toBook
+import com.kova700.bookchat.core.data.search.book.internal.mapper.toNetWork
+import com.kova700.bookchat.core.network.bookchat.BookChatApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull

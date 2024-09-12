@@ -1,7 +1,7 @@
-package com.example.bookchat.domain.repository
+package com.kova700.bookchat.core.data.search.book.external
 
-import com.example.bookchat.domain.model.Book
-import com.example.bookchat.domain.model.BookSearchSortOption
+import com.kova700.bookchat.core.data.search.book.external.model.Book
+import com.kova700.bookchat.core.data.search.book.external.model.BookSearchSortOption
 import kotlinx.coroutines.flow.Flow
 
 interface BookSearchRepository {
@@ -14,10 +14,9 @@ interface BookSearchRepository {
 	): List<Book>
 
 	fun getCachedBook(isbn: String): Book
+	fun clear()
 
 	companion object {
 		private const val SEARCH_BOOKS_LOAD_SIZE = 30
 	}
-
-	fun clear()
 }
