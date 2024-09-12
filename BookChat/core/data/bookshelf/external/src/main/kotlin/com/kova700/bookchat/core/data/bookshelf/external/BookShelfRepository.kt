@@ -1,11 +1,11 @@
-package com.example.bookchat.domain.repository
+package com.kova700.bookchat.core.data.bookshelf.external
 
-import com.example.bookchat.domain.model.Book
-import com.example.bookchat.domain.model.BookShelfItem
-import com.example.bookchat.domain.model.BookShelfState
-import com.example.bookchat.domain.model.BookStateInBookShelf
-import com.example.bookchat.domain.model.SearchSortOption
-import com.example.bookchat.domain.model.StarRating
+import com.kova700.bookchat.core.data.bookshelf.external.model.BookShelfItem
+import com.kova700.bookchat.core.data.bookshelf.external.model.BookShelfState
+import com.kova700.bookchat.core.data.bookshelf.external.model.BookStateInBookShelf
+import com.kova700.bookchat.core.data.bookshelf.external.model.StarRating
+import com.kova700.bookchat.core.data.search.book.external.model.Book
+import com.kova700.bookchat.core.data.util.model.SearchSortOption
 import kotlinx.coroutines.flow.Flow
 
 interface BookShelfRepository {
@@ -45,5 +45,4 @@ interface BookShelfRepository {
 		private const val BOOKSHELF_ITEM_LOAD_SIZE = 20
 		const val BOOKSHELF_ITEM_FIRST_PAGE = 0L
 	}
-
 }

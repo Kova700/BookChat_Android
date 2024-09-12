@@ -1,5 +1,6 @@
-package com.example.bookchat.domain.model
+package com.kova700.bookchat.core.data.bookshelf.external.model
 
+import com.kova700.bookchat.core.data.search.book.external.model.Book
 import java.util.Date
 
 data class BookShelfItem(
