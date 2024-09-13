@@ -1,4 +1,8 @@
-package com.example.bookchat.domain.model
+package com.kova700.bookchat.core.data.search.channel.external.model
+
+import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
+import com.kova700.bookchat.core.data.chat.external.model.Chat
+import com.kova700.bookchat.core.data.user.external.model.User
 
 /** isEntered 유무 확인을 위해서 Channel 클래스와 구분 */
 data class ChannelSearchResult(

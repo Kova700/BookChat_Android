@@ -3,9 +3,9 @@ package com.kova700.bookchat.core.data.search.book.internal
 import com.kova700.bookchat.core.data.search.book.external.BookSearchRepository
 import com.kova700.bookchat.core.data.search.book.external.model.Book
 import com.kova700.bookchat.core.data.search.book.external.model.BookSearchSortOption
-import com.kova700.bookchat.core.data.search.book.internal.mapper.toBook
-import com.kova700.bookchat.core.data.search.book.internal.mapper.toNetWork
-import com.kova700.bookchat.core.network.bookchat.BookChatApi
+import com.kova700.bookchat.core.network.bookchat.search.SearchApi
+import com.kova700.bookchat.core.network.bookchat.search.model.book.mapper.toBook
+import com.kova700.bookchat.core.network.bookchat.search.model.book.mapper.toNetWork
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class BookSearchRepositoryImpl @Inject constructor(
-	private val bookChatApi: BookChatApi,
+	private val searchApi: SearchApi,
 ) : BookSearchRepository {
 	private val mapBooks = MutableStateFlow<Map<String, Book>>(emptyMap())//(isbn, Book)
 	private val books = mapBooks.map { it.values.toList() }.filterNotNull()
@@ -39,7 +39,7 @@ class BookSearchRepositoryImpl @Inject constructor(
 		}
 		if (isEndPage) return books.firstOrNull() ?: emptyList()
 
-		val response = bookChatApi.getBookSearchResult(
+		val response = searchApi.getBookSearchResult(
 			query = keyword,
 			size = loadSize,
 			page = currentPage,

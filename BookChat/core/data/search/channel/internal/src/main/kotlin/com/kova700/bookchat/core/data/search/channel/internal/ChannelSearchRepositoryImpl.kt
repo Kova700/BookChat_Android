@@ -1,17 +1,16 @@
-package com.example.bookchat.data.repository
+package com.kova700.bookchat.core.data.search.channel.internal
 
-import com.example.bookchat.data.mapper.toChannelSearchResult
-import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.network.model.request.RequestGetSearchedChannels
-import com.example.bookchat.domain.model.ChannelSearchResult
-import com.example.bookchat.domain.model.SearchFilter
-import com.example.bookchat.domain.model.SearchFilter.BOOK_ISBN
-import com.example.bookchat.domain.model.SearchFilter.BOOK_TITLE
-import com.example.bookchat.domain.model.SearchFilter.ROOM_NAME
-import com.example.bookchat.domain.model.SearchFilter.ROOM_TAGS
-import com.example.bookchat.domain.repository.ChannelSearchRepository
-import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.repository.UserRepository
+import com.kova700.bookchat.core.data.search.channel.external.ChannelSearchRepository
+import com.kova700.bookchat.core.data.search.channel.external.model.ChannelSearchResult
+import com.kova700.bookchat.core.data.search.channel.external.model.SearchFilter
+import com.kova700.bookchat.core.data.search.channel.external.model.SearchFilter.BOOK_ISBN
+import com.kova700.bookchat.core.data.search.channel.external.model.SearchFilter.BOOK_TITLE
+import com.kova700.bookchat.core.data.search.channel.external.model.SearchFilter.ROOM_NAME
+import com.kova700.bookchat.core.data.search.channel.external.model.SearchFilter.ROOM_TAGS
+import com.kova700.bookchat.core.data.user.external.repository.UserRepository
+import com.kova700.bookchat.core.network.bookchat.search.SearchApi
+import com.kova700.bookchat.core.network.bookchat.search.model.channel.mapper.toChannelSearchResult
+import com.kova700.bookchat.core.network.bookchat.search.model.channel.request.RequestGetSearchedChannels
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -22,8 +21,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class ChannelSearchRepositoryImpl @Inject constructor(
-	private val bookChatApi: BookChatApi,
-	private val clientRepository: ClientRepository,
+	private val searchApi: SearchApi,
 	private val userRepository: UserRepository,
 ) : ChannelSearchRepository {
 
@@ -56,7 +54,7 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 			searchFilter = searchFilter
 		)
 
-		val response = bookChatApi.getSearchedChannels(
+		val response = searchApi.getSearchedChannels(
 			postCursorId = currentPage,
 			size = size,
 			roomName = requestGetSearchedChannels.roomName,
