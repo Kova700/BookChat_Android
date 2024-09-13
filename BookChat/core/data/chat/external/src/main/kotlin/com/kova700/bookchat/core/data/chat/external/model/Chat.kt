@@ -1,12 +1,12 @@
-package com.example.bookchat.domain.model
+package com.kova700.bookchat.core.data.chat.external.model
 
-import com.example.bookchat.domain.model.ChatStatus.SUCCESS
+import com.kova700.bookchat.core.data.user.external.model.User
 
 data class Chat(
 	val chatId: Long,
 	val channelId: Long,
 	val message: String,
-	val status: ChatStatus = SUCCESS,
+	val status: ChatStatus = ChatStatus.SUCCESS,
 	val dispatchTime: String,
 	val sender: User?,
 ) {

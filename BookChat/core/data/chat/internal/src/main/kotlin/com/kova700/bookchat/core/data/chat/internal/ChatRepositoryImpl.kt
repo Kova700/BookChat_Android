@@ -1,13 +1,14 @@
-package com.example.bookchat.data.repository
+package com.kova700.bookchat.core.data.chat.internal
 
-import com.example.bookchat.data.database.dao.ChatDAO
-import com.example.bookchat.data.mapper.toChat
-import com.example.bookchat.data.mapper.toChatEntity
-import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.network.model.SearchSortOptionNetwork
-import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.model.ChatStatus
-import com.example.bookchat.domain.repository.ChatRepository
+import com.kova700.bookchat.core.data.chat.external.model.Chat
+import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
+import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
+import com.kova700.bookchat.core.database.chatting.external.chat.ChatDAO
+import com.kova700.bookchat.core.database.chatting.external.chat.mapper.toChat
+import com.kova700.bookchat.core.database.chatting.external.chat.mapper.toChatEntity
+import com.kova700.bookchat.core.network.bookchat.chat.ChatApi
+import com.kova700.bookchat.core.network.bookchat.chat.model.mapper.toChat
+import com.kova700.bookchat.core.network.bookchat.common.model.SearchSortOptionNetwork
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +22,7 @@ import kotlin.math.pow
 import kotlin.time.Duration.Companion.seconds
 
 class ChatRepositoryImpl @Inject constructor(
-	private val bookChatApi: BookChatApi,
+	private val chatApi: ChatApi,
 	private val chatDAO: ChatDAO,
 ) : ChatRepository {
 	private val mapChats =
@@ -84,7 +85,7 @@ class ChatRepositoryImpl @Inject constructor(
 			}
 
 			runCatching {
-				bookChatApi.getChats(
+				chatApi.getChats(
 					roomId = channelId,
 					postCursorId = null,
 					size = ChatRepository.CHAT_DEFAULT_LOAD_SIZE,
@@ -111,7 +112,7 @@ class ChatRepositoryImpl @Inject constructor(
 		for (attempt in 0 until maxAttempts) {
 
 			runCatching {
-				bookChatApi.getChats(
+				chatApi.getChats(
 					roomId = channelId,
 					postCursorId = null,
 					size = size,
@@ -168,7 +169,7 @@ class ChatRepositoryImpl @Inject constructor(
 		size: Int,
 	) {
 
-		val response = bookChatApi.getChats(
+		val response = chatApi.getChats(
 			roomId = channelId,
 			postCursorId = baseChatId - 1,
 			size = size,
@@ -195,7 +196,7 @@ class ChatRepositoryImpl @Inject constructor(
 	override suspend fun getNewerChats(channelId: Long, size: Int) {
 		if (_isNewerChatFullyLoaded.value) return
 
-		val response = bookChatApi.getChats(
+		val response = chatApi.getChats(
 			roomId = channelId,
 			postCursorId = currentNewerChatPage,
 			size = size,
@@ -221,7 +222,7 @@ class ChatRepositoryImpl @Inject constructor(
 	override suspend fun getOlderChats(channelId: Long, size: Int) {
 		if (_isOlderChatFullyLoaded.value) return
 
-		val response = bookChatApi.getChats(
+		val response = chatApi.getChats(
 			roomId = channelId,
 			postCursorId = currentOlderChatPage,
 			size = size,
@@ -256,7 +257,7 @@ class ChatRepositoryImpl @Inject constructor(
 	}
 
 	private suspend fun getOnlineChat(chatId: Long): Chat {
-		return bookChatApi.getChat(chatId).toChat()
+		return chatApi.getChat(chatId).toChat()
 			.also { insertChat(it) }
 	}
 

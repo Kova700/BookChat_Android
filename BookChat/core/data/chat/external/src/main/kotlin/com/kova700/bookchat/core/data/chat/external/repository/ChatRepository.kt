@@ -1,7 +1,7 @@
-package com.example.bookchat.domain.repository
+package com.kova700.bookchat.core.data.chat.external.repository
 
-import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.model.ChatStatus
+import com.kova700.bookchat.core.data.chat.external.model.Chat
+import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 

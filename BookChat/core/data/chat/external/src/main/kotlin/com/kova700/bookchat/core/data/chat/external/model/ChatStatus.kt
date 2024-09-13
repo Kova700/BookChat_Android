@@ -1,4 +1,4 @@
-package com.example.bookchat.domain.model
+package com.kova700.bookchat.core.data.chat.external.model
 
 const val LOADING_CHAT_STATUS_CODE = -1
 const val RETRY_REQUIRED_CHAT_STATUS_CODE = 0
