@@ -1,11 +1,11 @@
-package com.example.bookchat.domain.usecase
+package com.kova700.core.domain.usecase.chat
 
-import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.model.ChatStatus
-import com.example.bookchat.domain.repository.ChannelRepository
-import com.example.bookchat.domain.repository.ChatRepository
-import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.repository.UserRepository
+import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
+import com.kova700.bookchat.core.data.chat.external.model.Chat
+import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
+import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
+import com.kova700.bookchat.core.data.client.external.ClientRepository
+import com.kova700.bookchat.core.data.user.external.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -26,7 +26,8 @@ class GetChatsFlowUseCase @Inject constructor(
 			channelId = channelId
 		).map { chats -> chats.map { it.attachUser() } }
 			.onEach { chats ->
-				val newestChatInList = chats.firstOrNull { chat -> chat.status == ChatStatus.SUCCESS }
+				val newestChatInList =
+					chats.firstOrNull { chat -> chat.status == ChatStatus.SUCCESS }
 				newestChatInList?.chatId?.let { chatId ->
 					channelRepository.updateChannelLastChatIfValid(channelId, chatId)
 					channelRepository.updateLastReadChatIdIfValid(channelId, chatId)

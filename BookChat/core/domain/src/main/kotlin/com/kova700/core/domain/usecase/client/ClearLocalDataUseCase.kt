@@ -1,21 +1,21 @@
-package com.example.bookchat.domain.usecase
+package com.kova700.core.domain.usecase.client
 
-import com.example.bookchat.domain.repository.AgonyRecordRepository
-import com.example.bookchat.domain.repository.AgonyRepository
+import com.kova700.bookchat.core.data.agony.external.AgonyRepository
+import com.kova700.bookchat.core.data.agonyrecord.external.AgonyRecordRepository
 import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
-import com.example.bookchat.domain.repository.BookSearchRepository
-import com.example.bookchat.domain.repository.BookShelfRepository
-import com.example.bookchat.domain.repository.ChannelRepository
-import com.example.bookchat.domain.repository.ChannelSearchRepository
-import com.example.bookchat.domain.repository.ChannelTempMessageRepository
-import com.example.bookchat.domain.repository.ChatRepository
-import com.kova700.core.data.notificationinfo.external.repository.ChattingNotificationInfoRepository
-import com.example.bookchat.domain.repository.ClientRepository
+import com.kova700.bookchat.core.data.bookshelf.external.BookShelfRepository
+import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
+import com.kova700.bookchat.core.data.channel.external.repository.ChannelTempMessageRepository
+import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
+import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.data.deviceinfo.external.DeviceIDRepository
-import com.example.bookchat.oauth.repository.external.OAuthIdTokenRepository
+import com.kova700.bookchat.core.data.oauth.external.OAuthIdTokenRepository
+import com.kova700.bookchat.core.data.search.book.external.BookSearchRepository
+import com.kova700.bookchat.core.data.search.channel.external.ChannelSearchRepository
+import com.kova700.bookchat.core.data.user.external.repository.UserRepository
+import com.kova700.bookchat.core.notification.chat.external.ChatNotificationHandler
+import com.kova700.core.data.notificationinfo.external.repository.ChattingNotificationInfoRepository
 import com.kova700.core.data.searchhistory.external.SearchHistoryRepository
-import com.example.bookchat.domain.repository.UserRepository
-import com.example.bookchat.notification.chat.ChatNotificationHandler
 import javax.inject.Inject
 
 class ClearLocalDataUseCase @Inject constructor(

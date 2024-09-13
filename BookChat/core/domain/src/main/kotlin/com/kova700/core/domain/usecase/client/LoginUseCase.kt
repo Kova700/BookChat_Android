@@ -1,10 +1,10 @@
-package com.example.bookchat.domain.usecase
+package com.kova700.core.domain.usecase.client
 
 import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
-import com.example.bookchat.domain.repository.ClientRepository
+import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.data.deviceinfo.external.DeviceIDRepository
-import com.example.bookchat.fcm.repository.external.FCMTokenRepository
-import com.example.bookchat.oauth.repository.external.OAuthIdTokenRepository
+import com.kova700.bookchat.core.data.fcm_token.external.FCMTokenRepository
+import com.kova700.bookchat.core.data.oauth.external.OAuthIdTokenRepository
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(

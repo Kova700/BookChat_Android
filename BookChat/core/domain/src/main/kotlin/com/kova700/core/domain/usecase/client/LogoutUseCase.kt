@@ -1,7 +1,7 @@
-package com.example.bookchat.domain.usecase
+package com.kova700.core.domain.usecase.client
 
-import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.fcm.repository.external.FCMTokenRepository
+import com.kova700.bookchat.core.data.client.external.ClientRepository
+import com.kova700.bookchat.core.data.fcm_token.external.FCMTokenRepository
 import javax.inject.Inject
 
 class LogoutUseCase @Inject constructor(

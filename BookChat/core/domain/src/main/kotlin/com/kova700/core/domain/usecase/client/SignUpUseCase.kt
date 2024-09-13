@@ -1,8 +1,8 @@
-package com.example.bookchat.domain.usecase
+package com.kova700.core.domain.usecase.client
 
-import com.example.bookchat.domain.model.ReadingTaste
-import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.oauth.repository.external.OAuthIdTokenRepository
+import com.kova700.bookchat.core.data.client.external.ClientRepository
+import com.kova700.bookchat.core.data.client.external.model.ReadingTaste
+import com.kova700.bookchat.core.data.oauth.external.OAuthIdTokenRepository
 import javax.inject.Inject
 
 class SignUpUseCase @Inject constructor(

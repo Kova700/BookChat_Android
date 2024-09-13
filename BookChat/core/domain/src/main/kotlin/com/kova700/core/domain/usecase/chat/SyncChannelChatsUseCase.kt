@@ -1,7 +1,7 @@
-package com.example.bookchat.domain.usecase
+package com.kova700.core.domain.usecase.chat
 
-import com.example.bookchat.domain.repository.ChannelRepository
-import com.example.bookchat.domain.repository.ChatRepository
+import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
+import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
 import javax.inject.Inject
 
 class SyncChannelChatsUseCase @Inject constructor(

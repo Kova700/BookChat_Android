@@ -1,9 +1,9 @@
-package com.example.bookchat.domain.usecase
+package com.kova700.core.domain.usecase.chat
 
-import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.repository.ChatRepository
-import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.repository.UserRepository
+import com.kova700.bookchat.core.data.chat.external.model.Chat
+import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
+import com.kova700.bookchat.core.data.client.external.ClientRepository
+import com.kova700.bookchat.core.data.user.external.repository.UserRepository
 import javax.inject.Inject
 
 class GetChatUseCase @Inject constructor(
