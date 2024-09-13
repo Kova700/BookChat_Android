@@ -1,10 +1,10 @@
-package com.example.bookchat.domain.repository
+package com.kova700.bookchat.core.data.client.external
 
 import com.kova700.bookchat.core.data.bookchat_token.external.model.BookChatToken
-import com.example.bookchat.fcm.repository.external.model.FCMToken
-import com.example.bookchat.domain.model.ReadingTaste
-import com.example.bookchat.domain.model.User
-import com.example.bookchat.oauth.repository.external.model.IdToken
+import com.kova700.bookchat.core.data.client.external.model.ReadingTaste
+import com.kova700.bookchat.core.data.fcm_token.external.model.FCMToken
+import com.kova700.bookchat.core.data.oauth.external.model.IdToken
+import com.kova700.bookchat.core.data.user.external.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface ClientRepository {

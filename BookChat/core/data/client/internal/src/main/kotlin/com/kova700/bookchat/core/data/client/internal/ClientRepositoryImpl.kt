@@ -1,22 +1,22 @@
-package com.example.bookchat.data.repository
+package com.kova700.bookchat.core.data.client.internal
 
-import com.example.bookchat.data.mapper.toBookChatToken
-import com.example.bookchat.data.mapper.toNetWork
-import com.example.bookchat.data.mapper.toNetwork
-import com.example.bookchat.data.mapper.toUser
-import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.network.model.request.RequestChangeUserNickname
-import com.example.bookchat.data.network.model.request.RequestUserLogin
-import com.example.bookchat.data.network.model.request.RequestUserSignUp
-import com.example.bookchat.data.network.model.response.NeedToDeviceWarningException
-import com.example.bookchat.data.network.model.response.NeedToSignUpException
 import com.kova700.bookchat.core.data.bookchat_token.external.model.BookChatToken
-import com.example.bookchat.fcm.repository.external.model.FCMToken
-import com.example.bookchat.domain.model.ReadingTaste
-import com.example.bookchat.domain.model.User
-import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.oauth.repository.external.model.IdToken
-import com.example.bookchat.utils.toMultiPartBody
+import com.kova700.bookchat.core.data.client.external.ClientRepository
+import com.kova700.bookchat.core.data.client.external.model.NeedToDeviceWarningException
+import com.kova700.bookchat.core.data.client.external.model.NeedToSignUpException
+import com.kova700.bookchat.core.data.client.external.model.ReadingTaste
+import com.kova700.bookchat.core.data.fcm_token.external.model.FCMToken
+import com.kova700.bookchat.core.data.oauth.external.model.IdToken
+import com.kova700.bookchat.core.data.user.external.model.User
+import com.kova700.bookchat.core.network.bookchat.client.ClientApi
+import com.kova700.bookchat.core.network.bookchat.client.model.mapper.toBookChatToken
+import com.kova700.bookchat.core.network.bookchat.client.model.mapper.toNetWork
+import com.kova700.bookchat.core.network.bookchat.client.model.mapper.toNetwork
+import com.kova700.bookchat.core.network.bookchat.client.model.request.RequestChangeUserNickname
+import com.kova700.bookchat.core.network.bookchat.client.model.request.RequestUserLogin
+import com.kova700.bookchat.core.network.bookchat.client.model.request.RequestUserSignUp
+import com.kova700.bookchat.core.network.bookchat.user.model.mapper.toUser
+import com.kova700.bookchat.util.multipart.toMultiPartBody
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class ClientRepositoryImpl @Inject constructor(
-	private val bookChatApi: BookChatApi,
+	private val clientApi: ClientApi,
 ) : ClientRepository {
 	private val client = MutableStateFlow<User?>(null)
 
@@ -47,7 +47,7 @@ class ClientRepositoryImpl @Inject constructor(
 			oauth2Provider = idToken.oAuth2Provider.toNetwork()
 		)
 
-		val response = bookChatApi.login(idToken.token, requestUserLogin)
+		val response = clientApi.login(idToken.token, requestUserLogin)
 		if (response.isSuccessful) response.body()?.toBookChatToken()?.let { return it }
 		when (response.code()) {
 			404 -> throw NeedToSignUpException(response.errorBody()?.string())
@@ -73,7 +73,7 @@ class ClientRepositoryImpl @Inject constructor(
 			readingTastes = readingTastes.map { it.toNetWork() },
 		)
 
-		bookChatApi.signUp(
+		clientApi.signUp(
 			idToken = idToken.token,
 			userProfileImage = userProfile?.toMultiPartBody(
 				contentType = CONTENT_TYPE_IMAGE_WEBP,
@@ -90,7 +90,7 @@ class ClientRepositoryImpl @Inject constructor(
 		newNickname: String,
 		userProfile: ByteArray?,
 	): User {
-		bookChatApi.changeUserProfile(
+		clientApi.changeUserProfile(
 			userProfileImage = userProfile?.toMultiPartBody(
 				contentType = CONTENT_TYPE_IMAGE_WEBP,
 				multipartName = PROFILE_IMAGE_MULTIPART_NAME,
@@ -99,18 +99,18 @@ class ClientRepositoryImpl @Inject constructor(
 			),
 			requestChangeUserNickname = RequestChangeUserNickname(nickname = newNickname)
 		)
-		return bookChatApi.getUserProfile().toUser()
+		return clientApi.getUserProfile().toUser()
 			.also { newClient -> client.update { newClient } }
 	}
 
 	override suspend fun renewBookChatToken(currentToken: BookChatToken): BookChatToken {
-		return bookChatApi.renewBookChatToken(currentToken.refreshToken).toBookChatToken()
+		return clientApi.renewBookChatToken(currentToken.refreshToken).toBookChatToken()
 	}
 
 	/** LogoutUsecase를 이용해 로컬 데이터 삭제가 필요함으로 해당 함수 단일로 호출 금지
 	 * (서버 FCM토큰 삭제용도로 사용)*/
 	override suspend fun logout() {
-		bookChatApi.logout()
+		clientApi.logout()
 	}
 
 	/** WithdrawUsecase를 이용해 로컬 데이터 삭제가 필요함으로 해당 함수 단일로 호출 금지 */
@@ -122,17 +122,17 @@ class ClientRepositoryImpl @Inject constructor(
 	//TODO : FCM은 또 이전 계정으로 계속 받아지고 있음
 	//TODO : 방장이 회원탈퇴해도 채팅방이 터지지 않고 남아있음
 	override suspend fun withdraw() {
-		bookChatApi.withdraw()
+		clientApi.withdraw()
 	}
 
 	override suspend fun getClientProfile(): User {
 		return client.firstOrNull()
-			?: bookChatApi.getUserProfile().toUser() //여까지 401 넘어온다는건 리프레시토큰마저 만료되었다는 뜻
-				.also { client.emit(it) }
+			?: clientApi.getUserProfile().toUser() //여까지 401 넘어온다는건 리프레시토큰마저 만료되었다는 뜻
+				.also { client.update { it } }
 	}
 
 	override suspend fun isDuplicatedUserNickName(nickName: String): Boolean {
-		val response = bookChatApi.requestNameDuplicateCheck(nickName)
+		val response = clientApi.requestNameDuplicateCheck(nickName)
 		return when (response.code()) {
 			200 -> false
 			409 -> true
