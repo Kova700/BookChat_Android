@@ -1,17 +1,17 @@
-package com.example.bookchat.notification.iconbuilder
+package com.kova700.bookchat.core.notification.util.iconbuilder
 
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.core.graphics.drawable.IconCompat
-import com.example.bookchat.utils.dpToPx
-import com.example.bookchat.utils.image.bitmap.getImageBitmap
+import com.kova700.bookchat.util.dp.dpToPx
+import com.kova700.bookchat.util.image.bitmap.getImageBitmap
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class IconBuilderImpl @Inject constructor(
+class IconBuilder @Inject constructor(
 	@ApplicationContext private val context: Context,
-) : IconBuilder {
-	override suspend fun buildIcon(
+) {
+	suspend fun buildIcon(
 		imageUrl: String?,
 		defaultImage: Bitmap,
 	): IconCompat {
