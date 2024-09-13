@@ -1,9 +1,9 @@
-package com.example.bookchat.domain.repository
+package com.kova700.bookchat.core.data.channel.external.repository
 
-import com.example.bookchat.domain.model.Book
-import com.example.bookchat.domain.model.Channel
-import com.example.bookchat.domain.model.ChannelDefaultImageType
-import com.example.bookchat.domain.model.ChannelMemberAuthority
+import com.kova700.bookchat.core.data.channel.external.model.Channel
+import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
+import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
+import com.kova700.bookchat.core.data.search.book.external.model.Book
 import kotlinx.coroutines.flow.Flow
 
 interface ChannelRepository {
@@ -11,7 +11,7 @@ interface ChannelRepository {
 	fun getChannelFlow(channelId: Long): Flow<Channel>
 
 	suspend fun getChannels(
-		loadSize: Int = REMOTE_CHANNELS_LOAD_SIZE
+		loadSize: Int = REMOTE_CHANNELS_LOAD_SIZE,
 	)
 
 	suspend fun getMostActiveChannels(
@@ -25,7 +25,7 @@ interface ChannelRepository {
 	suspend fun makeChannel(
 		channelTitle: String,
 		channelSize: Int,
-		defaultRoomImageType: ChannelDefaultImageType,
+		channelDefaultImageType: ChannelDefaultImageType,
 		channelTags: List<String>,
 		selectedBook: Book,
 		channelImage: ByteArray?,
@@ -97,10 +97,10 @@ interface ChannelRepository {
 
 	suspend fun updateChannelLastChatIfValid(channelId: Long, chatId: Long)
 
+	suspend fun clear()
+
 	companion object {
 		private const val REMOTE_CHANNELS_LOAD_SIZE = 15
 		private const val DEFAULT_RETRY_MAX_ATTEMPTS = 5
 	}
-
-	suspend fun clear()
 }

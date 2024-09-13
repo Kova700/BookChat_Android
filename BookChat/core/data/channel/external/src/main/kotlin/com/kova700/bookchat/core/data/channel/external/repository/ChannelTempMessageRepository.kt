@@ -1,4 +1,4 @@
-package com.example.bookchat.domain.repository
+package com.kova700.bookchat.core.data.channel.external.repository
 
 interface ChannelTempMessageRepository {
 	suspend fun getTempMessage(channelId: Long): String?

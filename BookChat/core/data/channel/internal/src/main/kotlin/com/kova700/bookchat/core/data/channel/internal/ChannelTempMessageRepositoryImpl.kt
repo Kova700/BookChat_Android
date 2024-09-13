@@ -1,8 +1,8 @@
-package com.example.bookchat.data.repository
+package com.kova700.bookchat.core.data.channel.internal
 
-import com.example.bookchat.data.database.dao.TempMessageDAO
-import com.example.bookchat.data.database.model.TempMessageEntity
-import com.example.bookchat.domain.repository.ChannelTempMessageRepository
+import com.kova700.bookchat.core.data.channel.external.repository.ChannelTempMessageRepository
+import com.kova700.bookchat.core.database.chatting.external.tempmessage.TempMessageDAO
+import com.kova700.bookchat.core.database.chatting.external.tempmessage.model.TempMessageEntity
 import javax.inject.Inject
 
 class ChannelTempMessageRepositoryImpl @Inject constructor(

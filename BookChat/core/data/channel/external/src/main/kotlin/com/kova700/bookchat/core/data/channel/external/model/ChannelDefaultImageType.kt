@@ -1,4 +1,4 @@
-package com.example.bookchat.domain.model
+package com.kova700.bookchat.core.data.channel.external.model
 
 import java.util.Random
 

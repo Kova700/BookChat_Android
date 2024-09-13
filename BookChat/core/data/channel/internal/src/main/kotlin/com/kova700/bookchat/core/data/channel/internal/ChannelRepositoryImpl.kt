@@ -1,28 +1,29 @@
-package com.example.bookchat.data.repository
+package com.kova700.bookchat.core.data.channel.internal
 
 import android.util.Log
-import com.example.bookchat.data.database.dao.ChannelDAO
-import com.example.bookchat.data.mapper.toBookRequest
-import com.example.bookchat.data.mapper.toChannel
-import com.example.bookchat.data.mapper.toChannelEntity
-import com.example.bookchat.data.mapper.toNetwork
-import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.network.model.ChannelMemberAuthorityNetwork
-import com.example.bookchat.data.network.model.request.RequestChangeChannelSetting
-import com.example.bookchat.data.network.model.request.RequestMakeChannel
-import com.example.bookchat.data.network.model.response.ChannelIsFullException
-import com.example.bookchat.data.network.model.response.FailResponseBody
-import com.example.bookchat.domain.model.Book
-import com.example.bookchat.domain.model.Channel
-import com.example.bookchat.domain.model.ChannelDefaultImageType
-import com.example.bookchat.domain.model.ChannelMemberAuthority
-import com.example.bookchat.domain.repository.ChannelRepository
-import com.example.bookchat.domain.repository.ChatRepository
-import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.repository.UserRepository
-import com.example.bookchat.utils.Constants.TAG
-import com.example.bookchat.utils.toMultiPartBody
-import com.google.gson.Gson
+import com.kova700.bookchat.core.data.channel.external.model.Channel
+import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
+import com.kova700.bookchat.core.data.channel.external.model.ChannelIsFullException
+import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
+import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
+import com.kova700.bookchat.core.data.channel.internal.mapper.toChannelEntity
+import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
+import com.kova700.bookchat.core.data.client.external.ClientRepository
+import com.kova700.bookchat.core.data.search.book.external.model.Book
+import com.kova700.bookchat.core.data.user.external.repository.UserRepository
+import com.kova700.bookchat.core.database.chatting.external.channel.ChannelDAO
+import com.kova700.bookchat.core.database.chatting.external.channel.mapper.toChannel
+import com.kova700.bookchat.core.database.chatting.external.channel.mapper.toChannelEntity
+import com.kova700.bookchat.core.network.bookchat.channel.ChannelApi
+import com.kova700.bookchat.core.network.bookchat.channel.model.both.ChannelMemberAuthorityNetwork
+import com.kova700.bookchat.core.network.bookchat.channel.model.mapper.toChannel
+import com.kova700.bookchat.core.network.bookchat.channel.model.mapper.toNetwork
+import com.kova700.bookchat.core.network.bookchat.channel.model.request.RequestChangeChannelSetting
+import com.kova700.bookchat.core.network.bookchat.channel.model.request.RequestMakeChannel
+import com.kova700.bookchat.core.network.bookchat.channel.model.response.FailResponseBody
+import com.kova700.bookchat.core.network.bookchat.common.mapper.toBookRequest
+import com.kova700.bookchat.util.Constants.TAG
+import com.kova700.bookchat.util.multipart.toMultiPartBody
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,18 +31,19 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.time.Duration.Companion.seconds
 
 //TODO : 채팅방 정보 조회 API 실패 시 재시도 로직 필요함 (채팅 전송 재시도 로직같은)
+//TODO : 최대한 Repository끼리 의존성 제거하도록 리팩토링
 class ChannelRepositoryImpl @Inject constructor(
-	private val bookChatApi: BookChatApi,
+	private val channelApi: ChannelApi,
 	private val channelDAO: ChannelDAO,
 	private val userRepository: UserRepository,
 	private val clientRepository: ClientRepository,
 	private val chatRepository: ChatRepository,
-	private val gson: Gson,
 ) : ChannelRepository {
 
 	private val mapChannels = MutableStateFlow<Map<Long, Channel>>(emptyMap())//(channelId, Channel)
@@ -91,7 +93,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	 * + 해당 채팅방에 입장하지 않은 채로 해당 API 호출하면 예외 던짐
 	 * {"errorCode":"4040400","message":"채팅방을 찾을 수 없습니다."}*/
 	private suspend fun getOnlineChannel(channelId: Long): Channel {
-		return bookChatApi.getChannel(channelId).toChannel()
+		return channelApi.getChannel(channelId).toChannel()
 			.also { channelDAO.upsertChannel(it.toChannelEntity()) }
 	}
 
@@ -100,7 +102,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	//예외가 터질까?
 	override suspend fun getChannelInfo(channelId: Long) {
 		Log.d(TAG, "ChannelRepositoryImpl: getChannelInfo() - called")
-		val channelInfo = bookChatApi.getChannelInfo(channelId)
+		val channelInfo = channelApi.getChannelInfo(channelId)
 		val participants = channelInfo.participants
 		userRepository.upsertAllUsers(participants)
 
@@ -125,16 +127,16 @@ class ChannelRepositoryImpl @Inject constructor(
 	override suspend fun makeChannel(
 		channelTitle: String,
 		channelSize: Int,
-		defaultRoomImageType: ChannelDefaultImageType,
+		channelDefaultImageType: ChannelDefaultImageType,
 		channelTags: List<String>,
 		selectedBook: Book,
 		channelImage: ByteArray?,
 	): Channel {
-		val response = bookChatApi.makeChannel(
+		val response = channelApi.makeChannel(
 			requestMakeChannel = RequestMakeChannel(
 				roomName = channelTitle,
 				roomSize = channelSize,
-				defaultRoomImageType = defaultRoomImageType.toNetwork(),
+				defaultRoomImageType = channelDefaultImageType.toNetwork(),
 				hashTags = channelTags,
 				bookRequest = selectedBook.toBookRequest()
 			),
@@ -159,7 +161,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		channelTags: List<String>,
 		channelImage: ByteArray?,
 	) {
-		bookChatApi.changeChannelSetting(
+		channelApi.changeChannelSetting(
 			channelId = channelId,
 			requestChangeChannelSetting = RequestChangeChannelSetting(
 				channelId = channelId,
@@ -191,7 +193,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	//TODO : 방장 나갈 경우 받는 메세지에 넘어오는 메세제지 nullable타입 서버 수정 대기 중
 	override suspend fun leaveChannel(channelId: Long) {
 		Log.d(TAG, "ChannelRepositoryImpl: leaveChannel() - called")
-		val response = bookChatApi.leaveChannel(channelId)
+		val response = channelApi.leaveChannel(channelId)
 		Log.d(TAG, "ChannelRepositoryImpl: leaveChannel() - response :${response.code()}")
 		channelDAO.delete(channelId)
 		//현재 방장이 채팅방을 나가면
@@ -278,10 +280,12 @@ class ChannelRepositoryImpl @Inject constructor(
 	//TODO : 차단된 사용자인 경우, 폭파된 채팅방인 경우
 	// 차단된 사용자 Or 폭파된 채팅방 임을 알리는 예외를 던져야함
 	override suspend fun enterChannel(channel: Channel) {
-		val response = bookChatApi.enterChannel(channel.roomId)
+		val response = channelApi.enterChannel(channel.roomId)
 		if (response.code() == 400) {
 			val failResponseBody = runCatching {
-				gson.fromJson(response.errorBody()?.string(), FailResponseBody::class.java)
+				response.errorBody()?.string()?.let {
+					Json.decodeFromString<FailResponseBody>(it)
+				}
 			}
 			when (failResponseBody.getOrNull()?.errorCode) {
 				RESPONSE_CODE_ALREADY_ENTERED_CHANNEL -> Unit
@@ -323,7 +327,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		val clientId = clientRepository.getClientProfile().id
 
 		if (needServer) {
-			bookChatApi.banChannelMember(
+			channelApi.banChannelMember(
 				channelId = channel.roomId,
 				userId = targetUserId,
 			)
@@ -355,7 +359,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	) {
 
 		if (needServer) {
-			bookChatApi.updateChannelMemberAuthority(
+			channelApi.updateChannelMemberAuthority(
 				channelId = channelId,
 				targetUserId = targetUserId,
 				authority = channelMemberAuthority.toNetwork()
@@ -382,7 +386,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		needServer: Boolean,
 	) {
 		if (needServer) {
-			bookChatApi.updateChannelMemberAuthority(
+			channelApi.updateChannelMemberAuthority(
 				channelId = channelId,
 				targetUserId = targetUserId,
 				authority = ChannelMemberAuthorityNetwork.HOST
@@ -435,15 +439,14 @@ class ChannelRepositoryImpl @Inject constructor(
 			Log.d(TAG, "ChannelRepositoryImpl: getMostActiveChannels() - attempt : $attempt")
 
 			runCatching {
-				bookChatApi.getChannels(
+				channelApi.getChannels(
 					postCursorId = null,
 					size = loadSize
 				)
 			}.onSuccess { response ->
 				channelDAO.upsertAllChannels(response.channels.toChannelEntity())
 				response.channels.forEach {
-					it.getLastChat(clientId = clientRepository.getClientProfile().id)
-						?.let { chat -> chatRepository.insertChat(chat) }
+					it.getLastChat()?.let { chat -> chatRepository.insertChat(chat) }
 				}
 				isEndPage = response.cursorMeta.last
 				currentPage = response.cursorMeta.nextCursorId
@@ -464,15 +467,14 @@ class ChannelRepositoryImpl @Inject constructor(
 	override suspend fun getChannels(loadSize: Int) {
 		if (isEndPage) return
 
-		val response = bookChatApi.getChannels(
+		val response = channelApi.getChannels(
 			postCursorId = currentPage,
 			size = loadSize
 		)
 
 		channelDAO.upsertAllChannels(response.channels.toChannelEntity())
 		response.channels.forEach {
-			it.getLastChat(clientId = clientRepository.getClientProfile().id)
-				?.let { chat -> chatRepository.insertChat(chat) }
+			it.getLastChat()?.let { chat -> chatRepository.insertChat(chat) }
 		}
 		isEndPage = response.cursorMeta.last
 		currentPage = response.cursorMeta.nextCursorId
