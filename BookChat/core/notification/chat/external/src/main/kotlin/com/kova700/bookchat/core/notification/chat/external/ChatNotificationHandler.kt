@@ -1,7 +1,7 @@
-package com.example.bookchat.notification.chat
+package com.kova700.bookchat.core.notification.chat.external
 
-import com.example.bookchat.domain.model.Channel
-import com.example.bookchat.domain.model.Chat
+import com.kova700.bookchat.core.data.channel.external.model.Channel
+import com.kova700.bookchat.core.data.chat.external.model.Chat
 
 interface ChatNotificationHandler {
 	suspend fun showNotification(channel: Channel, chat: Chat)

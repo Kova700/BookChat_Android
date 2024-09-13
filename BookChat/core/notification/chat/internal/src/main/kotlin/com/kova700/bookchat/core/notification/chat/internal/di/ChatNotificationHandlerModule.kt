@@ -1,7 +1,7 @@
-package com.example.bookchat.notification.chat.di
+package com.kova700.bookchat.core.notification.chat.internal.di
 
-import com.example.bookchat.notification.chat.ChatNotificationHandlerImpl
-import com.example.bookchat.notification.chat.ChatNotificationHandler
+import com.kova700.bookchat.core.notification.chat.external.ChatNotificationHandler
+import com.kova700.bookchat.core.notification.chat.internal.ChatNotificationHandlerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

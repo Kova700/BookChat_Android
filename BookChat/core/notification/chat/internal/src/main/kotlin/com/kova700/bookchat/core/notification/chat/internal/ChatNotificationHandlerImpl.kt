@@ -1,4 +1,4 @@
-package com.example.bookchat.notification.chat
+package com.kova700.bookchat.core.notification.chat.internal
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -12,17 +12,19 @@ import androidx.core.app.Person
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
-import com.example.bookchat.R
-import com.example.bookchat.domain.model.Channel
-import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.model.User
+import com.kova700.bookchat.core.data.channel.external.model.Channel
+import com.kova700.bookchat.core.data.chat.external.model.Chat
+import com.kova700.bookchat.core.data.user.external.model.User
+import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.core.notification.chat.external.ChatNotificationHandler
+import com.kova700.bookchat.core.notification.util.iconbuilder.IconBuilder
+import com.kova700.bookchat.core.stomp.chatting.external.StompHandler
+import com.kova700.bookchat.feature.main.MainActivity
+import com.kova700.bookchat.feature.main.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
+import com.kova700.bookchat.util.date.toDate
+import com.kova700.bookchat.util.image.channel.getBitmap
+import com.kova700.bookchat.util.image.user.getBitmap
 import com.kova700.core.data.notificationinfo.external.repository.ChattingNotificationInfoRepository
-import com.example.bookchat.data.stomp.external.StompHandler
-import com.example.bookchat.notification.iconbuilder.IconBuilder
-import com.example.bookchat.ui.MainActivity
-import com.example.bookchat.ui.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
-import com.example.bookchat.ui.mapper.getBitmap
-import com.example.bookchat.utils.toDate
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Date
 import javax.inject.Inject
@@ -48,7 +50,7 @@ class ChatNotificationHandlerImpl @Inject constructor(
 			}
 
 	override suspend fun showNotification(channel: Channel, chat: Chat) {
-		if (chat.sender == null) return
+		val sender = chat.sender ?: return
 
 		val notificationId = getNotificationId(channel)
 		if (shouldShowNotification(
@@ -62,7 +64,7 @@ class ChatNotificationHandlerImpl @Inject constructor(
 
 		val notification = getChatNotification(
 			chat = chat,
-			sender = chat.sender,
+			sender = sender,
 			channel = channel,
 			pendingIntent = getPendingIntent(channel)
 		)
@@ -169,9 +171,7 @@ class ChatNotificationHandlerImpl @Inject constructor(
 		val shortcutId = getNotificationId(channel).toString()
 		ShortcutManagerCompat.getDynamicShortcuts(context)
 			.find { it.id == shortcutId }
-			?.let {
-				ShortcutManagerCompat.removeDynamicShortcuts(context, listOf(shortcutId))
-			}
+			?.let { ShortcutManagerCompat.removeDynamicShortcuts(context, listOf(shortcutId)) }
 	}
 
 	private fun clearShortcut() {
