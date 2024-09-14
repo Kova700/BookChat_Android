@@ -1,27 +1,19 @@
-package com.example.bookchat.fcm
+package com.kova700.bookchat.core.fcm.service
 
 import android.util.Log
-import com.example.bookchat.data.network.model.response.FcmMessage
-import com.example.bookchat.domain.model.PushType
-import com.example.bookchat.fcm.forcedlogout.ForcedLogoutManagerImpl
-import com.example.bookchat.fcm.forcedlogout.ForcedLogoutWorker
-import com.example.bookchat.fcm.renewfcmtoken.RenewFcmTokenWorker
-import com.example.bookchat.fcm.noticechat.ChatNotificationWorker
-import com.example.bookchat.utils.Constants.TAG
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.google.gson.Gson
+import com.kova700.bookchat.core.fcm.chat.ChatNotificationWorker
+import com.kova700.bookchat.core.fcm.forced_logout.ForcedLogoutWorker
+import com.kova700.bookchat.core.fcm.renew_fcm_token.RenewFcmTokenWorker
+import com.kova700.bookchat.core.fcm.service.model.FcmMessage
+import com.kova700.bookchat.core.fcm.service.model.PushType
+import com.kova700.bookchat.util.Constants.TAG
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import kotlinx.serialization.json.Json
 
 @AndroidEntryPoint
 class FCMService : FirebaseMessagingService() {
-
-	@Inject
-	lateinit var gson: Gson
-
-	@Inject
-	lateinit var logoutPushMessageManager: ForcedLogoutManagerImpl
 
 	override fun onNewToken(token: String) {
 		super.onNewToken(token)
@@ -36,11 +28,10 @@ class FCMService : FirebaseMessagingService() {
 
 	private fun handleMessage(message: RemoteMessage) {
 		val messageBody = message.data["body"]
-		val hashMap = gson.fromJson(messageBody, HashMap::class.java)
+		val hashMap = Json.decodeFromString<HashMap<String, String>>(messageBody ?: return)
 		when (hashMap["pushType"]) {
 			PushType.LOGIN.toString() -> startForcedLogoutWorker()
-			PushType.CHAT.toString() ->
-				handleChatMessage(gson.fromJson(messageBody, FcmMessage::class.java))
+			PushType.CHAT.toString() -> handleChatMessage(Json.decodeFromString<FcmMessage>(messageBody))
 		}
 	}
 
