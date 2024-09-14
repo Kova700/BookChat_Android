@@ -1,7 +1,7 @@
-package com.example.bookchat.fcm.forcedlogout.di
+package com.kova700.bookchat.core.fcm.forced_logout.di
 
-import com.example.bookchat.fcm.forcedlogout.ForcedLogoutManager
-import com.example.bookchat.fcm.forcedlogout.ForcedLogoutManagerImpl
+import com.kova700.bookchat.core.fcm.forced_logout.ForcedLogoutManager
+import com.kova700.bookchat.core.fcm.forced_logout.ForcedLogoutManagerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

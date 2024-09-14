@@ -1,4 +1,4 @@
-package com.example.bookchat.fcm.forcedlogout
+package com.kova700.bookchat.core.fcm.forced_logout
 
 import android.app.Application
 
