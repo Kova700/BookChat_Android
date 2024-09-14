@@ -1,4 +1,4 @@
-package com.example.bookchat.fcm.noticechat
+package com.kova700.bookchat.core.fcm.chat
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -8,13 +8,12 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.kova700.core.data.appsetting.external.repository.AppSettingRepository
 import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
-import com.example.bookchat.domain.repository.ChannelRepository
-import com.example.bookchat.domain.repository.ChatRepository
-import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.usecase.GetChatUseCase
-import com.example.bookchat.notification.chat.ChatNotificationHandler
+import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
+import com.kova700.bookchat.core.data.client.external.ClientRepository
+import com.kova700.bookchat.core.notification.chat.external.ChatNotificationHandler
+import com.kova700.core.data.appsetting.external.repository.AppSettingRepository
+import com.kova700.core.domain.usecase.chat.GetChatUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -23,7 +22,6 @@ class ChatNotificationWorker @AssistedInject constructor(
 	@Assisted appContext: Context,
 	@Assisted workerParams: WorkerParameters,
 	private val channelRepository: ChannelRepository,
-	private val chatRepository: ChatRepository,
 	private val appSettingRepository: AppSettingRepository,
 	private val clientRepository: ClientRepository,
 	private val bookChatTokenRepository: BookChatTokenRepository,
