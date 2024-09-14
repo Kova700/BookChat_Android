@@ -1,4 +1,4 @@
-package com.example.bookchat.fcm.renewfcmtoken
+package com.kova700.bookchat.core.fcm.renew_fcm_token
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -8,9 +8,9 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.example.bookchat.fcm.repository.external.model.FCMToken
 import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
-import com.example.bookchat.fcm.repository.external.FCMTokenRepository
+import com.kova700.bookchat.core.data.fcm_token.external.FCMTokenRepository
+import com.kova700.bookchat.core.data.fcm_token.external.model.FCMToken
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
