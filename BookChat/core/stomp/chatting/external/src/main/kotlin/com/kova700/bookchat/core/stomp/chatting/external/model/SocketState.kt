@@ -1,4 +1,4 @@
-package com.example.bookchat.data.stomp.external.model
+package com.kova700.bookchat.core.stomp.chatting.external.model
 
 enum class SocketState {
 	DISCONNECTED,

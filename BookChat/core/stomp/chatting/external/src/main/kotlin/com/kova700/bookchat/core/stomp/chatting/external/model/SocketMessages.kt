@@ -1,37 +1,40 @@
-package com.example.bookchat.data.stomp.external.model
+package com.kova700.bookchat.core.stomp.chatting.external.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 sealed interface SocketMessage
 
+@Serializable
 data class CommonMessage(
-	@SerializedName("chatId")
+	@SerialName("chatId")
 	val chatId: Long,
-	@SerializedName("chatRoomId")
+	@SerialName("chatRoomId")
 	val channelId: Long,
-	@SerializedName("senderId")
+	@SerialName("senderId")
 	val senderId: Long,
-	@SerializedName("receiptId")
+	@SerialName("receiptId")
 	val receiptId: Long,
-	@SerializedName("message")
+	@SerialName("message")
 	val message: String,
-	@SerializedName("dispatchTime")
+	@SerialName("dispatchTime")
 	val dispatchTime: String,
 ) : SocketMessage
 
 //TODO : 채팅방별 소켓이 아닌 로그인 시 소켓 연결해서 메세지 관리하려면
 // NotificationMessage에도 ChatRoomId(ChannelId) 추가되어야함
+@Serializable
 data class NotificationMessage(
-	@SerializedName("chatId")
+	@SerialName("chatId")
 	val chatId: Long,
-	@SerializedName("targetId")
+	@SerialName("targetId")
 	val targetUserId: Long,
-	@SerializedName("message")
+	@SerialName("message")
 	val message: String,
-	@SerializedName("dispatchTime")
+	@SerialName("dispatchTime")
 	val dispatchTime: String,
-	@SerializedName("notificationMessageType")
-	val notificationMessageType: NotificationMessageType
+	@SerialName("notificationMessageType")
+	val notificationMessageType: NotificationMessageType,
 ) : SocketMessage
 // 응답 :
 //{"targetId":null,

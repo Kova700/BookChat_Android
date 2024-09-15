@@ -1,7 +1,7 @@
-package com.example.bookchat.data.stomp.internal.di
+package com.kova700.bookchat.core.stomp.stomp
 
 import android.util.Log
-import com.example.bookchat.utils.Constants.TAG
+import com.kova700.bookchat.util.Constants.TAG
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

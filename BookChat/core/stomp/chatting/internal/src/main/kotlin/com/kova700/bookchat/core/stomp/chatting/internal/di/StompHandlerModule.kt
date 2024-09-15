@@ -1,7 +1,7 @@
-package com.example.bookchat.data.stomp.internal.di
+package com.kova700.bookchat.core.stomp.chatting.internal.di
 
-import com.example.bookchat.data.stomp.external.StompHandler
-import com.example.bookchat.data.stomp.internal.StompHandlerImpl
+import com.kova700.bookchat.core.stomp.chatting.external.StompHandler
+import com.kova700.bookchat.core.stomp.chatting.internal.StompHandlerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -14,6 +14,6 @@ interface StompHandlerModule {
 	@Binds
 	@Singleton
 	fun bindStompHandler(
-		stompHandler: StompHandlerImpl
+		stompHandler: StompHandlerImpl,
 	): StompHandler
 }

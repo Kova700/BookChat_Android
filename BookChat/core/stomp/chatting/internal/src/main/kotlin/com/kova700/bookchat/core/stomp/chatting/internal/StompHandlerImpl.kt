@@ -1,30 +1,29 @@
-package com.example.bookchat.data.stomp.internal
+package com.kova700.bookchat.core.stomp.chatting.internal
 
 import android.util.Log
-import com.example.bookchat.BuildConfig
-import com.example.bookchat.data.networkmanager.external.NetworkManager
-import com.example.bookchat.data.networkmanager.external.model.NetworkState
-import com.example.bookchat.data.stomp.external.StompHandler
-import com.example.bookchat.data.stomp.external.model.CommonMessage
-import com.example.bookchat.data.stomp.external.model.NotificationMessage
-import com.example.bookchat.data.stomp.external.model.NotificationMessageType
-import com.example.bookchat.data.stomp.external.model.RequestSendChat
-import com.example.bookchat.data.stomp.external.model.SocketMessage
-import com.example.bookchat.data.stomp.external.model.SocketState
-import com.example.bookchat.data.stomp.internal.mapper.toChat
-import com.example.bookchat.domain.model.Channel
-import com.example.bookchat.domain.model.ChannelMemberAuthority
-import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.model.ChatStatus
 import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
-import com.example.bookchat.domain.repository.ChannelRepository
-import com.example.bookchat.domain.repository.ChatRepository
-import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.repository.UserRepository
-import com.example.bookchat.domain.usecase.GetChatUseCase
-import com.example.bookchat.domain.usecase.RenewBookChatTokenUseCase
-import com.example.bookchat.utils.Constants.TAG
-import com.google.gson.Gson
+import com.kova700.bookchat.core.data.channel.external.model.Channel
+import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
+import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
+import com.kova700.bookchat.core.data.chat.external.model.Chat
+import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
+import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
+import com.kova700.bookchat.core.data.client.external.ClientRepository
+import com.kova700.bookchat.core.data.user.external.repository.UserRepository
+import com.kova700.bookchat.core.network_manager.external.NetworkManager
+import com.kova700.bookchat.core.network_manager.external.model.NetworkState
+import com.kova700.bookchat.core.stomp.chatting.external.StompHandler
+import com.kova700.bookchat.core.stomp.chatting.external.model.CommonMessage
+import com.kova700.bookchat.core.stomp.chatting.external.model.NotificationMessage
+import com.kova700.bookchat.core.stomp.chatting.external.model.NotificationMessageType
+import com.kova700.bookchat.core.stomp.chatting.external.model.RequestSendChat
+import com.kova700.bookchat.core.stomp.chatting.external.model.SocketMessage
+import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
+import com.kova700.bookchat.core.stomp.chatting.internal.mapper.toChat
+import com.kova700.bookchat.core.stomp.internal.BuildConfig
+import com.kova700.bookchat.util.Constants.TAG
+import com.kova700.core.domain.usecase.chat.GetChatUseCase
+import com.kova700.core.domain.usecase.client.RenewBookChatTokenUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -39,6 +38,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.hildan.krossbow.stomp.ConnectionException
 import org.hildan.krossbow.stomp.LostReceiptException
 import org.hildan.krossbow.stomp.MissingHeartBeatException
@@ -69,7 +70,6 @@ class StompHandlerImpl @Inject constructor(
 	private val renewBookChatTokenUseCase: RenewBookChatTokenUseCase,
 	private val getChatUserCase: GetChatUseCase,
 	private val networkManager: NetworkManager,
-	private val gson: Gson,
 ) : StompHandler {
 
 	private lateinit var stompSession: StompSession
@@ -186,7 +186,7 @@ class StompHandlerImpl @Inject constructor(
 		runCatching {
 			stompSession.sendText(
 				destination = "$SEND_MESSAGE_DESTINATION${chat.channelId}",
-				body = gson.toJson(
+				body = Json.encodeToString(
 					RequestSendChat(
 						receiptId = chat.chatId,
 						message = chat.message
@@ -236,7 +236,7 @@ class StompHandlerImpl @Inject constructor(
 		runCatching {
 			stompSession.sendText(
 				destination = "$SEND_MESSAGE_DESTINATION$channelId",
-				body = gson.toJson(
+				body = Json.encodeToString(
 					RequestSendChat(
 						receiptId = receiptId,
 						message = message
@@ -399,11 +399,11 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	private fun String.parseToSocketMessage(): SocketMessage {
-		val hashMap = gson.fromJson(this, LinkedHashMap::class.java)
-		if (hashMap["senderId"] != null) {
-			return gson.fromJson(this, CommonMessage::class.java)
+		val hashMap = Json.decodeFromString<Map<String, String>>(this)
+		return when {
+			hashMap["senderId"] != null -> Json.decodeFromString<CommonMessage>(this)
+			else -> Json.decodeFromString<NotificationMessage>(this)
 		}
-		return gson.fromJson(this, NotificationMessage::class.java)
 	}
 	//{"targetId":null,
 	// "chatId":null,
