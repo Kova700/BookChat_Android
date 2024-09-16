@@ -1,4 +1,4 @@
-package com.example.bookchat.utils
+package com.kova700.bookchat.core.network.util.multipart
 
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -8,7 +8,7 @@ fun ByteArray.toMultiPartBody(
 	contentType: String,
 	multipartName: String,
 	fileName: String,
-	fileExtension: String
+	fileExtension: String,
 ): MultipartBody.Part {
 	val imageRequestBody = toRequestBody(contentType.toMediaTypeOrNull(), 0, size)
 	return MultipartBody.Part.createFormData(
