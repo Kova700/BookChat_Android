@@ -1,15 +1,13 @@
-package com.example.bookchat.data.network.intercepter
+package com.kova700.bookchat.core.network.network.intercepter
 
 import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
-import com.google.gson.Gson
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 
-class AppInterceptor @Inject constructor(
+class BookChatNetworkInterceptor @Inject constructor(
 	private val bookChatTokenRepository: BookChatTokenRepository,
-	private val gson: Gson,
 ) : Interceptor {
 
 	override fun intercept(
@@ -20,10 +18,7 @@ class AppInterceptor @Inject constructor(
 		if (response.isSuccessful) return response
 
 		if (response.isTokenExpired()) {
-			val newToken = chain.renewToken(
-				bookchatToken = bookchatToken,
-				parser = gson
-			)
+			val newToken = chain.renewToken(bookchatToken)
 			runBlocking { bookChatTokenRepository.saveBookChatToken(newToken) }
 			response = chain.requestWithAccessToken(newToken)
 			if (response.isSuccessful) return response

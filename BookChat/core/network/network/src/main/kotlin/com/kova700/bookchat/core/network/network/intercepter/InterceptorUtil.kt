@@ -1,10 +1,11 @@
-package com.example.bookchat.data.network.intercepter
+package com.kova700.bookchat.core.network.network.intercepter
 
-import com.example.bookchat.BuildConfig
-import com.example.bookchat.data.network.model.response.ForbiddenException
-import com.example.bookchat.data.network.model.response.TokenRenewalFailException
 import com.kova700.bookchat.core.data.bookchat_token.external.model.BookChatToken
-import com.google.gson.Gson
+import com.kova700.bookchat.core.data.util.model.network.ForbiddenException
+import com.kova700.bookchat.core.data.util.model.network.TokenRenewalFailException
+import com.kova700.bookchat.core.network.network.BuildConfig.TOKEN_RENEWAL_URL
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request
@@ -14,15 +15,14 @@ import okhttp3.Response
 
 fun Interceptor.Chain.renewToken(
 	bookchatToken: BookChatToken?,
-	parser: Gson,
 ): BookChatToken {
 	val refreshToken = bookchatToken?.refreshToken
 	val requestWithRefreshToken = getNewRequest(
-		requestBody = parser.getJsonRequestBody(
+		requestBody = Json.getJsonRequestBody(
 			content = refreshToken,
 			contentType = CONTENT_TYPE_JSON
 		),
-		requestUrl = BuildConfig.TOKEN_RENEWAL_URL
+		requestUrl = TOKEN_RENEWAL_URL
 	)
 
 	val response = proceed(requestWithRefreshToken)
@@ -30,14 +30,14 @@ fun Interceptor.Chain.renewToken(
 	// TODO : 리프레시 토큰마저 만료되었음으로 새로 로그인 해야함
 	//  모든 작업 종료하고 로그인 페이지로 이동하게 수정
 	if (response.isSuccessful.not()) throw TokenRenewalFailException()
-	return response.parseToToken(parser)
+	return response.parseToToken()
 }
 
-private fun <T> Gson.getJsonRequestBody(
+private inline fun <reified T> Json.getJsonRequestBody(
 	content: T,
 	contentType: String,
 ): RequestBody {
-	return toJson(content).toRequestBody(contentType.toMediaTypeOrNull())
+	return encodeToString(content).toRequestBody(contentType.toMediaTypeOrNull())
 }
 
 private fun Request.addHeader(headerName: String, headerContent: String): Request {
@@ -75,8 +75,8 @@ fun Response.isTokenExpired(): Boolean {
 	return this.code == 401
 }
 
-private fun Response.parseToToken(parser: Gson): BookChatToken {
-	val token = parser.fromJson(body?.string(), BookChatToken::class.java)
+private fun Response.parseToToken(): BookChatToken {
+	val token = Json.decodeFromString<BookChatToken>(body?.string() ?: "")
 	return token.copy(accessToken = "$TOKEN_PREFIX ${token.accessToken}")
 }
 

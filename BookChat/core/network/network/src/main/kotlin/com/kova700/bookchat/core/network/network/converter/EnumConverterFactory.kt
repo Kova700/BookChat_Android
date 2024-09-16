@@ -1,4 +1,4 @@
-package com.example.bookchat.data.network
+package com.kova700.bookchat.core.network.network.converter
 
 import com.google.gson.annotations.SerializedName
 import retrofit2.Converter

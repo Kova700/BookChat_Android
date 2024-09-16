@@ -1,11 +1,11 @@
-package com.example.bookchat.data.network.di
+package com.kova700.bookchat.core.network.network
 
-import com.example.bookchat.BuildConfig.DOMAIN
-import com.example.bookchat.data.network.intercepter.AppInterceptor
-import com.example.bookchat.data.network.BookChatApi
-import com.example.bookchat.data.network.EnumConverterFactory
-import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
 import com.google.gson.Gson
+import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
+import com.kova700.bookchat.core.network.network.BuildConfig.DOMAIN
+import com.kova700.bookchat.core.network.network.converter.EnumConverterFactory
+import com.kova700.bookchat.core.network.network.converter.ResultCallAdapterFactory
+import com.kova700.bookchat.core.network.network.intercepter.BookChatNetworkInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,16 +26,16 @@ object RetrofitModule {
 	fun provideRetrofit(
 		okHttpClient: OkHttpClient,
 		gsonConverterFactory: GsonConverterFactory,
-		enumConverterFactory: EnumConverterFactory
-	): BookChatApi {
+		enumConverterFactory: EnumConverterFactory,
+	): Retrofit {
 		return Retrofit.Builder()
 //    .baseUrl("https://webhook.site/") //API 테스트
 			.baseUrl(DOMAIN)
 			.client(okHttpClient)
 			.addConverterFactory(gsonConverterFactory)
 			.addConverterFactory(enumConverterFactory)
+			.addCallAdapterFactory(ResultCallAdapterFactory())
 			.build()
-			.create(BookChatApi::class.java)
 	}
 
 	@Provides
@@ -58,17 +58,10 @@ object RetrofitModule {
 
 	@Provides
 	@Singleton
-	fun provideGson(): Gson {
-		return Gson()
-	}
-
-	@Provides
-	@Singleton
 	fun provideAppInterceptor(
 		bookChatTokenRepository: BookChatTokenRepository,
-		gson: Gson,
 	): Interceptor {
-		return AppInterceptor(bookChatTokenRepository, gson)
+		return BookChatNetworkInterceptor(bookChatTokenRepository)
 	}
 
 	@Provides
