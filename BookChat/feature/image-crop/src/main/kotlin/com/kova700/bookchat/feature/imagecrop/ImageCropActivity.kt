@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.imagecrop
+package com.kova700.bookchat.feature.imagecrop
 
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -8,10 +8,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
-import com.example.bookchat.databinding.ActivityImageCropBinding
-import com.example.bookchat.ui.imagecrop.model.ImageCropAspectRatio
-import com.example.bookchat.utils.image.saveImageToCacheAndGetUri
+import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.feature.image_crop.databinding.ActivityImageCropBinding
+import com.kova700.bookchat.feature.imagecrop.model.ImageCropAspectRatio
+import com.kova700.bookchat.util.image.image.saveImageToCacheAndGetUri
 import kotlinx.coroutines.launch
 
 class ImageCropActivity : AppCompatActivity() {

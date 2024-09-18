@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.imagecrop
+package com.kova700.bookchat.feature.imagecrop
 
 import android.graphics.Bitmap
 import android.graphics.Rect
@@ -6,10 +6,10 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.ui.imagecrop.ImageCropActivity.Companion.EXTRA_CROP_PURPOSE
-import com.example.bookchat.ui.imagecrop.model.ImageCropAspectRatio
-import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
-import com.example.bookchat.utils.image.bitmap.scaleDownWithAspectRatio
+import com.kova700.bookchat.feature.imagecrop.ImageCropActivity.Companion.EXTRA_CROP_PURPOSE
+import com.kova700.bookchat.feature.imagecrop.model.ImageCropAspectRatio
+import com.kova700.bookchat.feature.imagecrop.model.ImageCropPurpose
+import com.kova700.bookchat.util.image.bitmap.scaleDownWithAspectRatio
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow

@@ -1,9 +1,9 @@
-package com.example.bookchat.ui.imagecrop
+package com.kova700.bookchat.feature.imagecrop
 
 import android.graphics.Bitmap
 import android.net.Uri
-import com.example.bookchat.ui.imagecrop.model.ImageCropAspectRatio
-import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
+import com.kova700.bookchat.feature.imagecrop.model.ImageCropAspectRatio
+import com.kova700.bookchat.feature.imagecrop.model.ImageCropPurpose
 
 data class ImageCropUiState(
 	val uiState: UiState,
@@ -37,9 +37,9 @@ data class ImageCropUiState(
 }
 
 sealed class ImageCropUiEvent {
-	object MoveToGallery : ImageCropUiEvent()
-	object RotateImageToRight : ImageCropUiEvent()
-	object CaptureWholeImage : ImageCropUiEvent()
+	data object MoveToGallery : ImageCropUiEvent()
+	data object RotateImageToRight : ImageCropUiEvent()
+	data object CaptureWholeImage : ImageCropUiEvent()
 	data class CropSelectedImageArea(
 		val width: Int,
 		val height: Int,

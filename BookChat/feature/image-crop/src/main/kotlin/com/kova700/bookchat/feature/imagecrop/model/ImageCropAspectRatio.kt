@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.imagecrop.model
+package com.kova700.bookchat.feature.imagecrop.model
 
 enum class ImageCropAspectRatio {
 	RATIO_FREE,
