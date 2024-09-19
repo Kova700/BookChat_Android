@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.login
+package com.kova700.bookchat.feature.login
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,12 +6,12 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.databinding.ActivityLoginBinding
-import com.example.bookchat.oauth.oauthclient.external.OAuthClient
-import com.example.bookchat.oauth.oauthclient.external.model.OAuth2Provider
-import com.example.bookchat.ui.MainActivity
-import com.example.bookchat.ui.signup.SignUpActivity
-import com.example.bookchat.utils.showSnackBar
+import com.kova700.bookchat.core.data.oauth.external.model.OAuth2Provider
+import com.kova700.bookchat.core.oauth.external.OAuthClient
+import com.kova700.bookchat.feature.login.databinding.ActivityLoginBinding
+import com.kova700.bookchat.feature.main.MainActivity
+import com.kova700.feature.signup.signup.SignUpActivity
+import com.kova700.bookchat.util.snackbar.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject

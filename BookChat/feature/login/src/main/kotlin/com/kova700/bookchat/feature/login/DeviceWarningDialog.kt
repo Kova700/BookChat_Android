@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.login
+package com.kova700.bookchat.feature.login
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
-import com.example.bookchat.databinding.DialogDeviceWarningBinding
+import com.kova700.bookchat.feature.login.databinding.DialogDeviceWarningBinding
 
 class DeviceWarningDialog : DialogFragment() {
 
@@ -43,7 +43,7 @@ class DeviceWarningDialog : DialogFragment() {
 		}
 	}
 
-	fun onClickOkBtn() {
+	private fun onClickOkBtn() {
 		loginViewModel.onClickDeviceWarningOk()
 		dismiss()
 	}
