@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.bookreport
+package com.kova700.bookchat.feature.bookreport
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import com.example.bookchat.databinding.DialogBookReportWarningBinding
+import com.kova700.bookchat.feature.bookreport.databinding.DialogBookReportWarningBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -47,7 +47,7 @@ class BookReportWarningDialog(
 		}
 	}
 
-	fun onClickOkBtn() {
+	private fun onClickOkBtn() {
 		onOkClick.invoke()
 		dismiss()
 	}

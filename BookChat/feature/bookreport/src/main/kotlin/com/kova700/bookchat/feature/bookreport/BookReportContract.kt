@@ -1,8 +1,7 @@
-package com.example.bookchat.ui.bookreport
+package com.kova700.bookchat.feature.bookreport
 
-import com.example.bookchat.domain.model.BookReport
-import com.example.bookchat.domain.model.BookShelfItem
-
+import com.kova700.bookchat.core.data.bookshelf.external.model.BookShelfItem
+import com.kova700.core.data.bookreport.external.model.BookReport
 
 data class BookReportUiState(
 	val uiState: UiState,

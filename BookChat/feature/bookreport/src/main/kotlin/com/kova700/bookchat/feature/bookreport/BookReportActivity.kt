@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.bookreport
+package com.kova700.bookchat.feature.bookreport
 
 import android.os.Bundle
 import android.text.Editable
@@ -8,11 +8,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.databinding.ActivityBookReportBinding
-import com.example.bookchat.ui.bookreport.BookReportUiState.UiState
-import com.example.bookchat.utils.BookImgSizeManager
-import com.example.bookchat.utils.image.loadUrl
-import com.example.bookchat.utils.showSnackBar
+import com.kova700.bookchat.feature.bookreport.BookReportUiState.UiState
+import com.kova700.bookchat.feature.bookreport.databinding.ActivityBookReportBinding
+import com.kova700.bookchat.util.book.BookImgSizeManager
+import com.kova700.bookchat.util.image.image.loadUrl
+import com.kova700.bookchat.util.snackbar.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -135,6 +135,7 @@ class BookReportActivity : AppCompatActivity() {
 
 	companion object {
 		private const val DIALOG_TAG_WARNING_BOOK_REPORT = "BookReportWarningDialog"
+		internal const val EXTRA_BOOKREPORT_BOOKSHELF_ITEM_ID = "EXTRA_BOOKREPORT_BOOKSHELF_ITEM_ID"
 	}
 
 }

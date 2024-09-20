@@ -1,16 +1,16 @@
-package com.example.bookchat.ui.bookreport
+package com.kova700.bookchat.feature.bookreport
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.R
-import com.example.bookchat.data.network.model.response.BookReportDoseNotExistException
-import com.example.bookchat.domain.repository.BookReportRepository
-import com.example.bookchat.domain.repository.BookShelfRepository
-import com.example.bookchat.ui.bookreport.BookReportUiState.UiState
-import com.example.bookchat.ui.bookshelf.complete.dialog.CompleteBookDialog.Companion.EXTRA_BOOKREPORT_BOOKSHELF_ITEM_ID
-import com.example.bookchat.utils.Constants.TAG
+import com.kova700.bookchat.core.data.bookshelf.external.BookShelfRepository
+import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.feature.bookreport.BookReportActivity.Companion.EXTRA_BOOKREPORT_BOOKSHELF_ITEM_ID
+import com.kova700.bookchat.feature.bookreport.BookReportUiState.UiState
+import com.kova700.bookchat.util.Constants.TAG
+import com.kova700.core.data.bookreport.external.BookReportRepository
+import com.kova700.core.data.bookreport.external.model.BookReportDoseNotExistException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -105,7 +105,8 @@ class BookReportViewModel @Inject constructor(
 				//수정 실패했는데 왜 성공 UI가 나오지..?
 				.onSuccess {
 					Log.d(TAG, "BookReportViewModel: reviseBookReport() - onSuccess")
-					updateState { copy(uiState = UiState.SUCCESS) } }
+					updateState { copy(uiState = UiState.SUCCESS) }
+				}
 				.onFailure {
 					Log.d(TAG, "BookReportViewModel: reviseBookReport() - onFailure")
 					updateState { copy(uiState = UiState.EDITING) }
