@@ -1,26 +1,26 @@
-package com.example.bookchat.ui.home.adapter
+package com.kova700.bookchat.feature.home.adapter
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.example.bookchat.R
-import com.example.bookchat.databinding.ItemHomeBookBinding
-import com.example.bookchat.databinding.ItemHomeBookDummyBinding
-import com.example.bookchat.databinding.ItemHomeBookEmptyBinding
-import com.example.bookchat.databinding.ItemHomeBookHeaderBinding
-import com.example.bookchat.databinding.ItemHomeBookRetryBinding
-import com.example.bookchat.databinding.ItemHomeChannelBinding
-import com.example.bookchat.databinding.ItemHomeChannelEmptyBinding
-import com.example.bookchat.databinding.ItemHomeChannelHeaderBinding
-import com.example.bookchat.databinding.ItemHomeChannelRetryBinding
-import com.example.bookchat.databinding.ItemHomeHeaderBinding
-import com.example.bookchat.databinding.LayoutHomeBookShimmerBinding
-import com.example.bookchat.databinding.LayoutHomeChannelShimmerBinding
-import com.example.bookchat.ui.home.model.HomeItem
-import com.example.bookchat.utils.BookImgSizeManager
-import com.example.bookchat.utils.getFormattedDetailDateTimeText
-import com.example.bookchat.utils.image.loadChannelProfile
-import com.example.bookchat.utils.image.loadUrl
+import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.feature.home.databinding.ItemHomeBookBinding
+import com.kova700.bookchat.feature.home.databinding.ItemHomeBookDummyBinding
+import com.kova700.bookchat.feature.home.databinding.ItemHomeBookEmptyBinding
+import com.kova700.bookchat.feature.home.databinding.ItemHomeBookHeaderBinding
+import com.kova700.bookchat.feature.home.databinding.ItemHomeBookRetryBinding
+import com.kova700.bookchat.feature.home.databinding.ItemHomeChannelBinding
+import com.kova700.bookchat.feature.home.databinding.ItemHomeChannelEmptyBinding
+import com.kova700.bookchat.feature.home.databinding.ItemHomeChannelHeaderBinding
+import com.kova700.bookchat.feature.home.databinding.ItemHomeChannelRetryBinding
+import com.kova700.bookchat.feature.home.databinding.ItemHomeHeaderBinding
+import com.kova700.bookchat.feature.home.databinding.LayoutHomeBookShimmerBinding
+import com.kova700.bookchat.feature.home.databinding.LayoutHomeChannelShimmerBinding
+import com.kova700.bookchat.util.book.BookImgSizeManager
+import com.kova700.bookchat.util.date.getFormattedDetailDateTimeText
+import com.kova700.bookchat.util.image.image.loadChannelProfile
+import com.kova700.bookchat.util.image.image.loadUrl
+import com.kova700.bookchat.feature.home.model.HomeItem
 
 sealed class HomeItemViewHolder(
 	binding: ViewBinding,

@@ -1,26 +1,25 @@
-package com.example.bookchat.ui.home
+package com.kova700.bookchat.feature.home
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
-import com.example.bookchat.databinding.FragmentHomeBinding
-import com.example.bookchat.ui.MainActivity
-import com.example.bookchat.ui.channel.chatting.ChannelActivity
-import com.example.bookchat.ui.channelList.ChannelListFragment
-import com.example.bookchat.ui.createchannel.MakeChannelActivity
-import com.example.bookchat.ui.home.adapter.HomeItemAdapter
-import com.example.bookchat.ui.home.model.HomeItem
-import com.example.bookchat.utils.showSnackBar
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
+import com.kova700.bookchat.core.navigation.ChannelNavigator
+import com.kova700.bookchat.core.navigation.MainNavigationViewModel
+import com.kova700.bookchat.core.navigation.MainRoute
+import com.kova700.bookchat.core.navigation.MakeChannelActivityNavigator
+import com.kova700.bookchat.feature.home.adapter.HomeItemAdapter
+import com.kova700.bookchat.feature.home.databinding.FragmentHomeBinding
+import com.kova700.bookchat.feature.home.model.HomeItem
+import com.kova700.bookchat.util.snackbar.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,9 +30,16 @@ class HomeFragment : Fragment() {
 	private var _binding: FragmentHomeBinding? = null
 	private val binding get() = _binding!!
 	private val homeViewModel: HomeViewModel by viewModels()
+	private val mainNavigationViewmodel by activityViewModels<MainNavigationViewModel>()
 
 	@Inject
 	lateinit var homeItemAdapter: HomeItemAdapter
+
+	@Inject
+	lateinit var channelNavigator: ChannelNavigator
+
+	@Inject
+	lateinit var makeChannelNavigator: MakeChannelActivityNavigator
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -48,7 +54,6 @@ class HomeFragment : Fragment() {
 		super.onViewCreated(view, savedInstanceState)
 		initAdapter()
 		initRecyclerView()
-		initViewState()
 		observeUiEvent()
 		observeUiState()
 	}
@@ -65,17 +70,8 @@ class HomeFragment : Fragment() {
 	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
 		homeViewModel.uiState.collect { uiState ->
 			homeItemAdapter.submitList(uiState.items)
-//			setViewState(uiState)
 		}
 	}
-
-	private fun initViewState() {
-
-	}
-
-//	private fun setViewState(uiState: HomeUiState) {
-//		binding.nicknameTv.text = getString(R.string.user_nickname, uiState.client.nickname)
-//	}
 
 	private fun initAdapter() {
 		homeItemAdapter.onClickBookItem = { itemPosition ->
@@ -103,22 +99,24 @@ class HomeFragment : Fragment() {
 	}
 
 	private fun moveToReadingBookShelf() {
-		(requireActivity() as MainActivity).navigateToBookShelfFragment()
-	}
-
-	private fun moveToChannel(channelId: Long) {
-		val intent = Intent(requireContext(), ChannelActivity::class.java)
-		intent.putExtra(ChannelListFragment.EXTRA_CHANNEL_ID, channelId)
-		startActivity(intent)
-	}
-
-	private fun moveToMakeChannel() {
-		val intent = Intent(requireContext(), MakeChannelActivity::class.java)
-		startActivity(intent)
+		mainNavigationViewmodel.navigateTo(MainRoute.Bookshelf)
 	}
 
 	private fun moveToSearch() {
-		(requireActivity() as MainActivity).navigateToSearchFragment()
+		mainNavigationViewmodel.navigateTo(MainRoute.Search)
+	}
+
+	private fun moveToChannel(channelId: Long) {
+		channelNavigator.navigate(
+			currentActivity = requireActivity(),
+			channelId = channelId,
+		)
+	}
+
+	private fun moveToMakeChannel() {
+		makeChannelNavigator.navigate(
+			currentActivity = requireActivity(),
+		)
 	}
 
 	private fun handleEvent(event: HomeUiEvent) {

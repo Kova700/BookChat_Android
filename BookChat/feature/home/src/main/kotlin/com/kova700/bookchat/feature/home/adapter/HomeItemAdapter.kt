@@ -1,12 +1,12 @@
-package com.example.bookchat.ui.home.adapter
+package com.kova700.bookchat.feature.home.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.example.bookchat.R
-import com.example.bookchat.ui.home.model.HomeItem
-import com.example.bookchat.utils.BookImgSizeManager
+import com.kova700.bookchat.util.book.BookImgSizeManager
+import com.kova700.bookchat.feature.home.model.HomeItem
 import javax.inject.Inject
+import com.kova700.bookchat.feature.home.R as homeR
 
 class HomeItemAdapter @Inject constructor(
 	private val bookImgSizeManager: BookImgSizeManager,
@@ -20,18 +20,18 @@ class HomeItemAdapter @Inject constructor(
 
 	override fun getItemViewType(position: Int): Int {
 		return when (getItem(position)) {
-			is HomeItem.Header -> R.layout.item_home_header
-			is HomeItem.BookHeader -> R.layout.item_home_book_header
-			is HomeItem.BookItem -> R.layout.item_home_book
-			is HomeItem.ChannelHeader -> R.layout.item_home_channel_header
-			is HomeItem.ChannelItem -> R.layout.item_home_channel
-			is HomeItem.BookDummy -> R.layout.item_home_book_dummy
-			HomeItem.BookEmpty -> R.layout.item_home_book_empty
-			HomeItem.ChannelEmpty -> R.layout.item_home_channel_empty
-			HomeItem.BookLoading -> R.layout.layout_home_book_shimmer
-			HomeItem.ChannelLoading -> R.layout.layout_home_channel_shimmer
-			HomeItem.BookRetry -> R.layout.item_home_book_retry
-			HomeItem.ChannelRetry -> R.layout.item_home_channel_retry
+			is HomeItem.Header -> homeR.layout.item_home_header
+			is HomeItem.BookHeader -> homeR.layout.item_home_book_header
+			is HomeItem.BookItem -> homeR.layout.item_home_book
+			is HomeItem.ChannelHeader -> homeR.layout.item_home_channel_header
+			is HomeItem.ChannelItem -> homeR.layout.item_home_channel
+			is HomeItem.BookDummy -> homeR.layout.item_home_book_dummy
+			HomeItem.BookEmpty -> homeR.layout.item_home_book_empty
+			HomeItem.ChannelEmpty -> homeR.layout.item_home_channel_empty
+			HomeItem.BookLoading -> homeR.layout.layout_home_book_shimmer
+			HomeItem.ChannelLoading -> homeR.layout.layout_home_channel_shimmer
+			HomeItem.BookRetry -> homeR.layout.item_home_book_retry
+			HomeItem.ChannelRetry -> homeR.layout.item_home_channel_retry
 		}
 	}
 

@@ -1,17 +1,15 @@
-package com.example.bookchat.ui.home
+package com.kova700.bookchat.feature.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.R
-import com.example.bookchat.domain.model.BookShelfState
-import com.example.bookchat.domain.repository.BookShelfRepository
-import com.example.bookchat.domain.repository.ChannelRepository
-import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.ui.home.HomeUiState.UiState
-import com.example.bookchat.ui.home.mapper.groupItems
-import com.example.bookchat.utils.BookImgSizeManager
-import com.example.bookchat.utils.Constants.TAG
+import com.kova700.bookchat.core.data.bookshelf.external.BookShelfRepository
+import com.kova700.bookchat.core.data.bookshelf.external.model.BookShelfState
+import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
+import com.kova700.bookchat.core.data.client.external.ClientRepository
+import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.feature.home.HomeUiState.UiState
+import com.kova700.bookchat.feature.home.mapper.groupItems
+import com.kova700.bookchat.util.book.BookImgSizeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,7 +75,6 @@ class HomeViewModel @Inject constructor(
 		runCatching { channelRepository.getChannels() }
 			.onSuccess { updateState { copy(channelUiState = UiState.SUCCESS) } }
 			.onFailure {
-				Log.d(TAG, "HomeViewModel: getChannels() - error: $it")
 				startEvent(HomeUiEvent.ShowSnackBar(R.string.error_else))
 				updateState { copy(channelUiState = UiState.ERROR) }
 			}
@@ -111,7 +108,7 @@ class HomeViewModel @Inject constructor(
 		_uiState.update { _uiState.value.block() }
 	}
 
-	fun startEvent(event: HomeUiEvent) = viewModelScope.launch {
+	private fun startEvent(event: HomeUiEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
 	}
 }

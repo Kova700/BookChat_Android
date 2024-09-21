@@ -1,11 +1,10 @@
-package com.example.bookchat.ui.home.model
+package com.kova700.bookchat.feature.home.model
 
-import com.example.bookchat.domain.model.Book
-import com.example.bookchat.domain.model.BookShelfState
-import com.example.bookchat.domain.model.ChannelDefaultImageType
-import com.example.bookchat.domain.model.ChannelMemberAuthority
-import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.model.User
+import com.kova700.bookchat.core.data.bookshelf.external.model.BookShelfState
+import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
+import com.kova700.bookchat.core.data.chat.external.model.Chat
+import com.kova700.bookchat.core.data.search.book.external.model.Book
+import com.kova700.bookchat.core.data.user.external.model.User
 import java.util.Date
 
 sealed interface HomeItem {

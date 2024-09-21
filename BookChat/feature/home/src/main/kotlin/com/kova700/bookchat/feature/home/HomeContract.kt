@@ -1,7 +1,7 @@
-package com.example.bookchat.ui.home
+package com.kova700.bookchat.feature.home
 
-import com.example.bookchat.domain.model.User
-import com.example.bookchat.ui.home.model.HomeItem
+import com.kova700.bookchat.core.data.user.external.model.User
+import com.kova700.bookchat.feature.home.model.HomeItem
 
 data class HomeUiState(
 	val client: User,

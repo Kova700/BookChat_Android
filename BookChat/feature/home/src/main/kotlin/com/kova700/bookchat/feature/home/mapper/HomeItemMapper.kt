@@ -1,10 +1,10 @@
-package com.example.bookchat.ui.home.mapper
+package com.kova700.bookchat.feature.home.mapper
 
-import com.example.bookchat.domain.model.BookShelfItem
-import com.example.bookchat.domain.model.Channel
-import com.example.bookchat.ui.home.HomeUiState.UiState
-import com.example.bookchat.ui.home.model.HomeItem
-import com.example.bookchat.utils.BookImgSizeManager
+import com.kova700.bookchat.core.data.bookshelf.external.model.BookShelfItem
+import com.kova700.bookchat.core.data.channel.external.model.Channel
+import com.kova700.bookchat.feature.home.HomeUiState.UiState
+import com.kova700.bookchat.feature.home.model.HomeItem
+import com.kova700.bookchat.util.book.BookImgSizeManager
 
 fun groupItems(
 	clientNickname: String,
