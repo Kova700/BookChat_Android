@@ -1,6 +1,6 @@
-package com.example.bookchat.ui.signup
+package com.kova700.bookchat.feature.signup.signup
 
-import com.example.bookchat.domain.model.NicknameCheckState
+import com.kova700.bookchat.util.user.namecheck.NicknameCheckState
 
 data class SignUpState(
 	val uiState: UiState,
@@ -33,8 +33,8 @@ sealed class SignUpEvent {
 		val userProfileUri: String?,
 	) : SignUpEvent()
 
-	object PermissionCheck : SignUpEvent()
-	object MoveToBack : SignUpEvent()
+	data object PermissionCheck : SignUpEvent()
+	data object MoveToBack : SignUpEvent()
 
 	data class ErrorEvent(val stringId: Int) : SignUpEvent()
 	data class UnknownErrorEvent(val message: String) : SignUpEvent()

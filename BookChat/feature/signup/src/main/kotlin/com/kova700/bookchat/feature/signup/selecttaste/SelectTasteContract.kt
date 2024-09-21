@@ -1,6 +1,6 @@
-package com.example.bookchat.ui.signup.selecttaste
+package com.kova700.bookchat.feature.signup.selecttaste
 
-import com.example.bookchat.domain.model.ReadingTaste
+import com.kova700.bookchat.core.data.client.external.model.ReadingTaste
 
 data class SelectTasteState(
 	val uiState: UiState,

@@ -1,16 +1,15 @@
-package com.example.bookchat.ui.signup.selecttaste
+package com.kova700.bookchat.feature.signup.selecttaste
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.R
-import com.example.bookchat.data.network.model.response.ForbiddenException
-import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
-import com.example.bookchat.domain.model.ReadingTaste
-import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.domain.usecase.LoginUseCase
-import com.example.bookchat.domain.usecase.SignUpUseCase
-import com.example.bookchat.ui.signup.selecttaste.SelectTasteActivity.Companion.EXTRA_SIGNUP_USER_NICKNAME
+import com.kova700.bookchat.core.data.client.external.ClientRepository
+import com.kova700.bookchat.core.data.client.external.model.ReadingTaste
+import com.kova700.bookchat.core.data.common.model.network.ForbiddenException
+import com.kova700.bookchat.core.design_system.R
+import com.kova700.core.domain.usecase.client.LoginUseCase
+import com.kova700.core.domain.usecase.client.SignUpUseCase
+import com.kova700.bookchat.feature.signup.selecttaste.SelectTasteActivity.Companion.EXTRA_SIGNUP_USER_NICKNAME
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -105,7 +104,6 @@ class SelectTasteViewModel @Inject constructor(
 	private fun failHandler(exception: Throwable) {
 		when (exception) {
 			is ForbiddenException -> startEvent(SelectTasteEvent.ErrorEvent(R.string.login_forbidden_user))
-			is NetworkIsNotConnectedException -> startEvent(SelectTasteEvent.ErrorEvent(R.string.error_network_not_connected))
 			else -> {
 				val errorMessage = exception.message
 				if (errorMessage.isNullOrBlank()) startEvent(SelectTasteEvent.ErrorEvent(R.string.error_else))

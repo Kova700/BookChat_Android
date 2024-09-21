@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.signup
+package com.kova700.bookchat.feature.signup.signup
 
 import android.content.Context
 import android.content.Intent
@@ -17,27 +17,29 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
-import com.example.bookchat.databinding.ActivitySignUpBinding
-import com.example.bookchat.domain.model.NicknameCheckState
-import com.example.bookchat.ui.imagecrop.ImageCropActivity
-import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
-import com.example.bookchat.ui.signup.selecttaste.SelectTasteActivity
-import com.example.bookchat.ui.signup.selecttaste.SelectTasteActivity.Companion.EXTRA_SIGNUP_USER_NICKNAME
-import com.example.bookchat.ui.signup.selecttaste.SelectTasteActivity.Companion.EXTRA_USER_PROFILE_URI
-import com.example.bookchat.utils.image.loadUserProfile
-import com.example.bookchat.utils.makeToast
-import com.example.bookchat.utils.namecheck.MAX_NICKNAME_LENGTH
-import com.example.bookchat.utils.namecheck.NAME_CHECK_REGULAR_EXPRESSION
-import com.example.bookchat.utils.namecheck.getNameCheckResultBackgroundResId
-import com.example.bookchat.utils.namecheck.getNameCheckResultHexInt
-import com.example.bookchat.utils.namecheck.getNameCheckResultText
-import com.example.bookchat.utils.permissions.galleryPermissions
-import com.example.bookchat.utils.permissions.getPermissionsLauncher
-import com.example.bookchat.utils.showSnackBar
+import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.core.navigation.ImageCropNavigator
+import com.kova700.bookchat.core.navigation.ImageCropNavigator.Companion.EXTRA_CROPPED_IMAGE_CACHE_URI
+import com.kova700.bookchat.core.navigation.ImageCropNavigator.ImageCropPurpose
+import com.kova700.bookchat.feature.signup.databinding.ActivitySignUpBinding
+import com.kova700.bookchat.feature.signup.selecttaste.SelectTasteActivity
+import com.kova700.bookchat.feature.signup.selecttaste.SelectTasteActivity.Companion.EXTRA_SIGNUP_USER_NICKNAME
+import com.kova700.bookchat.feature.signup.selecttaste.SelectTasteActivity.Companion.EXTRA_USER_PROFILE_URI
+import com.kova700.bookchat.util.image.image.loadUserProfile
+import com.kova700.bookchat.util.permissions.galleryPermissions
+import com.kova700.bookchat.util.permissions.getPermissionsLauncher
+import com.kova700.bookchat.util.snackbar.showSnackBar
+import com.kova700.bookchat.util.toast.makeToast
+import com.kova700.bookchat.util.user.namecheck.MAX_NICKNAME_LENGTH
+import com.kova700.bookchat.util.user.namecheck.NAME_CHECK_REGULAR_EXPRESSION
+import com.kova700.bookchat.util.user.namecheck.NicknameCheckState
+import com.kova700.bookchat.util.user.namecheck.getNameCheckResultBackgroundResId
+import com.kova700.bookchat.util.user.namecheck.getNameCheckResultHexInt
+import com.kova700.bookchat.util.user.namecheck.getNameCheckResultText
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SignUpActivity : AppCompatActivity() {
@@ -45,6 +47,9 @@ class SignUpActivity : AppCompatActivity() {
 	private lateinit var binding: ActivitySignUpBinding
 	private val signUpViewModel: SignUpViewModel by viewModels()
 	private val imm by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
+
+	@Inject
+	lateinit var imageCropNavigator: ImageCropNavigator
 
 	private val permissionsLauncher = this.getPermissionsLauncher(
 		onSuccess = { moveToImageCrop() },
@@ -177,15 +182,17 @@ class SignUpActivity : AppCompatActivity() {
 	}
 
 	private fun moveToImageCrop() {
-		val intent = Intent(this, ImageCropActivity::class.java)
-		intent.putExtra(ImageCropActivity.EXTRA_CROP_PURPOSE, ImageCropPurpose.USER_PROFILE)
-		cropActivityResultLauncher.launch(intent)
+		imageCropNavigator.navigate(
+			currentActivity = this,
+			imageCropPurpose = ImageCropPurpose.USER_PROFILE,
+			resultLauncher = cropActivityResultLauncher,
+		)
 	}
 
 	private val cropActivityResultLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 			if (result.resultCode == RESULT_OK) {
-				val uri = result.data?.getStringExtra(ImageCropActivity.EXTRA_CROPPED_IMAGE_CACHE_URI)
+				val uri = result.data?.getStringExtra(EXTRA_CROPPED_IMAGE_CACHE_URI)
 					?: return@registerForActivityResult
 				getCroppedImageBitmap(uri)
 			}
@@ -197,8 +204,8 @@ class SignUpActivity : AppCompatActivity() {
 
 	private fun moveToSelectTaste(event: SignUpEvent.MoveToSelectTaste) {
 		val intent = Intent(this, SelectTasteActivity::class.java)
-		intent.putExtra(EXTRA_SIGNUP_USER_NICKNAME, event.userNickname)
-		intent.putExtra(EXTRA_USER_PROFILE_URI, event.userProfileUri)
+			.putExtra(EXTRA_SIGNUP_USER_NICKNAME, event.userNickname)
+			.putExtra(EXTRA_USER_PROFILE_URI, event.userProfileUri)
 		startActivity(intent)
 	}
 

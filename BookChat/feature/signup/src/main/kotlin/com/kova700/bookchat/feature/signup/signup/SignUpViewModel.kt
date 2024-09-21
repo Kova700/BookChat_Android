@@ -1,13 +1,11 @@
-package com.example.bookchat.ui.signup
+package com.kova700.bookchat.feature.signup.signup
 
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.R
-import com.example.bookchat.data.network.model.response.ForbiddenException
-import com.example.bookchat.data.network.model.response.NetworkIsNotConnectedException
-import com.example.bookchat.domain.model.NicknameCheckState
-import com.example.bookchat.domain.repository.ClientRepository
+import com.kova700.bookchat.core.data.client.external.ClientRepository
+import com.kova700.bookchat.core.data.common.model.network.ForbiddenException
+import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.util.user.namecheck.NicknameCheckState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -120,7 +118,6 @@ class SignUpViewModel @Inject constructor(
 	private fun failHandler(exception: Throwable) {
 		when (exception) {
 			is ForbiddenException -> startEvent(SignUpEvent.ErrorEvent(R.string.login_forbidden_user))
-			is NetworkIsNotConnectedException -> startEvent(SignUpEvent.ErrorEvent(R.string.error_network_not_connected))
 			else -> {
 				val errorMessage = exception.message
 				if (errorMessage.isNullOrBlank()) startEvent(SignUpEvent.ErrorEvent(R.string.error_else))

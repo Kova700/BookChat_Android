@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.signup.selecttaste
+package com.kova700.bookchat.feature.signup.selecttaste
 
 import android.content.Intent
 import android.graphics.Color
@@ -6,21 +6,25 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.databinding.ActivitySelectTasteBinding
-import com.example.bookchat.domain.model.ReadingTaste
-import com.example.bookchat.ui.MainActivity
-import com.example.bookchat.utils.image.bitmap.compressToByteArray
-import com.example.bookchat.utils.image.bitmap.getImageBitmap
-import com.example.bookchat.utils.image.deleteImageCache
-import com.example.bookchat.utils.showSnackBar
+import com.kova700.bookchat.core.data.client.external.model.ReadingTaste
+import com.kova700.bookchat.core.navigation.MainNavigator
+import com.kova700.bookchat.feature.signup.databinding.ActivitySelectTasteBinding
+import com.kova700.bookchat.util.image.bitmap.compressToByteArray
+import com.kova700.bookchat.util.image.bitmap.getImageBitmap
+import com.kova700.bookchat.util.image.image.deleteImageCache
+import com.kova700.bookchat.util.snackbar.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SelectTasteActivity : AppCompatActivity() {
 
 	private lateinit var binding: ActivitySelectTasteBinding
 	private val selectTasteViewModel: SelectTasteViewModel by viewModels()
+
+	@Inject
+	lateinit var mainNavigator: MainNavigator
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -70,7 +74,6 @@ class SelectTasteActivity : AppCompatActivity() {
 			religionTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.RELIGION) }
 			characterTasteBtn.setOnClickListener { selectTasteViewModel.onClickTasteBtn(ReadingTaste.CHARACTER) }
 		}
-
 	}
 
 	private fun setViewState(uiState: SelectTasteState) {
@@ -90,11 +93,14 @@ class SelectTasteActivity : AppCompatActivity() {
 	}
 
 	private fun moveToMain() {
-		val intent = Intent(this, MainActivity::class.java)
-		intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-		startActivity(intent)
-		finish()
+		mainNavigator.navigate(
+			currentActivity = this,
+			intentAction = {
+				addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+				addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+			},
+			shouldFinish = true
+		)
 	}
 
 	private fun handleEvent(event: SelectTasteEvent) = when (event) {
@@ -107,7 +113,6 @@ class SelectTasteActivity : AppCompatActivity() {
 
 	companion object {
 		const val EXTRA_SIGNUP_USER_NICKNAME = "EXTRA_SIGNUP_USER_NICKNAME"
-		const val EXTRA_USER_PROFILE_BYTE_ARRAY = "EXTRA_USER_PROFILE_BYTE_ARRAY"
 		const val EXTRA_USER_PROFILE_URI = "EXTRA_USER_PROFILE_URI"
 	}
 }
