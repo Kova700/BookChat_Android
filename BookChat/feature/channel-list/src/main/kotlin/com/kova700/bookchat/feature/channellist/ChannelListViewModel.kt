@@ -1,15 +1,15 @@
-package com.example.bookchat.ui.channelList
+package com.kova700.bookchat.feature.channellist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.R
-import com.example.bookchat.data.networkmanager.external.NetworkManager
-import com.example.bookchat.data.networkmanager.external.model.NetworkState
-import com.example.bookchat.domain.model.ChannelMemberAuthority
-import com.example.bookchat.domain.repository.ChannelRepository
-import com.example.bookchat.ui.channelList.ChannelListUiState.UiState
-import com.example.bookchat.ui.channelList.mapper.toChannelListItem
-import com.example.bookchat.ui.channelList.model.ChannelListItem
+import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
+import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
+import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.core.network_manager.external.NetworkManager
+import com.kova700.bookchat.core.network_manager.external.model.NetworkState
+import com.kova700.bookchat.feature.channellist.ChannelListUiState.UiState
+import com.kova700.bookchat.feature.channellist.mapper.toChannelListItem
+import com.kova700.bookchat.feature.channellist.model.ChannelListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

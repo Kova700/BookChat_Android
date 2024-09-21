@@ -1,15 +1,15 @@
-package com.example.bookchat.ui.channelList
+package com.kova700.bookchat.feature.channellist
 
 import android.graphics.Canvas
 import android.view.View
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_SWIPE
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookchat.R
-import com.example.bookchat.ui.channelList.adpater.ChannelListDataViewHolder
+import com.kova700.bookchat.feature.channellist.adpater.ChannelListDataViewHolder
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
+import com.kova700.bookchat.feature.channellist.R as clR
 
 class ChannelListIItemSwipeHelper @Inject constructor() : ItemTouchHelper.Callback() {
 
@@ -18,7 +18,7 @@ class ChannelListIItemSwipeHelper @Inject constructor() : ItemTouchHelper.Callba
 
 	private fun getSwipeView(viewHolder: RecyclerView.ViewHolder): View =
 		(viewHolder as ChannelListDataViewHolder).itemView
-			.findViewById(R.id.channel_list_swipe_view)
+			.findViewById(clR.id.channel_list_swipe_view)
 
 	private fun setSwiped(viewHolder: RecyclerView.ViewHolder, flag: Boolean) {
 		(viewHolder as ChannelListDataViewHolder).setSwiped(flag)

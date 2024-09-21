@@ -1,15 +1,15 @@
-package com.example.bookchat.ui.channelList.adpater
+package com.kova700.bookchat.feature.channellist.adpater
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.example.bookchat.R
-import com.example.bookchat.databinding.ItemChannelListDataBinding
-import com.example.bookchat.databinding.ItemChannelListHeaderBinding
-import com.example.bookchat.ui.channelList.ChannelListIItemSwipeHelper.Companion.CHANNEL_LIST_ITEM_SWIPE_VIEW_PERCENT
-import com.example.bookchat.ui.channelList.model.ChannelListItem
-import com.example.bookchat.utils.getFormattedDetailDateTimeText
-import com.example.bookchat.utils.image.loadChannelProfile
+import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.feature.channellist.ChannelListIItemSwipeHelper.Companion.CHANNEL_LIST_ITEM_SWIPE_VIEW_PERCENT
+import com.kova700.bookchat.feature.channellist.databinding.ItemChannelListDataBinding
+import com.kova700.bookchat.feature.channellist.databinding.ItemChannelListHeaderBinding
+import com.kova700.bookchat.feature.channellist.model.ChannelListItem
+import com.kova700.bookchat.util.date.getFormattedDetailDateTimeText
+import com.kova700.bookchat.util.image.image.loadChannelProfile
 
 sealed class ChannelListItemViewHolder(
 	binding: ViewBinding,

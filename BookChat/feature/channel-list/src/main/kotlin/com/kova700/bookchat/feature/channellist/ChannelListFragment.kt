@@ -1,6 +1,5 @@
-package com.example.bookchat.ui.channelList
+package com.kova700.bookchat.feature.channellist
 
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,18 +11,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookchat.R
-import com.example.bookchat.data.networkmanager.external.model.NetworkState
-import com.example.bookchat.databinding.FragmentChannelListBinding
-import com.example.bookchat.domain.model.ChannelMemberAuthority
-import com.example.bookchat.ui.MainActivity
-import com.example.bookchat.ui.channel.chatting.ChannelActivity
-import com.example.bookchat.ui.channel.drawer.dialog.ChannelExitWarningDialog
-import com.example.bookchat.ui.channelList.adpater.ChannelListAdapter
-import com.example.bookchat.ui.channelList.dialog.ChannelSettingDialog
-import com.example.bookchat.ui.channelList.model.ChannelListItem
-import com.example.bookchat.ui.createchannel.MakeChannelActivity
-import com.example.bookchat.utils.showSnackBar
+import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
+import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.core.navigation.ChannelNavigator
+import com.kova700.bookchat.core.navigation.MainNavigationViewModel
+import com.kova700.bookchat.core.navigation.MainRoute
+import com.kova700.bookchat.core.navigation.MakeChannelActivityNavigator
+import com.kova700.bookchat.core.network_manager.external.model.NetworkState
+import com.kova700.bookchat.feature.channel.drawer.dialog.ChannelExitWarningDialog
+import com.kova700.bookchat.feature.channellist.adpater.ChannelListAdapter
+import com.kova700.bookchat.feature.channellist.databinding.FragmentChannelListBinding
+import com.kova700.bookchat.feature.channellist.dialog.ChannelSettingDialog
+import com.kova700.bookchat.feature.channellist.model.ChannelListItem
+import com.kova700.bookchat.util.snackbar.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,12 +34,19 @@ class ChannelListFragment : Fragment() {
 	private var _binding: FragmentChannelListBinding? = null
 	private val binding get() = _binding!!
 	private val channelListViewModel by activityViewModels<ChannelListViewModel>()
+	private val mainNavigationViewmodel by activityViewModels<MainNavigationViewModel>()
 
 	@Inject
 	lateinit var channelListAdapter: ChannelListAdapter
 
 	@Inject
 	lateinit var channelListIItemSwipeHelper: ChannelListIItemSwipeHelper
+
+	@Inject
+	lateinit var channelNavigator: ChannelNavigator
+
+	@Inject
+	lateinit var makeChannelNavigator: MakeChannelActivityNavigator
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -156,18 +163,20 @@ class ChannelListFragment : Fragment() {
 	}
 
 	private fun moveToChannel(channelId: Long) {
-		val intent = Intent(requireContext(), ChannelActivity::class.java)
-		intent.putExtra(EXTRA_CHANNEL_ID, channelId)
-		startActivity(intent)
+		channelNavigator.navigate(
+			currentActivity = requireActivity(),
+			channelId = channelId,
+		)
 	}
 
 	private fun moveToMakeChannel() {
-		val intent = Intent(requireContext(), MakeChannelActivity::class.java)
-		startActivity(intent)
+		makeChannelNavigator.navigate(
+			currentActivity = requireActivity(),
+		)
 	}
 
 	private fun moveToSearchChannelPage() {
-		(requireActivity() as MainActivity).navigateToSearchFragment()
+		mainNavigationViewmodel.navigateTo(MainRoute.Search)
 	}
 
 	private fun showChannelSettingDialog(
@@ -217,7 +226,6 @@ class ChannelListFragment : Fragment() {
 	}
 
 	companion object {
-		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
 		private const val DIALOG_TAG_CHANNEL_SETTING = "DIALOG_TAG_CHANNEL_SETTING"
 		private const val DIALOG_TAG_CHANNEL_EXIT_WARNING = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
 	}

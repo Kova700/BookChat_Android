@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.channelList.dialog
+package com.kova700.bookchat.feature.channellist.dialog
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -7,10 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import com.example.bookchat.R
-import com.example.bookchat.databinding.DialogChannelSettingBinding
-import com.example.bookchat.ui.channelList.model.ChannelListItem
-import com.example.bookchat.utils.DialogSizeManager
+import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.feature.channel.databinding.DialogChannelSettingBinding
+import com.kova700.bookchat.feature.channellist.model.ChannelListItem
+import com.kova700.bookchat.util.dialog.DialogSizeManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -47,17 +47,17 @@ class ChannelSettingDialog(
 		_binding = null
 	}
 
-	fun onClickMuteBtn() {
+	private fun onClickMuteBtn() {
 		onClickMuteRelatedBtn.invoke()
 		dismiss()
 	}
 
-	fun onClickTopPinBtn() {
+	private fun onClickTopPinBtn() {
 		onClickTopPinRelatedBtn.invoke()
 		dismiss()
 	}
 
-	fun onClickOkExitBtn() {
+	private fun onClickOkExitBtn() {
 		onClickOkExitBtn.invoke()
 		dismiss()
 	}

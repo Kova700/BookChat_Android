@@ -1,9 +1,9 @@
-package com.example.bookchat.ui.channelList.model
+package com.kova700.bookchat.feature.channellist.model
 
-import com.example.bookchat.domain.model.ChannelDefaultImageType
-import com.example.bookchat.domain.model.ChannelMemberAuthority
-import com.example.bookchat.domain.model.Chat
-import com.example.bookchat.domain.model.User
+import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
+import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
+import com.kova700.bookchat.core.data.chat.external.model.Chat
+import com.kova700.bookchat.core.data.user.external.model.User
 
 sealed interface ChannelListItem {
 	fun getCategoryId(): Long {
@@ -13,7 +13,7 @@ sealed interface ChannelListItem {
 		}
 	}
 
-	object Header : ChannelListItem
+	data object Header : ChannelListItem
 
 	data class ChannelItem(
 		val roomId: Long,

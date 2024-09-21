@@ -1,8 +1,8 @@
-package com.example.bookchat.ui.channelList
+package com.kova700.bookchat.feature.channellist
 
-import com.example.bookchat.domain.model.ChannelMemberAuthority
-import com.example.bookchat.data.networkmanager.external.model.NetworkState
-import com.example.bookchat.ui.channelList.model.ChannelListItem
+import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
+import com.kova700.bookchat.core.network_manager.external.model.NetworkState
+import com.kova700.bookchat.feature.channellist.model.ChannelListItem
 
 data class ChannelListUiState(
 	val uiState: UiState,

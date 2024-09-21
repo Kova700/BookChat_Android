@@ -1,7 +1,7 @@
-package com.example.bookchat.ui.channelList.mapper
+package com.kova700.bookchat.feature.channellist.mapper
 
-import com.example.bookchat.domain.model.Channel
-import com.example.bookchat.ui.channelList.model.ChannelListItem
+import com.kova700.bookchat.core.data.channel.external.model.Channel
+import com.kova700.bookchat.feature.channellist.model.ChannelListItem
 
 fun ChannelListItem.ChannelItem.toChannel(): Channel {
 	return Channel(

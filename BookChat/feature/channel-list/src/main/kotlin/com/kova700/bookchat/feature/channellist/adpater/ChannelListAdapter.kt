@@ -1,17 +1,15 @@
-package com.example.bookchat.ui.channelList.adpater
+package com.kova700.bookchat.feature.channellist.adpater
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.example.bookchat.R
-import com.example.bookchat.databinding.ItemChannelListDataBinding
-import com.example.bookchat.databinding.ItemChannelListHeaderBinding
-import com.example.bookchat.ui.channelList.model.ChannelListItem
+import com.kova700.bookchat.feature.channellist.databinding.ItemChannelListDataBinding
+import com.kova700.bookchat.feature.channellist.databinding.ItemChannelListHeaderBinding
+import com.kova700.bookchat.feature.channellist.model.ChannelListItem
 import javax.inject.Inject
+import com.kova700.bookchat.feature.channellist.R as clR
 
-//TODO : long Click :채팅방 상단고정, 알림 끄기 설정 가능한 다이얼로그
-//TODO : Swipe : 상단고정, 알림 끄기 UI 노출
 class ChannelListAdapter @Inject constructor() :
 	ListAdapter<ChannelListItem, ChannelListItemViewHolder>(CHANNEL_LIST_ITEM_COMPARATOR) {
 	var onSwipe: ((Int, Boolean) -> Unit)? = null
@@ -22,21 +20,21 @@ class ChannelListAdapter @Inject constructor() :
 
 	override fun getItemViewType(position: Int): Int {
 		return when (getItem(position)) {
-			ChannelListItem.Header -> R.layout.item_channel_list_header
-			is ChannelListItem.ChannelItem -> R.layout.item_channel_list_data
+			ChannelListItem.Header -> clR.layout.item_channel_list_header
+			is ChannelListItem.ChannelItem -> clR.layout.item_channel_list_data
 		}
 	}
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChannelListItemViewHolder {
 		when (viewType) {
-			R.layout.item_channel_list_header -> {
+			clR.layout.item_channel_list_header -> {
 				val binding = ItemChannelListHeaderBinding.inflate(
 					LayoutInflater.from(parent.context), parent, false
 				)
 				return ChannelListHeaderViewHolder(binding)
 			}
 
-			R.layout.item_channel_list_data -> {
+			clR.layout.item_channel_list_data -> {
 				val binding = ItemChannelListDataBinding.inflate(
 					LayoutInflater.from(parent.context), parent, false
 				)
