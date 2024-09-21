@@ -1,25 +1,30 @@
-package com.example.bookchat.ui.splash
+package com.kova700.bookchat.feature.splash
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
-import com.example.bookchat.ui.MainActivity
-import com.example.bookchat.ui.login.LoginActivity
-import com.example.bookchat.ui.splash.SplashViewModel.SplashEvent
+import com.kova700.bookchat.core.navigation.LoginActivityNavigator
+import com.kova700.bookchat.core.navigation.MainNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import com.kova700.bookchat.feature.splash.R as splashR
 
 //TODO : SplashScreen 적용
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 	private val splashViewModel: SplashViewModel by viewModels()
 
+	@Inject
+	lateinit var loginNavigator: LoginActivityNavigator
+
+	@Inject
+	lateinit var mainNavigator: MainNavigator
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		setContentView(R.layout.activity_splash)
+		setContentView(splashR.layout.activity_splash)
 		observeUiEvent()
 	}
 
@@ -28,13 +33,17 @@ class SplashActivity : AppCompatActivity() {
 	}
 
 	private fun moveToMain() {
-		startActivity(Intent(this, MainActivity::class.java))
-		finish()
+		mainNavigator.navigate(
+			currentActivity = this,
+			shouldFinish = true,
+		)
 	}
 
 	private fun moveToLogin() {
-		startActivity(Intent(this, LoginActivity::class.java))
-		finish()
+		loginNavigator.navigate(
+			currentActivity = this,
+			shouldFinish = true,
+		)
 	}
 
 	private fun handleEvent(event: SplashEvent) = when (event) {

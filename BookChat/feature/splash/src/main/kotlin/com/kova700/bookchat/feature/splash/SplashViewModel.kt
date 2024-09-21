@@ -1,11 +1,11 @@
-package com.example.bookchat.ui.splash
+package com.kova700.bookchat.feature.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
-import com.example.bookchat.domain.repository.ClientRepository
-import com.example.bookchat.fcm.repository.external.FCMTokenRepository
-import com.example.bookchat.domain.usecase.ClearLocalDataUseCase
+import com.kova700.bookchat.core.data.client.external.ClientRepository
+import com.kova700.bookchat.core.data.fcm_token.external.FCMTokenRepository
+import com.kova700.core.domain.usecase.client.ClearLocalDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -57,11 +57,6 @@ class SplashViewModel @Inject constructor(
 
 	private fun startEvent(event: SplashEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
-	}
-
-	sealed class SplashEvent {
-		object MoveToMain : SplashEvent()
-		object MoveToLogin : SplashEvent()
 	}
 
 	companion object {
