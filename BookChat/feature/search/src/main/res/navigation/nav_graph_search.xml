@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_serach"
+    app:startDestination="@id/searchTapDefaultFragment">
+    <fragment
+        android:id="@+id/searchTapDefaultFragment"
+        android:name="com.kova700.bookchat.feature.search.SearchTapDefaultFragment"
+        android:label="fragment_search_tap_default"
+        tools:layout="@layout/fragment_search_tap_default" />
+    <fragment
+        android:id="@+id/searchTapHistoryFragment"
+        android:name="com.kova700.bookchat.feature.search.SearchTapHistoryFragment"
+        android:label="fragment_search_tap_history"
+        tools:layout="@layout/fragment_search_tap_history" />
+    <fragment
+        android:id="@+id/searchTapSearchingFragment"
+        android:name="com.kova700.bookchat.feature.search.SearchTapSearchingFragment"
+        android:label="fragment_search_tap_searching"
+        tools:layout="@layout/fragment_search_tap_searching" />
+    <fragment
+        android:id="@+id/searchTapResultFragment"
+        android:name="com.kova700.bookchat.feature.search.SearchTapResultFragment"
+        android:label="fragment_search_tap_result"
+        tools:layout="@layout/fragment_search_tap_result" />
+</navigation>
