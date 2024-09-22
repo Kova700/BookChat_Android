@@ -12,9 +12,7 @@ fun ChannelResponse.toChannel(clientId: Long): Channel {
 		roomMemberCount = roomMemberCount,
 		defaultRoomImageType = defaultRoomImageType.toDomain(),
 		roomImageUri = roomImageUri,
-		lastChat = getLastChat(),
-		isBanned = isBanned,
-		isExploded = isExploded
+		lastChat = lastChat,
 	)
 }
 

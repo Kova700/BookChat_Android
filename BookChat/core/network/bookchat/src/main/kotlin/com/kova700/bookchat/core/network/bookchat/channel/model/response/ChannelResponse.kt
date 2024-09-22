@@ -1,11 +1,12 @@
 package com.kova700.bookchat.core.network.bookchat.channel.model.response
 
-import com.google.gson.annotations.SerializedName
 import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.network.bookchat.channel.model.both.ChannelDefaultImageTypeNetwork
 import com.kova700.bookchat.core.network.bookchat.user.model.both.UserDefaultProfileTypeNetwork
 import com.kova700.bookchat.core.network.bookchat.user.model.mapper.toDomain
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 //TODO : Host 정보가 필요함
 //  val id: Long,
@@ -14,54 +15,52 @@ import com.kova700.bookchat.core.network.bookchat.user.model.mapper.toDomain
 //	val defaultProfileImageType: UserDefaultProfileType
 // 채팅방 목록 꾹 눌러서 뜨는 dialog에서 나가기 누르면 경고 띄워야하는데 방장 유무를 몰라서 빨간글씨 띄울지 말지를 모름
 
+@Serializable
 data class ChannelResponse(
-	@SerializedName("roomId")
+	@SerialName("roomId")
 	val roomId: Long,
-	@SerializedName("roomName")
+	@SerialName("roomName")
 	val roomName: String,
-	@SerializedName("roomSid")
+	@SerialName("roomSid")
 	val roomSid: String,
-	@SerializedName("roomMemberCount")
+	@SerialName("roomMemberCount")
 	val roomMemberCount: Int,
-	@SerializedName("defaultRoomImageType")
+	@SerialName("defaultRoomImageType")
 	val defaultRoomImageType: ChannelDefaultImageTypeNetwork,
-	@SerializedName("isBanned")
-	val isBanned: Boolean,
-	@SerializedName("isExploded")
-	val isExploded: Boolean,
-	@SerializedName("lastChatId")
+	@SerialName("lastChatId")
 	val lastChatId: Long? = null,
-	@SerializedName("lastChatContent")
+	@SerialName("lastChatContent")
 	val lastChatContent: String? = null,
-	@SerializedName("lastChatDispatchTime")
+	@SerialName("lastChatDispatchTime")
 	val lastChatDispatchTime: String? = null,
-	@SerializedName("senderId")
+	@SerialName("senderId")
 	val senderId: Long? = null,
-	@SerializedName("senderNickname")
+	@SerialName("senderNickname")
 	val senderNickname: String? = null,
-	@SerializedName("senderProfileImageUrl")
+	@SerialName("senderProfileImageUrl")
 	val senderProfileImageUrl: String? = null,
-	@SerializedName("senderDefaultProfileImageType")
+	@SerialName("senderDefaultProfileImageType")
 	val senderDefaultProfileImageType: UserDefaultProfileTypeNetwork? = null,
-	@SerializedName("roomImageUri")
+	@SerialName("roomImageUri")
 	val roomImageUri: String? = null,
 ) {
 
-	fun getLastChat(): Chat? {
-		if (lastChatId == null) return null
-		return Chat(
-			chatId = lastChatId,
-			channelId = roomId,
-			message = lastChatContent!!,
-			dispatchTime = lastChatDispatchTime!!,
-			sender = senderId?.let { id ->
-				User(
-					id = id,
-					nickname = senderNickname!!,
-					profileImageUrl = senderProfileImageUrl,
-					defaultProfileImageType = senderDefaultProfileImageType!!.toDomain()
-				)
-			}
-		)
-	}
+	val lastChat: Chat?
+		get() {
+			if (lastChatId == null) return null
+			return Chat(
+				chatId = lastChatId,
+				channelId = roomId,
+				message = lastChatContent!!,
+				dispatchTime = lastChatDispatchTime!!,
+				sender = senderId?.let { id ->
+					User(
+						id = id,
+						nickname = senderNickname!!,
+						profileImageUrl = senderProfileImageUrl,
+						defaultProfileImageType = senderDefaultProfileImageType!!.toDomain()
+					)
+				}
+			)
+		}
 }

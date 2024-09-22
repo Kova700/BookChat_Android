@@ -1,14 +1,16 @@
 package com.kova700.bookchat.core.network.bookchat.channel.model.request
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class RequestChangeChannelSetting(
-	@SerializedName("roomId")
+	@SerialName("roomId")
 	val channelId: Long,
-	@SerializedName("roomName")
+	@SerialName("roomName")
 	val channelTitle: String,
-	@SerializedName("roomSize")
+	@SerialName("roomSize")
 	val channelCapacity: Int,
-	@SerializedName("tags")
+	@SerialName("tags")
 	val channelTags: List<String>,
 )

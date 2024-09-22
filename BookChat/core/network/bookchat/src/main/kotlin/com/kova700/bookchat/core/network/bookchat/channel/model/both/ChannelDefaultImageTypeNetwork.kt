@@ -1,13 +1,24 @@
 package com.kova700.bookchat.core.network.bookchat.channel.model.both
 
-import com.google.gson.annotations.SerializedName
+import com.kova700.bookchat.core.network.network.converter.EnumAsIntSerializer
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 
-enum class ChannelDefaultImageTypeNetwork {
-	@SerializedName("1") ONE,
-	@SerializedName("2") TWO,
-	@SerializedName("3") THREE,
-	@SerializedName("4") FOUR,
-	@SerializedName("5") FIVE,
-	@SerializedName("6") SIX,
-	@SerializedName("7") SEVEN
+@Serializable(with = ChannelDefaultImageTypeNetworkSerializer::class)
+enum class ChannelDefaultImageTypeNetwork(val code: Int) {
+	ONE(1),
+	TWO(2),
+	THREE(3),
+	FOUR(4),
+	FIVE(5),
+	SIX(6),
+	SEVEN(7)
 }
+
+class ChannelDefaultImageTypeNetworkSerializer :
+	KSerializer<ChannelDefaultImageTypeNetwork> by EnumAsIntSerializer(
+		codeGetter = { enum: ChannelDefaultImageTypeNetwork -> enum.code },
+		enumGetter = { code: Int ->
+			ChannelDefaultImageTypeNetwork.entries.first { it.code == code }
+		}
+	)

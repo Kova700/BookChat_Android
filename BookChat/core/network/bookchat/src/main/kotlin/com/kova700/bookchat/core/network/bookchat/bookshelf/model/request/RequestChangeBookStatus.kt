@@ -1,14 +1,16 @@
 package com.kova700.bookchat.core.network.bookchat.bookshelf.model.request
 
-import com.google.gson.annotations.SerializedName
 import com.kova700.bookchat.core.data.bookshelf.external.model.BookShelfState
 import com.kova700.bookchat.core.data.bookshelf.external.model.StarRating
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class RequestChangeBookStatus(
-	@SerializedName("readingStatus")
+	@SerialName("readingStatus")
 	private val bookShelfState: BookShelfState,
-	@SerializedName("star")
+	@SerialName("star")
 	private val star: StarRating? = null,
-	@SerializedName("pages")
+	@SerialName("pages")
 	private val pages: Int? = null,
 )

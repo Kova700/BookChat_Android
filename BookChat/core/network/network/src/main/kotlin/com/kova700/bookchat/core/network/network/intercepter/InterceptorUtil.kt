@@ -1,8 +1,10 @@
 package com.kova700.bookchat.core.network.network.intercepter
 
 import com.kova700.bookchat.core.data.bookchat_token.external.model.BookChatToken
-import com.kova700.bookchat.core.data.util.model.network.ForbiddenException
-import com.kova700.bookchat.core.data.util.model.network.TokenRenewalFailException
+import com.kova700.bookchat.core.data.common.model.network.ForbiddenException
+import com.kova700.bookchat.core.data.common.model.network.TokenRenewalFailException
+import com.kova700.bookchat.core.datastore.bookchat_token.mapper.toDomain
+import com.kova700.bookchat.core.datastore.bookchat_token.model.BookChatTokenEntity
 import com.kova700.bookchat.core.network.network.BuildConfig.TOKEN_RENEWAL_URL
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -12,6 +14,10 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+
+private const val AUTHORIZATION = "Authorization"
+private const val TOKEN_PREFIX = "Bearer"
+private const val CONTENT_TYPE_JSON = "application/json; charset=utf-8"
 
 fun Interceptor.Chain.renewToken(
 	bookchatToken: BookChatToken?,
@@ -30,7 +36,7 @@ fun Interceptor.Chain.renewToken(
 	// TODO : 리프레시 토큰마저 만료되었음으로 새로 로그인 해야함
 	//  모든 작업 종료하고 로그인 페이지로 이동하게 수정
 	if (response.isSuccessful.not()) throw TokenRenewalFailException()
-	return response.parseToToken()
+	return response.parseToBookChatToken()
 }
 
 private inline fun <reified T> Json.getJsonRequestBody(
@@ -75,11 +81,9 @@ fun Response.isTokenExpired(): Boolean {
 	return this.code == 401
 }
 
-private fun Response.parseToToken(): BookChatToken {
-	val token = Json.decodeFromString<BookChatToken>(body?.string() ?: "")
-	return token.copy(accessToken = "$TOKEN_PREFIX ${token.accessToken}")
+private fun Response.parseToBookChatToken(): BookChatToken {
+	val token = Json.decodeFromString<BookChatTokenEntity>(
+		body?.string() ?: throw TokenRenewalFailException()
+	)
+	return token.copy(accessToken = "$TOKEN_PREFIX ${token.accessToken}").toDomain()
 }
-
-const val AUTHORIZATION = "Authorization"
-const val TOKEN_PREFIX = "Bearer"
-const val CONTENT_TYPE_JSON = "application/json; charset=utf-8"

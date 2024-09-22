@@ -1,17 +1,31 @@
 package com.kova700.bookchat.core.network.bookchat.chat.model.response
 
-import com.google.gson.annotations.SerializedName
-import com.kova700.bookchat.core.data.user.external.model.User
+import com.kova700.bookchat.core.network.bookchat.user.model.both.UserDefaultProfileTypeNetwork
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class RespondGetChat(
-	@SerializedName("chatId")
+	@SerialName("chatId")
 	val chatId: Long,
-	@SerializedName("chatRoomId")
+	@SerialName("chatRoomId")
 	val channelId: Long,
-	@SerializedName("message")
+	@SerialName("message")
 	val message: String,
-	@SerializedName("dispatchTime")
+	@SerialName("dispatchTime")
 	val dispatchTime: String,
-	@SerializedName("sender")
-	val sender: User,
+	@SerialName("sender")
+	val sender: ResponseUser,
+)
+
+@Serializable
+data class ResponseUser(
+	@SerialName("id")
+	val id: Long,
+	@SerialName("nickname")
+	val nickname: String,
+	@SerialName("profileImageUrl")
+	val profileImageUrl: String?,
+	@SerialName("defaultProfileImageType")
+	val defaultProfileImageType: UserDefaultProfileTypeNetwork,
 )

@@ -1,6 +1,7 @@
 package com.kova700.bookchat.core.network.bookchat.client.model.both
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**ECONOMY 	    : 경제,
 PHILOSOPHY 	    : 철학,
@@ -18,49 +19,50 @@ MAGAZINE		: 잡지,
 RELIGION		: 종교,
 CHARACTER		: 인물,
  */
+@Serializable
 enum class ReadingTasteNetwork {
-	@SerializedName("경제")
+	@SerialName("경제")
 	ECONOMY,
 
-	@SerializedName("철학")
+	@SerialName("철학")
 	PHILOSOPHY,
 
-	@SerializedName("역사")
+	@SerialName("역사")
 	HISTORY,
 
-	@SerializedName("여행")
+	@SerialName("여행")
 	TRAVEL,
 
-	@SerializedName("건강")
+	@SerialName("건강")
 	HEALTH,
 
-	@SerializedName("취미")
+	@SerialName("취미")
 	HOBBY,
 
-	@SerializedName("인문")
+	@SerialName("인문")
 	HUMANITIES,
 
-	@SerializedName("소설")
+	@SerialName("소설")
 	NOVEL,
 
-	@SerializedName("예술")
+	@SerialName("예술")
 	ART,
 
-	@SerializedName("디자인")
+	@SerialName("디자인")
 	DESIGN,
 
-	@SerializedName("개발")
+	@SerialName("개발")
 	DEVELOPMENT,
 
-	@SerializedName("과학")
+	@SerialName("과학")
 	SCIENCE,
 
-	@SerializedName("잡지")
+	@SerialName("잡지")
 	MAGAZINE,
 
-	@SerializedName("종교")
+	@SerialName("종교")
 	RELIGION,
 
-	@SerializedName("인물")
+	@SerialName("인물")
 	CHARACTER;
 }

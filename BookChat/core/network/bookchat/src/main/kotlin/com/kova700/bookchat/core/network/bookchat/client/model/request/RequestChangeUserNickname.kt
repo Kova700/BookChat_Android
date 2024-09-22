@@ -1,8 +1,10 @@
 package com.kova700.bookchat.core.network.bookchat.client.model.request
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class RequestChangeUserNickname(
-	@SerializedName("nickname")
-	val nickname :String
+	@SerialName("nickname")
+	val nickname: String,
 )

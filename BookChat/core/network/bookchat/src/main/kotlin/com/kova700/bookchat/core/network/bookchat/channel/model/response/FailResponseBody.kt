@@ -1,11 +1,13 @@
 package com.kova700.bookchat.core.network.bookchat.channel.model.response
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /** {"errorCode":"4000501","message":"이미 참여한 참여자 입니다." } */
+@Serializable
 data class FailResponseBody(
-	@SerializedName("errorCode")
+	@SerialName("errorCode")
 	val errorCode: Int,
-	@SerializedName("message")
+	@SerialName("message")
 	val message: String,
 )

@@ -1,6 +1,6 @@
 package com.kova700.bookchat.core.network.bookchat.channel
 
-import com.kova700.bookchat.core.data.util.model.network.BookChatApiResult
+import com.kova700.bookchat.core.data.common.model.network.BookChatApiResult
 import com.kova700.bookchat.core.network.bookchat.channel.model.both.ChannelMemberAuthorityNetwork
 import com.kova700.bookchat.core.network.bookchat.channel.model.request.RequestChangeChannelSetting
 import com.kova700.bookchat.core.network.bookchat.channel.model.request.RequestMakeChannel
@@ -58,7 +58,7 @@ interface ChannelApi {
 	@GET("/v1/api/chatrooms/{roomId}")
 	suspend fun getChannelInfo(
 		@Path("roomId") roomId: Long,
-	): ResponseChannelInfo
+	): BookChatApiResult<ResponseChannelInfo>
 
 	@DELETE("/v1/api/chatrooms/{roomId}/participants/{userId}")
 	suspend fun banChannelMember(

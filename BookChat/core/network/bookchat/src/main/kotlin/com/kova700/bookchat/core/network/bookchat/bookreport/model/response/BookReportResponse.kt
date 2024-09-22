@@ -1,12 +1,14 @@
 package com.kova700.bookchat.core.network.bookchat.bookreport.model.response
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class BookReportResponse(
-	@SerializedName("reportTitle")
+	@SerialName("reportTitle")
 	var reportTitle: String,
-	@SerializedName("reportContent")
+	@SerialName("reportContent")
 	var reportContent: String,
-	@SerializedName("reportCreatedAt")
-	val reportCreatedAt: String
+	@SerialName("reportCreatedAt")
+	val reportCreatedAt: String,
 )

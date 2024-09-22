@@ -1,22 +1,24 @@
 package com.kova700.bookchat.core.network.bookchat.bookshelf.model.response
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class BookShelfMeta(
-    @SerializedName("totalElements")
-    val totalElements: Int,
-    @SerializedName("totalPages")
-    val totalPages: Int,
-    @SerializedName("pageSize")
-    val pageSize: Int,
-    @SerializedName("pageNumber")
-    val pageNumber: Int,
-    @SerializedName("offset")
-    val offset: Long,
-    @SerializedName("first")
-    val first: Boolean,
-    @SerializedName("last")
-    val last: Boolean,
-    @SerializedName("empty")
-    val empty: Boolean
+	@SerialName("totalElements")
+	val totalElements: Int,
+	@SerialName("totalPages")
+	val totalPages: Int,
+	@SerialName("pageSize")
+	val pageSize: Int,
+	@SerialName("pageNumber")
+	val pageNumber: Int,
+	@SerialName("offset")
+	val offset: Long,
+	@SerialName("first")
+	val first: Boolean,
+	@SerialName("last")
+	val last: Boolean,
+	@SerialName("empty")
+	val empty: Boolean,
 )

@@ -1,10 +1,12 @@
 package com.kova700.bookchat.core.network.bookchat.agonyrecord.model.request
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class RequestMakeAgonyRecord(
-    @SerializedName("title")
-    val title :String,
-    @SerializedName("content")
-    val content :String
+	@SerialName("title")
+	val title: String,
+	@SerialName("content")
+	val content: String,
 )

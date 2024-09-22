@@ -1,15 +1,17 @@
 package com.kova700.bookchat.core.network.bookchat.client.model.request
 
-import com.google.gson.annotations.SerializedName
 import com.kova700.bookchat.core.network.bookchat.client.model.both.OAuth2ProviderNetwork
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class RequestUserLogin(
-	@SerializedName("fcmToken")
+	@SerialName("fcmToken")
 	val fcmToken: String,
-	@SerializedName("deviceToken")
+	@SerialName("deviceToken")
 	val deviceToken: String,
-	@SerializedName("approveChangingDevice")
+	@SerialName("approveChangingDevice")
 	val isDeviceChangeApproved: Boolean,
-	@SerializedName("oauth2Provider")
-	val oauth2Provider: OAuth2ProviderNetwork
+	@SerialName("oauth2Provider")
+	val oauth2Provider: OAuth2ProviderNetwork,
 )

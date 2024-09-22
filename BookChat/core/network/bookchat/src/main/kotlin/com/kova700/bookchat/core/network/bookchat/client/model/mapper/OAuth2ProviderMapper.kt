@@ -1,7 +1,7 @@
 package com.kova700.bookchat.core.network.bookchat.client.model.mapper
 
+import com.kova700.bookchat.core.data.oauth.external.model.OAuth2Provider
 import com.kova700.bookchat.core.network.bookchat.client.model.both.OAuth2ProviderNetwork
-import com.kova700.bookchat.core.oauth.external.model.OAuth2Provider
 
 fun OAuth2ProviderNetwork.toDomain(): OAuth2Provider {
 	return OAuth2Provider.valueOf(name)

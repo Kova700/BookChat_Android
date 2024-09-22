@@ -1,20 +1,22 @@
 package com.kova700.bookchat.core.network.bookchat.common.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class CursorMeta(
-    @SerializedName("sliceSize")
-    val sliceSize: Int,
-    @SerializedName("contentSize")
-    val contentSize: Int,
-    @SerializedName("hasContent")
-    val hasContent: Boolean,
-    @SerializedName("hasNext")
-    val hasNext: Boolean,
-    @SerializedName("last")
-    val last: Boolean,
-    @SerializedName("first")
-    val first: Boolean,
-    @SerializedName("nextCursorId")
-    val nextCursorId: Long?,
+	@SerialName("sliceSize")
+	val sliceSize: Int,
+	@SerialName("contentSize")
+	val contentSize: Int,
+	@SerialName("hasContent")
+	val hasContent: Boolean,
+	@SerialName("hasNext")
+	val hasNext: Boolean,
+	@SerialName("last")
+	val last: Boolean,
+	@SerialName("first")
+	val first: Boolean,
+	@SerialName("nextCursorId")
+	val nextCursorId: Long?,
 )

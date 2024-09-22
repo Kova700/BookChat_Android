@@ -18,7 +18,7 @@ fun BookShelfItemResponse.toDomain(state: BookShelfState): BookShelfItem {
 			publishAt = publishAt,
 			bookCoverImageUrl = bookCoverImageUrl
 		),
-		pages = pages,
+		pages = pages ?: 0, //TODO :  //TODO : 서버 수정을 위해 임시로 nullable 처리 + default value 추가
 		star = star,
 		state = state,
 		lastUpdatedAt = lastUpdatedAt.toDate() ?: Date()

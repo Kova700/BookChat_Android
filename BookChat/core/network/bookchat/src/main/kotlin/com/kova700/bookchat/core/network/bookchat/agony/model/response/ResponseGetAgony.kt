@@ -1,11 +1,13 @@
 package com.kova700.bookchat.core.network.bookchat.agony.model.response
 
-import com.google.gson.annotations.SerializedName
 import com.kova700.bookchat.core.network.bookchat.common.model.CursorMeta
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ResponseGetAgony(
-	@SerializedName("agonyResponseList")
+	@SerialName("agonyResponseList")
 	val agonyResponseList: List<AgonyResponse>,
-	@SerializedName("cursorMeta")
-	val cursorMeta: CursorMeta
+	@SerialName("cursorMeta")
+	val cursorMeta: CursorMeta,
 )

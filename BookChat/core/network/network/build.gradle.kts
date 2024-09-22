@@ -29,7 +29,7 @@ dependencies {
 	implementation(libs.bundles.retrofit)
 	implementation(platform(libs.okhttp.bom))
 	implementation(libs.kotlinx.serialization.json)
-
 	implementation(project(":core:data:bookchat-token:external"))
+	implementation(project(":core:datastore:bookchat-token"))
 	implementation(project(":core:data:common"))
 }

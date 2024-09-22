@@ -1,13 +1,13 @@
 package com.kova700.bookchat.core.network.bookchat.bookshelf.model.response
 
-import com.google.gson.annotations.SerializedName
 import com.kova700.bookchat.core.data.bookshelf.external.model.BookShelfState
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class BookStateInBookShelfResponse(
-	@SerializedName("bookShelfId")
+	@SerialName("bookShelfId")
 	val bookShelfId: Long,
-	@SerializedName("bookId")
-	val bookId: Long,
-	@SerializedName("readingStatus")
+	@SerialName("readingStatus")
 	val bookShelfState: BookShelfState,
 )

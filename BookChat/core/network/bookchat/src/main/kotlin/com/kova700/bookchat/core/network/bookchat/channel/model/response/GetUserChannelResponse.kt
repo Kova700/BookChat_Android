@@ -1,11 +1,13 @@
 package com.kova700.bookchat.core.network.bookchat.channel.model.response
 
-import com.google.gson.annotations.SerializedName
 import com.kova700.bookchat.core.network.bookchat.common.model.CursorMeta
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class GetUserChannelResponse(
-	@SerializedName("userChatRoomResponseList")
+	@SerialName("userChatRoomResponseList")
 	val channels: List<ChannelResponse>,
-	@SerializedName("cursorMeta")
-	val cursorMeta: CursorMeta
+	@SerialName("cursorMeta")
+	val cursorMeta: CursorMeta,
 )

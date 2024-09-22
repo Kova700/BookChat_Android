@@ -1,9 +1,8 @@
 package com.kova700.bookchat.core.network.network.converter
 
 import android.os.Build
-import com.kova700.bookchat.core.data.util.model.network.BookChatApiResult
+import com.kova700.bookchat.core.data.common.model.network.BookChatApiResult
 import okhttp3.Request
-import okio.IOException
 import okio.Timeout
 import retrofit2.Call
 import retrofit2.CallAdapter
@@ -80,20 +79,20 @@ private class BookChatApiCall<R>(
 			isSuccessful.not() ->
 				BookChatApiResult.Failure(
 					code = code(),
-					headers = headers().toMap(),
+					locationHeader = getLocationHeader(),
 					message = message(),
 					body = errorBody()?.string() ?: ""
 				)
 
 			body != null -> BookChatApiResult.Success(
 				code = code(),
-				headers = headers().toMap(),
+				locationHeader = getLocationHeader(),
 				data = body,
 			)
 
 			successType == Unit::class.java -> BookChatApiResult.Success(
 				code = code(),
-				headers = headers().toMap(),
+				locationHeader = getLocationHeader(),
 				data = Unit as R,
 			)
 
@@ -101,6 +100,10 @@ private class BookChatApiCall<R>(
 				"The Body does not exist, but it was defined as a type other than Unit. Define it as BookChatApiResponse<Unit>"
 			)
 		}
+	}
+
+	private fun Response<R>.getLocationHeader(): Long? {
+		return headers()["Location"]?.substringAfterLast("/")?.toLong()
 	}
 
 	override fun clone(): Call<BookChatApiResult<R>> {

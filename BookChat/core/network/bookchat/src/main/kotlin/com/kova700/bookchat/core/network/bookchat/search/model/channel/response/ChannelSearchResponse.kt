@@ -1,55 +1,57 @@
 package com.kova700.bookchat.core.network.bookchat.search.model.channel.response
 
-import com.google.gson.annotations.SerializedName
 import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.network.bookchat.channel.model.both.ChannelDefaultImageTypeNetwork
 import com.kova700.bookchat.core.network.bookchat.user.model.both.UserDefaultProfileTypeNetwork
 import com.kova700.bookchat.core.network.bookchat.user.model.mapper.toDomain
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 //TODO : tags 타입 List로 반환해서 받으면 좋을 듯
+@Serializable
 data class ChannelSearchResponse(
-	@SerializedName("roomId")
+	@SerialName("roomId")
 	val roomId: Long,
-	@SerializedName("roomName")
+	@SerialName("roomName")
 	val roomName: String,
-	@SerializedName("roomSid")
+	@SerialName("roomSid")
 	val roomSid: String,
-	@SerializedName("bookTitle")
+	@SerialName("bookTitle")
 	val bookTitle: String,
-	@SerializedName("bookAuthors")
+	@SerialName("bookAuthors")
 	val bookAuthors: List<String>,
-	@SerializedName("bookCoverImageUri")
+	@SerialName("bookCoverImageUri")
 	val bookCoverImageUri: String,
-	@SerializedName("roomMemberCount")
+	@SerialName("roomMemberCount")
 	val roomMemberCount: Int,
-	@SerializedName("roomSize")
+	@SerialName("roomSize")
 	val roomSize: Int,
-	@SerializedName("hostId")
+	@SerialName("hostId")
 	val hostId: Long,
-	@SerializedName("hostName")
+	@SerialName("hostName")
 	val hostName: String,
-	@SerializedName("hostDefaultProfileImageType")
+	@SerialName("hostDefaultProfileImageType")
 	val hostDefaultProfileImageType: UserDefaultProfileTypeNetwork,
-	@SerializedName("hostProfileImageUri")
+	@SerialName("hostProfileImageUri")
 	val hostProfileImageUri: String,
-	@SerializedName("defaultRoomImageType")
+	@SerialName("defaultRoomImageType")
 	val defaultRoomImageType: ChannelDefaultImageTypeNetwork,
-	@SerializedName("tags")
+	@SerialName("tags")
 	val tags: String,
-	@SerializedName("roomImageUri")
+	@SerialName("roomImageUri")
 	val roomImageUri: String? = null,
-	@SerializedName("lastChatSenderId")
+	@SerialName("lastChatSenderId")
 	val lastChatSenderId: Long? = null,
-	@SerializedName("lastChatId")
+	@SerialName("lastChatId")
 	val lastChatId: Long? = null,
-	@SerializedName("lastChatMessage")
+	@SerialName("lastChatMessage")
 	val lastChatMessage: String? = null,
-	@SerializedName("lastChatDispatchTime")
+	@SerialName("lastChatDispatchTime")
 	val lastChatDispatchTime: String? = null,
-	@SerializedName("isEntered")
+	@SerialName("isEntered")
 	val isEntered: Boolean,
-	@SerializedName("isBanned")
+	@SerialName("isBanned")
 	val isBanned: Boolean,
 ) {
 	val host

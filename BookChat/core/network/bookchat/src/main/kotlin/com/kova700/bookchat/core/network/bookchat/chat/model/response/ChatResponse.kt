@@ -1,14 +1,16 @@
 package com.kova700.bookchat.core.network.bookchat.chat.model.response
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ChatResponse(
-	@SerializedName("chatId")
+	@SerialName("chatId")
 	val chatId: Long,
-	@SerializedName("senderId")
+	@SerialName("senderId")
 	val senderId: Long?,
-	@SerializedName("dispatchTime")
+	@SerialName("dispatchTime")
 	val dispatchTime: String,
-	@SerializedName("message")
-	val message: String
+	@SerialName("message")
+	val message: String,
 )

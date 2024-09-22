@@ -1,12 +1,14 @@
 package com.kova700.bookchat.core.network.bookchat.search.model.book.response
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class SearchingMeta(
-    @SerializedName("is_end")
-    val isEnd: Boolean,
-    @SerializedName("pageable_count")
-    val pageableCount: Int,
-    @SerializedName("total_count")
-    val totalCount: Int,
+	@SerialName("is_end")
+	val isEnd: Boolean,
+	@SerialName("pageable_count")
+	val pageableCount: Int,
+	@SerialName("total_count")
+	val totalCount: Int,
 )

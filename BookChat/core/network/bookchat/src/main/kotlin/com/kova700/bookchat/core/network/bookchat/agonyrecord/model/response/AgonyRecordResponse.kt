@@ -1,14 +1,16 @@
 package com.kova700.bookchat.core.network.bookchat.agonyrecord.model.response
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class AgonyRecordResponse(
-	@SerializedName("agonyRecordId")
+	@SerialName("agonyRecordId")
 	val agonyRecordId: Long,
-	@SerializedName("agonyRecordTitle")
+	@SerialName("agonyRecordTitle")
 	val agonyRecordTitle: String,
-	@SerializedName("agonyRecordContent")
+	@SerialName("agonyRecordContent")
 	val agonyRecordContent: String,
-	@SerializedName("createdAt")
-	val createdAt: String
+	@SerialName("createdAt")
+	val createdAt: String,
 )

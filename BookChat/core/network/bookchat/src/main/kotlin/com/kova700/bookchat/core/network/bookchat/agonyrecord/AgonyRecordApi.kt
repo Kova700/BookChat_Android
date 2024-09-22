@@ -1,6 +1,6 @@
 package com.kova700.bookchat.core.network.bookchat.agonyrecord
 
-import com.kova700.bookchat.core.data.util.model.network.BookChatApiResult
+import com.kova700.bookchat.core.data.common.model.network.BookChatApiResult
 import com.kova700.bookchat.core.network.bookchat.agonyrecord.model.request.RequestMakeAgonyRecord
 import com.kova700.bookchat.core.network.bookchat.agonyrecord.model.request.RequestReviseAgonyRecord
 import com.kova700.bookchat.core.network.bookchat.agonyrecord.model.response.AgonyRecordResponse

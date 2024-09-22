@@ -4,6 +4,7 @@ import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.network.bookchat.chat.model.response.ChatResponse
 import com.kova700.bookchat.core.network.bookchat.chat.model.response.RespondGetChat
+import com.kova700.bookchat.core.network.bookchat.user.model.mapper.toDomain
 
 fun ChatResponse.toChat(channelId: Long): Chat {
 	return Chat(
@@ -25,6 +26,11 @@ fun RespondGetChat.toChat(): Chat {
 		channelId = channelId,
 		message = message,
 		dispatchTime = dispatchTime,
-		sender = sender
+		sender = User(
+			id = sender.id,
+			nickname = sender.nickname,
+			profileImageUrl = sender.profileImageUrl,
+			defaultProfileImageType = sender.defaultProfileImageType.toDomain()
+		)
 	)
 }

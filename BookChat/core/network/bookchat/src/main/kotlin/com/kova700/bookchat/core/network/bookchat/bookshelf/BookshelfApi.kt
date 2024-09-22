@@ -1,6 +1,7 @@
 package com.kova700.bookchat.core.network.bookchat.bookshelf
 
-import com.kova700.bookchat.core.data.util.model.network.BookChatApiResult
+import com.kova700.bookchat.core.data.common.model.network.BookChatApiResult
+import com.kova700.bookchat.core.network.bookchat.bookshelf.model.both.BookShelfStateNetwork
 import com.kova700.bookchat.core.network.bookchat.bookshelf.model.request.RequestChangeBookStatus
 import com.kova700.bookchat.core.network.bookchat.bookshelf.model.request.RequestRegisterBookShelfBook
 import com.kova700.bookchat.core.network.bookchat.bookshelf.model.response.BookShelfItemResponse
@@ -18,7 +19,7 @@ import retrofit2.http.Query
 interface BookshelfApi {
 
 	@POST("/v1/api/bookshelves")
-	suspend fun registerBookShelfBook(
+	suspend fun registerBookShelfBook( //TODO : 서버 수정 대기
 		@Body requestRegisterBookShelfBook: RequestRegisterBookShelfBook,
 	): BookChatApiResult<Unit>
 
@@ -26,7 +27,7 @@ interface BookshelfApi {
 	suspend fun getBookShelfItems(
 		@Query("size") size: Int,
 		@Query("page") page: Long,
-		@Query("readingStatus") bookShelfState: String,
+		@Query("readingStatus") bookShelfState: BookShelfStateNetwork,
 		@Query("sort") sort: SearchSortOptionNetwork = SearchSortOptionNetwork.UPDATED_AT_DESC,
 	): ResponseGetBookShelfBooks
 

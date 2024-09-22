@@ -1,27 +1,29 @@
 package com.kova700.bookchat.core.network.bookchat.bookshelf.model.response
 
-import com.google.gson.annotations.SerializedName
 import com.kova700.bookchat.core.data.bookshelf.external.model.StarRating
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class BookShelfItemResponse(
-	@SerializedName("bookShelfId")
+	@SerialName("bookShelfId")
 	val bookShelfId: Long,
-	@SerializedName("title")
+	@SerialName("title")
 	val title: String,
-	@SerializedName("isbn")
+	@SerialName("isbn")
 	val isbn: String,
-	@SerializedName("bookCoverImageUrl")
+	@SerialName("bookCoverImageUrl")
 	val bookCoverImageUrl: String,
-	@SerializedName("authors")
+	@SerialName("authors")
 	val authors: List<String>,
-	@SerializedName("publisher")
+	@SerialName("publisher")
 	val publisher: String,
-	@SerializedName("publishAt")
+	@SerialName("publishAt")
 	val publishAt: String,
-	@SerializedName("pages")
-	val pages: Int,
-	@SerializedName("star")
+	@SerialName("pages")
+	val pages: Int? = 0, //TODO : 서버 수정을 위해 임시로 nullable 처리 + default value 추가
+	@SerialName("star")
 	val star: StarRating?,
-	@SerializedName("lastUpdatedAt")
+	@SerialName("lastUpdatedAt")
 	val lastUpdatedAt: String,
 )

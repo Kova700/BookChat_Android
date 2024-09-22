@@ -1,6 +1,6 @@
 package com.kova700.bookchat.core.network.bookchat.bookreport
 
-import com.kova700.bookchat.core.data.util.model.network.BookChatApiResult
+import com.kova700.bookchat.core.data.common.model.network.BookChatApiResult
 import com.kova700.bookchat.core.network.bookchat.bookreport.model.request.RequestRegisterBookReport
 import com.kova700.bookchat.core.network.bookchat.bookreport.model.response.BookReportResponse
 import retrofit2.http.Body

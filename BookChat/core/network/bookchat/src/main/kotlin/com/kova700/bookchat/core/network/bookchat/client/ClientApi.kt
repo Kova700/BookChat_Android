@@ -1,6 +1,6 @@
 package com.kova700.bookchat.core.network.bookchat.client
 
-import com.kova700.bookchat.core.data.util.model.network.BookChatApiResult
+import com.kova700.bookchat.core.data.common.model.network.BookChatApiResult
 import com.kova700.bookchat.core.network.bookchat.client.model.request.RequestChangeUserNickname
 import com.kova700.bookchat.core.network.bookchat.client.model.request.RequestUserLogin
 import com.kova700.bookchat.core.network.bookchat.client.model.request.RequestUserSignUp

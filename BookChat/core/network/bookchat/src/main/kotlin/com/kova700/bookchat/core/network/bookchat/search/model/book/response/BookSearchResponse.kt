@@ -1,18 +1,20 @@
 package com.kova700.bookchat.core.network.bookchat.search.model.book.response
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class BookSearchResponse(
-	@SerializedName("isbn")
+	@SerialName("isbn")
 	val isbn: String,
-	@SerializedName("title")
+	@SerialName("title")
 	var title: String,
-	@SerializedName("authors")
+	@SerialName("authors")
 	val authors: List<String>,
-	@SerializedName("publisher")
+	@SerialName("publisher")
 	val publisher: String,
-	@SerializedName("publishAt")
+	@SerialName("publishAt")
 	var publishAt: String,
-	@SerializedName("bookCoverImageUrl")
+	@SerialName("bookCoverImageUrl")
 	val bookCoverImageUrl: String,
 )

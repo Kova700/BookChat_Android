@@ -1,10 +1,12 @@
 package com.kova700.bookchat.core.network.bookchat.client.model.response
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class BookChatTokenResponse(
-	@SerializedName("accessToken")
+	@SerialName("accessToken")
 	val accessToken: String,
-	@SerializedName("refreshToken")
-	val refreshToken: String
+	@SerialName("refreshToken")
+	val refreshToken: String,
 )

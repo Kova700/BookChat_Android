@@ -1,9 +1,16 @@
 package com.kova700.bookchat.core.network.bookchat.channel.model.both
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 enum class ChannelMemberAuthorityNetwork {
-	@SerializedName("HOST") HOST,
-	@SerializedName("SUBHOST ") SUB_HOST,
-	@SerializedName("GUEST") GUEST
+	@SerialName("HOST")
+	HOST,
+
+	@SerialName("SUBHOST")
+	SUB_HOST,
+
+	@SerialName("GUEST")
+	GUEST
 }

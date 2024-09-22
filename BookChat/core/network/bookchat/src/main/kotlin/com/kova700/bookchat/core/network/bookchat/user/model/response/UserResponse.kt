@@ -1,15 +1,18 @@
 package com.kova700.bookchat.core.network.bookchat.user.model.response
 
 import com.kova700.bookchat.core.network.bookchat.user.model.both.UserDefaultProfileTypeNetwork
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+//TODO: 서버로부터 UserEmail 필드가 넘어옴 (서버 수정 필요)
+@Serializable
 data class UserResponse(
-	@SerializedName("userId")
+	@SerialName("userId")
 	val userId: Long,
-	@SerializedName("userNickname")
+	@SerialName("userNickname")
 	val userNickname: String,
-	@SerializedName("userProfileImageUri")
-	val userProfileImageUri: String?,
-	@SerializedName("defaultProfileImageType")
+	@SerialName("userProfileImageUri")
+	val userProfileImageUri: String? = null,
+	@SerialName("defaultProfileImageType")
 	val defaultProfileImageType: UserDefaultProfileTypeNetwork,
 )

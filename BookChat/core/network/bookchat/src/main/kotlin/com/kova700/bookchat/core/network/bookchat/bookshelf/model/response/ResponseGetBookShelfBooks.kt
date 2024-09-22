@@ -1,10 +1,12 @@
 package com.kova700.bookchat.core.network.bookchat.bookshelf.model.response
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ResponseGetBookShelfBooks(
-	@SerializedName("contents")
+	@SerialName("contents")
 	val contents: List<BookShelfItemResponse>,
-	@SerializedName("pageMeta")
+	@SerialName("pageMeta")
 	val pageMeta: BookShelfMeta,
 )

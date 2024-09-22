@@ -1,18 +1,20 @@
 package com.kova700.bookchat.core.network.bookchat.channel.model.request
 
-import com.google.gson.annotations.SerializedName
 import com.kova700.bookchat.core.network.bookchat.channel.model.both.ChannelDefaultImageTypeNetwork
 import com.kova700.bookchat.core.network.bookchat.common.model.BookRequest
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class RequestMakeChannel(
-	@SerializedName("roomName")
+	@SerialName("roomName")
 	val roomName: String,
-	@SerializedName("roomSize")
+	@SerialName("roomSize")
 	val roomSize: Int,
-	@SerializedName("defaultRoomImageType")
+	@SerialName("defaultRoomImageType")
 	val defaultRoomImageType: ChannelDefaultImageTypeNetwork,
-	@SerializedName("hashTags")
+	@SerialName("hashTags")
 	val hashTags: List<String>,
-	@SerializedName("bookRequest")
+	@SerialName("bookRequest")
 	val bookRequest: BookRequest,
 )

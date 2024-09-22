@@ -1,13 +1,15 @@
 package com.kova700.bookchat.core.network.bookchat.agony.model.response
 
 import com.kova700.bookchat.core.network.bookchat.agony.model.both.AgonyFolderHexColorNetwork
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class AgonyResponse(
-	@SerializedName("agonyId")
+	@SerialName("agonyId")
 	val agonyId: Long,
-	@SerializedName("title")
+	@SerialName("title")
 	val title: String,
-	@SerializedName("hexColorCode")
+	@SerialName("hexColorCode")
 	val hexColorCode: AgonyFolderHexColorNetwork,
 )

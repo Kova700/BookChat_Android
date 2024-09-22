@@ -1,34 +1,32 @@
 package com.kova700.bookchat.core.network.bookchat.channel.model.response
 
-import com.google.gson.annotations.SerializedName
 import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.network.bookchat.user.model.both.UserDefaultProfileTypeNetwork
 import com.kova700.bookchat.core.network.bookchat.user.model.mapper.toDomain
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ResponseChannelInfo(
-	@SerializedName("roomSize")
+	@SerialName("roomSize")
 	val roomCapacity: Int,
-	@SerializedName("roomTags")
+	@SerialName("roomTags")
 	val roomTags: List<String>,
-	@SerializedName("roomName")
+	@SerialName("roomName")
 	val roomName: String,
-	@SerializedName("bookTitle")
+	@SerialName("bookTitle")
 	val bookTitle: String,
-	@SerializedName("bookCoverImageUrl")
+	@SerialName("bookCoverImageUrl")
 	val bookCoverImageUrl: String,
-	@SerializedName("bookAuthors")
+	@SerialName("bookAuthors")
 	val bookAuthors: List<String>,
-	@SerializedName("roomHost")
+	@SerialName("roomHost")
 	val roomHost: ChannelUser,
-	@SerializedName("roomSubHostList")
+	@SerialName("roomSubHostList")
 	val roomSubHostList: List<ChannelUser>?,
-	@SerializedName("roomGuestList")
+	@SerialName("roomGuestList")
 	val roomGuestList: List<ChannelUser>?,
-	@SerializedName("isBanned")
-	val isBanned: Boolean,
-	@SerializedName("isExploded")
-	val isExploded: Boolean,
 ) {
 	val participants
 		get() = mutableListOf<User>().apply {
@@ -57,14 +55,15 @@ data class ResponseChannelInfo(
 }
 
 //TODO : UserResponse와 프로퍼티명 통일하여 개선 필요
+@Serializable
 data class ChannelUser(
-	@SerializedName("id")
+	@SerialName("id")
 	val id: Long,
-	@SerializedName("nickname")
+	@SerialName("nickname")
 	val nickname: String,
-	@SerializedName("profileImageUrl")
+	@SerialName("profileImageUrl")
 	val profileImageUrl: String,
-	@SerializedName("defaultProfileImageType")
+	@SerialName("defaultProfileImageType")
 	val defaultProfileImageType: UserDefaultProfileTypeNetwork,
 ) {
 	fun toUser() =

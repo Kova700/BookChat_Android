@@ -6,7 +6,6 @@ import com.kova700.bookchat.core.network.bookchat.bookshelf.model.response.BookS
 fun BookStateInBookShelfResponse.toDomain(): BookStateInBookShelf {
 	return BookStateInBookShelf(
 		bookShelfId = bookShelfId,
-		bookId = bookId,
 		bookShelfState = bookShelfState
 	)
 }

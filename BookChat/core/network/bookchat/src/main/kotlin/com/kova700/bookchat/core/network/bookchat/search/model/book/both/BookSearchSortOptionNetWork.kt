@@ -1,10 +1,13 @@
 package com.kova700.bookchat.core.network.bookchat.search.model.book.both
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 enum class BookSearchSortOptionNetWork {
-	@SerializedName("ACCURACY")
+	@SerialName("ACCURACY")
 	ACCURACY,
-	@SerializedName("LATEST")
+
+	@SerialName("LATEST")
 	LATEST
 }
