@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.createchannel.dialog
+package com.kova700.bookchat.feature.createchannel.dialog
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -7,8 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import com.example.bookchat.databinding.DialogMakeChannelImageSelectBinding
-import com.example.bookchat.utils.DialogSizeManager
+import com.kova700.bookchat.feature.createchannel.databinding.DialogMakeChannelImageSelectBinding
+import com.kova700.bookchat.util.dialog.DialogSizeManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

@@ -1,15 +1,15 @@
-package com.example.bookchat.ui.createchannel
+package com.kova700.bookchat.feature.createchannel
 
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookchat.R
-import com.example.bookchat.domain.model.Channel
-import com.example.bookchat.domain.model.ChannelDefaultImageType
-import com.example.bookchat.domain.repository.BookSearchRepository
-import com.example.bookchat.domain.repository.ChannelRepository
-import com.example.bookchat.ui.createchannel.MakeChannelUiState.UiState
-import com.example.bookchat.utils.image.bitmap.compressToByteArray
+import com.kova700.bookchat.core.data.channel.external.model.Channel
+import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
+import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
+import com.kova700.bookchat.core.data.search.book.external.BookSearchRepository
+import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.feature.createchannel.MakeChannelUiState.UiState
+import com.kova700.bookchat.util.image.bitmap.compressToByteArray
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +49,7 @@ class MakeChannelViewModel @Inject constructor(
 			channelRepository.makeChannel(
 				channelTitle = uiState.value.channelTitle.trim(),
 				channelSize = DEFAULT_ROOM_SIZE,
-				defaultRoomImageType = uiState.value.defaultProfileImageType,
+				channelDefaultImageType = uiState.value.defaultProfileImageType,
 				channelTags = uiState.value.channelTagList,
 				selectedBook = uiState.value.selectedBook!!,
 				channelImage = uiState.value.channelProfileImage?.compressToByteArray()

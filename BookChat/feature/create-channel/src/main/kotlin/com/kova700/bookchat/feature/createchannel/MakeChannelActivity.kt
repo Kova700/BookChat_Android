@@ -1,4 +1,4 @@
-package com.example.bookchat.ui.createchannel
+package com.kova700.bookchat.feature.createchannel
 
 import android.content.Intent
 import android.graphics.Color
@@ -12,23 +12,23 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
-import com.example.bookchat.R
-import com.example.bookchat.databinding.ActivityMakeChannelBinding
-import com.example.bookchat.ui.channel.chatting.ChannelActivity
-import com.example.bookchat.ui.channelList.ChannelListFragment.Companion.EXTRA_CHANNEL_ID
-import com.example.bookchat.ui.createchannel.dialog.MakeChannelImageSelectDialog
-import com.example.bookchat.ui.imagecrop.ImageCropActivity
-import com.example.bookchat.ui.imagecrop.model.ImageCropPurpose
-import com.example.bookchat.ui.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
-import com.example.bookchat.utils.MakeChannelImgSizeManager
-import com.example.bookchat.utils.image.bitmap.getImageBitmap
-import com.example.bookchat.utils.image.deleteImageCache
-import com.example.bookchat.utils.image.loadChangedChannelProfile
-import com.example.bookchat.utils.image.loadUrl
-import com.example.bookchat.utils.makeToast
-import com.example.bookchat.utils.permissions.galleryPermissions
-import com.example.bookchat.utils.permissions.getPermissionsLauncher
-import com.example.bookchat.utils.showSnackBar
+import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.core.navigation.ChannelNavigator
+import com.kova700.bookchat.core.navigation.ImageCropNavigator
+import com.kova700.bookchat.core.navigation.ImageCropNavigator.Companion.EXTRA_CROPPED_IMAGE_CACHE_URI
+import com.kova700.bookchat.core.navigation.ImageCropNavigator.ImageCropPurpose
+import com.kova700.bookchat.feature.createchannel.databinding.ActivityMakeChannelBinding
+import com.kova700.bookchat.feature.createchannel.dialog.MakeChannelImageSelectDialog
+import com.kova700.bookchat.feature.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
+import com.kova700.bookchat.util.channel.MakeChannelImgSizeManager
+import com.kova700.bookchat.util.image.bitmap.getImageBitmap
+import com.kova700.bookchat.util.image.image.deleteImageCache
+import com.kova700.bookchat.util.image.image.loadChangedChannelProfile
+import com.kova700.bookchat.util.image.image.loadUrl
+import com.kova700.bookchat.util.permissions.galleryPermissions
+import com.kova700.bookchat.util.permissions.getPermissionsLauncher
+import com.kova700.bookchat.util.snackbar.showSnackBar
+import com.kova700.bookchat.util.toast.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -43,7 +43,13 @@ class MakeChannelActivity : AppCompatActivity() {
 	@Inject
 	lateinit var makeChannelImgSizeManager: MakeChannelImgSizeManager
 
-	private val permissionsLauncher = this.getPermissionsLauncher(
+	@Inject
+	lateinit var imageCropNavigator: ImageCropNavigator
+
+	@Inject
+	lateinit var channelNavigator: ChannelNavigator
+
+	private val permissionsLauncher = getPermissionsLauncher(
 		onSuccess = { moveToImageCrop() },
 		onDenied = {
 			makeToast(R.string.gallery_permission_denied)
@@ -175,7 +181,7 @@ class MakeChannelActivity : AppCompatActivity() {
 	private val cropActivityResultLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 			if (result.resultCode == RESULT_OK) {
-				val uri = result.data?.getStringExtra(ImageCropActivity.EXTRA_CROPPED_IMAGE_CACHE_URI)
+				val uri = result.data?.getStringExtra(EXTRA_CROPPED_IMAGE_CACHE_URI)
 					?: return@registerForActivityResult
 				getCroppedImageBitmap(uri)
 			}
@@ -197,9 +203,11 @@ class MakeChannelActivity : AppCompatActivity() {
 		}
 
 	private fun moveToImageCrop() {
-		val intent = Intent(this, ImageCropActivity::class.java)
-		intent.putExtra(ImageCropActivity.EXTRA_CROP_PURPOSE, ImageCropPurpose.CHANNEL_PROFILE)
-		cropActivityResultLauncher.launch(intent)
+		imageCropNavigator.navigate(
+			currentActivity = this,
+			imageCropPurpose = ImageCropPurpose.CHANNEL_PROFILE,
+			resultLauncher = cropActivityResultLauncher,
+		)
 	}
 
 	private fun moveToBookSelect() {
@@ -208,10 +216,11 @@ class MakeChannelActivity : AppCompatActivity() {
 	}
 
 	private fun moveToChannel(channelId: Long) {
-		val intent = Intent(this, ChannelActivity::class.java)
-		intent.putExtra(EXTRA_CHANNEL_ID, channelId)
-		startActivity(intent)
-		finish()
+		channelNavigator.navigate(
+			currentActivity = this,
+			channelId = channelId,
+			shouldFinish = true
+		)
 	}
 
 	private fun showChannelImageSelectDialog() {

@@ -6,7 +6,7 @@
     app:startDestination="@id/searchFragment">
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.example.bookchat.ui.search.SearchFragment"
+        android:name="com.kova700.bookchat.feature.search.SearchFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search"/>
 </navigation>

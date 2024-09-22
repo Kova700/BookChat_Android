@@ -1,8 +1,8 @@
-package com.example.bookchat.ui.createchannel
+package com.kova700.bookchat.feature.createchannel
 
 import android.graphics.Bitmap
-import com.example.bookchat.domain.model.Book
-import com.example.bookchat.domain.model.ChannelDefaultImageType
+import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
+import com.kova700.bookchat.core.data.search.book.external.model.Book
 
 data class MakeChannelUiState(
 	val uiState: UiState,
@@ -42,12 +42,11 @@ data class MakeChannelUiState(
 }
 
 sealed class MakeChannelEvent {
-
-	object MoveToBack : MakeChannelEvent()
-	object MoveToBookSelect : MakeChannelEvent()
+	data object MoveToBack : MakeChannelEvent()
+	data object MoveToBookSelect : MakeChannelEvent()
 	data class MoveToChannel(val channelId: Long) : MakeChannelEvent()
-	object OpenGallery : MakeChannelEvent()
-	object ShowChannelImageSelectDialog : MakeChannelEvent()
+	data object OpenGallery : MakeChannelEvent()
+	data object ShowChannelImageSelectDialog : MakeChannelEvent()
 	data class ShowSnackBar(
 		val stringId: Int,
 	) : MakeChannelEvent()
