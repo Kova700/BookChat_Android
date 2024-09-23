@@ -81,7 +81,7 @@ private class BookChatApiCall<R>(
 					code = code(),
 					locationHeader = getLocationHeader(),
 					message = message(),
-					body = errorBody()?.string() ?: ""
+					body = errorBody()?.string() ?: "",
 				)
 
 			body != null -> BookChatApiResult.Success(
