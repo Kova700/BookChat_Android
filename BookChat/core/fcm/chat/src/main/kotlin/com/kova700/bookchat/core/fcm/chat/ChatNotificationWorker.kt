@@ -13,6 +13,7 @@ import com.kova700.bookchat.core.data.channel.external.repository.ChannelReposit
 import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.notification.chat.external.ChatNotificationHandler
 import com.kova700.core.data.appsetting.external.repository.AppSettingRepository
+import com.kova700.core.domain.usecase.channel.GetClientChannelUseCase
 import com.kova700.core.domain.usecase.chat.GetChatUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -27,36 +28,36 @@ class ChatNotificationWorker @AssistedInject constructor(
 	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val chatNotificationHandler: ChatNotificationHandler,
 	private val getChatUseCase: GetChatUseCase,
+	private val getClientChannelUseCase: GetClientChannelUseCase,
 ) : CoroutineWorker(appContext, workerParams) {
 
 	override suspend fun doWork(): Result {
 		if (bookChatTokenRepository.isBookChatTokenExist().not()
 			|| appSettingRepository.isPushNotificationEnabled().not()
-		) {
-			return Result.success()
-		}
+		) return Result.success()
 
 		val channelId: Long = inputData.getLong(EXTRA_CHANNEL_ID, -1)
 		val chatId: Long = inputData.getLong(EXTRA_CHAT_ID, -1)
+
 		//TODO : SenderId를 함께 넘겨 받아서 만약 Sender가 클라이언트라면 아래 API호출하지 않게 수정
-		runCatching {
-			val channel = channelRepository.getChannel(channelId)
+		val apiResult = runCatching {
+			val channel = getClientChannelUseCase(channelId)
 			val chat = getChatUseCase(chatId)
 			val client = clientRepository.getClientProfile()
+
 			channelRepository.updateChannelLastChatIfValid(chat.channelId, chat.chatId)
 			Triple(channel, chat, client)
-		}
-			.onSuccess {
-				val (channel, chat, client) = it
-				if (chat.sender?.id == client.id) return@onSuccess
+		}.getOrNull() ?: return Result.failure()
 
-				chatNotificationHandler.showNotification(
-					channel = channel,
-					chat = chat
-				)
-				return Result.success()
-			}
-		return Result.failure()
+		val (channel, chat, client) = apiResult
+		if (chat.sender?.id == client.id) return Result.success()
+
+		chatNotificationHandler.showNotification(
+			channel = channel,
+			chat = chat
+		)
+
+		return Result.success()
 	}
 
 	companion object {

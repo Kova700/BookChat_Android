@@ -8,6 +8,8 @@ import com.kova700.bookchat.core.data.channel.external.repository.ChannelReposit
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
 import com.kova700.bookchat.util.image.bitmap.compressToByteArray
+import com.kova700.core.domain.usecase.channel.GetClientChannelUseCase
+import com.kova700.core.domain.usecase.channel.LeaveChannelUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +23,8 @@ import javax.inject.Inject
 class ChannelSettingViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val channelRepository: ChannelRepository,
+	private val getClientChannelUseCase: GetClientChannelUseCase,
+	private val leaveChannelUseCase: LeaveChannelUseCase,
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
 
@@ -35,7 +39,7 @@ class ChannelSettingViewModel @Inject constructor(
 	}
 
 	private fun initUiState() = viewModelScope.launch {
-		val originChannel = channelRepository.getChannel(channelId)
+		val originChannel = getClientChannelUseCase(channelId)
 		updateState {
 			copy(
 				channel = originChannel,
@@ -48,7 +52,7 @@ class ChannelSettingViewModel @Inject constructor(
 	}
 
 	private fun exitChannel() = viewModelScope.launch {
-		runCatching { channelRepository.leaveChannel(channelId) }
+		runCatching { leaveChannelUseCase(channelId) }
 			.onSuccess { startEvent(ChannelSettingUiEvent.ExitChannel) }
 			.onFailure { startEvent(ChannelSettingUiEvent.ShowSnackBar(R.string.channel_exit_fail)) }
 	}

@@ -9,6 +9,7 @@ import com.kova700.bookchat.core.data.user.external.repository.UserRepository
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
 import com.kova700.bookchat.feature.channel.chatting.ChannelActivity.Companion.EXTRA_USER_ID
+import com.kova700.core.domain.usecase.channel.GetClientChannelUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +24,7 @@ class UserProfileViewModel @Inject constructor(
 	private val channelRepository: ChannelRepository,
 	private val userRepository: UserRepository,
 	private val clientRepository: ClientRepository,
+	private val getClientChannelUseCase: GetClientChannelUseCase,
 ) : ViewModel() {
 	private val targetUserId = savedStateHandle.get<Long>(EXTRA_USER_ID)!!
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
@@ -40,7 +42,7 @@ class UserProfileViewModel @Inject constructor(
 	private fun initUiState() = viewModelScope.launch {
 		updateState {
 			copy(
-				channel = channelRepository.getChannel(channelId),
+				channel = getClientChannelUseCase(channelId),
 				targetUser = userRepository.getUser(targetUserId),
 				client = clientRepository.getClientProfile()
 			)
@@ -63,7 +65,7 @@ class UserProfileViewModel @Inject constructor(
 			channelRepository.banChannelMember(
 				channelId = channelId,
 				targetUserId = targetUserId,
-				needServer = true
+				needServer = true,
 			)
 		}
 			.onSuccess { startEvent(UserProfileUiEvent.MoveBack) }

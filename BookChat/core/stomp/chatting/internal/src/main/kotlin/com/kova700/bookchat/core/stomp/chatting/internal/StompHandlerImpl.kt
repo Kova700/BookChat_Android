@@ -70,6 +70,7 @@ class StompHandlerImpl @Inject constructor(
 	private val renewBookChatTokenUseCase: RenewBookChatTokenUseCase,
 	private val getChatUserCase: GetChatUseCase,
 	private val networkManager: NetworkManager,
+	private val jsonSerializer: Json,
 ) : StompHandler {
 
 	private lateinit var stompSession: StompSession
@@ -186,7 +187,7 @@ class StompHandlerImpl @Inject constructor(
 		runCatching {
 			stompSession.sendText(
 				destination = "$SEND_MESSAGE_DESTINATION${chat.channelId}",
-				body = Json.encodeToString(
+				body = jsonSerializer.encodeToString(
 					RequestSendChat(
 						receiptId = chat.chatId,
 						message = chat.message
@@ -236,7 +237,7 @@ class StompHandlerImpl @Inject constructor(
 		runCatching {
 			stompSession.sendText(
 				destination = "$SEND_MESSAGE_DESTINATION$channelId",
-				body = Json.encodeToString(
+				body = jsonSerializer.encodeToString(
 					RequestSendChat(
 						receiptId = receiptId,
 						message = message
@@ -298,58 +299,52 @@ class StompHandlerImpl @Inject constructor(
 		)
 
 		when (socketMessage.notificationMessageType) {
-			NotificationMessageType.NOTICE_ENTER -> {
+			NotificationMessageType.NOTICE_ENTER ->
 				channelRepository.enterChannelMember(
 					channelId = channelId,
 					targetUserId = socketMessage.targetUserId
 				)
-			}
 
-			NotificationMessageType.NOTICE_EXIT -> {
+			NotificationMessageType.NOTICE_EXIT ->
 				channelRepository.leaveChannelMember(
 					channelId = channelId,
 					targetUserId = socketMessage.targetUserId
 				)
-			}
 
-			NotificationMessageType.NOTICE_HOST_EXIT -> {
-				//TODO : 방장이 채팅방을 나간 시점에 소켓에 연결되어있지 않던 사람은?
-				// 이걸 위해서 FCM으로 채팅방이 isExploded 되었다는 이벤트 + 채팅방 정보 조회 시점에 채팅방의 isExploded 유무 상태를 같이 주는 게 좋을 듯
-				// (서버에서는 Exploded된 채팅방을 특정 유예기간 동안만 데이터를 가지고 있다가 기간이 지나면 스케줄러가 Exploded 상태의 채팅방을 삭제하는 방향으로 하면 좋을 듯)
-				// 전체 채팅방 검색 시에는 Exploded된 채팅방은 필터해서 주거나 상태 또한 같이 주거나해서 enter 시도 시에 적절한 UI를 보일 수 있게 구현
-				// + isBanned도 같은 맥락으로 추가되어야 할듯 혹은 Banned된 유저 목록을 주거나
+			NotificationMessageType.NOTICE_HOST_EXIT ->
 				channelRepository.leaveChannelHost(channelId)
-			}
 
 			NotificationMessageType.NOTICE_KICK -> {
-				channelRepository.banChannelMember(
-					channelId = channelId,
-					targetUserId = socketMessage.targetUserId
-				)
+				val clientId = clientRepository.getClientProfile().id
+				val isClientBanned = socketMessage.targetUserId == clientId
+				when {
+					isClientBanned -> channelRepository.banChannelClient(channelId)
+					else -> channelRepository.leaveChannelMember(
+						channelId = channelId,
+						targetUserId = socketMessage.targetUserId
+					)
+				}
 			}
 
-			NotificationMessageType.NOTICE_HOST_DELEGATE -> {
+			NotificationMessageType.NOTICE_HOST_DELEGATE ->
 				channelRepository.updateChannelHost(
 					channelId = channelId,
 					targetUserId = socketMessage.targetUserId,
 				)
-			}
 
-			NotificationMessageType.NOTICE_SUB_HOST_DELEGATE -> {
+			NotificationMessageType.NOTICE_SUB_HOST_DELEGATE ->
 				channelRepository.updateChannelMemberAuthority(
 					channelId = channelId,
 					targetUserId = socketMessage.targetUserId,
 					channelMemberAuthority = ChannelMemberAuthority.SUB_HOST,
 				)
-			}
 
-			NotificationMessageType.NOTICE_SUB_HOST_DISMISS -> {
+			NotificationMessageType.NOTICE_SUB_HOST_DISMISS ->
 				channelRepository.updateChannelMemberAuthority(
 					channelId = channelId,
 					targetUserId = socketMessage.targetUserId,
 					channelMemberAuthority = ChannelMemberAuthority.GUEST,
 				)
-			}
 
 		}
 		insertNewChat(chat)
@@ -399,10 +394,10 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	private fun String.parseToSocketMessage(): SocketMessage {
-		val hashMap = Json.decodeFromString<Map<String, String>>(this)
+		val hashMap = jsonSerializer.decodeFromString<Map<String, String>>(this)
 		return when {
-			hashMap["senderId"] != null -> Json.decodeFromString<CommonMessage>(this)
-			else -> Json.decodeFromString<NotificationMessage>(this)
+			hashMap["senderId"] != null -> jsonSerializer.decodeFromString<CommonMessage>(this)
+			else -> jsonSerializer.decodeFromString<NotificationMessage>(this)
 		}
 	}
 	//{"targetId":null,

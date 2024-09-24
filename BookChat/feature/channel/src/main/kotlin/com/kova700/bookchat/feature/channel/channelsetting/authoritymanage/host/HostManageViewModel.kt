@@ -9,6 +9,8 @@ import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.channel.channelsetting.ChannelSettingActivity
 import com.kova700.bookchat.feature.channel.channelsetting.authoritymanage.mapper.toMemberItems
 import com.kova700.bookchat.feature.channel.channelsetting.authoritymanage.model.MemberItem
+import com.kova700.core.domain.usecase.channel.GetClientChannelFlowUseCase
+import com.kova700.core.domain.usecase.channel.GetClientChannelUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +26,8 @@ import javax.inject.Inject
 class HostManageViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val channelRepository: ChannelRepository,
+	private val getClientChannelUseCase: GetClientChannelUseCase,
+	private val getClientChannelFlowUseCase: GetClientChannelFlowUseCase
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(ChannelSettingActivity.EXTRA_CHANNEL_ID)!!
 
@@ -38,12 +42,12 @@ class HostManageViewModel @Inject constructor(
 	}
 
 	private fun initUiState() = viewModelScope.launch {
-		updateState { copy(channel = channelRepository.getChannel(channelId)) }
+		updateState { copy(channel = getClientChannelUseCase(channelId)) }
 		observeChannel()
 	}
 
 	private fun observeChannel() = viewModelScope.launch {
-		uiState.combine(channelRepository.getChannelFlow(channelId)) { state, channel ->
+		uiState.combine(getClientChannelFlowUseCase(channelId)) { state, channel ->
 			updateState {
 				copy(
 					channel = channel,

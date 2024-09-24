@@ -5,6 +5,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kova700.bookchat.core.data.channel.external.model.Channel
+import com.kova700.bookchat.core.data.channel.external.model.ChannelIsExplodedException
+import com.kova700.bookchat.core.data.channel.external.model.UserIsBannedException
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelTempMessageRepository
 import com.kova700.bookchat.core.data.chat.external.model.Chat
@@ -25,6 +27,10 @@ import com.kova700.bookchat.feature.channel.chatting.mapper.toChatItems
 import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
 import com.kova700.bookchat.feature.channel.drawer.mapper.toDrawerItems
 import com.kova700.bookchat.util.Constants.TAG
+import com.kova700.core.domain.usecase.channel.GetClientChannelFlowUseCase
+import com.kova700.core.domain.usecase.channel.GetClientChannelInfoUseCase
+import com.kova700.core.domain.usecase.channel.GetClientChannelUseCase
+import com.kova700.core.domain.usecase.channel.LeaveChannelUseCase
 import com.kova700.core.domain.usecase.chat.GetChatsFlowUseCase
 import com.kova700.core.domain.usecase.chat.SyncChannelChatsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,14 +51,20 @@ import kotlin.math.abs
 //TODO : 채팅 로딩 전체 화면 UI 구현  (필요한가?)
 //TODO : 출시 전 북챗 문의 방 만들기
 
+//TODO : Channel List 받아올때 받아온 Last Chat이 Notice Type으로 보여지는 현상이 있는데
+// 다시 나갔다 들어오면 정상적으로 Client가 보낸 Chat Type으로 보임
+
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val stompHandler: StompHandler,
-	private val getChatsFlowUserCase: GetChatsFlowUseCase,
+	private val getClientChannelInfoUseCase: GetClientChannelInfoUseCase,
+	private val getClientChannelUseCase: GetClientChannelUseCase,
+	private val getClientChannelFlowUseCase: GetClientChannelFlowUseCase,
 	private val syncChannelChatsUseCase: SyncChannelChatsUseCase,
+	private val getChatsFlowUserCase: GetChatsFlowUseCase,
+	private val leaveChannelUseCase: LeaveChannelUseCase,
 	private val channelTempMessageRepository: ChannelTempMessageRepository,
-	private val channelRepository: ChannelRepository,
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
 	private val networkManager: NetworkManager,
@@ -79,7 +91,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun initUiState() = viewModelScope.launch {
-		val originalChannel = runCatching { channelRepository.getChannel(channelId) }
+		val originalChannel = runCatching { getClientChannelUseCase(channelId) }
 			.getOrNull() ?: Channel.DEFAULT
 
 		val shouldLastReadChatScroll = originalChannel.isExistNewChat
@@ -121,7 +133,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun observeChannel() = viewModelScope.launch {
-		channelRepository.getChannelFlow(channelId)
+		getClientChannelFlowUseCase(channelId)
 			.onEach { chatNotificationHandler.dismissChannelNotifications(it) }
 			.collect { channel ->
 				if (channel.isAvailableChannel.not()) disconnectSocket()
@@ -281,7 +293,7 @@ class ChannelViewModel @Inject constructor(
 	 * 리커넥션 시마다 호출 (이벤트 History받는 로직 구현 이전까지 )*/
 	private fun getChannelInfo(channelId: Long) = viewModelScope.launch {
 //		if (uiState.value.isNetworkDisconnected) return@launch
-		runCatching { channelRepository.getChannelInfo(channelId) }
+		runCatching { getClientChannelInfoUseCase.invoke(channelId) }
 			.onFailure { handleError(it, "getChannelInfo") }
 	}
 
@@ -326,7 +338,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun exitChannel() = viewModelScope.launch {
-		runCatching { channelRepository.leaveChannel(channelId) }
+		runCatching { leaveChannelUseCase(channelId) }
 			.onSuccess { onClickBackBtn() }
 			.onFailure { startEvent(ChannelEvent.ShowSnackBar(R.string.channel_exit_fail)) }
 	}
@@ -582,6 +594,8 @@ class ChannelViewModel @Inject constructor(
 		Log.d(TAG, "ChannelViewModel: handleError(caller : $caller) - throwable: $throwable")
 		updateState { copy(uiState = UiState.ERROR) }
 		when (throwable) {
+			is UserIsBannedException -> {}
+			is ChannelIsExplodedException -> {}
 			is CancellationException -> Unit //JobCancellationException 이게 connectSocket 여기서 왜 잡히는거야
 			//NullPointerException도 connectSocket에서 잡히는데?
 			//ChannelViewModel: handleError(caller : connectSocket) -

@@ -10,6 +10,10 @@ import com.kova700.bookchat.core.network_manager.external.model.NetworkState
 import com.kova700.bookchat.feature.channellist.ChannelListUiState.UiState
 import com.kova700.bookchat.feature.channellist.mapper.toChannelListItem
 import com.kova700.bookchat.feature.channellist.model.ChannelListItem
+import com.kova700.core.domain.usecase.channel.GetClientChannelsFlowUseCase
+import com.kova700.core.domain.usecase.channel.GetClientChannelsUseCase
+import com.kova700.core.domain.usecase.channel.GetClientMostActiveChannelsUseCase
+import com.kova700.core.domain.usecase.channel.LeaveChannelUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +28,10 @@ import javax.inject.Inject
 class ChannelListViewModel @Inject constructor(
 	private val channelRepository: ChannelRepository,
 	private val networkManager: NetworkManager,
+	private val getClientChannelsUseCase: GetClientChannelsUseCase,
+	private val getClientMostActiveChannelsUseCase: GetClientMostActiveChannelsUseCase,
+	private val leaveChannelUseCase: LeaveChannelUseCase,
+	private val getClientChannelsFlowUseCase: GetClientChannelsFlowUseCase
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<ChannelListUiEvent>()
@@ -51,7 +59,7 @@ class ChannelListViewModel @Inject constructor(
 	}
 
 	private fun observeChannels() = viewModelScope.launch {
-		_isSwiped.combine(channelRepository.getChannelsFlow()) { isSwiped, channels ->
+		_isSwiped.combine(getClientChannelsFlowUseCase()) { isSwiped, channels ->
 			channels.toChannelListItem(isSwiped)
 		}.collect { updateState { copy(channelListItem = it) } }
 	}
@@ -59,7 +67,7 @@ class ChannelListViewModel @Inject constructor(
 	private fun getMostActiveChannels() = viewModelScope.launch {
 		if (uiState.value.uiState == UiState.LOADING) return@launch
 		updateState { copy(uiState = UiState.LOADING) }
-		runCatching { channelRepository.getMostActiveChannels() }
+		runCatching { getClientMostActiveChannelsUseCase() }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 			.onFailure { handleError(it) }
 	}
@@ -67,7 +75,7 @@ class ChannelListViewModel @Inject constructor(
 	private fun getChannels() = viewModelScope.launch {
 		if (uiState.value.uiState == UiState.LOADING) return@launch
 		updateState { copy(uiState = UiState.LOADING) }
-		runCatching { channelRepository.getChannels() }
+		runCatching { getClientChannelsUseCase() }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 			.onFailure { handleError(it) }
 	}
@@ -100,7 +108,7 @@ class ChannelListViewModel @Inject constructor(
 	}
 
 	private fun exitChannel(channelId: Long) = viewModelScope.launch {
-		runCatching { channelRepository.leaveChannel(channelId) }
+		runCatching { leaveChannelUseCase(channelId) }
 			.onFailure { startEvent(ChannelListUiEvent.ShowSnackBar(R.string.channel_exit_fail)) }
 	}
 
