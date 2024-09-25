@@ -2,7 +2,7 @@ package com.kova700.bookchat.core.data.agony.external
 
 import com.kova700.bookchat.core.data.agony.external.model.Agony
 import com.kova700.bookchat.core.data.agony.external.model.AgonyFolderHexColor
-import com.kova700.bookchat.core.data.util.model.SearchSortOption
+import com.kova700.bookchat.core.data.common.model.SearchSortOption
 import kotlinx.coroutines.flow.Flow
 
 interface AgonyRepository {

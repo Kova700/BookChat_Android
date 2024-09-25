@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.channel.userprofile.UserProfileActivity">
+    tools:context=".userprofile.UserProfileActivity">
 
     <com.kova700.core.design_system.customview.AntiDupClickImageButton
         android:id="@+id/back_btn"
@@ -37,7 +37,7 @@
             android:id="@+id/user_profile_iv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:scaleType="fitCenter"
+            android:scaleType="centerCrop"
             android:src="@drawable/default_profile_img1" />
     </androidx.cardview.widget.CardView>
 

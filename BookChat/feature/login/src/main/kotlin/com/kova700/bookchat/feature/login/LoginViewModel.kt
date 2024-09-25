@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.data.client.external.model.NeedToDeviceWarningException
 import com.kova700.bookchat.core.data.client.external.model.NeedToSignUpException
-import com.kova700.bookchat.core.data.util.model.network.ForbiddenException
+import com.kova700.bookchat.core.data.common.model.network.ForbiddenException
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.oauth.external.exception.ClientCancelException
 import com.kova700.bookchat.feature.login.LoginUiState.UiState
@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//TODO : 로그인 시에 로딩화면 안보임 체크 필요
 @HiltViewModel
 class LoginViewModel @Inject constructor(
 	private val clientRepository: ClientRepository,

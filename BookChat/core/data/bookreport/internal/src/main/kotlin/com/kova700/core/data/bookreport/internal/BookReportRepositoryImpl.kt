@@ -1,11 +1,12 @@
 package com.kova700.core.data.bookreport.internal
 
-import com.kova700.bookchat.core.network.bookchat.BookChatApi
-import com.kova700.bookchat.core.network.bookchat.model.request.RequestRegisterBookReport
+import com.kova700.bookchat.core.data.common.model.network.BookChatApiResult
+import com.kova700.bookchat.core.network.bookchat.bookreport.BookReportApi
+import com.kova700.bookchat.core.network.bookchat.bookreport.model.mapper.toDomain
+import com.kova700.bookchat.core.network.bookchat.bookreport.model.request.RequestRegisterBookReport
 import com.kova700.core.data.bookreport.external.BookReportRepository
 import com.kova700.core.data.bookreport.external.model.BookReport
 import com.kova700.core.data.bookreport.external.model.BookReportDoseNotExistException
-import com.kova700.core.data.bookreport.internal.mapper.toDomain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
@@ -13,7 +14,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class BookReportRepositoryImpl @Inject constructor(
-	private val bookChatApi: BookChatApi,
+	private val bookReportApi: BookReportApi,
 ) : BookReportRepository {
 
 	private val bookReports =
@@ -27,21 +28,24 @@ class BookReportRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun getBookReport(bookShelfId: Long) {
-		val response = bookChatApi.getBookReport(bookShelfId)
-		when (response.code()) {
-			200 -> {
-				val bookReportResult = response.body() ?: return
-				val bookReport = bookReportResult.toDomain()
+		val response = bookReportApi.getBookReport(bookShelfId)
+		when (response) {
+			is BookChatApiResult.Success -> {
+				val bookReport = response.data.toDomain()
 				setBookReports(bookReports.value + (bookShelfId to bookReport))
 			}
 
-			404 -> throw BookReportDoseNotExistException()
-			else -> throw Exception(
-				createExceptionMessage(
-					response.code(),
-					response.errorBody()?.string()
-				)
-			)
+			is BookChatApiResult.Failure -> {
+				when (response.code) {
+					404 -> throw BookReportDoseNotExistException()
+					else -> throw Exception(
+						createExceptionMessage(
+							response.code,
+							response.body
+						)
+					)
+				}
+			}
 		}
 	}
 
@@ -51,7 +55,7 @@ class BookReportRepositoryImpl @Inject constructor(
 		reportContent: String,
 		reportCreatedAt: String,
 	) {
-		bookChatApi.registerBookReport(
+		bookReportApi.registerBookReport(
 			bookShelfId = bookShelfId,
 			requestRegisterBookReport = RequestRegisterBookReport(
 				title = reportTitle,
@@ -69,7 +73,7 @@ class BookReportRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun deleteBookReport(bookShelfId: Long) {
-		bookChatApi.deleteBookReport(bookShelfId)
+		bookReportApi.deleteBookReport(bookShelfId)
 		setBookReports(bookReports.value - bookShelfId)
 	}
 
@@ -79,7 +83,7 @@ class BookReportRepositoryImpl @Inject constructor(
 		reportContent: String,
 		reportCreatedAt: String,
 	) {
-		bookChatApi.reviseBookReport(
+		bookReportApi.reviseBookReport(
 			bookShelfId = bookShelfId,
 			requestRegisterBookReport = RequestRegisterBookReport(
 				title = reportTitle,

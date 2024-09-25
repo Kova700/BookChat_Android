@@ -55,11 +55,9 @@ class MakeChannelViewModel @Inject constructor(
 				channelImage = uiState.value.channelProfileImage?.compressToByteArray()
 			)
 		}
-			.onSuccess { channel ->
-				updateState { copy(uiState = UiState.SUCCESS) }
-				enterChannel(channel)
-			}
+			.onSuccess { channel -> enterChannel(channel) }
 			.onFailure { startEvent(MakeChannelEvent.ShowSnackBar(R.string.make_chat_room_fail)) }
+			.also { updateState { copy(uiState = UiState.SUCCESS) } }
 	}
 
 	private fun enterChannel(channel: Channel) = viewModelScope.launch {

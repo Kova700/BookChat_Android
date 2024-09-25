@@ -6,10 +6,5 @@
             android:name="com.kova700.bookchat.feature.createchannel.MakeChannelActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
-        <activity
-            android:name="com.kova700.bookchat.feature.createchannel.MakeChannelSelectBookActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
     </application>
 </manifest>

@@ -17,6 +17,10 @@ class BookChatTokenRepositoryImpl @Inject constructor(
 		dataStore.saveBookChatToken(token)
 	}
 
+	override suspend fun saveBookChatToken(accessToken: String, refreshToken: String) {
+		dataStore.saveBookChatToken(accessToken, refreshToken)
+	}
+
 	override suspend fun isBookChatTokenExist(): Boolean {
 		return dataStore.isBookChatTokenExist()
 	}

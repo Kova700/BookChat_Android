@@ -3,19 +3,19 @@ package com.kova700.bookchat.core.data.fcm_token.internal
 import com.google.firebase.messaging.FirebaseMessaging
 import com.kova700.bookchat.core.data.fcm_token.external.FCMTokenRepository
 import com.kova700.bookchat.core.data.fcm_token.external.model.FCMToken
-import com.kova700.bookchat.core.network.bookchat.BookChatApi
+import com.kova700.bookchat.core.network.bookchat.client.ClientApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 class FCMTokenRepositoryImpl @Inject constructor(
-	private val bookChatApi: BookChatApi,
+	private val clientApi: ClientApi,
 	private val firebaseMessaging: FirebaseMessaging,
 ) : FCMTokenRepository {
 
 	override suspend fun renewFCMToken(fcmToken: FCMToken) {
-		bookChatApi.renewFcmToken(fcmToken.text)
+		clientApi.renewFcmToken(fcmToken.text)
 	}
 
 	override suspend fun getNewFCMToken(): FCMToken {

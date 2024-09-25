@@ -6,6 +6,9 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.kova700.bookchat.core.datastore.datastore.clearData
 import com.kova700.bookchat.core.datastore.datastore.getDataFlow
 import com.kova700.bookchat.core.datastore.datastore.setData
+import com.kova700.bookchat.core.datastore.nofiticationinfo.mapper.toDomainInfos
+import com.kova700.bookchat.core.datastore.nofiticationinfo.mapper.toEntityInfos
+import com.kova700.bookchat.core.datastore.nofiticationinfo.model.ActivatedChatNotificationInfoEntity
 import com.kova700.core.data.notificationinfo.external.model.ActivatedChatNotificationInfo
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.serialization.encodeToString
@@ -20,7 +23,8 @@ class ChattingNotificationInfoDataStore @Inject constructor(
 	suspend fun getShownNotificationInfos(): List<ActivatedChatNotificationInfo> {
 		val notificationIdsString = dataStore.getDataFlow(notificationIdKey).firstOrNull()
 		if (notificationIdsString.isNullOrBlank()) return emptyList()
-		return Json.decodeFromString<List<ActivatedChatNotificationInfo>>(notificationIdsString)
+		return Json.decodeFromString<List<ActivatedChatNotificationInfoEntity>>(notificationIdsString)
+			.toDomainInfos()
 	}
 
 	suspend fun getNotificationLastTimestamp(notificationId: Int): Long? {
@@ -36,15 +40,17 @@ class ChattingNotificationInfoDataStore @Inject constructor(
 		val previousInfo = notificationInfos[notificationId]
 		val currentInfo = ActivatedChatNotificationInfo(notificationId, lastTimestamp)
 		if (previousInfo != null && previousInfo.lastTimestamp > currentInfo.lastTimestamp) return
-
 		notificationInfos[notificationId] = currentInfo
-		dataStore.setData(notificationIdKey, Json.encodeToString(notificationInfos.values))
+		dataStore.setData(
+			notificationIdKey,
+			Json.encodeToString(notificationInfos.values.toEntityInfos())
+		)
 	}
 
 	suspend fun removeShownNotificationInfo(notificationId: Int) {
 		val notificationInfos = getShownNotificationInfos()
 			.filter { it.notificationId != notificationId }
-		dataStore.setData(notificationIdKey, Json.encodeToString(notificationInfos))
+		dataStore.setData(notificationIdKey, Json.encodeToString(notificationInfos.toEntityInfos()))
 	}
 
 	suspend fun clear() {

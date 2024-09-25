@@ -7,6 +7,9 @@ import com.kova700.bookchat.core.datastore.datastore.clearData
 import com.kova700.bookchat.core.datastore.datastore.getDataFlow
 import com.kova700.bookchat.core.datastore.datastore.setData
 import com.kova700.core.data.appsetting.external.model.AppSetting
+import com.kova700.core.datastore.appsetting.mapper.toDomain
+import com.kova700.core.datastore.appsetting.mapper.toEntity
+import com.kova700.core.datastore.appsetting.model.AppSettingEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -16,6 +19,7 @@ import javax.inject.Inject
 
 class AppSettingDataStore @Inject constructor(
 	private val dataStore: DataStore<Preferences>,
+	private val jsonSerializer: Json,
 ) {
 	private val appSettingKey = stringPreferencesKey(APP_SETTING_KEY)
 
@@ -23,7 +27,7 @@ class AppSettingDataStore @Inject constructor(
 		return dataStore.getDataFlow(appSettingKey)
 			.map { appSettingString ->
 				appSettingString?.let {
-					Json.decodeFromString<AppSetting>(appSettingString)
+					jsonSerializer.decodeFromString<AppSettingEntity>(appSettingString).toDomain()
 				} ?: AppSetting.DEFAULT
 			}
 	}
@@ -35,12 +39,12 @@ class AppSettingDataStore @Inject constructor(
 	suspend fun getAppSetting(): AppSetting {
 		val appSettingString =
 			dataStore.getDataFlow(appSettingKey).firstOrNull() ?: return AppSetting.DEFAULT
-		return Json.decodeFromString<AppSetting>(appSettingString)
+		return jsonSerializer.decodeFromString<AppSettingEntity>(appSettingString).toDomain()
 	}
 
 	suspend fun setPushNotificationMuteState(isMute: Boolean) {
 		val newAppSetting = getAppSetting().copy(isPushNotificationEnabled = isMute)
-		dataStore.setData(appSettingKey, Json.encodeToString(newAppSetting))
+		dataStore.setData(appSettingKey, jsonSerializer.encodeToString(newAppSetting.toEntity()))
 	}
 
 	suspend fun clear() {

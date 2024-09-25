@@ -228,6 +228,7 @@
     <string name="banned_channel">참여할 수 없는 채팅방</string>
     <string name="banned_channel_notice">참여 할 수 없는 채팅방입니다.\n관리자에 의해 내보내기 되었습니다.</string>
     <string name="full_channel_notice">대화 상대가 많아 참여할 수 없습니다.\n잠시 후 다시 시도해 주세요.</string>
+    <string name="invalid_channel_notice">채팅방이 종료되어 현재는 유효하지 않은 채팅방입니다.</string>
 
     <!--channel-->
     <string name="room_member_count">%1$d명</string>

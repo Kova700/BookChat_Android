@@ -195,6 +195,7 @@ class BookReportViewModel @Inject constructor(
 	}
 
 	private fun failHandler(exception: Throwable) {
+		Log.d(TAG, "BookReportViewModel: failHandler() - exception :$exception")
 		when (exception) {
 			is BookReportDoseNotExistException -> updateState { copy(uiState = UiState.EMPTY) }
 			else -> {

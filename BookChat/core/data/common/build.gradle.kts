@@ -7,6 +7,4 @@ android {
 	namespace = "com.kova700.bookchat.core.data.common"
 }
 
-dependencies {
-	implementation(project(":core:network:bookchat"))
-}
+dependencies {}

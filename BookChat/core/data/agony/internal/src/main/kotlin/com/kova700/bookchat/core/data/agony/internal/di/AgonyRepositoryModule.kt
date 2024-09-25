@@ -13,7 +13,7 @@ import javax.inject.Singleton
 interface AgonyRepositoryModule {
 	@Binds
 	@Singleton
-	fun bindBookReportRepository(
+	fun bindAgonyRepository(
 		repository: AgonyRepositoryImpl,
 	): AgonyRepository
 }

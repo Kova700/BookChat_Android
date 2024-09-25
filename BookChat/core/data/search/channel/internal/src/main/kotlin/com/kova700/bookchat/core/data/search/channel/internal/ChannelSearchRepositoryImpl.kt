@@ -7,7 +7,6 @@ import com.kova700.bookchat.core.data.search.channel.external.model.SearchFilter
 import com.kova700.bookchat.core.data.search.channel.external.model.SearchFilter.BOOK_TITLE
 import com.kova700.bookchat.core.data.search.channel.external.model.SearchFilter.ROOM_NAME
 import com.kova700.bookchat.core.data.search.channel.external.model.SearchFilter.ROOM_TAGS
-import com.kova700.bookchat.core.data.user.external.repository.UserRepository
 import com.kova700.bookchat.core.network.bookchat.search.SearchApi
 import com.kova700.bookchat.core.network.bookchat.search.model.channel.mapper.toChannelSearchResult
 import com.kova700.bookchat.core.network.bookchat.search.model.channel.request.RequestGetSearchedChannels
@@ -22,7 +21,6 @@ import javax.inject.Inject
 
 class ChannelSearchRepositoryImpl @Inject constructor(
 	private val searchApi: SearchApi,
-	private val userRepository: UserRepository,
 ) : ChannelSearchRepository {
 
 	private val mapChannels =
@@ -68,12 +66,7 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 		isEndPage = response.cursorMeta.last
 		currentPage = response.cursorMeta.nextCursorId
 
-		val newChannels = response.channels
-			.map {
-				it.toChannelSearchResult(
-					getUser = { userId -> userRepository.getUser(userId) }
-				)
-			}
+		val newChannels = response.channels.map { it.toChannelSearchResult() }
 		mapChannels.update { mapChannels.value + newChannels.associateBy { it.roomId } }
 		return channels.first()
 	}

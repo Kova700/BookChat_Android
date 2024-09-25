@@ -9,6 +9,7 @@ import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.navigation.ChannelNavigator
 import com.kova700.bookchat.feature.search.channelInfo.dialog.BannedChannelNoticeDialog
 import com.kova700.bookchat.feature.search.channelInfo.dialog.FullChannelNoticeDialog
+import com.kova700.bookchat.feature.search.channelInfo.dialog.InvalidChannelNoticeDialog
 import com.kova700.bookchat.feature.search.databinding.ActivityChannelInfoBinding
 import com.kova700.bookchat.util.book.BookImgSizeManager
 import com.kova700.bookchat.util.date.getFormattedAbstractDateTimeText
@@ -66,12 +67,14 @@ class ChannelInfoActivity : AppCompatActivity() {
 		setDateTimeText(uiState)
 		setRoomMemberCountText(uiState)
 		setChannelEnterBtnState(uiState)
-		binding.bookAuthorTv.text = uiState.channel.bookAuthorsString
-		binding.bookTitleTv.text = uiState.channel.bookTitle
-		binding.channelTitle.text = uiState.channel.roomName
-		binding.channelTagsTv.text = uiState.channel.tagsString
-		binding.channelHostNickNameTv.text = uiState.channel.host.nickname
-		if (uiState.channel.isBanned) showBannedChannelNoticeDialog()
+		with(binding) {
+			bookAuthorTv.text = uiState.channel.bookAuthorsString
+			bookTitleTv.text = uiState.channel.bookTitle
+			channelTitle.text = uiState.channel.roomName
+			channelTagsTv.text = uiState.channel.tagsString
+			channelHostNickNameTv.text = uiState.channel.host.nickname
+		}
+		if (uiState.isBannedChannel) showBannedChannelNoticeDialog()
 	}
 
 	private fun setHostProfileImage(uiState: ChannelInfoUiState) {
@@ -116,7 +119,7 @@ class ChannelInfoActivity : AppCompatActivity() {
 
 	private fun setChannelEnterBtnState(state: ChannelInfoUiState) {
 		with(binding.enterChannelBtn) {
-			if (state.channel.isBanned) {
+			if (state.isBannedChannel) {
 				setBackgroundColor(Color.parseColor("#D9D9D9"))
 				setText(R.string.banned_channel)
 				isEnabled = false
@@ -144,6 +147,14 @@ class ChannelInfoActivity : AppCompatActivity() {
 		dialog.show(supportFragmentManager, DIALOG_TAG_FULL_CHANNEL_NOTICE)
 	}
 
+	private fun showInvalidChannelNoticeDialog() {
+		val existingFragment =
+			supportFragmentManager.findFragmentByTag(DIALOG_TAG_INVALID_CHANNEL_NOTICE)
+		if (existingFragment != null) return
+		val dialog = InvalidChannelNoticeDialog()
+		dialog.show(supportFragmentManager, DIALOG_TAG_INVALID_CHANNEL_NOTICE)
+	}
+
 	private fun moveToChannel(channelId: Long) {
 		channelNavigator.navigate(
 			currentActivity = this,
@@ -160,12 +171,14 @@ class ChannelInfoActivity : AppCompatActivity() {
 				anchor = binding.enterChannelBtn
 			)
 
-			ChannelInfoEvent.ShowFullChannelDialog -> showFullChannelNoticeDialog()
+			ChannelInfoEvent.ShowFullChannelNoticeDialog -> showFullChannelNoticeDialog()
+			ChannelInfoEvent.ShowExplodedChannelDialog -> showInvalidChannelNoticeDialog()
 		}
 	}
 
 	companion object {
 		private const val DIALOG_TAG_BANNED_CHANNEL_NOTICE = "DIALOG_TAG_BANNED_CHANNEL_NOTICE"
 		private const val DIALOG_TAG_FULL_CHANNEL_NOTICE = "DIALOG_TAG_FULL_CHANNEL_NOTICE"
+		private const val DIALOG_TAG_INVALID_CHANNEL_NOTICE = "DIALOG_TAG_INVALID_CHANNEL_NOTICE"
 	}
 }

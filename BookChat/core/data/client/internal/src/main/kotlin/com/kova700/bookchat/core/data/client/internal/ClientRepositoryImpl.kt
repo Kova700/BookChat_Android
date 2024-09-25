@@ -5,6 +5,7 @@ import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.data.client.external.model.NeedToDeviceWarningException
 import com.kova700.bookchat.core.data.client.external.model.NeedToSignUpException
 import com.kova700.bookchat.core.data.client.external.model.ReadingTaste
+import com.kova700.bookchat.core.data.common.model.network.BookChatApiResult
 import com.kova700.bookchat.core.data.fcm_token.external.model.FCMToken
 import com.kova700.bookchat.core.data.oauth.external.model.IdToken
 import com.kova700.bookchat.core.data.user.external.model.User
@@ -16,7 +17,7 @@ import com.kova700.bookchat.core.network.bookchat.client.model.request.RequestCh
 import com.kova700.bookchat.core.network.bookchat.client.model.request.RequestUserLogin
 import com.kova700.bookchat.core.network.bookchat.client.model.request.RequestUserSignUp
 import com.kova700.bookchat.core.network.bookchat.user.model.mapper.toUser
-import com.kova700.bookchat.util.multipart.toMultiPartBody
+import com.kova700.bookchat.core.network.util.multipart.toMultiPartBody
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,17 +49,22 @@ class ClientRepositoryImpl @Inject constructor(
 		)
 
 		val response = clientApi.login(idToken.token, requestUserLogin)
-		if (response.isSuccessful) response.body()?.toBookChatToken()?.let { return it }
-		when (response.code()) {
-			404 -> throw NeedToSignUpException(response.errorBody()?.string())
-			409 -> throw NeedToDeviceWarningException(response.errorBody()?.string())
-			else -> throw Exception(
-				createExceptionMessage(
-					response.code(),
-					response.errorBody()?.string()
-				)
-			)
+		return when (response) {
+			is BookChatApiResult.Success -> response.data.toBookChatToken()
+			is BookChatApiResult.Failure -> {
+				when (response.code) {
+					404 -> throw NeedToSignUpException(response.body)
+					409 -> throw NeedToDeviceWarningException(response.body)
+					else -> throw Exception(
+						createExceptionMessage(
+							response.code,
+							response.body
+						)
+					)
+				}
+			}
 		}
+
 	}
 
 	override suspend fun signUp(
@@ -86,6 +92,8 @@ class ClientRepositoryImpl @Inject constructor(
 	}
 
 	//TODO : userProfile = null로 보내면 null로 설정이 안됨 (서버 수정 대기중)
+	//  기존에 이미지 URL을 ByteArray로 만들어서 다시 보내거나
+	// 서버에게 이미지는 바꾸지 않았다는 flag를 따로 보내거나
 	override suspend fun changeClientProfile(
 		newNickname: String,
 		userProfile: ByteArray?,
@@ -127,21 +135,29 @@ class ClientRepositoryImpl @Inject constructor(
 
 	override suspend fun getClientProfile(): User {
 		return client.firstOrNull()
-			?: clientApi.getUserProfile().toUser() //여까지 401 넘어온다는건 리프레시토큰마저 만료되었다는 뜻
-				.also { client.update { it } }
+			?: getClientProfileFromServer()
+	}
+
+	/** 여기까지 401 넘어온다는건 리프레시토큰마저 만료되었다는 뜻 */
+	private suspend fun getClientProfileFromServer(): User {
+		return clientApi.getUserProfile().toUser()
+			.also { newClient -> client.update { newClient } }
 	}
 
 	override suspend fun isDuplicatedUserNickName(nickName: String): Boolean {
 		val response = clientApi.requestNameDuplicateCheck(nickName)
-		return when (response.code()) {
-			200 -> false
-			409 -> true
-			else -> throw Exception(
-				createExceptionMessage(
-					response.code(),
-					response.errorBody()?.string()
-				)
-			)
+		return when (response) {
+			is BookChatApiResult.Success -> false
+			is BookChatApiResult.Failure ->
+				when (response.code) {
+					409 -> true
+					else -> throw Exception(
+						createExceptionMessage(
+							response.code,
+							response.body
+						)
+					)
+				}
 		}
 	}
 
@@ -149,7 +165,7 @@ class ClientRepositoryImpl @Inject constructor(
 		client.update { null }
 	}
 
-	private fun createExceptionMessage(responseCode: Int, responseErrorBody: String?): String {
+	private fun createExceptionMessage(responseCode: Int, responseErrorBody: String? = ""): String {
 		return "responseCode : $responseCode , responseErrorBody : $responseErrorBody"
 	}
 

@@ -49,10 +49,6 @@ data class ChannelSearchResponse(
 	val lastChatMessage: String? = null,
 	@SerialName("lastChatDispatchTime")
 	val lastChatDispatchTime: String? = null,
-	@SerialName("isEntered")
-	val isEntered: Boolean,
-	@SerialName("isBanned")
-	val isBanned: Boolean,
 ) {
 	val host
 		get() = User(
@@ -62,18 +58,15 @@ data class ChannelSearchResponse(
 			defaultProfileImageType = hostDefaultProfileImageType.toDomain(),
 		)
 
-	suspend fun getLastChat(
-		getUser: suspend (Long) -> User,
-	): Chat? {
-		if (lastChatId == null) return null
-
-		return Chat(
-			chatId = lastChatId,
-			channelId = roomId,
-			message = lastChatMessage!!,
-			dispatchTime = lastChatDispatchTime!!,
-			sender = lastChatSenderId?.let { getUser(it) }
-		)
-	}
+	val lastChat: Chat?
+		get() = lastChatId?.let {
+			Chat(
+				chatId = it,
+				channelId = roomId,
+				message = lastChatMessage!!,
+				dispatchTime = lastChatDispatchTime!!,
+				sender = lastChatSenderId?.let { senderId -> User.Default.copy(id = senderId) }
+			)
+		}
 
 }

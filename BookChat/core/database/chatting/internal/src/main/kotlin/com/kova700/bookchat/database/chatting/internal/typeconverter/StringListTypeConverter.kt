@@ -7,16 +7,18 @@ import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 @ProvidedTypeConverter
-class StringListTypeConverter @Inject constructor() {
+class StringListTypeConverter @Inject constructor(
+	private val jsonSerializer: Json,
+) {
 	@TypeConverter
 	fun listToJson(value: List<String>?): String? {
 		if (value == null) return null
-		return Json.encodeToString(value)
+		return jsonSerializer.encodeToString(value)
 	}
 
 	@TypeConverter
 	fun jsonToList(value: String?): List<String>? {
 		if (value == null) return null
-		return Json.decodeFromString<List<String>>(value)
+		return jsonSerializer.decodeFromString<List<String>>(value)
 	}
 }

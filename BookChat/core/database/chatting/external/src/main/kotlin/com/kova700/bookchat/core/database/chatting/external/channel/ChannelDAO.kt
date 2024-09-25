@@ -146,9 +146,7 @@ interface ChannelDAO {
 						"book_authors = :bookAuthors, " +
 						"book_cover_image_url = :bookCoverImageUrl, " +
 						"room_tags = :roomTags, " +
-						"room_capacity = :roomCapacity, " +
-						"is_exploded = :isExploded, " +
-						"is_banned = :isBanned " +
+						"room_capacity = :roomCapacity " +
 						"WHERE room_id = :roomId"
 	)
 	suspend fun updateDetailInfo(
@@ -163,8 +161,6 @@ interface ChannelDAO {
 		bookCoverImageUrl: String,
 		roomTags: List<String>,
 		roomCapacity: Int,
-		isBanned: Boolean,
-		isExploded: Boolean,
 	)
 
 	@Query("DELETE FROM Channel WHERE room_id = :channelId")
@@ -214,11 +210,11 @@ interface ChannelDAO {
 
 	@Query(
 		"UPDATE Channel SET " +
-						"is_exploded = :isExplosion " +
+						"is_exploded = :isExploded " +
 						"WHERE room_id = :channelId"
 	)
 	/** 방장이 채팅방을 나가서 채팅방이 터진 상황*/
-	suspend fun explosion(channelId: Long, isExplosion: Boolean = true)
+	suspend fun updateExploded(channelId: Long, isExploded: Boolean = true)
 
 	@Query("SELECT MAX(top_pin_num) FROM Channel")
 	suspend fun getMaxPinNum(): Int?

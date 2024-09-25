@@ -7,8 +7,6 @@ android {
 }
 
 dependencies {
-	implementation(project(":feature:main"))
-	implementation(project(":feature:signup"))
 	implementation(project(":core:domain"))
 	implementation(project(":core:oauth:external"))
 	implementation(project(":core:data:oauth:external"))

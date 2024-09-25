@@ -20,10 +20,10 @@ import com.kova700.bookchat.core.notification.chat.external.ChatNotificationHand
 import com.kova700.bookchat.core.notification.util.iconbuilder.IconBuilder
 import com.kova700.bookchat.core.stomp.chatting.external.StompHandler
 import com.kova700.bookchat.feature.main.MainActivity
-import com.kova700.bookchat.feature.main.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
+import com.kova700.bookchat.feature.main.MainActivity.Companion.EXTRA_NEW_CHAT_CHANNEL_ID
+import com.kova700.bookchat.util.channel.getBitmap
 import com.kova700.bookchat.util.date.toDate
-import com.kova700.bookchat.util.image.channel.getBitmap
-import com.kova700.bookchat.util.image.user.getBitmap
+import com.kova700.bookchat.util.user.getBitmap
 import com.kova700.core.data.notificationinfo.external.repository.ChattingNotificationInfoRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Date
@@ -137,7 +137,7 @@ class ChatNotificationHandlerImpl @Inject constructor(
 	private fun getMainActivityIntent(channel: Channel): Intent {
 		return Intent(context, MainActivity::class.java).apply {
 			flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-			putExtra(EXTRA_CHANNEL_ID, channel.roomId)
+			putExtra(EXTRA_NEW_CHAT_CHANNEL_ID, channel.roomId)
 		}
 	}
 

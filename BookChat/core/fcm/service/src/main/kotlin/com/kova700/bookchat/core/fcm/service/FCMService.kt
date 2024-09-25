@@ -11,9 +11,13 @@ import com.kova700.bookchat.core.fcm.service.model.PushType
 import com.kova700.bookchat.util.Constants.TAG
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.json.Json
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class FCMService : FirebaseMessagingService() {
+
+	@Inject
+	lateinit var jsonSerializer: Json
 
 	override fun onNewToken(token: String) {
 		super.onNewToken(token)
@@ -28,14 +32,15 @@ class FCMService : FirebaseMessagingService() {
 
 	private fun handleMessage(message: RemoteMessage) {
 		val messageBody = message.data["body"]
-		val hashMap = Json.decodeFromString<HashMap<String, String>>(messageBody ?: return)
-		when (hashMap["pushType"]) {
-			PushType.LOGIN.toString() -> startForcedLogoutWorker()
-			PushType.CHAT.toString() -> handleChatMessage(Json.decodeFromString<FcmMessage>(messageBody))
+		val fcmMessage = jsonSerializer.decodeFromString<FcmMessage>(messageBody ?: return)
+		when (fcmMessage.pushType) {
+			PushType.LOGIN -> startForcedLogoutWorker()
+			PushType.CHAT -> handleChatMessage(fcmMessage)
 		}
 	}
 
 	private fun handleChatMessage(fcmMessage: FcmMessage) {
+		if (fcmMessage.body == null) return
 		startChatNotificationWorker(
 			channelId = fcmMessage.body.channelId,
 			chatId = fcmMessage.body.chatId

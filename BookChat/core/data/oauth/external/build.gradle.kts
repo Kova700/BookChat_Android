@@ -8,5 +8,4 @@ android {
 }
 
 dependencies {
-	implementation(project(":core:oauth:external"))
 }

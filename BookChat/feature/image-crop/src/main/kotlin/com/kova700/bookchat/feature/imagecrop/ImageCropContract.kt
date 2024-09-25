@@ -2,8 +2,9 @@ package com.kova700.bookchat.feature.imagecrop
 
 import android.graphics.Bitmap
 import android.net.Uri
+import com.kova700.bookchat.core.navigation.ImageCropNavigator
+import com.kova700.bookchat.core.navigation.ImageCropNavigator.ImageCropPurpose
 import com.kova700.bookchat.feature.imagecrop.model.ImageCropAspectRatio
-import com.kova700.bookchat.feature.imagecrop.model.ImageCropPurpose
 
 data class ImageCropUiState(
 	val uiState: UiState,

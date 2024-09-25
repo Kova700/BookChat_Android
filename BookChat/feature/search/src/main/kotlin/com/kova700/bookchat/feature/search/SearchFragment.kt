@@ -16,7 +16,6 @@ import androidx.core.os.bundleOf
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -28,6 +27,7 @@ import com.kova700.bookchat.core.navigation.MakeChannelActivityNavigator
 import com.kova700.bookchat.feature.search.SearchUiState.SearchTapState
 import com.kova700.bookchat.feature.search.channelInfo.ChannelInfoActivity
 import com.kova700.bookchat.feature.search.createchannel.MakeChannelBookSelectDialog
+import com.kova700.bookchat.feature.search.createchannel.MakeChannelSelectBookActivity
 import com.kova700.bookchat.feature.search.databinding.FragmentSearchBinding
 import com.kova700.bookchat.feature.search.dialog.SearchBookDialog
 import com.kova700.bookchat.feature.search.dialog.SearchFilterSelectDialog
@@ -281,9 +281,8 @@ class SearchFragment : Fragment() {
 	}
 
 	private fun finishWithSelectedChannelBook(bookIsbn: String) {
-		setFragmentResult(
-			EXTRA_SELECTED_BOOK_ISBN, bundleOf(EXTRA_SELECTED_BOOK_ISBN to bookIsbn)
-		)
+		val parentActivity = requireActivity() as MakeChannelSelectBookActivity
+		parentActivity.finishBookSelect(bookIsbn)
 	}
 
 	private fun moveToChannelInfo(channelId: Long) {

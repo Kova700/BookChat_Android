@@ -27,6 +27,7 @@ kotlinxCollectionsImmutable = "0.3.7"
 kotlinxSerializationJson = "1.6.3"
 
 retrofit = "2.9.0"
+retrofitKotlinSerializationConverter = "1.0.0"
 okhttpBom = "4.10.0"
 
 krossbowStomp = "7.0.0"
@@ -49,6 +50,7 @@ simpleratingbar = "1.5.1"
 androidImageCropper = "4.3.1"
 
 mockito = "5.7.0"
+mockitoInline = "5.2.0"
 mockitoKotlin = "5.2.1"
 testAndroidxCore = "1.6.1"
 androidxTestJunit = "1.2.1"
@@ -68,6 +70,8 @@ workManagerHilt = "1.2.0"
 
 flexbox = "3.0.0"
 jetbrainsKotlinGradlePlugin = "1.9.0"
+firebaseFirestoreKtx = "25.1.0"
+generativeai = "0.9.0"
 
 [libraries]
 ## AndroidX Default
@@ -108,7 +112,7 @@ glide-compiler = { group = "com.github.bumptech.glide", name = "compiler", versi
 
 ## Network
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
-retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+retrofit2-kotlinx-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinSerializationConverter" }
 okhttp-bom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref = "okhttpBom" }
 okhttp3-okhttp = { group = "com.squareup.okhttp3", name = "okhttp" }
 logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor" }
@@ -161,7 +165,7 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 ## Test Mockito
 test-mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
-test-mockito-inline = { group = "org.mockito", name = "mockito-inline", version.ref = "mockito" }
+test-mockito-inline = { group = "org.mockito", name = "mockito-inline", version.ref = "mockitoInline" }
 test-mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 
 # gradle-plugin
@@ -170,6 +174,8 @@ gradle-plugin-ksp = { group = "com.google.devtools.ksp", name = "com.google.devt
 gradle-plugin-android = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 gradle-plugin-hilt = { group = "com.google.dagger", name = "hilt-android-gradle-plugin", version.ref = "hilt" }
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "jetbrainsKotlinGradlePlugin" }
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -216,7 +222,7 @@ android-test = [
 ]
 retrofit = [
     "retrofit",
-    "retrofit-converter-gson",
+    "retrofit2-kotlinx-serialization-converter",
     "okhttp3-okhttp",
     "logging-interceptor"
 ]

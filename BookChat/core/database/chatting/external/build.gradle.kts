@@ -8,10 +8,10 @@ android {
 }
 
 dependencies {
+	ksp(libs.androidx.room.compiler)
+	implementation(libs.bundles.room)
 	implementation(project(":core:data:channel:external"))
 	implementation(project(":core:data:user:external"))
 	implementation(project(":core:data:chat:external"))
 	implementation(project(":core:util"))
-	implementation(libs.bundles.room)
-	ksp(libs.androidx.room.compiler)
 }

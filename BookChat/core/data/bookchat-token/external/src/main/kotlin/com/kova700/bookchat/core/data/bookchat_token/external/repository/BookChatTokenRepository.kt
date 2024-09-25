@@ -5,6 +5,11 @@ import com.kova700.bookchat.core.data.bookchat_token.external.model.BookChatToke
 interface BookChatTokenRepository {
 	suspend fun getBookChatToken(): BookChatToken?
 	suspend fun saveBookChatToken(token: BookChatToken)
+	suspend fun saveBookChatToken(
+		accessToken: String,
+		refreshToken: String,
+	)
+
 	suspend fun isBookChatTokenExist(): Boolean
 	suspend fun clear()
 

@@ -1,15 +1,17 @@
 package com.kova700.bookchat.core.oauth.internal.kakao.external
 
 import android.content.Context
-import com.kova700.bookchat.core.oauth.external.model.OAuth2Provider.KAKAO
-import com.kova700.bookchat.core.oauth.internal.kakao.external.exception.KakaoLoginClientCancelException
-import com.kova700.bookchat.core.oauth.internal.kakao.external.exception.KakaoLoginFailException
 import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import com.kova700.bookchat.core.data.oauth.external.model.IdToken
 import com.kova700.bookchat.core.data.oauth.external.model.IdToken.Companion.ID_TOKEN_PREFIX
+import com.kova700.bookchat.core.data.oauth.external.model.OAuth2Provider.KAKAO
+import com.kova700.bookchat.core.oauth.internal.kakao.external.BuildConfig.KAKAO_APP_KEY
+import com.kova700.bookchat.core.oauth.internal.kakao.external.exception.KakaoLoginClientCancelException
+import com.kova700.bookchat.core.oauth.internal.kakao.external.exception.KakaoLoginFailException
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
@@ -19,7 +21,6 @@ import kotlin.coroutines.resumeWithException
 class KakaoLoginClient @Inject constructor(
 	private val kakaoUserApiClient: UserApiClient,
 ) {
-
 	suspend fun login(context: Context): IdToken {
 		if (kakaoUserApiClient.isKakaoTalkLoginAvailable(context)) {
 			return runCatching { loginWithKakaoTalk(context) }
@@ -76,6 +77,15 @@ class KakaoLoginClient @Inject constructor(
 	private fun OAuthToken.getIdToken(): IdToken {
 		idToken ?: throw KakaoLoginFailException("idToken is null")
 		return IdToken("$ID_TOKEN_PREFIX $idToken", KAKAO)
+	}
+
+	companion object {
+		fun init(context: Context) {
+			KakaoSdk.init(
+				context = context,
+				appKey = KAKAO_APP_KEY
+			)
+		}
 	}
 
 }

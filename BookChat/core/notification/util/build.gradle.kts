@@ -7,4 +7,6 @@ android {
 	namespace = "com.kova700.bookchat.core.notification.util"
 }
 
-dependencies {}
+dependencies {
+	implementation(project(":core:util"))
+}

@@ -23,11 +23,15 @@ import javax.inject.Singleton
 object RetrofitModule {
 	private val contentType = "application/json".toMediaType()
 
-	private val json = Json {
-		ignoreUnknownKeys = true
-//		coerceInputValues = true
-//		encodeDefaults = true
-//		isLenient = true
+	@Provides
+	@Singleton
+	fun provideJsonSerializer(): Json {
+		return Json {
+			ignoreUnknownKeys = true
+			coerceInputValues = true
+			encodeDefaults = true
+			isLenient = true
+		}
 	}
 
 	@Provides
@@ -35,12 +39,13 @@ object RetrofitModule {
 	fun provideRetrofit(
 		okHttpClient: OkHttpClient,
 		enumConverterFactory: EnumConverterFactory,
+		jsonSerializer: Json,
 	): Retrofit {
 		return Retrofit.Builder()
 //    .baseUrl("https://webhook.site/") //API 테스트
 			.baseUrl(DOMAIN)
 			.client(okHttpClient)
-			.addConverterFactory(json.asConverterFactory(contentType))
+			.addConverterFactory(jsonSerializer.asConverterFactory(contentType))
 			.addConverterFactory(enumConverterFactory)
 			.addCallAdapterFactory(ResultCallAdapterFactory())
 			.build()
@@ -62,8 +67,12 @@ object RetrofitModule {
 	@Singleton
 	fun provideAppInterceptor(
 		bookChatTokenRepository: BookChatTokenRepository,
+		jsonSerializer: Json,
 	): Interceptor {
-		return BookChatNetworkInterceptor(bookChatTokenRepository)
+		return BookChatNetworkInterceptor(
+			bookChatTokenRepository = bookChatTokenRepository,
+			jsonSerializer = jsonSerializer,
+		)
 	}
 
 	@Provides

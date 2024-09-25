@@ -5,6 +5,7 @@ import com.kova700.bookchat.core.data.search.channel.external.model.ChannelSearc
 data class ChannelInfoUiState(
 	val uiState: UiState,
 	val channel: ChannelSearchResult,
+	val isBannedChannel: Boolean,
 ) {
 
 	enum class UiState {
@@ -16,14 +17,16 @@ data class ChannelInfoUiState(
 	companion object {
 		val DEFAULT = ChannelInfoUiState(
 			uiState = UiState.LOADING,
-			channel = ChannelSearchResult.DEFAULT
+			channel = ChannelSearchResult.DEFAULT,
+			isBannedChannel = false
 		)
 	}
 }
 
 sealed class ChannelInfoEvent {
 	data object MoveToBack : ChannelInfoEvent()
-	data object ShowFullChannelDialog : ChannelInfoEvent()
+	data object ShowFullChannelNoticeDialog : ChannelInfoEvent()
+	data object ShowExplodedChannelDialog : ChannelInfoEvent()
 	data class MoveToChannel(
 		val channelId: Long,
 	) : ChannelInfoEvent()

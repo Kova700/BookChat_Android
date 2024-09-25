@@ -476,7 +476,7 @@ class ChannelRepositoryImpl @Inject constructor(
 			currentPage = response.cursorMeta.nextCursorId
 			val newChannels = response.channels.map { getChannelWithUpdatedData(it.roomId) }
 			setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
-			return newChannels
+			return response.channels.map { it.toChannel() }
 		}
 		throw IOException("failed to retrieve most active channels")
 	}
@@ -492,12 +492,13 @@ class ChannelRepositoryImpl @Inject constructor(
 			postCursorId = currentPage,
 			size = loadSize
 		)
+
 		channelDAO.upsertAllChannels(response.channels.toChannelEntity())
 		isEndPage = response.cursorMeta.last
 		currentPage = response.cursorMeta.nextCursorId
 		val newChannels = response.channels.map { getChannelWithUpdatedData(it.roomId) }
 		setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
-		return newChannels
+		return response.channels.map { it.toChannel() }
 	}
 
 	private suspend fun getOfflineMostActiveChannels(loadSize: Int): List<Channel> {

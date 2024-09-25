@@ -6,9 +6,9 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kova700.bookchat.core.navigation.ImageCropNavigator.ImageCropPurpose
 import com.kova700.bookchat.feature.imagecrop.ImageCropActivity.Companion.EXTRA_CROP_PURPOSE
 import com.kova700.bookchat.feature.imagecrop.model.ImageCropAspectRatio
-import com.kova700.bookchat.feature.imagecrop.model.ImageCropPurpose
 import com.kova700.bookchat.util.image.bitmap.scaleDownWithAspectRatio
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,8 @@ import javax.inject.Inject
 class ImageCropViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-	private val cropPurpose = savedStateHandle.get<ImageCropPurpose>(EXTRA_CROP_PURPOSE)!!
+	private val cropPurpose =
+		savedStateHandle.get<ImageCropPurpose>(EXTRA_CROP_PURPOSE)!!
 
 	private val _eventFlow = MutableSharedFlow<ImageCropUiEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()

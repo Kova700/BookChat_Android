@@ -53,7 +53,7 @@ interface ChannelApi {
 	@DELETE("/v1/api/leave/chatrooms/{roomId}")
 	suspend fun leaveChannel(
 		@Path("roomId") roomId: Long,
-	)
+	): BookChatApiResult<Unit>
 
 	@GET("/v1/api/chatrooms/{roomId}")
 	suspend fun getChannelInfo(

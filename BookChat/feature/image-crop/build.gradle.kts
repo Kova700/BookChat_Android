@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-	namespace = "com.kova700.bookchat.feature.image_crop"
+	namespace = "com.kova700.bookchat.feature.imagecrop"
 	buildFeatures.viewBinding = true
 }
 

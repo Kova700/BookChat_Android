@@ -17,4 +17,6 @@ dependencies {
 	implementation(project(":core:data:notificationinfo:external"))
 	implementation(project(":core:stomp:chatting:external"))
 	implementation(project(":feature:main"))
+	implementation(project(":core:util"))
+	implementation(project(":core:navigation"))
 }

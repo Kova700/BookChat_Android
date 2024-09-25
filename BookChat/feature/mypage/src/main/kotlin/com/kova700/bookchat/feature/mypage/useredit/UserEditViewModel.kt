@@ -7,6 +7,7 @@ import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.mypage.useredit.UserEditUiState.UiState
 import com.kova700.bookchat.util.image.bitmap.compressToByteArray
+import com.kova700.bookchat.util.image.bitmap.getImageBitmap
 import com.kova700.bookchat.util.user.namecheck.NicknameCheckState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -40,6 +41,11 @@ class UserEditViewModel @Inject constructor(
 		}
 	}
 
+	//TODO : 닉네임만 변경할 때, 이미지 Profile은 null로 전송됨
+	// null로 전송되면 서버입장에서는 default 이미지로 변경되는지 알고 기존에 이미지를 null로 수정시킴
+	// 기본 이미지로 변경된다는 flag를 추가하면 기존 프로필을 변경한다라는 구조로 바꾸는게 더 효율적인거 같은데
+	// isProfileChanged = true라면 서버는 새로 받은 이미지로 덮어쓰기(null Or MultiPart)
+	// isProfileChanged = false라면 서버는 기존 이미지로 유지
 	private fun verifyNickname() {
 		val nickName = uiState.value.newNickname
 		val userProfile = uiState.value.clientNewImage

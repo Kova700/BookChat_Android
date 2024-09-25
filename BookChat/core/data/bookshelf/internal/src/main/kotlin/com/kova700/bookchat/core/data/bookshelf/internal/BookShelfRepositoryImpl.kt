@@ -6,14 +6,16 @@ import com.kova700.bookchat.core.data.bookshelf.external.model.BookShelfItem
 import com.kova700.bookchat.core.data.bookshelf.external.model.BookShelfState
 import com.kova700.bookchat.core.data.bookshelf.external.model.BookStateInBookShelf
 import com.kova700.bookchat.core.data.bookshelf.external.model.StarRating
-import com.kova700.bookchat.core.data.bookshelf.internal.mapper.toBookRequest
-import com.kova700.bookchat.core.data.bookshelf.internal.mapper.toDomain
+import com.kova700.bookchat.core.data.common.model.SearchSortOption
+import com.kova700.bookchat.core.data.common.model.network.BookChatApiResult
 import com.kova700.bookchat.core.data.search.book.external.model.Book
-import com.kova700.bookchat.core.data.util.mapper.toNetwork
-import com.kova700.bookchat.core.data.util.model.SearchSortOption
-import com.kova700.bookchat.core.network.bookchat.BookChatApi
-import com.kova700.bookchat.core.network.bookchat.model.request.RequestChangeBookStatus
-import com.kova700.bookchat.core.network.bookchat.model.request.RequestRegisterBookShelfBook
+import com.kova700.bookchat.core.network.bookchat.bookshelf.BookshelfApi
+import com.kova700.bookchat.core.network.bookchat.bookshelf.model.mapper.toDomain
+import com.kova700.bookchat.core.network.bookchat.bookshelf.model.mapper.toNetwork
+import com.kova700.bookchat.core.network.bookchat.bookshelf.model.request.RequestChangeBookStatus
+import com.kova700.bookchat.core.network.bookchat.bookshelf.model.request.RequestRegisterBookShelfBook
+import com.kova700.bookchat.core.network.bookchat.common.mapper.toBookRequest
+import com.kova700.bookchat.core.network.bookchat.common.mapper.toNetwork
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -24,7 +26,7 @@ import javax.inject.Inject
 
 //TODO : DB적용 후, ROOM에서 Flow로 가저오도록 수정
 class BookShelfRepositoryImpl @Inject constructor(
-	private val bookChatApi: BookChatApi,
+	private val bookshelfApi: BookshelfApi,
 ) : BookShelfRepository {
 	private val mapBookShelfItems =
 		MutableStateFlow<Map<Long, BookShelfItem>>(mapOf()) //(ItemId, Item)
@@ -72,10 +74,10 @@ class BookShelfRepositoryImpl @Inject constructor(
 	) {
 		if (isEndPages[bookShelfState] == true) return
 
-		val response = bookChatApi.getBookShelfItems(
+		val response = bookshelfApi.getBookShelfItems(
 			size = size,
 			page = currentPages[bookShelfState] ?: BOOKSHELF_ITEM_FIRST_PAGE,
-			bookShelfState = bookShelfState.name,
+			bookShelfState = bookShelfState.toNetwork(),
 			sort = sort.toNetwork()
 		)
 
@@ -109,7 +111,7 @@ class BookShelfRepositoryImpl @Inject constructor(
 		bookShelfId: Long,
 		bookShelfState: BookShelfState,
 	): BookShelfItem {
-		val bookShelfItem = bookChatApi.getBookShelfItem(bookShelfId).toDomain(bookShelfState)
+		val bookShelfItem = bookshelfApi.getBookShelfItem(bookShelfId).toDomain(bookShelfState)
 		setBookShelfItems(mapBookShelfItems.value + (bookShelfItem.bookShelfId to bookShelfItem))
 		return bookShelfItem
 	}
@@ -133,10 +135,9 @@ class BookShelfRepositoryImpl @Inject constructor(
 			star = starRating
 		)
 
-		val response = bookChatApi.registerBookShelfBook(requestRegisterBookShelfBook)
+		val response = bookshelfApi.registerBookShelfBook(requestRegisterBookShelfBook)
 
-		val createdItemID = response.headers()["Location"]
-			?.split("/")?.last()?.toLong()
+		val createdItemID = response.locationHeader
 			?: throw Exception("bookShelfId does not exist in Http header.")
 
 		getOnlineBookShelfItem(
@@ -147,7 +148,7 @@ class BookShelfRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun deleteBookShelfBook(bookShelfItemId: Long) {
-		bookChatApi.deleteBookShelfBook(bookShelfItemId)
+		bookshelfApi.deleteBookShelfBook(bookShelfItemId)
 
 		val bookShelfState = mapBookShelfItems.value[bookShelfItemId]?.state ?: return
 		totalItemCount.update {
@@ -166,7 +167,7 @@ class BookShelfRepositoryImpl @Inject constructor(
 			pages = newBookShelfItem.pages
 		)
 
-		bookChatApi.changeBookShelfBookStatus(bookShelfItemId, request)
+		bookshelfApi.changeBookShelfBookStatus(bookShelfItemId, request)
 
 		val previousState = mapBookShelfItems.value[bookShelfItemId]?.state ?: return
 		val newState = newBookShelfItem.state
@@ -184,11 +185,15 @@ class BookShelfRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun checkAlreadyInBookShelf(book: Book): BookStateInBookShelf? {
-		val response = bookChatApi.checkAlreadyInBookShelf(book.isbn, book.publishAt)
-		if (response.isSuccessful) return response.body()?.toDomain()
-		when (response.code()) {
-			404 -> return null
-			else -> throw Exception("Unexpected response code: ${response.code()}")
+		val response = bookshelfApi.checkAlreadyInBookShelf(book.isbn, book.publishAt)
+		return when (response) {
+			is BookChatApiResult.Success -> response.data.toDomain()
+			is BookChatApiResult.Failure -> {
+				when (response.code) {
+					404 -> null
+					else -> throw Exception("Unexpected response code: ${response.code}")
+				}
+			}
 		}
 	}
 

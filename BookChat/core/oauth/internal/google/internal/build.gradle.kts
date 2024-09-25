@@ -11,7 +11,8 @@ plugins {
 }
 
 android {
-	namespace = "com.kova700.bookchat.core.oauth:internal:google:internal"
+	namespace = "com.kova700.bookchat.core.oauth.internal.google.internal"
+
 	defaultConfig.buildConfigField(
 		type = "String",
 		name = "GOOGLE_SERVER_CLIENT_ID",

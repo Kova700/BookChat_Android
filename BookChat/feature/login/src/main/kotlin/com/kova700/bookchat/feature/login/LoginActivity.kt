@@ -1,16 +1,15 @@
 package com.kova700.bookchat.feature.login
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.kova700.bookchat.core.data.oauth.external.model.OAuth2Provider
+import com.kova700.bookchat.core.navigation.MainNavigator
+import com.kova700.bookchat.core.navigation.SignUpActivityNavigator
 import com.kova700.bookchat.core.oauth.external.OAuthClient
 import com.kova700.bookchat.feature.login.databinding.ActivityLoginBinding
-import com.kova700.bookchat.feature.main.MainActivity
-import com.kova700.feature.signup.signup.SignUpActivity
 import com.kova700.bookchat.util.snackbar.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -23,6 +22,12 @@ class LoginActivity : AppCompatActivity() {
 
 	@Inject
 	lateinit var oauthClient: OAuthClient
+
+	@Inject
+	lateinit var signUpNavigator: SignUpActivityNavigator
+
+	@Inject
+	lateinit var mainNavigator: MainNavigator
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -68,12 +73,16 @@ class LoginActivity : AppCompatActivity() {
 	}
 
 	private fun moveToMain() {
-		startActivity(Intent(this, MainActivity::class.java))
-		finish()
+		mainNavigator.navigate(
+			currentActivity = this,
+			shouldFinish = true,
+		)
 	}
 
 	private fun moveToSignUp() {
-		startActivity(Intent(this, SignUpActivity::class.java))
+		signUpNavigator.navigate(
+			currentActivity = this,
+		)
 	}
 
 	private fun showDeviceChangeWarning() {

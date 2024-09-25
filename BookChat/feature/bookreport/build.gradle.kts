@@ -12,4 +12,5 @@ dependencies{
 	implementation(libs.simpleratingbar)
 	implementation(project(":core:data:bookreport:external"))
 	implementation(project(":core:data:bookshelf:external"))
+	implementation(project(":core:data:search:book:external"))
 }

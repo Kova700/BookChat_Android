@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FcmMessage(
 	@SerialName("pushType") val pushType: PushType,
-	@SerialName("body") val body: FcmBody,
+	@SerialName("body") val body: FcmBody? = null,
 )
 
 @Serializable

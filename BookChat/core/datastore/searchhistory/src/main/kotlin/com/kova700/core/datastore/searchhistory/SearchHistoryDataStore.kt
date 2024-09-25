@@ -15,6 +15,7 @@ import javax.inject.Inject
 
 class SearchHistoryDataStore @Inject constructor(
 	private val dataStore: DataStore<Preferences>,
+	private val jsonSerializer: Json,
 ) {
 	private val historyKey = stringPreferencesKey(SEARCH_HISTORY_KEY)
 
@@ -24,7 +25,7 @@ class SearchHistoryDataStore @Inject constructor(
 		return dataStore.getDataFlow(historyKey)
 			.map { historyString ->
 				historyString?.let {
-					Json.decodeFromString<List<String>>(historyString)
+					jsonSerializer.decodeFromString<List<String>>(historyString)
 				} ?: emptyList()
 			}.onEach { cachedHistoryList = it.toMutableList() }
 	}
@@ -56,7 +57,7 @@ class SearchHistoryDataStore @Inject constructor(
 	}
 
 	private suspend fun updateDataStore(newList: List<String>) {
-		val newHistoryString = Json.encodeToString(newList)
+		val newHistoryString = jsonSerializer.encodeToString(newList)
 		dataStore.setData(historyKey, newHistoryString)
 	}
 

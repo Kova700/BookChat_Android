@@ -59,11 +59,14 @@ class MakeChannelBookSelectDialog(
 			selectedBookAuthorsTv.isSelected = true
 			selectedBookPublishAtTv.isSelected = true
 			makeChannelBtn.setOnClickListener { onClickMakeChannel() }
+			selectedBookTitleTv.text = selectedBook.title
+			selectedBookAuthorsTv.text = selectedBook.authorsString
+			selectedBookPublishAtTv.text = selectedBook.publishAt
 		}
 	}
 
 	private fun onClickMakeChannel() {
-		dismiss()
 		onClickMakeChannel.invoke()
+		dismiss()
 	}
 }

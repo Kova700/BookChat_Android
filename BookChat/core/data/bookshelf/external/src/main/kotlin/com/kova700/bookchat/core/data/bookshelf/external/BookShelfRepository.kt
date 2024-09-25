@@ -5,7 +5,7 @@ import com.kova700.bookchat.core.data.bookshelf.external.model.BookShelfState
 import com.kova700.bookchat.core.data.bookshelf.external.model.BookStateInBookShelf
 import com.kova700.bookchat.core.data.bookshelf.external.model.StarRating
 import com.kova700.bookchat.core.data.search.book.external.model.Book
-import com.kova700.bookchat.core.data.util.model.SearchSortOption
+import com.kova700.bookchat.core.data.common.model.SearchSortOption
 import kotlinx.coroutines.flow.Flow
 
 interface BookShelfRepository {

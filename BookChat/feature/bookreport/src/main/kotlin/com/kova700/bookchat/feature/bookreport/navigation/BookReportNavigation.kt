@@ -30,10 +30,10 @@ internal class BookReportNavigatorImpl @Inject constructor() : BookReportNavigat
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal abstract class BookReportNavigatorModule {
+internal interface BookReportNavigatorModule {
 	@Binds
 	@Singleton
-	abstract fun bindBookReportNavigator(
+	fun bindBookReportNavigator(
 		bookReportNavigator: BookReportNavigatorImpl,
 	): BookReportNavigator
 }

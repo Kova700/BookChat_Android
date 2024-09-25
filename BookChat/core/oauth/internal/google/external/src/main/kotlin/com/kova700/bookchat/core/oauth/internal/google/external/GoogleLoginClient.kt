@@ -11,7 +11,7 @@ import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.kova700.bookchat.core.data.oauth.external.model.IdToken
 import com.kova700.bookchat.core.data.oauth.external.model.IdToken.Companion.ID_TOKEN_PREFIX
-import com.kova700.bookchat.core.oauth.external.model.OAuth2Provider
+import com.kova700.bookchat.core.data.oauth.external.model.OAuth2Provider
 import com.kova700.bookchat.core.oauth.internal.google.external.exception.GoogleLoginClientCancelException
 import com.kova700.bookchat.core.oauth.internal.google.external.exception.GoogleLoginFailException
 import javax.inject.Inject

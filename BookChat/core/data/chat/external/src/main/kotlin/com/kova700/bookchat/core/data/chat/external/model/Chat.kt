@@ -17,4 +17,14 @@ data class Chat(
 			else -> ChatType.Other
 		}
 	}
+	companion object{
+		val DEFAULT = Chat(
+			chatId = 0,
+			channelId = 0,
+			message = "",
+			status = ChatStatus.SUCCESS,
+			dispatchTime = "",
+			sender = null
+		)
+	}
 }

@@ -8,6 +8,7 @@ var properties = Properties().apply {
 plugins {
 	id("convention.android.library")
 	id("convention.android.hilt")
+	alias(libs.plugins.kotlin.serialization)
 }
 
 android {

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import java.io.IOException
 import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.time.Duration.Companion.seconds
@@ -100,7 +101,7 @@ class ChatRepositoryImpl @Inject constructor(
 				return newChats
 			}
 		}
-		throw Exception("chat synchronization is failed") //TODO : 필요하다면 커스텀 예외 사용하자
+		throw IOException("chat synchronization is failed")
 	}
 
 	/** 서버에 있는 채팅 우선적으로 쿼리 (지수백오프 getNewestChats 요청) */
@@ -137,7 +138,7 @@ class ChatRepositoryImpl @Inject constructor(
 			}
 			delay((DEFAULT_RETRY_ATTEMPT_DELAY_TIME * (1.5).pow(attempt)))
 		}
-		throw Exception("failed to retrieve newest chat") //TODO : 필요하다면 커스텀 예외 사용하자
+		throw IOException("failed to retrieve newest chat")
 	}
 
 	override suspend fun getOfflineNewestChats(

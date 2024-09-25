@@ -4,12 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kova700.bookchat.core.data.bookshelf.external.BookShelfRepository
 import com.kova700.bookchat.core.data.bookshelf.external.model.BookShelfState
-import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
 import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.home.HomeUiState.UiState
 import com.kova700.bookchat.feature.home.mapper.groupItems
 import com.kova700.bookchat.util.book.BookImgSizeManager
+import com.kova700.core.domain.usecase.channel.GetClientChannelsFlowUseCase
+import com.kova700.core.domain.usecase.channel.GetClientMostActiveChannelsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,8 +25,9 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
 	private val bookShelfRepository: BookShelfRepository,
 	private val clientRepository: ClientRepository,
-	private val channelRepository: ChannelRepository,
 	private val bookImgSizeManager: BookImgSizeManager,
+	private val getClientMostActiveChannelsUseCase: GetClientMostActiveChannelsUseCase,
+	private val getClientChannelsFlowUseCase: GetClientChannelsFlowUseCase,
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<HomeUiEvent>()
@@ -48,7 +50,7 @@ class HomeViewModel @Inject constructor(
 	private fun observeItems() = viewModelScope.launch {
 		combine(
 			bookShelfRepository.getBookShelfFlow(BookShelfState.READING),
-			channelRepository.getChannelsFlow(),
+			getClientChannelsFlowUseCase(),
 			_uiState
 		) { bookshelfItems, channels, uiState ->
 			groupItems(
@@ -72,7 +74,7 @@ class HomeViewModel @Inject constructor(
 	}
 
 	private fun getChannels() = viewModelScope.launch {
-		runCatching { channelRepository.getChannels() }
+		runCatching { getClientMostActiveChannelsUseCase() }
 			.onSuccess { updateState { copy(channelUiState = UiState.SUCCESS) } }
 			.onFailure {
 				startEvent(HomeUiEvent.ShowSnackBar(R.string.error_else))

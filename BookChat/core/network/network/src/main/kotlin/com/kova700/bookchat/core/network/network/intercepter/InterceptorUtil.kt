@@ -20,11 +20,12 @@ private const val TOKEN_PREFIX = "Bearer"
 private const val CONTENT_TYPE_JSON = "application/json; charset=utf-8"
 
 fun Interceptor.Chain.renewToken(
-	bookchatToken: BookChatToken?,
+	currentBookchatToken: BookChatToken?,
+	jsonSerializer: Json,
 ): BookChatToken {
-	val refreshToken = bookchatToken?.refreshToken
+	val refreshToken = currentBookchatToken?.refreshToken
 	val requestWithRefreshToken = getNewRequest(
-		requestBody = Json.getJsonRequestBody(
+		requestBody = jsonSerializer.getJsonRequestBody(
 			content = refreshToken,
 			contentType = CONTENT_TYPE_JSON
 		),
@@ -36,7 +37,7 @@ fun Interceptor.Chain.renewToken(
 	// TODO : 리프레시 토큰마저 만료되었음으로 새로 로그인 해야함
 	//  모든 작업 종료하고 로그인 페이지로 이동하게 수정
 	if (response.isSuccessful.not()) throw TokenRenewalFailException()
-	return response.parseToBookChatToken()
+	return response.parseToBookChatToken(jsonSerializer = jsonSerializer)
 }
 
 private inline fun <reified T> Json.getJsonRequestBody(
@@ -81,8 +82,8 @@ fun Response.isTokenExpired(): Boolean {
 	return this.code == 401
 }
 
-private fun Response.parseToBookChatToken(): BookChatToken {
-	val token = Json.decodeFromString<BookChatTokenEntity>(
+private fun Response.parseToBookChatToken(jsonSerializer: Json): BookChatToken {
+	val token = jsonSerializer.decodeFromString<BookChatTokenEntity>(
 		body?.string() ?: throw TokenRenewalFailException()
 	)
 	return token.copy(accessToken = "$TOKEN_PREFIX ${token.accessToken}").toDomain()

@@ -1,11 +1,13 @@
 package com.kova700.bookchat.feature.channel.chatting.mapper
 
+import android.util.Log
 import com.kova700.bookchat.core.data.channel.external.model.Channel
 import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
 import com.kova700.bookchat.core.data.chat.external.model.ChatType
 import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
+import com.kova700.bookchat.util.Constants.TAG
 import com.kova700.bookchat.util.date.getDateKoreanString
 import com.kova700.bookchat.util.date.isSameDate
 
@@ -24,6 +26,7 @@ fun List<Chat>.toChatItems(
 
 	for (i in 0..lastIndex) {
 		val chat = this[i]
+		Log.d(TAG, ": toChatItems() - chat :$chat")
 
 		if (isVisibleLastReadChatNotice
 			&& (chat.chatId == focusTargetId)

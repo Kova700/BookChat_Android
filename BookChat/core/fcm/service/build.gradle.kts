@@ -9,9 +9,11 @@ android {
 }
 
 dependencies {
+	implementation(libs.firebase.messaging.ktx)
+	implementation(libs.kotlinx.serialization.json)
+	testImplementation(libs.bundles.unit.test)
 	implementation(project(":core:fcm:renew-fcm-token"))
 	implementation(project(":core:fcm:forced-logout"))
 	implementation(project(":core:fcm:chat"))
-	implementation(libs.firebase.messaging.ktx)
-	implementation(libs.kotlinx.serialization.json)
+	implementation(project(":core:util"))
 }

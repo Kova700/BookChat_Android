@@ -2,12 +2,12 @@ package com.kova700.bookchat.core.data.agonyrecord.internal
 
 import com.kova700.bookchat.core.data.agonyrecord.external.AgonyRecordRepository
 import com.kova700.bookchat.core.data.agonyrecord.external.model.AgonyRecord
-import com.kova700.bookchat.core.data.agonyrecord.internal.mapper.toAgonyRecord
-import com.kova700.bookchat.core.data.util.mapper.toNetwork
-import com.kova700.bookchat.core.data.util.model.SearchSortOption
-import com.kova700.bookchat.core.network.bookchat.BookChatApi
-import com.kova700.bookchat.core.network.bookchat.model.request.RequestMakeAgonyRecord
-import com.kova700.bookchat.core.network.bookchat.model.request.RequestReviseAgonyRecord
+import com.kova700.bookchat.core.data.common.model.SearchSortOption
+import com.kova700.bookchat.core.network.bookchat.agonyrecord.AgonyRecordApi
+import com.kova700.bookchat.core.network.bookchat.agonyrecord.model.mapper.toAgonyRecord
+import com.kova700.bookchat.core.network.bookchat.agonyrecord.model.request.RequestMakeAgonyRecord
+import com.kova700.bookchat.core.network.bookchat.agonyrecord.model.request.RequestReviseAgonyRecord
+import com.kova700.bookchat.core.network.bookchat.common.mapper.toNetwork
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class AgonyRecordRepositoryImpl @Inject constructor(
-	private val bookChatApi: BookChatApi,
+	private val agonyRecordApi: AgonyRecordApi,
 ) : AgonyRecordRepository {
 
 	private val mapAgonyRecords =
@@ -46,7 +46,7 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 		if (cachedAgonyId != agonyId) clear()
 		if (isEndPage) return
 
-		val response = bookChatApi.getAgonyRecords(
+		val response = agonyRecordApi.getAgonyRecords(
 			bookShelfId = bookShelfId,
 			agonyId = agonyId,
 			postCursorId = currentPage,
@@ -82,7 +82,7 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 		agonyId: Long,
 		recordId: Long,
 	): AgonyRecord {
-		return bookChatApi.getAgonyRecord(
+		return agonyRecordApi.getAgonyRecord(
 			bookShelfId = bookShelfId,
 			agonyId = agonyId,
 			recordId = recordId
@@ -96,14 +96,13 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 		content: String,
 	): AgonyRecord {
 		val requestMakeAgonyRecord = RequestMakeAgonyRecord(title, content)
-		val response = bookChatApi.makeAgonyRecord(
+		val response = agonyRecordApi.makeAgonyRecord(
 			bookShelfId = bookShelfId,
 			agonyId = agonyId,
 			requestMakeAgonyRecord = requestMakeAgonyRecord
 		)
 
-		val createdAgonyRecordId = response.headers()["Location"]
-			?.split("/")?.last()?.toLong()
+		val createdAgonyRecordId = response.locationHeader
 			?: throw Exception("AgonyRecordId does not exist in Http header.")
 
 		return getAgonyRecord(
@@ -121,7 +120,7 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 		newContent: String,
 	) {
 		val requestReviseAgonyRecord = RequestReviseAgonyRecord(newTitle, newContent)
-		bookChatApi.reviseAgonyRecord(
+		agonyRecordApi.reviseAgonyRecord(
 			bookShelfId,
 			agonyId,
 			agonyRecord.recordId,
@@ -141,7 +140,7 @@ class AgonyRecordRepositoryImpl @Inject constructor(
 		agonyId: Long,
 		recordId: Long,
 	) {
-		bookChatApi.deleteAgonyRecord(bookShelfId, agonyId, recordId)
+		agonyRecordApi.deleteAgonyRecord(bookShelfId, agonyId, recordId)
 		setAgonyRecords(mapAgonyRecords.value - recordId)
 	}
 

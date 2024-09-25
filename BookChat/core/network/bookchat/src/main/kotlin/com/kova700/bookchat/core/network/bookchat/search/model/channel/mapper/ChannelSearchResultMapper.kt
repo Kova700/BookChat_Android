@@ -3,12 +3,10 @@ package com.kova700.bookchat.core.network.bookchat.search.model.channel.mapper
 import com.kova700.bookchat.core.data.channel.external.model.Channel
 import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.data.search.channel.external.model.ChannelSearchResult
-import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.network.bookchat.channel.model.mapper.toDomain
 import com.kova700.bookchat.core.network.bookchat.search.model.channel.response.ChannelSearchResponse
 
-suspend fun ChannelSearchResponse.toChannelSearchResult(
-	getUser: suspend (Long) -> User,
+fun ChannelSearchResponse.toChannelSearchResult(
 ): ChannelSearchResult {
 	return ChannelSearchResult(
 		roomId = roomId,
@@ -20,14 +18,10 @@ suspend fun ChannelSearchResponse.toChannelSearchResult(
 		roomTags = tags.split(","),
 		roomCapacity = roomSize,
 		host = host,
-		lastChat = this.getLastChat(
-			getUser = getUser
-		),
+		lastChat = lastChat,
 		bookTitle = bookTitle,
 		bookAuthors = bookAuthors,
 		bookCoverImageUrl = bookCoverImageUri,
-		isBanned = isBanned,
-		isEntered = isEntered
 	)
 }
 
@@ -48,6 +42,5 @@ fun ChannelSearchResult.toChannel(): Channel {
 		bookTitle = bookTitle,
 		bookAuthors = bookAuthors,
 		bookCoverImageUrl = bookCoverImageUrl,
-		isBanned = isBanned,
 	)
 }

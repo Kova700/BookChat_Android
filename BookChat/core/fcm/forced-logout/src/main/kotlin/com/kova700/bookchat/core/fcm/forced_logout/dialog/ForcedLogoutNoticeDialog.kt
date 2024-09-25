@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.kova700.bookchat.core.fcm.forcedLogout.databinding.DialogForcedLogoutNoticeBinding
-import com.kova700.bookchat.util.DialogSizeManager
+import com.kova700.bookchat.util.dialog.DialogSizeManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

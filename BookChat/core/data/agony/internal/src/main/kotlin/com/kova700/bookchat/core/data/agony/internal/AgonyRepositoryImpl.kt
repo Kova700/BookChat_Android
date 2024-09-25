@@ -3,13 +3,13 @@ package com.kova700.bookchat.core.data.agony.internal
 import com.kova700.bookchat.core.data.agony.external.AgonyRepository
 import com.kova700.bookchat.core.data.agony.external.model.Agony
 import com.kova700.bookchat.core.data.agony.external.model.AgonyFolderHexColor
-import com.kova700.bookchat.core.data.agony.internal.mapper.toAgony
-import com.kova700.bookchat.core.data.agony.internal.mapper.toNetWork
-import com.kova700.bookchat.core.data.util.mapper.toNetwork
-import com.kova700.bookchat.core.data.util.model.SearchSortOption
-import com.kova700.bookchat.core.network.bookchat.BookChatApi
-import com.kova700.bookchat.core.network.bookchat.model.request.RequestMakeAgony
-import com.kova700.bookchat.core.network.bookchat.model.request.RequestReviseAgony
+import com.kova700.bookchat.core.network.bookchat.agony.model.mapper.toAgony
+import com.kova700.bookchat.core.network.bookchat.agony.model.mapper.toNetWork
+import com.kova700.bookchat.core.data.common.model.SearchSortOption
+import com.kova700.bookchat.core.network.bookchat.agony.AgonyApi
+import com.kova700.bookchat.core.network.bookchat.agony.model.request.RequestMakeAgony
+import com.kova700.bookchat.core.network.bookchat.agony.model.request.RequestReviseAgony
+import com.kova700.bookchat.core.network.bookchat.common.mapper.toNetwork
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class AgonyRepositoryImpl @Inject constructor(
-	private val bookChatApi: BookChatApi,
+	private val agonyApi: AgonyApi,
 ) : AgonyRepository {
 
 	private val mapAgonies = MutableStateFlow<Map<Long, Agony>>(emptyMap()) //(agonyId, Agony)
@@ -50,7 +50,7 @@ class AgonyRepositoryImpl @Inject constructor(
 		if (cachedBookShelfItemId != bookShelfId) clear()
 		if (isEndPage) return
 
-		val response = bookChatApi.getAgonies(
+		val response = agonyApi.getAgonies(
 			bookShelfId = bookShelfId,
 			size = size,
 			sort = sort.toNetwork(),
@@ -81,7 +81,7 @@ class AgonyRepositoryImpl @Inject constructor(
 		bookShelfId: Long,
 		agonyId: Long,
 	): Agony {
-		return bookChatApi.getAgony(
+		return agonyApi.getAgony(
 			bookShelfId = bookShelfId,
 			agonyId = agonyId
 		).toAgony()
@@ -96,13 +96,12 @@ class AgonyRepositoryImpl @Inject constructor(
 			title = title,
 			hexColorCode = hexColorCode.toNetWork()
 		)
-		val response = bookChatApi.makeAgony(
+		val response = agonyApi.makeAgony(
 			bookId = bookShelfId,
 			requestMakeAgony = requestMakeAgony
 		)
 
-		val createdAgonyId = response.headers()["Location"]
-			?.split("/")?.last()?.toLong()
+		val createdAgonyId = response.locationHeader
 			?: throw Exception("AgonyId does not exist in Http header.")
 
 		return getAgony(
@@ -125,7 +124,7 @@ class AgonyRepositoryImpl @Inject constructor(
 			title = newTitle,
 			hexColorCode = agony.hexColorCode.toNetWork()
 		)
-		bookChatApi.reviseAgony(bookShelfId, agony.agonyId, requestReviseAgony)
+		agonyApi.reviseAgony(bookShelfId, agony.agonyId, requestReviseAgony)
 		setAgonies(mapAgonies.value + (agony.agonyId to agony.copy(title = newTitle)))
 	}
 
@@ -134,7 +133,7 @@ class AgonyRepositoryImpl @Inject constructor(
 		agonyIds: List<Long>,
 	) {
 		val agonyIdsString = agonyIds.joinToString(",")
-		bookChatApi.deleteAgony(bookShelfId, agonyIdsString)
+		agonyApi.deleteAgony(bookShelfId, agonyIdsString)
 		setAgonies(mapAgonies.value - agonyIds.toSet())
 	}
 

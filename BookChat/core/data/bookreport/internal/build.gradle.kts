@@ -10,4 +10,5 @@ android {
 dependencies {
 	implementation(project(":core:data:bookreport:external"))
 	implementation(project(":core:network:bookchat"))
+	implementation(project(":core:data:common"))
 }

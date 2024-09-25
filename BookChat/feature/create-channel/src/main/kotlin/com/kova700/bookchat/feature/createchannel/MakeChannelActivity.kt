@@ -1,5 +1,6 @@
 package com.kova700.bookchat.feature.createchannel
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -7,6 +8,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.text.Editable
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +21,7 @@ import com.kova700.bookchat.core.navigation.ImageCropNavigator.Companion.EXTRA_C
 import com.kova700.bookchat.core.navigation.ImageCropNavigator.ImageCropPurpose
 import com.kova700.bookchat.feature.createchannel.databinding.ActivityMakeChannelBinding
 import com.kova700.bookchat.feature.createchannel.dialog.MakeChannelImageSelectDialog
+import com.kova700.bookchat.feature.search.createchannel.MakeChannelSelectBookActivity
 import com.kova700.bookchat.feature.search.searchdetail.SearchDetailActivity.Companion.EXTRA_SELECTED_BOOK_ISBN
 import com.kova700.bookchat.util.channel.MakeChannelImgSizeManager
 import com.kova700.bookchat.util.image.bitmap.getImageBitmap
@@ -48,6 +51,10 @@ class MakeChannelActivity : AppCompatActivity() {
 
 	@Inject
 	lateinit var channelNavigator: ChannelNavigator
+
+	private val imm by lazy {
+		getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+	}
 
 	private val permissionsLauncher = getPermissionsLauncher(
 		onSuccess = { moveToImageCrop() },
@@ -92,12 +99,24 @@ class MakeChannelActivity : AppCompatActivity() {
 		makeChannelImgSizeManager.setMakeChannelImgSize(binding.channelImg)
 		with(binding) {
 			xBtn.setOnClickListener { makeChannelViewModel.onClickXBtn() }
-			makeChannelFinishBtn.setOnClickListener { makeChannelViewModel.onClickFinishBtn() }
+			makeChannelFinishBtn.setOnClickListener {
+				makeChannelViewModel.onClickFinishBtn()
+				closeKeyboard()
+			}
 			textClearBtn.setOnClickListener { makeChannelViewModel.onClickTextClearBtn() }
 			selectBootBtn.setOnClickListener { makeChannelViewModel.onClickSelectBookBtn() }
 			deleteSelectedBookBtn.setOnClickListener { makeChannelViewModel.onClickDeleteSelectedBookBtn() }
 			cameraBtn.setOnClickListener { makeChannelViewModel.onClickCameraBtn() }
 		}
+	}
+
+	private fun closeKeyboard() {
+		imm.hideSoftInputFromWindow(
+			currentFocus?.windowToken,
+			InputMethodManager.HIDE_NOT_ALWAYS
+		)
+		binding.hashTagEt.clearFocus()
+		binding.channelTitleEt.clearFocus()
 	}
 
 	private fun initChannelHashTagBar() {

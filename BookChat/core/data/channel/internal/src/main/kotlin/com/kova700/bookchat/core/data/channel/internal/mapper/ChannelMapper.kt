@@ -13,8 +13,6 @@ fun ChannelResponse.toChannelEntity(): ChannelEntity {
 		defaultRoomImageType = defaultRoomImageType.toDomain(),
 		roomImageUri = roomImageUri,
 		lastChatId = lastChatId,
-		isBanned = isBanned,
-		isExploded = isExploded
 	)
 }
 

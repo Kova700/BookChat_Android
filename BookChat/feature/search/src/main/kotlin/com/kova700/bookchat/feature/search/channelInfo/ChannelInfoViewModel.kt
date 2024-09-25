@@ -1,14 +1,18 @@
 package com.kova700.bookchat.feature.search.channelInfo
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kova700.bookchat.core.data.channel.external.model.ChannelIsExplodedException
 import com.kova700.bookchat.core.data.channel.external.model.ChannelIsFullException
+import com.kova700.bookchat.core.data.channel.external.model.UserIsBannedException
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
 import com.kova700.bookchat.core.data.search.channel.external.ChannelSearchRepository
 import com.kova700.bookchat.core.data.search.channel.external.mapper.toChannel
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.search.SearchFragment.Companion.EXTRA_CLICKED_CHANNEL_ID
+import com.kova700.bookchat.util.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,8 +48,10 @@ class ChannelInfoViewModel @Inject constructor(
 		runCatching { channelRepository.enterChannel(uiState.value.channel.toChannel()) }
 			.onSuccess { startEvent(ChannelInfoEvent.MoveToChannel(uiState.value.channel.roomId)) }
 			.onFailure {
-				failHandler(it)
-				startEvent(ChannelInfoEvent.ShowSnackBar(R.string.enter_chat_room_fail))
+				failHandler(
+					throwable = it,
+					default = { startEvent(ChannelInfoEvent.ShowSnackBar(R.string.enter_chat_room_fail)) }
+				)
 			}
 	}
 
@@ -65,9 +71,16 @@ class ChannelInfoViewModel @Inject constructor(
 		_uiState.update { _uiState.value.block() }
 	}
 
-	private fun failHandler(throwable: Throwable) {
+	private fun failHandler(
+		throwable: Throwable,
+		default: (() -> Unit)? = null,
+	) {
+		Log.d(TAG, "ChannelInfoViewModel: failHandler() -  throwable :$throwable")
 		when (throwable) {
-			is ChannelIsFullException -> startEvent(ChannelInfoEvent.ShowFullChannelDialog)
+			is ChannelIsFullException -> startEvent(ChannelInfoEvent.ShowFullChannelNoticeDialog)
+			is ChannelIsExplodedException -> startEvent(ChannelInfoEvent.ShowExplodedChannelDialog)
+			is UserIsBannedException -> updateState { copy(isBannedChannel = true) }
+			else -> default?.invoke()
 		}
 	}
 }

@@ -17,15 +17,7 @@ enum class ChannelDefaultImageType(val num: Int) {
 			while (new == now.num) {
 				new = Random().nextInt(7) + 1
 			}
-			return when (new) {
-				ONE.num -> ONE
-				TWO.num -> TWO
-				THREE.num -> THREE
-				FOUR.num -> FOUR
-				FIVE.num -> FIVE
-				SIX.num -> SIX
-				else -> SEVEN
-			}
+			return entries.first { it.num == new }
 		}
 	}
 }

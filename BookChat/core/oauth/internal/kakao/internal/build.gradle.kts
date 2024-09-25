@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-	namespace = "com.kova700.bookchat.core.oauth:internal:kakao:external"
+	namespace = "com.kova700.bookchat.core.oauth.internal.kakao.external"
 }
 
 dependencies {

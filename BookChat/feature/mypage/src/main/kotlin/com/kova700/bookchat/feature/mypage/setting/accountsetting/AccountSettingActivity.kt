@@ -14,6 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//TODO : 로그인 회원탈퇴 시에 로딩 UI 필요
 @AndroidEntryPoint
 class AccountSettingActivity : AppCompatActivity() {
 

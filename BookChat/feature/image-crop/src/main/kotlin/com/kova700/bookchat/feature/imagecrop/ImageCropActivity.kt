@@ -9,7 +9,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.kova700.bookchat.core.design_system.R
-import com.kova700.bookchat.feature.image_crop.databinding.ActivityImageCropBinding
+import com.kova700.bookchat.core.navigation.ImageCropNavigator.Companion.EXTRA_CROPPED_IMAGE_CACHE_URI
+import com.kova700.bookchat.feature.imagecrop.databinding.ActivityImageCropBinding
 import com.kova700.bookchat.feature.imagecrop.model.ImageCropAspectRatio
 import com.kova700.bookchat.util.image.image.saveImageToCacheAndGetUri
 import kotlinx.coroutines.launch
@@ -235,7 +236,6 @@ class ImageCropActivity : AppCompatActivity() {
 	companion object {
 		private const val LAUNCHER_INPUT_IMAGE = "image/*"
 		private const val ANGLE_90 = 90
-		const val EXTRA_CROPPED_IMAGE_CACHE_URI = "EXTRA_CROPPED_IMAGE_CACHE_URI"
-		const val EXTRA_CROP_PURPOSE = "EXTRA_CROP_PURPOSE"
+		internal const val EXTRA_CROP_PURPOSE = "EXTRA_CROP_PURPOSE"
 	}
 }

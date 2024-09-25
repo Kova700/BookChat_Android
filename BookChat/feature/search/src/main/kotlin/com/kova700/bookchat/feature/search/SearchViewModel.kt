@@ -1,5 +1,6 @@
 package com.kova700.bookchat.feature.search
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +16,7 @@ import com.kova700.bookchat.feature.search.mapper.toBook
 import com.kova700.bookchat.feature.search.model.SearchPurpose
 import com.kova700.bookchat.feature.search.model.SearchResultItem
 import com.kova700.bookchat.feature.search.model.SearchTarget
+import com.kova700.bookchat.util.Constants.TAG
 import com.kova700.bookchat.util.book.BookImgSizeManager
 import com.kova700.core.data.searchhistory.external.SearchHistoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -274,6 +276,7 @@ class SearchViewModel @Inject constructor(
 	}
 
 	private fun failHandler(exception: Throwable) {
+		Log.d(TAG, "SearchViewModel: failHandler() - exception :$exception")
 		updateState { copy(searchResultState = SearchResultState.Error) }
 		when (exception) {
 			else -> startEvent(SearchEvent.ShowSnackBar(R.string.error_else))

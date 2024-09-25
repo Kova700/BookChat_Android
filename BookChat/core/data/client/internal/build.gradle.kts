@@ -8,11 +8,15 @@ android {
 }
 
 dependencies {
-	implementation(project(":core:data:client:external"))
+	implementation(libs.bundles.retrofit)
+	implementation(platform(libs.okhttp.bom))
+	implementation(project(":core:oauth:external"))
 	implementation(project(":core:data:oauth:external"))
+	implementation(project(":core:data:client:external"))
 	implementation(project(":core:data:fcm-token:external"))
 	implementation(project(":core:data:bookchat-token:external"))
 	implementation(project(":core:data:user:external"))
-	implementation(project(":core:util"))
+	implementation(project(":core:data:common"))
 	implementation(project(":core:network:bookchat"))
+	implementation(project(":core:network:util"))
 }

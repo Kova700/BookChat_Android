@@ -15,6 +15,7 @@ import com.kova700.bookchat.core.data.search.book.external.model.Book
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.search.createchannel.MakeChannelBookSelectDialog
 import com.kova700.bookchat.feature.search.SearchFragment
+import com.kova700.bookchat.feature.search.SearchFragment.Companion.DIALOG_TAG_SELECT_BOOK
 import com.kova700.bookchat.feature.search.SearchFragment.Companion.EXTRA_CLICKED_CHANNEL_ID
 import com.kova700.bookchat.feature.search.adapter.SearchItemAdapter
 import com.kova700.bookchat.feature.search.channelInfo.ChannelInfoActivity
@@ -130,6 +131,8 @@ class SearchDetailActivity : AppCompatActivity() {
 	}
 
 	private fun moveToMakeChannelSelectBookDialog(book: Book) {
+		val existingFragment = supportFragmentManager.findFragmentByTag(DIALOG_TAG_SELECT_BOOK)
+		if (existingFragment != null) return
 		val dialog = MakeChannelBookSelectDialog(
 			onClickMakeChannel = { finishWithSelectedBook(book.isbn) },
 			selectedBook = book
