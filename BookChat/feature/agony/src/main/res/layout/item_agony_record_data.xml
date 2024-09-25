@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/swipe_view"
+        app:layout_constraintEnd_toEndOf="@+id/swipe_view"
+        app:layout_constraintStart_toStartOf="@+id/swipe_view"
+        app:layout_constraintTop_toTopOf="@+id/swipe_view" />
+
+    <include
+        android:id="@+id/edit_layout"
+        layout="@layout/item_agony_record_edit_data"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include
+        android:id="@+id/swipe_background"
+        layout="@layout/item_agony_record_swipe_background"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/swipe_view"
+        app:layout_constraintEnd_toEndOf="@+id/swipe_view"
+        app:layout_constraintStart_toStartOf="@+id/swipe_view"
+        app:layout_constraintTop_toTopOf="@+id/swipe_view" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_top_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="10dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_start_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="30dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_end_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="30dp" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/swipe_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="3dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_end_parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline_start_parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline_top_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="190dp"
+            android:paddingBottom="10dp">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_begin="15dp" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="15dp" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_end="15dp" />
+
+            <TextView
+                android:id="@+id/agony_record_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:elegantTextHeight="true"
+                android:elevation="10dp"
+                android:fontFamily="@font/notosanskr_regular"
+                android:textColor="#222222"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+                app:layout_constraintStart_toStartOf="@+id/guideline_start"
+                app:layout_constraintTop_toTopOf="@+id/guideline_top" />
+
+            <TextView
+                android:id="@+id/agony_record_content"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:elegantTextHeight="true"
+                android:elevation="10dp"
+                android:fontFamily="@font/notosanskr_regular"
+                android:minHeight="80dp"
+                android:textColor="#373737"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@+id/agony_record_createdAt"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+                app:layout_constraintStart_toStartOf="@+id/guideline_start"
+                app:layout_constraintTop_toBottomOf="@+id/agony_record_title"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/agony_record_createdAt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:elegantTextHeight="true"
+                android:elevation="10dp"
+                android:fontFamily="@font/notosanskr_regular"
+                android:textColor="#373737"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+                app:layout_constraintStart_toStartOf="@+id/guideline_start" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

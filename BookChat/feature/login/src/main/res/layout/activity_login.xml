@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="228dp"
+        android:layout_height="47dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.278"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.276"
+        app:srcCompat="@drawable/ic_bookchat_logo" />
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="87dp"
+        android:fontFamily="@font/notosanskr_regular"
+        android:text="@string/login_main_slogan"
+        android:textColor="#222222"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/imageView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.286"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.813" />
+
+    <com.kova700.core.design_system.customview.AntiDupClickButton
+        android:id="@+id/googleLogin_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
+        android:layout_marginEnd="35dp"
+        android:layout_marginBottom="50dp"
+        android:backgroundTint="#FFFFFF"
+        android:drawableLeft="@drawable/ic_google_icon"
+        android:fontFamily="@font/notosanskr_medium"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:stateListAnimator="@null"
+        android:text="@string/login_google_btn"
+        android:textColor="#747474"
+        android:textSize="16sp"
+        app:iconPadding="-6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:strokeColor="#F5F5F5"
+        app:strokeWidth="1.5dp" />
+
+    <com.kova700.core.design_system.customview.AntiDupClickButton
+        android:id="@+id/kakaoLogin_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
+        android:layout_marginEnd="35dp"
+        android:layout_marginBottom="15dp"
+        android:backgroundTint="#FEE500"
+        android:drawableLeft="@drawable/ic_kakao_icon"
+        android:fontFamily="@font/notosanskr_medium"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:stateListAnimator="@null"
+        android:text="@string/login_kakao_btn"
+        android:textColor="#392020"
+        android:textSize="16sp"
+        app:iconPadding="-10dp"
+        app:layout_constraintBottom_toTopOf="@+id/googleLogin_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/fast_login_cv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/white"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/fast_login_layout"
+        app:layout_constraintEnd_toEndOf="@+id/fast_login_layout"
+        app:layout_constraintStart_toStartOf="@+id/fast_login_layout"
+        app:layout_constraintTop_toTopOf="@+id/fast_login_layout" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/fast_login_tail_cv"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_marginTop="-6dp"
+        android:backgroundTint="@color/white"
+        android:rotation="45"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="1dp"
+        app:layout_constraintEnd_toEndOf="@+id/fast_login_cv"
+        app:layout_constraintStart_toStartOf="@+id/fast_login_cv"
+        app:layout_constraintTop_toBottomOf="@+id/fast_login_cv" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/fast_login_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="10dp"
+        android:layout_marginBottom="10dp"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="2dp"
+        app:layout_constraintBottom_toTopOf="@+id/kakaoLogin_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:id="@+id/imageView5"
+            android:layout_width="11dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_lightning" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="87dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="5dp"
+            android:elegantTextHeight="true"
+            android:fontFamily="@font/notosanskr_regular"
+            android:gravity="center"
+            android:text="@string/login_fast_sign_up"
+            android:textColor="#222222"
+            android:textSize="9sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.23"
+            app:layout_constraintStart_toEndOf="@+id/imageView5"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

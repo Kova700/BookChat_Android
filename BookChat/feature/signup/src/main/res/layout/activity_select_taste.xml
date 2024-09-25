@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/selectTasteLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.signup.selecttaste.SelectTasteActivity">
+
+    <Button
+        android:id="@+id/start_bookchat_btn"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:backgroundTint="#D9D9D9"
+        android:enabled="false"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="@string/select_taste_submit_btn"
+        app:cornerRadius="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chipGroup3" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/notosanskr_regular"
+        android:text="@string/select_taste_main"
+        android:textColor="#222222"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/back_btn"
+        app:layout_constraintTop_toBottomOf="@+id/back_btn" />
+
+    <ImageButton
+        android:id="@+id/back_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="27dp"
+        android:background="#00ff0000"
+        android:elevation="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_back_btn" />
+
+    <LinearLayout
+        android:id="@+id/chipGroup1"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="27dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="27dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView4">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/economy_taste_btn"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/economy"
+            android:textColor="@color/chip_state_text_color"
+            app:chipStrokeColor="@color/chip_state_strok_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@android:color/transparent"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="177dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/philosophy_taste_btn"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/philosophy"
+            android:textColor="@color/chip_state_text_color"
+            app:chipStrokeColor="@color/chip_state_strok_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@android:color/transparent"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="177dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/history_taste_btn"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/history"
+            android:textColor="@color/chip_state_text_color"
+            app:chipStrokeColor="@color/chip_state_strok_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@android:color/transparent"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="177dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/travel_taste_btn"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/travel"
+            android:textColor="@color/chip_state_text_color"
+            app:chipStrokeColor="@color/chip_state_strok_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@android:color/transparent"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="177dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/health_taste_btn"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/health"
+            android:textColor="@color/chip_state_text_color"
+            app:chipStrokeColor="@color/chip_state_strok_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@android:color/transparent"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="177dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/chipGroup2"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="27dp"
+        android:layout_marginEnd="27dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chipGroup1">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/hobby_taste_btn"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/hobby"
+            android:textColor="@color/chip_state_text_color"
+            app:chipStrokeColor="@color/chip_state_strok_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@android:color/transparent"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="177dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/humanities_taste_btn"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/humanities"
+            android:textColor="@color/chip_state_text_color"
+            app:chipStrokeColor="@color/chip_state_strok_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@android:color/transparent"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="177dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/novel_taste_btn"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/novel"
+            android:textColor="@color/chip_state_text_color"
+            app:chipStrokeColor="@color/chip_state_strok_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@android:color/transparent"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="177dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/art_taste_btn"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/art"
+            android:textColor="@color/chip_state_text_color"
+            app:chipStrokeColor="@color/chip_state_strok_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@android:color/transparent"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="177dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/design_taste_btn"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/design"
+            android:textColor="@color/chip_state_text_color"
+            app:chipStrokeColor="@color/chip_state_strok_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@android:color/transparent"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="177dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/chipGroup3"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="27dp"
+        android:layout_marginEnd="27dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chipGroup2">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/development_taste_btn"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/development"
+            android:textColor="@color/chip_state_text_color"
+            app:chipStrokeColor="@color/chip_state_strok_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@android:color/transparent"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="177dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/science_taste_btn"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/science"
+            android:textColor="@color/chip_state_text_color"
+            app:chipStrokeColor="@color/chip_state_strok_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@android:color/transparent"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="177dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/magazine_taste_btn"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/magazine"
+            android:textColor="@color/chip_state_text_color"
+            app:chipStrokeColor="@color/chip_state_strok_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@android:color/transparent"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="177dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/religion_taste_btn"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/religion"
+            android:textColor="@color/chip_state_text_color"
+            app:chipStrokeColor="@color/chip_state_strok_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@android:color/transparent"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="177dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/character_taste_btn"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/character"
+            android:textColor="@color/chip_state_text_color"
+            app:chipStrokeColor="@color/chip_state_strok_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@android:color/transparent"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="177dp" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

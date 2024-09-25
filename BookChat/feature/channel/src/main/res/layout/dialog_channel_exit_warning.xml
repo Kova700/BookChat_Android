@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/view_round_white_not_padding"
+    android:minWidth="300dp">
+
+    <TextView
+        android:id="@+id/warning_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_bold"
+        android:gravity="center"
+        android:text="@string/channel_exit_warning_dialog_title"
+        android:textColor="#000000"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/warning_content_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="17dp"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_medium"
+        android:gravity="center"
+        android:text="@string/channel_exit_warning_dialog_content"
+        android:textColor="#000000"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/warning_title_tv" />
+
+    <TextView
+        android:id="@+id/host_warning_content_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_medium"
+        android:gravity="center"
+        android:text="@string/channel_exit_host_warning_dialog_content"
+        android:textColor="#FF004D"
+        android:textSize="11sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/warning_content_tv" />
+
+    <View
+        android:id="@+id/bottom_horizontal_divider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="45dp"
+        android:background="#D9D9D9"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/host_warning_content_tv" />
+
+    <TextView
+        android:id="@+id/cancel_btn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/notosanskr_medium"
+        android:gravity="center"
+        android:text="@string/cancel"
+        android:textColor="#000000"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/bottom_vertical_divider"
+        app:layout_constraintEnd_toStartOf="@+id/bottom_vertical_divider"
+        app:layout_constraintStart_toStartOf="@+id/bottom_horizontal_divider"
+        app:layout_constraintTop_toTopOf="@+id/bottom_vertical_divider" />
+
+    <View
+        android:id="@+id/bottom_vertical_divider"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:background="#D9D9D9"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/bottom_horizontal_divider"
+        app:layout_constraintStart_toStartOf="@+id/bottom_horizontal_divider"
+        app:layout_constraintTop_toBottomOf="@+id/bottom_horizontal_divider" />
+
+    <TextView
+        android:id="@+id/ok_btn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/notosanskr_medium"
+        android:gravity="center"
+        android:text="@string/confirm"
+        android:textColor="#5648FF"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/bottom_horizontal_divider"
+        app:layout_constraintStart_toEndOf="@+id/bottom_vertical_divider"
+        app:layout_constraintTop_toTopOf="@+id/bottom_vertical_divider" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/homeFragment"
+        android:enabled="true"
+        android:icon="@drawable/ic_home_navi_btn"
+        android:title="@string/bottom_navi_home"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/bookShelfFragment"
+        android:enabled="true"
+        android:icon="@drawable/ic_bookshelf_navi_btn"
+        android:title="@string/bottom_navi_bookshelf"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/searchFragment"
+        android:enabled="true"
+        android:icon="@drawable/ic_search_navi_btn"
+        android:title="@string/bottom_navi_search"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/channelListFragment"
+        android:enabled="true"
+        android:icon="@drawable/ic_chat_navi_btn"
+        android:title="@string/bottom_navi_channel_list"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/myPageFragment"
+        android:enabled="true"
+        android:icon="@drawable/ic_mypage_navi_btn"
+        android:title="@string/bottom_navi_my_page"
+        app:showAsAction="always" />
+</menu>

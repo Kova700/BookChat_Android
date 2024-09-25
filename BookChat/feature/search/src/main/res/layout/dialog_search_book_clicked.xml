@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/dialog_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/view_round_white"
+    android:paddingHorizontal="25dp"
+    android:paddingVertical="30dp">
+
+    <ProgressBar
+        android:id="@+id/loading_progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/not_loading_state_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="channel_search_btn, bookImg_cv, book_title_tv, book_authors_tv, book_publishA_tv" />
+
+    <ImageButton
+        android:id="@+id/channel_search_btn"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_chat_navi_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.kova700.core.design_system.customview.AntiDupClickToggleButton
+        android:id="@+id/heart_btn"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/selector_wish_btn"
+        android:scaleType="fitXY"
+        android:textOff=""
+        android:textOn=""
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/bookImg_cv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        app:cardCornerRadius="@dimen/book_img_corner_radius"
+        app:cardElevation="@dimen/book_img_elevation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/channel_search_btn">
+
+        <ImageView
+            android:id="@+id/bookImg"
+            android:layout_width="@dimen/book_img_width_default"
+            android:layout_height="@dimen/book_img_height_default"
+            android:scaleType="fitXY"
+            android:src="@drawable/empty_img" />
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/book_title_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="17dp"
+        android:elegantTextHeight="true"
+        android:ellipsize="marquee"
+        android:fontFamily="@font/notosanskr_bold"
+        android:gravity="center"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:textColor="#222222"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bookImg_cv" />
+
+    <TextView
+        android:id="@+id/book_authors_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:elegantTextHeight="true"
+        android:ellipsize="marquee"
+        android:fontFamily="@font/notosanskr_regular"
+        android:gravity="center"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:textColor="#373737"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/book_title_tv" />
+
+    <TextView
+        android:id="@+id/book_publishA_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:elegantTextHeight="true"
+        android:ellipsize="marquee"
+        android:fontFamily="@font/notosanskr_regular"
+        android:gravity="center"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:textColor="#373737"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/change_status_to_complete_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/book_authors_tv" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/change_status_to_complete_btn"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="4dp"
+        android:backgroundTint="#FFFFFF"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:minHeight="55dp"
+        android:stateListAnimator="@null"
+        android:text="@string/complete_book"
+        android:textColor="#5648FF"
+        app:cornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/change_status_to_reading_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/book_publishA_tv"
+        app:strokeColor="#5648FF"
+        app:strokeWidth="1dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/change_status_to_reading_btn"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="30dp"
+        android:backgroundTint="#5648FF"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:minHeight="55dp"
+        android:stateListAnimator="@null"
+        android:text="@string/reading_book"
+        android:textColor="#FFFFFF"
+        app:cornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/change_status_to_complete_btn"
+        app:layout_constraintTop_toBottomOf="@+id/book_publishA_tv"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/already_in_bookshelf_btn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:backgroundTint="#D9D9D9"
+        android:clickable="false"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:stateListAnimator="@null"
+        android:text="@string/already_in_bookshelf"
+        android:textColor="#FFFFFF"
+        android:visibility="invisible"
+        app:cornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/change_status_to_complete_btn"
+        app:layout_constraintEnd_toEndOf="@+id/change_status_to_reading_btn"
+        app:layout_constraintStart_toStartOf="@+id/change_status_to_complete_btn"
+        app:layout_constraintTop_toTopOf="@+id/change_status_to_complete_btn" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

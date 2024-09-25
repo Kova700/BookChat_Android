@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.agony.agony.AgonyActivity">
+
+    <include
+        android:id="@+id/agony_shimmer_layout"
+        layout="@layout/layout_agony_shimmer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="3dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/agonyRcv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/editting_state_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="edit_cancel_btn, agony_delete_btn" />
+
+    <com.kova700.core.design_system.customview.AntiDupClickImageButton
+        android:id="@+id/back_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="27dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:padding="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_back_btn" />
+
+    <TextView
+        android:id="@+id/textView12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_bold"
+        android:text="@string/agony_record"
+        android:textColor="#222222"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/back_btn"
+        app:layout_constraintStart_toEndOf="@+id/back_btn"
+        app:layout_constraintTop_toTopOf="@+id/back_btn" />
+
+    <com.kova700.core.design_system.customview.AntiDupClickImageButton
+        android:id="@+id/waste_basket_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="30dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:padding="5dp"
+        android:src="@drawable/ic_wastebasket_btn"
+        app:layout_constraintBottom_toBottomOf="@+id/back_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/back_btn" />
+
+    <TextView
+        android:id="@+id/edit_cancel_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:elegantTextHeight="true"
+        android:focusable="true"
+        android:fontFamily="@font/notosanskr_medium"
+        android:padding="5dp"
+        android:text="@string/cancel"
+        android:textColor="#222222"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/waste_basket_btn"
+        app:layout_constraintEnd_toEndOf="@+id/waste_basket_btn"
+        app:layout_constraintStart_toStartOf="@+id/waste_basket_btn"
+        app:layout_constraintTop_toTopOf="@+id/waste_basket_btn" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/agonyRcv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/agony_delete_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+    <com.kova700.core.design_system.customview.AntiDupClickButton
+        android:id="@+id/agony_delete_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#5648FF"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:minHeight="45dp"
+        android:text="@string/agony_record_delete_btn_text"
+        android:textSize="14sp"
+        app:cornerRadius="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

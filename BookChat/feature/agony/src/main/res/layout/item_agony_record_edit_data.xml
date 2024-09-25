@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_top_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="10dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_start_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="30dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_end_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="30dp" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/agony_record_eidt_cv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#F6F6F6"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="0dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_end_parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline_start_parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline_top_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="190dp"
+            android:paddingBottom="5dp">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_begin="15dp" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="15dp" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_end="15dp" />
+
+            <EditText
+                android:id="@+id/agony_record_edit_title_et"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@null"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_regular"
+                android:gravity="top"
+                android:hint="@string/title"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textColor="#222222"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@+id/agony_record_edit_cancel_btn"
+                app:layout_constraintEnd_toStartOf="@+id/agony_record_edit_cancel_btn"
+                app:layout_constraintStart_toStartOf="@+id/guideline_start"
+                app:layout_constraintTop_toTopOf="@+id/guideline_top" />
+
+            <com.kova700.core.design_system.customview.AntiDupClickImageButton
+                android:id="@+id/agony_record_edit_cancel_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="5dp"
+                android:src="@drawable/x_icon_round_small"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/agony_record_edit_content_et"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@null"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_regular"
+                android:gravity="top"
+                android:hint="@string/content"
+                android:minHeight="80dp"
+                android:textColor="#373737"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@+id/agony_record_edit_finish_tv"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+                app:layout_constraintStart_toStartOf="@+id/guideline_start"
+                app:layout_constraintTop_toBottomOf="@+id/agony_record_edit_title_et"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/agony_record_edit_finish_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:elegantTextHeight="true"
+                android:elevation="2dp"
+                android:focusable="true"
+                android:fontFamily="@font/notosanskr_regular"
+                android:padding="5dp"
+                android:text="@string/revise_confirm"
+                android:textColor="#5648FF"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_end" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

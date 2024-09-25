@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/empty_chat_room_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="15dp"
+    android:minHeight="135dp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/channel_title">
+
+    <TextView
+        android:id="@+id/channel_empty_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_bold"
+        android:text="@string/chat_room_is_empty"
+        android:textColor="#222222"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/channel_empty_content_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:gravity="center"
+        android:text="@string/chat_room_is_empty_sub_text"
+        android:textColor="#222222"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/channel_empty_title_tv" />
+
+    <com.kova700.core.design_system.customview.AntiDupClickButton
+        android:id="@+id/channel_add_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:backgroundTint="#FFFFFF"
+        android:elegantTextHeight="true"
+        android:fontFamily="@font/notosanskr_regular"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:minWidth="75dp"
+        android:minHeight="35dp"
+        android:stateListAnimator="@null"
+        android:text="@string/add"
+        android:textColor="#5648FF"
+        android:textSize="12sp"
+        app:cornerRadius="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/channel_empty_content_tv"
+        app:strokeColor="#5648FF"
+        app:strokeWidth="1dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

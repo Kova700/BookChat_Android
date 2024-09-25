@@ -1,0 +1,35 @@
+package com.kova700.bookchat.core.data.client.external.model
+
+/**ECONOMY 	    : 경제,
+PHILOSOPHY 	    : 철학,
+HISTORY		      : 역사,
+TRAVEL		      : 여행,
+HEALTH		      : 건강,
+HOBBY		        : 취미,
+HUMANITIES	    : 인문,
+NOVEL		        : 소설,
+ART		          : 예술,
+DESIGN		      : 디자인,
+DEVELOPMENT	    : 개발,
+SCIENCE		      : 과학,
+MAGAZINE		    : 잡지,
+RELIGION		    : 종교,
+CHARACTER		    : 인물,
+ */
+enum class ReadingTaste {
+	ECONOMY,
+	PHILOSOPHY,
+	HISTORY,
+	TRAVEL,
+	HEALTH,
+	HOBBY,
+	HUMANITIES,
+	NOVEL,
+	ART,
+	DESIGN,
+	DEVELOPMENT,
+	SCIENCE,
+	MAGAZINE,
+	RELIGION,
+	CHARACTER;
+}

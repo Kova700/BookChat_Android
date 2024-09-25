@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.search.channelInfo.ChannelInfoActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="30dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="30dp" />
+
+    <com.kova700.core.design_system.customview.AntiDupClickImageButton
+        android:id="@+id/back_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="25dp"
+        android:background="?android:selectableItemBackground"
+        android:src="@drawable/back_btn_white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@+id/enter_channel_btn"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+        app:layout_constraintStart_toStartOf="@+id/guideline_start"
+        app:layout_constraintTop_toBottomOf="@+id/back_btn">
+
+        <!--TODO : 이전버전, 카톡 보면서 비교할점 찾고 수정할 점 수정하자. -->
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/book_img_cv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginTop="5dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardCornerRadius="@dimen/book_img_corner_radius"
+                app:cardElevation="@dimen/book_img_elevation"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/book_img"
+                    android:layout_width="@dimen/book_img_width_default"
+                    android:layout_height="@dimen/book_img_height_default"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/empty_img" />
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/book_author_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="80dp"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_regular"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/book_img_cv" />
+
+            <TextView
+                android:id="@+id/book_title_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:elegantTextHeight="true"
+                android:ellipsize="end"
+                android:fontFamily="@font/notosanskr_bold"
+                android:textColor="#FFFFFF"
+                android:textSize="30sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/book_author_tv" />
+
+            <TextView
+                android:id="@+id/channel_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:elegantTextHeight="true"
+                android:ellipsize="end"
+                android:fontFamily="@font/notosanskr_regular"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/book_title_tv"
+                app:layout_constraintTop_toBottomOf="@+id/book_title_tv" />
+
+            <TextView
+                android:id="@+id/channel_tags_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:elegantTextHeight="true"
+                android:ellipsize="end"
+                android:fontFamily="@font/notosanskr_regular"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/book_title_tv"
+                app:layout_constraintTop_toBottomOf="@+id/channel_title" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/host_profile_image_cv"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="30dp"
+                app:cardCornerRadius="15dp"
+                app:cardElevation="0dp"
+                app:layout_constraintStart_toStartOf="@+id/channel_tags_tv"
+                app:layout_constraintTop_toBottomOf="@+id/channel_tags_tv">
+
+                <ImageView
+                    android:id="@+id/host_profile_img_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#D9D9D9"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/loading_img" />
+            </androidx.cardview.widget.CardView>
+
+            <ImageView
+                android:id="@+id/host_crown"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/host_crown"
+                app:layout_constraintBottom_toBottomOf="@+id/host_profile_image_cv"
+                app:layout_constraintEnd_toEndOf="@+id/host_profile_image_cv" />
+
+            <TextView
+                android:id="@+id/channel_host_nick_name_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:elegantTextHeight="true"
+                android:ellipsize="end"
+                android:fontFamily="@font/notosanskr_regular"
+                android:maxLines="1"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@+id/channel_member_count"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/host_profile_image_cv"
+                app:layout_constraintTop_toTopOf="@+id/host_profile_image_cv" />
+
+            <TextView
+                android:id="@+id/channel_member_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_regular"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="@+id/host_profile_image_cv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/host_profile_image_cv"
+                app:layout_constraintTop_toBottomOf="@+id/channel_host_nick_name_tv" />
+
+            <TextView
+                android:id="@+id/channel_last_active_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="40dp"
+                android:elegantTextHeight="true"
+                android:fontFamily="@font/notosanskr_regular"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/host_profile_image_cv"
+                app:layout_constraintTop_toBottomOf="@+id/host_profile_image_cv"
+                app:layout_constraintVertical_bias="0.0" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <com.kova700.core.design_system.customview.AntiDupClickButton
+        android:id="@+id/enter_channel_btn"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginBottom="30dp"
+        android:backgroundTint="#5648FF"
+        android:elegantTextHeight="true"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:stateListAnimator="@null"
+        android:text="@string/enter"
+        android:textColor="#FFFFFF"
+        app:cornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/channel_background_shadow"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#B3272727"
+        android:clickable="false"
+        android:elevation="-3dp"
+        android:outlineProvider="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/channel_background_iv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#B3272727"
+        android:clickable="false"
+        android:elevation="-5dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

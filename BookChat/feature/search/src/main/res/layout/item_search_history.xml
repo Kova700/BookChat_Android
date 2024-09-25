@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/search_history_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="15dp"
+        android:fontFamily="@font/notosanskr_regular"
+        android:singleLine="true"
+        android:textColor="#373737"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@+id/delete_searchHistory_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.kova700.core.design_system.customview.AntiDupClickImageButton
+        android:id="@+id/delete_searchHistory_btn"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="-5dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_history_delete_btn"
+        app:layout_constraintBottom_toBottomOf="@+id/search_history_tv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/search_history_tv" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
