@@ -34,8 +34,7 @@
 * **test** (when adding missing tests)            : 테스트 코드 수정에 대한 커밋
 * **chore** (maintain)                            : 그 외 자잘한 수정에 대한 커밋
 
-***
-### Related Tech
+## *****Tech Stack***** 
 - `MVVM`, `Data Binding`, `Room`, `Hilt`, `Pager3`, 
 - `RemoteMediator`, `List Adapter`, `LiveData`, `Flow`
 - `DataStore`, `OAuth`, `OIDC`, [`Stomp`](https://stomp.github.io), `WebSocket`,
@@ -43,17 +42,18 @@
 - [`Glide`](https://github.com/bumptech/glide), `AAC`, `JetPack`, [`Krossbow`](https://github.com/joffrey-bion/krossbow), [`FlexBox`](https://github.com/google/flexbox-layout), [`Shimmer`](https://github.com/facebook/shimmer-android)
 - [`SimpleRatingBar`](https://github.com/williamyyu/SimpleRatingBar), [`ImageCropper`](https://github.com/CanHub/Android-Image-Cropper), [`Gson`](https://github.com/google/gson)(수정 예정)
 
-***
-### Team 
-- [Android Developer](https://github.com/Kova700)
-- [BackEnd Developer](https://github.com/geneaky)
-- [Designer](https://kse0313.creatorlink.net/ABOUT)
+</br>
 
-***
-### 진행 상황
-- Stomp프로토콜을 이용한 오픈채팅방 기능 (안정화 작업 중)
-- 채팅방에 주요했던 채팅을 기록할 수 있는 채팅 스크랩 기능 (개발 중)
-- Google Play Store : 출시 준비 중
+## *****Module Dependency Graph***** 
+### Abstract
+![bookchat_abstract_dependency_graph](https://github.com/user-attachments/assets/eaefd499-cb17-41a7-92d6-e9f416a12374)
+
+</br>
+
+### Whole ([크게보기](https://github.com/user-attachments/assets/c77bf141-cb87-45ad-97d2-b57ece050535))
+![project dot](https://github.com/user-attachments/assets/c77bf141-cb87-45ad-97d2-b57ece050535)
+
+</br>
 
 ***
 ### ScreenShots
@@ -131,7 +131,15 @@
 
 - 마이페이지
 
-***
+</br>
+
 ### App Design ([Figma](https://www.figma.com/file/h6ZwMa9QzWDn1TyCJmawsb/BookChat?node-id=693%3A2079)) 
 ![image](https://github.com/Kova700/BookChat_Android/assets/81726145/c7cefba2-1013-4d08-b6fd-c5655fc5a734)
 이전 디자인 ([Figma](https://www.figma.com/file/h6ZwMa9QzWDn1TyCJmawsb/BookChat?type=design&node-id=0%3A1&mode=design&t=0ceQ3aaZuYh3IsM4-1)) 
+
+</br>
+
+## *****Team***** 
+- [Android Developer](https://github.com/Kova700)
+- [BackEnd Developer](https://github.com/geneaky)
+- [Designer](https://kse0313.creatorlink.net/ABOUT)
