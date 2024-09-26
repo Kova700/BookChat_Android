@@ -35,12 +35,17 @@
 * **chore** (maintain)                            : 그 외 자잘한 수정에 대한 커밋
 
 ## *****Tech Stack***** 
-- `MVVM`, `Data Binding`, `Room`, `Hilt`, `Pager3`, 
-- `RemoteMediator`, `List Adapter`, `LiveData`, `Flow`
-- `DataStore`, `OAuth`, `OIDC`, [`Stomp`](https://stomp.github.io), `WebSocket`,
-- [`Retrofit2`](https://github.com/square/retrofit), [`OkHttp3`](https://github.com/square/okhttp), `Coroutines`, `FCM`, `ViewModel`, 
-- [`Glide`](https://github.com/bumptech/glide), `AAC`, `JetPack`, [`Krossbow`](https://github.com/joffrey-bion/krossbow), [`FlexBox`](https://github.com/google/flexbox-layout), [`Shimmer`](https://github.com/facebook/shimmer-android)
-- [`SimpleRatingBar`](https://github.com/williamyyu/SimpleRatingBar), [`ImageCropper`](https://github.com/CanHub/Android-Image-Cropper), [`Gson`](https://github.com/google/gson)(수정 예정)
+| 구분 | Tech |
+|:---|:---------------------------------------------------------------------------|
+| Language | Kotlin |
+| Architecture | MVVM, Clean-Architecture, Multi-Module |
+| Network | Retrofit2 |
+| DataBase | Room, DataStore |
+| Asynchronous | Coroutine, Flow |
+| DI | Dagger-Hilt |
+| Serialization | Kotlinx-Serialization |
+| Build |Version Catalog, Precompiled-Script-Plugin   |
+| ETC | OAuth, OIDC, FCM, Glide, [Stomp](https://stomp.github.io), WebSocket, [Krossbow](https://github.com/joffrey-bion/krossbow) |
 
 </br>
 
