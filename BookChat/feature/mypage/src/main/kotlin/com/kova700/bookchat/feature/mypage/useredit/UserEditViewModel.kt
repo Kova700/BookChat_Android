@@ -7,7 +7,6 @@ import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.mypage.useredit.UserEditUiState.UiState
 import com.kova700.bookchat.util.image.bitmap.compressToByteArray
-import com.kova700.bookchat.util.image.bitmap.getImageBitmap
 import com.kova700.bookchat.util.user.namecheck.NicknameCheckState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
