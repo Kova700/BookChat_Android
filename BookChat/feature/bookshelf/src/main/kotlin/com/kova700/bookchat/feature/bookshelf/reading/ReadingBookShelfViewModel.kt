@@ -49,11 +49,14 @@ class ReadingBookShelfViewModel @Inject constructor(
 		}.collect { newItems -> updateState { copy(readingItems = newItems) } }
 	}
 
-	private fun getBookShelfItems() = viewModelScope.launch {
+	fun getBookShelfItems() = viewModelScope.launch {
 		if (uiState.value.uiState != UiState.INIT_LOADING) updateState { copy(uiState = UiState.LOADING) }
 		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.READING) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { startEvent(ReadingBookShelfEvent.ShowSnackBar(R.string.error_else)) }
+			.onFailure {
+				updateState { copy(uiState = UiState.INIT_ERROR) }
+				startEvent(ReadingBookShelfEvent.ShowSnackBar(R.string.error_else))
+			}
 	}
 
 

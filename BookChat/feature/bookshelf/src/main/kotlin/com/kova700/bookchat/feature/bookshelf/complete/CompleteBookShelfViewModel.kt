@@ -50,11 +50,14 @@ class CompleteBookShelfViewModel @Inject constructor(
 		}.collect { newItems -> updateState { copy(completeItems = newItems) } }
 	}
 
-	private fun getBookShelfItems() = viewModelScope.launch {
+	fun getBookShelfItems() = viewModelScope.launch {
 		if (uiState.value.uiState != UiState.INIT_LOADING) updateState { copy(uiState = UiState.LOADING) }
 		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.COMPLETE) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { startEvent(CompleteBookShelfEvent.ShowSnackBar(R.string.error_else)) }
+			.onFailure {
+				updateState { copy(uiState = UiState.INIT_ERROR) }
+				startEvent(CompleteBookShelfEvent.ShowSnackBar(R.string.error_else))
+			}
 	}
 
 	fun loadNextBookShelfItems(lastVisibleItemPosition: Int) {

@@ -13,15 +13,26 @@ data class ReadingBookShelfUiState(
 	val isInitLoading: Boolean
 		get() = uiState == UiState.INIT_LOADING
 
+	val isInitError: Boolean
+		get() = uiState == UiState.INIT_ERROR
+
 	val isEmpty: Boolean
 		get() = readingItems.isEmpty()
 						&& isLoading.not()
 						&& isInitLoading.not()
+						&& isInitError.not()
+
+	val isNotEmpty: Boolean
+		get() = readingItems.isNotEmpty()
+						&& isLoading.not()
+						&& isInitLoading.not()
+						&& isInitError.not()
 
 	enum class UiState {
 		SUCCESS,
 		LOADING,
-		INIT_LOADING
+		INIT_LOADING,
+		INIT_ERROR,
 	}
 
 	companion object {

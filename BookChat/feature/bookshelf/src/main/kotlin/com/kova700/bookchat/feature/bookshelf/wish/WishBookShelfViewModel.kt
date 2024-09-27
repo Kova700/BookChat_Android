@@ -25,6 +25,9 @@ class WishBookShelfViewModel @Inject constructor(
 	private val bookImgSizeManager: BookImgSizeManager,
 ) : ViewModel() {
 
+	//TODO : 서재 Init load 오류 State
+	// 서재 paging load 오류 State
+
 	private val _eventFlow = MutableSharedFlow<WishBookShelfEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
 
@@ -47,11 +50,14 @@ class WishBookShelfViewModel @Inject constructor(
 		}.collect { items -> updateState { copy(wishItems = items) } }
 	}
 
-	private fun getBookShelfItems() = viewModelScope.launch {
+	fun getBookShelfItems() = viewModelScope.launch {
 		if (uiState.value.uiState != UiState.INIT_LOADING) updateState { copy(uiState = UiState.LOADING) }
 		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.WISH) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { startEvent(WishBookShelfEvent.ShowSnackBar(R.string.error_else)) }
+			.onFailure {
+				updateState { copy(uiState = UiState.INIT_ERROR) }
+				startEvent(WishBookShelfEvent.ShowSnackBar(R.string.error_else))
+			}
 	}
 
 	fun loadNextBookShelfItems(lastVisibleItemPosition: Int) {

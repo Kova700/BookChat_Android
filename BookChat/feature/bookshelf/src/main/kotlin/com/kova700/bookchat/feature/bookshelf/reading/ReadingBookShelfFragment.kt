@@ -76,9 +76,15 @@ class ReadingBookShelfFragment : Fragment() {
 	}
 
 	private fun initViewState() {
-		binding.bookshelfEmptyLayout.addBookBtn.setOnClickListener {
-			mainNavigationViewmodel.navigateTo(MainRoute.Search)
+		with(binding) {
+			bookshelfEmptyLayout.addBookBtn.setOnClickListener {
+				mainNavigationViewmodel.navigateTo(MainRoute.Search)
+			}
+			bookshelfRetryLayout.retryBtn.setOnClickListener {
+				readingBookShelfViewModel.getBookShelfItems()
+			}
 		}
+
 		initShimmerBook()
 	}
 
@@ -94,14 +100,15 @@ class ReadingBookShelfFragment : Fragment() {
 		with(binding) {
 			bookshelfEmptyLayout.root.visibility =
 				if (uiState.isEmpty) View.VISIBLE else View.GONE
+			bookshelfRetryLayout.root.visibility =
+				if (uiState.isInitError) View.VISIBLE else View.GONE
 			bookshelfReadingRcv.visibility =
-				if (uiState.isEmpty.not()) View.VISIBLE else View.GONE
+				if (uiState.isNotEmpty) View.VISIBLE else View.GONE
 			progressbar.visibility =
 				if (uiState.isLoading) View.VISIBLE else View.GONE
 			readingBookshelfShimmerLayout.root.visibility =
 				if (uiState.isInitLoading) View.VISIBLE else View.GONE
 					.also { readingBookshelfShimmerLayout.shimmerLayout.stopShimmer() }
-
 		}
 	}
 
