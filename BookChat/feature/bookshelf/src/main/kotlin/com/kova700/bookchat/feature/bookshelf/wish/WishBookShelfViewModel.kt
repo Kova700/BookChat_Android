@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,9 +27,6 @@ class WishBookShelfViewModel @Inject constructor(
 	private val bookImgSizeManager: BookImgSizeManager,
 ) : ViewModel() {
 
-	//TODO : 서재 Init load 오류 State
-	// 서재 paging load 오류 State
-
 	private val _eventFlow = MutableSharedFlow<WishBookShelfEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
 
@@ -35,23 +34,30 @@ class WishBookShelfViewModel @Inject constructor(
 	val uiState = _uiState.asStateFlow()
 
 	init {
+		initUiState()
+	}
+
+	private fun initUiState() {
+		updateState { copy(uiState = UiState.INIT_LOADING) }
 		observeBookShelfItems()
-		getBookShelfItems()
+		getInitBookShelfItems()
 	}
 
 	private fun observeBookShelfItems() = viewModelScope.launch {
-		bookShelfRepository.getBookShelfFlow(BookShelfState.WISH).combine(
-			bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.WISH)
-		) { items, totalCount ->
+		combine(
+			bookShelfRepository.getBookShelfFlow(BookShelfState.WISH),
+			bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.WISH),
+			uiState.map { it.uiState }.distinctUntilChanged()
+		) { items, totalCount, uiState ->
 			items.toWishBookShelfItems(
 				totalItemCount = totalCount,
 				dummyItemCount = bookImgSizeManager.getFlexBoxDummyItemCount(items.size),
+				uiState = uiState
 			)
 		}.collect { items -> updateState { copy(wishItems = items) } }
 	}
 
-	fun getBookShelfItems() = viewModelScope.launch {
-		if (uiState.value.uiState != UiState.INIT_LOADING) updateState { copy(uiState = UiState.LOADING) }
+	fun getInitBookShelfItems() = viewModelScope.launch {
 		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.WISH) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 			.onFailure {
@@ -60,10 +66,20 @@ class WishBookShelfViewModel @Inject constructor(
 			}
 	}
 
+	fun getBookShelfItems() = viewModelScope.launch {
+		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.WISH) }
+			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
+			.onFailure {
+				updateState { copy(uiState = UiState.PAGING_ERROR) }
+				startEvent(WishBookShelfEvent.ShowSnackBar(R.string.error_else))
+			}
+	}
+
 	fun loadNextBookShelfItems(lastVisibleItemPosition: Int) {
 		if (uiState.value.wishItems.size - 1 > lastVisibleItemPosition ||
-			uiState.value.uiState == UiState.LOADING
+			uiState.value.uiState == UiState.PAGING_LOADING
 		) return
+		updateState { copy(uiState = UiState.PAGING_LOADING) }
 		getBookShelfItems()
 	}
 

@@ -83,7 +83,7 @@ class WishBookBookShelfFragment : Fragment() {
 				mainNavigationViewmodel.navigateTo(MainRoute.Search)
 			}
 			bookshelfRetryLayout.retryBtn.setOnClickListener {
-				wishBookShelfViewModel.getBookShelfItems()
+				wishBookShelfViewModel.getInitBookShelfItems()
 			}
 		}
 		initShimmerBook()
@@ -108,7 +108,7 @@ class WishBookBookShelfFragment : Fragment() {
 			bookshelfWishRcv.visibility =
 				if (uiState.isNotEmpty) View.VISIBLE else View.GONE
 			progressbar.visibility =
-				if (uiState.isLoading) View.VISIBLE else View.GONE
+				if (uiState.isPagingLoading) View.VISIBLE else View.GONE
 			wishBookshelfShimmerLayout.root.visibility =
 				if (uiState.isInitLoading) View.VISIBLE else View.GONE
 					.also { wishBookshelfShimmerLayout.shimmerLayout.stopShimmer() }
@@ -116,10 +116,13 @@ class WishBookBookShelfFragment : Fragment() {
 	}
 
 	private fun initAdapter() {
-		wishBookShelfAdapter.onItemClick = { itemPosition ->
+		wishBookShelfAdapter.onClickItem = { itemPosition ->
 			wishBookShelfViewModel.onItemClick(
 				(wishBookShelfAdapter.currentList[itemPosition] as WishBookShelfItem.Item)
 			)
+		}
+		wishBookShelfAdapter.onClickPagingRetryBtn = {
+			wishBookShelfViewModel.getBookShelfItems()
 		}
 	}
 

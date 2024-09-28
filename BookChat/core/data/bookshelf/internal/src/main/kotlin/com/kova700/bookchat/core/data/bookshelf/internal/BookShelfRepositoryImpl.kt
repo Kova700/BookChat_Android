@@ -31,21 +31,7 @@ class BookShelfRepositoryImpl @Inject constructor(
 	private val mapBookShelfItems =
 		MutableStateFlow<Map<Long, BookShelfItem>>(mapOf()) //(ItemId, Item)
 
-	//현재 가지고 있는 데이터를 기준으로 totalItemCount를 세는 중,
-	//데이터 삭제, 상태 이동 시, 해당 숫자 변화는 그대로 반영할 수 있으나,
-	//전체 데이터 개수와 차이가 생김(데이터를 전부 로드하지 않은 상황이라면, 서버와 클라이언트의 개수 차이가 생김)
-
-	//그렇다고 서버의 데이터를 우선적으로 적용하기 위해서는,
-	//데이터를 페이징할때만 데이터 갱신이 발생하고, 삭제 상태 이동 시, 따로 숫자를 카운팅 해주어야함
-	//
-
-	//그리고 로컬 데이터 개수만 셀꺼라면 굳이 여기 말고 Ui레이어로 올려도 됨
-//	private val totalItemCount =
-//		mapBookShelfItems.map { itemsMap ->
-//			itemsMap.values.groupBy { it.state }
-//				.mapValues { (bookShelfState, items) -> items.size }
-//		}
-
+	/** 서버로부터 모든 데이터를 한 번에 가져오지 않음으로, 검색 결과 MetaData로부터 갱신하기 위해 totalItemCount를 따로 분리 */
 	private val totalItemCount = MutableStateFlow<Map<BookShelfState, Int>>(mapOf())
 
 	private val currentPages: MutableMap<BookShelfState, Long> = mutableMapOf()

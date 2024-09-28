@@ -7,8 +7,8 @@ data class WishBookShelfUiState(
 	val uiState: UiState,
 	val wishItems: List<WishBookShelfItem>,
 ) {
-	val isLoading: Boolean
-		get() = uiState == UiState.LOADING
+	val isPagingLoading: Boolean
+		get() = uiState == UiState.PAGING_LOADING
 
 	val isInitLoading: Boolean
 		get() = uiState == UiState.INIT_LOADING
@@ -18,26 +18,25 @@ data class WishBookShelfUiState(
 
 	val isEmpty: Boolean
 		get() = wishItems.isEmpty()
-						&& isLoading.not()
 						&& isInitLoading.not()
 						&& isInitError.not()
 
 	val isNotEmpty: Boolean
 		get() = wishItems.isNotEmpty()
-						&& isLoading.not()
 						&& isInitLoading.not()
 						&& isInitError.not()
 
 	enum class UiState {
 		SUCCESS,
-		LOADING,
 		INIT_LOADING,
 		INIT_ERROR,
+		PAGING_LOADING,
+		PAGING_ERROR
 	}
 
 	companion object {
 		val DEFAULT = WishBookShelfUiState(
-			uiState = UiState.INIT_LOADING,
+			uiState = UiState.SUCCESS,
 			wishItems = emptyList(),
 		)
 	}
