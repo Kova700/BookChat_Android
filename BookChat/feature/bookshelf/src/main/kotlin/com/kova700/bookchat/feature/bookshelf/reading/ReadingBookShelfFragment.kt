@@ -16,7 +16,7 @@ import com.kova700.bookchat.core.navigation.MainNavigationViewModel
 import com.kova700.bookchat.core.navigation.MainRoute
 import com.kova700.bookchat.feature.bookshelf.BookShelfViewModel
 import com.kova700.bookchat.feature.bookshelf.databinding.FragmentReadingBookshelfBinding
-import com.kova700.bookchat.feature.bookshelf.reading.adapter.ReadingBookShelfDataAdapter
+import com.kova700.bookchat.feature.bookshelf.reading.adapter.ReadingBookShelfAdapter
 import com.kova700.bookchat.feature.bookshelf.reading.dialog.PageInputBottomSheetDialog
 import com.kova700.bookchat.feature.bookshelf.reading.dialog.PageInputBottomSheetDialog.Companion.EXTRA_PAGE_INPUT_ITEM_ID
 import com.kova700.bookchat.feature.bookshelf.reading.dialog.ReadingBookDialog
@@ -37,7 +37,7 @@ class ReadingBookShelfFragment : Fragment() {
 	private val mainNavigationViewmodel by activityViewModels<MainNavigationViewModel>()
 
 	@Inject
-	lateinit var readingBookShelfDataAdapter: ReadingBookShelfDataAdapter
+	lateinit var readingBookShelfAdapter: ReadingBookShelfAdapter
 
 	@Inject
 	lateinit var bookImgSizeManager: BookImgSizeManager
@@ -67,7 +67,7 @@ class ReadingBookShelfFragment : Fragment() {
 	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
 		readingBookShelfViewModel.uiState.collect { uiState ->
 			setViewState(uiState)
-			readingBookShelfDataAdapter.submitList(uiState.readingItems)
+			readingBookShelfAdapter.submitList(uiState.readingItems)
 		}
 	}
 
@@ -81,10 +81,9 @@ class ReadingBookShelfFragment : Fragment() {
 				mainNavigationViewmodel.navigateTo(MainRoute.Search)
 			}
 			bookshelfRetryLayout.retryBtn.setOnClickListener {
-				readingBookShelfViewModel.getBookShelfItems()
+				readingBookShelfViewModel.getInitBookShelfItems()
 			}
 		}
-
 		initShimmerBook()
 	}
 
@@ -105,7 +104,7 @@ class ReadingBookShelfFragment : Fragment() {
 			bookshelfReadingRcv.visibility =
 				if (uiState.isNotEmpty) View.VISIBLE else View.GONE
 			progressbar.visibility =
-				if (uiState.isLoading) View.VISIBLE else View.GONE
+				if (uiState.isPagingLoading) View.VISIBLE else View.GONE
 			readingBookshelfShimmerLayout.root.visibility =
 				if (uiState.isInitLoading) View.VISIBLE else View.GONE
 					.also { readingBookshelfShimmerLayout.shimmerLayout.stopShimmer() }
@@ -123,7 +122,7 @@ class ReadingBookShelfFragment : Fragment() {
 			}
 		}
 		with(binding.bookshelfReadingRcv) {
-			adapter = readingBookShelfDataAdapter
+			adapter = readingBookShelfAdapter
 			setHasFixedSize(true)
 			layoutManager = linearLayoutManager
 			addOnScrollListener(rcvScrollListener)
@@ -131,26 +130,29 @@ class ReadingBookShelfFragment : Fragment() {
 	}
 
 	private fun initAdapter() {
-		readingBookShelfDataAdapter.onItemClick = { itemPosition ->
+		readingBookShelfAdapter.onItemClick = { itemPosition ->
 			readingBookShelfViewModel.onItemClick(
-				(readingBookShelfDataAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item)
+				(readingBookShelfAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item)
 			)
 		}
-		readingBookShelfDataAdapter.onLongItemClick = { itemPosition, isSwiped ->
+		readingBookShelfAdapter.onLongItemClick = { itemPosition, isSwiped ->
 			readingBookShelfViewModel.onItemLongClick(
-				(readingBookShelfDataAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item),
+				(readingBookShelfAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item),
 				isSwiped
 			)
 		}
-		readingBookShelfDataAdapter.onPageInputBtnClick = { itemPosition ->
+		readingBookShelfAdapter.onPageInputBtnClick = { itemPosition ->
 			readingBookShelfViewModel.onPageInputBtnClick(
-				(readingBookShelfDataAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item)
+				(readingBookShelfAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item)
 			)
 		}
-		readingBookShelfDataAdapter.onDeleteClick = { itemPosition ->
+		readingBookShelfAdapter.onDeleteClick = { itemPosition ->
 			readingBookShelfViewModel.onItemDeleteClick(
-				(readingBookShelfDataAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item)
+				(readingBookShelfAdapter.currentList[itemPosition] as ReadingBookShelfItem.Item)
 			)
+		}
+		readingBookShelfAdapter.onClickPagingRetryBtn = {
+			readingBookShelfViewModel.getBookShelfItems()
 		}
 	}
 

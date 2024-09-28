@@ -11,6 +11,7 @@ sealed interface ReadingBookShelfItem {
 		return when (this) {
 			is Header -> HEADER_ITEM_STABLE_ID
 			is Item -> bookShelfId
+			is PagingRetry -> PAGING_RETRY_ITEM_STABLE_ID
 		}
 	}
 
@@ -25,7 +26,10 @@ sealed interface ReadingBookShelfItem {
 		val isSwiped: Boolean = false,
 	) : ReadingBookShelfItem
 
+	data object PagingRetry : ReadingBookShelfItem
+
 	private companion object {
 		private const val HEADER_ITEM_STABLE_ID = -1L
+		private const val PAGING_RETRY_ITEM_STABLE_ID = -2L
 	}
 }

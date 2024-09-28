@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import com.kova700.bookchat.feature.bookshelf.databinding.ItemBookshelfPagingRetryBinding
 import com.kova700.bookchat.feature.bookshelf.databinding.ItemReadingBookshelfDataBinding
 import com.kova700.bookchat.feature.bookshelf.databinding.ItemReadingBookshelfHeaderBinding
 import com.kova700.bookchat.feature.bookshelf.reading.model.ReadingBookShelfItem
@@ -11,7 +12,7 @@ import com.kova700.bookchat.util.book.BookImgSizeManager
 import javax.inject.Inject
 import com.kova700.bookchat.feature.bookshelf.R as bookshelfR
 
-class ReadingBookShelfDataAdapter @Inject constructor(
+class ReadingBookShelfAdapter @Inject constructor(
 	private val bookImgSizeManager: BookImgSizeManager,
 ) : ListAdapter<ReadingBookShelfItem, ReadingBookViewHolder>(BOOK_SHELF_ITEM_COMPARATOR) {
 
@@ -19,11 +20,13 @@ class ReadingBookShelfDataAdapter @Inject constructor(
 	var onLongItemClick: ((Int, Boolean) -> Unit)? = null
 	var onPageInputBtnClick: ((Int) -> Unit)? = null
 	var onDeleteClick: ((Int) -> Unit)? = null
+	var onClickPagingRetryBtn: (() -> Unit)? = null
 
 	override fun getItemViewType(position: Int): Int {
 		return when (getItem(position)) {
 			is ReadingBookShelfItem.Header -> bookshelfR.layout.item_reading_bookshelf_header
 			is ReadingBookShelfItem.Item -> bookshelfR.layout.item_reading_bookshelf_data
+			ReadingBookShelfItem.PagingRetry -> bookshelfR.layout.item_bookshelf_paging_retry
 		}
 	}
 
@@ -40,7 +43,7 @@ class ReadingBookShelfDataAdapter @Inject constructor(
 				return ReadingBookHeaderViewHolder(binding)
 			}
 
-			else -> {
+			bookshelfR.layout.item_reading_bookshelf_data -> {
 				val binding = ItemReadingBookshelfDataBinding.inflate(
 					LayoutInflater.from(parent.context), parent, false
 				)
@@ -53,6 +56,18 @@ class ReadingBookShelfDataAdapter @Inject constructor(
 					onDeleteClick = onDeleteClick
 				)
 			}
+
+			bookshelfR.layout.item_bookshelf_paging_retry -> {
+				val binding = ItemBookshelfPagingRetryBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
+				)
+				return ReadingPagingRetryViewHolder(
+					binding = binding,
+					onClickPagingRetryBtn = onClickPagingRetryBtn
+				)
+			}
+
+			else -> throw IllegalArgumentException("Invalid viewType: $viewType")
 		}
 
 	}
