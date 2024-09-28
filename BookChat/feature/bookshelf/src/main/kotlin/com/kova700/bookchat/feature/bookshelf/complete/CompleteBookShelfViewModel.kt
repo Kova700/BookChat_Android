@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,25 +35,31 @@ class CompleteBookShelfViewModel @Inject constructor(
 	private val _isSwiped = MutableStateFlow<Map<Long, Boolean>>(emptyMap())
 
 	init {
+		initUiState()
+	}
+
+	private fun initUiState() {
+		updateState { copy(uiState = UiState.INIT_LOADING) }
 		observeBookShelfItems()
-		getBookShelfItems()
+		getInitBookShelfItems()
 	}
 
 	private fun observeBookShelfItems() = viewModelScope.launch {
 		combine(
 			bookShelfRepository.getBookShelfFlow(BookShelfState.COMPLETE),
 			_isSwiped,
-			bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.COMPLETE)
-		) { items, isSwipedMap, totalCount ->
+			bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.COMPLETE),
+			uiState.map { it.uiState }.distinctUntilChanged()
+		) { items, isSwipedMap, totalCount, uiState ->
 			items.toCompleteBookShelfItems(
 				totalItemCount = totalCount,
-				isSwipedMap = isSwipedMap
+				isSwipedMap = isSwipedMap,
+				uiState = uiState
 			)
 		}.collect { newItems -> updateState { copy(completeItems = newItems) } }
 	}
 
-	fun getBookShelfItems() = viewModelScope.launch {
-		if (uiState.value.uiState != UiState.INIT_LOADING) updateState { copy(uiState = UiState.LOADING) }
+	fun getInitBookShelfItems() = viewModelScope.launch {
 		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.COMPLETE) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 			.onFailure {
@@ -60,10 +68,20 @@ class CompleteBookShelfViewModel @Inject constructor(
 			}
 	}
 
+	fun getBookShelfItems() = viewModelScope.launch {
+		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.COMPLETE) }
+			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
+			.onFailure {
+				updateState { copy(uiState = UiState.PAGING_ERROR) }
+				startEvent(CompleteBookShelfEvent.ShowSnackBar(R.string.error_else))
+			}
+	}
+
 	fun loadNextBookShelfItems(lastVisibleItemPosition: Int) {
 		if (uiState.value.completeItems.size - 1 > lastVisibleItemPosition ||
-			uiState.value.uiState == UiState.LOADING
+			uiState.value.uiState == UiState.PAGING_LOADING
 		) return
+		updateState { copy(uiState = UiState.PAGING_LOADING) }
 		getBookShelfItems()
 	}
 

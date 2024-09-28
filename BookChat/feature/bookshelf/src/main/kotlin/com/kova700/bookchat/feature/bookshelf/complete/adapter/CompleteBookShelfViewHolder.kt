@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.bookshelf.complete.model.CompleteBookShelfItem
+import com.kova700.bookchat.feature.bookshelf.databinding.ItemBookshelfPagingRetryBinding
 import com.kova700.bookchat.feature.bookshelf.databinding.ItemCompleteBookshelfDataBinding
 import com.kova700.bookchat.feature.bookshelf.databinding.ItemCompleteBookshelfHeaderBinding
 import com.kova700.bookchat.util.book.BookImgSizeManager
@@ -111,4 +112,17 @@ class CompleteBookItemViewHolder(
 	companion object {
 		private const val SWIPE_VIEW_PERCENT = 0.3F
 	}
+}
+
+class CompletePagingRetryViewHolder(
+	private val binding: ItemBookshelfPagingRetryBinding,
+	private val onClickPagingRetryBtn: (() -> Unit)?,
+) : CompleteBookViewHolder(binding) {
+	init {
+		binding.retryBtn.setOnClickListener {
+			onClickPagingRetryBtn?.invoke()
+		}
+	}
+
+	override fun bind(completeBookShelfItem: CompleteBookShelfItem) {}
 }

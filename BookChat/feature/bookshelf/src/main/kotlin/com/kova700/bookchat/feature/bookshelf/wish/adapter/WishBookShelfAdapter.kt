@@ -68,7 +68,7 @@ class WishBookShelfAdapter @Inject constructor(
 				)
 			}
 
-			else -> throw IllegalArgumentException("Invalid viewType")
+			else -> throw IllegalArgumentException("Invalid viewType: $viewType")
 		}
 
 	}

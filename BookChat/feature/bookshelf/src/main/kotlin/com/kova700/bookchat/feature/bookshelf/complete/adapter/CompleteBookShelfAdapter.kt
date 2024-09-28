@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.kova700.bookchat.feature.bookshelf.complete.model.CompleteBookShelfItem
+import com.kova700.bookchat.feature.bookshelf.databinding.ItemBookshelfPagingRetryBinding
 import com.kova700.bookchat.feature.bookshelf.databinding.ItemCompleteBookshelfDataBinding
 import com.kova700.bookchat.feature.bookshelf.databinding.ItemCompleteBookshelfHeaderBinding
 import com.kova700.bookchat.util.book.BookImgSizeManager
@@ -17,11 +18,13 @@ class CompleteBookShelfAdapter @Inject constructor(
 	var onItemClick: ((Int) -> Unit)? = null
 	var onLongItemClick: ((Int, Boolean) -> Unit)? = null
 	var onDeleteClick: ((Int) -> Unit)? = null
+	var onClickPagingRetryBtn: (() -> Unit)? = null
 
 	override fun getItemViewType(position: Int): Int {
 		return when (getItem(position)) {
 			is CompleteBookShelfItem.Header -> bookshelfR.layout.item_complete_bookshelf_header
 			is CompleteBookShelfItem.Item -> bookshelfR.layout.item_complete_bookshelf_data
+			CompleteBookShelfItem.PagingRetry -> bookshelfR.layout.item_bookshelf_paging_retry
 		}
 	}
 
@@ -34,7 +37,7 @@ class CompleteBookShelfAdapter @Inject constructor(
 				return CompleteBookHeaderViewHolder(binding)
 			}
 
-			else -> {
+			bookshelfR.layout.item_complete_bookshelf_data -> {
 				val binding = ItemCompleteBookshelfDataBinding.inflate(
 					LayoutInflater.from(parent.context), parent, false
 				)
@@ -46,6 +49,18 @@ class CompleteBookShelfAdapter @Inject constructor(
 					onDeleteClick = onDeleteClick
 				)
 			}
+
+			bookshelfR.layout.item_bookshelf_paging_retry -> {
+				val binding = ItemBookshelfPagingRetryBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
+				)
+				return CompletePagingRetryViewHolder(
+					binding = binding,
+					onClickPagingRetryBtn = onClickPagingRetryBtn
+				)
+			}
+
+			else -> throw IllegalArgumentException("Invalid viewType: $viewType")
 		}
 	}
 
