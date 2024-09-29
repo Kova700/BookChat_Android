@@ -8,7 +8,7 @@ import com.kova700.bookchat.util.book.BookImgSizeManager
 
 fun groupItems(
 	clientNickname: String,
-	bookshelfItems: List<BookShelfItem>? = null,
+	books: List<BookShelfItem>? = null,
 	channels: List<Channel>? = null,
 	bookImgSizeManager: BookImgSizeManager,
 	bookUiState: UiState,
@@ -19,13 +19,13 @@ fun groupItems(
 
 	if (bookUiState != UiState.INIT_LOADING) groupedItems.add(HomeItem.BookHeader)
 	when {
-		bookUiState == UiState.ERROR -> groupedItems.add(HomeItem.BookRetry)
+		bookUiState == UiState.INIT_ERROR -> groupedItems.add(HomeItem.BookRetry)
 		bookUiState == UiState.INIT_LOADING -> groupedItems.add(HomeItem.BookLoading)
-		bookshelfItems.isNullOrEmpty() -> groupedItems.add(HomeItem.BookEmpty)
+		books.isNullOrEmpty() -> groupedItems.add(HomeItem.BookEmpty)
 		else -> {
 			val defaultSize = bookImgSizeManager.flexBoxBookSpanSize
-			val exposureItemCount = minOf(bookshelfItems.size, defaultSize)
-			groupedItems.addAll(bookshelfItems.take(exposureItemCount).toHomeBookItems())
+			val exposureItemCount = minOf(books.size, defaultSize)
+			groupedItems.addAll(books.take(exposureItemCount).toHomeBookItems())
 			val dummyItemCount = bookImgSizeManager.getFlexBoxDummyItemCount(exposureItemCount)
 			(0 until dummyItemCount).forEach { i -> groupedItems.add(HomeItem.BookDummy(i)) }
 		}
@@ -33,7 +33,7 @@ fun groupItems(
 
 	if (channelUiState != UiState.INIT_LOADING) groupedItems.add(HomeItem.ChannelHeader)
 	when {
-		channelUiState == UiState.ERROR -> groupedItems.add(HomeItem.ChannelRetry)
+		channelUiState == UiState.INIT_ERROR -> groupedItems.add(HomeItem.ChannelRetry)
 		channelUiState == UiState.INIT_LOADING -> groupedItems.add(HomeItem.ChannelLoading)
 		channels.isNullOrEmpty() -> groupedItems.add(HomeItem.ChannelEmpty)
 		else -> groupedItems.addAll(channels.take(3).toHomeChannelItems())
