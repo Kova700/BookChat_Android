@@ -71,6 +71,13 @@ class SearchDetailViewModel @Inject constructor(
 					it.toBookSearchResultItem(bookImgSizeManager.getFlexBoxDummyItemCount(it.size))
 				}.collect { items ->
 					if (items.isEmpty()) updateState { copy(uiState = UiState.EMPTY) }
+					//이렇게 Empty 상태를 정의하는 방법 1
+					//Uistate에 Item이 비어있고, State가 Success면 isEmpty로 처리하는 방법 2 (like : Bookshelf)
+					//최초의 Search 함수 호출에 Result가 비어있다면 Empty로 처리하는 방법 3 (If문 만들어서 isFirst Or isInit로 분기문 작성)
+					//     3번 방법은 검색처럼 데이터 가공이 없는 경우는 유효하나,
+					//     유저가 데이터의 CRUD가 가능한 경우 검색을 안하고도 DataSet이 변경되는 경우가 생김으로 유효하지 않음
+					//     고로 BookShelf와 같이 검색이 아닌 경우는 1번 혹은 2번이 유효함
+					//     검색의 경우는 3번만으로도 충분함 (통일을 위해서 1번 혹은 2번으로 통일하는게 좋음 == 2번이 제일 깔끔하긴할듯
 					else updateState { copy(searchItems = items) }
 				}
 			}

@@ -4,20 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/result_empty_layout"
-        layout="@layout/layout_search_result_empty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
-
-    <include
-        android:id="@+id/result_shimmer_layout"
-        layout="@layout/layout_search_result_shimmer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/result_rcv"
         android:layout_width="match_parent"

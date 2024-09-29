@@ -17,8 +17,10 @@ data class SearchDetailUiState(
 
 	enum class UiState {
 		SUCCESS,
-		LOADING,
-		ERROR,
+		LOADING,  //INIT_LOADING
+		ERROR,    //INIT_ERROR
+		//PAGING_LOADING
+		//PAGING_ERROR
 		EMPTY,
 	}
 

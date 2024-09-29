@@ -12,22 +12,17 @@ data class SearchUiState(
 	val searchPurpose: SearchPurpose,
 	val searchFilter: SearchFilter,
 	val searchKeyword: String,
-	val searchResultState: SearchResultState,
+	val bookSearchResultUiState: SearchResultUiState,
+	val channelSearchResultUiState: SearchResultUiState,
 	val searchResults: List<SearchResultItem>,
 	val searchHistory: List<String>,
 ) {
-	val isBothEmptyResult
-		get() = (searchTapState is SearchTapState.Result)
-						&& (searchResultState == SearchResultState.Empty)
 
-	val isLoading
-		get() = (searchTapState is SearchTapState.Result)
-						&& (searchResultState == SearchResultState.Loading)
-
-	val isErrorOrSuccessResult
-		get() = (searchTapState is SearchTapState.Result)
-						&& ((searchResultState == SearchResultState.Success)
-						|| (searchResultState == SearchResultState.Error))
+	enum class SearchResultUiState {
+		SUCCESS,
+		INIT_LOADING,
+		INIT_ERROR,
+	}
 
 	sealed class SearchTapState(open val fragmentId: Int) {
 		data class Default(
@@ -50,20 +45,14 @@ data class SearchUiState(
 		val isDefaultOrHistory get() = this is Default || this is History
 	}
 
-	sealed class SearchResultState {
-		data object Loading : SearchResultState()
-		data object Empty : SearchResultState()
-		data object Error : SearchResultState()
-		data object Success : SearchResultState()
-	}
-
 	companion object {
 		val DEFAULT = SearchUiState(
 			searchTapState = SearchTapState.Default(),
 			searchPurpose = SearchPurpose.SEARCH_BOTH,
 			searchFilter = SearchFilter.BOOK_TITLE,
 			searchKeyword = "",
-			searchResultState = SearchResultState.Loading,
+			bookSearchResultUiState = SearchResultUiState.SUCCESS,
+			channelSearchResultUiState = SearchResultUiState.SUCCESS,
 			searchResults = emptyList(),
 			searchHistory = emptyList()
 		)
