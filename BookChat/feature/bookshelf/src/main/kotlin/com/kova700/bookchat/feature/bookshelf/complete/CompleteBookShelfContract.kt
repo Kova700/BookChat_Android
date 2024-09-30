@@ -6,6 +6,9 @@ data class CompleteBookShelfUiState(
 	val uiState: UiState,
 	val completeItems: List<CompleteBookShelfItem>,
 ) {
+	val isLoading: Boolean
+		get() = isPagingLoading || isInitLoading
+
 	val isPagingLoading: Boolean
 		get() = uiState == UiState.PAGING_LOADING
 

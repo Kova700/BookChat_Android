@@ -77,7 +77,7 @@ class WishBookShelfViewModel @Inject constructor(
 
 	fun loadNextBookShelfItems(lastVisibleItemPosition: Int) {
 		if (uiState.value.wishItems.size - 1 > lastVisibleItemPosition ||
-			uiState.value.uiState == UiState.PAGING_LOADING
+			uiState.value.isLoading
 		) return
 		updateState { copy(uiState = UiState.PAGING_LOADING) }
 		getBookShelfItems()

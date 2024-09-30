@@ -7,6 +7,9 @@ data class WishBookShelfUiState(
 	val uiState: UiState,
 	val wishItems: List<WishBookShelfItem>,
 ) {
+	val isLoading: Boolean
+		get() = isPagingLoading || isInitLoading
+
 	val isPagingLoading: Boolean
 		get() = uiState == UiState.PAGING_LOADING
 
