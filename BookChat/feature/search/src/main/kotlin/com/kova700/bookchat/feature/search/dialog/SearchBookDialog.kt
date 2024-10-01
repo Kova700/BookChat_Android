@@ -13,9 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import com.kova700.bookchat.core.data.search.channel.external.model.SearchFilter
 import com.kova700.bookchat.feature.search.SearchFragment
 import com.kova700.bookchat.feature.search.databinding.DialogSearchBookClickedBinding
-import com.kova700.bookchat.feature.search.dialog.SearchDialogUiState.SearchDialogState.AlreadyInBookShelf
-import com.kova700.bookchat.feature.search.dialog.SearchDialogUiState.SearchDialogState.Default
-import com.kova700.bookchat.feature.search.dialog.SearchDialogUiState.SearchDialogState.Loading
 import com.kova700.bookchat.feature.search.model.SearchPurpose
 import com.kova700.bookchat.feature.search.model.SearchTarget
 import com.kova700.bookchat.feature.search.searchdetail.SearchDetailActivity
@@ -78,10 +75,7 @@ class SearchBookDialog : DialogFragment() {
 		dialogSizeManager.setDialogSize(binding.dialogLayout)
 		with(binding) {
 			channelSearchBtn.setOnClickListener { searchBookDialogViewModel.onClickChatBtn() }
-			heartBtn.setOnClickListener {
-				heartBtn.isChecked = searchBookDialogViewModel.uiState.value.isAlreadyInWishBookShelf
-				searchBookDialogViewModel.onClickWishToggleBtn()
-			}
+			heartBtn.setOnClickListener { searchBookDialogViewModel.onClickWishToggleBtn() }
 			changeStatusToCompleteBtn.setOnClickListener { searchBookDialogViewModel.onClickCompleteBtn() }
 			changeStatusToReadingBtn.setOnClickListener { searchBookDialogViewModel.onClickReadingBtn() }
 		}
@@ -97,24 +91,26 @@ class SearchBookDialog : DialogFragment() {
 			bookPublishATv.isSelected = true
 			bookPublishATv.text = uiState.book.publishAt
 		}
-		setViewVisibility(uiState.uiState)
+		setViewVisibility(uiState)
 	}
 
-	private fun setViewVisibility(uiState: SearchDialogUiState.SearchDialogState) {
+	private fun setViewVisibility(uiState: SearchDialogUiState) {
 		with(binding) {
 			loadingProgressbar.visibility =
-				if (uiState == Loading) View.VISIBLE else View.INVISIBLE
-			notLoadingStateGroup.visibility =
-				if (uiState != SearchDialogUiState.SearchDialogState.Loading) View.VISIBLE else View.INVISIBLE
+				if (uiState.isLoading) View.VISIBLE else View.INVISIBLE
 			alreadyInBookshelfBtn.visibility =
-				if (uiState is AlreadyInBookShelf) View.VISIBLE else View.INVISIBLE
+				if (uiState.isAlreadyInBookShelf) View.VISIBLE else View.INVISIBLE
+			resultRetryLayout.root.visibility =
+				if (uiState.isInitError) View.VISIBLE else View.INVISIBLE
+			successStateGroup.visibility =
+				if (uiState.isSuccess) View.VISIBLE else View.INVISIBLE
 			changeStatusToCompleteBtn.visibility =
-				if (uiState is Default) View.VISIBLE else View.INVISIBLE
+				if (uiState.isNotInBookShelf) View.VISIBLE else View.INVISIBLE
 			changeStatusToReadingBtn.visibility =
-				if (uiState is Default) View.VISIBLE else View.INVISIBLE
+				if (uiState.isNotInBookShelf) View.VISIBLE else View.INVISIBLE
 			heartBtn.visibility =
-				if (uiState is Default) View.VISIBLE else View.INVISIBLE
-			heartBtn.isChecked = searchBookDialogViewModel.uiState.value.isAlreadyInWishBookShelf
+				if (uiState.isNotInBookShelf) View.VISIBLE else View.INVISIBLE
+			heartBtn.isChecked = uiState.isAlreadyInWishBookShelf
 		}
 	}
 

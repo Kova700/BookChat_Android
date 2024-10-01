@@ -10,23 +10,41 @@ data class SearchDialogUiState(
 	val uiState: SearchDialogState,
 	val book: Book,
 	val starRating: Float,
+	val bookshelfState: BookShelfState?,
 ) {
+	val isSuccess: Boolean
+		get() = uiState is SearchDialogState.Success
+
+	val isLoading: Boolean
+		get() = uiState is SearchDialogState.Loading
+
+	val isInitError: Boolean
+		get() = uiState is SearchDialogState.InitError
+
+	val isNotInBookShelf: Boolean
+		get() = uiState is SearchDialogState.Success
+						&& uiState.bookShelfState == null
+
+	val isAlreadyInBookShelf: Boolean
+		get() = uiState is SearchDialogState.Success
+						&& uiState.bookShelfState != null
 
 	val isAlreadyInWishBookShelf: Boolean
-		get() = uiState is SearchDialogState.AlreadyInBookShelf
+		get() = uiState is SearchDialogState.Success
 						&& uiState.bookShelfState == BookShelfState.WISH
 
 	sealed class SearchDialogState {
-		data object Default : SearchDialogState()
+		data class Success(val bookShelfState: BookShelfState?) : SearchDialogState()
 		data object Loading : SearchDialogState()
-		data class AlreadyInBookShelf(val bookShelfState: BookShelfState) : SearchDialogState()
+		data object InitError : SearchDialogState()
 	}
 
 	companion object {
 		val DEFAULT = SearchDialogUiState(
-			uiState = SearchDialogState.Loading,
+			uiState = SearchDialogState.Success(null),
 			book = Book.DEFAULT,
 			starRating = 0F,
+			bookshelfState = null,
 		)
 	}
 }
