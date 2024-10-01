@@ -19,6 +19,7 @@ class SearchItemAdapter @Inject constructor(
 	var onClickMakeChannelBtn: (() -> Unit)? = null
 	var onBookRetryBtnClick: (() -> Unit)? = null
 	var onChannelRetryBtnClick: (() -> Unit)? = null
+	var onPagingRetryBtnClick: (() -> Unit)? = null
 
 	override fun getItemViewType(position: Int): Int {
 		return when (getItem(position)) {
@@ -34,6 +35,7 @@ class SearchItemAdapter @Inject constructor(
 			SearchResultItem.ChannelRetry -> searchR.layout.item_search_channel_retry
 			SearchResultItem.ChannelLoading -> searchR.layout.item_search_channels_shimmer
 			SearchResultItem.BothEmpty -> searchR.layout.layout_search_result_empty
+			SearchResultItem.PagingRetry -> searchR.layout.item_search_paging_retry
 		}
 	}
 
@@ -48,6 +50,7 @@ class SearchItemAdapter @Inject constructor(
 			onChannelItemClick = onChannelItemClick,
 			onClickMakeChannelBtn = onClickMakeChannelBtn,
 			onBookRetryBtnClick = onBookRetryBtnClick,
+			onPagingRetryBtnClick = onPagingRetryBtnClick,
 			onChannelRetryBtnClick = onChannelRetryBtnClick,
 		)
 	}

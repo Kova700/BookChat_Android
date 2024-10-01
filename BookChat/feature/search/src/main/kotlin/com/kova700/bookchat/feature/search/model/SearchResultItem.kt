@@ -11,14 +11,15 @@ sealed interface SearchResultItem {
 			is BookDummy -> hashCode().toString()
 			BookEmpty -> BOOK_EMPTY_ITEM_STABLE_ID
 			is BookItem -> isbn
-			BookRetry -> BOOK_ERROR_ITEM_STABLE_ID
+			BookRetry -> BOOK_RETRY_ITEM_STABLE_ID
 			BookLoading -> BOOK_LOADING_ITEM_STABLE_ID
 			ChannelHeader -> CHANNEL_HEADER_ITEM_STABLE_ID
 			ChannelEmpty -> CHANNEL_EMPTY_ITEM_STABLE_ID
 			is ChannelItem -> roomId.toString()
-			ChannelRetry -> CHANNEL_ERROR_ITEM_STABLE_ID
+			ChannelRetry -> CHANNEL_RETRY_ITEM_STABLE_ID
 			ChannelLoading -> CHANNEL_LOADING_ITEM_STABLE_ID
 			BothEmpty -> BOTH_EMPTY_ITEM_STABLE_ID
+			PagingRetry -> PAGING_RETRY_ITEM_STABLE_ID
 		}
 	}
 
@@ -56,16 +57,18 @@ sealed interface SearchResultItem {
 	data object ChannelLoading : SearchResultItem
 
 	data object BothEmpty : SearchResultItem
+	data object PagingRetry : SearchResultItem
 
 	companion object {
 		private const val BOOK_HEADER_ITEM_STABLE_ID = "BOOK_HEADER_ITEM_STABLE_ID"
 		private const val BOOK_EMPTY_ITEM_STABLE_ID = "BOOK_EMPTY_ITEM_STABLE_ID"
-		private const val BOOK_ERROR_ITEM_STABLE_ID = "BOOK_ERROR_ITEM_STABLE_ID"
+		private const val BOOK_RETRY_ITEM_STABLE_ID = "BOOK_RETRY_ITEM_STABLE_ID"
 		private const val BOOK_LOADING_ITEM_STABLE_ID = "BOOK_LOADING_ITEM_STABLE_ID"
 		private const val CHANNEL_HEADER_ITEM_STABLE_ID = "CHANNEL_HEADER_ITEM_STABLE_ID"
 		private const val CHANNEL_EMPTY_ITEM_STABLE_ID = "CHANNEL_EMPTY_ITEM_STABLE_ID"
-		private const val CHANNEL_ERROR_ITEM_STABLE_ID = "CHANNEL_ERROR_ITEM_STABLE_ID"
+		private const val CHANNEL_RETRY_ITEM_STABLE_ID = "CHANNEL_RETRY_ITEM_STABLE_ID"
 		private const val CHANNEL_LOADING_ITEM_STABLE_ID = "CHANNEL_LOADING_ITEM_STABLE_ID"
 		private const val BOTH_EMPTY_ITEM_STABLE_ID = "BOTH_EMPTY_ITEM_STABLE_ID"
+		private const val PAGING_RETRY_ITEM_STABLE_ID = "PAGING_RETRY_ITEM_STABLE_ID"
 	}
 }

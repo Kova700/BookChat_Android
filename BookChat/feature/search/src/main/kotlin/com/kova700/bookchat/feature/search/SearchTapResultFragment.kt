@@ -46,7 +46,6 @@ class SearchTapResultFragment : Fragment() {
 		super.onViewCreated(view, savedInstanceState)
 		initAdapter()
 		initRcv()
-		initViewState()
 		observeUiState()
 	}
 
@@ -57,34 +56,10 @@ class SearchTapResultFragment : Fragment() {
 
 	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
 		searchViewModel.uiState.collect { uiState ->
-			setViewVisibility(uiState)
 			searchItemAdapter.submitList(uiState.searchResults)
 		}
 	}
 
-	private fun initViewState() {
-//		initShimmerChannel()
-	}
-//	private fun initShimmerChannel() {
-//		val isMakeChannelPurpose =
-//			searchViewModel.uiState.value.searchPurpose == SearchPurpose.MAKE_CHANNEL
-////		with(binding.resultShimmerLayout) {
-////			channelShimmerGroup.visibility =
-////				if (isMakeChannelPurpose) View.GONE else View.VISIBLE
-////		}
-//	}
-
-	private fun setViewVisibility(uiState: SearchUiState) {
-		with(binding) {
-//			resultEmptyLayout.root.visibility =
-//				if (uiState.isBothEmptyResult) View.VISIBLE else View.GONE
-//			resultShimmerLayout.shimmerLayout.visibility =
-//				if (uiState.isLoading) View.VISIBLE else View.GONE
-//					.also { resultShimmerLayout.shimmerLayout.stopShimmer() }
-//			resultRcv.visibility =
-//				if (uiState.isErrorOrSuccessResult) View.VISIBLE else View.INVISIBLE
-		}
-	}
 
 	private fun initAdapter() {
 		searchItemAdapter.onBookHeaderBtnClick = {

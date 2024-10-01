@@ -34,9 +34,7 @@ class BookSearchRepositoryImpl @Inject constructor(
 		loadSize: Int,
 		sort: BookSearchSortOption,
 	): List<Book> {
-		if (cachedSearchKeyword != keyword) {
-			clear()
-		}
+		if (cachedSearchKeyword != keyword) clear()
 		if (isEndPage) return books.firstOrNull() ?: emptyList()
 
 		val response = searchApi.getBookSearchResult(

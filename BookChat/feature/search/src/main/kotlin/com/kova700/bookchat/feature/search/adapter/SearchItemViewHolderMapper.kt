@@ -14,6 +14,7 @@ import com.kova700.bookchat.feature.search.databinding.ItemSearchChannelEmptyBin
 import com.kova700.bookchat.feature.search.databinding.ItemSearchChannelHeaderBinding
 import com.kova700.bookchat.feature.search.databinding.ItemSearchChannelRetryBinding
 import com.kova700.bookchat.feature.search.databinding.ItemSearchChannelsShimmerBinding
+import com.kova700.bookchat.feature.search.databinding.ItemSearchPagingRetryBinding
 import com.kova700.bookchat.feature.search.databinding.LayoutSearchResultEmptyBinding
 import com.kova700.bookchat.util.book.BookImgSizeManager
 
@@ -28,6 +29,7 @@ fun getSearchItemViewHolder(
 	onClickMakeChannelBtn: (() -> Unit)?,
 	onBookRetryBtnClick: (() -> Unit)?,
 	onChannelRetryBtnClick: (() -> Unit)?,
+	onPagingRetryBtnClick: (() -> Unit)?,
 ): SearchItemViewHolder {
 
 	return when (viewType) {
@@ -76,6 +78,16 @@ fun getSearchItemViewHolder(
 			BookRetryViewHolder(
 				binding = binding,
 				onRetryBtnClick = onBookRetryBtnClick
+			)
+		}
+
+		R.layout.item_search_paging_retry -> {
+			val binding = ItemSearchPagingRetryBinding.inflate(
+				LayoutInflater.from(parent.context), parent, false
+			)
+			PagingRetryViewHolder(
+				binding = binding,
+				onPagingRetryBtnClick = onPagingRetryBtnClick
 			)
 		}
 
