@@ -122,7 +122,7 @@ class WishBookBookShelfFragment : Fragment() {
 			)
 		}
 		wishBookShelfAdapter.onClickPagingRetryBtn = {
-			wishBookShelfViewModel.getBookShelfItems()
+			wishBookShelfViewModel.onClickPagingRetry()
 		}
 	}
 

@@ -105,6 +105,7 @@ class SearchDetailViewModel @Inject constructor(
 	}
 
 	private fun getSearchItems() = viewModelScope.launch {
+		updateState { copy(uiState = UiState.PAGING_LOADING) }
 		when (searchTarget) {
 			SearchTarget.BOOK -> searchBooks()
 			SearchTarget.CHANNEL -> searchChannels()
@@ -130,7 +131,6 @@ class SearchDetailViewModel @Inject constructor(
 		if (uiState.value.searchItems.size - 1 > lastVisibleItemPosition
 			|| uiState.value.isLoading
 		) return
-		updateState { copy(uiState = UiState.PAGING_LOADING) }
 		getSearchItems()
 	}
 

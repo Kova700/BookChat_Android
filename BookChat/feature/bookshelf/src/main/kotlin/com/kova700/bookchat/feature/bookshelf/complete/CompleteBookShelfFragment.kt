@@ -125,7 +125,7 @@ class CompleteBookShelfFragment : Fragment() {
 			)
 		}
 		completeBookShelfAdapter.onClickPagingRetryBtn = {
-			completeBookShelfViewModel.getBookShelfItems()
+			completeBookShelfViewModel.onClickPagingRetry()
 		}
 	}
 

@@ -152,7 +152,7 @@ class ReadingBookShelfFragment : Fragment() {
 			)
 		}
 		readingBookShelfAdapter.onClickPagingRetryBtn = {
-			readingBookShelfViewModel.getBookShelfItems()
+			readingBookShelfViewModel.onClickPagingRetry()
 		}
 	}
 

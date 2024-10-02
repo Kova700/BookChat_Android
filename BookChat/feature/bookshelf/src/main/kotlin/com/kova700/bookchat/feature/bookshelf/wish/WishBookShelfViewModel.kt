@@ -66,7 +66,8 @@ class WishBookShelfViewModel @Inject constructor(
 			}
 	}
 
-	fun getBookShelfItems() = viewModelScope.launch {
+	private fun getBookShelfItems() = viewModelScope.launch {
+		updateState { copy(uiState = UiState.PAGING_LOADING) }
 		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.WISH) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 			.onFailure {
@@ -79,7 +80,10 @@ class WishBookShelfViewModel @Inject constructor(
 		if (uiState.value.wishItems.size - 1 > lastVisibleItemPosition ||
 			uiState.value.isLoading
 		) return
-		updateState { copy(uiState = UiState.PAGING_LOADING) }
+		getBookShelfItems()
+	}
+
+	fun onClickPagingRetry() {
 		getBookShelfItems()
 	}
 

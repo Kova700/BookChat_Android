@@ -67,7 +67,8 @@ class ReadingBookShelfViewModel @Inject constructor(
 			}
 	}
 
-	fun getBookShelfItems() = viewModelScope.launch {
+	private fun getBookShelfItems() = viewModelScope.launch {
+		updateState { copy(uiState = UiState.PAGING_LOADING) }
 		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.READING) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 			.onFailure {
@@ -80,7 +81,6 @@ class ReadingBookShelfViewModel @Inject constructor(
 		if (uiState.value.readingItems.size - 1 > lastVisibleItemPosition ||
 			uiState.value.isLoading
 		) return
-		updateState { copy(uiState = UiState.PAGING_LOADING) }
 		getBookShelfItems()
 	}
 
@@ -90,6 +90,10 @@ class ReadingBookShelfViewModel @Inject constructor(
 				.onSuccess { startEvent(ReadingBookShelfEvent.ShowSnackBar(R.string.bookshelf_delete_success)) }
 				.onFailure { startEvent(ReadingBookShelfEvent.ShowSnackBar(R.string.bookshelf_delete_fail)) }
 		}
+
+	fun onClickPagingRetry() {
+		getBookShelfItems()
+	}
 
 
 	fun onItemClick(bookShelfListItem: ReadingBookShelfItem.Item) {
