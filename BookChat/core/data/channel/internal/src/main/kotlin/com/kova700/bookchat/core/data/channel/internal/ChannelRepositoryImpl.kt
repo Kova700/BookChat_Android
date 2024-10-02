@@ -453,6 +453,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	override suspend fun getMostActiveChannels(
 		loadSize: Int,
 		maxAttempts: Int,
+		isOfflineOnly: Boolean,
 	): List<Channel> {
 
 		setChannels(
@@ -460,6 +461,7 @@ class ChannelRepositoryImpl @Inject constructor(
 				loadSize = loadSize
 			).associateBy { it.roomId }
 		)
+		if (isOfflineOnly) return sortedChannels.first()
 
 		for (attempt in 0 until maxAttempts) {
 			Log.d(TAG, "ChannelRepositoryImpl: getMostActiveChannels() - attempt : $attempt")

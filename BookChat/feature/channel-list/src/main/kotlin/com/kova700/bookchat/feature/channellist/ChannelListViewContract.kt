@@ -9,17 +9,34 @@ data class ChannelListUiState(
 	val channelListItem: List<ChannelListItem>,
 	val networkState: NetworkState,
 ) {
+	val isLoading
+		get() = isInitLoading || isPageLoading
+
+	val isPageLoading
+		get() = uiState == UiState.PAGING_LOADING
+
+	val isInitError
+		get() = uiState == UiState.INIT_ERROR
+
+	val isInitLoading
+		get() = uiState == UiState.INIT_LOADING
+
+	val isEmpty
+		get() = channelListItem.isEmpty()
+						&& isInitError.not()
+						&& isInitLoading.not()
 
 	enum class UiState {
 		SUCCESS,
-		LOADING,
-		ERROR,
-		EMPTY,
+		INIT_ERROR,
+		INIT_LOADING,
+		PAGING_ERROR,
+		PAGING_LOADING,
 	}
 
 	companion object {
 		val DEFAULT = ChannelListUiState(
-			uiState = UiState.EMPTY,
+			uiState = UiState.SUCCESS,
 			channelListItem = listOf(ChannelListItem.Header),
 			networkState = NetworkState.DISCONNECTED,
 		)

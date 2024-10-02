@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.kova700.bookchat.feature.channellist.databinding.ItemChannelListDataBinding
 import com.kova700.bookchat.feature.channellist.databinding.ItemChannelListHeaderBinding
+import com.kova700.bookchat.feature.channellist.databinding.ItemChannelPagingRetryBinding
 import com.kova700.bookchat.feature.channellist.model.ChannelListItem
 import javax.inject.Inject
 import com.kova700.bookchat.feature.channellist.R as clR
@@ -17,11 +18,13 @@ class ChannelListAdapter @Inject constructor() :
 	var onLongClick: ((Int) -> Unit)? = null
 	var onClickMuteRelatedBtn: ((Int) -> Unit)? = null
 	var onClickTopPinRelatedBtn: ((Int) -> Unit)? = null
+	var onClickRetryBtn: (() -> Unit)? = null
 
 	override fun getItemViewType(position: Int): Int {
 		return when (getItem(position)) {
 			ChannelListItem.Header -> clR.layout.item_channel_list_header
 			is ChannelListItem.ChannelItem -> clR.layout.item_channel_list_data
+			ChannelListItem.PagingRetry -> clR.layout.item_channel_paging_retry
 		}
 	}
 
@@ -45,6 +48,16 @@ class ChannelListAdapter @Inject constructor() :
 					onItemLongClick = onLongClick,
 					onItemMuteClick = onClickMuteRelatedBtn,
 					onItemTopPinClick = onClickTopPinRelatedBtn,
+				)
+			}
+
+			clR.layout.item_channel_paging_retry -> {
+				val binding = ItemChannelPagingRetryBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
+				)
+				return ChannelListPagingRetryViewHolder(
+					binding = binding,
+					onClickRetryBtn = onClickRetryBtn
 				)
 			}
 

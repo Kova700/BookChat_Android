@@ -18,6 +18,7 @@ interface ChannelRepository {
 	suspend fun getMostActiveChannels(
 		loadSize: Int = REMOTE_CHANNELS_LOAD_SIZE,
 		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS,
+		isOfflineOnly: Boolean = false,
 	): List<Channel>
 
 	suspend fun getChannel(channelId: Long): Channel
