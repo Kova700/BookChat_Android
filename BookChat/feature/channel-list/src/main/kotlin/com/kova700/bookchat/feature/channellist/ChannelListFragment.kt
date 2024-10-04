@@ -85,7 +85,7 @@ class ChannelListFragment : Fragment() {
 	private fun initViewState() {
 		with(binding) {
 			channelAddBtn.setOnClickListener { channelListViewModel.onClickPlusBtn() }
-			emptyChannelLayout.channelAddBtn.setOnClickListener { channelListViewModel.onClickPlusBtn() }
+			emptyChannelLayout.makeChannelBtn.setOnClickListener { channelListViewModel.onClickPlusBtn() }
 			channelSearchBtn.setOnClickListener { channelListViewModel.onClickChannelSearchBtn() }
 		}
 	}
@@ -101,8 +101,7 @@ class ChannelListFragment : Fragment() {
 			emptyChannelLayout.root.visibility =
 				if (uiState.isEmpty) View.VISIBLE else View.GONE
 			channelListRcv.visibility =
-				if (uiState.channelListItem.isNotEmpty()) View.VISIBLE else View.GONE
-			progressbar.visibility = if (uiState.isLoading) View.VISIBLE else View.GONE
+				if (uiState.isNotEmpty) View.VISIBLE else View.GONE
 			retryChannelLayout.root.visibility =
 				if (uiState.isInitError) View.VISIBLE else View.GONE
 		}

@@ -3,13 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:elevation="10dp"
     android:minHeight="135dp">
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/empty_result_fox"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.25" />
 
     <TextView
         android:id="@+id/chatroom_empty_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
         android:elegantTextHeight="true"
         android:fontFamily="@font/notosanskr_bold"
         android:text="@string/chat_room_is_empty"
@@ -17,7 +28,7 @@
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView4" />
 
     <TextView
         android:id="@+id/chatroom_empty_tv2"
@@ -35,17 +46,13 @@
         app:layout_constraintTop_toBottomOf="@+id/chatroom_empty_tv" />
 
     <com.kova700.core.design_system.customview.AntiDupClickButton
-        android:id="@+id/channel_add_btn"
+        android:id="@+id/make_channel_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:backgroundTint="#FFFFFF"
         android:elegantTextHeight="true"
         android:fontFamily="@font/notosanskr_regular"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:minWidth="75dp"
-        android:minHeight="35dp"
         android:stateListAnimator="@null"
         android:text="@string/add"
         android:textColor="#5648FF"
