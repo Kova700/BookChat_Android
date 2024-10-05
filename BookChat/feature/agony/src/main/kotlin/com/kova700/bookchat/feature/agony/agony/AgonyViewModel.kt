@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -47,44 +49,69 @@ class AgonyViewModel @Inject constructor(
 			)
 		}
 		observeAgonies()
-		getAgonies()
+		getInitAgonies()
 	}
 
 	private fun observeAgonies() = viewModelScope.launch {
-		combine(agonyRepository.getAgoniesFlow(true), _isSelected) { items, isSelectedMap ->
+		combine(
+			agonyRepository.getAgoniesFlow(true),
+			_isSelected,
+			uiState.map { it.uiState }.distinctUntilChanged()
+		) { items, isSelectedMap, uiState ->
 			items.toAgonyListItem(
-				bookshelfItem = uiState.value.bookshelfItem,
-				isSelectedMap = isSelectedMap
+				bookshelfItem = _uiState.value.bookshelfItem,
+				isSelectedMap = isSelectedMap,
+				uiState = uiState
 			)
 		}.collect { updateState { copy(agonies = it) } }
 	}
 
-	private fun getAgonies() = viewModelScope.launch {
-		if (uiState.value.uiState != UiState.INIT_LOADING) updateState { copy(uiState = UiState.LOADING) }
+	private fun getInitAgonies() = viewModelScope.launch {
+		if (uiState.value.isInitLoading) return@launch
+		updateState { copy(uiState = UiState.INIT_LOADING) }
 		runCatching { agonyRepository.getAgonies(bookShelfItemId) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 			.onFailure {
-				handleError(it)
+				updateState { copy(uiState = UiState.INIT_ERROR) }
+				startEvent(AgonyEvent.ShowSnackBar(R.string.error_else))
+			}
+	}
+
+	private fun getAgonies() = viewModelScope.launch {
+		if (uiState.value.isPagingLoading) return@launch
+		updateState { copy(uiState = UiState.PAGING_LOADING) }
+		runCatching { agonyRepository.getAgonies(bookShelfItemId) }
+			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
+			.onFailure {
+				updateState { copy(uiState = UiState.PAGING_ERROR) }
 				startEvent(AgonyEvent.ShowSnackBar(R.string.error_else))
 			}
 	}
 
 	fun loadNextAgonies(lastVisibleItemPosition: Int) {
 		if (uiState.value.agonies.size - 1 > lastVisibleItemPosition
-			|| uiState.value.uiState == UiState.LOADING
+			|| uiState.value.isLoading
 		) return
 		getAgonies()
 	}
 
 	private fun deleteAgonies() = viewModelScope.launch {
-		if (uiState.value.uiState == UiState.LOADING) return@launch
-		updateState { copy(uiState = UiState.LOADING) }
+		if (uiState.value.isLoading) return@launch
+		val selectedIds = _isSelected.value.filterValues { it }.keys.toList()
+		if (selectedIds.isEmpty()) {
+			onClickEditCancelBtn()
+			return@launch
+		}
+		updateState { copy(uiState = UiState.PAGING_LOADING) }
 		runCatching {
-			agonyRepository.deleteAgony(bookShelfItemId, _isSelected.value.keys.toList())
+			agonyRepository.deleteAgony(
+				bookShelfId = bookShelfItemId,
+				agonyIds = selectedIds
+			)
 		}
 			.onSuccess { onClickEditCancelBtn() }
 			.onFailure {
-				updateState { copy(uiState = UiState.EDITING) }
+				updateState { copy(uiState = UiState.EDITING) } //요놈 마지막 체크
 				startEvent(AgonyEvent.ShowSnackBar(R.string.agony_delete_fail))
 			}
 	}
@@ -108,12 +135,20 @@ class AgonyViewModel @Inject constructor(
 		_isSelected.update { emptyMap() }
 	}
 
+	fun onClickRetryBtn() {
+		getInitAgonies()
+	}
+
+	fun onClickPagingRetry() {
+		getAgonies()
+	}
+
 	fun onClickBackBtn() {
 		startEvent(AgonyEvent.MoveToBack)
 	}
 
 	fun onClickFirstItem() {
-		if (uiState.value.uiState == UiState.EDITING) return
+		if (uiState.value.isEditing) return
 
 		startEvent(
 			AgonyEvent.OpenBottomSheetDialog(
@@ -142,9 +177,6 @@ class AgonyViewModel @Inject constructor(
 
 	private inline fun updateState(block: AgonyUiState.() -> AgonyUiState) {
 		_uiState.update { _uiState.value.block() }
-	}
-
-	private fun handleError(throwable: Throwable) {
 	}
 
 	companion object {

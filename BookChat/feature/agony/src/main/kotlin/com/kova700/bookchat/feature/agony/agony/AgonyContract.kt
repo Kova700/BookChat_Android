@@ -8,16 +8,37 @@ data class AgonyUiState(
 	val bookshelfItem: BookShelfItem,
 	val agonies: List<AgonyListItem>,
 ) {
+	val isNotInitLoadingOrError: Boolean
+		get() = (isInitLoading || isInitError).not()
+
+	val isInitLoading: Boolean
+		get() = uiState == UiState.INIT_LOADING
+
+	val isPagingLoading: Boolean
+		get() = uiState == UiState.PAGING_LOADING
+
+	val isLoading: Boolean
+		get() = isInitLoading || isPagingLoading
+
+	val isInitError: Boolean
+		get() = uiState == UiState.INIT_ERROR
+
+	val isEditing: Boolean
+		get() = uiState == UiState.EDITING
+
+
 	enum class UiState {
 		SUCCESS,
-		LOADING,
 		INIT_LOADING,
+		INIT_ERROR,
+		PAGING_LOADING,
+		PAGING_ERROR,
 		EDITING
 	}
 
 	companion object {
 		val DEFAULT = AgonyUiState(
-			uiState = UiState.INIT_LOADING,
+			uiState = UiState.SUCCESS,
 			bookshelfItem = BookShelfItem.DEFAULT,
 			agonies = emptyList()
 		)

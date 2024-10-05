@@ -11,6 +11,7 @@ import com.kova700.bookchat.feature.agony.databinding.ItemAgonyDataBinding
 import com.kova700.bookchat.feature.agony.databinding.ItemAgonyDataEditingBinding
 import com.kova700.bookchat.feature.agony.databinding.ItemAgonyFirstBinding
 import com.kova700.bookchat.feature.agony.databinding.ItemAgonyHeaderBinding
+import com.kova700.bookchat.feature.agony.databinding.ItemAgonyPagingRetryBinding
 import com.kova700.bookchat.feature.agony.makeagony.util.getTextColorHexInt
 import com.kova700.bookchat.util.book.BookImgSizeManager
 import com.kova700.bookchat.util.image.image.loadUrl
@@ -94,4 +95,17 @@ class AgonyDataEditingItemViewHolder(
 				else root.context.getColorStateList(R.color.agony_color_white)
 		}
 	}
+}
+
+class AgonyPagingRetryViewHolder(
+	private val binding: ItemAgonyPagingRetryBinding,
+	private val onClickPagingRetry: (() -> Unit)?,
+) : AgonyViewHolder(binding) {
+	init {
+		binding.retryBtn.setOnClickListener {
+			onClickPagingRetry?.invoke()
+		}
+	}
+
+	override fun bind(agonyListItem: AgonyListItem) {}
 }
