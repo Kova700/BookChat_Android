@@ -1,27 +1,29 @@
 package com.kova700.bookchat.feature.agony.agonyrecord
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kova700.bookchat.core.data.agony.external.AgonyRepository
-import com.kova700.bookchat.core.data.agony.external.model.Agony
 import com.kova700.bookchat.core.data.agonyrecord.external.AgonyRecordRepository
-import com.kova700.bookchat.core.data.agonyrecord.external.model.AgonyRecord
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.agony.agonyrecord.AgonyRecordActivity.Companion.EXTRA_AGONY_ID
 import com.kova700.bookchat.feature.agony.agonyrecord.AgonyRecordActivity.Companion.EXTRA_BOOKSHELF_ITEM_ID
-import com.kova700.bookchat.feature.agony.agonyrecord.AgonyRecordeUiState.UiState
+import com.kova700.bookchat.feature.agony.agonyrecord.AgonyRecordUiState.UiState
+import com.kova700.bookchat.feature.agony.agonyrecord.mapper.groupItems
 import com.kova700.bookchat.feature.agony.agonyrecord.mapper.toAgonyRecord
-import com.kova700.bookchat.feature.agony.agonyrecord.mapper.toAgonyRecordListItem
 import com.kova700.bookchat.feature.agony.agonyrecord.model.AgonyRecordListItem
 import com.kova700.bookchat.feature.agony.agonyrecord.model.AgonyRecordListItem.Companion.FIRST_ITEM_STABLE_ID
 import com.kova700.bookchat.feature.agony.agonyrecord.model.AgonyRecordListItem.ItemState
+import com.kova700.bookchat.util.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,55 +40,59 @@ class AgonyRecordViewModel @Inject constructor(
 	private val _eventFlow = MutableSharedFlow<AgonyRecordEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
 
-	private val _uiState = MutableStateFlow<AgonyRecordeUiState>(AgonyRecordeUiState.DEFAULT)
+	private val _uiState = MutableStateFlow<AgonyRecordUiState>(AgonyRecordUiState.DEFAULT)
 	val uiState get() = _uiState.asStateFlow()
 
 	private val _itemState = MutableStateFlow<Map<Long, ItemState>>(emptyMap()) //(recordId, state)
 
 	init {
 		observeAgonyRecords()
-		getAgonyRecords()
+		getInitAgonyRecords()
 	}
 
 	private fun observeAgonyRecords() = viewModelScope.launch {
 		combine(
 			agonyRecordRepository.getAgonyRecordsFlow(true),
 			agonyRepository.getAgonyFlow(agonyId),
-			_itemState
-		) { records, agony, stateMap -> groupItems(records, agony, stateMap) }
-			.collect { newRecords -> updateState { copy(records = newRecords) } }
+			_itemState,
+			uiState.map { it.uiState }.distinctUntilChanged()
+		) { records, agony, stateMap, uiState ->
+			groupItems(
+				records = records,
+				agony = agony,
+				stateMap = stateMap,
+				uiState = uiState
+			)
+		}.collect { newRecords -> updateState { copy(records = newRecords) } }
 	}
 
-	private fun groupItems(
-		records: List<AgonyRecord>,
-		agony: Agony,
-		stateMap: Map<Long, ItemState>,
-	): List<AgonyRecordListItem> {
-		val groupedItems = mutableListOf<AgonyRecordListItem>()
-		groupedItems.add(AgonyRecordListItem.Header(agony))
-		groupedItems.add(
-			AgonyRecordListItem.FirstItem(stateMap[FIRST_ITEM_STABLE_ID] ?: ItemState.Success())
-		)
-		groupedItems.addAll(records.map {
-			it.toAgonyRecordListItem(itemState = stateMap[it.recordId] ?: ItemState.Success())
-		})
-		return groupedItems
-	}
-
-	private fun getAgonyRecords() = viewModelScope.launch {
-		updateState { copy(uiState = UiState.LOADING) }
+	private fun getInitAgonyRecords() = viewModelScope.launch {
+		if (uiState.value.isInitLoading) return@launch
+		updateState { copy(uiState = UiState.INIT_LOADING) }
 		runCatching {
 			agonyRecordRepository.getAgonyRecords(
 				bookShelfId = bookShelfListItemId,
 				agonyId = agonyId
 			)
 		}.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { handleError(it) }
+			.onFailure { updateState { copy(uiState = UiState.INIT_ERROR) } }
+	}
+
+	private fun getAgonyRecords() = viewModelScope.launch {
+		if (uiState.value.isPagingLoading) return@launch
+		updateState { copy(uiState = UiState.PAGING_LOADING) }
+		runCatching {
+			agonyRecordRepository.getAgonyRecords(
+				bookShelfId = bookShelfListItemId,
+				agonyId = agonyId
+			)
+		}.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
+			.onFailure { updateState { copy(uiState = UiState.PAGING_ERROR) } }
 	}
 
 	fun loadNextAgonyRecords(lastVisibleItemPosition: Int) {
 		if (uiState.value.records.size - 1 > lastVisibleItemPosition ||
-			uiState.value.uiState == UiState.LOADING
+			uiState.value.isLoading
 		) return
 		getAgonyRecords()
 	}
@@ -256,20 +262,30 @@ class AgonyRecordViewModel @Inject constructor(
 		deleteAgonyRecord(recordItem)
 	}
 
-	fun clearEditingState() {
+	fun onClickWarningDialogOKBtn() {
+		clearEditingState()
+	}
+
+	fun onClickRetryBtn() {
+		Log.d(TAG, "AgonyRecordViewModel: onClickRetryBtn() - called")
+		getInitAgonyRecords()
+	}
+
+	fun onClickPagingRetryBtn() {
+		Log.d(TAG, "AgonyRecordViewModel: onClickPagingRetryBtn() - called")
+		getAgonyRecords()
+	}
+
+	private fun clearEditingState() {
 		updateState { copy(isEditing = false) }
 		_itemState.update { _itemState.value.filter { it.value !is ItemState.Editing } }
 	}
 
-	private inline fun updateState(block: AgonyRecordeUiState.() -> AgonyRecordeUiState) {
+	private inline fun updateState(block: AgonyRecordUiState.() -> AgonyRecordUiState) {
 		_uiState.update { _uiState.value.block() }
 	}
 
-	fun startEvent(event: AgonyRecordEvent) = viewModelScope.launch {
+	private fun startEvent(event: AgonyRecordEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
-	}
-
-	private fun handleError(throwable: Throwable) {
-		updateState { copy(uiState = UiState.ERROR) }
 	}
 }

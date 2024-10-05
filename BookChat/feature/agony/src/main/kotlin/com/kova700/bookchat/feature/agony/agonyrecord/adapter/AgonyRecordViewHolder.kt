@@ -10,6 +10,7 @@ import com.kova700.bookchat.feature.agony.agonyrecord.model.AgonyRecordListItem
 import com.kova700.bookchat.feature.agony.databinding.ItemAgonyRecordDataBinding
 import com.kova700.bookchat.feature.agony.databinding.ItemAgonyRecordFirstBinding
 import com.kova700.bookchat.feature.agony.databinding.ItemAgonyRecordHeaderBinding
+import com.kova700.bookchat.feature.agony.databinding.ItemAgonyRecordPagingRetryBinding
 
 sealed class AgonyRecordViewHolder(
 	binding: ViewBinding,
@@ -184,4 +185,17 @@ class AgonyRecordItemViewHolder(
 				swipeableView.measuredWidth.toFloat() * AgonyRecordSwipeHelper.SWIPE_VIEW_PERCENT
 		}
 	}
+}
+
+class AgonyRecordPagingErrorViewHolder(
+	private val binding: ItemAgonyRecordPagingRetryBinding,
+	private val onClickPagingRetry: (() -> Unit)?,
+) : AgonyRecordViewHolder(binding) {
+	init {
+		binding.retryBtn.setOnClickListener {
+			onClickPagingRetry?.invoke()
+		}
+	}
+
+	override fun bind(agonyRecordListItem: AgonyRecordListItem) {}
 }

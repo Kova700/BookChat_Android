@@ -2,22 +2,42 @@ package com.kova700.bookchat.feature.agony.agonyrecord
 
 import com.kova700.bookchat.feature.agony.agonyrecord.model.AgonyRecordListItem
 
-data class AgonyRecordeUiState(
+data class AgonyRecordUiState(
 	val uiState: UiState,
 	val records: List<AgonyRecordListItem>,
-	val isEditing: Boolean = false,
+	val isEditing: Boolean,
 ) {
+	val isNotInitErrorOrLoading: Boolean
+		get() = (isInitLoading || isInitError).not()
+
+	val isInitLoading: Boolean
+		get() = uiState == UiState.INIT_LOADING
+
+	val isPagingLoading: Boolean
+		get() = uiState == UiState.PAGING_LOADING
+
+	val isLoading: Boolean
+		get() = isInitLoading || isPagingLoading
+
+	val isInitError: Boolean
+		get() = uiState == UiState.INIT_ERROR
+
+	val isPagingError: Boolean
+		get() = uiState == UiState.PAGING_ERROR
+
 	enum class UiState {
 		SUCCESS,
-		LOADING,
-		ERROR,
-		EMPTY,
+		INIT_LOADING,
+		INIT_ERROR,
+		PAGING_ERROR,
+		PAGING_LOADING,
 	}
 
 	companion object {
-		val DEFAULT = AgonyRecordeUiState(
+		val DEFAULT = AgonyRecordUiState(
 			uiState = UiState.SUCCESS,
 			records = emptyList(),
+			isEditing = false,
 		)
 	}
 }
