@@ -42,16 +42,12 @@ class SearchBookDialogViewModel @Inject constructor(
 	}
 
 	private fun initUiState() {
-		updateState {
-			copy(
-				uiState = SearchDialogState.Loading,
-				book = bookSearchRepository.getCachedBook(bookIsbn)
-			)
-		}
+		updateState { copy(book = bookSearchRepository.getCachedBook(bookIsbn)) }
 		checkAlreadyInBookShelf()
 	}
 
 	private fun checkAlreadyInBookShelf() = viewModelScope.launch {
+		updateState { copy(uiState = SearchDialogState.Loading) }
 		runCatching { bookShelfRepository.checkAlreadyInBookShelf(uiState.value.book) }
 			.onSuccess { updateState { copy(uiState = SearchDialogState.Success(it?.bookShelfState)) } }
 			.onFailure {
@@ -64,7 +60,7 @@ class SearchBookDialogViewModel @Inject constructor(
 		bookShelfState: BookShelfState,
 		starRating: StarRating? = null,
 	) = viewModelScope.launch {
-		if (uiState.value.uiState is SearchDialogState.Loading) return@launch
+		if (uiState.value.isLoading) return@launch
 		updateState { copy(uiState = SearchDialogState.Loading) }
 
 		runCatching {

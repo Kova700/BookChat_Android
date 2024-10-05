@@ -18,6 +18,12 @@ data class SearchUiState(
 	val searchHistory: List<String>,
 ) {
 
+	val isBookSearchLoading
+		get() = bookSearchResultUiState == SearchResultUiState.INIT_LOADING
+
+	val isChannelSearchLoading
+		get() = channelSearchResultUiState == SearchResultUiState.INIT_LOADING
+
 	enum class SearchResultUiState {
 		SUCCESS,
 		INIT_LOADING,

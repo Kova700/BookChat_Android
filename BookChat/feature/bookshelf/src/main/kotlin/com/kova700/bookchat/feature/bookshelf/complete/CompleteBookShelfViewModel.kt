@@ -39,7 +39,6 @@ class CompleteBookShelfViewModel @Inject constructor(
 	}
 
 	private fun initUiState() {
-		updateState { copy(uiState = UiState.INIT_LOADING) }
 		observeBookShelfItems()
 		getInitBookShelfItems()
 	}
@@ -59,7 +58,9 @@ class CompleteBookShelfViewModel @Inject constructor(
 		}.collect { newItems -> updateState { copy(completeItems = newItems) } }
 	}
 
-	fun getInitBookShelfItems() = viewModelScope.launch {
+	private fun getInitBookShelfItems() = viewModelScope.launch {
+		if (uiState.value.isLoading) return@launch
+		updateState { copy(uiState = UiState.INIT_LOADING) }
 		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.COMPLETE) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 			.onFailure {
@@ -69,6 +70,7 @@ class CompleteBookShelfViewModel @Inject constructor(
 	}
 
 	private fun getBookShelfItems() = viewModelScope.launch {
+		if (uiState.value.isLoading) return@launch
 		updateState { copy(uiState = UiState.PAGING_LOADING) }
 		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.COMPLETE) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
@@ -91,6 +93,10 @@ class CompleteBookShelfViewModel @Inject constructor(
 				.onSuccess { startEvent(CompleteBookShelfEvent.ShowSnackBar(R.string.bookshelf_delete_success)) }
 				.onFailure { startEvent(CompleteBookShelfEvent.ShowSnackBar(R.string.bookshelf_delete_fail)) }
 		}
+
+	fun onClickInitRetry() {
+		getInitBookShelfItems()
+	}
 
 	fun onClickPagingRetry() {
 		getBookShelfItems()

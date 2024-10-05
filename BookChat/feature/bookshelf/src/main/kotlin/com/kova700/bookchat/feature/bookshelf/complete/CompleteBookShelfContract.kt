@@ -38,7 +38,7 @@ data class CompleteBookShelfUiState(
 
 	companion object {
 		val DEFAULT = CompleteBookShelfUiState(
-			uiState = UiState.INIT_LOADING,
+			uiState = UiState.SUCCESS,
 			completeItems = emptyList(),
 		)
 	}

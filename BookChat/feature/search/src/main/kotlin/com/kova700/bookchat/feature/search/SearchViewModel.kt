@@ -140,6 +140,7 @@ class SearchViewModel @Inject constructor(
 	}
 
 	private fun searchBooks(searchKeyword: String) = viewModelScope.launch {
+		if (uiState.value.isBookSearchLoading) return@launch
 		updateState { copy(bookSearchResultUiState = SearchResultUiState.INIT_LOADING) }
 		runCatching { bookSearchRepository.search(searchKeyword.trim()) }
 			.onSuccess { updateState { copy(bookSearchResultUiState = SearchResultUiState.SUCCESS) } }
@@ -150,6 +151,7 @@ class SearchViewModel @Inject constructor(
 	}
 
 	private fun searchChannels(searchKeyword: String) = viewModelScope.launch {
+		if (uiState.value.isChannelSearchLoading) return@launch
 		updateState { copy(channelSearchResultUiState = SearchResultUiState.INIT_LOADING) }
 		runCatching {
 			channelSearchRepository.search(

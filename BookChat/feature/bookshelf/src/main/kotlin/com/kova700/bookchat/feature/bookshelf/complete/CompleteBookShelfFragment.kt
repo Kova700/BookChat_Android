@@ -77,7 +77,7 @@ class CompleteBookShelfFragment : Fragment() {
 				mainNavigationViewmodel.navigateTo(MainRoute.Search)
 			}
 			bookshelfRetryLayout.retryBtn.setOnClickListener {
-				completeBookShelfViewModel.getInitBookShelfItems()
+				completeBookShelfViewModel.onClickInitRetry()
 			}
 		}
 		initShimmerBook()

@@ -54,13 +54,11 @@ class SearchDetailViewModel @Inject constructor(
 
 	init {
 		initUiState()
-		observeSearchItems()
 	}
 
 	private fun initUiState() {
 		updateState {
 			copy(
-				uiState = UiState.INIT_LOADING,
 				searchKeyword = this@SearchDetailViewModel.searchKeyword,
 				searchTarget = this@SearchDetailViewModel.searchTarget,
 				searchPurpose = this@SearchDetailViewModel.searchPurpose,
@@ -68,6 +66,7 @@ class SearchDetailViewModel @Inject constructor(
 			)
 		}
 		getInitSearchItems()
+		observeSearchItems()
 	}
 
 	private fun observeSearchItems() = viewModelScope.launch {
@@ -95,6 +94,8 @@ class SearchDetailViewModel @Inject constructor(
 	}
 
 	private fun getInitSearchItems() = viewModelScope.launch {
+		if (uiState.value.isLoading) return@launch
+		updateState { copy(uiState = UiState.INIT_LOADING) }
 		when (searchTarget) {
 			SearchTarget.BOOK -> searchBooks()
 			SearchTarget.CHANNEL -> searchChannels()
@@ -105,6 +106,7 @@ class SearchDetailViewModel @Inject constructor(
 	}
 
 	private fun getSearchItems() = viewModelScope.launch {
+		if (uiState.value.isLoading) return@launch
 		updateState { copy(uiState = UiState.PAGING_LOADING) }
 		when (searchTarget) {
 			SearchTarget.BOOK -> searchBooks()
