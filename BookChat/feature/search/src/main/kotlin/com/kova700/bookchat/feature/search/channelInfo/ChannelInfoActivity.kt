@@ -12,7 +12,7 @@ import com.kova700.bookchat.feature.search.channelInfo.dialog.FullChannelNoticeD
 import com.kova700.bookchat.feature.search.channelInfo.dialog.InvalidChannelNoticeDialog
 import com.kova700.bookchat.feature.search.databinding.ActivityChannelInfoBinding
 import com.kova700.bookchat.util.book.BookImgSizeManager
-import com.kova700.bookchat.util.date.getFormattedAbstractDateTimeText
+import com.kova700.bookchat.util.date.toFormattedAbstractDateTimeText
 import com.kova700.bookchat.util.image.image.loadChannelProfile
 import com.kova700.bookchat.util.image.image.loadUrl
 import com.kova700.bookchat.util.image.image.loadUserProfile
@@ -103,7 +103,7 @@ class ChannelInfoActivity : AppCompatActivity() {
 			binding.channelLastActiveTv.text =
 				getString(
 					R.string.channel_last_active_time,
-					getFormattedAbstractDateTimeText(it.dispatchTime)
+					it.dispatchTime.toFormattedAbstractDateTimeText()
 				)
 		}
 	}

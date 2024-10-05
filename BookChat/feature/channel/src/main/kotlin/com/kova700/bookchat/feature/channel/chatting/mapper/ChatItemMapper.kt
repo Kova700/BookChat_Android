@@ -8,8 +8,8 @@ import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
 import com.kova700.bookchat.core.data.chat.external.model.ChatType
 import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
 import com.kova700.bookchat.util.Constants.TAG
-import com.kova700.bookchat.util.date.getDateKoreanString
 import com.kova700.bookchat.util.date.isSameDate
+import com.kova700.bookchat.util.date.toDateKoreanString
 
 fun List<Chat>.toChatItems(
 	channel: Channel?,
@@ -107,7 +107,7 @@ fun List<Chat>.toChatItems(
 		if (chat.status != ChatStatus.SUCCESS) continue
 
 		if (i == lastIndex) {
-			val date = getDateKoreanString(chat.dispatchTime)
+			val date = chat.dispatchTime.toDateKoreanString()
 			val isCaptureBottom = captureBottomItemId == date.hashCode().toLong()
 			val isCaptureHeader = captureHeaderItemId == date.hashCode().toLong()
 			isFindCaptureBottom = isFindCaptureBottom || isCaptureBottom
@@ -126,12 +126,9 @@ fun List<Chat>.toChatItems(
 			continue
 		}
 
-		val isSameDate = isSameDate(
-			dateTimeString = chat.dispatchTime,
-			other = this[i + 1].dispatchTime
-		)
+		val isSameDate = chat.dispatchTime.isSameDate(this[i + 1].dispatchTime)
 		if (isSameDate.not()) {
-			val date = getDateKoreanString(chat.dispatchTime)
+			val date = chat.dispatchTime.toDateKoreanString()
 			val isCaptureBottom = captureBottomItemId == date.hashCode().toLong()
 			val isCaptureHeader = captureHeaderItemId == date.hashCode().toLong()
 			isFindCaptureBottom = isFindCaptureBottom || isCaptureBottom

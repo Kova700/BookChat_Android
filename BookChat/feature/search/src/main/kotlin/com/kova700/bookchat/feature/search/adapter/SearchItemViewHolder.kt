@@ -18,7 +18,7 @@ import com.kova700.bookchat.feature.search.databinding.ItemSearchPagingRetryBind
 import com.kova700.bookchat.feature.search.databinding.LayoutSearchResultEmptyBinding
 import com.kova700.bookchat.feature.search.model.SearchResultItem
 import com.kova700.bookchat.util.book.BookImgSizeManager
-import com.kova700.bookchat.util.date.getFormattedAbstractDateTimeText
+import com.kova700.bookchat.util.date.toFormattedAbstractDateTimeText
 import com.kova700.bookchat.util.image.image.loadChannelProfile
 import com.kova700.bookchat.util.image.image.loadUrl
 
@@ -150,7 +150,7 @@ class ChannelItemViewHolder(
 		with(binding) {
 			item.lastChat?.let {
 				lastChatDispatchTimeTv.text =
-					getFormattedAbstractDateTimeText(it.dispatchTime)
+					it.dispatchTime.toFormattedAbstractDateTimeText()
 			}
 			channelImageIv.loadChannelProfile(
 				imageUrl = item.roomImageUri,

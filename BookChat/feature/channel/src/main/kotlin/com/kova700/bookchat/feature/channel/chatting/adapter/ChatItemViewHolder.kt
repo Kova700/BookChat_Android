@@ -12,7 +12,7 @@ import com.kova700.bookchat.feature.channel.databinding.ItemChattingLastReadNoti
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingMineBinding
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingNoticeBinding
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingOtherBinding
-import com.kova700.bookchat.util.date.getFormattedTimeText
+import com.kova700.bookchat.util.date.toFormattedTimeText
 import com.kova700.bookchat.util.emoji.isSingleTextOrEmoji
 import com.kova700.bookchat.util.image.image.loadUserProfile
 
@@ -88,7 +88,7 @@ class MyChatViewHolder(
 				if (item.status == ChatStatus.LOADING || item.status == ChatStatus.RETRY_REQUIRED)
 					View.VISIBLE else View.GONE
 			chatDispatchTimeTv.text =
-				if (item.dispatchTime.isNotBlank()) getFormattedTimeText(item.dispatchTime)
+				if (item.dispatchTime.isNotBlank()) item.dispatchTime.toFormattedTimeText()
 				else ""
 			setCaptureViewState(
 				isCaptureMode = isCaptureMode,
@@ -166,7 +166,7 @@ class AnotherUserChatViewHolder(
 				if (item.sender?.nickname.isNullOrBlank()) root.context.getString(R.string.unknown)
 				else item.sender?.nickname
 			chatDispatchTimeTv.text =
-				if (item.dispatchTime.isNotBlank()) getFormattedTimeText(item.dispatchTime) else ""
+				if (item.dispatchTime.isNotBlank()) item.dispatchTime.toFormattedTimeText() else ""
 			userProfileIv.loadUserProfile(
 				imageUrl = item.sender?.profileImageUrl,
 				userDefaultProfileType = item.sender?.defaultProfileImageType

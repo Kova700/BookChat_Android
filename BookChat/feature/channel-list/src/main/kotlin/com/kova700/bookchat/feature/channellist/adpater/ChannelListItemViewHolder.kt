@@ -9,7 +9,7 @@ import com.kova700.bookchat.feature.channellist.databinding.ItemChannelListDataB
 import com.kova700.bookchat.feature.channellist.databinding.ItemChannelListHeaderBinding
 import com.kova700.bookchat.feature.channellist.databinding.ItemChannelPagingRetryBinding
 import com.kova700.bookchat.feature.channellist.model.ChannelListItem
-import com.kova700.bookchat.util.date.getFormattedDetailDateTimeText
+import com.kova700.bookchat.util.date.toFormattedDetailDateTimeText
 import com.kova700.bookchat.util.image.image.loadChannelProfile
 
 sealed class ChannelListItemViewHolder(
@@ -75,7 +75,7 @@ class ChannelListDataViewHolder(
 	private fun setViewState(channelListItem: ChannelListItem) {
 		val item = (channelListItem as ChannelListItem.ChannelItem)
 		with(binding) {
-			dispatchTimeTv.text = item.lastChat?.dispatchTime?.let { getFormattedDetailDateTimeText(it) }
+			dispatchTimeTv.text = item.lastChat?.dispatchTime?.toFormattedDetailDateTimeText()
 			uncheckedChatCountTv.text = if (item.isExistNewChat) "New+" else ""
 			muteChannelIcon.visibility =
 				if ((item.notificationFlag.not()) && item.isAvailableChannel) View.VISIBLE else View.GONE
