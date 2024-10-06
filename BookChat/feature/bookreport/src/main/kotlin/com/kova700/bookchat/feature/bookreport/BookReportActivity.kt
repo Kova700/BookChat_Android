@@ -61,6 +61,7 @@ class BookReportActivity : AppCompatActivity() {
 			bookReportEditLayout.bookReportContentEt.addTextChangedListener { text: Editable? ->
 				text.let { bookReportViewModel.onChangeContent(it.toString()) }
 			}
+			retryBookreportLayout.retryBtn.setOnClickListener { bookReportViewModel.onClickRetryBtn() }
 		}
 	}
 
@@ -78,16 +79,20 @@ class BookReportActivity : AppCompatActivity() {
 			}
 		}
 		with(binding.bookReportDefaultLayout) {
-			bookReportTitleTv.text = uiState.existingBookReport.reportTitle
-			bookReportContentTv.text = uiState.existingBookReport.reportContent
-			bookReportCreatedDateTv.text = uiState.existingBookReport.reportCreatedAt
+			bookReportTitleTv.text = uiState.existingBookReport?.reportTitle
+			bookReportContentTv.text = uiState.existingBookReport?.reportContent
+			bookReportCreatedDateTv.text = uiState.existingBookReport?.reportCreatedAt
 		}
 		with(binding) {
 			bookImg.loadUrl(uiState.bookshelfItem.book.bookCoverImageUrl)
-			bookTitleTv.text = uiState.bookshelfItem.book.title
-			bookTitleTv.isSelected = true
-			bookAuthorsTv.text = uiState.bookshelfItem.book.authorsString
-			bookAuthorsTv.isSelected = true
+			if (bookTitleTv.text != uiState.bookshelfItem.book.title) {
+				bookTitleTv.text = uiState.bookshelfItem.book.title
+				bookTitleTv.isSelected = true
+			}
+			if (bookAuthorsTv.text != uiState.bookshelfItem.book.authorsString) {
+				bookAuthorsTv.text = uiState.bookshelfItem.book.authorsString
+				bookAuthorsTv.isSelected = true
+			}
 			starRatingBar.rating = uiState.bookshelfItem.star?.value ?: 0F
 		}
 	}
@@ -95,7 +100,9 @@ class BookReportActivity : AppCompatActivity() {
 	private fun setViewVisibility(uiState: BookReportUiState) {
 		with(binding) {
 			editStateGroup.visibility =
-				if (uiState.isEditOrEmpty) View.VISIBLE else View.GONE
+				if (uiState.isEditing) View.VISIBLE else View.GONE
+			retryBookreportLayout.root.visibility =
+				if (uiState.isInitError) View.VISIBLE else View.GONE
 			successStateGroup.visibility =
 				if (uiState.uiState == UiState.SUCCESS) View.VISIBLE else View.GONE
 			progressbar.visibility =
@@ -128,9 +135,7 @@ class BookReportActivity : AppCompatActivity() {
 	}
 
 	private fun setBackPressedDispatcher() {
-		onBackPressedDispatcher.addCallback {
-			bookReportViewModel.onClickBackBtn()
-		}
+		onBackPressedDispatcher.addCallback { bookReportViewModel.onClickBackBtn() }
 	}
 
 	companion object {

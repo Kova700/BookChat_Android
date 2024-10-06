@@ -6,35 +6,45 @@ import com.kova700.core.data.bookreport.external.model.BookReport
 data class BookReportUiState(
 	val uiState: UiState,
 	val bookshelfItem: BookShelfItem,
-	val existingBookReport: BookReport,
+	val existingBookReport: BookReport?,
 	val enteredTitle: String,
 	val enteredContent: String,
 ) {
-	val isEditOrEmpty
+	val isLoading
+		get() = uiState == UiState.LOADING
+
+	val isInitError
+		get() = uiState == UiState.INIT_ERROR
+
+	val isEditing
 		get() = uiState == UiState.EDITING
-						|| uiState == UiState.EMPTY
+
+	val isNotExistBookReport
+		get() = existingBookReport == null
+						&& isLoading.not()
+						&& isInitError.not()
 
 	val isExistChanges
-		get() = existingBookReport.reportTitle != enteredTitle
-						|| existingBookReport.reportContent != enteredContent
+		get() = isEditing
+						&& (existingBookReport?.reportTitle != enteredTitle
+						|| existingBookReport.reportContent != enteredContent)
 
-	val isEnteredTextEmpty
-		get() = enteredTitle.isEmpty()
-						|| enteredContent.isEmpty()
+	val isEnteredTextBlank
+		get() = isEditing
+						&& (enteredTitle.isBlank() || enteredContent.isBlank())
 
 	enum class UiState {
 		SUCCESS,
 		LOADING,
-		EMPTY,
+		INIT_ERROR,
 		EDITING,
-		ERROR,
 	}
 
 	companion object {
 		val DEFAULT = BookReportUiState(
-			uiState = UiState.LOADING,
+			uiState = UiState.SUCCESS,
 			bookshelfItem = BookShelfItem.DEFAULT,
-			existingBookReport = BookReport.DEFAULT,
+			existingBookReport = null,
 			enteredTitle = "",
 			enteredContent = "",
 		)

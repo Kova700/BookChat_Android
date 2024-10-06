@@ -10,7 +10,6 @@ interface BookReportRepository {
 		bookShelfId: Long,
 		reportTitle: String,
 		reportContent: String,
-		reportCreatedAt: String,
 	)
 
 	suspend fun deleteBookReport(bookShelfId: Long)
