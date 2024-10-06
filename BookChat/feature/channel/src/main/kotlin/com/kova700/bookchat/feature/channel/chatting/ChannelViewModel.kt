@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.kova700.bookchat.core.data.channel.external.model.Channel
 import com.kova700.bookchat.core.data.channel.external.model.ChannelIsExplodedException
 import com.kova700.bookchat.core.data.channel.external.model.UserIsBannedException
-import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelTempMessageRepository
 import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.chat.external.model.ChatType
@@ -50,9 +49,6 @@ import kotlin.math.abs
 //TODO : 채팅방 정보 조회 실패 시 예외 처리 (필요한가?)
 //TODO : 채팅 로딩 전체 화면 UI 구현  (필요한가?)
 //TODO : 출시 전 북챗 문의 방 만들기
-
-//TODO : Channel List 받아올때 받아온 Last Chat이 Notice Type으로 보여지는 현상이 있는데
-// 다시 나갔다 들어오면 정상적으로 Client가 보낸 Chat Type으로 보임
 
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
@@ -407,6 +403,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	fun onChangeEnteredMessage(text: String) {
+		if (text.length > MAX_CHAT_MESSAGE_LENGTH) return
 		updateState { copy(enteredMessage = text) }
 		saveTempSavedMessage(text.trim())
 	}
@@ -607,5 +604,9 @@ class ChannelViewModel @Inject constructor(
 
 	private inline fun updateState(block: ChannelUiState.() -> ChannelUiState) {
 		_uiState.update { _uiState.value.block() }
+	}
+
+	companion object {
+		const val MAX_CHAT_MESSAGE_LENGTH = 50000
 	}
 }

@@ -13,7 +13,7 @@ data class HomeUiState(
 	enum class UiState {
 		SUCCESS,
 		INIT_LOADING,
-		ERROR,
+		INIT_ERROR,
 	}
 
 	companion object {

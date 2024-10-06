@@ -3,6 +3,7 @@ package com.kova700.bookchat.feature.agony.agonyrecord
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -51,6 +52,7 @@ class AgonyRecordActivity : AppCompatActivity() {
 	private fun observeUiState() = lifecycleScope.launch {
 		agonyRecordViewModel.uiState.collect { uiState ->
 			agonyRecordAdapter.submitList(uiState.records)
+			setViewState(uiState)
 		}
 	}
 
@@ -59,45 +61,51 @@ class AgonyRecordActivity : AppCompatActivity() {
 	}
 
 	private fun initViewState() {
-		binding.backBtn.setOnClickListener { agonyRecordViewModel.onBackBtnClick() }
+		with(binding) {
+			backBtn.setOnClickListener { agonyRecordViewModel.onBackBtnClick() }
+			retryAgonyLayout.retryBtn.setOnClickListener { agonyRecordViewModel.onClickRetryBtn() }
+		}
+	}
+
+	private fun setViewState(uiState: AgonyRecordUiState) {
+		with(binding) {
+			agonyRecordRcv.visibility = if (uiState.isNotInitErrorOrLoading) View.VISIBLE else View.GONE
+			retryAgonyLayout.root.visibility = if (uiState.isInitError) View.VISIBLE else View.GONE
+		}
 	}
 
 	private fun initAdapter() {
-		agonyRecordAdapter.onHeaderEditBtnClick = {
-			agonyRecordViewModel.onHeaderEditBtnClick()
+		with(agonyRecordAdapter) {
+			onHeaderEditBtnClick = { agonyRecordViewModel.onHeaderEditBtnClick() }
+			onFirstItemClick = { agonyRecordViewModel.onFirstItemClick() }
+			onFirstItemEditCancelBtnClick = { agonyRecordViewModel.onFirstItemEditCancelBtnClick() }
+			onFirstItemEditFinishBtnClick = {
+				val item = agonyRecordAdapter.currentList[1] as AgonyRecordListItem.FirstItem
+				agonyRecordViewModel.onFirstItemEditFinishBtnClick(item)
+			}
+			onItemClick = { position ->
+				val item = agonyRecordAdapter.currentList[position] as AgonyRecordListItem.Item
+				agonyRecordViewModel.onItemClick(item)
+			}
+			onItemSwipe = { position, isSwiped ->
+				val item = agonyRecordAdapter.currentList[position] as AgonyRecordListItem.Item
+				agonyRecordViewModel.onItemSwipe(item, isSwiped)
+			}
+			onItemEditCancelBtnClick = { position ->
+				val item = agonyRecordAdapter.currentList[position] as AgonyRecordListItem.Item
+				agonyRecordViewModel.onItemEditCancelBtnClick(item)
+			}
+			onItemEditFinishBtnClick = { position ->
+				val item = agonyRecordAdapter.currentList[position] as AgonyRecordListItem.Item
+				agonyRecordViewModel.onItemEditFinishBtnClick(item)
+			}
+			onItemDeleteBtnClick = { position ->
+				val item = agonyRecordAdapter.currentList[position] as AgonyRecordListItem.Item
+				agonyRecordViewModel.onItemDeleteBtnClick(item)
+			}
+			onClickPagingRetry = { agonyRecordViewModel.onClickPagingRetryBtn() }
 		}
 
-		agonyRecordAdapter.onFirstItemClick = {
-			agonyRecordViewModel.onFirstItemClick()
-		}
-		agonyRecordAdapter.onFirstItemEditCancelBtnClick = {
-			agonyRecordViewModel.onFirstItemEditCancelBtnClick()
-		}
-		agonyRecordAdapter.onFirstItemEditFinishBtnClick = {
-			val item = agonyRecordAdapter.currentList[1] as AgonyRecordListItem.FirstItem
-			agonyRecordViewModel.onFirstItemEditFinishBtnClick(item)
-		}
-
-		agonyRecordAdapter.onItemClick = { position ->
-			val item = agonyRecordAdapter.currentList[position] as AgonyRecordListItem.Item
-			agonyRecordViewModel.onItemClick(item)
-		}
-		agonyRecordAdapter.onItemSwipe = { position, isSwiped ->
-			val item = agonyRecordAdapter.currentList[position] as AgonyRecordListItem.Item
-			agonyRecordViewModel.onItemSwipe(item, isSwiped)
-		}
-		agonyRecordAdapter.onItemEditCancelBtnClick = { position ->
-			val item = agonyRecordAdapter.currentList[position] as AgonyRecordListItem.Item
-			agonyRecordViewModel.onItemEditCancelBtnClick(item)
-		}
-		agonyRecordAdapter.onItemEditFinishBtnClick = { position ->
-			val item = agonyRecordAdapter.currentList[position] as AgonyRecordListItem.Item
-			agonyRecordViewModel.onItemEditFinishBtnClick(item)
-		}
-		agonyRecordAdapter.onItemDeleteBtnClick = { position ->
-			val item = agonyRecordAdapter.currentList[position] as AgonyRecordListItem.Item
-			agonyRecordViewModel.onItemDeleteBtnClick(item)
-		}
 	}
 
 	private fun moveToAgonyTitleEdit(agonyId: Long, bookShelfItemId: Long) {
@@ -134,7 +142,7 @@ class AgonyRecordActivity : AppCompatActivity() {
 
 	private fun showEditCancelWarning() {
 		val warningDialog = AgonyRecordWarningDialog(
-			onClickOkBtn = { agonyRecordViewModel.clearEditingState() }
+			onClickOkBtn = { agonyRecordViewModel.onClickWarningDialogOKBtn() }
 		)
 		warningDialog.show(supportFragmentManager, DIALOG_TAG_WARNING_EDIT_CANCEL)
 	}

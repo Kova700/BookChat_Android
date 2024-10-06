@@ -55,13 +55,14 @@ class NetworkManagerImpl @Inject constructor(
 			connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork) ?: return
 
 		val currentState = when {
-			networkCapabilities.isWIFIConnected()
-							|| networkCapabilities.isMobileDataConnected() -> NetworkState.CONNECTED
-
+			networkCapabilities.isConnected() -> NetworkState.CONNECTED
 			else -> NetworkState.DISCONNECTED
 		}
-
 		_networkState.update { currentState }
+	}
+
+	private fun NetworkCapabilities.isConnected(): Boolean {
+		return isWIFIConnected() || isMobileDataConnected()
 	}
 
 	private fun NetworkCapabilities.isWIFIConnected(): Boolean {

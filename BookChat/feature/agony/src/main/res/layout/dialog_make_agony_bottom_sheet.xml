@@ -63,7 +63,7 @@
         android:fontFamily="@font/notosanskr_regular"
         android:gravity="start"
         android:hint="@string/agony_make_input_hint"
-        android:maxLength="30"
+        android:maxLength="500"
         android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@+id/color_select_layout"
         app:layout_constraintEnd_toEndOf="@+id/make_agony_folder_cv"

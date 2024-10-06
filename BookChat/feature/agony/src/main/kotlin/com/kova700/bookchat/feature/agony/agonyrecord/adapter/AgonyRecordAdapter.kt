@@ -8,6 +8,7 @@ import com.kova700.bookchat.feature.agony.agonyrecord.model.AgonyRecordListItem
 import com.kova700.bookchat.feature.agony.databinding.ItemAgonyRecordDataBinding
 import com.kova700.bookchat.feature.agony.databinding.ItemAgonyRecordFirstBinding
 import com.kova700.bookchat.feature.agony.databinding.ItemAgonyRecordHeaderBinding
+import com.kova700.bookchat.feature.agony.databinding.ItemAgonyRecordPagingRetryBinding
 import javax.inject.Inject
 import com.kova700.bookchat.feature.agony.R as agonyR
 
@@ -26,11 +27,14 @@ class AgonyRecordAdapter @Inject constructor() :
 	var onItemEditFinishBtnClick: ((Int) -> Unit)? = null
 	var onItemDeleteBtnClick: ((Int) -> Unit)? = null
 
+	var onClickPagingRetry: (() -> Unit)? = null
+
 	override fun getItemViewType(position: Int): Int {
 		return when (getItem(position)) {
 			is AgonyRecordListItem.Header -> agonyR.layout.item_agony_record_header
 			is AgonyRecordListItem.FirstItem -> agonyR.layout.item_agony_record_first
 			is AgonyRecordListItem.Item -> agonyR.layout.item_agony_record_data
+			AgonyRecordListItem.PagingError -> agonyR.layout.item_agony_record_paging_retry
 		}
 	}
 
@@ -66,7 +70,7 @@ class AgonyRecordAdapter @Inject constructor() :
 				)
 			}
 
-			else -> {
+			agonyR.layout.item_agony_record_data -> {
 				val binding = ItemAgonyRecordDataBinding.inflate(
 					LayoutInflater.from(parent.context),
 					parent,
@@ -81,6 +85,20 @@ class AgonyRecordAdapter @Inject constructor() :
 					onItemDeleteBtnClick = onItemDeleteBtnClick,
 				)
 			}
+
+			agonyR.layout.item_agony_record_paging_retry -> {
+				val binding = ItemAgonyRecordPagingRetryBinding.inflate(
+					LayoutInflater.from(parent.context),
+					parent,
+					false
+				)
+				return AgonyRecordPagingErrorViewHolder(
+					binding = binding,
+					onClickPagingRetry = onClickPagingRetry
+				)
+			}
+
+			else -> throw IllegalArgumentException("Unknown viewType: $viewType")
 		}
 	}
 

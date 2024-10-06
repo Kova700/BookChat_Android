@@ -10,10 +10,12 @@ sealed interface ChannelListItem {
 		return when (this) {
 			Header -> CHANNEL_HEADER_ITEM_STABLE_ID
 			is ChannelItem -> roomId
+			PagingRetry -> CHANNEL_PAGING_RETRY_ITEM_STABLE_ID
 		}
 	}
 
 	data object Header : ChannelListItem
+	data object PagingRetry : ChannelListItem
 
 	data class ChannelItem(
 		val roomId: Long,
@@ -59,6 +61,7 @@ sealed interface ChannelListItem {
 	}
 
 	companion object {
-		const val CHANNEL_HEADER_ITEM_STABLE_ID = -1L
+		private const val CHANNEL_HEADER_ITEM_STABLE_ID = -1L
+		private const val CHANNEL_PAGING_RETRY_ITEM_STABLE_ID = -2L
 	}
 }

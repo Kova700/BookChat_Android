@@ -10,6 +10,7 @@ import com.kova700.bookchat.feature.agony.databinding.ItemAgonyDataBinding
 import com.kova700.bookchat.feature.agony.databinding.ItemAgonyDataEditingBinding
 import com.kova700.bookchat.feature.agony.databinding.ItemAgonyFirstBinding
 import com.kova700.bookchat.feature.agony.databinding.ItemAgonyHeaderBinding
+import com.kova700.bookchat.feature.agony.databinding.ItemAgonyPagingRetryBinding
 import com.kova700.bookchat.util.book.BookImgSizeManager
 import javax.inject.Inject
 import com.kova700.bookchat.feature.agony.R as agonyR
@@ -22,6 +23,7 @@ class AgonyAdapter @Inject constructor(
 	var onFirstItemClick: (() -> Unit)? = null
 	var onItemClick: ((Int) -> Unit)? = null
 	var onItemSelect: ((Int) -> Unit)? = null
+	var onClickPagingRetry: (() -> Unit)? = null
 
 	override fun getItemViewType(position: Int): Int {
 		return when (getItem(position)) {
@@ -31,6 +33,8 @@ class AgonyAdapter @Inject constructor(
 				if (agonyUiState.uiState == AgonyUiState.UiState.EDITING) agonyR.layout.item_agony_data_editing
 				else agonyR.layout.item_agony_data
 			}
+
+			AgonyListItem.PagingRetry -> agonyR.layout.item_agony_paging_retry
 		}
 	}
 
@@ -61,12 +65,24 @@ class AgonyAdapter @Inject constructor(
 				return AgonyDataEditingItemViewHolder(binding, onItemSelect)
 			}
 
-			else -> {
+			agonyR.layout.item_agony_data -> {
 				val binding = ItemAgonyDataBinding.inflate(
 					LayoutInflater.from(parent.context), parent, false
 				)
 				return AgonyDataItemViewHolder(binding, onItemClick)
 			}
+
+			agonyR.layout.item_agony_paging_retry -> {
+				val binding = ItemAgonyPagingRetryBinding.inflate(
+					LayoutInflater.from(parent.context), parent, false
+				)
+				return AgonyPagingRetryViewHolder(
+					binding = binding,
+					onClickPagingRetry = onClickPagingRetry
+				)
+			}
+
+			else -> throw IllegalArgumentException("Unknown viewType: $viewType")
 		}
 	}
 

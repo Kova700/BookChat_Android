@@ -1,6 +1,5 @@
 package com.kova700.bookchat.feature.bookreport
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,7 +7,6 @@ import com.kova700.bookchat.core.data.bookshelf.external.BookShelfRepository
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.bookreport.BookReportActivity.Companion.EXTRA_BOOKREPORT_BOOKSHELF_ITEM_ID
 import com.kova700.bookchat.feature.bookreport.BookReportUiState.UiState
-import com.kova700.bookchat.util.Constants.TAG
 import com.kova700.core.data.bookreport.external.BookReportRepository
 import com.kova700.core.data.bookreport.external.model.BookReportDoseNotExistException
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +18,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO : 추후 Room 사용
 @HiltViewModel
 class BookReportViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
@@ -37,12 +34,12 @@ class BookReportViewModel @Inject constructor(
 
 	init {
 		initUiState()
-		observeBookReport()
 	}
 
 	private fun initUiState() {
 		getBookShelfItem()
 		getBookReport()
+		observeBookReport()
 	}
 
 	private fun observeBookReport() = viewModelScope.launch {
@@ -57,17 +54,17 @@ class BookReportViewModel @Inject constructor(
 	}
 
 	private fun getBookReport() = viewModelScope.launch {
+		updateState { copy(uiState = UiState.LOADING) }
 		runCatching { bookReportRepository.getBookReport(bookShelfItemId) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { failHandler(it) }
+			.onFailure { throwable ->
+				if (throwable is BookReportDoseNotExistException) updateState { copy(uiState = UiState.EDITING) }
+				else updateState { copy(uiState = UiState.INIT_ERROR) }
+			}
 	}
 
-	//TODO : 내용이 긴 경우에는 등록이 되나,
-	// 제목이 긴 경우는 해결되지 않음
-	// --> POST https://bookchat.link/v1/api/bookshelves/124/report h2
-	// {"errorCode":"500","message":"예상치 못한 예외가 발생했습니다."}
 	private fun registerBookReport() {
-		if (uiState.value.uiState == UiState.LOADING) return
+		if (uiState.value.isLoading) return
 		updateState { copy(uiState = UiState.LOADING) }
 		viewModelScope.launch {
 			runCatching {
@@ -75,40 +72,29 @@ class BookReportViewModel @Inject constructor(
 					bookShelfId = bookShelfItemId,
 					reportTitle = uiState.value.enteredTitle,
 					reportContent = uiState.value.enteredContent,
-					reportCreatedAt = uiState.value.existingBookReport.reportCreatedAt,
 				)
 			}
 				.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 				.onFailure {
-					updateState { copy(uiState = UiState.EMPTY) }
+					updateState { copy(uiState = UiState.EDITING) }
 					startEvent(BookReportEvent.ShowSnackBar(R.string.book_report_make_fail))
 				}
 		}
 	}
 
-	//TODO : 장문인 경우 BadRequestException 에러 해결 필요 (이거 이슈 해결됨 테스트하고 삭제)
-	// 수정하고 뒤로 돌아 나갔다오면 수정내용이 반영되지 않는 현상이 있음
 	private fun reviseBookReport() {
-		if (uiState.value.uiState == UiState.LOADING) return
+		if (uiState.value.isLoading) return
 		updateState { copy(uiState = UiState.LOADING) }
-
-		Log.d(TAG, "BookReportViewModel: reviseBookReport() - called")
 		viewModelScope.launch {
 			runCatching {
 				bookReportRepository.reviseBookReport(
 					bookShelfId = bookShelfItemId,
 					reportTitle = uiState.value.enteredTitle,
 					reportContent = uiState.value.enteredContent,
-					reportCreatedAt = uiState.value.existingBookReport.reportCreatedAt,
+					reportCreatedAt = uiState.value.existingBookReport?.reportCreatedAt ?: "",
 				)
-			}
-				//수정 실패했는데 왜 성공 UI가 나오지..?
-				.onSuccess {
-					Log.d(TAG, "BookReportViewModel: reviseBookReport() - onSuccess")
-					updateState { copy(uiState = UiState.SUCCESS) }
-				}
+			}.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 				.onFailure {
-					Log.d(TAG, "BookReportViewModel: reviseBookReport() - onFailure")
 					updateState { copy(uiState = UiState.EDITING) }
 					startEvent(BookReportEvent.ShowSnackBar(R.string.book_report_revise_fail))
 				}
@@ -116,7 +102,7 @@ class BookReportViewModel @Inject constructor(
 	}
 
 	private fun deleteBookReport() {
-		if (uiState.value.uiState == UiState.LOADING) return
+		if (uiState.value.isLoading) return
 		updateState { copy(uiState = UiState.LOADING) }
 		viewModelScope.launch {
 			runCatching { bookReportRepository.deleteBookReport(bookShelfItemId) }
@@ -129,30 +115,24 @@ class BookReportViewModel @Inject constructor(
 	}
 
 	fun onClickRegisterBtn() {
-		if (uiState.value.isEnteredTextEmpty) {
-			startEvent(BookReportEvent.ShowSnackBar(R.string.title_content_empty))
-			return
-		}
+		when {
+			uiState.value.isEditing.not() -> return
+			uiState.value.isEnteredTextBlank ->
+				startEvent(BookReportEvent.ShowSnackBar(R.string.title_content_empty))
 
-		when (uiState.value.uiState) {
-			UiState.EMPTY -> registerBookReport()
-			UiState.EDITING -> {
-				if (uiState.value.isExistChanges.not()) {
-					updateState { copy(uiState = UiState.SUCCESS) }
-					return
-				}
-				reviseBookReport()
-			}
-
-			else -> Unit
+			uiState.value.isNotExistBookReport -> registerBookReport()
+			uiState.value.isExistChanges.not() -> updateState { copy(uiState = UiState.SUCCESS) }
+			else -> reviseBookReport()
 		}
 	}
 
 	fun onChangeTitle(text: String) {
+		if (text.length > BOOKREPORT_TITLE_MAX_LENGTH) return
 		updateState { copy(enteredTitle = text.trim()) }
 	}
 
 	fun onChangeContent(text: String) {
+		if (text.length > BOOKREPORT_CONTENT_MAX_LENGTH) return
 		updateState { copy(enteredContent = text.trim()) }
 	}
 
@@ -160,8 +140,8 @@ class BookReportViewModel @Inject constructor(
 		updateState {
 			copy(
 				uiState = UiState.EDITING,
-				enteredTitle = existingBookReport.reportTitle,
-				enteredContent = existingBookReport.reportContent,
+				enteredTitle = existingBookReport?.reportTitle ?: "",
+				enteredContent = existingBookReport?.reportContent ?: "",
 			)
 		}
 	}
@@ -173,16 +153,18 @@ class BookReportViewModel @Inject constructor(
 		))
 	}
 
+	fun onClickRetryBtn() {
+		getBookReport()
+	}
+
 	fun onClickBackBtn() {
 		when {
-			uiState.value.isEditOrEmpty.not() -> startEvent(BookReportEvent.MoveBack)
-			uiState.value.isExistChanges.not()
-							|| uiState.value.isEnteredTextEmpty -> startEvent(BookReportEvent.MoveBack)
-
-			else -> startEvent(BookReportEvent.ShowDeleteWarningDialog(
+			uiState.value.isEditing -> startEvent(BookReportEvent.ShowDeleteWarningDialog(
 				stringId = R.string.book_report_writing_cancel_warning,
 				onOkClick = { startEvent(BookReportEvent.MoveBack) }
 			))
+
+			else -> startEvent(BookReportEvent.MoveBack)
 		}
 	}
 
@@ -194,15 +176,8 @@ class BookReportViewModel @Inject constructor(
 		_uiState.update { _uiState.value.block() }
 	}
 
-	private fun failHandler(exception: Throwable) {
-		Log.d(TAG, "BookReportViewModel: failHandler() - exception :$exception")
-		when (exception) {
-			is BookReportDoseNotExistException -> updateState { copy(uiState = UiState.EMPTY) }
-			else -> {
-				val errorMessage = exception.message
-				if (errorMessage.isNullOrBlank()) startEvent(BookReportEvent.ShowSnackBar(R.string.error_else))
-				else startEvent(BookReportEvent.UnknownErrorEvent(errorMessage))
-			}
-		}
+	companion object {
+		const val BOOKREPORT_TITLE_MAX_LENGTH = 500
+		const val BOOKREPORT_CONTENT_MAX_LENGTH = 50000
 	}
 }

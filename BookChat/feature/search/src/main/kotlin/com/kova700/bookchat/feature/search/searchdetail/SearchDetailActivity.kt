@@ -13,12 +13,12 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.kova700.bookchat.core.data.search.book.external.model.Book
 import com.kova700.bookchat.core.design_system.R
-import com.kova700.bookchat.feature.search.createchannel.MakeChannelBookSelectDialog
 import com.kova700.bookchat.feature.search.SearchFragment
 import com.kova700.bookchat.feature.search.SearchFragment.Companion.DIALOG_TAG_SELECT_BOOK
 import com.kova700.bookchat.feature.search.SearchFragment.Companion.EXTRA_CLICKED_CHANNEL_ID
 import com.kova700.bookchat.feature.search.adapter.SearchItemAdapter
 import com.kova700.bookchat.feature.search.channelInfo.ChannelInfoActivity
+import com.kova700.bookchat.feature.search.createchannel.MakeChannelBookSelectDialog
 import com.kova700.bookchat.feature.search.databinding.ActivitySearchTapResultDetailBinding
 import com.kova700.bookchat.feature.search.dialog.SearchBookDialog
 import com.kova700.bookchat.feature.search.model.SearchResultItem
@@ -44,7 +44,6 @@ class SearchDetailActivity : AppCompatActivity() {
 		initAdapter()
 		initRecyclerView()
 		initViewState()
-		initHeaderTitle()
 		observeUiState()
 		observeUiEvent()
 	}
@@ -61,14 +60,24 @@ class SearchDetailActivity : AppCompatActivity() {
 	}
 
 	private fun initViewState() {
-		binding.backBtn.setOnClickListener { searchDetailViewModel.onClickBackBtn() }
+		initHeaderTitle()
+		with(binding) {
+			backBtn.setOnClickListener { searchDetailViewModel.onClickBackBtn() }
+			resultRetryLayout.retryBtn.setOnClickListener { searchDetailViewModel.onInitRetryBtnClick() }
+		}
 	}
 
 	private fun setViewState(state: SearchDetailUiState) {
-		binding.searchResultRcv.visibility =
-			if (state.searchItems.isNotEmpty()) RecyclerView.VISIBLE else RecyclerView.GONE
-		binding.resultEmptyLayout.root.visibility =
-			if (state.searchItems.isEmpty()) RecyclerView.VISIBLE else RecyclerView.GONE
+		with(binding) {
+			searchResultRcv.visibility =
+				if (state.isNotEmpty) RecyclerView.VISIBLE else RecyclerView.GONE
+			resultEmptyLayout.root.visibility =
+				if (state.isEmpty) RecyclerView.VISIBLE else RecyclerView.GONE
+			resultRetryLayout.root.visibility =
+				if (state.isInitError) RecyclerView.VISIBLE else RecyclerView.GONE
+			progressbar.visibility =
+				if (state.isLoading) RecyclerView.VISIBLE else RecyclerView.GONE
+		}
 	}
 
 	private fun initAdapter() {
@@ -81,6 +90,9 @@ class SearchDetailActivity : AppCompatActivity() {
 			searchDetailViewModel.onChannelItemClick(
 				((searchItemAdapter.currentList[position]) as SearchResultItem.ChannelItem).roomId
 			)
+		}
+		searchItemAdapter.onPagingRetryBtnClick = {
+			searchDetailViewModel.onPagingRetryBtnClick()
 		}
 	}
 
@@ -137,7 +149,7 @@ class SearchDetailActivity : AppCompatActivity() {
 			onClickMakeChannel = { finishWithSelectedBook(book.isbn) },
 			selectedBook = book
 		)
-		dialog.show(supportFragmentManager, SearchFragment.DIALOG_TAG_SELECT_BOOK)
+		dialog.show(supportFragmentManager, DIALOG_TAG_SELECT_BOOK)
 	}
 
 	private fun finishWithSelectedBook(bookIsbn: String) {

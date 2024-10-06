@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import java.io.IOException
 import javax.inject.Inject
 
 class BookReportRepositoryImpl @Inject constructor(
@@ -38,10 +39,10 @@ class BookReportRepositoryImpl @Inject constructor(
 			is BookChatApiResult.Failure -> {
 				when (response.code) {
 					404 -> throw BookReportDoseNotExistException()
-					else -> throw Exception(
+					else -> throw IOException(
 						createExceptionMessage(
-							response.code,
-							response.body
+							responseCode = response.code,
+							responseErrorBody = response.body
 						)
 					)
 				}
@@ -53,7 +54,6 @@ class BookReportRepositoryImpl @Inject constructor(
 		bookShelfId: Long,
 		reportTitle: String,
 		reportContent: String,
-		reportCreatedAt: String,
 	) {
 		bookReportApi.registerBookReport(
 			bookShelfId = bookShelfId,
@@ -67,7 +67,7 @@ class BookReportRepositoryImpl @Inject constructor(
 			bookReports.value + (bookShelfId to BookReport(
 				reportTitle = reportTitle,
 				reportContent = reportContent,
-				reportCreatedAt = reportCreatedAt,
+				reportCreatedAt = "",
 			))
 		)
 	}

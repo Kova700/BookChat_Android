@@ -12,18 +12,23 @@ import com.kova700.bookchat.feature.search.SearchFragment.Companion.EXTRA_SEARCH
 import com.kova700.bookchat.feature.search.SearchFragment.Companion.EXTRA_SEARCH_PURPOSE
 import com.kova700.bookchat.feature.search.SearchFragment.Companion.EXTRA_SEARCH_TARGET
 import com.kova700.bookchat.feature.search.mapper.toBook
-import com.kova700.bookchat.feature.search.mapper.toBookSearchResultItem
-import com.kova700.bookchat.feature.search.mapper.toChannelSearchResultItem
 import com.kova700.bookchat.feature.search.model.SearchPurpose
+import com.kova700.bookchat.feature.search.model.SearchPurpose.MAKE_CHANNEL
+import com.kova700.bookchat.feature.search.model.SearchPurpose.SEARCH_BOTH
+import com.kova700.bookchat.feature.search.model.SearchPurpose.SEARCH_CHANNEL
 import com.kova700.bookchat.feature.search.model.SearchResultItem
 import com.kova700.bookchat.feature.search.model.SearchTarget
 import com.kova700.bookchat.feature.search.searchdetail.SearchDetailUiState.UiState
+import com.kova700.bookchat.feature.search.searchdetail.mapper.toBookSearchResultDetailItem
+import com.kova700.bookchat.feature.search.searchdetail.mapper.toChannelSearchResultDetailItem
 import com.kova700.bookchat.util.book.BookImgSizeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -49,91 +54,110 @@ class SearchDetailViewModel @Inject constructor(
 
 	init {
 		initUiState()
-		observeSearchItems()
 	}
 
 	private fun initUiState() {
 		updateState {
 			copy(
-				uiState = UiState.SUCCESS,
 				searchKeyword = this@SearchDetailViewModel.searchKeyword,
 				searchTarget = this@SearchDetailViewModel.searchTarget,
 				searchPurpose = this@SearchDetailViewModel.searchPurpose,
 				searchFilter = this@SearchDetailViewModel.searchFilter
 			)
 		}
+		getInitSearchItems()
+		observeSearchItems()
 	}
 
 	private fun observeSearchItems() = viewModelScope.launch {
 		when (searchTarget) {
 			SearchTarget.BOOK -> {
-				bookSearchRepository.getBooksFLow().map {
-					it.toBookSearchResultItem(bookImgSizeManager.getFlexBoxDummyItemCount(it.size))
-				}.collect { items ->
-					if (items.isEmpty()) updateState { copy(uiState = UiState.EMPTY) }
-					else updateState { copy(searchItems = items) }
-				}
+				combine(
+					bookSearchRepository.getBooksFLow(),
+					uiState.map { it.uiState }.distinctUntilChanged(),
+				) { books, uiState ->
+					books.toBookSearchResultDetailItem(
+						bookImgSizeManager = bookImgSizeManager,
+						uiState = uiState
+					)
+				}.collect { items -> updateState { copy(searchItems = items) } }
 			}
 
 			SearchTarget.CHANNEL -> {
-				channelSearchRepository.getChannelsFLow().map { it.toChannelSearchResultItem() }
-					.collect { items ->
-						if (items.isEmpty()) updateState { copy(uiState = UiState.EMPTY) }
-						else updateState { copy(searchItems = items) }
-					}
+				combine(
+					channelSearchRepository.getChannelsFLow(),
+					uiState.map { it.uiState }.distinctUntilChanged(),
+				) { channels, uiState -> channels.toChannelSearchResultDetailItem(uiState) }
+					.collect { items -> updateState { copy(searchItems = items) } }
 			}
+		}
+	}
+
+	private fun getInitSearchItems() = viewModelScope.launch {
+		if (uiState.value.isLoading) return@launch
+		updateState { copy(uiState = UiState.INIT_LOADING) }
+		when (searchTarget) {
+			SearchTarget.BOOK -> searchBooks()
+			SearchTarget.CHANNEL -> searchChannels()
+		}.onFailure {
+			updateState { copy(uiState = UiState.INIT_ERROR) }
+			startEvent(SearchDetailEvent.ShowSnackBar(R.string.error_else))
 		}
 	}
 
 	private fun getSearchItems() = viewModelScope.launch {
-		updateState { copy(uiState = UiState.LOADING) }
+		if (uiState.value.isLoading) return@launch
+		updateState { copy(uiState = UiState.PAGING_LOADING) }
 		when (searchTarget) {
 			SearchTarget.BOOK -> searchBooks()
 			SearchTarget.CHANNEL -> searchChannels()
+		}.onFailure {
+			updateState { copy(uiState = UiState.PAGING_ERROR) }
+			startEvent(SearchDetailEvent.ShowSnackBar(R.string.error_else))
 		}
 	}
 
-	private fun searchBooks() = viewModelScope.launch {
+	private suspend fun searchBooks() =
 		runCatching { bookSearchRepository.search(searchKeyword) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { failHandler(it) }
-	}
 
-	private fun searchChannels() = viewModelScope.launch {
+	private suspend fun searchChannels() =
 		runCatching {
 			channelSearchRepository.search(
 				keyword = searchKeyword,
 				searchFilter = uiState.value.searchFilter,
 			)
-		}
-			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { failHandler(it) }
-	}
+		}.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 
 	fun loadNextData(lastVisibleItemPosition: Int) {
 		if (uiState.value.searchItems.size - 1 > lastVisibleItemPosition
-			|| uiState.value.uiState == UiState.LOADING
+			|| uiState.value.isLoading
 		) return
 		getSearchItems()
 	}
 
 	fun onBookItemClick(bookItem: SearchResultItem.BookItem) {
 		when (uiState.value.searchPurpose) {
-			SearchPurpose.SEARCH_BOTH -> startEvent(SearchDetailEvent.MoveToSearchBookDialog(bookItem.toBook()))
-			SearchPurpose.MAKE_CHANNEL -> startEvent(
-				SearchDetailEvent.MoveToMakeChannelSelectBookDialog(bookItem.toBook())
-			)
-
-			SearchPurpose.SEARCH_CHANNEL -> Unit
+			SEARCH_BOTH -> startEvent(SearchDetailEvent.MoveToSearchBookDialog(bookItem.toBook()))
+			MAKE_CHANNEL -> startEvent(SearchDetailEvent.MoveToMakeChannelSelectBookDialog(bookItem.toBook()))
+			SEARCH_CHANNEL -> Unit
 		}
+	}
+
+	fun onChannelItemClick(channelId: Long) {
+		startEvent(SearchDetailEvent.MoveToChannelInfo(channelId))
 	}
 
 	fun onClickBackBtn() {
 		startEvent(SearchDetailEvent.MoveToBack)
 	}
 
-	fun onChannelItemClick(channelId: Long) {
-		startEvent(SearchDetailEvent.MoveToChannelInfo(channelId))
+	fun onInitRetryBtnClick() {
+		getInitSearchItems()
+	}
+
+	fun onPagingRetryBtnClick() {
+		getSearchItems()
 	}
 
 	private fun startEvent(event: SearchDetailEvent) = viewModelScope.launch {
@@ -142,13 +166,6 @@ class SearchDetailViewModel @Inject constructor(
 
 	private inline fun updateState(block: SearchDetailUiState.() -> SearchDetailUiState) {
 		_uiState.update { _uiState.value.block() }
-	}
-
-	private fun failHandler(exception: Throwable) {
-		updateState { copy(uiState = UiState.ERROR) }
-		when (exception) {
-			else -> startEvent(SearchDetailEvent.ShowSnackBar(R.string.error_else))
-		}
 	}
 
 }

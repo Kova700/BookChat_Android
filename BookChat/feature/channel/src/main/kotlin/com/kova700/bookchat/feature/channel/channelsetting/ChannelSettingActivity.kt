@@ -86,17 +86,11 @@ class ChannelSettingActivity : AppCompatActivity() {
 	}
 
 	private fun initViewState() {
-		with(binding.channelTitleEt) {
-			addTextChangedListener { text ->
-				val message = text?.toString() ?: return@addTextChangedListener
-				channelSettingViewModel.onChangeChannelTitle(message)
-			}
+		binding.channelTitleEt.addTextChangedListener { text ->
+			channelSettingViewModel.onChangeChannelTitle(text.toString())
 		}
-		with(binding.channelTagEt) {
-			addTextChangedListener { text ->
-				val message = text?.toString() ?: return@addTextChangedListener
-				channelSettingViewModel.onChangeChannelTags(message)
-			}
+		binding.channelTagEt.addTextChangedListener { text ->
+			channelSettingViewModel.onChangeChannelTags(text.toString())
 		}
 		makeChannelImgSizeManager.setMakeChannelImgSize(binding.channelImgIv)
 		with(binding) {

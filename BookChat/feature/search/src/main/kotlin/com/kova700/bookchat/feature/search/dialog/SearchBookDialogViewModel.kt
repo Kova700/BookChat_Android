@@ -1,6 +1,5 @@
 package com.kova700.bookchat.feature.search.dialog
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,10 +12,8 @@ import com.kova700.bookchat.core.data.search.channel.external.model.SearchFilter
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.search.SearchFragment.Companion.EXTRA_SEARCHED_BOOK_ITEM_ID
 import com.kova700.bookchat.feature.search.dialog.SearchDialogUiState.SearchDialogState
-import com.kova700.bookchat.feature.search.dialog.SearchDialogUiState.SearchDialogState.AlreadyInBookShelf
 import com.kova700.bookchat.feature.search.model.SearchPurpose
 import com.kova700.bookchat.feature.search.model.SearchTarget
-import com.kova700.bookchat.util.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,29 +39,28 @@ class SearchBookDialogViewModel @Inject constructor(
 
 	init {
 		initUiState()
-		checkAlreadyInBookShelf()
 	}
 
 	private fun initUiState() {
-		updateState {
-			copy(book = bookSearchRepository.getCachedBook(bookIsbn))
-		}
+		updateState { copy(book = bookSearchRepository.getCachedBook(bookIsbn)) }
+		checkAlreadyInBookShelf()
 	}
 
 	private fun checkAlreadyInBookShelf() = viewModelScope.launch {
+		updateState { copy(uiState = SearchDialogState.Loading) }
 		runCatching { bookShelfRepository.checkAlreadyInBookShelf(uiState.value.book) }
-			.onSuccess {
-				if (it == null) updateState { copy(uiState = SearchDialogState.Default) }
-				else updateState { copy(uiState = SearchDialogState.AlreadyInBookShelf(it.bookShelfState)) }
+			.onSuccess { updateState { copy(uiState = SearchDialogState.Success(it?.bookShelfState)) } }
+			.onFailure {
+				updateState { copy(uiState = SearchDialogState.InitError) }
+				startEvent(SearchTapDialogEvent.ShowSnackBar(R.string.error_else_2_line))
 			}
-			.onFailure { startEvent(SearchTapDialogEvent.ShowSnackBar(R.string.error_else_2_line)) }
 	}
 
 	private fun registerBookshelf(
 		bookShelfState: BookShelfState,
 		starRating: StarRating? = null,
 	) = viewModelScope.launch {
-		if (uiState.value.uiState is SearchDialogState.Loading) return@launch
+		if (uiState.value.isLoading) return@launch
 		updateState { copy(uiState = SearchDialogState.Loading) }
 
 		runCatching {
@@ -76,12 +72,11 @@ class SearchBookDialogViewModel @Inject constructor(
 		}
 			.onSuccess {
 				startEvent(SearchTapDialogEvent.ShowSnackBar(R.string.bookshelf_register_success))
-				updateState { copy(uiState = AlreadyInBookShelf(bookShelfState)) }
+				updateState { copy(uiState = SearchDialogState.Success(bookShelfState)) }
 			}
 			.onFailure {
-				Log.d(TAG, "SearchBookDialogViewModel: registerBookshelf() - cause :$it")
 				startEvent(SearchTapDialogEvent.ShowSnackBar(R.string.bookshelf_register_fail))
-				updateState { copy(uiState = SearchDialogState.Default) }
+				updateState { copy(uiState = SearchDialogState.Success(null)) }
 			}
 	}
 
@@ -90,7 +85,7 @@ class SearchBookDialogViewModel @Inject constructor(
 	}
 
 	fun onClickWishToggleBtn() {
-		if (uiState.value.uiState is AlreadyInBookShelf) return
+		if (uiState.value.isAlreadyInBookShelf) return
 		registerBookshelf(BookShelfState.WISH)
 	}
 

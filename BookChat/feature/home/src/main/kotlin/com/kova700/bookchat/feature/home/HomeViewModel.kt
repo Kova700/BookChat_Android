@@ -55,7 +55,7 @@ class HomeViewModel @Inject constructor(
 		) { bookshelfItems, channels, uiState ->
 			groupItems(
 				clientNickname = uiState.client.nickname,
-				bookshelfItems = bookshelfItems,
+				books = bookshelfItems,
 				channels = channels,
 				bookImgSizeManager = bookImgSizeManager,
 				bookUiState = uiState.bookUiState,
@@ -69,7 +69,7 @@ class HomeViewModel @Inject constructor(
 			.onSuccess { updateState { copy(bookUiState = UiState.SUCCESS) } }
 			.onFailure {
 				startEvent(HomeUiEvent.ShowSnackBar(R.string.error_else))
-				updateState { copy(bookUiState = UiState.ERROR) }
+				updateState { copy(bookUiState = UiState.INIT_ERROR) }
 			}
 	}
 
@@ -78,7 +78,7 @@ class HomeViewModel @Inject constructor(
 			.onSuccess { updateState { copy(channelUiState = UiState.SUCCESS) } }
 			.onFailure {
 				startEvent(HomeUiEvent.ShowSnackBar(R.string.error_else))
-				updateState { copy(channelUiState = UiState.ERROR) }
+				updateState { copy(channelUiState = UiState.INIT_ERROR) }
 			}
 	}
 

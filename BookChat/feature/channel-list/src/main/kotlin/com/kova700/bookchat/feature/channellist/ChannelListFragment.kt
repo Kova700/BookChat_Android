@@ -83,33 +83,39 @@ class ChannelListFragment : Fragment() {
 	}
 
 	private fun initViewState() {
-		binding.channelAddBtn.setOnClickListener { channelListViewModel.onClickPlusBtn() }
-		binding.emptyChannelAddBtn.setOnClickListener { channelListViewModel.onClickPlusBtn() }
-		binding.channelSearchBtn.setOnClickListener { channelListViewModel.onClickChannelSearchBtn() }
+		with(binding) {
+			channelAddBtn.setOnClickListener { channelListViewModel.onClickPlusBtn() }
+			emptyChannelLayout.makeChannelBtn.setOnClickListener { channelListViewModel.onClickPlusBtn() }
+			channelSearchBtn.setOnClickListener { channelListViewModel.onClickChannelSearchBtn() }
+		}
 	}
 
 	private fun setViewState(uiState: ChannelListUiState) {
 		setNetworkStateBarUiState(uiState)
-		emptyChatRoomLayoutState(uiState)
+		setViewVisibility(uiState)
+		binding.retryChannelLayout.retryBtn.setOnClickListener { channelListViewModel.onClickInitRetry() }
 	}
 
-	private fun emptyChatRoomLayoutState(uiState: ChannelListUiState) {
-		binding.emptyChannelLayout.visibility =
-			if (uiState.channelListItem.isEmpty()) View.VISIBLE else View.GONE
-		binding.channelListRcv.visibility =
-			if (uiState.channelListItem.isNotEmpty()) View.VISIBLE else View.GONE
+	private fun setViewVisibility(uiState: ChannelListUiState) {
+		with(binding) {
+			emptyChannelLayout.root.visibility =
+				if (uiState.isEmpty) View.VISIBLE else View.GONE
+			channelListRcv.visibility =
+				if (uiState.isNotEmpty) View.VISIBLE else View.GONE
+			retryChannelLayout.root.visibility =
+				if (uiState.isInitError) View.VISIBLE else View.GONE
+		}
 	}
 
 	private fun setNetworkStateBarUiState(uiState: ChannelListUiState) {
-		when (uiState.networkState) {
-			NetworkState.CONNECTED -> {
-				binding.networkStateBar.visibility = View.GONE
-			}
-
-			NetworkState.DISCONNECTED -> {
-				binding.networkStateBar.setText(R.string.please_connect_the_network)
-				binding.networkStateBar.setBackgroundColor(Color.parseColor("#666666"))
-				binding.networkStateBar.visibility = View.VISIBLE
+		with(binding) {
+			when (uiState.networkState) {
+				NetworkState.CONNECTED -> networkStateBar.visibility = View.GONE
+				NetworkState.DISCONNECTED -> {
+					networkStateBar.setText(R.string.please_connect_the_network)
+					networkStateBar.setBackgroundColor(Color.parseColor("#666666"))
+					networkStateBar.visibility = View.VISIBLE
+				}
 			}
 		}
 	}
@@ -135,6 +141,7 @@ class ChannelListFragment : Fragment() {
 			val item = channelListAdapter.currentList[position] as ChannelListItem.ChannelItem
 			channelListViewModel.onClickTopPinRelatedBtn(item)
 		}
+		channelListAdapter.onClickRetryBtn = { channelListViewModel.onClickPagingRetry() }
 	}
 
 	private fun initRecyclerView() {

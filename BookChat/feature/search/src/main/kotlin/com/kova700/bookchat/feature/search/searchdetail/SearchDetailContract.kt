@@ -14,17 +14,39 @@ data class SearchDetailUiState(
 	val searchFilter: SearchFilter,
 	val searchItems: List<SearchResultItem>,
 ) {
+	val isLoading: Boolean
+		get() = isPagingLoading || isInitLoading
+
+	val isPagingLoading: Boolean
+		get() = uiState == UiState.PAGING_LOADING
+
+	val isInitLoading: Boolean
+		get() = uiState == UiState.INIT_LOADING
+
+	val isInitError: Boolean
+		get() = uiState == UiState.INIT_ERROR
+
+	val isEmpty: Boolean
+		get() = searchItems.isEmpty()
+						&& isInitLoading.not()
+						&& isInitError.not()
+
+	val isNotEmpty: Boolean
+		get() = searchItems.isNotEmpty()
+						&& isInitLoading.not()
+						&& isInitError.not()
 
 	enum class UiState {
 		SUCCESS,
-		LOADING,
-		ERROR,
-		EMPTY,
+		INIT_LOADING,
+		INIT_ERROR,
+		PAGING_LOADING,
+		PAGING_ERROR,
 	}
 
 	companion object {
 		val DEFAULT = SearchDetailUiState(
-			uiState = UiState.LOADING,
+			uiState = UiState.SUCCESS,
 			searchKeyword = "",
 			searchPurpose = SearchPurpose.SEARCH_BOTH,
 			searchTarget = null,

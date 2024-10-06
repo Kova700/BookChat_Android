@@ -16,11 +16,11 @@ import com.kova700.bookchat.feature.home.databinding.ItemHomeChannelRetryBinding
 import com.kova700.bookchat.feature.home.databinding.ItemHomeHeaderBinding
 import com.kova700.bookchat.feature.home.databinding.LayoutHomeBookShimmerBinding
 import com.kova700.bookchat.feature.home.databinding.LayoutHomeChannelShimmerBinding
+import com.kova700.bookchat.feature.home.model.HomeItem
 import com.kova700.bookchat.util.book.BookImgSizeManager
-import com.kova700.bookchat.util.date.getFormattedDetailDateTimeText
+import com.kova700.bookchat.util.date.toFormattedDetailDateTimeText
 import com.kova700.bookchat.util.image.image.loadChannelProfile
 import com.kova700.bookchat.util.image.image.loadUrl
-import com.kova700.bookchat.feature.home.model.HomeItem
 
 sealed class HomeItemViewHolder(
 	binding: ViewBinding,
@@ -134,7 +134,7 @@ class HomeChannelViewHolder(
 		val channel = (homeItem as HomeItem.ChannelItem)
 		with(binding) {
 			dispatchTimeTv.text =
-				channel.lastChat?.dispatchTime?.let { getFormattedDetailDateTimeText(it) }
+				channel.lastChat?.dispatchTime?.toFormattedDetailDateTimeText()
 			uncheckedChatCountTv.text = if (channel.isExistNewChat) "New+" else ""
 			muteChannelIcon.visibility =
 				if ((channel.notificationFlag.not()) && channel.isAvailableChannel) View.VISIBLE else View.GONE

@@ -4,7 +4,6 @@ import com.kova700.bookchat.core.network.bookchat.user.model.both.UserDefaultPro
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-//TODO: 서버로부터 UserEmail 필드가 넘어옴 (서버 수정 필요)
 @Serializable
 data class UserResponse(
 	@SerialName("userId")

@@ -3,6 +3,7 @@ package com.kova700.bookchat.feature.bookshelf.wish.adapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.feature.bookshelf.databinding.ItemBookshelfPagingRetryBinding
 import com.kova700.bookchat.feature.bookshelf.databinding.ItemWishBookDummyBinding
 import com.kova700.bookchat.feature.bookshelf.databinding.ItemWishBookshelfDataBinding
 import com.kova700.bookchat.feature.bookshelf.databinding.ItemWishBookshelfHeaderBinding
@@ -57,6 +58,19 @@ class WishBookDummyViewHolder(
 ) : WishBookViewHolder(binding) {
 	init {
 		bookImgSizeManager.setBookImgSize(binding.flexBoxDummyBookLayout)
+	}
+
+	override fun bind(wishBookShelfItem: WishBookShelfItem) {}
+}
+
+class WishPagingRetryViewHolder(
+	private val binding: ItemBookshelfPagingRetryBinding,
+	private val onClickPagingRetryBtn: (() -> Unit)?,
+) : WishBookViewHolder(binding) {
+	init {
+		binding.retryBtn.setOnClickListener {
+			onClickPagingRetryBtn?.invoke()
+		}
 	}
 
 	override fun bind(wishBookShelfItem: WishBookShelfItem) {}

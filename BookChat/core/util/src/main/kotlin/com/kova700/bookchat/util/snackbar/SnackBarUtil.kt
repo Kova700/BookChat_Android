@@ -14,6 +14,7 @@ fun View.showSnackBar(
 	textId: Int,
 	anchor: View? = null,
 ) {
+	if (parent == null) return
 	getSnackBar(
 		text = context.getString(textId),
 		anchor = anchor
@@ -24,6 +25,7 @@ fun View.showSnackBar(
 	text: String,
 	anchor: View? = null,
 ) {
+	if (parent == null) return
 	getSnackBar(
 		text = text,
 		anchor = anchor

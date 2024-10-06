@@ -62,10 +62,13 @@ class AgonyActivity : AppCompatActivity() {
 	}
 
 	private fun initViewState() {
-		binding.backBtn.setOnClickListener { agonyViewModel.onClickBackBtn() }
-		binding.wasteBasketBtn.setOnClickListener { agonyViewModel.onClickEditBtn() }
-		binding.editCancelBtn.setOnClickListener { agonyViewModel.onClickEditCancelBtn() }
-		binding.agonyDeleteBtn.setOnClickListener { agonyViewModel.onClickDeleteBtn() }
+		with(binding) {
+			backBtn.setOnClickListener { agonyViewModel.onClickBackBtn() }
+			wasteBasketBtn.setOnClickListener { agonyViewModel.onClickEditBtn() }
+			editCancelBtn.setOnClickListener { agonyViewModel.onClickEditCancelBtn() }
+			agonyDeleteBtn.setOnClickListener { agonyViewModel.onClickDeleteBtn() }
+			retryAgonyLayout.retryBtn.setOnClickListener { agonyViewModel.onClickRetryBtn() }
+		}
 		initShimmerState()
 	}
 
@@ -76,12 +79,14 @@ class AgonyActivity : AppCompatActivity() {
 			wasteBasketBtn.visibility =
 				if (state.uiState == UiState.SUCCESS) View.VISIBLE else View.INVISIBLE
 			agonyRcv.visibility =
-				if (state.uiState != UiState.INIT_LOADING) View.VISIBLE else View.GONE
+				if (state.isNotInitLoadingOrError) View.VISIBLE else View.GONE
 			agonyShimmerLayout.root.visibility =
-				if (state.uiState == UiState.INIT_LOADING) View.VISIBLE else View.GONE
+				if (state.isInitLoading) View.VISIBLE else View.GONE
 					.also { agonyShimmerLayout.shimmerLayout.stopShimmer() }
 			progressbar.visibility =
-				if (state.uiState == UiState.LOADING) View.VISIBLE else View.GONE
+				if (state.isPagingLoading) View.VISIBLE else View.GONE
+			retryAgonyLayout.root.visibility =
+				if (state.isInitError) View.VISIBLE else View.GONE
 		}
 	}
 
@@ -90,18 +95,17 @@ class AgonyActivity : AppCompatActivity() {
 	}
 
 	private fun initAdapter() {
-		agonyAdapter.onFirstItemClick = {
-			agonyViewModel.onClickFirstItem()
-		}
-
-		agonyAdapter.onItemClick = { itemPosition ->
-			val item = agonyAdapter.currentList[itemPosition] as AgonyListItem.Item
-			agonyViewModel.onClickItem(item)
-		}
-
-		agonyAdapter.onItemSelect = { itemPosition ->
-			val item = agonyAdapter.currentList[itemPosition] as AgonyListItem.Item
-			agonyViewModel.onItemSelect(item)
+		with(agonyAdapter) {
+			onFirstItemClick = { agonyViewModel.onClickFirstItem() }
+			onItemClick = { itemPosition ->
+				val item = agonyAdapter.currentList[itemPosition] as AgonyListItem.Item
+				agonyViewModel.onClickItem(item)
+			}
+			onItemSelect = { itemPosition ->
+				val item = agonyAdapter.currentList[itemPosition] as AgonyListItem.Item
+				agonyViewModel.onItemSelect(item)
+			}
+			onClickPagingRetry = { agonyViewModel.onClickPagingRetry() }
 		}
 	}
 
@@ -132,6 +136,7 @@ class AgonyActivity : AppCompatActivity() {
 			override fun getSpanSize(position: Int): Int {
 				return when (agonyAdapter.getItemViewType(position)) {
 					agonyR.layout.item_agony_header -> 2
+					agonyR.layout.item_agony_paging_retry -> 2
 					else -> 1
 				}
 			}

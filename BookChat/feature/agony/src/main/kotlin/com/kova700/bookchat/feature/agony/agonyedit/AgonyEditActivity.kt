@@ -13,9 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.kova700.bookchat.core.design_system.R
-import com.kova700.bookchat.feature.agony.agonyrecord.AgonyRecordActivity
-import com.kova700.bookchat.feature.agony.agonyrecord.AgonyRecordActivity.Companion.EXTRA_AGONY_ID
-import com.kova700.bookchat.feature.agony.agonyrecord.AgonyRecordActivity.Companion.EXTRA_BOOKSHELF_ITEM_ID
 import com.kova700.bookchat.feature.agony.databinding.ActivityAgonyEditBinding
 import com.kova700.bookchat.util.snackbar.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
@@ -67,8 +64,10 @@ class AgonyEditActivity : AppCompatActivity() {
 	private fun setViewState(state: AgonyEditUiState) {
 		setAgonyEditConfirmBtnState(state)
 		setAgonyTitleEtState(state)
-		binding.newTitleLengthTv.text =
-			getString(R.string.agony_title_new_title_length, state.newTitle.length)
+		with(binding){
+			newTitleLengthTv.text = getString(R.string.agony_title_new_title_length, state.newTitle.length)
+			progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
+		}
 	}
 
 	private fun setAgonyEditConfirmBtnState(state: AgonyEditUiState) {

@@ -20,6 +20,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -43,46 +47,64 @@ class ChannelListViewModel @Inject constructor(
 	private val _isSwiped = MutableStateFlow<Map<Long, Boolean>>(emptyMap()) //(channelId, Boolean)
 
 	init {
+		initUiState()
+	}
+
+	private fun initUiState() {
+		getInitChannels()
 		observeChannels()
-		getMostActiveChannels()
 		observeNetworkState()
 	}
 
 	private fun observeNetworkState() = viewModelScope.launch {
-		networkManager.getStateFlow().collect { state ->
-			updateState { copy(networkState = state) }
-			when (state) {
-				NetworkState.CONNECTED -> getMostActiveChannels()
-				NetworkState.DISCONNECTED -> Unit
+		networkManager.getStateFlow()
+			.onEach { updateState { copy(networkState = it) } }
+			.drop(1)
+			.collect { state ->
+				when (state) {
+					NetworkState.CONNECTED -> getInitChannels()
+					NetworkState.DISCONNECTED -> Unit
+				}
 			}
-		}
 	}
 
 	private fun observeChannels() = viewModelScope.launch {
-		_isSwiped.combine(getClientChannelsFlowUseCase()) { isSwiped, channels ->
-			channels.toChannelListItem(isSwiped)
+		combine(
+			_isSwiped,
+			getClientChannelsFlowUseCase(),
+			uiState.map { it.uiState }.distinctUntilChanged()
+		) { isSwiped, channels, uiState ->
+			channels.toChannelListItem(
+				isSwipedMap = isSwiped,
+				uiState = uiState
+			)
 		}.collect { updateState { copy(channelListItem = it) } }
 	}
 
-	private fun getMostActiveChannels() = viewModelScope.launch {
-		if (uiState.value.uiState == UiState.LOADING) return@launch
-		updateState { copy(uiState = UiState.LOADING) }
+	private fun getInitChannels() = viewModelScope.launch {
+		if (uiState.value.isInitLoading) return@launch
+		updateState { copy(uiState = UiState.INIT_LOADING) }
 		runCatching { getClientMostActiveChannelsUseCase() }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { handleError(it) }
+			.onFailure {
+				if (uiState.value.channelListItem.isEmpty()) updateState { copy(uiState = UiState.INIT_ERROR) }
+				else updateState { copy(uiState = UiState.SUCCESS) }
+				startEvent(ChannelListUiEvent.ShowSnackBar(R.string.error_else))
+			}
 	}
 
 	private fun getChannels() = viewModelScope.launch {
-		if (uiState.value.uiState == UiState.LOADING) return@launch
-		updateState { copy(uiState = UiState.LOADING) }
+		if (uiState.value.isPageLoading) return@launch
+		updateState { copy(uiState = UiState.PAGING_LOADING) }
 		runCatching { getClientChannelsUseCase() }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { handleError(it) }
+			.onFailure { updateState { copy(uiState = UiState.PAGING_ERROR) } }
 	}
 
 	fun loadNextChannels(lastVisibleItemPosition: Int) {
 		if (uiState.value.channelListItem.size - 1 > lastVisibleItemPosition
 			|| uiState.value.networkState == NetworkState.DISCONNECTED
+			|| uiState.value.isLoading
 		) return
 		getChannels()
 	}
@@ -110,6 +132,14 @@ class ChannelListViewModel @Inject constructor(
 	private fun exitChannel(channelId: Long) = viewModelScope.launch {
 		runCatching { leaveChannelUseCase(channelId) }
 			.onFailure { startEvent(ChannelListUiEvent.ShowSnackBar(R.string.channel_exit_fail)) }
+	}
+
+	fun onClickPagingRetry() {
+		getChannels()
+	}
+
+	fun onClickInitRetry() {
+		getInitChannels()
 	}
 
 	fun onClickPlusBtn() {
@@ -150,10 +180,6 @@ class ChannelListViewModel @Inject constructor(
 
 	fun onClickChannelExit(channelId: Long) {
 		exitChannel(channelId)
-	}
-
-	private fun handleError(throwable: Throwable) {
-		updateState { copy(uiState = UiState.ERROR) }
 	}
 
 	private inline fun updateState(block: ChannelListUiState.() -> ChannelListUiState) {

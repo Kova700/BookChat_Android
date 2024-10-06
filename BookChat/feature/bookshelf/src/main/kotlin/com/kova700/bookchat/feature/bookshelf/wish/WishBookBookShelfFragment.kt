@@ -78,8 +78,13 @@ class WishBookBookShelfFragment : Fragment() {
 	}
 
 	private fun initViewState() {
-		binding.bookshelfEmptyLayout.addBookBtn.setOnClickListener {
-			mainNavigationViewmodel.navigateTo(MainRoute.Search)
+		with(binding) {
+			bookshelfEmptyLayout.addBookBtn.setOnClickListener {
+				mainNavigationViewmodel.navigateTo(MainRoute.Search)
+			}
+			bookshelfRetryLayout.retryBtn.setOnClickListener {
+				wishBookShelfViewModel.onClickInitRetry()
+			}
 		}
 		initShimmerBook()
 	}
@@ -98,10 +103,12 @@ class WishBookBookShelfFragment : Fragment() {
 		with(binding) {
 			bookshelfEmptyLayout.root.visibility =
 				if (uiState.isEmpty) View.VISIBLE else View.GONE
+			bookshelfRetryLayout.root.visibility =
+				if (uiState.isInitError) View.VISIBLE else View.GONE
 			bookshelfWishRcv.visibility =
-				if (uiState.isEmpty.not()) View.VISIBLE else View.GONE
+				if (uiState.isNotEmpty) View.VISIBLE else View.GONE
 			progressbar.visibility =
-				if (uiState.isLoading) View.VISIBLE else View.GONE
+				if (uiState.isPagingLoading) View.VISIBLE else View.GONE
 			wishBookshelfShimmerLayout.root.visibility =
 				if (uiState.isInitLoading) View.VISIBLE else View.GONE
 					.also { wishBookshelfShimmerLayout.shimmerLayout.stopShimmer() }
@@ -109,10 +116,13 @@ class WishBookBookShelfFragment : Fragment() {
 	}
 
 	private fun initAdapter() {
-		wishBookShelfAdapter.onItemClick = { itemPosition ->
+		wishBookShelfAdapter.onClickItem = { itemPosition ->
 			wishBookShelfViewModel.onItemClick(
 				(wishBookShelfAdapter.currentList[itemPosition] as WishBookShelfItem.Item)
 			)
+		}
+		wishBookShelfAdapter.onClickPagingRetryBtn = {
+			wishBookShelfViewModel.onClickPagingRetry()
 		}
 	}
 

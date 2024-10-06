@@ -7,12 +7,18 @@ import com.kova700.bookchat.feature.search.databinding.ItemSearchBookDataBinding
 import com.kova700.bookchat.feature.search.databinding.ItemSearchBookDummyBinding
 import com.kova700.bookchat.feature.search.databinding.ItemSearchBookEmptyBinding
 import com.kova700.bookchat.feature.search.databinding.ItemSearchBookHeaderBinding
+import com.kova700.bookchat.feature.search.databinding.ItemSearchBookRetryBinding
+import com.kova700.bookchat.feature.search.databinding.ItemSearchBooksShimmerBinding
 import com.kova700.bookchat.feature.search.databinding.ItemSearchChannelDataBinding
 import com.kova700.bookchat.feature.search.databinding.ItemSearchChannelEmptyBinding
 import com.kova700.bookchat.feature.search.databinding.ItemSearchChannelHeaderBinding
+import com.kova700.bookchat.feature.search.databinding.ItemSearchChannelRetryBinding
+import com.kova700.bookchat.feature.search.databinding.ItemSearchChannelsShimmerBinding
+import com.kova700.bookchat.feature.search.databinding.ItemSearchPagingRetryBinding
+import com.kova700.bookchat.feature.search.databinding.LayoutSearchResultEmptyBinding
 import com.kova700.bookchat.feature.search.model.SearchResultItem
 import com.kova700.bookchat.util.book.BookImgSizeManager
-import com.kova700.bookchat.util.date.getFormattedAbstractDateTimeText
+import com.kova700.bookchat.util.date.toFormattedAbstractDateTimeText
 import com.kova700.bookchat.util.image.image.loadChannelProfile
 import com.kova700.bookchat.util.image.image.loadUrl
 
@@ -70,6 +76,37 @@ class BookDummyViewHolder(
 	override fun bind(searchResultItem: SearchResultItem) {}
 }
 
+class BookRetryViewHolder(
+	private val binding: ItemSearchBookRetryBinding,
+	private val onRetryBtnClick: (() -> Unit)?,
+) : SearchItemViewHolder(binding) {
+	init {
+		binding.retryBtn.setOnClickListener { onRetryBtnClick?.invoke() }
+	}
+
+	override fun bind(searchResultItem: SearchResultItem) {}
+}
+
+class BookLoadingViewHolder(
+	private val binding: ItemSearchBooksShimmerBinding,
+	private val bookImgSizeManager: BookImgSizeManager,
+) : SearchItemViewHolder(binding) {
+	init {
+		with(binding.shimmerBookRcvGridLayout) {
+			columnCount = bookImgSizeManager.flexBoxBookSpanSize
+			rowCount = 2
+		}
+		bookImgSizeManager.setBookImgSize(binding.shimmerBook1.bookImg)
+		bookImgSizeManager.setBookImgSize(binding.shimmerBook2.bookImg)
+		bookImgSizeManager.setBookImgSize(binding.shimmerBook3.bookImg)
+		bookImgSizeManager.setBookImgSize(binding.shimmerBook4.bookImg)
+		bookImgSizeManager.setBookImgSize(binding.shimmerBook5.bookImg)
+		bookImgSizeManager.setBookImgSize(binding.shimmerBook6.bookImg)
+	}
+
+	override fun bind(searchResultItem: SearchResultItem) {}
+}
+
 class ChannelHeaderViewHolder(
 	private val binding: ItemSearchChannelHeaderBinding,
 	private val onChannelHeaderBtnClick: (() -> Unit)?,
@@ -113,7 +150,7 @@ class ChannelItemViewHolder(
 		with(binding) {
 			item.lastChat?.let {
 				lastChatDispatchTimeTv.text =
-					getFormattedAbstractDateTimeText(it.dispatchTime)
+					it.dispatchTime.toFormattedAbstractDateTimeText()
 			}
 			channelImageIv.loadChannelProfile(
 				imageUrl = item.roomImageUri,
@@ -128,4 +165,38 @@ class ChannelItemViewHolder(
 			channelTagsTv.text = item.tagsString
 		}
 	}
+}
+
+class ChannelRetryViewHolder(
+	private val binding: ItemSearchChannelRetryBinding,
+	private val onRetryBtnClick: (() -> Unit)?,
+) : SearchItemViewHolder(binding) {
+	init {
+		binding.retryBtn.setOnClickListener { onRetryBtnClick?.invoke() }
+	}
+
+	override fun bind(searchResultItem: SearchResultItem) {}
+}
+
+class ChannelLoadingViewHolder(
+	private val binding: ItemSearchChannelsShimmerBinding,
+) : SearchItemViewHolder(binding) {
+	override fun bind(searchResultItem: SearchResultItem) {}
+}
+
+class BothEmptyViewHolder(
+	private val binding: LayoutSearchResultEmptyBinding,
+) : SearchItemViewHolder(binding) {
+	override fun bind(searchResultItem: SearchResultItem) {}
+}
+
+class PagingRetryViewHolder(
+	private val binding: ItemSearchPagingRetryBinding,
+	private val onPagingRetryBtnClick: (() -> Unit)?,
+) : SearchItemViewHolder(binding) {
+	init {
+		binding.retryBtn.setOnClickListener { onPagingRetryBtnClick?.invoke() }
+	}
+
+	override fun bind(searchResultItem: SearchResultItem) {}
 }

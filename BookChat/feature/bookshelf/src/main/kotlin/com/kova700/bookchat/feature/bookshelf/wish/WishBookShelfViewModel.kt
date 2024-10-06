@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,32 +34,62 @@ class WishBookShelfViewModel @Inject constructor(
 	val uiState = _uiState.asStateFlow()
 
 	init {
+		initUiState()
+	}
+
+	private fun initUiState() {
 		observeBookShelfItems()
-		getBookShelfItems()
+		getInitBookShelfItems()
 	}
 
 	private fun observeBookShelfItems() = viewModelScope.launch {
-		bookShelfRepository.getBookShelfFlow(BookShelfState.WISH).combine(
-			bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.WISH)
-		) { items, totalCount ->
+		combine(
+			bookShelfRepository.getBookShelfFlow(BookShelfState.WISH),
+			bookShelfRepository.getBookShelfTotalItemCountFlow(BookShelfState.WISH),
+			uiState.map { it.uiState }.distinctUntilChanged()
+		) { items, totalCount, uiState ->
 			items.toWishBookShelfItems(
 				totalItemCount = totalCount,
 				dummyItemCount = bookImgSizeManager.getFlexBoxDummyItemCount(items.size),
+				uiState = uiState
 			)
 		}.collect { items -> updateState { copy(wishItems = items) } }
 	}
 
-	private fun getBookShelfItems() = viewModelScope.launch {
-		if (uiState.value.uiState != UiState.INIT_LOADING) updateState { copy(uiState = UiState.LOADING) }
+	private fun getInitBookShelfItems() = viewModelScope.launch {
+		if (uiState.value.isLoading) return@launch
+		updateState { copy(uiState = UiState.INIT_LOADING) }
 		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.WISH) }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { startEvent(WishBookShelfEvent.ShowSnackBar(R.string.error_else)) }
+			.onFailure {
+				updateState { copy(uiState = UiState.INIT_ERROR) }
+				startEvent(WishBookShelfEvent.ShowSnackBar(R.string.error_else))
+			}
+	}
+
+	private fun getBookShelfItems() = viewModelScope.launch {
+		if (uiState.value.isLoading) return@launch
+		updateState { copy(uiState = UiState.PAGING_LOADING) }
+		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.WISH) }
+			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
+			.onFailure {
+				updateState { copy(uiState = UiState.PAGING_ERROR) }
+				startEvent(WishBookShelfEvent.ShowSnackBar(R.string.error_else))
+			}
 	}
 
 	fun loadNextBookShelfItems(lastVisibleItemPosition: Int) {
 		if (uiState.value.wishItems.size - 1 > lastVisibleItemPosition ||
-			uiState.value.uiState == UiState.LOADING
+			uiState.value.isLoading
 		) return
+		getBookShelfItems()
+	}
+
+	fun onClickInitRetry() {
+		getInitBookShelfItems()
+	}
+
+	fun onClickPagingRetry() {
 		getBookShelfItems()
 	}
 

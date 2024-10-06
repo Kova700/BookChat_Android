@@ -72,8 +72,13 @@ class CompleteBookShelfFragment : Fragment() {
 	}
 
 	private fun initViewState() {
-		binding.bookshelfEmptyLayout.addBookBtn.setOnClickListener {
-			mainNavigationViewmodel.navigateTo(MainRoute.Search)
+		with(binding) {
+			bookshelfEmptyLayout.addBookBtn.setOnClickListener {
+				mainNavigationViewmodel.navigateTo(MainRoute.Search)
+			}
+			bookshelfRetryLayout.retryBtn.setOnClickListener {
+				completeBookShelfViewModel.onClickInitRetry()
+			}
 		}
 		initShimmerBook()
 	}
@@ -90,10 +95,12 @@ class CompleteBookShelfFragment : Fragment() {
 		with(binding) {
 			bookshelfEmptyLayout.root.visibility =
 				if (uiState.isEmpty) View.VISIBLE else View.GONE
+			bookshelfRetryLayout.root.visibility =
+				if (uiState.isInitError) View.VISIBLE else View.GONE
 			bookshelfCompleteRcv.visibility =
-				if (uiState.isEmpty.not()) View.VISIBLE else View.GONE
+				if (uiState.isNotEmpty) View.VISIBLE else View.GONE
 			progressbar.visibility =
-				if (uiState.isLoading) View.VISIBLE else View.GONE
+				if (uiState.isPagingLoading) View.VISIBLE else View.GONE
 			completeBookshelfShimmerLayout.root.visibility =
 				if (uiState.isInitLoading) View.VISIBLE else View.GONE
 					.also { completeBookshelfShimmerLayout.shimmerLayout.stopShimmer() }
@@ -116,6 +123,9 @@ class CompleteBookShelfFragment : Fragment() {
 			completeBookShelfViewModel.onItemDeleteClick(
 				(completeBookShelfAdapter.currentList[itemPosition] as CompleteBookShelfItem.Item)
 			)
+		}
+		completeBookShelfAdapter.onClickPagingRetryBtn = {
+			completeBookShelfViewModel.onClickPagingRetry()
 		}
 	}
 

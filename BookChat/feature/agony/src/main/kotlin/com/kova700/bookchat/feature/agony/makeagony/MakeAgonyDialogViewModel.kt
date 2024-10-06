@@ -45,8 +45,6 @@ class MakeAgonyDialogViewModel @Inject constructor(
 		}
 	}
 
-	//TODO : 길이제한 500자로두고 끝에 ...나오게 수정 +
-	// 만들때 키보드 좀 어떻게 해보자 글자가 잘 안보임 (바텀시트가 키보드 위로 올라가게 수정이 안되려나)
 	fun onRegisterBtnClick() {
 		if (uiState.value.agonyTitle.isBlank()) {
 			startEvent(MakeAgonyUiEvent.ShowSnackBar(R.string.agony_make_empty))
@@ -59,7 +57,7 @@ class MakeAgonyDialogViewModel @Inject constructor(
 	}
 
 	fun onTitleChanged(newTitle: String) {
-		if (newTitle.length > 30) return
+		if (newTitle.length > MAX_TITLE_LENGTH) return
 		updateState { copy(agonyTitle = newTitle.trim()) }
 	}
 
@@ -96,5 +94,9 @@ class MakeAgonyDialogViewModel @Inject constructor(
 
 	private fun startEvent(event: MakeAgonyUiEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
+	}
+
+	companion object {
+		const val MAX_TITLE_LENGTH = 500
 	}
 }

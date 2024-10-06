@@ -4,6 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.kova700.core.design_system.customview.AntiDupClickImageButton
         android:id="@+id/x_btn"
         android:layout_width="wrap_content"
@@ -58,7 +68,7 @@
         android:background="@null"
         android:elegantTextHeight="true"
         android:fontFamily="@font/notosanskr_bold"
-        android:maxLength="30"
+        android:maxLength="500"
         android:singleLine="true"
         android:textColor="#222222"
         android:textSize="14sp"

@@ -13,7 +13,6 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.kova700.bookchat.feature.search.adapter.SearchItemAdapter
 import com.kova700.bookchat.feature.search.databinding.FragmentSearchTapResultBinding
-import com.kova700.bookchat.feature.search.model.SearchPurpose
 import com.kova700.bookchat.feature.search.model.SearchResultItem
 import com.kova700.bookchat.util.book.BookImgSizeManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,7 +46,6 @@ class SearchTapResultFragment : Fragment() {
 		super.onViewCreated(view, savedInstanceState)
 		initAdapter()
 		initRcv()
-		initViewState()
 		observeUiState()
 	}
 
@@ -58,55 +56,10 @@ class SearchTapResultFragment : Fragment() {
 
 	private fun observeUiState() = viewLifecycleOwner.lifecycleScope.launch {
 		searchViewModel.uiState.collect { uiState ->
-			setViewVisibility(uiState)
 			searchItemAdapter.submitList(uiState.searchResults)
 		}
 	}
 
-	private fun initViewState() {
-		initShimmerGridLayout()
-		initShimmerBook()
-		initShimmerChannel()
-	}
-
-	private fun initShimmerGridLayout() {
-		with(binding.resultShimmerLayout.shimmerBookRcvGridLayout) {
-			columnCount = bookImgSizeManager.flexBoxBookSpanSize
-			rowCount = 2
-		}
-	}
-
-	private fun initShimmerBook() {
-		with(binding.resultShimmerLayout) {
-			bookImgSizeManager.setBookImgSize(shimmerBook1.bookImg)
-			bookImgSizeManager.setBookImgSize(shimmerBook2.bookImg)
-			bookImgSizeManager.setBookImgSize(shimmerBook3.bookImg)
-			bookImgSizeManager.setBookImgSize(shimmerBook4.bookImg)
-			bookImgSizeManager.setBookImgSize(shimmerBook5.bookImg)
-			bookImgSizeManager.setBookImgSize(shimmerBook6.bookImg)
-		}
-	}
-
-	private fun initShimmerChannel() {
-		val isMakeChannelPurpose =
-			searchViewModel.uiState.value.searchPurpose == SearchPurpose.MAKE_CHANNEL
-		with(binding.resultShimmerLayout) {
-			channelShimmerGroup.visibility =
-				if (isMakeChannelPurpose) View.GONE else View.VISIBLE
-		}
-	}
-
-	private fun setViewVisibility(uiState: SearchUiState) {
-		with(binding) {
-			resultEmptyLayout.root.visibility =
-				if (uiState.isBothEmptyResult) View.VISIBLE else View.GONE
-			resultShimmerLayout.shimmerLayout.visibility =
-				if (uiState.isLoading) View.VISIBLE else View.GONE
-					.also { resultShimmerLayout.shimmerLayout.stopShimmer() }
-			resultRcv.visibility =
-				if (uiState.isErrorOrSuccessResult) View.VISIBLE else View.INVISIBLE
-		}
-	}
 
 	private fun initAdapter() {
 		searchItemAdapter.onBookHeaderBtnClick = {
@@ -127,6 +80,12 @@ class SearchTapResultFragment : Fragment() {
 		}
 		searchItemAdapter.onClickMakeChannelBtn = {
 			searchViewModel.onClickMakeChannelBtn()
+		}
+		searchItemAdapter.onBookRetryBtnClick = {
+			searchViewModel.onClickBookRetryBtn()
+		}
+		searchItemAdapter.onChannelRetryBtnClick = {
+			searchViewModel.onClickChannelRetryBtn()
 		}
 	}
 

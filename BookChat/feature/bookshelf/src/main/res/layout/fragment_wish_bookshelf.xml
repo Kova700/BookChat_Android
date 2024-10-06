@@ -16,6 +16,17 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <include
+        android:id="@+id/bookshelf_retry_layout"
+        layout="@layout/layout_bookshelf_retry"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include
         android:id="@+id/wish_bookshelf_shimmer_layout"
         layout="@layout/layout_wish_bookshelf_shimmer"
         android:layout_width="0dp"
