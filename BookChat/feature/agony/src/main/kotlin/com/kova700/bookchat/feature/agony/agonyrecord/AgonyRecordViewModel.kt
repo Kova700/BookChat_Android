@@ -1,6 +1,5 @@
 package com.kova700.bookchat.feature.agony.agonyrecord
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,7 +14,6 @@ import com.kova700.bookchat.feature.agony.agonyrecord.mapper.toAgonyRecord
 import com.kova700.bookchat.feature.agony.agonyrecord.model.AgonyRecordListItem
 import com.kova700.bookchat.feature.agony.agonyrecord.model.AgonyRecordListItem.Companion.FIRST_ITEM_STABLE_ID
 import com.kova700.bookchat.feature.agony.agonyrecord.model.AgonyRecordListItem.ItemState
-import com.kova700.bookchat.util.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -99,7 +97,6 @@ class AgonyRecordViewModel @Inject constructor(
 
 	private fun makeAgonyRecord(title: String, content: String) = viewModelScope.launch {
 		updateFirstItemState(ItemState.Loading)
-		updateState { copy(isEditing = true) }
 		runCatching {
 			agonyRecordRepository.makeAgonyRecord(
 				bookShelfId = bookShelfListItemId,
@@ -109,13 +106,13 @@ class AgonyRecordViewModel @Inject constructor(
 			)
 		}.onSuccess {
 			updateFirstItemState(ItemState.Success())
-			updateState { copy(isEditing = false) }
+			updateState { copy(uiState = UiState.SUCCESS) }
 		}.onFailure {
 			startEvent(AgonyRecordEvent.ShowSnackBar(R.string.agony_record_make_fail))
 			updateFirstItemState(
 				ItemState.Editing(
-					titleBeingEdited = title,
-					contentBeingEdited = content
+					editingTitle = title,
+					editingContent = content
 				)
 			)
 		}
@@ -127,7 +124,6 @@ class AgonyRecordViewModel @Inject constructor(
 		newContent: String,
 	) = viewModelScope.launch {
 		_itemState.update { _itemState.value + (recordItem.recordId to ItemState.Loading) }
-		updateState { copy(isEditing = true) }
 		runCatching {
 			agonyRecordRepository.reviseAgonyRecord(
 				bookShelfId = bookShelfListItemId,
@@ -136,25 +132,23 @@ class AgonyRecordViewModel @Inject constructor(
 				newTitle = newTitle,
 				newContent = newContent
 			)
-		}
-			.onSuccess {
-				_itemState.update { _itemState.value + (recordItem.recordId to ItemState.Success()) }
-				updateState { copy(isEditing = false) }
-			}
-			.onFailure { startEvent(AgonyRecordEvent.ShowSnackBar(R.string.agony_record_revise_fail)) }
+		}.onSuccess {
+			_itemState.update { _itemState.value + (recordItem.recordId to ItemState.Success()) }
+			updateState { copy(uiState = UiState.SUCCESS) }
+		}.onFailure { startEvent(AgonyRecordEvent.ShowSnackBar(R.string.agony_record_revise_fail)) }
 	}
 
 	private fun deleteAgonyRecord(
 		recordItem: AgonyRecordListItem.Item,
 	) = viewModelScope.launch {
+		_itemState.update { _itemState.value + (recordItem.recordId to ItemState.Loading) }
 		runCatching {
 			agonyRecordRepository.deleteAgonyRecord(
 				bookShelfId = bookShelfListItemId,
 				agonyId = agonyId,
 				recordId = recordItem.recordId
 			)
-		}
-			.onSuccess { _itemState.update { _itemState.value - recordItem.recordId } }
+		}.onSuccess { _itemState.update { _itemState.value - recordItem.recordId } }
 			.onFailure { startEvent(AgonyRecordEvent.ShowSnackBar(R.string.agony_record_delete_fail)) }
 	}
 
@@ -169,12 +163,11 @@ class AgonyRecordViewModel @Inject constructor(
 
 		_itemState.update {
 			_itemState.value + (recordItem.recordId to ItemState.Editing(
-				titleBeingEdited = recordItem.title,
-				contentBeingEdited = recordItem.content
+				editingTitle = recordItem.title,
+				editingContent = recordItem.content
 			))
 		}
-
-		updateState { copy(isEditing = true) }
+		updateState { copy(uiState = UiState.EDITING) }
 	}
 
 	fun onItemSwipe(recordItem: AgonyRecordListItem.Item, isSwiped: Boolean) {
@@ -184,14 +177,14 @@ class AgonyRecordViewModel @Inject constructor(
 
 	fun onItemEditCancelBtnClick(recordItem: AgonyRecordListItem.Item) {
 		_itemState.update { _itemState.value + (recordItem.recordId to ItemState.Success()) }
-		updateState { copy(isEditing = false) }
+		updateState { copy(uiState = UiState.SUCCESS) }
 	}
 
 	fun onItemEditFinishBtnClick(recordItem: AgonyRecordListItem.Item) {
 		val itemState = recordItem.state as ItemState.Editing
 
-		val titleWithSpacesRemoved = itemState.titleBeingEdited.trim()
-		val contentWithSpacesRemoved = itemState.contentBeingEdited.trim()
+		val titleWithSpacesRemoved = itemState.editingTitle.trim()
+		val contentWithSpacesRemoved = itemState.editingContent.trim()
 
 		if (titleWithSpacesRemoved.isBlank() || contentWithSpacesRemoved.isBlank()) {
 			startEvent(AgonyRecordEvent.ShowSnackBar(R.string.title_content_empty))
@@ -203,7 +196,7 @@ class AgonyRecordViewModel @Inject constructor(
 		val isChanged = (oldTitle != titleWithSpacesRemoved) || (oldContent != contentWithSpacesRemoved)
 		if (isChanged.not()) {
 			_itemState.update { _itemState.value + (recordItem.recordId to ItemState.Success()) }
-			updateState { copy(isEditing = false) }
+			updateState { copy(uiState = UiState.SUCCESS) }
 			return
 		}
 
@@ -224,25 +217,24 @@ class AgonyRecordViewModel @Inject constructor(
 			return
 		}
 		updateFirstItemState(ItemState.Editing())
-		updateState { copy(isEditing = true) }
+		updateState { copy(uiState = UiState.EDITING) }
 	}
 
 	fun onFirstItemEditCancelBtnClick() {
 		updateFirstItemState(ItemState.Success())
-		updateState { copy(isEditing = false) }
+		updateState { copy(uiState = UiState.SUCCESS) }
 	}
 
 	fun onFirstItemEditFinishBtnClick(recordItem: AgonyRecordListItem.FirstItem) {
 		if (recordItem.state !is ItemState.Editing) return
 
-		val titleWithSpacesRemoved = recordItem.state.titleBeingEdited.trim()
-		val contentWithSpacesRemoved = recordItem.state.contentBeingEdited.trim()
+		val titleWithSpacesRemoved = recordItem.state.editingTitle.trim()
+		val contentWithSpacesRemoved = recordItem.state.editingContent.trim()
 
 		if (titleWithSpacesRemoved.isBlank() || contentWithSpacesRemoved.isBlank()) {
 			startEvent(AgonyRecordEvent.ShowSnackBar(R.string.title_content_empty))
 			return
 		}
-
 		makeAgonyRecord(titleWithSpacesRemoved, contentWithSpacesRemoved)
 	}
 
@@ -267,17 +259,15 @@ class AgonyRecordViewModel @Inject constructor(
 	}
 
 	fun onClickRetryBtn() {
-		Log.d(TAG, "AgonyRecordViewModel: onClickRetryBtn() - called")
 		getInitAgonyRecords()
 	}
 
 	fun onClickPagingRetryBtn() {
-		Log.d(TAG, "AgonyRecordViewModel: onClickPagingRetryBtn() - called")
 		getAgonyRecords()
 	}
 
 	private fun clearEditingState() {
-		updateState { copy(isEditing = false) }
+		updateState { copy(uiState = UiState.SUCCESS) }
 		_itemState.update { _itemState.value.filter { it.value !is ItemState.Editing } }
 	}
 
@@ -287,5 +277,10 @@ class AgonyRecordViewModel @Inject constructor(
 
 	private fun startEvent(event: AgonyRecordEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
+	}
+
+	companion object {
+		const val TITLE_MAX_LENGTH = 500
+		const val CONTENT_MAX_LENGTH = 50000
 	}
 }

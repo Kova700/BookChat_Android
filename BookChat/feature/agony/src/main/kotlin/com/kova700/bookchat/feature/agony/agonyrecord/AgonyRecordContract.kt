@@ -5,7 +5,6 @@ import com.kova700.bookchat.feature.agony.agonyrecord.model.AgonyRecordListItem
 data class AgonyRecordUiState(
 	val uiState: UiState,
 	val records: List<AgonyRecordListItem>,
-	val isEditing: Boolean,
 ) {
 	val isNotInitErrorOrLoading: Boolean
 		get() = (isInitLoading || isInitError).not()
@@ -25,8 +24,12 @@ data class AgonyRecordUiState(
 	val isPagingError: Boolean
 		get() = uiState == UiState.PAGING_ERROR
 
+	val isEditing: Boolean
+		get() = uiState == UiState.EDITING
+
 	enum class UiState {
 		SUCCESS,
+		EDITING,
 		INIT_LOADING,
 		INIT_ERROR,
 		PAGING_ERROR,
@@ -37,7 +40,6 @@ data class AgonyRecordUiState(
 		val DEFAULT = AgonyRecordUiState(
 			uiState = UiState.SUCCESS,
 			records = emptyList(),
-			isEditing = false,
 		)
 	}
 }

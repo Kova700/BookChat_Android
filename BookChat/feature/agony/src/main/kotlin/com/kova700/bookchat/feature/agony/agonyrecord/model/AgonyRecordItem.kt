@@ -34,8 +34,8 @@ sealed interface AgonyRecordListItem {
 
 		/** 타이핑 입력시 마다 새로운 ItemList submit함을 방지하기 위해 가변 프로퍼티 사용*/
 		data class Editing(
-			var titleBeingEdited: String = "",
-			var contentBeingEdited: String = "",
+			var editingTitle: String = "",
+			var editingContent: String = "",
 		) : ItemState
 	}
 

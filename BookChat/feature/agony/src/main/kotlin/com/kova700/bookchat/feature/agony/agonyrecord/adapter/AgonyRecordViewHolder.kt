@@ -68,20 +68,20 @@ class AgonyRecordFirstItemViewHolder(
 			progressbar.visibility =
 				if (state is AgonyRecordListItem.ItemState.Loading) View.VISIBLE else View.GONE
 			editLayout.root.visibility =
-				if (state is AgonyRecordListItem.ItemState.Editing) View.VISIBLE else View.INVISIBLE
+				if (state is AgonyRecordListItem.ItemState.Editing) View.VISIBLE else View.GONE
 			agonyRecordFirstItemCv.visibility =
-				if (state is AgonyRecordListItem.ItemState.Success) View.VISIBLE else View.INVISIBLE
+				if (state is AgonyRecordListItem.ItemState.Success) View.VISIBLE else View.GONE
 		}
 
 		if (state is AgonyRecordListItem.ItemState.Editing) {
 			with(binding.editLayout) {
-				agonyRecordFirstItemTitleEt.setText(state.titleBeingEdited)
-				agonyRecordFirstItemContentEt.setText(state.contentBeingEdited)
+				agonyRecordFirstItemTitleEt.setText(state.editingTitle)
+				agonyRecordFirstItemContentEt.setText(state.editingContent)
 				agonyRecordFirstItemTitleEt.addTextChangedListener { text: Editable? ->
-					state.titleBeingEdited = text.toString()
+					state.editingTitle = text.toString()
 				}
 				agonyRecordFirstItemContentEt.addTextChangedListener { text: Editable? ->
-					state.contentBeingEdited = text.toString()
+					state.editingContent = text.toString()
 				}
 			}
 		}
@@ -143,14 +143,14 @@ class AgonyRecordItemViewHolder(
 		when (state) {
 			is AgonyRecordListItem.ItemState.Editing -> {
 				with(binding.editLayout) {
-					agonyRecordEditTitleEt.setText(state.titleBeingEdited)
-					agonyRecordEditContentEt.setText(state.contentBeingEdited)
-					agonyRecordEditContentEt.setSelection(state.contentBeingEdited.length)
+					agonyRecordEditTitleEt.setText(state.editingTitle)
+					agonyRecordEditContentEt.setText(state.editingContent)
+					agonyRecordEditContentEt.setSelection(state.editingContent.length)
 					agonyRecordEditTitleEt.addTextChangedListener { text: Editable? ->
-						state.titleBeingEdited = text.toString()
+						state.editingTitle = text.toString()
 					}
 					agonyRecordEditContentEt.addTextChangedListener { text: Editable? ->
-						state.contentBeingEdited = text.toString()
+						state.editingContent = text.toString()
 					}
 				}
 			}
@@ -160,7 +160,7 @@ class AgonyRecordItemViewHolder(
 				setViewHolderSwipeState(binding.swipeView, state.isSwiped)
 			}
 
-			else -> {}
+			else -> Unit
 		}
 	}
 
