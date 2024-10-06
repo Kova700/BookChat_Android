@@ -7,6 +7,7 @@ import com.kova700.bookchat.core.data.agony.external.AgonyRepository
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.agony.agonyedit.AgonyEditActivity.Companion.EXTRA_AGONY_ID
 import com.kova700.bookchat.feature.agony.agonyedit.AgonyEditActivity.Companion.EXTRA_BOOKSHELF_ITEM_ID
+import com.kova700.bookchat.feature.agony.agonyedit.AgonyEditUiState.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,15 +49,16 @@ class AgonyEditViewModel @Inject constructor(
 	}
 
 	private fun reviseAgony(newTitle: String) = viewModelScope.launch {
+		updateState { copy(uiState = UiState.LOADING) }
 		runCatching {
 			agonyRepository.reviseAgony(
 				bookShelfId = bookShelfItemId,
 				agonyId = agonyId,
 				newTitle = newTitle
 			)
-		}
-			.onSuccess { startEvent(AgonyEditUiEvent.MoveToBack) }
+		}.onSuccess { startEvent(AgonyEditUiEvent.MoveToBack) }
 			.onFailure { startEvent(AgonyEditUiEvent.ShowSnackBar(R.string.agony_title_edit_fail)) }
+			.also { updateState { copy(uiState = UiState.SUCCESS) } }
 	}
 
 	fun onClickXBtn() {
@@ -83,6 +85,10 @@ class AgonyEditViewModel @Inject constructor(
 
 	private fun startEvent(event: AgonyEditUiEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
+	}
+
+	companion object {
+		const val MAX_TITLE_LENGTH = 500
 	}
 
 }

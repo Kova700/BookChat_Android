@@ -1,6 +1,7 @@
 package com.kova700.bookchat.feature.agony.agonyedit
 
 import com.kova700.bookchat.core.data.agony.external.model.Agony
+import com.kova700.bookchat.feature.agony.agonyedit.AgonyEditViewModel.Companion.MAX_TITLE_LENGTH
 
 data class AgonyEditUiState(
 	val uiState: UiState,
@@ -8,9 +9,12 @@ data class AgonyEditUiState(
 	val agony: Agony,
 ) {
 
+	val isLoading get() = uiState == UiState.LOADING
+
 	val isPossibleChangeAgony
 		get() = (agony.title != newTitle)
 						&& newTitle.isNotBlank()
+						&& newTitle.length <= MAX_TITLE_LENGTH
 
 	enum class UiState {
 		SUCCESS,
