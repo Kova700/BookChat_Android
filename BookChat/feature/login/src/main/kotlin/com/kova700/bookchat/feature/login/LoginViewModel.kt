@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO : 로그인 시에 로딩화면 안보임 체크 필요
 @HiltViewModel
 class LoginViewModel @Inject constructor(
 	private val clientRepository: ClientRepository,

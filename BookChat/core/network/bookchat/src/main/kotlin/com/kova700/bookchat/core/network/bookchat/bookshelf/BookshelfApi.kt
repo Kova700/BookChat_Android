@@ -19,7 +19,7 @@ import retrofit2.http.Query
 interface BookshelfApi {
 
 	@POST("/v1/api/bookshelves")
-	suspend fun registerBookShelfBook( //TODO : 서버 수정 대기
+	suspend fun registerBookShelfBook(
 		@Body requestRegisterBookShelfBook: RequestRegisterBookShelfBook,
 	): BookChatApiResult<Unit>
 

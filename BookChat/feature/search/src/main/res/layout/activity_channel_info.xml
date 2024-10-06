@@ -42,8 +42,6 @@
         app:layout_constraintStart_toStartOf="@+id/guideline_start"
         app:layout_constraintTop_toBottomOf="@+id/back_btn">
 
-        <!--TODO : 이전버전, 카톡 보면서 비교할점 찾고 수정할 점 수정하자. -->
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">

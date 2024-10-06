@@ -29,9 +29,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO : 검색필터 채팅방 제목으로하고 자바 검색하면 타임아웃나옴 +
-// 채팅방 검색 결과가 있는경우 시간이 너무 오래걸림 (없는 경우는 빨리 끝남)
-
 @HiltViewModel
 class SearchViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,

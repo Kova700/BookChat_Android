@@ -34,11 +34,6 @@ class SelectTasteViewModel @Inject constructor(
 	private val _uiState = MutableStateFlow<SelectTasteState>(SelectTasteState.DEFAULT)
 	val uiState get() = _uiState.asStateFlow()
 
-	// TODO : 서버 수정 대기 중
-	//  4.독서 취향 누르고 시작하기 누르면 토큰은 넘어오는데 사용자를 확일 할 수없습니다 아래에 스낵바 뜸
-	//      {"errorCode":"4040100","message":"사용자를 찾을 수 없습니다."}
-	//      다시 시작하기 누르면 그냥 에러 던짐
-	//  6.이미지 없이 보내면 {"errorCode":"5000001","message":"이미지 업로드에 실패했습니다."} 넘어옴 (전송부 확인해볼 것)
 	init {
 		initUiState()
 	}

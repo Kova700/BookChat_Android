@@ -3,7 +3,6 @@ package com.kova700.bookchat.feature.signup.signup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kova700.bookchat.core.data.client.external.ClientRepository
-import com.kova700.bookchat.core.data.common.model.network.ForbiddenException
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.util.user.namecheck.NicknameCheckState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,7 +51,7 @@ class SignUpViewModel @Inject constructor(
 					)
 				}
 			}
-			.onFailure { failHandler(it) }
+			.onFailure { startEvent(SignUpEvent.ErrorEvent(R.string.error_else)) }
 	}
 
 	fun onClickStartBtn() {
@@ -72,22 +71,24 @@ class SignUpViewModel @Inject constructor(
 	}
 
 	private fun updateUserNicknameIfValid(text: String) {
-
-		if (text.length < 2) {
-			updateState {
-				copy(
-					nickname = text,
-					nicknameCheckState = NicknameCheckState.IsShort
-				)
+		when {
+			text.length < 2 -> {
+				updateState {
+					copy(
+						nickname = text,
+						nicknameCheckState = NicknameCheckState.IsShort
+					)
+				}
 			}
-			return
-		}
 
-		updateState {
-			copy(
-				nickname = text,
-				nicknameCheckState = NicknameCheckState.Default
-			)
+			else -> {
+				updateState {
+					copy(
+						nickname = text,
+						nicknameCheckState = NicknameCheckState.Default
+					)
+				}
+			}
 		}
 	}
 
@@ -114,16 +115,4 @@ class SignUpViewModel @Inject constructor(
 	private fun startEvent(event: SignUpEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
 	}
-
-	private fun failHandler(exception: Throwable) {
-		when (exception) {
-			is ForbiddenException -> startEvent(SignUpEvent.ErrorEvent(R.string.login_forbidden_user))
-			else -> {
-				val errorMessage = exception.message
-				if (errorMessage.isNullOrBlank()) startEvent(SignUpEvent.ErrorEvent(R.string.error_else))
-				else startEvent(SignUpEvent.UnknownErrorEvent(errorMessage))
-			}
-		}
-	}
-
 }
