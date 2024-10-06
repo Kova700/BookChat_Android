@@ -2,6 +2,8 @@ package com.kova700.bookchat.feature.mypage.setting.accountsetting
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -14,7 +16,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO : 로그인 회원탈퇴 시에 로딩 UI 필요
 @AndroidEntryPoint
 class AccountSettingActivity : AppCompatActivity() {
 
@@ -32,17 +33,28 @@ class AccountSettingActivity : AppCompatActivity() {
 		binding = ActivityAccountSettingBinding.inflate(layoutInflater)
 		setContentView(binding.root)
 		initViewState()
+		observeUiState()
 		observeUiEvent()
+	}
+
+	private fun observeUiState() = lifecycleScope.launch {
+		accountSettingViewModel.uiState.collect { state -> setViewState(state) }
 	}
 
 	private fun observeUiEvent() = lifecycleScope.launch {
 		accountSettingViewModel.eventFlow.collect { event -> handleEvent(event) }
 	}
 
+	private fun setViewState(state: AccountSettingUiState) {
+		binding.progressBar.visibility = if (state.isLoading) VISIBLE else GONE
+	}
+
 	private fun initViewState() {
-		binding.backBtn.setOnClickListener { finish() }
-		binding.logoutBtn.setOnClickListener { accountSettingViewModel.onClickLogoutBtn() }
-		binding.withdrawBtn.setOnClickListener { accountSettingViewModel.onClickWithdrawBtn() }
+		with(binding) {
+			backBtn.setOnClickListener { finish() }
+			logoutBtn.setOnClickListener { accountSettingViewModel.onClickLogoutBtn() }
+			withdrawBtn.setOnClickListener { accountSettingViewModel.onClickWithdrawBtn() }
+		}
 	}
 
 	private fun startOAuthLogout() = lifecycleScope.launch {
