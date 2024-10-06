@@ -32,9 +32,7 @@ class ChatNotificationWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
 	override suspend fun doWork(): Result {
-		if (bookChatTokenRepository.isBookChatTokenExist().not()
-			|| appSettingRepository.isPushNotificationEnabled().not()
-		) return Result.success()
+		if (bookChatTokenRepository.isBookChatTokenExist().not()) return Result.success()
 
 		val channelId: Long = inputData.getLong(EXTRA_CHANNEL_ID, -1)
 		val chatId: Long = inputData.getLong(EXTRA_CHAT_ID, -1)
@@ -51,6 +49,7 @@ class ChatNotificationWorker @AssistedInject constructor(
 
 		val (channel, chat, client) = apiResult
 		if (chat.sender?.id == client.id) return Result.success()
+		if (appSettingRepository.isPushNotificationEnabled().not()) return Result.success()
 
 		chatNotificationHandler.showNotification(
 			channel = channel,
