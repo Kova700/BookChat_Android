@@ -22,9 +22,9 @@ private fun String.toDateString() = split(T).firstOrNull()
 private fun String.toTimeString() = split(T).lastOrNull()
 
 fun String.toDateKoreanString(): String {
-	val (year, month, day) = this.toDateString()?.split(HYPHEN) ?: return EMPTY
-	return "${year}$YEAR ${month.toInt()}$MONTH  ${day.toInt()}$DAY " +
-					toWeekKoreanString()
+	if (isBlank()) return EMPTY
+	val (year, month, day) = toDateString()?.split(HYPHEN) ?: return EMPTY
+	return "${year}$YEAR ${month.toInt()}$MONTH  ${day.toInt()}$DAY ${toWeekKoreanString()}"
 }
 
 private fun String.toWeekKoreanString(): String {
@@ -60,6 +60,7 @@ fun String.toFormattedAbstractDateTimeText(): String =
 fun String.toFormattedTimeText(): String = toDetailFormattedTodayText()
 
 private fun String.toAbstractFormattedTodayText(): String {
+	if (isBlank()) return EMPTY
 	val (cTime, cMinute) = getCurrentDateTimeString().toTimeString()?.split(COLON)
 		?.dropLast(1)?.map { it.toInt() } ?: return EMPTY
 	val (iTime, iMinute) = this.toTimeString()?.split(COLON)
@@ -71,7 +72,8 @@ private fun String.toAbstractFormattedTodayText(): String {
 }
 
 private fun String.toDetailFormattedTodayText(): String {
-	val (time, minute, second) = this.toTimeString()?.split(COLON) ?: return EMPTY
+	if (isBlank()) return EMPTY
+	val (time, minute, second) = toTimeString()?.split(COLON) ?: return EMPTY
 	return when (val flag = if (time.toInt() >= 12) PM else AM) {
 		PM -> flag + SPACE + getPmTime(time.toInt()) + COLON + minute
 		AM -> flag + SPACE + getAmTime(time.toInt()) + COLON + minute
@@ -80,12 +82,14 @@ private fun String.toDetailFormattedTodayText(): String {
 }
 
 private fun String.toFormattedThisYearText(): String {
-	val (iMonth, iDay) = this.toDateString()?.split(HYPHEN)?.drop(1) ?: return EMPTY
+	if (isBlank()) return EMPTY
+	val (iMonth, iDay) = toDateString()?.split(HYPHEN)?.drop(1) ?: return EMPTY
 	return iMonth.toInt().toString() + MONTH + iDay.toInt() + DAY
 }
 
 private fun String.toFormattedElseYearText(): String {
-	val (iYear, iMonth, iDay) = this.toDateString()?.split(HYPHEN) ?: return EMPTY
+	if (isBlank()) return EMPTY
+	val (iYear, iMonth, iDay) = toDateString()?.split(HYPHEN) ?: return EMPTY
 	return "$iYear.$iMonth.$iDay"
 }
 
@@ -93,33 +97,36 @@ private fun getPmTime(time: Int): Int = if (time - 12 == 0) 12 else time - 12
 private fun getAmTime(time: Int): Int = if (time == 0) 12 else time
 
 private fun String.isToday(): Boolean {
+	if (isBlank()) return false
 	val (cYear, cMonth, cDay) = getCurrentDateTimeString().toDateString()?.split(HYPHEN)
 		?: return false
-	val (iYear, iMonth, iDay) = this.toDateString()?.split(HYPHEN)
+	val (iYear, iMonth, iDay) = toDateString()?.split(HYPHEN)
 		?: return false
 	return (cYear == iYear) && (cMonth == iMonth) && (cDay == iDay)
 }
 
 private fun String.isYesterday(): Boolean {
+	if (isBlank()) return false
 	val calendar = Calendar.getInstance().apply { add(Calendar.DATE, -1) }
 	val cYear = calendar.get(Calendar.YEAR).toString()
 	val cMonth = (calendar.get(Calendar.MONTH) + 1).toString()
 	val cDay = calendar.get(Calendar.DATE).toString()
 
-	val (iYear, iMonth, iDay) = this.toDateString()?.split(HYPHEN)
+	val (iYear, iMonth, iDay) = toDateString()?.split(HYPHEN)
 		?.map { it.toInt().toString() } ?: return false
 	return (cYear == iYear) && (cMonth == iMonth) && (cDay == iDay)
 }
 
 private fun String.isThisYear(): Boolean {
+	if (isBlank()) return false
 	val cYear = getCurrentDateTimeString().toDateString()?.split(HYPHEN)?.first()
-	val iYear = this.toDateString()?.split(HYPHEN)?.first()
+	val iYear = toDateString()?.split(HYPHEN)?.first()
 	return cYear == iYear
 }
 
 fun String?.isSameDate(other: String?): Boolean {
-	if (this.isNullOrBlank() || other.isNullOrBlank()) return false
-	val (year, month, day) = this.toDateString()?.split(HYPHEN) ?: return false
+	if (isNullOrBlank() || other.isNullOrBlank()) return false
+	val (year, month, day) = toDateString()?.split(HYPHEN) ?: return false
 	val (oYear, oMonth, oDay) = other.toDateString()?.split(HYPHEN) ?: return false
 	return (year == oYear) && (month == oMonth) && (day == oDay)
 }
