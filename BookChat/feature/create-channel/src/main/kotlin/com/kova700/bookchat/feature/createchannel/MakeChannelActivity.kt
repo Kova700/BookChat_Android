@@ -148,11 +148,11 @@ class MakeChannelActivity : AppCompatActivity() {
 			channelTagCountTv.text =
 				getString(R.string.make_chat_room_tags_length, uiState.channelTag.length)
 			selectedBookCv.visibility =
-				if (uiState.selectedBook != null) View.VISIBLE else View.GONE //TODO : INVISIBLE 해야되는지 테스트
+				if (uiState.selectedBook != null) View.VISIBLE else View.GONE
 			selectBootBtn.visibility =
-				if (uiState.selectedBook == null) View.VISIBLE else View.GONE //TODO : INVISIBLE 해야되는지 테스트
+				if (uiState.selectedBook == null) View.VISIBLE else View.GONE
 			deleteSelectedBookBtn.visibility =
-				if (uiState.selectedBook != null) View.VISIBLE else View.GONE //TODO : INVISIBLE 해야되는지 테스트
+				if (uiState.selectedBook != null) View.VISIBLE else View.GONE
 		}
 	}
 

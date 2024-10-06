@@ -45,6 +45,7 @@ class UserEditViewModel @Inject constructor(
 	// 기본 이미지로 변경된다는 flag를 추가하면 기존 프로필을 변경한다라는 구조로 바꾸는게 더 효율적인거 같은데
 	// isProfileChanged = true라면 서버는 새로 받은 이미지로 덮어쓰기(null Or MultiPart)
 	// isProfileChanged = false라면 서버는 기존 이미지로 유지
+	// 서버 수정 대기 중
 	private fun verifyNickname() {
 		val nickName = uiState.value.newNickname
 		val userProfile = uiState.value.clientNewImage
@@ -87,7 +88,6 @@ class UserEditViewModel @Inject constructor(
 		verifyNickname()
 	}
 
-	//TODO : userProfile = null로 보내면 null로 설정이 안됨 (서버 수정 대기중)
 	private fun changeClientProfile(
 		newNickName: String,
 		userProfile: Bitmap?,

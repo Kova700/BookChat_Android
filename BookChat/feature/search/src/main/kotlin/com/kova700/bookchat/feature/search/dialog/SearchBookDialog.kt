@@ -114,7 +114,6 @@ class SearchBookDialog : DialogFragment() {
 		}
 	}
 
-	//TODO : ISBN으로 채팅방 검색하기 서버 API 수정 대기중
 	private fun moveToChannelSearchWithSelectedBook(
 		searchKeyword: String,
 		searchTarget: SearchTarget,
