@@ -75,11 +75,13 @@ class MakeChannelViewModel @Inject constructor(
 	}
 
 	fun onChangeHashTag(text: String?) {
-		text?.let { updateState { copy(channelTag = it) } }
+		if (text.isNullOrBlank() || text.length > CHANNEL_TAG_MAX_LENGTH) return
+		updateState { copy(channelTag = text) }
 	}
 
 	fun onChangeChannelTitle(text: String?) {
-		text?.let { updateState { copy(channelTitle = it) } }
+		if (text.isNullOrBlank() || text.length > CHANNEL_TITLE_MAX_LENGTH) return
+		updateState { copy(channelTitle = text) }
 	}
 
 	fun onChangeChannelImg(bitmap: Bitmap) {
@@ -136,5 +138,7 @@ class MakeChannelViewModel @Inject constructor(
 
 	companion object {
 		private const val DEFAULT_ROOM_SIZE = 100
+		const val CHANNEL_TITLE_MAX_LENGTH = 30
+		const val CHANNEL_TAG_MAX_LENGTH = 50
 	}
 }

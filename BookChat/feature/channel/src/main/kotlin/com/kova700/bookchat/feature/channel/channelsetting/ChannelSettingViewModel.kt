@@ -91,11 +91,13 @@ class ChannelSettingViewModel @Inject constructor(
 		startEvent(ChannelSettingUiEvent.ShowChannelExitWarningDialog)
 	}
 
-	fun onChangeChannelTitle(text: String) {
+	fun onChangeChannelTitle(text: String?) {
+		if (text.isNullOrBlank() || text.length > CHANNEL_TITLE_MAX_LENGTH) return
 		updateState { copy(newTitle = text) }
 	}
 
-	fun onChangeChannelTags(text: String) {
+	fun onChangeChannelTags(text: String?) {
+		if (text.isNullOrBlank() || text.length > CHANNEL_TAG_MAX_LENGTH) return
 		updateState { copy(newTags = text) }
 	}
 
@@ -153,6 +155,11 @@ class ChannelSettingViewModel @Inject constructor(
 
 	private fun startEvent(event: ChannelSettingUiEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
+	}
+
+	companion object {
+		const val CHANNEL_TITLE_MAX_LENGTH = 30
+		const val CHANNEL_TAG_MAX_LENGTH = 50
 	}
 
 }
