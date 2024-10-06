@@ -18,7 +18,6 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="20dp" />
 
-    <!--수정 배경 (REVISE , EMPTY)-->
     <androidx.cardview.widget.CardView
         android:id="@+id/book_report_Input_layout"
         android:layout_width="0dp"
@@ -33,7 +32,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!--수정 제목 (REVISE , EMPTY)-->
     <EditText
         android:id="@+id/book_report_title_et"
         android:layout_width="0dp"
@@ -44,6 +42,7 @@
         android:elevation="10dp"
         android:fontFamily="@font/notosanskr_bold"
         android:hint="@string/title"
+        android:maxLength="500"
         android:singleLine="true"
         android:textColorHint="#222222"
         android:textSize="14sp"
@@ -51,7 +50,6 @@
         app:layout_constraintStart_toStartOf="@+id/guideline_start"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!--수정 제목,내용 구분자 (REVISE , EMPTY)-->
     <View
         android:id="@+id/book_report_title_content_separator"
         android:layout_width="0dp"
@@ -62,7 +60,6 @@
         app:layout_constraintStart_toStartOf="@+id/guideline_start"
         app:layout_constraintTop_toBottomOf="@+id/book_report_title_et" />
 
-    <!--수정 내용 (REVISE , EMPTY)-->
     <EditText
         android:id="@+id/book_report_content_et"
         android:layout_width="0dp"
@@ -74,6 +71,7 @@
         android:gravity="top"
         android:hint="@string/content"
         android:lineSpacingExtra="5dp"
+        android:maxLength="50000"
         android:minHeight="150dp"
         android:textColorHint="#373737"
         android:textSize="12sp"

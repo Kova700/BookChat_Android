@@ -1,6 +1,5 @@
 package com.kova700.bookchat.feature.bookreport
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,7 +7,6 @@ import com.kova700.bookchat.core.data.bookshelf.external.BookShelfRepository
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.bookreport.BookReportActivity.Companion.EXTRA_BOOKREPORT_BOOKSHELF_ITEM_ID
 import com.kova700.bookchat.feature.bookreport.BookReportUiState.UiState
-import com.kova700.bookchat.util.Constants.TAG
 import com.kova700.core.data.bookreport.external.BookReportRepository
 import com.kova700.core.data.bookreport.external.model.BookReportDoseNotExistException
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -65,10 +63,6 @@ class BookReportViewModel @Inject constructor(
 			}
 	}
 
-	//TODO : 내용이 긴 경우에는 등록이 되나,
-	// 제목이 긴 경우는 해결되지 않음
-	// --> POST https://bookchat.link/v1/api/bookshelves/124/report h2
-	// {"errorCode":"500","message":"예상치 못한 예외가 발생했습니다."}
 	private fun registerBookReport() {
 		if (uiState.value.isLoading) return
 		updateState { copy(uiState = UiState.LOADING) }
@@ -88,12 +82,9 @@ class BookReportViewModel @Inject constructor(
 		}
 	}
 
-	//TODO : 장문인 경우 BadRequestException 에러 해결 필요 (이거 이슈 해결됨 테스트하고 삭제)
-	// 수정하고 뒤로 돌아 나갔다오면 수정내용이 반영되지 않는 현상이 있음
 	private fun reviseBookReport() {
 		if (uiState.value.isLoading) return
 		updateState { copy(uiState = UiState.LOADING) }
-		Log.d(TAG, "BookReportViewModel: reviseBookReport() - called")
 		viewModelScope.launch {
 			runCatching {
 				bookReportRepository.reviseBookReport(
@@ -102,14 +93,8 @@ class BookReportViewModel @Inject constructor(
 					reportContent = uiState.value.enteredContent,
 					reportCreatedAt = uiState.value.existingBookReport?.reportCreatedAt ?: "",
 				)
-			}
-				//수정 실패했는데 왜 성공 UI가 나오지..?
-				.onSuccess {
-					Log.d(TAG, "BookReportViewModel: reviseBookReport() - onSuccess")
-					updateState { copy(uiState = UiState.SUCCESS) }
-				}
+			}.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
 				.onFailure {
-					Log.d(TAG, "BookReportViewModel: reviseBookReport() - onFailure")
 					updateState { copy(uiState = UiState.EDITING) }
 					startEvent(BookReportEvent.ShowSnackBar(R.string.book_report_revise_fail))
 				}
@@ -142,10 +127,12 @@ class BookReportViewModel @Inject constructor(
 	}
 
 	fun onChangeTitle(text: String) {
+		if (text.length > BOOKREPORT_TITLE_MAX_LENGTH) return
 		updateState { copy(enteredTitle = text.trim()) }
 	}
 
 	fun onChangeContent(text: String) {
+		if (text.length > BOOKREPORT_CONTENT_MAX_LENGTH) return
 		updateState { copy(enteredContent = text.trim()) }
 	}
 
@@ -187,5 +174,10 @@ class BookReportViewModel @Inject constructor(
 
 	private inline fun updateState(block: BookReportUiState.() -> BookReportUiState) {
 		_uiState.update { _uiState.value.block() }
+	}
+
+	companion object {
+		const val BOOKREPORT_TITLE_MAX_LENGTH = 500
+		const val BOOKREPORT_CONTENT_MAX_LENGTH = 50000
 	}
 }

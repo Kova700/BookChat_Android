@@ -2,6 +2,7 @@ package com.kova700.bookchat.feature.bookreport
 
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
 import android.view.View
 import androidx.activity.addCallback
 import androidx.activity.viewModels
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.kova700.bookchat.feature.bookreport.BookReportUiState.UiState
+import com.kova700.bookchat.feature.bookreport.BookReportViewModel.Companion.BOOKREPORT_CONTENT_MAX_LENGTH
 import com.kova700.bookchat.feature.bookreport.databinding.ActivityBookReportBinding
 import com.kova700.bookchat.util.book.BookImgSizeManager
 import com.kova700.bookchat.util.image.image.loadUrl
@@ -61,7 +63,7 @@ class BookReportActivity : AppCompatActivity() {
 			bookReportEditLayout.bookReportContentEt.addTextChangedListener { text: Editable? ->
 				text.let { bookReportViewModel.onChangeContent(it.toString()) }
 			}
-			retryBookreportLayout.retryBtn.setOnClickListener { bookReportViewModel.onClickRetryBtn() }
+			retryBookreportLayout.retryBtn.setOnClickListener { bookReportViewModel.onClickRetryBtn() };
 		}
 	}
 
