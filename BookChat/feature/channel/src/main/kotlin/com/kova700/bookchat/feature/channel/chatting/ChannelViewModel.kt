@@ -403,6 +403,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	fun onChangeEnteredMessage(text: String) {
+		if (text.length > MAX_CHAT_MESSAGE_LENGTH) return
 		updateState { copy(enteredMessage = text) }
 		saveTempSavedMessage(text.trim())
 	}
@@ -603,5 +604,9 @@ class ChannelViewModel @Inject constructor(
 
 	private inline fun updateState(block: ChannelUiState.() -> ChannelUiState) {
 		_uiState.update { _uiState.value.block() }
+	}
+
+	companion object {
+		const val MAX_CHAT_MESSAGE_LENGTH = 50000
 	}
 }
