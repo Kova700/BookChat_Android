@@ -156,10 +156,6 @@ class ChannelListViewModel @Inject constructor(
 		startEvent(ChannelListUiEvent.MoveToChannel(channelId))
 	}
 
-	//TODO : ChannelResponse에 호스트 정보 반영되면 호스트 유무 반영해서 전달
-	//  생각해보니까 방장이 아닌 상태에서 ChannelList를 가져왔는데,
-	//  방장이 그 사이 방장을 전달한경우 방장이 나가면 채팅방이 터진다는 경고를 하지 못하는데
-	//  방장이 되었을 경우에 나가버리면 경고 없이 채팅방이 터지는 경우가 발생함
 	fun onLongClickChannelItem(channel: ChannelListItem.ChannelItem) {
 		startEvent(
 			ChannelListUiEvent.ShowChannelSettingDialog(

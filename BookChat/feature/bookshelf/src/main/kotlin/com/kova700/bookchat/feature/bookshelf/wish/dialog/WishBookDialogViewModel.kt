@@ -18,9 +18,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO : 하트 풀었다 다시 누르고 상태이동, 하트 누르면면 실패함 체크 필요 (ID가 변경되어서 그럼) (2번정도하면 발생함)
-//TODO : 하트 지워진 채로 고민기록 이동 누르면 터짐
-//TODO : 걍 하트 비우면 바로 다이얼로그 끌까
 @HiltViewModel
 class WishBookDialogViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
