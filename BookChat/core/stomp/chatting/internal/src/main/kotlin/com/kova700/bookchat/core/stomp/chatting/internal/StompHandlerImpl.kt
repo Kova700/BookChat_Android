@@ -90,6 +90,8 @@ class StompHandlerImpl @Inject constructor(
 		channel: Channel,
 		maxAttempts: Int,
 	) {
+		if (channel.roomSid.isBlank()) return
+
 		mutex.withLock {
 			if (_socketState.value == SocketState.CONNECTING
 				|| _socketState.value == SocketState.CONNECTED
