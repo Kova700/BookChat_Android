@@ -458,7 +458,7 @@ class ChannelViewModel @Inject constructor(
 
 	fun onClickChannelExitBtn() {
 		if (uiState.value.isCaptureMode) return
-		startEvent(ChannelEvent.ShowChannelExitWarningDialog(uiState.value.clientAuthority))
+		startEvent(ChannelEvent.ShowChannelExitWarningDialog(uiState.value.isClientHost))
 	}
 
 	fun onClickCancelCaptureSelection() {

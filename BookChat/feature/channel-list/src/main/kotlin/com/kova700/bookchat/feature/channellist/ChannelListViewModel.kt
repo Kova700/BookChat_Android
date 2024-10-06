@@ -2,8 +2,8 @@ package com.kova700.bookchat.feature.channellist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
+import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.network_manager.external.NetworkManager
 import com.kova700.bookchat.core.network_manager.external.model.NetworkState
@@ -31,6 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ChannelListViewModel @Inject constructor(
 	private val channelRepository: ChannelRepository,
+	private val clientRepository: ClientRepository,
 	private val networkManager: NetworkManager,
 	private val getClientChannelsUseCase: GetClientChannelsUseCase,
 	private val getClientMostActiveChannelsUseCase: GetClientMostActiveChannelsUseCase,
@@ -52,8 +53,13 @@ class ChannelListViewModel @Inject constructor(
 
 	private fun initUiState() {
 		getInitChannels()
+		getClientProfile()
 		observeChannels()
 		observeNetworkState()
+	}
+
+	private fun getClientProfile() = viewModelScope.launch {
+		updateState { copy(client = clientRepository.getClientProfile()) }
 	}
 
 	private fun observeNetworkState() = viewModelScope.launch {
@@ -151,10 +157,13 @@ class ChannelListViewModel @Inject constructor(
 	}
 
 	//TODO : ChannelResponse에 호스트 정보 반영되면 호스트 유무 반영해서 전달
+	//  생각해보니까 방장이 아닌 상태에서 ChannelList를 가져왔는데,
+	//  방장이 그 사이 방장을 전달한경우 방장이 나가면 채팅방이 터진다는 경고를 하지 못하는데
+	//  방장이 되었을 경우에 나가버리면 경고 없이 채팅방이 터지는 경우가 발생함
 	fun onLongClickChannelItem(channel: ChannelListItem.ChannelItem) {
 		startEvent(
 			ChannelListUiEvent.ShowChannelSettingDialog(
-				clientAuthority = ChannelMemberAuthority.GUEST,
+				isClientHost = channel.host?.id == uiState.value.client.id,
 				channel = channel
 			)
 		)

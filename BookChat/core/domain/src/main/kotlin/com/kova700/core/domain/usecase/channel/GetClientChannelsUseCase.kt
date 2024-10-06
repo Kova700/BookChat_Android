@@ -18,6 +18,7 @@ class GetClientChannelsUseCase @Inject constructor(
 				chatRepository.insertChat(chat)
 				chat.sender?.let { user -> userRepository.upsertUser(user) }
 			}
+			channel.host?.let { user -> userRepository.upsertUser(user) }
 		}
 	}
 }

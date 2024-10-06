@@ -13,6 +13,10 @@ fun ChannelResponse.toChannelEntity(): ChannelEntity {
 		defaultRoomImageType = defaultRoomImageType.toDomain(),
 		roomImageUri = roomImageUri,
 		lastChatId = lastChatId,
+		hostId = hostId,
+		bookTitle = bookTitle,
+		bookAuthors = bookAuthors,
+		bookCoverImageUrl = bookCoverImageUrl,
 	)
 }
 

@@ -11,7 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.navigation.ChannelNavigator
 import com.kova700.bookchat.core.navigation.MainNavigationViewModel
@@ -187,7 +186,7 @@ class ChannelListFragment : Fragment() {
 	}
 
 	private fun showChannelSettingDialog(
-		clientAuthority: ChannelMemberAuthority,
+		isClientHost: Boolean,
 		channel: ChannelListItem.ChannelItem,
 	) {
 		val existingFragment =
@@ -196,7 +195,7 @@ class ChannelListFragment : Fragment() {
 
 		val dialog = ChannelSettingDialog(
 			channel = channel,
-			onClickOkExitBtn = { showChannelExitWarningDialog(clientAuthority, channel) },
+			onClickOkExitBtn = { showChannelExitWarningDialog(isClientHost, channel) },
 			onClickMuteRelatedBtn = { channelListViewModel.onClickMuteRelatedBtn(channel) },
 			onClickTopPinRelatedBtn = { channelListViewModel.onClickTopPinRelatedBtn(channel) },
 		)
@@ -204,7 +203,7 @@ class ChannelListFragment : Fragment() {
 	}
 
 	private fun showChannelExitWarningDialog(
-		clientAuthority: ChannelMemberAuthority,
+		isClientHost: Boolean,
 		channel: ChannelListItem.ChannelItem,
 	) {
 		val existingFragment =
@@ -212,7 +211,7 @@ class ChannelListFragment : Fragment() {
 		if (existingFragment != null) return
 
 		val dialog = ChannelExitWarningDialog(
-			clientAuthority = clientAuthority,
+			isClientHost = isClientHost,
 			onClickOkBtn = { channelListViewModel.onClickChannelExit(channel.roomId) }
 		)
 		dialog.show(childFragmentManager, DIALOG_TAG_CHANNEL_EXIT_WARNING)
@@ -224,7 +223,7 @@ class ChannelListFragment : Fragment() {
 			is ChannelListUiEvent.MoveToChannel -> moveToChannel(event.channelId)
 			is ChannelListUiEvent.MoveToSearchChannelPage -> moveToSearchChannelPage()
 			is ChannelListUiEvent.ShowChannelSettingDialog -> showChannelSettingDialog(
-				clientAuthority = event.clientAuthority,
+				isClientHost = event.isClientHost,
 				channel = event.channel
 			)
 

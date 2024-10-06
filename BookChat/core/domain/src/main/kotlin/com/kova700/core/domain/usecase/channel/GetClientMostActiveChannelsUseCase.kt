@@ -12,11 +12,13 @@ class GetClientMostActiveChannelsUseCase @Inject constructor(
 ) {
 	suspend operator fun invoke(isOfflineOnly: Boolean = false) {
 		val channels = channelRepository.getMostActiveChannels(isOfflineOnly = isOfflineOnly)
+		if (isOfflineOnly) return
 		channels.forEach { channel ->
 			channel.lastChat?.let { chat ->
 				chatRepository.insertChat(chat)
 				chat.sender?.let { user -> userRepository.upsertUser(user) }
 			}
+			channel.host?.let { user -> userRepository.upsertUser(user) }
 		}
 	}
 }

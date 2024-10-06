@@ -21,7 +21,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.design_system.R
@@ -534,13 +533,12 @@ class ChannelActivity : AppCompatActivity() {
 		dialog.show(supportFragmentManager, DIALOG_TAG_EXPLODED_CHANNEL_NOTICE)
 	}
 
-	private fun showChannelExitWarningDialog(clientAuthority: ChannelMemberAuthority) {
-		Log.d(TAG, "ChannelActivity: showChannelExitWarningDialog() - called")
+	private fun showChannelExitWarningDialog(isClientHost: Boolean) {
 		val existingFragment =
 			supportFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_EXIT_WARNING)
 		if (existingFragment != null) return
 		val dialog = ChannelExitWarningDialog(
-			clientAuthority = clientAuthority,
+			isClientHost = isClientHost,
 			onClickOkBtn = { channelViewModel.onClickChannelExitDialogBtn() }
 		)
 		dialog.show(supportFragmentManager, DIALOG_TAG_CHANNEL_EXIT_WARNING)
@@ -660,7 +658,7 @@ class ChannelActivity : AppCompatActivity() {
 
 			is ChannelEvent.NewChatOccurEvent -> checkIfNewChatNoticeIsRequired(event.chat)
 			is ChannelEvent.ShowChannelExitWarningDialog ->
-				showChannelExitWarningDialog(event.clientAuthority)
+				showChannelExitWarningDialog(event.isClientHost)
 
 			is ChannelEvent.MakeCaptureImage -> makeCaptureImage(
 				headerIndex = event.headerIndex, bottomIndex = event.bottomIndex

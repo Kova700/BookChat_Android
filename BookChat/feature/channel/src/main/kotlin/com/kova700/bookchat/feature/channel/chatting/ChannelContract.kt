@@ -111,7 +111,7 @@ sealed class ChannelEvent {
 	) : ChannelEvent()
 
 	data class ShowChannelExitWarningDialog(
-		val clientAuthority: ChannelMemberAuthority,
+		val isClientHost: Boolean,
 	) : ChannelEvent()
 
 	data class NewChatOccurEvent(

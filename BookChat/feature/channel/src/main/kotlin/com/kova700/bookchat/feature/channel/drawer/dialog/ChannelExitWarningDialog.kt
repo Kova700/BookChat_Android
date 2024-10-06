@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.feature.channel.databinding.DialogChannelExitWarningBinding
 import com.kova700.bookchat.util.dialog.DialogSizeManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,7 +14,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChannelExitWarningDialog(
-	private val clientAuthority: ChannelMemberAuthority,
+	private val isClientHost: Boolean,
 	private val onClickOkBtn: () -> Unit,
 ) : DialogFragment() {
 
@@ -53,8 +52,7 @@ class ChannelExitWarningDialog(
 	private fun initViewState() {
 		dialogSizeManager.setDialogSize(binding.root)
 		with(binding) {
-			hostWarningContentTv.visibility =
-				if (clientAuthority == ChannelMemberAuthority.HOST) View.VISIBLE else View.GONE
+			hostWarningContentTv.visibility = if (isClientHost) View.VISIBLE else View.GONE
 			okBtn.setOnClickListener { onClickOkBtn() }
 			cancelBtn.setOnClickListener { dismiss() }
 		}

@@ -225,7 +225,7 @@ class ChannelSettingActivity : AppCompatActivity() {
 		if (existingFragment != null) return
 
 		val dialog = ChannelExitWarningDialog(
-			clientAuthority = ChannelMemberAuthority.HOST,
+			isClientHost = true,
 			onClickOkBtn = { channelSettingViewModel.onClickChannelExitDialogBtn() }
 		)
 		dialog.show(supportFragmentManager, DIALOG_TAG_CHANNEL_EXIT_WARNING)
