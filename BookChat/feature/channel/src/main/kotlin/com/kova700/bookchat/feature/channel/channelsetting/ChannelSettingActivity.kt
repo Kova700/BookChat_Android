@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,7 +14,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
-import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.navigation.ImageCropNavigator
 import com.kova700.bookchat.core.navigation.ImageCropNavigator.Companion.EXTRA_CROPPED_IMAGE_CACHE_URI
@@ -24,6 +24,7 @@ import com.kova700.bookchat.feature.channel.channelsetting.dialog.ChannelCapacit
 import com.kova700.bookchat.feature.channel.channelsetting.dialog.ChannelProfileEditDialog
 import com.kova700.bookchat.feature.channel.databinding.ActivityChannelSettingBinding
 import com.kova700.bookchat.feature.channel.drawer.dialog.ChannelExitWarningDialog
+import com.kova700.bookchat.util.Constants.TAG
 import com.kova700.bookchat.util.channel.MakeChannelImgSizeManager
 import com.kova700.bookchat.util.image.bitmap.getImageBitmap
 import com.kova700.bookchat.util.image.image.deleteImageCache
@@ -50,7 +51,6 @@ class ChannelSettingActivity : AppCompatActivity() {
 
 	@Inject
 	lateinit var makeChannelImgSizeManager: MakeChannelImgSizeManager
-	//TODO : 기본이미지 채널 기본이미지 맞는지 확인
 
 	private val permissionsLauncher = this.getPermissionsLauncher(
 		onSuccess = { moveToImageCrop() },
@@ -152,6 +152,10 @@ class ChannelSettingActivity : AppCompatActivity() {
 	}
 
 	private fun setChannelImage(uiState: ChannelSettingUiState) {
+		Log.d(
+			TAG,
+			"ChannelSettingActivity: setChannelImage() - uiState.channel.defaultRoomImageType : ${uiState.channel.defaultRoomImageType}"
+		)
 		binding.channelImgIv.loadChangedChannelProfile(
 			imageUrl = uiState.channel.roomImageUri,
 			channelDefaultImageType = uiState.channel.defaultRoomImageType,

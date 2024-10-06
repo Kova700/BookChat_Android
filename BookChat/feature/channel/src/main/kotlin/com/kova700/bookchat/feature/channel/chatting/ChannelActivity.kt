@@ -266,10 +266,8 @@ class ChannelActivity : AppCompatActivity() {
 				setSelection(uiState.enteredMessage.length)
 			}
 		}
-		with(binding.chatSendBtn) {
-			visibility =
-				if (uiState.enteredMessage.isBlank()) View.GONE else View.VISIBLE //TODO : GONE OR INVISIBLE 테스트 필요
-		}
+		binding.chatSendBtn.visibility =
+			if (uiState.enteredMessage.isBlank()) View.GONE else View.VISIBLE
 	}
 
 	private fun setNewChatNoticeState(uiState: ChannelUiState) {
