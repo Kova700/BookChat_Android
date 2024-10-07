@@ -65,26 +65,21 @@ class ChatRepositoryImpl @Inject constructor(
 	}
 
 	/** 소켓이 끊긴 사이 발생한 채팅들을 서버와 동기화하기 위해서 호출하는 함수
-	 * 2번 getNewerChats 호출 후, 남은 채팅이 더 있다면
-	 * 유저가 아래로 스크롤을 굳이 하지않는 이상. 더 이상 호출하지않고
-	 * channelLastChat만 갱신하여 유저에게 새로운 채팅이 있음을 알림 */
+	 * 마지막 load된 채팅을 기준으로 최대 2번 getNewerChats 호출 후, 남은 채팅을 전부 load하지 못했다면,
+	 * 가장 최근 채팅만 가져와서 channelLastChat만 갱신하여 유저에게 새로운 채팅이 있음을 알림
+	 * (유저가 스크롤해서 이동하지 않는 이상, 중간에 load되지 않은 채팅을 남겨둔다는 의미)*/
 	override suspend fun syncChats(
 		channelId: Long,
 		maxAttempts: Int,
 	): List<Chat> {
 		_isNewerChatFullyLoaded.value = false
 
-		var isFinishGetNewerChats = false
+		for (i in 0 until 2) {
+			runCatching { getNewerChats(channelId) }
+			if (_isNewerChatFullyLoaded.value) return sortedChats.firstOrNull() ?: emptyList()
+		}
+
 		for (attempt in 0 until maxAttempts) {
-
-			if (isFinishGetNewerChats.not()) {
-				for (i in 0 until 2) {
-					runCatching { getNewerChats(channelId) }
-					if (_isNewerChatFullyLoaded.value) return sortedChats.firstOrNull() ?: emptyList()
-				}
-				isFinishGetNewerChats = true
-			}
-
 			runCatching {
 				chatApi.getChats(
 					roomId = channelId,
@@ -93,9 +88,7 @@ class ChatRepositoryImpl @Inject constructor(
 					sort = SearchSortOptionNetwork.ID_DESC,
 				)
 			}.onSuccess { response ->
-				val newChats = response.chatResponseList
-					.map { it.toChat(channelId = channelId) }
-
+				val newChats = response.chatResponseList.map { it.toChat(channelId = channelId) }
 				cachedChannelId = channelId
 				chatDAO.insertChats(newChats.toChatEntity())
 				return newChats
