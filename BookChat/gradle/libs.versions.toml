@@ -131,6 +131,7 @@ androidx-room-paging = { group = "androidx.room", name = "room-paging", version.
 ## WorkManager
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManagerRuntimeKtx" }
 androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "workManagerHilt" }
+androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "workManagerHilt" }
 
 ## About Libraries
 aboutlibraries = { group = "com.mikepenz", name = "aboutlibraries", version.ref = "aboutlibraries" }
@@ -238,7 +239,7 @@ room = [
 ]
 workmanager = [
     "androidx-work-runtime-ktx",
-    "androidx-hilt-work"
+    "androidx-hilt-work",
 ]
 google-login = [
     "androidx-credentials",

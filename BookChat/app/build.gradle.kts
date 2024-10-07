@@ -22,6 +22,7 @@ dependencies {
 	implementation(libs.bundles.androidx.default)
 // WorkManager
 	implementation(libs.bundles.workmanager)
+	ksp(libs.androidx.hilt.compiler)
 
 	//splash는 default Activity라서 지우면 안됨
 	implementation(project(":feature:splash"))

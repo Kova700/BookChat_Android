@@ -9,6 +9,7 @@ android {
 
 dependencies {
 	implementation(libs.bundles.workmanager)
+	ksp(libs.androidx.hilt.compiler)
 	implementation(project(":core:domain"))
 	implementation(project(":core:data:channel:external"))
 	implementation(project(":core:data:chat:external"))
