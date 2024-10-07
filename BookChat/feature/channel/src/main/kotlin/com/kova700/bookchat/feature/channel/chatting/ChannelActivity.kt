@@ -25,10 +25,11 @@ import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
+import com.kova700.bookchat.feature.channel.channelsetting.ChannelSettingActivity
 import com.kova700.bookchat.feature.channel.channelsetting.ChannelSettingActivity.Companion.RESULT_CODE_USER_CHANNEL_EXIT
 import com.kova700.bookchat.feature.channel.chatting.adapter.ChatItemAdapter
+import com.kova700.bookchat.feature.channel.chatting.capture.captureItems
 import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
-import com.kova700.bookchat.feature.channel.chatting.util.captureItems
 import com.kova700.bookchat.feature.channel.chatting.wholetext.ChatWholeTextActivity
 import com.kova700.bookchat.feature.channel.chatting.wholetext.ChatWholeTextViewmodel
 import com.kova700.bookchat.feature.channel.databinding.ActivityChannelBinding
@@ -187,6 +188,7 @@ class ChannelActivity : AppCompatActivity() {
 			channelTitle.text = uiState.channel.roomName
 			roomMemberCount.text = uiState.channel.roomMemberCount.toString()
 		}
+		binding.progressBar.visibility = if (uiState.isInitLoading) View.VISIBLE else View.GONE
 	}
 
 	private fun setCaptureMode(uiState: ChannelUiState) {
@@ -471,10 +473,7 @@ class ChannelActivity : AppCompatActivity() {
 
 	private fun moveChannelSetting() {
 		val channelId = channelViewModel.uiState.value.channel.roomId
-		val intent = Intent(
-			this,
-			_root_ide_package_.com.kova700.bookchat.feature.channel.channelsetting.ChannelSettingActivity::class.java
-		)
+		val intent = Intent(this, ChannelSettingActivity::class.java)
 			.putExtra(EXTRA_CHANNEL_ID, channelId)
 		channelSettingResultLauncher.launch(intent)
 	}
@@ -625,8 +624,7 @@ class ChannelActivity : AppCompatActivity() {
 				headerIndex = headerIndex,
 				bottomIndex = bottomIndex
 			)
-		}
-			.onSuccess { channelViewModel.onCompletedCapture() }
+		}.onSuccess { channelViewModel.onCompletedCapture() }
 			.onFailure { channelViewModel.onFailedCapture() }
 	}
 

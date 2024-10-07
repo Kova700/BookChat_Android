@@ -1,4 +1,4 @@
-package com.kova700.bookchat.feature.channel.chatting.util
+package com.kova700.bookchat.feature.channel.chatting.capture
 
 import android.graphics.Bitmap
 import android.graphics.Canvas

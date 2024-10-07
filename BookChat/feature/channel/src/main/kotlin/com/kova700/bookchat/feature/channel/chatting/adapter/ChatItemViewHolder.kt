@@ -6,7 +6,7 @@ import androidx.viewbinding.ViewBinding
 import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
-import com.kova700.bookchat.feature.channel.chatting.util.setCaptureViewState
+import com.kova700.bookchat.feature.channel.chatting.capture.setCaptureViewState
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingDateBinding
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingLastReadNoticeBinding
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingMineBinding
