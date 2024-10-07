@@ -96,42 +96,50 @@ class ChannelRepositoryImpl @Inject constructor(
 			.also { channelDAO.upsertChannel(it.toChannelEntity()) }
 	}
 
-	override suspend fun getChannelInfo(channelId: Long): ChannelInfo? {
-		Log.d(TAG, "ChannelRepositoryImpl: getChannelInfo() - called")
-		val response = channelApi.getChannelInfo(channelId)
-		when (response) {
-			is BookChatApiResult.Success -> {
-				val channelInfo = response.data.toDomain()
+	/** 지수 백오프 적용 */
+	override suspend fun getChannelInfo(
+		channelId: Long,
+		maxAttempts: Int,
+	): ChannelInfo? {
+		for (attempt in 0 until maxAttempts) {
+			val response = runCatching { channelApi.getChannelInfo(channelId) }
+				.onFailure { delay((DEFAULT_RETRY_ATTEMPT_DELAY_TIME * (1.5).pow(attempt))) }
+				.getOrNull() ?: continue
 
-				channelDAO.updateDetailInfo(
-					roomId = channelId,
-					roomName = channelInfo.roomName,
-					roomHostId = channelInfo.roomHost.id,
-					roomMemberCount = channelInfo.participants.size,
-					participantIds = channelInfo.participantIds,
-					participantAuthorities = channelInfo.participantAuthorities,
-					bookTitle = channelInfo.bookTitle,
-					bookAuthors = channelInfo.bookAuthors,
-					bookCoverImageUrl = channelInfo.bookCoverImageUrl,
-					roomTags = channelInfo.roomTags,
-					roomCapacity = channelInfo.roomCapacity,
-				)
-				setChannels(mapChannels.value + (channelId to getChannelWithUpdatedData(channelId)))
-				return channelInfo
-			}
-
-			is BookChatApiResult.Failure -> {
-				val failBody =
-					response.body?.let { jsonSerializer.decodeFromString<BookChatFailResponseBody>(it) }
-				when (failBody?.errorCode) {
-					RESPONSE_CODE_CHANNEL_PARTICIPANT_NOT_FOUND -> Unit
-					RESPONSE_CODE_CHANNEL_IS_BANNED -> banChannelClient(channelId = channelId)
-					RESPONSE_CODE_CHANNEL_IS_EXPLODED -> leaveChannelHost(channelId)
-					else -> throw Exception("failed to get channel info")
+			when (response) {
+				is BookChatApiResult.Success -> {
+					val channelInfo = response.data.toDomain()
+					channelDAO.updateDetailInfo(
+						roomId = channelId,
+						roomName = channelInfo.roomName,
+						roomHostId = channelInfo.roomHost.id,
+						roomMemberCount = channelInfo.participants.size,
+						participantIds = channelInfo.participantIds,
+						participantAuthorities = channelInfo.participantAuthorities,
+						bookTitle = channelInfo.bookTitle,
+						bookAuthors = channelInfo.bookAuthors,
+						bookCoverImageUrl = channelInfo.bookCoverImageUrl,
+						roomTags = channelInfo.roomTags,
+						roomCapacity = channelInfo.roomCapacity,
+					)
+					setChannels(mapChannels.value + (channelId to getChannelWithUpdatedData(channelId)))
+					return channelInfo
 				}
-				return null
+
+				is BookChatApiResult.Failure -> {
+					val failBody =
+						response.body?.let { jsonSerializer.decodeFromString<BookChatFailResponseBody>(it) }
+					when (failBody?.errorCode) {
+						RESPONSE_CODE_CHANNEL_PARTICIPANT_NOT_FOUND -> Unit
+						RESPONSE_CODE_CHANNEL_IS_BANNED -> banChannelClient(channelId = channelId)
+						RESPONSE_CODE_CHANNEL_IS_EXPLODED -> leaveChannelHost(channelId)
+						else -> throw Exception("failed to get channel info")
+					}
+					return null
+				}
 			}
 		}
+		throw IOException("failed to get channel info")
 	}
 
 	override suspend fun makeChannel(

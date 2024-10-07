@@ -22,7 +22,10 @@ interface ChannelRepository {
 	): List<Channel>
 
 	suspend fun getChannel(channelId: Long): Channel
-	suspend fun getChannelInfo(channelId: Long): ChannelInfo?
+	suspend fun getChannelInfo(
+		channelId: Long,
+		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS,
+	): ChannelInfo?
 
 	suspend fun makeChannel(
 		channelTitle: String,
