@@ -12,6 +12,15 @@
         android:layout_height="match_parent"
         tools:context=".ui.channel.chatting.ChannelActivity">
 
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="47dp"
+            android:layout_height="52dp"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_layout"
+            app:layout_constraintEnd_toEndOf="@+id/chatting_rcv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/top_divider" />
+
         <TextView
             android:id="@+id/socket_state_bar"
             android:layout_width="0dp"
@@ -204,8 +213,8 @@
                     android:gravity="center_vertical"
                     android:hint="@string/chat_room_send_message"
                     android:lineSpacingExtra="5dp"
-                    android:maxLines="4"
                     android:maxLength="50000"
+                    android:maxLines="4"
                     android:paddingVertical="5dp"
                     android:textColor="#303030"
                     android:textColorHint="#CFCFCF"

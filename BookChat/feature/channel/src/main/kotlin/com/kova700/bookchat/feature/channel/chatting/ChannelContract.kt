@@ -51,9 +51,12 @@ data class ChannelUiState(
 	val isClientHost
 		get() = clientAuthority == ChannelMemberAuthority.HOST
 
+	val isInitLoading
+		get() = uiState == UiState.INIT_LOADING
+
 	enum class UiState {
 		SUCCESS,
-		LOADING,
+		INIT_LOADING,
 		ERROR,
 	}
 
