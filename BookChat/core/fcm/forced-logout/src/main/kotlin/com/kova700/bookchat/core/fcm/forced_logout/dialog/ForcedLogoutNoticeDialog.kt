@@ -34,6 +34,7 @@ class ForcedLogoutNoticeDialog(
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+		isCancelable = false
 		initViewState()
 	}
 
