@@ -32,8 +32,10 @@ class AccountSettingViewModel @Inject constructor(
 		updateState { copy(uiState = UiState.LOADING) }
 		runCatching { logoutUseCase() }
 			.onSuccess { startEvent(AccountSettingUiEvent.StartOAuthLogout) }
-			.onFailure { startEvent(AccountSettingUiEvent.ShowSnackBar(R.string.sign_out_fail)) }
-			.also { updateState { copy(uiState = UiState.SUCCESS) } }
+			.onFailure {
+				startEvent(AccountSettingUiEvent.ShowSnackBar(R.string.sign_out_fail))
+				updateState { copy(uiState = UiState.ERROR) }
+			}
 	}
 
 	private fun withdraw() = viewModelScope.launch {
@@ -41,8 +43,10 @@ class AccountSettingViewModel @Inject constructor(
 		updateState { copy(uiState = UiState.LOADING) }
 		runCatching { withdrawUseCase() }
 			.onSuccess { startEvent(AccountSettingUiEvent.StartOAuthWithdraw) }
-			.onFailure { startEvent(AccountSettingUiEvent.ShowSnackBar(R.string.withdraw_fail)) }
-			.also { updateState { copy(uiState = UiState.SUCCESS) } }
+			.onFailure {
+				startEvent(AccountSettingUiEvent.ShowSnackBar(R.string.withdraw_fail))
+				updateState { copy(uiState = UiState.ERROR) }
+			}
 	}
 
 	fun onSuccessOAuthLogout() {
