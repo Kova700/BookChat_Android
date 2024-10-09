@@ -1,6 +1,8 @@
 package com.kova700.bookchat.feature.channel.channelsetting.authoritymanage.subhost
 
 import android.os.Bundle
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -33,7 +35,14 @@ class SubHostManageActivity : AppCompatActivity() {
 		viewPagerAdapter = SubHostManageViewPagerAdapter(fragments, this)
 		setBackPressedDispatcher()
 		initViewState()
+		observeUiState()
 		observeUiEvent()
+	}
+
+	private fun observeUiState() = lifecycleScope.launch {
+		subHostManageViewModel.uiState.collect { state ->
+			setViewState(state)
+		}
 	}
 
 	private fun observeUiEvent() = lifecycleScope.launch {
@@ -45,6 +54,10 @@ class SubHostManageActivity : AppCompatActivity() {
 			subHostManageVp.adapter = viewPagerAdapter
 			subHostManageVp.isUserInputEnabled = false
 		}
+	}
+
+	private fun setViewState(state: SubHostManageUiState) {
+		binding.progressBar.visibility = if (state.isLoading) VISIBLE else GONE
 	}
 
 	private fun changeTab(tabIndex: Int) {

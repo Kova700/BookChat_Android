@@ -280,6 +280,7 @@
     <string name="change_channel_setting_fail">채팅방 수정을 실패했습니다.</string>
     <string name="leave_channel">채팅방 나가기</string>
     <string name="channel_member_search_by_name">이름으로 검색</string>
+    <string name="channel_member_authority_delete">해제</string>
 
     <!--image crop-->
     <string name="select_image">사진 선택</string>
