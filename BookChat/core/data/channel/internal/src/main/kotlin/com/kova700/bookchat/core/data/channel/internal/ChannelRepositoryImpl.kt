@@ -41,7 +41,6 @@ import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.time.Duration.Companion.seconds
 
-//TODO : 채팅방 정보 조회 API 실패 시 재시도 로직 필요함 (채팅 전송 재시도 로직같은)
 class ChannelRepositoryImpl @Inject constructor(
 	private val channelApi: ChannelApi,
 	private val channelDAO: ChannelDAO,
