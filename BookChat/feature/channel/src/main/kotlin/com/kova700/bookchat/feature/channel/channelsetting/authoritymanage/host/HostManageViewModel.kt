@@ -7,6 +7,7 @@ import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthor
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.channel.channelsetting.ChannelSettingActivity
+import com.kova700.bookchat.feature.channel.channelsetting.authoritymanage.host.HostManageUiState.UiState
 import com.kova700.bookchat.feature.channel.channelsetting.authoritymanage.mapper.toMemberItems
 import com.kova700.bookchat.feature.channel.channelsetting.authoritymanage.model.MemberItem
 import com.kova700.core.domain.usecase.channel.GetClientChannelFlowUseCase
@@ -62,20 +63,21 @@ class HostManageViewModel @Inject constructor(
 	}
 
 	private fun updateChannelHost(selectedMemberId: Long) = viewModelScope.launch {
-		if (uiState.value.uiState == HostManageUiState.UiState.LOADING) return@launch
-		updateState { copy(uiState = HostManageUiState.UiState.LOADING) }
+		if (uiState.value.isLoading) return@launch
+		updateState { copy(uiState = UiState.LOADING) }
 		runCatching {
 			channelRepository.updateChannelHost(
 				channelId = channelId,
 				targetUserId = selectedMemberId,
 				needServer = true
 			)
+		}.onSuccess {
+			updateState { copy(uiState = UiState.SUCCESS) }
+			startEvent(HostManageUiEvent.ShowHostChangeSuccessDialog)
+		}.onFailure {
+			updateState { copy(uiState = UiState.ERROR) }
+			startEvent(HostManageUiEvent.ShowSnackBar(R.string.change_channel_host_fail))
 		}
-			.onSuccess {
-				updateState { copy(uiState = HostManageUiState.UiState.SUCCESS) }
-				startEvent(HostManageUiEvent.ShowHostChangeSuccessDialog)
-			}
-			.onFailure { startEvent(HostManageUiEvent.ShowSnackBar(R.string.change_channel_host_fail)) }
 	}
 
 	fun onClickXBtn() {
