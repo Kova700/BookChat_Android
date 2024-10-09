@@ -89,8 +89,9 @@ class AgonyRecordViewModel @Inject constructor(
 	}
 
 	fun loadNextAgonyRecords(lastVisibleItemPosition: Int) {
-		if (uiState.value.records.size - 1 > lastVisibleItemPosition ||
-			uiState.value.isLoading
+		if (uiState.value.records.size - 1 > lastVisibleItemPosition
+			|| uiState.value.isLoading
+			|| uiState.value.isPagingError
 		) return
 		getAgonyRecords()
 	}

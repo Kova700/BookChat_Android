@@ -22,7 +22,7 @@ data class ChannelListUiState(
 	val isInitError
 		get() = uiState == UiState.INIT_ERROR
 
-	val isPageError
+	val isPagingError
 		get() = uiState == UiState.PAGING_ERROR
 
 	val isEmpty

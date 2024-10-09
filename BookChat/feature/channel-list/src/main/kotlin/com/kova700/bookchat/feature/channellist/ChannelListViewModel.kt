@@ -104,14 +104,17 @@ class ChannelListViewModel @Inject constructor(
 		updateState { copy(uiState = UiState.PAGING_LOADING) }
 		runCatching { getClientChannelsUseCase() }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { updateState { copy(uiState = UiState.PAGING_ERROR) } }
+			.onFailure {
+				updateState { copy(uiState = UiState.PAGING_ERROR) }
+				startEvent(ChannelListUiEvent.ShowSnackBar(R.string.error_else))
+			}
 	}
 
 	fun loadNextChannels(lastVisibleItemPosition: Int) {
 		if (uiState.value.channelListItem.size - 1 > lastVisibleItemPosition
 			|| uiState.value.networkState == NetworkState.DISCONNECTED
 			|| uiState.value.isLoading
-			|| uiState.value.isPageError
+			|| uiState.value.isPagingError
 		) return
 		getChannels()
 	}

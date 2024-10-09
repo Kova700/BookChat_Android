@@ -19,6 +19,9 @@ data class WishBookShelfUiState(
 	val isInitError: Boolean
 		get() = uiState == UiState.INIT_ERROR
 
+	val isPagingError: Boolean
+		get() = uiState == UiState.PAGING_ERROR
+
 	val isEmpty: Boolean
 		get() = wishItems.isEmpty()
 						&& isInitLoading.not()

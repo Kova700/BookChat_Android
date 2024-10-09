@@ -23,6 +23,9 @@ data class AgonyUiState(
 	val isInitError: Boolean
 		get() = uiState == UiState.INIT_ERROR
 
+	val isPagingError: Boolean
+		get() = uiState == UiState.PAGING_ERROR
+
 	val isEditing: Boolean
 		get() = uiState == UiState.EDITING
 

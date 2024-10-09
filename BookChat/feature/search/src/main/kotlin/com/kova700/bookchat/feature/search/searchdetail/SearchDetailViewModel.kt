@@ -132,6 +132,7 @@ class SearchDetailViewModel @Inject constructor(
 	fun loadNextData(lastVisibleItemPosition: Int) {
 		if (uiState.value.searchItems.size - 1 > lastVisibleItemPosition
 			|| uiState.value.isLoading
+			|| uiState.value.isPagingError
 		) return
 		getSearchItems()
 	}

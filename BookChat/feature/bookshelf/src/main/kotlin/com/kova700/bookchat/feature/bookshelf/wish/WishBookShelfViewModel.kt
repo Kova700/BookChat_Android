@@ -79,8 +79,9 @@ class WishBookShelfViewModel @Inject constructor(
 	}
 
 	fun loadNextBookShelfItems(lastVisibleItemPosition: Int) {
-		if (uiState.value.wishItems.size - 1 > lastVisibleItemPosition ||
-			uiState.value.isLoading
+		if (uiState.value.wishItems.size - 1 > lastVisibleItemPosition
+			|| uiState.value.isLoading
+			|| uiState.value.isPagingError
 		) return
 		getBookShelfItems()
 	}
