@@ -91,11 +91,9 @@ class ClientRepositoryImpl @Inject constructor(
 		)
 	}
 
-	//TODO : userProfile = null로 보내면 null로 설정이 안됨 (서버 수정 대기중)
-	//  기존에 이미지 URL을 ByteArray로 만들어서 다시 보내거나
-	// 서버에게 이미지는 바꾸지 않았다는 flag를 따로 보내거나
 	override suspend fun changeClientProfile(
 		newNickname: String,
+		isProfileChanged: Boolean,
 		userProfile: ByteArray?,
 	): User {
 		clientApi.changeUserProfile(
@@ -105,7 +103,10 @@ class ClientRepositoryImpl @Inject constructor(
 				fileName = PROFILE_IMAGE_FILE_NAME,
 				fileExtension = PROFILE_IMAGE_FILE_EXTENSION
 			),
-			requestChangeUserNickname = RequestChangeUserNickname(nickname = newNickname)
+			requestChangeUserNickname = RequestChangeUserNickname(
+				nickname = newNickname,
+				isProfileChanged = isProfileChanged
+			)
 		)
 		return clientApi.getUserProfile().toUser()
 			.also { newClient -> client.update { newClient } }

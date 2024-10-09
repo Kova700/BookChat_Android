@@ -21,7 +21,7 @@ data class UserEditUiState(
 	private val isNicknameChanged
 		get() = newNickname != client.nickname
 
-	private val isProfileChanged
+	val isProfileChanged
 		get() = clientNewImage != null
 
 	val isNeedDuplicatesNicknameCheck

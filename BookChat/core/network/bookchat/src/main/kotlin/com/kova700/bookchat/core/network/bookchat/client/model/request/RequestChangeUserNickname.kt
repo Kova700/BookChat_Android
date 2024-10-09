@@ -7,4 +7,6 @@ import kotlinx.serialization.Serializable
 data class RequestChangeUserNickname(
 	@SerialName("nickname")
 	val nickname: String,
+	@SerialName("isProfileChanged")
+	val isProfileChanged: Boolean,
 )

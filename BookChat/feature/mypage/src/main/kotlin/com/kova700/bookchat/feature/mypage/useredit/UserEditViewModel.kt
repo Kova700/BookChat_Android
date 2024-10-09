@@ -40,19 +40,18 @@ class UserEditViewModel @Inject constructor(
 		}
 	}
 
-	//TODO : 닉네임만 변경할 때, 이미지 Profile은 null로 전송됨
-	// null로 전송되면 서버입장에서는 default 이미지로 변경되는지 알고 기존에 이미지를 null로 수정시킴
-	// 기본 이미지로 변경된다는 flag를 추가하면 기존 프로필을 변경한다라는 구조로 바꾸는게 더 효율적인거 같은데
-	// isProfileChanged = true라면 서버는 새로 받은 이미지로 덮어쓰기(null Or MultiPart)
-	// isProfileChanged = false라면 서버는 기존 이미지로 유지
-	// 서버 수정 대기 중
 	private fun verifyNickname() {
-		val nickName = uiState.value.newNickname
+		val nickname = uiState.value.newNickname
 		val userProfile = uiState.value.clientNewImage
+		val isProfileChanged = uiState.value.isProfileChanged
 
 		when {
-			uiState.value.isNeedDuplicatesNicknameCheck -> checkNicknameDuplication(nickName)
-			else -> changeClientProfile(nickName, userProfile)
+			uiState.value.isNeedDuplicatesNicknameCheck -> checkNicknameDuplication(nickname)
+			else -> changeClientProfile(
+				newNickname = nickname,
+				userProfile = userProfile,
+				isProfileChanged = isProfileChanged
+			)
 		}
 	}
 
@@ -89,8 +88,9 @@ class UserEditViewModel @Inject constructor(
 	}
 
 	private fun changeClientProfile(
-		newNickName: String,
+		newNickname: String,
 		userProfile: Bitmap?,
+		isProfileChanged: Boolean
 	) {
 		if (uiState.value.uiState == UiState.LOADING) return
 		updateState { copy(uiState = UiState.LOADING) }
@@ -98,8 +98,9 @@ class UserEditViewModel @Inject constructor(
 		viewModelScope.launch {
 			runCatching {
 				clientRepository.changeClientProfile(
-					newNickname = newNickName,
-					userProfile = userProfile?.compressToByteArray()
+					newNickname = newNickname,
+					userProfile = userProfile?.compressToByteArray(),
+					isProfileChanged = isProfileChanged
 				)
 			}
 				.onSuccess { newClient ->

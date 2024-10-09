@@ -27,6 +27,7 @@ interface ClientRepository {
 
 	suspend fun changeClientProfile(
 		newNickname: String,
+		isProfileChanged: Boolean,
 		userProfile: ByteArray?,
 	): User
 
