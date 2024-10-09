@@ -111,6 +111,7 @@ class ChannelListViewModel @Inject constructor(
 		if (uiState.value.channelListItem.size - 1 > lastVisibleItemPosition
 			|| uiState.value.networkState == NetworkState.DISCONNECTED
 			|| uiState.value.isLoading
+			|| uiState.value.isPageError
 		) return
 		getChannels()
 	}

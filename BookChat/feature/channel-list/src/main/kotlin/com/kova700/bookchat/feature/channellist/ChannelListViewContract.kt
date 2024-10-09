@@ -13,14 +13,17 @@ data class ChannelListUiState(
 	val isLoading
 		get() = isInitLoading || isPageLoading
 
+	val isInitLoading
+		get() = uiState == UiState.INIT_LOADING
+
 	val isPageLoading
 		get() = uiState == UiState.PAGING_LOADING
 
 	val isInitError
 		get() = uiState == UiState.INIT_ERROR
 
-	val isInitLoading
-		get() = uiState == UiState.INIT_LOADING
+	val isPageError
+		get() = uiState == UiState.PAGING_ERROR
 
 	val isEmpty
 		get() = channelListItem.isEmpty()
