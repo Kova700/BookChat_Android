@@ -12,6 +12,9 @@ data class ChannelSettingUiState(
 	val newProfileImage: Bitmap?,
 	val isSelectedDefaultImage: Boolean,
 ) {
+	val isLoading
+		get() = uiState == UiState.LOADING
+
 	private val isExistsChange
 		get() = isTitleChanged || isTagsChanged
 						|| isProfileChanged || isCapacityChanged
@@ -23,8 +26,9 @@ data class ChannelSettingUiState(
 	private val isTagsChanged
 		get() = newTags != channel.tagsString
 
-	private val isProfileChanged
-		get() = newProfileImage != null
+	val isProfileChanged
+		get() = (newProfileImage != null)
+						|| isSelectedDefaultImage
 
 	private val isCapacityChanged
 		get() = newCapacity != channel.roomCapacity

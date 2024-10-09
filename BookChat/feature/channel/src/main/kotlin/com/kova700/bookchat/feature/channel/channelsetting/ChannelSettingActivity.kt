@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,7 +23,6 @@ import com.kova700.bookchat.feature.channel.channelsetting.dialog.ChannelCapacit
 import com.kova700.bookchat.feature.channel.channelsetting.dialog.ChannelProfileEditDialog
 import com.kova700.bookchat.feature.channel.databinding.ActivityChannelSettingBinding
 import com.kova700.bookchat.feature.channel.drawer.dialog.ChannelExitWarningDialog
-import com.kova700.bookchat.util.Constants.TAG
 import com.kova700.bookchat.util.channel.MakeChannelImgSizeManager
 import com.kova700.bookchat.util.image.bitmap.getImageBitmap
 import com.kova700.bookchat.util.image.image.deleteImageCache
@@ -86,11 +84,13 @@ class ChannelSettingActivity : AppCompatActivity() {
 	}
 
 	private fun initViewState() {
-		binding.channelTitleEt.addTextChangedListener { text ->
-			channelSettingViewModel.onChangeChannelTitle(text.toString())
-		}
-		binding.channelTagEt.addTextChangedListener { text ->
-			channelSettingViewModel.onChangeChannelTags(text.toString())
+		with(binding) {
+			channelTitleEt.addTextChangedListener { text ->
+				channelSettingViewModel.onChangeChannelTitle(text.toString())
+			}
+			channelTagEt.addTextChangedListener { text ->
+				channelSettingViewModel.onChangeChannelTags(text.toString())
+			}
 		}
 		makeChannelImgSizeManager.setMakeChannelImgSize(binding.channelImgIv)
 		with(binding) {
@@ -118,6 +118,7 @@ class ChannelSettingActivity : AppCompatActivity() {
 				getString(R.string.channel_setting_new_title_length, uiState.newTitle.length)
 			channelTagsCountTv.text =
 				getString(R.string.channel_setting_new_tags_length, uiState.newTags.length)
+			progressBar.visibility = if (uiState.isLoading) View.VISIBLE else View.GONE
 		}
 	}
 
@@ -152,10 +153,6 @@ class ChannelSettingActivity : AppCompatActivity() {
 	}
 
 	private fun setChannelImage(uiState: ChannelSettingUiState) {
-		Log.d(
-			TAG,
-			"ChannelSettingActivity: setChannelImage() - uiState.channel.defaultRoomImageType : ${uiState.channel.defaultRoomImageType}"
-		)
 		binding.channelImgIv.loadChangedChannelProfile(
 			imageUrl = uiState.channel.roomImageUri,
 			channelDefaultImageType = uiState.channel.defaultRoomImageType,

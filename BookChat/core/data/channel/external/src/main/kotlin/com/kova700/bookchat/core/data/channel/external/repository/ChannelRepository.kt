@@ -42,6 +42,7 @@ interface ChannelRepository {
 		channelCapacity: Int,
 		channelTags: List<String>,
 		channelImage: ByteArray?,
+		isProfileChanged: Boolean,
 	)
 
 	suspend fun leaveChannel(channelId: Long)

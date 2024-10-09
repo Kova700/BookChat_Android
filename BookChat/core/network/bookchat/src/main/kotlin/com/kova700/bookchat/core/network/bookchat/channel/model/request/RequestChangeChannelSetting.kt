@@ -13,4 +13,6 @@ data class RequestChangeChannelSetting(
 	val channelCapacity: Int,
 	@SerialName("tags")
 	val channelTags: List<String>,
+	@SerialName("isProfileChanged")
+	val isProfileChanged: Boolean,
 )

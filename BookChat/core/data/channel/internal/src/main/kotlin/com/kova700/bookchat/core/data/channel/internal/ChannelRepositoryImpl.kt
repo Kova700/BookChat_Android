@@ -175,6 +175,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		channelCapacity: Int,
 		channelTags: List<String>,
 		channelImage: ByteArray?,
+		isProfileChanged: Boolean,
 	) {
 		channelApi.changeChannelSetting(
 			channelId = channelId,
@@ -182,7 +183,8 @@ class ChannelRepositoryImpl @Inject constructor(
 				channelId = channelId,
 				channelTitle = channelTitle,
 				channelCapacity = channelCapacity,
-				channelTags = channelTags
+				channelTags = channelTags,
+				isProfileChanged = isProfileChanged
 			),
 			chatRoomImage = channelImage?.toMultiPartBody(
 				contentType = CONTENT_TYPE_IMAGE_WEBP,
