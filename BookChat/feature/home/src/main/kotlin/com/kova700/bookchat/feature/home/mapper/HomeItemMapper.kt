@@ -33,7 +33,7 @@ fun groupItems(
 
 	if (channelUiState != UiState.INIT_LOADING) groupedItems.add(HomeItem.ChannelHeader)
 	when {
-		channelUiState == UiState.INIT_ERROR -> groupedItems.add(HomeItem.ChannelRetry)
+		channels.isNullOrEmpty() && channelUiState == UiState.INIT_ERROR -> groupedItems.add(HomeItem.ChannelRetry)
 		channelUiState == UiState.INIT_LOADING -> groupedItems.add(HomeItem.ChannelLoading)
 		channels.isNullOrEmpty() -> groupedItems.add(HomeItem.ChannelEmpty)
 		else -> groupedItems.addAll(channels.take(3).toHomeChannelItems())

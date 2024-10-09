@@ -53,6 +53,7 @@ class HomeViewModel @Inject constructor(
 			getClientChannelsFlowUseCase(),
 			_uiState
 		) { bookshelfItems, channels, uiState ->
+			if (channels.isNotEmpty()) updateState { copy(channelUiState = UiState.SUCCESS) }
 			groupItems(
 				clientNickname = uiState.client.nickname,
 				books = bookshelfItems,
@@ -65,6 +66,7 @@ class HomeViewModel @Inject constructor(
 	}
 
 	private fun getReadingBooks() = viewModelScope.launch {
+		updateState { copy(bookUiState = UiState.INIT_LOADING) }
 		runCatching { bookShelfRepository.getBookShelfItems(BookShelfState.READING) }
 			.onSuccess { updateState { copy(bookUiState = UiState.SUCCESS) } }
 			.onFailure {
@@ -74,11 +76,12 @@ class HomeViewModel @Inject constructor(
 	}
 
 	private fun getChannels() = viewModelScope.launch {
+		updateState { copy(channelUiState = UiState.INIT_LOADING) }
 		runCatching { getClientMostActiveChannelsUseCase() }
 			.onSuccess { updateState { copy(channelUiState = UiState.SUCCESS) } }
 			.onFailure {
-				startEvent(HomeUiEvent.ShowSnackBar(R.string.error_else))
 				updateState { copy(channelUiState = UiState.INIT_ERROR) }
+				startEvent(HomeUiEvent.ShowSnackBar(R.string.error_else))
 			}
 	}
 
