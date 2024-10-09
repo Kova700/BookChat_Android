@@ -170,7 +170,6 @@ class ChannelRepositoryImpl @Inject constructor(
 		return getChannel(createdChannelId)
 	}
 
-	//TODO : 기존 사이즈보다 더 작은 수용인원으로 줄이려고한다면 안된다고 경고 UI 추가 필요
 	override suspend fun changeChannelSetting(
 		channelId: Long,
 		channelTitle: String,

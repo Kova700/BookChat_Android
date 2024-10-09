@@ -57,7 +57,7 @@ class ChannelSettingViewModel @Inject constructor(
 			.onFailure { startEvent(ChannelSettingUiEvent.ShowSnackBar(R.string.channel_exit_fail)) }
 	}
 
-	//TODO :{"errorCode":"500","message":"예상치 못한 예외가 발생했습니다."} 서버 수정 대기중
+	//TODO : isProfileChanged flag 추가해서 최적화 서버 수정 대기중
 	private fun changeChannelSetting() = viewModelScope.launch {
 		runCatching {
 			channelRepository.changeChannelSetting(
@@ -67,8 +67,7 @@ class ChannelSettingViewModel @Inject constructor(
 				channelCapacity = uiState.value.newCapacity,
 				channelImage = uiState.value.newProfileImage?.compressToByteArray()
 			)
-		}
-			.onSuccess { startEvent(ChannelSettingUiEvent.MoveBack) }
+		}.onSuccess { startEvent(ChannelSettingUiEvent.MoveBack) }
 			.onFailure {
 				startEvent(ChannelSettingUiEvent.CloseKeyboard)
 				startEvent(ChannelSettingUiEvent.ShowSnackBar(R.string.change_channel_setting_fail))
