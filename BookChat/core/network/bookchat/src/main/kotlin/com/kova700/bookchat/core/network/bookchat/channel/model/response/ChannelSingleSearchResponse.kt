@@ -19,5 +19,5 @@ data class ChannelSingleSearchResponse(
 	@SerialName("defaultRoomImageType")
 	val defaultRoomImageType: ChannelDefaultImageTypeNetwork,
 	@SerialName("roomImageUri")
-	val roomImageUri: String,
+	val roomImageUri: String? = null,
 )
