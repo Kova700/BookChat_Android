@@ -10,6 +10,7 @@ android {
 dependencies {
 	implementation(libs.bundles.retrofit)
 	implementation(platform(libs.okhttp.bom))
+	implementation(libs.kotlinx.serialization.json)
 	implementation(project(":core:oauth:external"))
 	implementation(project(":core:data:oauth:external"))
 	implementation(project(":core:data:client:external"))

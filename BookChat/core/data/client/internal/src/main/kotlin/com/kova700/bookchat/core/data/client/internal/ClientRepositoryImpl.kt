@@ -2,6 +2,7 @@ package com.kova700.bookchat.core.data.client.internal
 
 import com.kova700.bookchat.core.data.bookchat_token.external.model.BookChatToken
 import com.kova700.bookchat.core.data.client.external.ClientRepository
+import com.kova700.bookchat.core.data.client.external.model.AlreadySignedUpException
 import com.kova700.bookchat.core.data.client.external.model.NeedToDeviceWarningException
 import com.kova700.bookchat.core.data.client.external.model.NeedToSignUpException
 import com.kova700.bookchat.core.data.client.external.model.ReadingTaste
@@ -9,6 +10,7 @@ import com.kova700.bookchat.core.data.common.model.network.BookChatApiResult
 import com.kova700.bookchat.core.data.fcm_token.external.model.FCMToken
 import com.kova700.bookchat.core.data.oauth.external.model.IdToken
 import com.kova700.bookchat.core.data.user.external.model.User
+import com.kova700.bookchat.core.network.bookchat.channel.model.response.BookChatFailResponseBody
 import com.kova700.bookchat.core.network.bookchat.client.ClientApi
 import com.kova700.bookchat.core.network.bookchat.client.model.mapper.toBookChatToken
 import com.kova700.bookchat.core.network.bookchat.client.model.mapper.toNetWork
@@ -24,10 +26,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
+import kotlinx.serialization.json.Json
+import java.io.IOException
 import javax.inject.Inject
 
 class ClientRepositoryImpl @Inject constructor(
 	private val clientApi: ClientApi,
+	private val jsonSerializer: Json,
 ) : ClientRepository {
 	private val client = MutableStateFlow<User?>(null)
 
@@ -79,7 +84,7 @@ class ClientRepositoryImpl @Inject constructor(
 			readingTastes = readingTastes.map { it.toNetWork() },
 		)
 
-		clientApi.signUp(
+		val response = clientApi.signUp(
 			idToken = idToken.token,
 			userProfileImage = userProfile?.toMultiPartBody(
 				contentType = CONTENT_TYPE_IMAGE_WEBP,
@@ -89,6 +94,18 @@ class ClientRepositoryImpl @Inject constructor(
 			),
 			requestUserSignUp = requestUserSignUp
 		)
+
+		when (response) {
+			is BookChatApiResult.Success -> Unit
+			is BookChatApiResult.Failure -> {
+				val failBody =
+					response.body?.let { jsonSerializer.decodeFromString<BookChatFailResponseBody>(it) }
+				when (failBody?.errorCode) {
+					RESPONSE_CODE_ALREADY_SIGNED_UP -> throw AlreadySignedUpException(failBody.message)
+					else -> throw IOException("failed to signUp")
+				}
+			}
+		}
 	}
 
 	override suspend fun changeClientProfile(

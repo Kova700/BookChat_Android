@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kova700.bookchat.core.data.client.external.ClientRepository
+import com.kova700.bookchat.core.data.client.external.model.AlreadySignedUpException
 import com.kova700.bookchat.core.data.client.external.model.ReadingTaste
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.signup.selecttaste.SelectTasteActivity.Companion.EXTRA_SIGNUP_USER_NICKNAME
@@ -52,9 +53,10 @@ class SelectTasteViewModel @Inject constructor(
 				userProfile = uiState.value.userProfile
 			)
 		}.onSuccess { signIn() }
-			.onFailure {
+			.onFailure { throwable ->
 				updateState { copy(uiState = UiState.ERROR) }
-				startEvent(SelectTasteEvent.ErrorEvent(R.string.sign_up_fail))
+				if (throwable is AlreadySignedUpException) startEvent(SelectTasteEvent.ErrorEvent(R.string.sign_up_already_user))
+				else startEvent(SelectTasteEvent.ErrorEvent(R.string.sign_up_fail))
 			}
 	}
 

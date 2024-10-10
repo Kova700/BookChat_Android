@@ -30,7 +30,7 @@ interface ClientApi {
 		@Header("OIDC") idToken: String,
 		@Part userProfileImage: MultipartBody.Part? = null,
 		@Part("userSignUpRequest") requestUserSignUp: RequestUserSignUp,
-	)
+	): BookChatApiResult<Unit>
 
 	@PUT("/v1/api/devices/fcm-token")
 	suspend fun renewFcmToken(
