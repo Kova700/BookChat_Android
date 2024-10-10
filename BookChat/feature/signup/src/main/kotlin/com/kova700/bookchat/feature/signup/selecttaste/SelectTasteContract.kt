@@ -9,6 +9,9 @@ data class SelectTasteState(
 	val userProfile: ByteArray?,
 ) {
 
+	val isLoading: Boolean
+		get() = uiState == UiState.LOADING
+
 	enum class UiState {
 		SUCCESS,
 		LOADING,
@@ -26,8 +29,8 @@ data class SelectTasteState(
 }
 
 sealed class SelectTasteEvent {
-	object MoveToMain : SelectTasteEvent()
-	object MoveToBack : SelectTasteEvent()
+	data object MoveToMain : SelectTasteEvent()
+	data object MoveToBack : SelectTasteEvent()
 
 	data class ErrorEvent(val stringId: Int) : SelectTasteEvent()
 	data class UnknownErrorEvent(val message: String) : SelectTasteEvent()
