@@ -4,6 +4,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.kova700.bookchat.core.fcm.chat.ChatNotificationWorker
 import com.kova700.bookchat.core.fcm.forced_logout.ForcedLogoutWorker
+import com.kova700.bookchat.core.fcm.forced_logout.model.ForcedLogoutReason
 import com.kova700.bookchat.core.fcm.renew_fcm_token.RenewFcmTokenWorker
 import com.kova700.bookchat.core.fcm.service.model.ChatFcmBody
 import com.kova700.bookchat.core.fcm.service.model.FcmMessage
@@ -61,7 +62,10 @@ class FCMService : FirebaseMessagingService() {
 	}
 
 	private fun startForcedLogoutWorker() {
-		ForcedLogoutWorker.start(applicationContext)
+		ForcedLogoutWorker.start(
+			context = applicationContext,
+			reason = ForcedLogoutReason.CHANGE_DEVICE
+		)
 	}
 
 }

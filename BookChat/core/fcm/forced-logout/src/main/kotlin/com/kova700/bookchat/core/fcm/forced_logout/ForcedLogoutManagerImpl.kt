@@ -5,7 +5,8 @@ import android.app.Application
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.kova700.bookchat.core.fcm.forced_logout.dialog.ForcedLogoutNoticeDialog
+import com.kova700.bookchat.core.fcm.forced_logout.dialog.DeviceChangeForcedLogoutNoticeDialog
+import com.kova700.bookchat.core.fcm.forced_logout.dialog.TokenExpiredForcedLogoutNoticeDialog
 import com.kova700.bookchat.feature.login.LoginActivity
 import com.kova700.core.domain.usecase.client.LogoutUseCase
 import javax.inject.Inject
@@ -20,10 +21,16 @@ class ForcedLogoutManagerImpl @Inject constructor(
 		application.registerActivityLifecycleCallbacks(this)
 	}
 
-	override suspend fun onLogoutMessageReceived() {
+	override suspend fun onDeviceChanged() {
 		shouldShowLogoutNoticeDialog = true
 		logoutUseCase(needServer = false)
-		showLogoutDialog()
+		showDeviceChangedLogoutDialog()
+	}
+
+	override suspend fun onBookChatTokenExpired() {
+		shouldShowLogoutNoticeDialog = true
+		logoutUseCase(needServer = false)
+		showTokenExpiredDialog()
 	}
 
 	override fun onActivityCreated(activity: Activity, bundle: Bundle?) {
@@ -32,12 +39,12 @@ class ForcedLogoutManagerImpl @Inject constructor(
 
 	override fun onActivityStarted(activity: Activity) {
 		currentActivity = activity
-		showLogoutDialog()
+		showDeviceChangedLogoutDialog()
 	}
 
 	override fun onActivityResumed(activity: Activity) {
 		currentActivity = activity
-		showLogoutDialog()
+		showDeviceChangedLogoutDialog()
 	}
 
 	override fun onActivityPaused(activity: Activity) {}
@@ -48,23 +55,42 @@ class ForcedLogoutManagerImpl @Inject constructor(
 	override fun onActivitySaveInstanceState(activity: Activity, bundle: Bundle) {}
 	override fun onActivityDestroyed(activity: Activity) {}
 
-	private fun showLogoutDialog() {
+	private fun showTokenExpiredDialog() {
 		if (shouldShowLogoutNoticeDialog.not()) return
 
 		val supportFragmentManager =
 			(currentActivity as? AppCompatActivity ?: return).supportFragmentManager
 
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_LOGOUT_NOTICE)
+			supportFragmentManager.findFragmentByTag(DIALOG_TAG_TOKEN_EXPIRED_LOGOUT_NOTICE)
 		if (existingFragment != null) return
 
-		val dialog = ForcedLogoutNoticeDialog(
+		val dialog = TokenExpiredForcedLogoutNoticeDialog(
 			onClickOkBtn = {
 				moveToLoginActivity()
 				shouldShowLogoutNoticeDialog = false
 			}
 		)
-		dialog.show(supportFragmentManager, DIALOG_TAG_LOGOUT_NOTICE)
+		dialog.show(supportFragmentManager, DIALOG_TAG_TOKEN_EXPIRED_LOGOUT_NOTICE)
+	}
+
+	private fun showDeviceChangedLogoutDialog() {
+		if (shouldShowLogoutNoticeDialog.not()) return
+
+		val supportFragmentManager =
+			(currentActivity as? AppCompatActivity ?: return).supportFragmentManager
+
+		val existingFragment =
+			supportFragmentManager.findFragmentByTag(DIALOG_TAG_DEVICE_CHANGE_LOGOUT_NOTICE)
+		if (existingFragment != null) return
+
+		val dialog = DeviceChangeForcedLogoutNoticeDialog(
+			onClickOkBtn = {
+				moveToLoginActivity()
+				shouldShowLogoutNoticeDialog = false
+			}
+		)
+		dialog.show(supportFragmentManager, DIALOG_TAG_DEVICE_CHANGE_LOGOUT_NOTICE)
 	}
 
 	private fun moveToLoginActivity() {
@@ -76,6 +102,9 @@ class ForcedLogoutManagerImpl @Inject constructor(
 	}
 
 	companion object {
-		private const val DIALOG_TAG_LOGOUT_NOTICE = "DIALOG_TAG_LOGOUT_NOTICE"
+		private const val DIALOG_TAG_DEVICE_CHANGE_LOGOUT_NOTICE =
+			"DIALOG_TAG_DEVICE_CHANGE_LOGOUT_NOTICE"
+		private const val DIALOG_TAG_TOKEN_EXPIRED_LOGOUT_NOTICE =
+			"DIALOG_TAG_TOKEN_EXPIRED_LOGOUT_NOTICE"
 	}
 }

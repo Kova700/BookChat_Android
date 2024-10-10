@@ -32,4 +32,5 @@ dependencies {
 	implementation(project(":core:data:bookchat-token:external"))
 	implementation(project(":core:datastore:bookchat-token"))
 	implementation(project(":core:data:common"))
+	implementation(project(":core:fcm:forced-logout"))
 }

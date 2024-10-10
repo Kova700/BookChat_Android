@@ -4,5 +4,6 @@ import android.app.Application
 
 interface ForcedLogoutManager : Application.ActivityLifecycleCallbacks {
 	fun start(application: Application)
-	suspend fun onLogoutMessageReceived()
+	suspend fun onDeviceChanged()
+	suspend fun onBookChatTokenExpired()
 }

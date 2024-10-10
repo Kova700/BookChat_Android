@@ -1,5 +1,6 @@
 package com.kova700.bookchat.core.network.network
 
+import android.content.Context
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
 import com.kova700.bookchat.core.network.network.BuildConfig.DOMAIN
@@ -9,6 +10,7 @@ import com.kova700.bookchat.core.network.network.intercepter.BookChatNetworkInte
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
@@ -68,10 +70,12 @@ object RetrofitModule {
 	fun provideAppInterceptor(
 		bookChatTokenRepository: BookChatTokenRepository,
 		jsonSerializer: Json,
+		@ApplicationContext context: Context,
 	): Interceptor {
 		return BookChatNetworkInterceptor(
 			bookChatTokenRepository = bookChatTokenRepository,
 			jsonSerializer = jsonSerializer,
+			context = context,
 		)
 	}
 

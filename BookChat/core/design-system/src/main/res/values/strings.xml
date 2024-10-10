@@ -34,6 +34,10 @@
     <string name="name_check_status_duplicate">이미 사용 중인 닉네임 입니다.</string>
     <string name="name_check_status_special_char">특수문자는 사용 불가능합니다.</string>
     <string name="name_check_status_perfect">사용 가능한 닉네임입니다.</string>
+    <string name="sign_up_already_user">이미 가입된 사용자이거나 탈퇴한 사용자 입니다.</string>
+    <string name="sign_up_fail">회원가입을 실패했습니다.</string>
+    <string name="sign_in_fail">로그인을 실패했습니다.</string>
+    <string name="sign_up_get_client_profile_fail">유저 정보를 가져오지 못했습니다.</string>
 
     <!--select taste-->
     <string name="select_taste_submit_btn">북챗 시작하기</string>
@@ -204,13 +208,16 @@
     <!--app setting-->
     <string name="push_notification">푸시 알림</string>
 
+    <!--forced-logout-->
+    <string name="logout_notice_other_device_login">다른 기기에서 로그인이 시도되었습니다.\n북챗을 이용하시려면\n다시 로그인을 진행해주세요.</string>
+    <string name="logout_notice_token_expired">세션이 만료되었습니다.\n북챗을 이용하시려면\n다시 로그인을 진행해주세요.</string>
+
     <!--user setting-->
     <string name="sign_out">로그아웃</string>
     <string name="withdraw">회원탈퇴</string>
     <string name="sign_out_fail">로그아웃을 실패했습니다.</string>
     <string name="withdraw_success">정상적으로 탈퇴되었습니다.</string>
     <string name="withdraw_fail">회원탈퇴를 실패했습니다.</string>
-    <string name="logout_notice_other_device_login">다른 기기에서 로그인이 시도되었습니다.\n북챗을 이용하시려면\n다시 로그인을 진행해주세요.</string>
     <string name="withdraw_warning_content">회원탈퇴를 진행하시면\n참여 중인 모든 채팅방에서 나가게 되며,\n서재에 저장된 도서들, 독후감, 고민기록 등\n모든 정보가 삭제되며 복구가 불가능합니다.</string>
     <string name="withdraw_warning_channel_host_warning_content">*방장을 위임하지 않고 탈퇴 진행 시,\n방장으로 관리하셨던 채팅방은 삭제처리됩니다.</string>
 
