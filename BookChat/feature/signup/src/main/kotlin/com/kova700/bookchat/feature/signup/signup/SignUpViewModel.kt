@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.feature.signup.signup.SignUpState.UiState
 import com.kova700.bookchat.util.user.namecheck.NicknameCheckState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,7 +26,9 @@ class SignUpViewModel @Inject constructor(
 	private val _uiState = MutableStateFlow<SignUpState>(SignUpState.DEFAULT)
 	val uiState = _uiState.asStateFlow()
 
-	private fun verifyNickname() = viewModelScope.launch {
+
+	//Loading Ui 추가 및 중복 API 방지
+	private fun verifyNickname() {
 		val nickName = uiState.value.nickname
 		val userProfile = uiState.value.clientNewImageUri
 		val nameCheckStatus = uiState.value.nicknameCheckState
@@ -42,20 +45,25 @@ class SignUpViewModel @Inject constructor(
 	}
 
 	private fun checkNicknameDuplication(nickName: String) = viewModelScope.launch {
+		if (uiState.value.isLoading) return@launch
+		updateState { copy(uiState = UiState.LOADING) }
 		runCatching { clientRepository.isDuplicatedUserNickName(nickName) }
 			.onSuccess { isDuplicated ->
+				updateState { copy(uiState = UiState.SUCCESS) }
 				updateState {
 					copy(
 						nicknameCheckState =
 						if (isDuplicated) NicknameCheckState.IsDuplicate else NicknameCheckState.IsPerfect,
 					)
 				}
+			}.onFailure {
+				updateState { copy(uiState = UiState.ERROR) }
+				startEvent(SignUpEvent.ErrorEvent(R.string.error_else))
 			}
-			.onFailure { startEvent(SignUpEvent.ErrorEvent(R.string.error_else)) }
 	}
 
 	fun onClickStartBtn() {
-		if (uiState.value.uiState == SignUpState.UiState.LOADING
+		if (uiState.value.isLoading
 			|| uiState.value.nicknameCheckState == NicknameCheckState.IsShort
 			|| uiState.value.nickname.length < 2
 		) return

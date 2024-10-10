@@ -9,6 +9,9 @@ data class SignUpState(
 	val clientNewImageUri: String?,
 ) {
 
+	val isLoading: Boolean
+		get() = uiState == UiState.LOADING
+
 	enum class UiState {
 		SUCCESS,
 		LOADING,

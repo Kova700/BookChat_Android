@@ -101,9 +101,11 @@ class SignUpActivity : AppCompatActivity() {
 		setUserProfileImage(state)
 		setNameCheckResultTextViewState(state)
 		setNameCheckResultLayoutState(state)
-		binding.textLengthTv.text =
-			getString(R.string.sign_up_user_nickname_length, state.nickname.length)
-		binding.textClearBtn.visibility = if (state.nickname.isEmpty()) View.INVISIBLE else View.VISIBLE
+		with(binding) {
+			textLengthTv.text = getString(R.string.sign_up_user_nickname_length, state.nickname.length)
+			textClearBtn.visibility = if (state.nickname.isBlank()) View.INVISIBLE else View.VISIBLE
+			progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
+		}
 	}
 
 	private fun setNameCheckResultLayoutState(state: SignUpState) {
