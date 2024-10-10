@@ -44,8 +44,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.abs
 
-//TODO : 점검 중 , 새로운 업데이트 RemoteConfig 구성해서 출시 + Crashtics
-//TODO : 위로 스크롤 올려도 아래 스크롤 버튼 안생기는 현상이 있음
+//TODO :  kotlinx.serialization.json.internal.JsonDecodingException: Unexpected JSON token at offset 16: Unexpected 'null' value instead of string literal at path: $['targetId']
+//                 JSON input: {"targetId":null,"chatId":560,"message":"방장이 오픈채팅방을 종료했습니다.\n더 이상 대화를 할 수 없으며, \n채팅방을 나가면 다시 입장 할 수 없게 됩니다.","dispatchTime":"2024-10-09T17:50:42.645043","notificationMessageType":"NOTICE_HOST_EXIT"}
+
+//TODO : 채팅방 막 생성하고 채팅방 서랍 열면 유저 정보 텅빈 이름 나옴
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,

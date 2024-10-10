@@ -16,6 +16,7 @@
             android:id="@+id/progress_bar"
             android:layout_width="47dp"
             android:layout_height="52dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/bottom_layout"
             app:layout_constraintEnd_toEndOf="@+id/chatting_rcv"
             app:layout_constraintStart_toStartOf="parent"
@@ -127,9 +128,9 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
-            android:visibility="gone"
             app:cardCornerRadius="100dp"
             app:cardElevation="10dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/bottom_layout"
             app:layout_constraintEnd_toEndOf="parent">
 

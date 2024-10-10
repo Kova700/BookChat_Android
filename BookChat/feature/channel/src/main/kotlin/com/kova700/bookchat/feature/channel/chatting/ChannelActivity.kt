@@ -364,7 +364,7 @@ class ChannelActivity : AppCompatActivity() {
 	private var isGoneAnimatingBottomScrollBtn = false
 	private fun setBottomScrollBtnState() {
 		fun setVisible() {
-			with(binding.bottomScrollBtn) {
+			with(binding.chatBottomScrollBtnCv) {
 				if (isGoneAnimatingBottomScrollBtn.not() && visibility == View.VISIBLE) return
 				isGoneAnimatingBottomScrollBtn = false
 				bottomScrollBtnAnimation?.cancel()
@@ -385,7 +385,7 @@ class ChannelActivity : AppCompatActivity() {
 		}
 
 		fun setGone() {
-			with(binding.bottomScrollBtn) {
+			with(binding.chatBottomScrollBtnCv) {
 				if (visibility != View.VISIBLE) return
 				isGoneAnimatingBottomScrollBtn = true
 				bottomScrollBtnAnimation?.cancel()
