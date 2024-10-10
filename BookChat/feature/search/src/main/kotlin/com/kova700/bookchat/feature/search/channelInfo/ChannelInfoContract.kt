@@ -8,6 +8,9 @@ data class ChannelInfoUiState(
 	val isBannedChannel: Boolean,
 ) {
 
+	val isLoading
+		get() = uiState == UiState.LOADING
+
 	enum class UiState {
 		SUCCESS,
 		LOADING,
@@ -16,7 +19,7 @@ data class ChannelInfoUiState(
 
 	companion object {
 		val DEFAULT = ChannelInfoUiState(
-			uiState = UiState.LOADING,
+			uiState = UiState.SUCCESS,
 			channel = ChannelSearchResult.DEFAULT,
 			isBannedChannel = false
 		)

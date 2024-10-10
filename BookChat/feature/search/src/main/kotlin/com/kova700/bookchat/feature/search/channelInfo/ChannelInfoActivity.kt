@@ -2,6 +2,8 @@ package com.kova700.bookchat.feature.search.channelInfo
 
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -75,6 +77,7 @@ class ChannelInfoActivity : AppCompatActivity() {
 			channelHostNickNameTv.text = uiState.channel.host.nickname
 		}
 		if (uiState.isBannedChannel) showBannedChannelNoticeDialog()
+		binding.progressBar.visibility = if (uiState.isLoading) VISIBLE else GONE
 	}
 
 	private fun setHostProfileImage(uiState: ChannelInfoUiState) {
