@@ -18,21 +18,12 @@ class FCMTokenRepositoryImpl @Inject constructor(
 		clientApi.renewFcmToken(fcmToken.text)
 	}
 
-	override suspend fun getNewFCMToken(): FCMToken {
-		expireFCMToken()
-		return getFCMToken()
-	}
-
 	override suspend fun getFCMToken(): FCMToken {
 		return suspendCancellableCoroutine<FCMToken> { continuation ->
 			firebaseMessaging.token.addOnCompleteListener { task ->
-				if (task.isSuccessful.not()) continuation.resumeWithException(
+				if (task.isSuccessful) continuation.resume(FCMToken(text = task.result))
+				else continuation.resumeWithException(
 					task.exception ?: Exception("Failed to retrieve FCM token")
-				)
-				else continuation.resume(
-					FCMToken(
-						task.result
-					)
 				)
 			}
 		}
@@ -41,10 +32,10 @@ class FCMTokenRepositoryImpl @Inject constructor(
 	override suspend fun expireFCMToken() {
 		suspendCancellableCoroutine<Unit> { continuation ->
 			firebaseMessaging.deleteToken().addOnCompleteListener { task ->
-				if (task.isSuccessful.not()) continuation.resumeWithException(
+				if (task.isSuccessful) continuation.resume(Unit)
+				else continuation.resumeWithException(
 					task.exception ?: Exception("Failed to delete FCM token")
 				)
-				else continuation.resume(Unit)
 			}
 		}
 	}

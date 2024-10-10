@@ -4,8 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
 import com.kova700.bookchat.core.data.client.external.ClientRepository
-import com.kova700.bookchat.core.data.fcm_token.external.FCMTokenRepository
-import com.kova700.core.domain.usecase.client.ClearLocalDataUseCase
+import com.kova700.core.domain.usecase.client.LogoutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,19 +21,20 @@ import kotlin.time.Duration.Companion.seconds
 class SplashViewModel @Inject constructor(
 	private val clientRepository: ClientRepository,
 	private val bookChatTokenRepository: BookChatTokenRepository,
-	private val fcmTokenRepository: FCMTokenRepository,
-	private val clearLocalDataUseCase: ClearLocalDataUseCase,
+	private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<SplashEvent>()
 	val eventFlow = _eventFlow.asSharedFlow()
 
 	init {
-		viewModelScope.launch {
-			delay(SPLASH_DURATION.seconds)
-			if (isBookChatTokenExist()) requestUserInfo()
-			else startEvent(SplashEvent.MoveToLogin)
-		}
+		initUiState()
+	}
+
+	private fun initUiState() = viewModelScope.launch {
+		delay(SPLASH_DURATION.seconds)
+		if (isBookChatTokenExist()) requestUserInfo()
+		else startEvent(SplashEvent.MoveToLogin)
 	}
 
 	private suspend fun isBookChatTokenExist(): Boolean {
@@ -48,11 +48,11 @@ class SplashViewModel @Inject constructor(
 			.onFailure { clearAllData() }
 	}
 
+	//TODO : DeviceID가져와서 서버에게 보내기( DeviceID가 같은 경우만 FCM 토큰 삭제되게 수정)
+	// 수정되면 needServer = true로 변경
 	private fun clearAllData() = viewModelScope.launch {
-		runCatching {
-			clearLocalDataUseCase()
-			fcmTokenRepository.expireFCMToken()
-		}.also { startEvent(SplashEvent.MoveToLogin) }
+		runCatching { logoutUseCase(needServer = false) }
+			.also { startEvent(SplashEvent.MoveToLogin) }
 	}
 
 	private fun startEvent(event: SplashEvent) = viewModelScope.launch {
