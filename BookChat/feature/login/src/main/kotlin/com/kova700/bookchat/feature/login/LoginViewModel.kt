@@ -1,16 +1,13 @@
 package com.kova700.bookchat.feature.login
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.data.client.external.model.NeedToDeviceWarningException
 import com.kova700.bookchat.core.data.client.external.model.NeedToSignUpException
-import com.kova700.bookchat.core.data.common.model.network.ForbiddenException
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.oauth.external.exception.ClientCancelException
 import com.kova700.bookchat.feature.login.LoginUiState.UiState
-import com.kova700.bookchat.util.Constants.TAG
 import com.kova700.core.domain.usecase.client.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,13 +33,19 @@ class LoginViewModel @Inject constructor(
 	private fun login(isDeviceChangeApproved: Boolean = false) = viewModelScope.launch {
 		runCatching { loginUseCase(isDeviceChangeApproved) }
 			.onSuccess { getClientProfile() }
-			.onFailure { failHandler(it) }
+			.onFailure { throwable ->
+				when (throwable) {
+					is NeedToSignUpException -> startEvent(LoginEvent.MoveToSignUp)
+					is NeedToDeviceWarningException -> startEvent(LoginEvent.ShowDeviceWarning)
+					else -> startEvent(LoginEvent.ErrorEvent(R.string.sign_in_fail))
+				}
+			}
 	}
 
 	private fun getClientProfile() = viewModelScope.launch {
 		runCatching { clientRepository.getClientProfile() }
 			.onSuccess { startEvent(LoginEvent.MoveToMain) }
-			.onFailure { failHandler(it) }
+			.onFailure { startEvent(LoginEvent.ErrorEvent(R.string.get_client_profile_fail)) }
 	}
 
 	fun onChangeIdToken() {
@@ -51,14 +54,12 @@ class LoginViewModel @Inject constructor(
 
 	fun onFailedKakaoLogin(throwable: Throwable) {
 		updateState { copy(uiState = UiState.SUCCESS) }
-		Log.d(TAG, "LoginViewModel: onFailedKakaoLogin() - throwable : $throwable")
 		if (throwable is ClientCancelException) return
 		startEvent(LoginEvent.ErrorEvent(R.string.error_kakao_login))
 	}
 
 	fun onFailedGoogleLogin(throwable: Throwable) {
 		updateState { copy(uiState = UiState.SUCCESS) }
-		Log.d(TAG, "LoginViewModel: onFailedGoogleLogin() - throwable : $throwable")
 		if (throwable is ClientCancelException) return
 		startEvent(LoginEvent.ErrorEvent(R.string.error_google_login))
 	}
@@ -85,21 +86,6 @@ class LoginViewModel @Inject constructor(
 
 	private inline fun updateState(block: LoginUiState.() -> LoginUiState) {
 		_uiState.update { _uiState.value.block() }
-	}
-
-	private fun failHandler(exception: Throwable) {
-		updateState { copy(uiState = UiState.SUCCESS) }
-		Log.d(TAG, "LoginViewModel: failHandler() - exception : $exception")
-		when (exception) {
-			is NeedToSignUpException -> startEvent(LoginEvent.MoveToSignUp)
-			is NeedToDeviceWarningException -> startEvent(LoginEvent.ShowDeviceWarning)
-			is ForbiddenException -> startEvent(LoginEvent.ErrorEvent(R.string.login_forbidden_user))
-			else -> {
-				val errorMessage = exception.message
-				if (errorMessage.isNullOrBlank()) startEvent(LoginEvent.ErrorEvent(R.string.error_else))
-				else startEvent(LoginEvent.UnknownErrorEvent(errorMessage))
-			}
-		}
 	}
 
 }

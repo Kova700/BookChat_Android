@@ -37,7 +37,7 @@
     <string name="sign_up_already_user">이미 가입된 사용자이거나 탈퇴한 사용자 입니다.</string>
     <string name="sign_up_fail">회원가입을 실패했습니다.</string>
     <string name="sign_in_fail">로그인을 실패했습니다.</string>
-    <string name="sign_up_get_client_profile_fail">유저 정보를 가져오지 못했습니다.</string>
+    <string name="get_client_profile_fail">유저 정보를 가져오지 못했습니다.</string>
 
     <!--select taste-->
     <string name="select_taste_submit_btn">북챗 시작하기</string>

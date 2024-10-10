@@ -76,7 +76,7 @@ class SelectTasteViewModel @Inject constructor(
 				startEvent(SelectTasteEvent.MoveToMain)
 			}.onFailure {
 				updateState { copy(uiState = UiState.ERROR) }
-				startEvent(SelectTasteEvent.ErrorEvent(R.string.sign_up_get_client_profile_fail))
+				startEvent(SelectTasteEvent.ErrorEvent(R.string.get_client_profile_fail))
 			}
 	}
 
