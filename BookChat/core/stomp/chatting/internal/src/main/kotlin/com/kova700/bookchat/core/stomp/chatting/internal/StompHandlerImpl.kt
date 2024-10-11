@@ -40,6 +40,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
 import org.hildan.krossbow.stomp.ConnectionException
 import org.hildan.krossbow.stomp.LostReceiptException
 import org.hildan.krossbow.stomp.MissingHeartBeatException
@@ -254,7 +255,6 @@ class StompHandlerImpl @Inject constructor(
 		socketMessage: SocketMessage,
 		channelId: Long,
 	) {
-		Log.d(TAG, "StompHandlerImpl: handleSocketMessage() - socketMessage :$socketMessage")
 		when (socketMessage) {
 			is CommonMessage -> handleCommonMessage(
 				socketMessage = socketMessage,
@@ -272,7 +272,6 @@ class StompHandlerImpl @Inject constructor(
 		socketMessage: CommonMessage,
 		channelId: Long,
 	) {
-		Log.d(TAG, "StompHandlerImpl: handleCommonMessage() - ${socketMessage.message}")
 		val clientId = clientRepository.getClientProfile().id
 		val receiptId = socketMessage.receiptId
 
@@ -282,7 +281,6 @@ class StompHandlerImpl @Inject constructor(
 		)
 
 		if (socketMessage.senderId == clientId) {
-			Log.d(TAG, "StompHandlerImpl: handleCommonMessage() - called")
 			updateWaitingChat(chat, receiptId)
 			updateChannelLastChat(chat)
 			return
@@ -301,17 +299,19 @@ class StompHandlerImpl @Inject constructor(
 		)
 
 		when (socketMessage.notificationMessageType) {
-			NotificationMessageType.NOTICE_ENTER ->
+			NotificationMessageType.NOTICE_ENTER -> {
 				channelRepository.enterChannelMember(
 					channelId = channelId,
-					targetUserId = socketMessage.targetUserId
+					targetUserId = socketMessage.targetUserId ?: return
 				)
+			}
 
-			NotificationMessageType.NOTICE_EXIT ->
+			NotificationMessageType.NOTICE_EXIT -> {
 				channelRepository.leaveChannelMember(
 					channelId = channelId,
-					targetUserId = socketMessage.targetUserId
+					targetUserId = socketMessage.targetUserId ?: return
 				)
+			}
 
 			NotificationMessageType.NOTICE_HOST_EXIT ->
 				channelRepository.leaveChannelHost(channelId)
@@ -323,28 +323,30 @@ class StompHandlerImpl @Inject constructor(
 					isClientBanned -> channelRepository.banChannelClient(channelId)
 					else -> channelRepository.leaveChannelMember(
 						channelId = channelId,
-						targetUserId = socketMessage.targetUserId
+						targetUserId = socketMessage.targetUserId ?: return
 					)
 				}
 			}
 
-			NotificationMessageType.NOTICE_HOST_DELEGATE ->
+			NotificationMessageType.NOTICE_HOST_DELEGATE -> {
 				channelRepository.updateChannelHost(
 					channelId = channelId,
-					targetUserId = socketMessage.targetUserId,
+					targetUserId = socketMessage.targetUserId ?: return,
 				)
+			}
 
-			NotificationMessageType.NOTICE_SUB_HOST_DELEGATE ->
+			NotificationMessageType.NOTICE_SUB_HOST_DELEGATE -> {
 				channelRepository.updateChannelMemberAuthority(
 					channelId = channelId,
-					targetUserId = socketMessage.targetUserId,
+					targetUserId = socketMessage.targetUserId ?: return,
 					channelMemberAuthority = ChannelMemberAuthority.SUB_HOST,
 				)
+			}
 
 			NotificationMessageType.NOTICE_SUB_HOST_DISMISS ->
 				channelRepository.updateChannelMemberAuthority(
 					channelId = channelId,
-					targetUserId = socketMessage.targetUserId,
+					targetUserId = socketMessage.targetUserId ?: return,
 					channelMemberAuthority = ChannelMemberAuthority.GUEST,
 				)
 
@@ -396,18 +398,12 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	private fun String.parseToSocketMessage(): SocketMessage {
-		val hashMap = jsonSerializer.decodeFromString<Map<String, String>>(this)
+		val jsonObject = jsonSerializer.parseToJsonElement(this).jsonObject
 		return when {
-			hashMap["senderId"] != null -> jsonSerializer.decodeFromString<CommonMessage>(this)
+			jsonObject["senderId"] != null -> jsonSerializer.decodeFromString<CommonMessage>(this)
 			else -> jsonSerializer.decodeFromString<NotificationMessage>(this)
 		}
 	}
-	//{"targetId":null,
-	// "chatId":null,
-	// "message":"방장이 오픈채팅방을 종료했습니다.\n더 이상 대화를 할 수 없으며, \n채팅방을 나가면 다시 입장 할 수 없게 됩니다.",
-	// "dispatchTime":null,
-	// "notificationMessageType":"NOTICE_HOST_EXIT
-	// "}
 
 	private suspend fun handleSocketError(caller: String, throwable: Throwable) {
 		Log.d(TAG, "StompHandlerImpl: handleSocketError(caller :$caller) - throwable :$throwable")

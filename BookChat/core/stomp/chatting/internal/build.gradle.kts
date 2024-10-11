@@ -25,6 +25,7 @@ android {
 dependencies {
 	implementation(libs.bundles.krossbow.stomp)
 	implementation(libs.kotlinx.serialization.json)
+	implementation(libs.bundles.unit.test)
 
 	implementation(project(":core:stomp:chatting:external"))
 	implementation(project(":core:stomp:stomp"))
