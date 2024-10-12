@@ -31,6 +31,12 @@ interface ChannelDAO {
 	)
 	suspend fun getChannel(channelId: Long): ChannelEntity?
 
+	@Query(
+		"SELECT EXISTS" +
+						"(SELECT * FROM Channel WHERE room_id = :channelId)"
+	)
+	suspend fun isChannelExist(channelId: Long): Boolean
+
 	@Insert(onConflict = OnConflictStrategy.IGNORE)
 	suspend fun insertIfNotPresent(channel: ChannelEntity): Long
 

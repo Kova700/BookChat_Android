@@ -290,6 +290,8 @@ class ChannelRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun enterChannel(channel: Channel) {
+		if (channelDAO.isChannelExist(channel.roomId)) return
+
 		val response = channelApi.enterChannel(channel.roomId)
 		when (response) {
 			is BookChatApiResult.Success -> {
@@ -472,7 +474,6 @@ class ChannelRepositoryImpl @Inject constructor(
 		if (isOfflineOnly) return sortedChannels.first()
 
 		for (attempt in 0 until maxAttempts) {
-			Log.d(TAG, "ChannelRepositoryImpl: getMostActiveChannels() - attempt : $attempt")
 			val response = runCatching {
 				channelApi.getChannels(
 					postCursorId = null,
