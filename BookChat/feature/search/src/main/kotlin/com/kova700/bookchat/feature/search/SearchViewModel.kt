@@ -154,9 +154,9 @@ class SearchViewModel @Inject constructor(
 			channelSearchRepository.search(
 				keyword = searchKeyword.trim(),
 				searchFilter = uiState.value.searchFilter,
+				initFlag = true
 			)
-		}
-			.onSuccess { updateState { copy(channelSearchResultUiState = SearchResultUiState.SUCCESS) } }
+		}.onSuccess { updateState { copy(channelSearchResultUiState = SearchResultUiState.SUCCESS) } }
 			.onFailure {
 				updateState { copy(channelSearchResultUiState = SearchResultUiState.INIT_ERROR) }
 				startEvent(SearchEvent.ShowSnackBar(R.string.error_else))
