@@ -20,10 +20,14 @@ class UserRepositoryImpl @Inject constructor(
 		if (offlineData != null) return offlineData
 
 		val response = runCatching { userApi.getUser(userId).toUser() }
-		if (response.isFailure) return User.Default.copy(nickname = "알 수 없음") // 탈퇴한 유저 혹은 잘못된 요청
-
-		userDao.upsertUser(response.getOrThrow().toUserEntity())
-		return response.getOrThrow()
+			.getOrDefault(  // 탈퇴한 유저 혹은 잘못된 요청
+				User.Default.copy(
+					id = userId,
+					nickname = "알 수 없음"
+				)
+			)
+		userDao.upsertUser(response.toUserEntity())
+		return response
 	}
 
 	override suspend fun upsertAllUsers(users: List<User>) {
