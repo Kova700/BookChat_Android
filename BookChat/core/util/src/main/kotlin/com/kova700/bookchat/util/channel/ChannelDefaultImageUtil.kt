@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
 import com.kova700.bookchat.core.design_system.R
-import com.kova700.bookchat.util.dp.dpToPx
 import com.kova700.bookchat.util.image.bitmap.getImageBitmap
 
 fun ChannelDefaultImageType.getResId() =
@@ -18,15 +17,6 @@ fun ChannelDefaultImageType.getResId() =
 		ChannelDefaultImageType.SEVEN -> R.drawable.default_chat_room_img7
 	}
 
-suspend fun ChannelDefaultImageType.getBitmap(
-	context: Context,
-	imageSizePx: Int = 35.dpToPx(context),
-	roundedCornersRadiusPx: Int = 14.dpToPx(context),
-): Bitmap {
-	return getResId().getImageBitmap(
-		context = context,
-		imageWidthPx = imageSizePx,
-		imageHeightPx = imageSizePx,
-		roundedCornersRadiusPx = roundedCornersRadiusPx
-	)!!
+suspend fun ChannelDefaultImageType.getBitmap(context: Context): Bitmap {
+	return getResId().getImageBitmap(context)
 }

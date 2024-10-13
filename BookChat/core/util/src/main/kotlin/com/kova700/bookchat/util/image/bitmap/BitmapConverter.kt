@@ -3,13 +3,17 @@ package com.kova700.bookchat.util.image.bitmap
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
+import android.graphics.Rect
+import android.graphics.RectF
 import android.os.Build
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -35,64 +39,32 @@ fun ByteArray.toBitmap(): Bitmap? {
 //Int = Resource Id
 suspend fun @receiver:DrawableRes Int.getImageBitmap(
 	context: Context,
-	imageWidthPx: Int,
-	imageHeightPx: Int,
-	roundedCornersRadiusPx: Int? = null,
-): Bitmap? {
+): Bitmap {
 	return withContext(Dispatchers.IO) {
-		runCatching {
-			Glide.with(context)
-				.asBitmap()
-				.load(
-					AppCompatResources.getDrawable(context, this@getImageBitmap)
-						?.toBitmap(
-							width = imageWidthPx,
-							height = imageHeightPx,
-							config = Bitmap.Config.ARGB_8888
-						)
-				)
-				.apply(makeBitmapRequestOptions(imageWidthPx, imageHeightPx, roundedCornersRadiusPx))
-				.submit()
-				.get()
-		}.getOrNull()
+		Glide.with(context)
+			.asBitmap()
+			.load(
+				AppCompatResources
+					.getDrawable(context, this@getImageBitmap)
+					?.toBitmap(config = Bitmap.Config.ARGB_8888)
+			).submit()
+			.get()
 	}
 }
 
 //Stirng = Image Url
 suspend fun String.getImageBitmap(
 	context: Context,
-	imageWidthPx: Int? = null,
-	imageHeightPx: Int? = null,
-	roundedCornersRadiusPx: Int? = null,
 ): Bitmap? {
 	return withContext(Dispatchers.IO) {
 		runCatching {
 			Glide.with(context)
 				.asBitmap()
 				.load(this@getImageBitmap)
-				.apply(makeBitmapRequestOptions(imageWidthPx, imageHeightPx, roundedCornersRadiusPx))
 				.submit()
 				.get()
 		}.getOrNull()
 	}
-}
-
-private fun makeBitmapRequestOptions(
-	imageWidthPx: Int? = null,
-	imageHeightPx: Int? = null,
-	roundedCornersRadiusPx: Int? = null,
-): RequestOptions {
-	var requestOptions = RequestOptions()
-
-	if (imageWidthPx != null && imageHeightPx != null) {
-		requestOptions = requestOptions.override(imageWidthPx, imageHeightPx)
-	}
-
-	if (roundedCornersRadiusPx != null) {
-		requestOptions = requestOptions.transform(RoundedCorners(roundedCornersRadiusPx))
-	}
-
-	return requestOptions
 }
 
 /** 기본적으로 가로,세로 최대 길이를 제한하지 않고
@@ -150,4 +122,38 @@ suspend fun Bitmap.resize(newWidth: Int, newHeight: Int): Bitmap {
 	return withContext(Dispatchers.IO) {
 		Bitmap.createScaledBitmap(this@resize, newWidth, newHeight, true)
 	}
+}
+
+suspend fun Bitmap.resize(size: Int): Bitmap {
+	return resize(size, size)
+}
+
+suspend fun Bitmap.cropCenterSquare(): Bitmap {
+	if (width == height) return this
+	val minSize = minOf(width, height)
+	val x = (width - minSize) / 2
+	val y = (height - minSize) / 2
+	return withContext(Dispatchers.IO) {
+		Bitmap.createBitmap(this@cropCenterSquare, x, y, minSize, minSize)
+	}
+}
+
+fun Bitmap.setRoundedCorner(roundPx: Float): Bitmap {
+	val output = Bitmap.createBitmap(
+		width,
+		height,
+		Bitmap.Config.ARGB_8888
+	)
+
+	val canvas = Canvas(output)
+	val paint = Paint()
+	val rect = Rect(0, 0, width, height)
+	val rectF = RectF(rect)
+
+	paint.isAntiAlias = true
+	canvas.drawARGB(0, 0, 0, 0)
+	canvas.drawRoundRect(rectF, roundPx, roundPx, paint)
+	paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+	canvas.drawBitmap(this, rect, rect, paint)
+	return output
 }

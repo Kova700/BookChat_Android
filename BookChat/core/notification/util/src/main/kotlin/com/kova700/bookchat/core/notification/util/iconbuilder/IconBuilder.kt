@@ -4,7 +4,10 @@ import android.content.Context
 import android.graphics.Bitmap
 import androidx.core.graphics.drawable.IconCompat
 import com.kova700.bookchat.util.dp.dpToPx
+import com.kova700.bookchat.util.image.bitmap.cropCenterSquare
 import com.kova700.bookchat.util.image.bitmap.getImageBitmap
+import com.kova700.bookchat.util.image.bitmap.resize
+import com.kova700.bookchat.util.image.bitmap.setRoundedCorner
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -15,14 +18,18 @@ class IconBuilder @Inject constructor(
 		imageUrl: String?,
 		defaultImage: Bitmap,
 	): IconCompat {
-		if (imageUrl.isNullOrBlank()) return IconCompat.createWithBitmap(defaultImage)
+		if (imageUrl.isNullOrBlank()) return defaultImage.getIcon()
 
-		return imageUrl.getImageBitmap(
-			context = context,
-			imageWidthPx = 35.dpToPx(context),
-			imageHeightPx = 35.dpToPx(context),
-			roundedCornersRadiusPx = 14.dpToPx(context)
-		)?.let(IconCompat::createWithBitmap)
-			?: IconCompat.createWithBitmap(defaultImage)
+		return imageUrl
+			.getImageBitmap(context)
+			?.getIcon()
+			?: defaultImage.getIcon()
+	}
+
+	private suspend fun Bitmap.getIcon(): IconCompat {
+		return cropCenterSquare()
+			.resize(35.dpToPx(context))
+			.setRoundedCorner(14.dpToPx(context).toFloat())
+			.let(IconCompat::createWithBitmap)
 	}
 }
