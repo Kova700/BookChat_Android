@@ -86,7 +86,7 @@ class ChatNotificationHandlerImpl @Inject constructor(
 		val previousTimeStamp =
 			chattingNotificationInfoRepository.getNotificationLastTimestamp(notificationId)
 		return (previousTimeStamp == null || previousTimeStamp < chat.timestamp)
-						&& channel.notificationFlag
+						&& channel.isNotificationOn
 						&& stompHandler.isSocketConnected(channel.roomId).not()
 	}
 

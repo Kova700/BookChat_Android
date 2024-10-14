@@ -74,7 +74,7 @@ class ChannelSettingDialog(
 
 	private fun initDialogText() {
 		binding.channelMuteTv.setText(
-			if (channel.notificationFlag) R.string.channel_mute
+			if (channel.isNotificationOn) R.string.channel_mute
 			else R.string.channel_turn_on_notification
 		)
 		binding.channelTopPinTv.setText(

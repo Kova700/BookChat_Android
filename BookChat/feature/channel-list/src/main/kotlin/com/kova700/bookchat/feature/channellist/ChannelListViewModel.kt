@@ -28,6 +28,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//TODO : 로그 아웃하고 다시 로그인하면 채널별로 어디까지 읽었는지에대한 정보가 없어서
+// 새로운 채팅으로 업데이트 됨에도 불구하고 New+ 표시가 나타나지 않는 현상이 있음
 @HiltViewModel
 class ChannelListViewModel @Inject constructor(
 	private val channelRepository: ChannelRepository,
@@ -178,7 +180,7 @@ class ChannelListViewModel @Inject constructor(
 	}
 
 	fun onClickMuteRelatedBtn(channel: ChannelListItem.ChannelItem) {
-		if (channel.notificationFlag) muteChannel(channel.roomId)
+		if (channel.isNotificationOn) muteChannel(channel.roomId)
 		else unMuteChannel(channel.roomId)
 	}
 

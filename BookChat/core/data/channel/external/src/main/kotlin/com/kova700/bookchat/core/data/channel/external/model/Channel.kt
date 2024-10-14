@@ -9,7 +9,7 @@ data class Channel(
 	val roomSid: String,
 	val roomMemberCount: Int,
 	val defaultRoomImageType: ChannelDefaultImageType,
-	val notificationFlag: Boolean = true,
+	val isNotificationOn: Boolean = true,
 	val topPinNum: Int = 0,
 	val isBanned: Boolean = false,
 	val isExploded: Boolean = false,

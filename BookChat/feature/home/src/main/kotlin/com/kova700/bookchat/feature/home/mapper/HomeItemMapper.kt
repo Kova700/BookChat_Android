@@ -66,7 +66,7 @@ private fun Channel.toHomeItem(): HomeItem.ChannelItem {
 		roomSid = roomSid,
 		roomMemberCount = roomMemberCount,
 		defaultRoomImageType = defaultRoomImageType,
-		notificationFlag = notificationFlag,
+		isNotificationOn = isNotificationOn,
 		topPinNum = topPinNum,
 		isBanned = isBanned,
 		isExploded = isExploded,
