@@ -9,7 +9,6 @@ import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
 import com.kova700.bookchat.core.data.chat.external.model.SUCCESS_CHAT_STATUS_CODE
 import com.kova700.bookchat.core.database.chatting.external.chat.model.CHAT_ENTITY_TABLE_NAME
 import com.kova700.bookchat.core.database.chatting.external.chat.model.ChatEntity
-import com.kova700.bookchat.core.database.chatting.external.combined.ChatWithUser
 import com.kova700.bookchat.util.date.getCurrentDateTimeString
 
 @Dao
@@ -17,14 +16,14 @@ interface ChatDAO {
 
 	@Transaction
 	@Query("SELECT * FROM Chat WHERE chat_id = :chatId")
-	suspend fun getChat(chatId: Long): ChatWithUser?
+	suspend fun getChat(chatId: Long): ChatEntity?
 
 	@Transaction
 	@Query(
 		"SELECT * FROM Chat WHERE chat_id IN (:chatIds) " +
 						"ORDER BY status ASC, chat_id DESC "
 	)
-	suspend fun getChats(chatIds: List<Long>): List<ChatWithUser>
+	suspend fun getChats(chatIds: List<Long>): List<ChatEntity>
 
 	@Query(
 		"SELECT * FROM Chat " +
@@ -32,10 +31,7 @@ interface ChatDAO {
 						"ORDER BY status ASC, chat_id DESC " +
 						"LIMIT :size"
 	)
-	@Transaction
-	//warning: The return value includes a POJO with a @Relation. It is usually desired to annotate this method with @Transaction to avoid possibility of inconsistent results between the POJO and its relations. See https://developer.android.com/reference/androidx/room/Transaction.html for details.
-	//    public abstract java.lang.Object getNewestChats(long channelId, int size, @org.jetbrains.annotations.NotNull()
-	suspend fun getNewestChats(channelId: Long, size: Int): List<ChatWithUser>
+	suspend fun getNewestChats(channelId: Long, size: Int): List<ChatEntity>
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insertChats(chats: List<ChatEntity>): List<Long>
