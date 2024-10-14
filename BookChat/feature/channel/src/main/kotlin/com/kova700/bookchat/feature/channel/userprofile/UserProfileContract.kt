@@ -40,8 +40,8 @@ data class UserProfileUiState(
 		val DEFAULT = UserProfileUiState(
 			uiState = UiState.SUCCESS,
 			channel = Channel.DEFAULT,
-			targetUser = User.Default,
-			client = User.Default
+			targetUser = User.DEFAULT,
+			client = User.DEFAULT
 		)
 	}
 }

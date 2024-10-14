@@ -12,11 +12,7 @@ fun ChatResponse.toChat(channelId: Long): Chat {
 		channelId = channelId,
 		dispatchTime = this.dispatchTime,
 		message = this.message,
-		sender = senderId?.let {
-			User.Default.copy(
-				id = it
-			)
-		}
+		sender = senderId?.let { User.DEFAULT.copy(id = it) }
 	)
 }
 

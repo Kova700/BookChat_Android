@@ -48,8 +48,8 @@ fun ChannelEntity.toChannel(): Channel {
 			)
 		},
 		lastReadChatId = lastReadChatId,
-		host = hostId?.let { User.Default.copy(id = it) },
-		participants = participantIds?.map { User.Default.copy(id = it) },
+		host = hostId?.let { User.DEFAULT.copy(id = it) },
+		participants = participantIds?.map { User.DEFAULT.copy(id = it) },
 		participantAuthorities = participantAuthorities,
 		roomTags = roomTags,
 		roomCapacity = roomCapacity,

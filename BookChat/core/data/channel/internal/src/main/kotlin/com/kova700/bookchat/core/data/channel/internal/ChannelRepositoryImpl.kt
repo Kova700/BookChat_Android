@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.json.Json
@@ -315,7 +314,7 @@ class ChannelRepositoryImpl @Inject constructor(
 
 	override suspend fun enterChannelMember(channelId: Long, targetUserId: Long) {
 		val channel = getChannel(channelId)
-		val targetUser = User.Default.copy(id = targetUserId)
+		val targetUser = User.DEFAULT.copy(id = targetUserId)
 		val newParticipants = channel.participants?.plus(targetUser)
 		val newParticipantAuthorities = channel.participantAuthorities
 			?.plus(targetUser.id to ChannelMemberAuthority.GUEST)
@@ -434,7 +433,7 @@ class ChannelRepositoryImpl @Inject constructor(
 			?.plus(targetUserId to ChannelMemberAuthority.HOST)
 
 		val newChannel = channel.copy(
-			host = User.Default.copy(id = targetUserId),
+			host = User.DEFAULT.copy(id = targetUserId),
 			participantAuthorities = newParticipantAuthorities
 		)
 
@@ -463,7 +462,6 @@ class ChannelRepositoryImpl @Inject constructor(
 	override suspend fun getMostActiveChannels(
 		loadSize: Int,
 		maxAttempts: Int,
-		isOfflineOnly: Boolean,
 	): List<Channel> {
 
 		setChannels(
@@ -471,7 +469,6 @@ class ChannelRepositoryImpl @Inject constructor(
 				loadSize = loadSize
 			).associateBy { it.roomId }
 		)
-		if (isOfflineOnly) return sortedChannels.first()
 
 		for (attempt in 0 until maxAttempts) {
 			val response = runCatching {
@@ -496,8 +493,8 @@ class ChannelRepositoryImpl @Inject constructor(
 	//  페이징 방식 수정되면 수정된 offset방식으로 getMostActiveChannels처럼 로컬 우선 쿼리로 수정
 	/** 로컬 데이터 우선적으로 쿼리 */
 	/** Channel 세부 정보는 채팅방 들어 가면 getChannelInfo에 의해 갱신될 예정 */
-	override suspend fun getChannels(loadSize: Int): List<Channel> {
-		if (isEndPage) return sortedChannels.first()
+	override suspend fun getChannels(loadSize: Int): List<Channel>? {
+		if (isEndPage) return null
 
 		val response = channelApi.getChannels(
 			postCursorId = currentPage,

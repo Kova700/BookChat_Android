@@ -70,7 +70,7 @@ data class ChannelUiState(
 		val DEFAULT = ChannelUiState(
 			enteredMessage = "",
 			channel = Channel.DEFAULT,
-			client = User.Default,
+			client = User.DEFAULT,
 			uiState = UiState.SUCCESS,
 			drawerItems = listOf(ChannelDrawerItem.Header.DEFAULT),
 			chats = emptyList(),

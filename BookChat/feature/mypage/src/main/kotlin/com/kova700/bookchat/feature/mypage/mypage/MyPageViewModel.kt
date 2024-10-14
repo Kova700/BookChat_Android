@@ -17,7 +17,7 @@ import javax.inject.Inject
 class MyPageViewModel @Inject constructor(
 	private val clientRepository: ClientRepository,
 ) : ViewModel() {
-	private val _uiState = MutableStateFlow<User>(User.Default)
+	private val _uiState = MutableStateFlow<User>(User.DEFAULT)
 	val uiState get() = _uiState.asStateFlow()
 
 	private val _eventFlow = MutableSharedFlow<MyPageEvent>()

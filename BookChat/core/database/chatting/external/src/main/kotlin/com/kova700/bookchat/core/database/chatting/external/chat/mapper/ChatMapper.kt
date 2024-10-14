@@ -4,8 +4,6 @@ import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.database.chatting.external.chat.model.ChatEntity
-import com.kova700.bookchat.core.database.chatting.external.combined.ChatWithUser
-import com.kova700.bookchat.core.database.chatting.external.user.mapper.toUser
 
 fun ChatEntity.toChat(): Chat {
 	return Chat(
@@ -14,22 +12,7 @@ fun ChatEntity.toChat(): Chat {
 		dispatchTime = dispatchTime,
 		message = message,
 		status = ChatStatus.getType(status)!!,
-		sender = senderId?.let {
-			User.Default.copy(
-				id = it
-			)
-		}
-	)
-}
-
-fun ChatWithUser.toChat(): Chat {
-	return Chat(
-		chatId = chatEntity.chatId,
-		channelId = chatEntity.channelId,
-		dispatchTime = chatEntity.dispatchTime,
-		message = chatEntity.message,
-		status = ChatStatus.getType(chatEntity.status)!!,
-		sender = userEntity?.toUser()
+		sender = senderId?.let { User.DEFAULT.copy(id = it) }
 	)
 }
 

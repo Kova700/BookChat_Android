@@ -18,7 +18,7 @@ data class HomeUiState(
 
 	companion object {
 		val DEFAULT = HomeUiState(
-			client = User.Default,
+			client = User.DEFAULT,
 			bookUiState = UiState.SUCCESS,
 			channelUiState = UiState.SUCCESS,
 			items = emptyList()

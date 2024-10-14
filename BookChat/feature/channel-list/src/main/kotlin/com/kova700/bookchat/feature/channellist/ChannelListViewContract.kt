@@ -44,7 +44,7 @@ data class ChannelListUiState(
 	companion object {
 		val DEFAULT = ChannelListUiState(
 			uiState = UiState.SUCCESS,
-			client = User.Default,
+			client = User.DEFAULT,
 			channelListItem = emptyList(),
 			networkState = NetworkState.DISCONNECTED,
 		)

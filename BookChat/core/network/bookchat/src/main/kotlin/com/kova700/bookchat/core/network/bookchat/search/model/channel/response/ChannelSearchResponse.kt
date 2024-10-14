@@ -65,7 +65,7 @@ data class ChannelSearchResponse(
 				channelId = roomId,
 				message = lastChatMessage!!,
 				dispatchTime = lastChatDispatchTime!!,
-				sender = lastChatSenderId?.let { senderId -> User.Default.copy(id = senderId) }
+				sender = lastChatSenderId?.let { senderId -> User.DEFAULT.copy(id = senderId) }
 			)
 		}
 

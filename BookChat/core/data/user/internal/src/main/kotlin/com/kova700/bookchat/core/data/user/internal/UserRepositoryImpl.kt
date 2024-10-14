@@ -21,7 +21,7 @@ class UserRepositoryImpl @Inject constructor(
 
 		val response = runCatching { userApi.getUser(userId).toUser() }
 			.getOrDefault(  // 탈퇴한 유저 혹은 잘못된 요청
-				User.Default.copy(
+				User.DEFAULT.copy(
 					id = userId,
 					nickname = "알 수 없음"
 				)
