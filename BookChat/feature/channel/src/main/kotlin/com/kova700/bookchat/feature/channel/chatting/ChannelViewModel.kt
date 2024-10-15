@@ -44,10 +44,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.abs
 
-//TODO :  kotlinx.serialization.json.internal.JsonDecodingException: Unexpected JSON token at offset 16: Unexpected 'null' value instead of string literal at path: $['targetId']
-//                 JSON input: {"targetId":null,"chatId":560,"message":"방장이 오픈채팅방을 종료했습니다.\n더 이상 대화를 할 수 없으며, \n채팅방을 나가면 다시 입장 할 수 없게 됩니다.","dispatchTime":"2024-10-09T17:50:42.645043","notificationMessageType":"NOTICE_HOST_EXIT"}
+// TODO :채팅방 터져도 로컬에 있던 채팅들을 보이게 해줘야지 (터졌다는 채팅이 안보임)
+// TODO :카톡 알림 누르면 기존 백스택 위에 채팅방 액티비티 올리는 구조 같음 개선가능하면 해보자
 
-//TODO : 채팅방 막 생성하고 채팅방 서랍 열면 유저 정보 텅빈 이름 나옴
+// TODO : FCM 안오다가 채팅방 들어갔다 나오면 FCM 받아지는 현상이 있음
+//  아마 서버에서 disconnected 상태 업데이트가 아직 안되어서 FCM 수신이 안되는 듯하다
+//  추후 앱 단위에서 소켓 연결하고 모든 소켓 Frame에 ChannelId, ChatId를 포함하여
+//  모든 채팅방이 자동 subscribe된 채로 사용되는 형식으로 수정하해야 할듯하다.(Version 2.0)
+
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
@@ -96,11 +100,8 @@ class ChannelViewModel @Inject constructor(
 			)
 		}
 		observeNetworkState()
-		//TODO: 채널에서 강퇴되었는지 , 채널이 폭파되었는지 알기 위해 해당 API를 호출해야함
-		// 하지만,isBaned, isExploded가 넘어오는게 아니라 강퇴 당하면 그냥 404 {"errorCode":"4040500","message":"참여자를 찾을 수 없습니다."} 넘어옴
-		// 채팅방 터진 경우는 404안뜨고 isExploded = true로 잘 넘어오긴함 (서버 수정 대기중)
 		getChannelInfo(channelId)
-		if (originalChannel.isAvailableChannel.not()) return@launch
+		if (originalChannel.isAvailable.not()) return@launch
 		getTempSavedMessage(channelId)
 		observeChannel()
 		observeChats()
@@ -127,7 +128,7 @@ class ChannelViewModel @Inject constructor(
 		getClientChannelFlowUseCase(channelId)
 			.onEach { chatNotificationHandler.dismissChannelNotifications(it) }
 			.collect { channel ->
-				if (channel.isAvailableChannel.not()) disconnectSocket()
+				if (channel.isAvailable.not()) disconnectSocket()
 				handleChannelNewChat(channel)
 				updateState {
 					copy(
@@ -296,6 +297,7 @@ class ChannelViewModel @Inject constructor(
 	 * 리커넥션 시마다 호출 (이벤트 History받는 로직 구현 이전까지 임시로 사용)*/
 	private fun getChannelInfo(channelId: Long) = viewModelScope.launch {
 		if (uiState.value.isNetworkDisconnected) return@launch
+		Log.d(TAG, "ChannelViewModel: getChannelInfo() - called")
 		runCatching { getClientChannelInfoUseCase.invoke(channelId) }
 			.onFailure {
 				updateState { copy(uiState = UiState.ERROR) }
@@ -314,7 +316,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun sendMessage(text: String? = null) {
-		if (uiState.value.channel.isAvailableChannel.not()) return
+		if (uiState.value.channel.isAvailable.not()) return
 		if (uiState.value.socketState != SocketState.CONNECTED) connectSocket()
 
 		val message = text ?: uiState.value.enteredMessage
@@ -364,18 +366,19 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	fun onStartScreen() {
-		if (uiState.value.channel.isAvailableChannel.not()) return
+		if (uiState.value.channel.isAvailable.not()) return
 		connectSocket()
 	}
 
 	fun onStopScreen() {
-		if (uiState.value.channel.isAvailableChannel.not()) return
+		if (uiState.value.channel.isAvailable.not()) return
 		disconnectSocket()
 		updateState { copy(socketState = SocketState.DISCONNECTED) }
 	}
 
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트간의 채널 데이터 불일치 동기화*/
 	private fun syncChannelState() {
+		if (uiState.value.channel.isAvailable.not()) return
 		getChannelInfo(channelId)
 		syncChats(channelId)
 	}
@@ -453,7 +456,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	fun onClickCaptureBtn() {
-		if (uiState.value.channel.isAvailableChannel.not()
+		if (uiState.value.channel.isAvailable.not()
 			|| uiState.value.chats.isEmpty()
 		) return
 		updateState { copy(isCaptureMode = true) }

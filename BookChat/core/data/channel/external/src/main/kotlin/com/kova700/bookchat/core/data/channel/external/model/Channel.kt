@@ -36,7 +36,7 @@ data class Channel(
 			else -> false
 		}
 
-	val isAvailableChannel
+	val isAvailable
 		get() = isBanned.not() && isExploded.not()
 
 	val bookAuthorsString

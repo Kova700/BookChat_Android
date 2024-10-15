@@ -36,13 +36,13 @@ data class ChannelUiState(
 		get() = (olderChatsLoadState != LoadState.LOADING)
 						&& isOlderChatFullyLoaded.not()
 						&& socketState == SocketState.CONNECTED
-						&& channel.isAvailableChannel
+						&& channel.isAvailable
 
 	val isPossibleToLoadNewerChat
 		get() = (newerChatsLoadState != LoadState.LOADING)
 						&& isNewerChatFullyLoaded.not()
 						&& socketState == SocketState.CONNECTED
-						&& channel.isAvailableChannel
+						&& channel.isAvailable
 
 	val clientAuthority
 		get() = channel.participantAuthorities?.get(client.id)

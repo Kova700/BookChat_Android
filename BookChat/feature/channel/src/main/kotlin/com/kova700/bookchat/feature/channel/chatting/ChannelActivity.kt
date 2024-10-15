@@ -145,7 +145,7 @@ class ChannelActivity : AppCompatActivity() {
 		initAdapter()
 		initRcv()
 		with(binding.chatInputEt) {
-			if (channelViewModel.uiState.value.channel.isAvailableChannel) isEnabled = true
+			if (channelViewModel.uiState.value.channel.isAvailable) isEnabled = true
 			addTextChangedListener { text ->
 				val message = text?.toString() ?: return@addTextChangedListener
 				channelViewModel.onChangeEnteredMessage(message)
