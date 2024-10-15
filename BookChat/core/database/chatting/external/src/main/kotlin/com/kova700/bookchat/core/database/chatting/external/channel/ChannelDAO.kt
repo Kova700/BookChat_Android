@@ -14,9 +14,9 @@ interface ChannelDAO {
 
 	@Query(
 		"SELECT * FROM Channel " +
-						"ORDER BY last_chat_id IS NULL DESC, " +
+						"ORDER BY top_pin_num DESC, " +
+						"last_chat_id IS NULL DESC, " +
 						"last_chat_id DESC, " +
-						"top_pin_num DESC, " +
 						"room_id DESC " +
 						"LIMIT :pageSize OFFSET :offset"
 	)
@@ -41,9 +41,7 @@ interface ChannelDAO {
 	suspend fun insertIfNotPresent(channel: ChannelEntity): Long
 
 	suspend fun upsertAllChannels(channels: List<ChannelEntity>) {
-		for (channel in channels) {
-			upsertChannel(channel)
-		}
+		for (channel in channels) upsertChannel(channel)
 	}
 
 	suspend fun upsertChannel(channel: ChannelEntity) {
