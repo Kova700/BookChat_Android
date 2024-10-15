@@ -1,6 +1,5 @@
 package com.kova700.bookchat.core.data.channel.internal
 
-import android.util.Log
 import com.kova700.bookchat.core.data.channel.external.model.Channel
 import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
 import com.kova700.bookchat.core.data.channel.external.model.ChannelInfo
@@ -26,7 +25,6 @@ import com.kova700.bookchat.core.network.bookchat.channel.model.request.RequestM
 import com.kova700.bookchat.core.network.bookchat.channel.model.response.BookChatFailResponseBody
 import com.kova700.bookchat.core.network.bookchat.common.mapper.toBookRequest
 import com.kova700.bookchat.core.network.util.multipart.toMultiPartBody
-import com.kova700.bookchat.util.Constants.TAG
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,6 +44,10 @@ class ChannelRepositoryImpl @Inject constructor(
 	private val jsonSerializer: Json,
 ) : ChannelRepository {
 
+	//TODO :
+	// TopPinNum 내림 차순 정렬
+	//  lastMessageAt(Date Type) 내림 차순 정렬 ?: createdAt(Date Type) 내림 차순 정렬로 추후 수정
+	//  (lastChatId가 null인 신생 채널보다, 더 최신에 채팅이 발생한 채팅방이 더 아래에 노출되는 상황이 생김)
 	private val mapChannels = MutableStateFlow<Map<Long, Channel>>(emptyMap())//(channelId, Channel)
 	private val sortedChannels = mapChannels.map { it.values }
 		.map { channels ->
@@ -75,13 +77,13 @@ class ChannelRepositoryImpl @Inject constructor(
 	/** 로컬에 있는 채널 우선적으로 쿼리
 	 * (API를 통해 받아온 Channel에는 LastChat을 비롯한 detail정보가 없음) */
 	override suspend fun getChannel(channelId: Long): Channel {
-		val cachedChannel = mapChannels.value[channelId]
-		if (cachedChannel != null) return cachedChannel
-
+		mapChannels.value[channelId]?.let { return it }
 		val channel = getOfflineChannel(channelId) ?: getOnlineChannel(channelId)
 		return channel.also { setChannels(mapChannels.value + (channelId to it)) }
 	}
 
+	/** DB에 갱신된 LastChat, Participants와 기존에 존재하던
+	 * 채널 부가 정보들을 반영해서 반환 (ex : topPin, roomTags, ..) */
 	private suspend fun getOfflineChannel(channelId: Long): Channel? {
 		return channelDAO.getChannel(channelId)?.toChannel()
 	}
@@ -90,8 +92,15 @@ class ChannelRepositoryImpl @Inject constructor(
 	 * + 해당 채팅방에 입장하지 않은 채로 해당 API 호출하면 예외 던짐
 	 * {"errorCode":"4040400","message":"채팅방을 찾을 수 없습니다."}*/
 	private suspend fun getOnlineChannel(channelId: Long): Channel {
-		return channelApi.getChannel(channelId).toChannel()
-			.also { channelDAO.upsertChannel(it.toChannelEntity()) }
+		val response = runCatching { channelApi.getChannel(channelId).toChannel() }
+			.getOrDefault(
+				Channel.DEFAULT.copy(
+					roomId = channelId,
+					roomName = "존재하지 않는 채팅방"
+				)
+			)
+		channelDAO.upsertChannel(response.toChannelEntity())
+		return response
 	}
 
 	/** 지수 백오프 적용 */
@@ -120,7 +129,8 @@ class ChannelRepositoryImpl @Inject constructor(
 						roomTags = channelInfo.roomTags,
 						roomCapacity = channelInfo.roomCapacity,
 					)
-					setChannels(mapChannels.value + (channelId to getChannelWithUpdatedData(channelId)))
+					val updatedChannel = getOfflineChannel(channelId) ?: return null
+					setChannels(mapChannels.value + (channelId to updatedChannel))
 					return channelInfo
 				}
 
@@ -195,15 +205,8 @@ class ChannelRepositoryImpl @Inject constructor(
 		getOnlineChannel(channelId)
 	}
 
-	/** DB에 갱신된 LastChat, Participants와 기존에 존재하던
-	 * 채널 부가 정보들을 반영해서 반환 (ex : topPin, roomTags, ..) */
-	private suspend fun getChannelWithUpdatedData(channelId: Long): Channel {
-		return getOfflineChannel(channelId) ?: getOnlineChannel(channelId)
-	}
-
 	//TODO : 방장 나갈 경우 받는 메세지에 넘어오는 메세지 nullable타입 서버 수정 대기 중
 	override suspend fun leaveChannel(channelId: Long) {
-		Log.d(TAG, "ChannelRepositoryImpl: leaveChannel() - called")
 		val response = channelApi.leaveChannel(channelId)
 
 		suspend fun onSuccess() {
@@ -247,7 +250,7 @@ class ChannelRepositoryImpl @Inject constructor(
 
 	override suspend fun leaveChannelHost(channelId: Long) {
 		channelDAO.updateExploded(channelId)
-		val updatedChannel = getChannelWithUpdatedData(channelId)
+		val updatedChannel = getOfflineChannel(channelId) ?: return
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
@@ -256,7 +259,7 @@ class ChannelRepositoryImpl @Inject constructor(
 			channelId = channelId,
 			isNotificationOn = false
 		)
-		val updatedChannel = getChannelWithUpdatedData(channelId)
+		val updatedChannel = getOfflineChannel(channelId) ?: return
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
@@ -265,7 +268,7 @@ class ChannelRepositoryImpl @Inject constructor(
 			channelId = channelId,
 			isNotificationOn = true
 		)
-		val updatedChannel = getChannelWithUpdatedData(channelId)
+		val updatedChannel = getOfflineChannel(channelId) ?: return
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
@@ -275,7 +278,7 @@ class ChannelRepositoryImpl @Inject constructor(
 			channelId = channelId,
 			isTopPinNum = maxTopPinNum + 1
 		)
-		val updatedChannel = getChannelWithUpdatedData(channelId)
+		val updatedChannel = getOfflineChannel(channelId) ?: return
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
@@ -284,7 +287,7 @@ class ChannelRepositoryImpl @Inject constructor(
 			channelId = channelId,
 			isTopPinNum = 0
 		)
-		val updatedChannel = getChannelWithUpdatedData(channelId)
+		val updatedChannel = getOfflineChannel(channelId) ?: return
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
@@ -454,8 +457,8 @@ class ChannelRepositoryImpl @Inject constructor(
 			channelId = channelId,
 			lastReadChatId = chatId
 		)
-		val newChannel = getChannelWithUpdatedData(channelId)
-		setChannels(mapChannels.value + mapOf(channelId to newChannel))
+		val updatedChannel = getOfflineChannel(channelId) ?: return
+		setChannels(mapChannels.value + mapOf(channelId to updatedChannel))
 	}
 
 	/** 지수 백오프 적용 */
@@ -482,7 +485,7 @@ class ChannelRepositoryImpl @Inject constructor(
 			channelDAO.upsertAllChannels(response.channels.toChannelEntity())
 			isEndPage = response.cursorMeta.last
 			currentPage = response.cursorMeta.nextCursorId
-			val newChannels = response.channels.map { getChannelWithUpdatedData(it.roomId) }
+			val newChannels = response.channels.map { getOfflineChannel(it.roomId) ?: it.toChannel() }
 			setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
 			return response.channels.map { it.toChannel() }
 		}
@@ -504,7 +507,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		channelDAO.upsertAllChannels(response.channels.toChannelEntity())
 		isEndPage = response.cursorMeta.last
 		currentPage = response.cursorMeta.nextCursorId
-		val newChannels = response.channels.map { getChannelWithUpdatedData(it.roomId) }
+		val newChannels = response.channels.map { getOfflineChannel(it.roomId) ?: it.toChannel() }
 		setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
 		return response.channels.map { it.toChannel() }
 	}
@@ -523,7 +526,7 @@ class ChannelRepositoryImpl @Inject constructor(
 			lastChatId = chatId,
 		)
 
-		val updatedChannel = getChannelWithUpdatedData(channelId)
+		val updatedChannel = getOfflineChannel(channelId) ?: return
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
