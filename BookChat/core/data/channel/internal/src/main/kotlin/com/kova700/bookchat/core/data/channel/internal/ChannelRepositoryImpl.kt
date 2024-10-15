@@ -450,14 +450,11 @@ class ChannelRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun updateLastReadChatIdIfValid(channelId: Long, chatId: Long) {
-		val channel = channelDAO.getChannel(channelId)
-		val existingLastReadChatId = channel?.lastReadChatId
-		if (existingLastReadChatId != null && existingLastReadChatId >= chatId) return
-
-		channelDAO.updateLastReadChat(
+		val isValid = channelDAO.updateLastReadChatIdIfValid(
 			channelId = channelId,
-			lastReadChatId = chatId
+			chatId = chatId
 		)
+		if (isValid.not()) return
 		val updatedChannel = getOfflineChannel(channelId) ?: return
 		setChannels(mapChannels.value + mapOf(channelId to updatedChannel))
 	}
@@ -519,14 +516,11 @@ class ChannelRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun updateChannelLastChatIfValid(channelId: Long, chatId: Long) {
-		val existingLastChatId = channelDAO.getChannel(channelId)?.lastChatId
-		if (existingLastChatId != null && chatId <= existingLastChatId) return
-
-		channelDAO.updateLastChat(
+		val isValid = channelDAO.updateChannelLastChatIfValid(
 			channelId = channelId,
-			lastChatId = chatId,
+			chatId = chatId,
 		)
-
+		if (isValid.not()) return
 		val updatedChannel = getOfflineChannel(channelId) ?: return
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}

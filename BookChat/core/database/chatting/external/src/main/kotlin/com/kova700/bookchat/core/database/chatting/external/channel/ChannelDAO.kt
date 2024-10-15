@@ -57,10 +57,14 @@ interface ChannelDAO {
 			roomImageUri = channel.roomImageUri
 		)
 
-		if (channel.lastChatId != null) {
-			updateLastChat(
+		channel.lastChatId?.let {
+			updateChannelLastChatIfValid(
 				channelId = channel.roomId,
-				lastChatId = channel.lastChatId
+				chatId = it
+			)
+			updateLastReadChatIdIfValid(
+				channelId = channel.roomId,
+				chatId = it
 			)
 		}
 	}
@@ -82,6 +86,26 @@ interface ChannelDAO {
 		defaultRoomImageType: ChannelDefaultImageType,
 		roomImageUri: String?,
 	)
+
+	suspend fun updateLastReadChatIdIfValid(
+		channelId: Long,
+		chatId: Long
+	): Boolean {
+		val existingLastReadChatId = getChannel(channelId)?.lastReadChatId
+		if (existingLastReadChatId != null && chatId <= existingLastReadChatId) return false
+		updateLastReadChat(channelId, chatId)
+		return true
+	}
+
+	suspend fun updateChannelLastChatIfValid(
+		channelId: Long,
+		chatId: Long
+	): Boolean {
+		val existingLastChatId = getChannel(channelId)?.lastChatId
+		if (existingLastChatId != null && chatId <= existingLastChatId) return false
+		updateLastChat(channelId, chatId)
+		return true
+	}
 
 	@Query(
 		"UPDATE Channel SET " +

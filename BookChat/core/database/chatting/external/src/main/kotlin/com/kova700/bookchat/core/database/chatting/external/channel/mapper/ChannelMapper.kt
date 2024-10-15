@@ -18,6 +18,7 @@ fun Channel.toChannelEntity(): ChannelEntity {
 		isExploded = isExploded,
 		roomImageUri = roomImageUri,
 		lastChatId = lastChat?.chatId,
+		lastReadChatId = lastReadChatId,
 		hostId = host?.id,
 		participantIds = participantIds,
 		participantAuthorities = participantAuthorities,
