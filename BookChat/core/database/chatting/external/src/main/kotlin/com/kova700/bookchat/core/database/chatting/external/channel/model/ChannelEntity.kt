@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
 import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 
-// TODO : last_read_chat_id를 이용한 읽지 않은 채팅 수는 추후 업데이트
+// TODO : last_read_chat_id를 이용한 읽지 않은 채팅 + 읽지 않은 유저 수는 Read Event 구현 후, 추후 업데이트
 @Entity(tableName = CHANNEL_ENTITY_TABLE_NAME)
 data class ChannelEntity(
 	@PrimaryKey
@@ -27,7 +27,7 @@ data class ChannelEntity(
 	@ColumnInfo(name = "participant_authorities") val participantAuthorities: Map<Long, ChannelMemberAuthority>? = null,
 	@ColumnInfo(name = "room_tags") val roomTags: List<String>? = null,
 	@ColumnInfo(name = "room_capacity") val roomCapacity: Int? = null,
-	// -----------------------bookId만 남기고 테이블 분리-------------------------
+	// TODO : bookId만 남기고 테이블 분리---------------------------------------------
 	@ColumnInfo(name = "book_title") val bookTitle: String? = null,
 	@ColumnInfo(name = "book_authors") val bookAuthors: List<String>? = null,
 	@ColumnInfo(name = "book_cover_image_url") val bookCoverImageUrl: String? = null,
