@@ -35,17 +35,33 @@ class LoginViewModel @Inject constructor(
 			.onSuccess { getClientProfile() }
 			.onFailure { throwable ->
 				when (throwable) {
-					is NeedToSignUpException -> startEvent(LoginEvent.MoveToSignUp)
-					is NeedToDeviceWarningException -> startEvent(LoginEvent.ShowDeviceWarning)
-					else -> startEvent(LoginEvent.ErrorEvent(R.string.sign_in_fail))
+					is NeedToSignUpException -> {
+						updateState { copy(uiState = UiState.SUCCESS) }
+						startEvent(LoginEvent.MoveToSignUp)
+					}
+
+					is NeedToDeviceWarningException -> {
+						updateState { copy(uiState = UiState.SUCCESS) }
+						startEvent(LoginEvent.ShowDeviceWarning)
+					}
+
+					else -> {
+						updateState { copy(uiState = UiState.ERROR) }
+						startEvent(LoginEvent.ErrorEvent(R.string.sign_in_fail))
+					}
 				}
 			}
 	}
 
 	private fun getClientProfile() = viewModelScope.launch {
 		runCatching { clientRepository.getClientProfile() }
-			.onSuccess { startEvent(LoginEvent.MoveToMain) }
-			.onFailure { startEvent(LoginEvent.ErrorEvent(R.string.get_client_profile_fail)) }
+			.onSuccess {
+				updateState { copy(uiState = UiState.SUCCESS) }
+				startEvent(LoginEvent.MoveToMain)
+			}.onFailure {
+				updateState { copy(uiState = UiState.ERROR) }
+				startEvent(LoginEvent.ErrorEvent(R.string.get_client_profile_fail))
+			}
 	}
 
 	fun onChangeIdToken() {
@@ -53,25 +69,33 @@ class LoginViewModel @Inject constructor(
 	}
 
 	fun onFailedKakaoLogin(throwable: Throwable) {
-		updateState { copy(uiState = UiState.SUCCESS) }
-		if (throwable is ClientCancelException) return
-		startEvent(LoginEvent.ErrorEvent(R.string.error_kakao_login))
+		when (throwable) {
+			is ClientCancelException -> updateState { copy(uiState = UiState.SUCCESS) }
+			else -> {
+				updateState { copy(uiState = UiState.ERROR) }
+				startEvent(LoginEvent.ErrorEvent(R.string.error_kakao_login))
+			}
+		}
 	}
 
 	fun onFailedGoogleLogin(throwable: Throwable) {
-		updateState { copy(uiState = UiState.SUCCESS) }
-		if (throwable is ClientCancelException) return
-		startEvent(LoginEvent.ErrorEvent(R.string.error_google_login))
+		when (throwable) {
+			is ClientCancelException -> updateState { copy(uiState = UiState.SUCCESS) }
+			else -> {
+				updateState { copy(uiState = UiState.ERROR) }
+				startEvent(LoginEvent.ErrorEvent(R.string.error_google_login))
+			}
+		}
 	}
 
 	fun onClickKakaoLoginBtn() {
-		if (uiState.value.uiState == UiState.LOADING) return
+		if (uiState.value.isLoading) return
 		updateState { copy(uiState = UiState.LOADING) }
 		startEvent(LoginEvent.StartKakaoLogin)
 	}
 
 	fun onClickGoogleLoginBtn() {
-		if (uiState.value.uiState == UiState.LOADING) return
+		if (uiState.value.isLoading) return
 		updateState { copy(uiState = UiState.LOADING) }
 		startEvent(LoginEvent.StartGoogleLogin)
 	}

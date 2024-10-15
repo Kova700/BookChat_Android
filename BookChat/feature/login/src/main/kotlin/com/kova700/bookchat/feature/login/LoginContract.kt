@@ -4,6 +4,9 @@ data class LoginUiState(
 	val uiState: UiState,
 ) {
 
+	val isLoading: Boolean
+		get() = uiState == UiState.LOADING
+
 	enum class UiState {
 		SUCCESS,
 		LOADING,

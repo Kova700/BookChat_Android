@@ -56,8 +56,7 @@ class LoginActivity : AppCompatActivity() {
 	}
 
 	private fun setViewState(uiState: LoginUiState) {
-		binding.progressbar.visibility =
-			if (uiState.uiState == LoginUiState.UiState.LOADING) View.VISIBLE else View.GONE
+		binding.progressbar.visibility = if (uiState.isLoading) View.VISIBLE else View.GONE
 	}
 
 	private fun startKakaoLogin() = lifecycleScope.launch {
