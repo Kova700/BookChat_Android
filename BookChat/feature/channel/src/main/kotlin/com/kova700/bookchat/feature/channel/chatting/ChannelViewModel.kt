@@ -144,9 +144,8 @@ class ChannelViewModel @Inject constructor(
 
 		when (channelLastChat.getChatType(uiState.value.client.id)) {
 			ChatType.Mine -> scrollToBottom()
-			ChatType.Notice, //TODO : [FixWaiting] Notice타입의 NewChatNotice UI 만들기
-			ChatType.Other,
-			-> startEvent(ChannelEvent.NewChatOccurEvent(channelLastChat))
+			ChatType.Notice,
+			ChatType.Other -> startEvent(ChannelEvent.NewChatOccurEvent(channelLastChat))
 		}
 	}
 

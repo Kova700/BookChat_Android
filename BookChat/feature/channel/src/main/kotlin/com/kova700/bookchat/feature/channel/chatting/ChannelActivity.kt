@@ -274,6 +274,8 @@ class ChannelActivity : AppCompatActivity() {
 		with(binding.newChatNoticeLayout) {
 			root.visibility =
 				if (uiState.newChatNotice != null) View.VISIBLE else View.INVISIBLE
+			userProfileCv.visibility =
+				if (uiState.newChatNotice?.sender == null) View.INVISIBLE else View.VISIBLE
 			userProfileIv.loadUserProfile(
 				imageUrl = uiState.newChatNotice?.sender?.profileImageUrl,
 				userDefaultProfileType = uiState.newChatNotice?.sender?.defaultProfileImageType
@@ -576,7 +578,7 @@ class ChannelActivity : AppCompatActivity() {
 	 * FailedChat으로 화면이 가득찬 경우로 인지하고 띄우지 않음 */
 	private fun checkIfNewChatNoticeIsRequired(channelLastChat: Chat) {
 		val newestChatNotFailedIndex = chatItemAdapter.newestChatNotFailedIndex
-		val lvip = linearLayoutManager.findLastVisibleItemPosition()
+		val lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition()
 
 		if (channelViewModel.uiState.value.isNewerChatFullyLoaded.not()) {
 			channelViewModel.onNeedNewChatNotice(channelLastChat)
@@ -584,7 +586,7 @@ class ChannelActivity : AppCompatActivity() {
 		}
 
 		if (linearLayoutManager.isVisiblePosition(newestChatNotFailedIndex)
-			|| (lvip <= newestChatNotFailedIndex)
+			|| (lastVisibleItemPosition <= newestChatNotFailedIndex)
 		) return
 
 		channelViewModel.onNeedNewChatNotice(channelLastChat)

@@ -39,7 +39,7 @@
                 app:layout_constraintGuide_percent="0.9" />
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/user_profile_cardview"
+                android:id="@+id/user_profile_cv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -71,8 +71,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_start_new_chat_notice"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/user_profile_cardview"
-                app:layout_constraintTop_toTopOf="@+id/user_profile_cardview" />
+                app:layout_constraintStart_toEndOf="@+id/user_profile_cv"
+                app:layout_constraintTop_toTopOf="@+id/user_profile_cv" />
 
             <TextView
                 android:id="@+id/message_tv"
@@ -90,7 +90,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/guideline_end_new_chat_notice"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/user_nickname_tv"
-                app:layout_constraintTop_toTopOf="@+id/user_profile_cardview" />
+                app:layout_constraintTop_toTopOf="@+id/user_profile_cv" />
 
             <ImageView
                 android:id="@+id/bottom_new_chat_notice_iv"
@@ -101,7 +101,7 @@
                 android:src="@drawable/bottom_new_chat_notice_img"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/user_profile_cardview" />
+                app:layout_constraintTop_toTopOf="@+id/user_profile_cv" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
