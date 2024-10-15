@@ -44,13 +44,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.abs
 
-// TODO :채팅방 터져도 로컬에 있던 채팅들을 보이게 해줘야지 (터졌다는 채팅이 안보임)
 // TODO :카톡 알림 누르면 기존 백스택 위에 채팅방 액티비티 올리는 구조 같음 개선가능하면 해보자
 
 // TODO : FCM 안오다가 채팅방 들어갔다 나오면 FCM 받아지는 현상이 있음
 //  아마 서버에서 disconnected 상태 업데이트가 아직 안되어서 FCM 수신이 안되는 듯하다
 //  추후 앱 단위에서 소켓 연결하고 모든 소켓 Frame에 ChannelId, ChatId를 포함하여
-//  모든 채팅방이 자동 subscribe된 채로 사용되는 형식으로 수정하해야 할듯하다.(Version 2.0)
+//  모든 채팅방이 자동 subscribe된 채로 사용되는 형식으로 수정하해야 할듯하다. (Version 2.0)
 
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
@@ -86,9 +85,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun initUiState() = viewModelScope.launch {
-		val originalChannel = runCatching { getClientChannelUseCase(channelId) }
-			.getOrNull() ?: Channel.DEFAULT
-
+		val originalChannel = getClientChannelUseCase(channelId)
 		val shouldLastReadChatScroll = originalChannel.isExistNewChat
 		updateState {
 			copy(
@@ -100,12 +97,12 @@ class ChannelViewModel @Inject constructor(
 			)
 		}
 		observeNetworkState()
+		observeChats()
+		getOfflineNewestChats()
 		getChannelInfo(channelId)
 		if (originalChannel.isAvailable.not()) return@launch
 		getTempSavedMessage(channelId)
 		observeChannel()
-		observeChats()
-		getOfflineNewestChats()
 		observeChatsLoadState()
 		observeSocketState()
 	}
@@ -121,6 +118,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private suspend fun getOfflineNewestChats() {
+		Log.d(TAG, "ChannelViewModel: getOfflineNewestChats() - called")
 		chatRepository.getOfflineNewestChats(channelId)
 	}
 
@@ -164,6 +162,7 @@ class ChannelViewModel @Inject constructor(
 			captureIds,
 			uiState.map { it.isVisibleLastReadChatNotice }.distinctUntilChanged()
 		) { chats, captureHeaderBottomIds, isVisibleLastReadChatNotice ->
+			Log.d(TAG, "ChannelViewModel: observeChats() - chats :$chats")
 			chats.toChatItems(
 				channel = uiState.value.channel,
 				clientId = uiState.value.client.id,
@@ -221,6 +220,9 @@ class ChannelViewModel @Inject constructor(
 
 	/** 마지막으로 읽었던 채팅이 getNewestChats 결과에 포함되어있다면 getChatsAroundId는 호출하지 않음 */
 	private fun getInitChats() = viewModelScope.launch {
+		if (uiState.value.isNetworkDisconnected
+			|| uiState.value.channel.isAvailable.not()
+		) return@launch
 		val newestChats = getNewestChats().await() ?: emptyList()
 		val originalLastReadChatId = uiState.value.originalLastReadChatId ?: return@launch
 		val shouldLastReadChatScroll =
@@ -296,8 +298,9 @@ class ChannelViewModel @Inject constructor(
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트 간의 데이터 불일치를 메우기 위해서
 	 * 리커넥션 시마다 호출 (이벤트 History받는 로직 구현 이전까지 임시로 사용)*/
 	private fun getChannelInfo(channelId: Long) = viewModelScope.launch {
-		if (uiState.value.isNetworkDisconnected) return@launch
-		Log.d(TAG, "ChannelViewModel: getChannelInfo() - called")
+		if (uiState.value.isNetworkDisconnected
+			|| uiState.value.channel.isAvailable.not()
+		) return@launch
 		runCatching { getClientChannelInfoUseCase.invoke(channelId) }
 			.onFailure {
 				updateState { copy(uiState = UiState.ERROR) }
@@ -306,7 +309,9 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun connectSocket() = viewModelScope.launch {
-		if (uiState.value.isNetworkDisconnected) return@launch
+		if (uiState.value.isNetworkDisconnected
+			|| uiState.value.channel.isAvailable.not()
+		) return@launch
 		runCatching { stompHandler.connectSocket(uiState.value.channel) }
 			.onFailure {
 				Log.d(TAG, "ChannelViewModel: connectSocket() - throwable: $it")
@@ -378,7 +383,9 @@ class ChannelViewModel @Inject constructor(
 
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트간의 채널 데이터 불일치 동기화*/
 	private fun syncChannelState() {
-		if (uiState.value.channel.isAvailable.not()) return
+		if (uiState.value.isNetworkDisconnected
+			|| uiState.value.channel.isAvailable.not()
+		) return
 		getChannelInfo(channelId)
 		syncChats(channelId)
 	}

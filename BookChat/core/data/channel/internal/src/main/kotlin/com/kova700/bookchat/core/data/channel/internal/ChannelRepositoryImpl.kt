@@ -138,9 +138,10 @@ class ChannelRepositoryImpl @Inject constructor(
 					val failBody =
 						response.body?.let { jsonSerializer.decodeFromString<BookChatFailResponseBody>(it) }
 					when (failBody?.errorCode) {
-						RESPONSE_CODE_CHANNEL_PARTICIPANT_NOT_FOUND -> Unit
 						RESPONSE_CODE_CHANNEL_IS_BANNED -> banChannelClient(channelId = channelId)
+						RESPONSE_CODE_CHANNEL_PARTICIPANT_NOT_FOUND,
 						RESPONSE_CODE_CHANNEL_IS_EXPLODED -> leaveChannelHost(channelId)
+
 						else -> throw Exception("failed to get channel info")
 					}
 					return null
