@@ -13,6 +13,7 @@ class ChannelTempMessageRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun saveTempMessage(channelId: Long, message: String) {
+		if (message.isBlank() || message.isTooLong()) return
 		tempMessageDAO.insert(
 			TempMessageEntity(
 				chatRoomId = channelId,
@@ -28,4 +29,6 @@ class ChannelTempMessageRepositoryImpl @Inject constructor(
 	override suspend fun clear() {
 		tempMessageDAO.deleteAll()
 	}
+
+	private fun String.isTooLong(): Boolean = length > 10000
 }
