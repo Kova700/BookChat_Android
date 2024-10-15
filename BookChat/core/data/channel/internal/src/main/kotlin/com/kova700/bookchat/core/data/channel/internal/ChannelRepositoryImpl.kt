@@ -206,7 +206,6 @@ class ChannelRepositoryImpl @Inject constructor(
 		getOnlineChannel(channelId)
 	}
 
-	//TODO : 방장 나갈 경우 받는 메세지에 넘어오는 메세지 nullable타입 서버 수정 대기 중
 	override suspend fun leaveChannel(channelId: Long) {
 		val response = channelApi.leaveChannel(channelId)
 
@@ -490,10 +489,8 @@ class ChannelRepositoryImpl @Inject constructor(
 		throw IOException("failed to retrieve most active channels")
 	}
 
-	//TODO : 서버측에서 lastChatID가 가장 높은 순으로 쿼리되게 혹은 쿼리 옵션을 주게 수정 대기
-	//  페이징 방식 수정되면 수정된 offset방식으로 getMostActiveChannels처럼 로컬 우선 쿼리로 수정
-	/** 로컬 데이터 우선적으로 쿼리 */
-	/** Channel 세부 정보는 채팅방 들어 가면 getChannelInfo에 의해 갱신될 예정 */
+	//TODO : 서버 측에서 lastChat.dispatchedAt ?: channel.createdAt으로 정렬되도록 수정대기
+	/** Channel 세부 정보는 getChannelInfo에 의해 갱신될 예정 */
 	override suspend fun getChannels(loadSize: Int): List<Channel>? {
 		if (isEndPage) return null
 
