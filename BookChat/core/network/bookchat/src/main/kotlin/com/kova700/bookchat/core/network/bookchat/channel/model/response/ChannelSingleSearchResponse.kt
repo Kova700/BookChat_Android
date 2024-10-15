@@ -4,8 +4,8 @@ import com.kova700.bookchat.core.network.bookchat.channel.model.both.ChannelDefa
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-//TODO : lastChatId 추가되면 상당히 편할 듯
-//TODO : 여기도 Host, LastChat 필요
+//TODO : [NotUrgent] lastChatId 추가되면 상당히 편할 듯
+//TODO : [FixWaiting] host 정보 추가되어야함
 @Serializable
 data class ChannelSingleSearchResponse(
 	@SerialName("roomId")

@@ -135,7 +135,7 @@ class ClientRepositoryImpl @Inject constructor(
 
 	/** LogoutUsecase를 이용해 로컬 데이터 삭제가 필요함으로 해당 함수 단일로 호출 금지
 	 * (서버 FCM토큰 삭제용도로 사용)*/
-	//TODO : DeviceID가져와서 서버에게 보내기( DeviceID가 같은 경우만 FCM 토큰 삭제되게 수정)
+	//TODO : [FixWaiting] DeviceID가져와서 서버에게 보내기( DeviceID가 같은 경우만 FCM 토큰 삭제되게 수정)
 	override suspend fun logout() {
 		clientApi.logout()
 	}

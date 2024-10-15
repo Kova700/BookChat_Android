@@ -57,9 +57,9 @@ import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.time.Duration.Companion.seconds
 
-//TODO : Socket은 채팅방과 관계없이 연결해두고, 채팅방을 복수로 subscribe하는것도 방법 중 하나일 듯
+//TODO : [Version 2] Socket은 채팅방과 관계없이 연결해두고, 채팅방을 복수로 subscribe하는것도 방법 중 하나일 듯
 
-//TODO : 최종적으로 채팅 무식하게 계속 쳐보고 실패한 채팅도 재전송되고, 소켓 끊기면 재연결 되고, 예외터져도 앱이 안죽는지 Check
+//TODO : [FixWaiting] 최종적으로 채팅 무식하게 계속 쳐보고 실패한 채팅도 재전송되고, 소켓 끊기면 재연결 되고, 예외터져도 앱이 안죽는지 Check
 //      홈 나갔다와도 리커넥션 잘 되는지 동기화는 잘 되는지
 class StompHandlerImpl @Inject constructor(
 	private val stompClient: StompClient,
@@ -160,7 +160,7 @@ class StompHandlerImpl @Inject constructor(
 								)
 							}
 					}
-				retrySendFailedChats(channel.roomId) //TODO : 이걸로도 타이밍이 완벽하지 않음 (소켓 연결이 완벽히 재연결 되었을 떄, 실패된 채팅들 전송되게)
+				retrySendFailedChats(channel.roomId) //TODO : [FixWaiting] 이걸로도 타이밍이 완벽하지 않음 (소켓 연결이 완벽히 재연결 되었을 떄, 실패된 채팅들 전송되게)
 				channelSubscription.join()
 
 				disconnectSocket()

@@ -147,7 +147,7 @@ class ChatRepositoryImpl @Inject constructor(
 		cachedChannelId = channelId
 	}
 
-	//TODO : 추후 WorkManager로 ChatStatus.RETRY_REQUIRED인 채팅들 retry로직 앱 단위로 추가
+	//TODO : [Version 2] 추후 WorkManager로 ChatStatus.RETRY_REQUIRED인 채팅들 retry로직 앱 단위로 추가
 	override suspend fun getFailedChats(channelId: Long): List<Chat> {
 		return chatDAO.getChannelsFailedChats(channelId)
 			.map {

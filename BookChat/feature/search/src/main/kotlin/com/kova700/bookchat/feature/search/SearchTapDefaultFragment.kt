@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.kova700.bookchat.feature.search.databinding.FragmentSearchTapDefaultBinding
 
-/*TODO : 추천 검색어 추가 예정*/
+/*TODO : [Version 2] 추천 검색어 추가 예정*/
 class SearchTapDefaultFragment : Fragment() {
 	private var _binding: FragmentSearchTapDefaultBinding? = null
 	private val binding get() = _binding!!

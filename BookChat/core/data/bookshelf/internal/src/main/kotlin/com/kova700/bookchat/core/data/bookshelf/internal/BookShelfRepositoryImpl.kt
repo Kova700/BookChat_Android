@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-//TODO : DB적용 후, ROOM에서 Flow로 가저오도록 수정
+//TODO : [Version 2] DB적용 후, ROOM에서 Flow로 가저오도록 수정
 class BookShelfRepositoryImpl @Inject constructor(
 	private val bookshelfApi: BookshelfApi,
 ) : BookShelfRepository {
@@ -79,9 +79,6 @@ class BookShelfRepositoryImpl @Inject constructor(
 		totalItemCount.update { it + (bookShelfState to response.pageMeta.totalElements) }
 	}
 
-	//TODO : 조회 반환값에 서재의 어떤 상태인지 추가되면 매우 좋을듯
-	// (다중 조회랑 단건 조회랑 스펙이 다름) (가져온놈이 어떤 상태인지는 알아야할 듯)
-	// 수정되면 getCachedBookShelfItem이랑 통합
 	override suspend fun getBookShelfItem(
 		bookShelfId: Long,
 		bookShelfState: BookShelfState,
@@ -93,6 +90,9 @@ class BookShelfRepositoryImpl @Inject constructor(
 			)
 	}
 
+	//TODO : [NotUrgent] 단건 조회 반환 값에 서재의 어떤 상태인지 추가되면 매우 좋을듯
+	// (다중 조회랑 단건 조회랑 스펙이 다름) (가져온놈이 어떤 상태인지는 알아야할 듯)
+	// 수정되면 getCachedBookShelfItem이랑 통합
 	private suspend fun getOnlineBookShelfItem(
 		bookShelfId: Long,
 		bookShelfState: BookShelfState,

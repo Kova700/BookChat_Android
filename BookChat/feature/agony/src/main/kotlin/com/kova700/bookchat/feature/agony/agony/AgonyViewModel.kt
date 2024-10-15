@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO : 고민폴더 글자 짤림 현상 있음 .. 처리 하던가 하자
+//TODO : [FixWaiting] 고민폴더 글자 짤림 현상 있음 .. 처리 하던가 하자
 @HiltViewModel
 class AgonyViewModel @Inject constructor(
 	private val agonyRepository: AgonyRepository,

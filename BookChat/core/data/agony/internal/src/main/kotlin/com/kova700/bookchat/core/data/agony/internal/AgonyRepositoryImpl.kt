@@ -110,7 +110,7 @@ class AgonyRepositoryImpl @Inject constructor(
 		)
 	}
 
-	//TODO : 색상도 변경 가능하게 UI 추가
+	//TODO : [Version 2] 색상도 변경 가능하게 UI 추가
 	override suspend fun reviseAgony(
 		bookShelfId: Long,
 		agonyId: Long,

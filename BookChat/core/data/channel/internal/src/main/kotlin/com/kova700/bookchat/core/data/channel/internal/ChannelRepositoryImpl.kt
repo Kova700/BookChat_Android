@@ -44,7 +44,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	private val jsonSerializer: Json,
 ) : ChannelRepository {
 
-	//TODO :
+	//TODO : [Version 2]
 	// TopPinNum 내림 차순 정렬
 	//  lastMessageAt(Date Type) 내림 차순 정렬 ?: createdAt(Date Type) 내림 차순 정렬로 추후 수정
 	//  (lastChatId가 null인 신생 채널보다, 더 최신에 채팅이 발생한 채팅방이 더 아래에 노출되는 상황이 생김)

@@ -28,7 +28,7 @@ data class ResponseChannelInfo(
 	val roomGuestList: List<ChannelUser>?,
 )
 
-//TODO : UserResponse와 프로퍼티명 통일하여 개선 가능
+//TODO : [NotUrgent] UserResponse와 프로퍼티명 통일하여 개선 가능
 @Serializable
 data class ChannelUser(
 	@SerialName("id")

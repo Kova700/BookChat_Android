@@ -3,7 +3,7 @@ package com.kova700.bookchat.core.stomp.chatting.external.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-//TODO : 채팅방별 소켓이 아닌 로그인 시 소켓 연결해서 메세지 관리하려면
+//TODO : [Version 2] 채팅방별 소켓이 아닌 로그인 시 소켓 연결해서 메세지 관리하려면
 // NotificationMessage에도 ChatRoomId(ChannelId) 추가되어야함
 
 sealed interface SocketMessage

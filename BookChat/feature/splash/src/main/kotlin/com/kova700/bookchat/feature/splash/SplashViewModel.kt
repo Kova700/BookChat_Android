@@ -13,10 +13,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-//TODO : Firebase- RemoteConfig 이용해서
+//TODO : [FixWaiting] Firebase- RemoteConfig 이용해서
 //    서버 점검중 Dialog (ServerMaintenanceNoticeDialog)추가
-//    + Flag추가 해서 Notification 막기
-//    + 기존에 있던 notificaiton 눌러도 지워지지 않고, 서버 점검중 Dialog 띄우기
+//    Notification 누르고 ChannelActivity로 이동해도 서버 점검중 Dialog 띄울 수 있어야함
 @HiltViewModel
 class SplashViewModel @Inject constructor(
 	private val clientRepository: ClientRepository,
@@ -33,7 +32,7 @@ class SplashViewModel @Inject constructor(
 
 	private fun initUiState() = viewModelScope.launch {
 		delay(SPLASH_DURATION.seconds)
-		if (isBookChatTokenExist()) requestUserInfo()
+		if (isBookChatTokenExist()) getClientProfile()
 		else startEvent(SplashEvent.MoveToLogin)
 	}
 
@@ -42,13 +41,13 @@ class SplashViewModel @Inject constructor(
 			.getOrDefault(false)
 	}
 
-	private fun requestUserInfo() = viewModelScope.launch {
+	private fun getClientProfile() = viewModelScope.launch {
 		runCatching { clientRepository.getClientProfile() }
 			.onSuccess { startEvent(SplashEvent.MoveToMain) }
 			.onFailure { clearAllData() }
 	}
 
-	//TODO : DeviceID가져와서 서버에게 보내기( DeviceID가 같은 경우만 FCM 토큰 삭제되게 수정)
+	//TODO : [FixWaiting] DeviceID가져와서 서버에게 보내기( DeviceID가 같은 경우만 FCM 토큰 삭제되게 수정)
 	// 수정되면 needServer = true로 변경
 	private fun clearAllData() = viewModelScope.launch {
 		runCatching { logoutUseCase(needServer = false) }
@@ -60,6 +59,6 @@ class SplashViewModel @Inject constructor(
 	}
 
 	companion object {
-		const val SPLASH_DURATION = 1.5
+		private const val SPLASH_DURATION = 1.5
 	}
 }

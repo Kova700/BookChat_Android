@@ -21,7 +21,7 @@ class BookChatTokenDataStore @Inject constructor(
 ) {
 	private val bookChatTokenKey = stringPreferencesKey(BOOKCHAT_TOKEN_KEY)
 
-	//TODO : 토큰 암호화 추가
+	//TODO :[FixWaiting] 토큰 암호화 추가
 	suspend fun getBookChatToken(): BookChatToken? {
 		val tokenString = dataStore.getDataFlow(bookChatTokenKey).firstOrNull()
 		if (tokenString.isNullOrBlank()) return null

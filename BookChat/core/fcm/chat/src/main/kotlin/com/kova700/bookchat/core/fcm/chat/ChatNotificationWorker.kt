@@ -37,7 +37,7 @@ class ChatNotificationWorker @AssistedInject constructor(
 		val channelId: Long = inputData.getLong(EXTRA_CHANNEL_ID, -1)
 		val chatId: Long = inputData.getLong(EXTRA_CHAT_ID, -1)
 
-		//TODO : SenderId를 함께 넘겨 받아서 만약 Sender가 클라이언트라면 아래 API호출하지 않게 수정
+		//TODO : [FixWaiting] SenderId를 함께 넘겨 받아서 만약 Sender가 클라이언트라면 아래 API호출하지 않게 수정
 		val apiResult = runCatching {
 			val channel = getClientChannelUseCase(channelId)
 			val chat = getChatUseCase(chatId)

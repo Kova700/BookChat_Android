@@ -44,12 +44,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.abs
 
-// TODO :카톡 알림 누르면 기존 백스택 위에 채팅방 액티비티 올리는 구조 같음 개선가능하면 해보자
+// TODO : [FixWaiting] 카톡 알림 누르면 기존 백스택 위에 채팅방 액티비티 올리는 구조 같음 개선가능하면 해보자
 
-// TODO : FCM 안오다가 채팅방 들어갔다 나오면 FCM 받아지는 현상이 있음
+// TODO : [FixWaiting] 유저 프로필 변경 시 drawerItem에 바로 반영안됨 수정 필요
+
+// TODO : [Version 2] FCM 안오다가 채팅방 들어갔다 나오면 FCM 받아지는 현상이 있음
 //  아마 서버에서 disconnected 상태 업데이트가 아직 안되어서 FCM 수신이 안되는 듯하다
 //  추후 앱 단위에서 소켓 연결하고 모든 소켓 Frame에 ChannelId, ChatId를 포함하여
-//  모든 채팅방이 자동 subscribe된 채로 사용되는 형식으로 수정하해야 할듯하다. (Version 2.0)
+//  모든 채팅방이 자동 subscribe된 채로 사용되는 형식으로 수정하해야 할듯하다.
 
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
@@ -118,7 +120,6 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private suspend fun getOfflineNewestChats() {
-		Log.d(TAG, "ChannelViewModel: getOfflineNewestChats() - called")
 		chatRepository.getOfflineNewestChats(channelId)
 	}
 
@@ -143,7 +144,7 @@ class ChannelViewModel @Inject constructor(
 
 		when (channelLastChat.getChatType(uiState.value.client.id)) {
 			ChatType.Mine -> scrollToBottom()
-			ChatType.Notice, //TODO : Notice타입의 NewChatNotice UI 만들기
+			ChatType.Notice, //TODO : [FixWaiting] Notice타입의 NewChatNotice UI 만들기
 			ChatType.Other,
 			-> startEvent(ChannelEvent.NewChatOccurEvent(channelLastChat))
 		}
@@ -162,7 +163,6 @@ class ChannelViewModel @Inject constructor(
 			captureIds,
 			uiState.map { it.isVisibleLastReadChatNotice }.distinctUntilChanged()
 		) { chats, captureHeaderBottomIds, isVisibleLastReadChatNotice ->
-			Log.d(TAG, "ChannelViewModel: observeChats() - chats :$chats")
 			chats.toChatItems(
 				channel = uiState.value.channel,
 				clientId = uiState.value.client.id,
@@ -337,7 +337,7 @@ class ChannelViewModel @Inject constructor(
 					message = message,
 				)
 			}.onFailure {
-				//TODO : 소켓 닫혔을 때, 메세지 보내면 StompErrorFrameReceived 넘어옴
+				//TODO : [FixWaiting] 소켓 닫혔을 때, 메세지 보내면 StompErrorFrameReceived 넘어옴
 				Log.d(TAG, "ChannelViewModel: sendMessage() - throwable: $it")
 			}
 		}
@@ -348,7 +348,8 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun retryFailedChat(chatId: Long) = viewModelScope.launch {
-		if (uiState.value.socketState != SocketState.CONNECTED) return@launch
+		if (uiState.value.channel.isAvailable.not()) return@launch
+		if (uiState.value.socketState != SocketState.CONNECTED) connectSocket()
 		stompHandler.retrySendMessage(chatId)
 	}
 

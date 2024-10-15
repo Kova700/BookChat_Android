@@ -20,7 +20,7 @@ fun ChannelResponse.toChannel(): Channel {
 	)
 }
 
-//TODO : lastChatId 추가되면 상당히 편할 듯
+//TODO : [NotUrgent] lastChatId 추가되면 상당히 편할 듯
 fun ChannelSingleSearchResponse.toChannel(): Channel {
 	return Channel(
 		roomId = roomId,

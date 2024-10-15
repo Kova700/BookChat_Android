@@ -8,7 +8,7 @@ import com.kova700.bookchat.core.network.bookchat.user.model.mapper.toDomain
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-//TODO : tags 타입 List로 반환해서 받으면 좋을 듯
+//TODO : [NotUrgent] tags 타입 List로 반환해서 받으면 좋을 듯
 @Serializable
 data class ChannelSearchResponse(
 	@SerialName("roomId")
