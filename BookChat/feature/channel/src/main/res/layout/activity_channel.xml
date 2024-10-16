@@ -214,7 +214,7 @@
                     android:gravity="center_vertical"
                     android:hint="@string/chat_room_send_message"
                     android:lineSpacingExtra="5dp"
-                    android:maxLength="50000"
+                    android:maxLength="10000"
                     android:maxLines="4"
                     android:paddingVertical="5dp"
                     android:textColor="#303030"

@@ -609,6 +609,6 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	companion object {
-		const val MAX_CHAT_MESSAGE_LENGTH = 50000
+		const val MAX_CHAT_MESSAGE_LENGTH = 10000
 	}
 }
