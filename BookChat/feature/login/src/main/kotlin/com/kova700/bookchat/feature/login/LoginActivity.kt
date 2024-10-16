@@ -87,7 +87,9 @@ class LoginActivity : AppCompatActivity() {
 	private fun showDeviceChangeWarning() {
 		val existingFragment = supportFragmentManager.findFragmentByTag(DIALOG_TAG_DEVICE_WARNING)
 		if (existingFragment != null) return
-		val deviceWarningDialog = DeviceWarningDialog()
+		val deviceWarningDialog = DeviceWarningDialog(
+			onClickOkBtn = { loginViewModel.onClickDeviceWarningOk() },
+		)
 		deviceWarningDialog.show(supportFragmentManager, DIALOG_TAG_DEVICE_WARNING)
 	}
 
