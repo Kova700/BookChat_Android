@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import com.kova700.bookchat.core.navigation.MainNavigator
 import com.kova700.bookchat.feature.main.MainActivity
-import com.kova700.bookchat.feature.main.MainActivity.Companion.EXTRA_NEW_CHAT_CHANNEL_ID
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -17,12 +16,9 @@ internal class MainNavigatorImpl @Inject constructor() : MainNavigator {
 		currentActivity: Activity,
 		intentAction: Intent.() -> Intent,
 		shouldFinish: Boolean,
-		newChatChannelId: Long?,
 	) {
 		currentActivity.startActivity(
-			Intent(currentActivity, MainActivity::class.java).apply {
-				newChatChannelId?.let { putExtra(EXTRA_NEW_CHAT_CHANNEL_ID, it) }
-			}.intentAction()
+			Intent(currentActivity, MainActivity::class.java).intentAction()
 		)
 		if (shouldFinish) currentActivity.finish()
 	}

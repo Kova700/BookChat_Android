@@ -1,5 +1,6 @@
 package com.kova700.bookchat.feature.channel.chatting
 
+import android.app.ActivityManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -24,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.core.navigation.MainNavigator
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
 import com.kova700.bookchat.feature.channel.channelsetting.ChannelSettingActivity
 import com.kova700.bookchat.feature.channel.channelsetting.ChannelSettingActivity.Companion.RESULT_CODE_USER_CHANNEL_EXIT
@@ -63,6 +65,9 @@ class ChannelActivity : AppCompatActivity() {
 
 	@Inject
 	lateinit var channelDrawerAdapter: ChannelDrawerAdapter
+
+	@Inject
+	lateinit var mainNavigator: MainNavigator
 
 	private lateinit var linearLayoutManager: LinearLayoutManager
 
@@ -642,7 +647,7 @@ class ChannelActivity : AppCompatActivity() {
 
 	private fun handleEvent(event: ChannelEvent) {
 		when (event) {
-			ChannelEvent.MoveBack -> finish()
+			ChannelEvent.MoveBack -> moveBack()
 			ChannelEvent.OpenOrCloseDrawer -> openOrCloseDrawer()
 			ChannelEvent.ScrollToBottom -> scrollToBottom()
 			ChannelEvent.MoveChannelSetting -> moveChannelSetting()
@@ -662,6 +667,23 @@ class ChannelActivity : AppCompatActivity() {
 
 			is ChannelEvent.MoveToWholeText -> moveToWholeText(event.chatId)
 			is ChannelEvent.CopyChatToClipboard -> copyTextToClipboard(event.message)
+		}
+	}
+
+	private fun moveBack() {
+		when {
+			isMainActivityRunning() -> finish()
+			else -> mainNavigator.navigate(
+				currentActivity = this,
+				shouldFinish = true
+			)
+		}
+	}
+
+	private fun isMainActivityRunning(): Boolean {
+		val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+		return activityManager.appTasks.any { task ->
+			task.taskInfo.baseActivity?.className == "MainActivity"
 		}
 	}
 
@@ -686,7 +708,7 @@ class ChannelActivity : AppCompatActivity() {
 
 	companion object {
 		const val EXTRA_USER_ID = "EXTRA_USER_ID"
-		internal const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
+		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
 		private const val CLIPBOARD_LABEL = "CLIPBOARD_LABEL"
 		private const val DIALOG_TAG_CHANNEL_EXIT_WARNING = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
 		private const val DIALOG_TAG_EXPLODED_CHANNEL_NOTICE = "DIALOG_TAG_EXPLODED_CHANNEL_NOTICE"

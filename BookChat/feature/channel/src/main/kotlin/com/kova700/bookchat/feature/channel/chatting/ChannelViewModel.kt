@@ -44,8 +44,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.abs
 
-// TODO : [FixWaiting] 카톡 알림 누르면 기존 백스택 위에 채팅방 액티비티 올리는 구조 같음 개선가능하면 해보자
-
 // TODO : [FixWaiting] 유저 프로필 변경 시 drawerItem에 바로 반영안됨 수정 필요
 
 // TODO : [Version 2] FCM 안오다가 채팅방 들어갔다 나오면 FCM 받아지는 현상이 있음

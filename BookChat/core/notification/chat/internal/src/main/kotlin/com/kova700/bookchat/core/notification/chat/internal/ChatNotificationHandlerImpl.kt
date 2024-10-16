@@ -1,9 +1,11 @@
 package com.kova700.bookchat.core.notification.chat.internal
 
+import android.app.ActivityManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -19,8 +21,9 @@ import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.notification.chat.external.ChatNotificationHandler
 import com.kova700.bookchat.core.notification.util.iconbuilder.IconBuilder
 import com.kova700.bookchat.core.stomp.chatting.external.StompHandler
+import com.kova700.bookchat.feature.channel.chatting.ChannelActivity
+import com.kova700.bookchat.feature.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
 import com.kova700.bookchat.feature.main.MainActivity
-import com.kova700.bookchat.feature.main.MainActivity.Companion.EXTRA_NEW_CHAT_CHANNEL_ID
 import com.kova700.bookchat.util.channel.getBitmap
 import com.kova700.bookchat.util.date.toDate
 import com.kova700.bookchat.util.user.getBitmap
@@ -126,25 +129,54 @@ class ChatNotificationHandlerImpl @Inject constructor(
 	}
 
 	private fun getPendingIntent(channel: Channel): PendingIntent {
-		return PendingIntent.getActivity(
-			context,
-			getNotificationId(channel),
-			getMainActivityIntent(channel),
-			PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-		)
+		val mainIntent = getMainActivityIntent()
+		val channelIntent = getChannelActivityIntent(channel)
+
+		val pendingIntent = when {
+			isAppRunning() -> {
+				PendingIntent.getActivity(
+					context,
+					getNotificationId(channel),
+					channelIntent,
+					PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+				)
+			}
+
+			else -> {
+				val stackBuilder = TaskStackBuilder.create(context).apply {
+					addNextIntent(mainIntent)
+					addNextIntent(channelIntent)
+				}
+				stackBuilder.getPendingIntent(
+					getNotificationId(channel),
+					PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+				)
+			}
+		}
+
+		return pendingIntent
 	}
 
-	private fun getMainActivityIntent(channel: Channel): Intent {
+	private fun isAppRunning(): Boolean {
+		val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+		return activityManager.runningAppProcesses.any { it.processName == context.packageName }
+	}
+
+	private fun getMainActivityIntent(): Intent {
 		return Intent(context, MainActivity::class.java).apply {
 			flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-			putExtra(EXTRA_NEW_CHAT_CHANNEL_ID, channel.roomId)
+		}
+	}
+
+	private fun getChannelActivityIntent(channel: Channel): Intent {
+		return Intent(context, ChannelActivity::class.java).apply {
+			putExtra(EXTRA_CHANNEL_ID, channel.roomId)
 		}
 	}
 
 	private suspend fun createDynamicShortcut(channel: Channel) {
 		val shortcutId = getNotificationId(channel).toString()
-		val intent = getMainActivityIntent(channel).setAction(Intent.ACTION_CREATE_SHORTCUT)
-
+		val intent = getChannelActivityIntent(channel).setAction(Intent.ACTION_CREATE_SHORTCUT)
 		val icon = iconBuilder.buildIcon(
 			imageUrl = channel.roomImageUri,
 			defaultImage = channel.defaultRoomImageType.getBitmap(context)

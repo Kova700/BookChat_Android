@@ -12,7 +12,6 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.kova700.bookchat.core.design_system.R
-import com.kova700.bookchat.core.navigation.ChannelNavigator
 import com.kova700.bookchat.core.navigation.MainNavigationViewModel
 import com.kova700.bookchat.feature.main.databinding.ActivityMainBinding
 import com.kova700.bookchat.feature.main.navigation.getResId
@@ -21,7 +20,6 @@ import com.kova700.bookchat.util.permissions.notificationPermission
 import com.kova700.bookchat.util.toast.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import com.kova700.bookchat.feature.main.R as mainR
 
 @AndroidEntryPoint
@@ -31,9 +29,6 @@ class MainActivity : AppCompatActivity() {
 	private lateinit var navController: NavController
 
 	private val mainNavigationViewmodel by viewModels<MainNavigationViewModel>()
-
-	@Inject
-	lateinit var channelNavigator: ChannelNavigator
 
 	private val notificationPermissionLauncher = getPermissionsLauncher(
 		onSuccess = {},
@@ -52,7 +47,6 @@ class MainActivity : AppCompatActivity() {
 		binding = ActivityMainBinding.inflate(layoutInflater)
 		setContentView(binding.root)
 		initNavigation()
-		moveToChannelIfNeed()
 		requestNotificationPermission()
 		observeNavigationEvents()
 	}
@@ -75,25 +69,11 @@ class MainActivity : AppCompatActivity() {
 		}
 	}
 
-	private fun moveToChannelIfNeed() {
-		if (intent.hasExtra(EXTRA_NEW_CHAT_CHANNEL_ID).not()) return
-		val channelId = intent.getLongExtra(EXTRA_NEW_CHAT_CHANNEL_ID, -1)
-		moveToChannel(channelId)
-	}
-
-	private fun moveToChannel(channelId: Long) {
-		channelNavigator.navigate(
-			currentActivity = this,
-			channelId = channelId,
-		)
-	}
-
 	private fun requestNotificationPermission() {
 		notificationPermissionLauncher.launch(notificationPermission)
 	}
 
 	companion object {
 		private const val SCHEME_PACKAGE = "package"
-		const val EXTRA_NEW_CHAT_CHANNEL_ID = "EXTRA_NEW_CHAT_CHANNEL_ID"
 	}
 }

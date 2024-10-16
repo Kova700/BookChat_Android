@@ -19,4 +19,5 @@ dependencies {
 	implementation(project(":feature:main"))
 	implementation(project(":core:util"))
 	implementation(project(":core:navigation"))
+	implementation(project(":feature:channel"))
 }
