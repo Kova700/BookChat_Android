@@ -15,6 +15,7 @@ import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.network_manager.external.NetworkManager
 import com.kova700.bookchat.core.network_manager.external.model.NetworkState
 import com.kova700.bookchat.core.notification.chat.external.ChatNotificationHandler
+import com.kova700.bookchat.core.remoteconfig.RemoteConfigManager
 import com.kova700.bookchat.core.stomp.chatting.external.StompHandler
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
 import com.kova700.bookchat.feature.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
@@ -66,6 +67,7 @@ class ChannelViewModel @Inject constructor(
 	private val clientRepository: ClientRepository,
 	private val networkManager: NetworkManager,
 	private val chatNotificationHandler: ChatNotificationHandler,
+	private val remoteConfigManager: RemoteConfigManager,
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
 
@@ -85,6 +87,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun initUiState() = viewModelScope.launch {
+		if (isBookChatAvailable().not()) return@launch
 		val originalChannel = getClientChannelUseCase(channelId)
 		val shouldLastReadChatScroll = originalChannel.isExistNewChat
 		updateState {
@@ -197,6 +200,34 @@ class ChannelViewModel @Inject constructor(
 			SocketState.FAILURE -> onChannelConnectFail()
 			SocketState.NEED_RECONNECTION -> connectSocket()
 		}
+	}
+
+	private suspend fun isBookChatAvailable(): Boolean {
+		val remoteConfigValues = getRemoteConfig().await() ?: return true
+		when {
+			remoteConfigValues.isServerEnabled.not() -> {
+				startEvent(
+					ChannelEvent.ShowServerDisabledDialog(
+						message = remoteConfigValues.serverDownNoticeMessage
+					)
+				)
+				return false
+			}
+
+			remoteConfigValues.isServerUnderMaintenance -> {
+				startEvent(
+					ChannelEvent.ShowServerMaintenanceDialog(
+						message = remoteConfigValues.serverUnderMaintenanceNoticeMessage
+					)
+				)
+				return false
+			}
+		}
+		return true
+	}
+
+	private fun getRemoteConfig() = viewModelScope.async {
+		runCatching { remoteConfigManager.getRemoteConfig() }.getOrNull()
 	}
 
 	private fun onChannelConnected() {

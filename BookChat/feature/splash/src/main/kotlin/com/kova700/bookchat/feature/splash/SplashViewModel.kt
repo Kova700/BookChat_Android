@@ -21,10 +21,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-//TODO : [FixWaiting] Firebase- RemoteConfig 이용해서 (O)
-//    서버 점검중 Dialog (ServerMaintenanceNoticeDialog)추가 (O)
-//    (강조) Notification 누르고 ChannelActivity로 이동해도 서버 점검중 Dialog 띄울 수 있어야함 (X)
-
 //TODO : [FixWaiting] 강제 업데이트 추가하기 (X)
 @HiltViewModel
 class SplashViewModel @Inject constructor(

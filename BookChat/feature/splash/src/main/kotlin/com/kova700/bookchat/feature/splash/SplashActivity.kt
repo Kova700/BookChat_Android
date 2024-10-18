@@ -7,9 +7,9 @@ import androidx.lifecycle.lifecycleScope
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.navigation.LoginActivityNavigator
 import com.kova700.bookchat.core.navigation.MainNavigator
+import com.kova700.bookchat.core.remoteconfig.dialog.ServerDownNoticeDialog
+import com.kova700.bookchat.core.remoteconfig.dialog.ServerUnderMaintenanceNoticeDialog
 import com.kova700.bookchat.feature.splash.dialog.NetworkDisconnectedNoticeDialog
-import com.kova700.bookchat.feature.splash.dialog.ServerDownNoticeDialog
-import com.kova700.bookchat.feature.splash.dialog.ServerUnderMaintenanceNoticeDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -64,39 +64,39 @@ class SplashActivity : AppCompatActivity() {
 
 	private fun showServerDisabledDialog(noticeMessage: String?) {
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_SERVER_DOWN_NOTICE)
+			supportFragmentManager.findFragmentByTag(ServerDownNoticeDialog.TAG)
 		if (existingFragment != null) return
 		val dialog = ServerDownNoticeDialog(
 			onClickOkBtn = { finish() },
 			noticeMessage = noticeMessage.takeUnless { it.isNullOrBlank() }
 				?: getString(R.string.splash_server_down),
 		)
-		dialog.show(supportFragmentManager, DIALOG_TAG_SERVER_DOWN_NOTICE)
+		dialog.show(supportFragmentManager, ServerDownNoticeDialog.TAG)
 	}
 
 	private fun showServerMaintenanceDialog(noticeMessage: String?) {
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_MAINTENANCE_NOTICE)
+			supportFragmentManager.findFragmentByTag(ServerUnderMaintenanceNoticeDialog.TAG)
 		if (existingFragment != null) return
 		val dialog = ServerUnderMaintenanceNoticeDialog(
 			onClickOkBtn = { finish() },
 			noticeMessage = noticeMessage.takeUnless { it.isNullOrBlank() }
 				?: getString(R.string.splash_server_under_maintenance),
 		)
-		dialog.show(supportFragmentManager, DIALOG_TAG_MAINTENANCE_NOTICE)
+		dialog.show(supportFragmentManager, ServerUnderMaintenanceNoticeDialog.TAG)
 	}
 
 	private fun showNetworkDisconnectedDialog() {
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_NETWORK_DISCONNECTED_NOTICE)
+			supportFragmentManager.findFragmentByTag(NetworkDisconnectedNoticeDialog.TAG)
 		if (existingFragment != null) return
 		val dialog = NetworkDisconnectedNoticeDialog()
-		dialog.show(supportFragmentManager, DIALOG_TAG_NETWORK_DISCONNECTED_NOTICE)
+		dialog.show(supportFragmentManager, NetworkDisconnectedNoticeDialog.TAG)
 	}
 
 	private fun dismissNetworkDisconnectedDialog() {
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_NETWORK_DISCONNECTED_NOTICE) ?: return
+			supportFragmentManager.findFragmentByTag(NetworkDisconnectedNoticeDialog.TAG) ?: return
 		(existingFragment as NetworkDisconnectedNoticeDialog).dismiss()
 	}
 
@@ -105,12 +105,5 @@ class SplashActivity : AppCompatActivity() {
 		is SplashEvent.MoveToLogin -> moveToLogin()
 		is SplashEvent.ShowServerDisabledDialog -> showServerDisabledDialog(event.message)
 		is SplashEvent.ShowServerMaintenanceDialog -> showServerMaintenanceDialog(event.message)
-	}
-
-	companion object {
-		private const val DIALOG_TAG_MAINTENANCE_NOTICE = "DIALOG_TAG_MAINTENANCE_NOTICE"
-		private const val DIALOG_TAG_SERVER_DOWN_NOTICE = "DIALOG_TAG_SERVER_DOWN_NOTICE"
-		private const val DIALOG_TAG_NETWORK_DISCONNECTED_NOTICE =
-			"DIALOG_TAG_NETWORK_DISCONNECTED_NOTICE"
 	}
 }

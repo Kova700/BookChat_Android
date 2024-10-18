@@ -117,6 +117,14 @@ sealed class ChannelEvent {
 		val isClientHost: Boolean,
 	) : ChannelEvent()
 
+	data class ShowServerDisabledDialog(
+		val message: String
+	) : ChannelEvent()
+
+	data class ShowServerMaintenanceDialog(
+		val message: String
+	) : ChannelEvent()
+
 	data class NewChatOccurEvent(
 		val chat: Chat,
 	) : ChannelEvent()

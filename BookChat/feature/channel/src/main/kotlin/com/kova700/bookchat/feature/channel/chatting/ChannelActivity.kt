@@ -25,6 +25,8 @@ import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.navigation.MainNavigator
+import com.kova700.bookchat.core.remoteconfig.dialog.ServerDownNoticeDialog
+import com.kova700.bookchat.core.remoteconfig.dialog.ServerUnderMaintenanceNoticeDialog
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
 import com.kova700.bookchat.feature.channel.channelsetting.ChannelSettingActivity
 import com.kova700.bookchat.feature.channel.channelsetting.ChannelSettingActivity.Companion.RESULT_CODE_USER_CHANNEL_EXIT
@@ -641,6 +643,30 @@ class ChannelActivity : AppCompatActivity() {
 		channelViewModel.onCopiedToClipboard()
 	}
 
+	private fun showServerDisabledDialog(noticeMessage: String?) {
+		val existingFragment =
+			supportFragmentManager.findFragmentByTag(ServerDownNoticeDialog.TAG)
+		if (existingFragment != null) return
+		val dialog = ServerDownNoticeDialog(
+			onClickOkBtn = { finish() },
+			noticeMessage = noticeMessage.takeUnless { it.isNullOrBlank() }
+				?: getString(R.string.splash_server_down),
+		)
+		dialog.show(supportFragmentManager, ServerDownNoticeDialog.TAG)
+	}
+
+	private fun showServerMaintenanceDialog(noticeMessage: String?) {
+		val existingFragment =
+			supportFragmentManager.findFragmentByTag(ServerUnderMaintenanceNoticeDialog.TAG)
+		if (existingFragment != null) return
+		val dialog = ServerUnderMaintenanceNoticeDialog(
+			onClickOkBtn = { finish() },
+			noticeMessage = noticeMessage.takeUnless { it.isNullOrBlank() }
+				?: getString(R.string.splash_server_under_maintenance),
+		)
+		dialog.show(supportFragmentManager, ServerUnderMaintenanceNoticeDialog.TAG)
+	}
+
 	private fun handleEvent(event: ChannelEvent) {
 		when (event) {
 			ChannelEvent.MoveBack -> moveBack()
@@ -663,6 +689,8 @@ class ChannelActivity : AppCompatActivity() {
 
 			is ChannelEvent.MoveToWholeText -> moveToWholeText(event.chatId)
 			is ChannelEvent.CopyChatToClipboard -> copyTextToClipboard(event.message)
+			is ChannelEvent.ShowServerDisabledDialog -> showServerDisabledDialog(event.message)
+			is ChannelEvent.ShowServerMaintenanceDialog -> showServerMaintenanceDialog(event.message)
 		}
 	}
 
