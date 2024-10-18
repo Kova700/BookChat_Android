@@ -108,7 +108,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun observeNetworkState() = viewModelScope.launch {
-		networkManager.getStateFlow().collect { state ->
+		networkManager.observeNetworkState().collect { state ->
 			updateState { copy(networkState = state) }
 			when (state) {
 				NetworkState.CONNECTED -> connectSocket()

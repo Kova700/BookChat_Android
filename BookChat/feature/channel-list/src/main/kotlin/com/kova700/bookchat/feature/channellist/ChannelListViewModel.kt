@@ -63,7 +63,7 @@ class ChannelListViewModel @Inject constructor(
 	}
 
 	private fun observeNetworkState() = viewModelScope.launch {
-		networkManager.getStateFlow()
+		networkManager.observeNetworkState()
 			.onEach { updateState { copy(networkState = it) } }
 			.drop(1)
 			.collect { state ->

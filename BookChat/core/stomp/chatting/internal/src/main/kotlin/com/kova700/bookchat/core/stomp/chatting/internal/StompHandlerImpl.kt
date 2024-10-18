@@ -11,7 +11,6 @@ import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
 import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.data.user.external.repository.UserRepository
 import com.kova700.bookchat.core.network_manager.external.NetworkManager
-import com.kova700.bookchat.core.network_manager.external.model.NetworkState
 import com.kova700.bookchat.core.stomp.chatting.external.StompHandler
 import com.kova700.bookchat.core.stomp.chatting.external.model.CommonMessage
 import com.kova700.bookchat.core.stomp.chatting.external.model.NotificationMessage
@@ -32,7 +31,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -103,7 +101,7 @@ class StompHandlerImpl @Inject constructor(
 		var haveTriedRenewingToken = false
 		for (attempt in 0 until maxAttempts) {
 			Log.d(TAG, "StompHandlerImpl: connectSocket() - attempt : $attempt")
-			if (networkManager.getStateFlow().first() == NetworkState.DISCONNECTED) return
+			if (networkManager.isNetworkAvailable().not()) return
 
 			runCatching {
 				stompClient.connect(
@@ -135,7 +133,7 @@ class StompHandlerImpl @Inject constructor(
 	) {
 		for (attempt in 0 until maxAttempts) {
 			Log.d(TAG, "StompHandlerImpl: subscribeChannel() - attempt : $attempt")
-			if (networkManager.getStateFlow().first() == NetworkState.DISCONNECTED) return
+			if (networkManager.isNetworkAvailable().not()) return
 
 			runCatching {
 				stompSession.subscribe(
