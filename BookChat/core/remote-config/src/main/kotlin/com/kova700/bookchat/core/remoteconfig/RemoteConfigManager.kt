@@ -2,7 +2,10 @@ package com.kova700.bookchat.core.remoteconfig
 
 import android.util.Log
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.ConfigUpdate
+import com.google.firebase.remoteconfig.ConfigUpdateListener
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigException
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.kova700.bookchat.core.remoteconfig.model.RemoteConfigValues
@@ -17,10 +20,14 @@ class RemoteConfigManager @Inject constructor() {
 		Firebase.remoteConfig.apply {
 			setConfigSettingsAsync(
 				remoteConfigSettings {
-					minimumFetchIntervalInSeconds = 10 //TODO : 적절한 값으로 수정 필요
+					minimumFetchIntervalInSeconds = 3600
 				}
 			)
 		}
+	}
+
+	init {
+		observeRemoteConfigUpdate()
 	}
 
 	suspend fun getRemoteConfig(): RemoteConfigValues {
@@ -38,9 +45,7 @@ class RemoteConfigManager @Inject constructor() {
 								serverUnderMaintenanceNoticeMessage = remoteConfig.getStringWithMultiLine(
 									SERVER_UNDER_MAINTENANCE_NOTICE_TEXT_KEY
 								),
-							).also {
-								Log.d("ㄺ", "RemoteConfigManager: getRemoteConfig() - $it")
-							}
+							)
 						)
 					}
 
@@ -48,6 +53,25 @@ class RemoteConfigManager @Inject constructor() {
 				}
 			}
 		}
+	}
+
+	private fun observeRemoteConfigUpdate() {
+		remoteConfig.addOnConfigUpdateListener(object : ConfigUpdateListener {
+			override fun onUpdate(configUpdate: ConfigUpdate) {
+				val updatedKeys = configUpdate.updatedKeys
+				Log.d("ㄺ", "RemoteConfigManager: onUpdate() - updatedKeys : $updatedKeys")
+
+				if (updatedKeys.contains(IS_SERVER_ENABLED_KEY)
+					|| updatedKeys.contains(IS_SERVER_UNDER_MAINTENANCE_KEY)
+					|| updatedKeys.contains(SERVER_DOWN_NOTICE_TEXT_KEY)
+					|| updatedKeys.contains(SERVER_UNDER_MAINTENANCE_NOTICE_TEXT_KEY)
+				) {
+					remoteConfig.activate()
+				}
+			}
+
+			override fun onError(error: FirebaseRemoteConfigException) {}
+		})
 	}
 
 	private fun FirebaseRemoteConfig.getStringWithMultiLine(key: String) =
