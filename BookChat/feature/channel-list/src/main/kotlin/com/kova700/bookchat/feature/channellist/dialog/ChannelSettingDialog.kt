@@ -82,4 +82,7 @@ class ChannelSettingDialog(
 			else R.string.channel_top_pin
 		)
 	}
+	companion object {
+		const val TAG = "DIALOG_TAG_CHANNEL_SETTING"
+	}
 }

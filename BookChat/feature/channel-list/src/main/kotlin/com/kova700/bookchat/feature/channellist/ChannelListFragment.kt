@@ -190,7 +190,7 @@ class ChannelListFragment : Fragment() {
 		channel: ChannelListItem.ChannelItem,
 	) {
 		val existingFragment =
-			childFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_SETTING)
+			childFragmentManager.findFragmentByTag(ChannelSettingDialog.TAG)
 		if (existingFragment != null) return
 
 		val dialog = ChannelSettingDialog(
@@ -199,7 +199,7 @@ class ChannelListFragment : Fragment() {
 			onClickMuteRelatedBtn = { channelListViewModel.onClickMuteRelatedBtn(channel) },
 			onClickTopPinRelatedBtn = { channelListViewModel.onClickTopPinRelatedBtn(channel) },
 		)
-		dialog.show(childFragmentManager, DIALOG_TAG_CHANNEL_SETTING)
+		dialog.show(childFragmentManager, ChannelSettingDialog.TAG)
 	}
 
 	private fun showChannelExitWarningDialog(
@@ -207,14 +207,14 @@ class ChannelListFragment : Fragment() {
 		channel: ChannelListItem.ChannelItem,
 	) {
 		val existingFragment =
-			childFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_EXIT_WARNING)
+			childFragmentManager.findFragmentByTag(ChannelExitWarningDialog.TAG)
 		if (existingFragment != null) return
 
 		val dialog = ChannelExitWarningDialog(
 			isClientHost = isClientHost,
 			onClickOkBtn = { channelListViewModel.onClickChannelExit(channel.roomId) }
 		)
-		dialog.show(childFragmentManager, DIALOG_TAG_CHANNEL_EXIT_WARNING)
+		dialog.show(childFragmentManager, ChannelExitWarningDialog.TAG)
 	}
 
 	private fun handleEvent(event: ChannelListUiEvent) {
@@ -229,10 +229,5 @@ class ChannelListFragment : Fragment() {
 
 			is ChannelListUiEvent.ShowSnackBar -> binding.root.showSnackBar(event.stringId)
 		}
-	}
-
-	companion object {
-		private const val DIALOG_TAG_CHANNEL_SETTING = "DIALOG_TAG_CHANNEL_SETTING"
-		private const val DIALOG_TAG_CHANNEL_EXIT_WARNING = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
 	}
 }

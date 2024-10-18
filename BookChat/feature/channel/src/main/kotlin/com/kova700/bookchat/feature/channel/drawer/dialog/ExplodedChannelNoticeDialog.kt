@@ -49,4 +49,7 @@ class ExplodedChannelNoticeDialog : DialogFragment() {
 		dialogSizeManager.setDialogSize(binding.root)
 		binding.okBtn.setOnClickListener { onClickOkBtn() }
 	}
+	companion object{
+		const val TAG = "DIALOG_TAG_EXPLODED_CHANNEL_NOTICE"
+	}
 }

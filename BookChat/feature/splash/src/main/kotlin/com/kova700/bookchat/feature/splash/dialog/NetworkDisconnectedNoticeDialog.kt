@@ -32,4 +32,8 @@ class NetworkDisconnectedNoticeDialog : DialogFragment() {
 		super.onDestroyView()
 		_binding = null
 	}
+
+	companion object {
+		const val TAG = "DIALOG_TAG_NETWORK_DISCONNECTED_NOTICE"
+	}
 }

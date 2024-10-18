@@ -222,19 +222,19 @@ class ChannelSettingActivity : AppCompatActivity() {
 
 	private fun showChannelExitWarningDialog() {
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_EXIT_WARNING)
+			supportFragmentManager.findFragmentByTag(ChannelExitWarningDialog.TAG)
 		if (existingFragment != null) return
 
 		val dialog = ChannelExitWarningDialog(
 			isClientHost = true,
 			onClickOkBtn = { channelSettingViewModel.onClickChannelExitDialogBtn() }
 		)
-		dialog.show(supportFragmentManager, DIALOG_TAG_CHANNEL_EXIT_WARNING)
+		dialog.show(supportFragmentManager, ChannelExitWarningDialog.TAG)
 	}
 
 	private fun showChannelCapacityDialog() {
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_CAPACITY_DIALOG)
+			supportFragmentManager.findFragmentByTag(ChannelCapacitySettingDialog.TAG)
 		if (existingFragment != null) return
 
 		val dialog = ChannelCapacitySettingDialog(
@@ -243,7 +243,7 @@ class ChannelSettingActivity : AppCompatActivity() {
 				channelSettingViewModel.onClickChannelCapacityDialogBtn(newCapacity)
 			}
 		)
-		dialog.show(supportFragmentManager, DIALOG_TAG_CHANNEL_CAPACITY_DIALOG)
+		dialog.show(supportFragmentManager, ChannelCapacitySettingDialog.TAG)
 	}
 
 	private fun exitChannel() {
@@ -277,8 +277,6 @@ class ChannelSettingActivity : AppCompatActivity() {
 	}
 
 	companion object {
-		private const val DIALOG_TAG_CHANNEL_EXIT_WARNING = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
-		private const val DIALOG_TAG_CHANNEL_CAPACITY_DIALOG = "DIALOG_TAG_CHANNEL_CAPACITY_DIALOG"
 		private const val DIALOG_TAG_PROFILE_EDIT = "DIALOG_TAG_USER_PROFILE_EDIT"
 		const val RESULT_CODE_USER_CHANNEL_EXIT = 100
 		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"

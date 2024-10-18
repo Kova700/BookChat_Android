@@ -49,4 +49,8 @@ class ChannelBannedUserNoticeDialog : DialogFragment() {
 		dialogSizeManager.setDialogSize(binding.root)
 		binding.okBtn.setOnClickListener { onClickOkBtn() }
 	}
+
+	companion object {
+		const val TAG = "DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE"
+	}
 }

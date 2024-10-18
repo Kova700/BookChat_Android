@@ -57,4 +57,7 @@ class ChannelExitWarningDialog(
 			cancelBtn.setOnClickListener { dismiss() }
 		}
 	}
+	companion object {
+		const val TAG = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
+	}
 }

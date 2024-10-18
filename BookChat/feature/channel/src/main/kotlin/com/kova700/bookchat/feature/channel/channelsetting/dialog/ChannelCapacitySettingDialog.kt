@@ -69,4 +69,7 @@ class ChannelCapacitySettingDialog(
 			channelCapacityNp.value = selectableValues.indexOfFirst { it.toInt() == currentCapacity }
 		}
 	}
+	companion object{
+		const val TAG = "DIALOG_TAG_CHANNEL_CAPACITY_DIALOG"
+	}
 }

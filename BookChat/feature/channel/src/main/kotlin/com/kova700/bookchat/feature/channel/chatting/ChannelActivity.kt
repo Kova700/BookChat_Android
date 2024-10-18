@@ -519,29 +519,29 @@ class ChannelActivity : AppCompatActivity() {
 
 	private fun showBannedClientNoticeDialog() {
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE)
+			supportFragmentManager.findFragmentByTag(ChannelBannedUserNoticeDialog.TAG)
 		if (existingFragment != null) return
 		val dialog = ChannelBannedUserNoticeDialog()
-		dialog.show(supportFragmentManager, DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE)
+		dialog.show(supportFragmentManager, ChannelBannedUserNoticeDialog.TAG)
 	}
 
 	private fun showExplodedChannelNoticeDialog() {
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_EXPLODED_CHANNEL_NOTICE)
+			supportFragmentManager.findFragmentByTag(ExplodedChannelNoticeDialog.TAG)
 		if (existingFragment != null) return
 		val dialog = ExplodedChannelNoticeDialog()
-		dialog.show(supportFragmentManager, DIALOG_TAG_EXPLODED_CHANNEL_NOTICE)
+		dialog.show(supportFragmentManager, ExplodedChannelNoticeDialog.TAG)
 	}
 
 	private fun showChannelExitWarningDialog(isClientHost: Boolean) {
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_EXIT_WARNING)
+			supportFragmentManager.findFragmentByTag(ChannelExitWarningDialog.TAG)
 		if (existingFragment != null) return
 		val dialog = ChannelExitWarningDialog(
 			isClientHost = isClientHost,
 			onClickOkBtn = { channelViewModel.onClickChannelExitDialogBtn() }
 		)
-		dialog.show(supportFragmentManager, DIALOG_TAG_CHANNEL_EXIT_WARNING)
+		dialog.show(supportFragmentManager, ChannelExitWarningDialog.TAG)
 	}
 
 	private fun setBackPressedDispatcher() {
@@ -734,10 +734,6 @@ class ChannelActivity : AppCompatActivity() {
 		const val EXTRA_USER_ID = "EXTRA_USER_ID"
 		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
 		private const val CLIPBOARD_LABEL = "CLIPBOARD_LABEL"
-		private const val DIALOG_TAG_CHANNEL_EXIT_WARNING = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
-		private const val DIALOG_TAG_EXPLODED_CHANNEL_NOTICE = "DIALOG_TAG_EXPLODED_CHANNEL_NOTICE"
-		private const val DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE =
-			"DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE"
 		private const val SOCKET_CONNECTION_SUCCESS_BAR_EXPOSURE_TIME = 1500L
 		private const val BOTTOM_SCROLL_BTN_REFERENCE_POSITION = 3
 	}
