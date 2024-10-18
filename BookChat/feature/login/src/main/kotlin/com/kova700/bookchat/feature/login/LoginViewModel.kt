@@ -6,6 +6,7 @@ import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.data.client.external.model.NeedToDeviceWarningException
 import com.kova700.bookchat.core.data.client.external.model.NeedToSignUpException
 import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.core.network_manager.external.NetworkManager
 import com.kova700.bookchat.core.oauth.external.exception.ClientCancelException
 import com.kova700.bookchat.feature.login.LoginUiState.UiState
 import com.kova700.core.domain.usecase.client.LoginUseCase
@@ -22,6 +23,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
 	private val clientRepository: ClientRepository,
 	private val loginUseCase: LoginUseCase,
+	private val networkManager: NetworkManager
 ) : ViewModel() {
 
 	private val _eventFlow = MutableSharedFlow<LoginEvent>()
@@ -47,7 +49,7 @@ class LoginViewModel @Inject constructor(
 
 					else -> {
 						updateState { copy(uiState = UiState.ERROR) }
-						startEvent(LoginEvent.ErrorEvent(R.string.sign_in_fail))
+						startEvent(LoginEvent.ShowSnackBar(R.string.sign_in_fail))
 					}
 				}
 			}
@@ -60,7 +62,7 @@ class LoginViewModel @Inject constructor(
 				startEvent(LoginEvent.MoveToMain)
 			}.onFailure {
 				updateState { copy(uiState = UiState.ERROR) }
-				startEvent(LoginEvent.ErrorEvent(R.string.get_client_profile_fail))
+				startEvent(LoginEvent.ShowSnackBar(R.string.get_client_profile_fail))
 			}
 	}
 
@@ -73,7 +75,7 @@ class LoginViewModel @Inject constructor(
 			is ClientCancelException -> updateState { copy(uiState = UiState.SUCCESS) }
 			else -> {
 				updateState { copy(uiState = UiState.ERROR) }
-				startEvent(LoginEvent.ErrorEvent(R.string.error_kakao_login))
+				startEvent(LoginEvent.ShowSnackBar(R.string.error_kakao_login))
 			}
 		}
 	}
@@ -83,18 +85,26 @@ class LoginViewModel @Inject constructor(
 			is ClientCancelException -> updateState { copy(uiState = UiState.SUCCESS) }
 			else -> {
 				updateState { copy(uiState = UiState.ERROR) }
-				startEvent(LoginEvent.ErrorEvent(R.string.error_google_login))
+				startEvent(LoginEvent.ShowSnackBar(R.string.error_google_login))
 			}
 		}
 	}
 
 	fun onClickKakaoLoginBtn() {
+		if (networkManager.isNetworkAvailable().not()) {
+			startEvent(LoginEvent.ShowSnackBar(R.string.error_network_not_connected))
+			return
+		}
 		if (uiState.value.isLoading) return
 		updateState { copy(uiState = UiState.LOADING) }
 		startEvent(LoginEvent.StartKakaoLogin)
 	}
 
 	fun onClickGoogleLoginBtn() {
+		if (networkManager.isNetworkAvailable().not()) {
+			startEvent(LoginEvent.ShowSnackBar(R.string.error_network_not_connected))
+			return
+		}
 		if (uiState.value.isLoading) return
 		updateState { copy(uiState = UiState.LOADING) }
 		startEvent(LoginEvent.StartGoogleLogin)

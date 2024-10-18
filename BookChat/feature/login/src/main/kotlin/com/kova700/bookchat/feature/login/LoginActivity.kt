@@ -98,8 +98,7 @@ class LoginActivity : AppCompatActivity() {
 			is LoginEvent.MoveToMain -> moveToMain()
 			is LoginEvent.MoveToSignUp -> moveToSignUp()
 			is LoginEvent.ShowDeviceWarning -> showDeviceChangeWarning()
-			is LoginEvent.ErrorEvent -> binding.loginLayout.showSnackBar(event.stringId)
-			is LoginEvent.UnknownErrorEvent -> binding.loginLayout.showSnackBar(event.message)
+			is LoginEvent.ShowSnackBar -> binding.loginLayout.showSnackBar(event.stringId)
 			is LoginEvent.StartKakaoLogin -> startKakaoLogin()
 			LoginEvent.StartGoogleLogin -> startGoogleLogin()
 		}

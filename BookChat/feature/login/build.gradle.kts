@@ -13,4 +13,5 @@ dependencies {
 	implementation(project(":core:data:client:external"))
 	implementation(project(":core:data:user:external"))
 	implementation(project(":core:data:common"))
+	implementation(project(":core:network-manager:external"))
 }

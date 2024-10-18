@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">BookChat</string>
     <!--error-->
-    <string name="error_network_not_connected">네트워크가 연결되어 있지 않습니다.\n네트워크를 연결해주세요.</string>
+    <string name="error_network_not_connected">네트워크가 연결되어 있지 않습니다.</string>
     <string name="error_network_error">네트워크가 불안정합니다.\n잠시 후 다시 시도해주세요.</string>
     <string name="error_kakao_login">Kakao 로그인을 실패했습니다.</string>
     <string name="error_google_login">Google 로그인을 실패했습니다.</string>
