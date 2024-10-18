@@ -15,6 +15,10 @@
     <string name="notification_permission_denied">[알림]\n권한을 허용해주세요.</string>
     <string name="notification_permission_explained">[권한] - [알림]\n권한을 허용해주세요.</string>
 
+    <!--Splash-->
+    <string name="splash_server_under_maintenance">현재 서버 점검이 진행 중입니다.\n잠시 후 다시 시도해 주시면 감사하겠습니다.</string>
+    <string name="splash_server_down">현재 서버 이용이 일시적으로 원활하지 않습니다.\n빠르게 복구 중이니 \n잠시 후 다시 시도해 주시기 바랍니다.\n이용에 불편을 드려 죄송합니다.</string>
+
     <!--login-->
     <string name="login_main_slogan">책으로 연결되는 우리\n이제부터 북챗으로 대화해요</string>
     <string name="login_kakao_btn">카카오로 시작하기</string>

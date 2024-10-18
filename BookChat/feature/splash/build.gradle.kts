@@ -14,4 +14,6 @@ dependencies {
 	implementation(project(":core:data:fcm-token:external"))
 	implementation(project(":core:domain"))
 	implementation(project(":core:util"))
+	implementation(project(":core:remote-config"))
+	implementation(project(":core:network-manager:external"))
 }

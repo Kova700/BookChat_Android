@@ -61,8 +61,8 @@ org-jetbrains-kotlin-jvm = "2.0.10"
 kotlinGradlePlugin = "1.9.0"
 kotlinGradlePluginVersion = "1.9.0"
 
-firebaseBom = "33.2.0"
-firebaseMessagingKtx = "24.0.1"
+firebaseBom = "33.4.0"
+firebaseMessagingKtx = "24.0.2"
 fcmPlugin = "4.4.2"
 
 workManagerRuntimeKtx = "2.9.1"
@@ -101,6 +101,7 @@ androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-analytics-ktx = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
 firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
+firebase-config-ktx = { group = "com.google.firebase", name = "firebase-config-ktx" }
 
 # Hilt
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }

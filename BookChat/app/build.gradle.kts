@@ -20,7 +20,7 @@ android {
 
 dependencies {
 	implementation(libs.bundles.androidx.default)
-// WorkManager
+	// WorkManager
 	implementation(libs.bundles.workmanager)
 	ksp(libs.androidx.hilt.compiler)
 
@@ -39,6 +39,7 @@ dependencies {
 	implementation(project(":core:design-system"))
 	implementation(project(":core:fcm:forced-logout"))
 	implementation(project(":core:fcm:service"))
+	implementation(project(":core:remote-config"))
 	implementation(project(":core:stomp:chatting:internal"))
 	implementation(project(":core:network-manager:internal"))
 	implementation(project(":core:oauth:external"))
