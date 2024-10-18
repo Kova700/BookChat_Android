@@ -4,6 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/network_state_bar"
+        android:layout_width="0dp"
+        android:layout_height="18dp"
+        android:background="#666666"
+        android:gravity="center"
+        android:visibility="gone"
+        android:textColor="#FFFFFF"
+        android:textSize="10sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/container_main"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -13,10 +26,11 @@
         app:layout_constraintBottom_toTopOf="@id/bnv_main"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/network_state_bar"
         app:navGraph="@navigation/nav_graph_main" />
 
     <View
+        android:id="@+id/bnv_divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#D9D9D9"

@@ -1,6 +1,5 @@
 package com.kova700.bookchat.feature.channellist
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,12 +10,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.navigation.ChannelNavigator
 import com.kova700.bookchat.core.navigation.MainNavigationViewModel
 import com.kova700.bookchat.core.navigation.MainRoute
 import com.kova700.bookchat.core.navigation.MakeChannelActivityNavigator
-import com.kova700.bookchat.core.network_manager.external.model.NetworkState
 import com.kova700.bookchat.feature.channel.drawer.dialog.ChannelExitWarningDialog
 import com.kova700.bookchat.feature.channellist.adpater.ChannelListAdapter
 import com.kova700.bookchat.feature.channellist.databinding.FragmentChannelListBinding
@@ -90,7 +87,6 @@ class ChannelListFragment : Fragment() {
 	}
 
 	private fun setViewState(uiState: ChannelListUiState) {
-		setNetworkStateBarUiState(uiState)
 		setViewVisibility(uiState)
 		binding.retryChannelLayout.retryBtn.setOnClickListener { channelListViewModel.onClickInitRetry() }
 	}
@@ -103,19 +99,6 @@ class ChannelListFragment : Fragment() {
 				if (uiState.isNotEmpty) View.VISIBLE else View.GONE
 			retryChannelLayout.root.visibility =
 				if (uiState.isInitError) View.VISIBLE else View.GONE
-		}
-	}
-
-	private fun setNetworkStateBarUiState(uiState: ChannelListUiState) {
-		with(binding) {
-			when (uiState.networkState) {
-				NetworkState.CONNECTED -> networkStateBar.visibility = View.GONE
-				NetworkState.DISCONNECTED -> {
-					networkStateBar.setText(R.string.please_connect_the_network)
-					networkStateBar.setBackgroundColor(Color.parseColor("#666666"))
-					networkStateBar.visibility = View.VISIBLE
-				}
-			}
 		}
 	}
 
