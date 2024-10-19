@@ -57,14 +57,15 @@ interface ChannelDAO {
 			roomImageUri = channel.roomImageUri
 		)
 
-		channel.lastChatId?.let {
+		channel.lastChatId?.let { lastChatId ->
 			updateChannelLastChatIfValid(
 				channelId = channel.roomId,
-				chatId = it
+				chatId = lastChatId
 			)
-			updateLastReadChatIdIfValid(
+			val existingLastReadChatId = getChannel(channel.roomId)?.lastReadChatId
+			existingLastReadChatId ?: updateLastReadChat(
 				channelId = channel.roomId,
-				chatId = it
+				lastReadChatId = lastChatId
 			)
 		}
 	}

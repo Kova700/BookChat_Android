@@ -57,8 +57,15 @@ import kotlin.time.Duration.Companion.seconds
 
 //TODO : [Version 2] Socket은 채팅방과 관계없이 연결해두고, 채팅방을 복수로 subscribe하는것도 방법 중 하나일 듯
 
-//TODO : [FixWaiting] 최종적으로 채팅 무식하게 계속 쳐보고 실패한 채팅도 재전송되고, 소켓 끊기면 재연결 되고, 예외터져도 앱이 안죽는지 Check
-//      홈 나갔다와도 리커넥션 잘 되는지 동기화는 잘 되는지
+//TODO : [FixWaiting] 최종적으로 채팅 무식하게 계속 쳐보고 실패한 채팅도 재전송되고,
+// 소켓 끊기면 재연결 되고, 예외터져도 앱이 안죽는지 Check,
+// 홈 나갔다와도 리커넥션 잘 되는지 동기화는 잘 되는지
+
+// TODO : [FixWaiting] 다른 채팅방에서 채팅을 보고 있을때, Notification눌러서 다른 채팅방으로 가면 소켓연결이 안됨
+// TODO : [FixWaiting] 위 상황대로 다른 채팅방 갔다가 다시 이전 채팅방으로 가면 채팅이 보였다가 사라지는 현상이 있음
+// TODO : [FixWaiting] "존재하지 않는 채팅방" 저장되는 현상있고 로그도 찍힘
+// TODO : [FixWaiting] FCM 수신안되는 이슈
+
 class StompHandlerImpl @Inject constructor(
 	private val stompClient: StompClient,
 	private val channelRepository: ChannelRepository,
@@ -89,6 +96,7 @@ class StompHandlerImpl @Inject constructor(
 		channel: Channel,
 		maxAttempts: Int,
 	) {
+		Log.d(TAG, "StompHandlerImpl: connectSocket() - Channel.name :${channel.roomName}")
 		if (channel.roomSid.isBlank()) return
 
 		mutex.withLock {
@@ -97,6 +105,10 @@ class StompHandlerImpl @Inject constructor(
 			) return
 			_socketState.emit(SocketState.CONNECTING)
 		}
+		Log.d(
+			TAG,
+			"StompHandlerImpl: connectSocket() - Channel.name :${channel.roomName} - 실제 연결 작업 시작"
+		)
 
 		var haveTriedRenewingToken = false
 		for (attempt in 0 until maxAttempts) {
@@ -161,7 +173,7 @@ class StompHandlerImpl @Inject constructor(
 				retrySendFailedChats(channel.roomId) //TODO : [FixWaiting] 이걸로도 타이밍이 완벽하지 않음 (소켓 연결이 완벽히 재연결 되었을 떄, 실패된 채팅들 전송되게)
 				channelSubscription.join()
 
-				disconnectSocket()
+				disconnectSocket(connectedChannelId)
 				return
 
 			}.onFailure { throwable ->
@@ -203,7 +215,8 @@ class StompHandlerImpl @Inject constructor(
 						&& connectedChannelId == channelId
 	}
 
-	override suspend fun disconnectSocket() {
+	override suspend fun disconnectSocket(channelId: Long) {
+		if (channelId != connectedChannelId || channelId <= 0) return
 		_socketState.emit(SocketState.DISCONNECTED)
 		connectedChannelId = -1
 		Log.d(TAG, "StompHandlerImpl: disconnectSocket() - called")

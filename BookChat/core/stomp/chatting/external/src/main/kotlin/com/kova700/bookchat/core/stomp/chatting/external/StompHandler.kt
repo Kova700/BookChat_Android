@@ -12,7 +12,7 @@ interface StompHandler {
 		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS,
 	)
 
-	suspend fun disconnectSocket()
+	suspend fun disconnectSocket(channelId : Long)
 	suspend fun sendMessage(
 		channelId: Long,
 		message: String,
