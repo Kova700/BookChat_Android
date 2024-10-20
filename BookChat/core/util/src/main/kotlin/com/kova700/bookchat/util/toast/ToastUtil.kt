@@ -1,10 +1,10 @@
 package com.kova700.bookchat.util.toast
 
-import android.app.Activity
+import android.content.Context
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 
-fun Activity.makeToast(stringId: Int) {
+fun Context.makeToast(stringId: Int) {
 	Toast.makeText(this, stringId, Toast.LENGTH_SHORT).show()
 }
 
