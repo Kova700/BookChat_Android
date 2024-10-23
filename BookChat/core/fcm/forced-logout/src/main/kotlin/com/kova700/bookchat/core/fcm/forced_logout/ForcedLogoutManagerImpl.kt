@@ -11,6 +11,7 @@ import com.kova700.bookchat.feature.login.LoginActivity
 import com.kova700.core.domain.usecase.client.LogoutUseCase
 import javax.inject.Inject
 
+//TODO : [FixWaiting] 같은 기기로 재로그인 시에, 같은 기기가 로그아웃 FCM을 받는현상 발생
 class ForcedLogoutManagerImpl @Inject constructor(
 	private val logoutUseCase: LogoutUseCase,
 ) : ForcedLogoutManager {

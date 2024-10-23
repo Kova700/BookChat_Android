@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-//TODO : [FixWaiting] 강제 업데이트 추가하기 (X)
+//TODO : [FixWaiting] 강제 업데이트 Or 입앱 업데이트 추가하기
 @HiltViewModel
 class SplashViewModel @Inject constructor(
 	private val clientRepository: ClientRepository,
