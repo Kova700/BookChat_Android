@@ -36,6 +36,10 @@ class ClientRepositoryImpl @Inject constructor(
 ) : ClientRepository {
 	private val client = MutableStateFlow<User?>(null)
 
+	override fun isClientLoggedIn(): Boolean {
+		return client.value != null
+	}
+
 	override fun getClientFlow(): Flow<User> {
 		return client.asStateFlow().filterNotNull()
 	}

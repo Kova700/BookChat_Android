@@ -8,7 +8,7 @@ import com.kova700.bookchat.core.data.user.external.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface ClientRepository {
-
+	fun isClientLoggedIn(): Boolean
 	fun getClientFlow(): Flow<User>
 
 	suspend fun login(
