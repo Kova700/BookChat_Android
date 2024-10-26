@@ -1,7 +1,6 @@
 package com.kova700.bookchat.core.stomp.stomp
 
 import android.util.Log
-import com.kova700.bookchat.util.Constants.TAG
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,11 +46,12 @@ object StompClientModule {
 					expectedPeriod = 10.seconds
 				)
 				defaultSessionCoroutineContext = Dispatchers.IO
-//				instrumentation = debugInstrumentation
+				instrumentation = debugInstrumentation
 			})
 	}
 
 	private val debugInstrumentation = object : KrossbowInstrumentation {
+		val TAG = "Stomp"
 		override suspend fun onWebSocketFrameReceived(frame: WebSocketFrame) {
 			super.onWebSocketFrameReceived(frame)
 			Log.d(TAG, "StompModule: onWebSocketFrameReceived() - frame : $frame")

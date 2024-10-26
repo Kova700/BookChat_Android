@@ -20,4 +20,6 @@ dependencies {
 	implementation(project(":core:util"))
 	implementation(project(":core:navigation"))
 	implementation(project(":feature:channel"))
+	implementation(project(":core:chat-client"))
+	implementation(project(":core:data:appsetting:external"))
 }

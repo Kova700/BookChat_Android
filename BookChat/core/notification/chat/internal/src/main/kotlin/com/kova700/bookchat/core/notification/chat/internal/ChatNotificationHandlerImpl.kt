@@ -14,7 +14,6 @@ import androidx.core.app.Person
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
-import com.kova700.bookchat.core.chatclient.ChatClient
 import com.kova700.bookchat.core.data.channel.external.model.Channel
 import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.user.external.model.User
@@ -27,6 +26,7 @@ import com.kova700.bookchat.feature.main.MainActivity
 import com.kova700.bookchat.util.channel.getBitmap
 import com.kova700.bookchat.util.date.toDate
 import com.kova700.bookchat.util.user.getBitmap
+import com.kova700.core.data.appsetting.external.repository.AppSettingRepository
 import com.kova700.core.data.notificationinfo.external.repository.ChattingNotificationInfoRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Date
@@ -35,8 +35,8 @@ import javax.inject.Inject
 class ChatNotificationHandlerImpl @Inject constructor(
 	@ApplicationContext private val appContext: Context,
 	private val iconBuilder: IconBuilder,
-	private val chatClient: ChatClient,
 	private val chattingNotificationInfoRepository: ChattingNotificationInfoRepository,
+	private val appSettingRepository: AppSettingRepository
 ) : ChatNotificationHandler {
 
 	private val notificationManager =
@@ -86,21 +86,25 @@ class ChatNotificationHandlerImpl @Inject constructor(
 		chat: Chat,
 		notificationId: Int,
 	): Boolean {
+		return appSettingRepository.isPushNotificationEnabled()
+						&& channel.isNotificationOn
+						&& chat.isNewerNotification(notificationId)
+						&& isChannelWatching(channel.roomId).not()
+	}
+
+	private suspend fun Chat.isNewerNotification(notificationId: Int): Boolean {
 		val previousTimeStamp =
 			chattingNotificationInfoRepository.getNotificationLastTimestamp(notificationId)
-		return (previousTimeStamp == null || previousTimeStamp < chat.timestamp)
-						&& channel.isNotificationOn
-						&& isChannelWatching(channel.roomId).not()
+		return (previousTimeStamp == null || previousTimeStamp < timestamp)
 	}
 
 	private fun isChannelWatching(channelId: Long): Boolean {
 		val activityManager = appContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 		val isChannelActivityRunning = activityManager.appTasks
-			.any { task -> task.taskInfo.baseActivity?.className == ChannelActivity::class.java.name }
+			.any { task -> task.taskInfo.topActivity?.className == ChannelActivity::class.java.name }
 		val watchingChannelId = ChannelActivity.watchingChannelId ?: return false
 		return isChannelActivityRunning
 						&& watchingChannelId == channelId
-						&& chatClient.isChannelSubscribed(channelId)
 	}
 
 	private suspend fun getChatNotification(

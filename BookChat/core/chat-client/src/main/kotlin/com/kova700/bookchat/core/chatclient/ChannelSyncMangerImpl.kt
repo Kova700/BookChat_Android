@@ -6,6 +6,7 @@ import com.kova700.core.domain.usecase.chat.SyncChannelChatsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,10 +19,9 @@ class ChannelSyncMangerImpl @Inject constructor(
 	private val getClientChannelInfoUseCase: GetClientChannelInfoUseCase,
 	private val networkManager: NetworkManager,
 ) : ChannelSyncManger {
-	//TODO : 스코프 뭔가 이렇게 사용해도 되나 싶은
-	private val channelSyncScope = CoroutineScope(Job() + Dispatchers.IO)
+	//TODO : [FixWaiting] 스코프 뭔가 이렇게 사용해도 되나 싶은
+	private val channelSyncScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-	//TODO : Version 2 이전 까지는 현재 보고 있는 채널들에 대해서만 호출하는걸로하자
 	override fun sync(channelIds: Collection<Long>) {
 		channelIds.forEach { channelId ->
 			syncChats(channelId)

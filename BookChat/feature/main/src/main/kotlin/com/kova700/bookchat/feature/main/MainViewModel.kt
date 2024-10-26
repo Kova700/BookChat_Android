@@ -2,6 +2,7 @@ package com.kova700.bookchat.feature.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kova700.bookchat.core.chatclient.ChatClient
 import com.kova700.bookchat.core.network_manager.external.NetworkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-	private val networkManager: NetworkManager
+	private val networkManager: NetworkManager,
+	private val chatClient: ChatClient
 ) : ViewModel() {
 
 	private val _uiState = MutableStateFlow<MainUiState>(MainUiState.DEFAULT)
@@ -20,6 +22,7 @@ class MainViewModel @Inject constructor(
 
 	init {
 		observeNetworkState()
+		chatClient.connectSocketIfNeeded()
 	}
 
 	private fun observeNetworkState() = viewModelScope.launch {

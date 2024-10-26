@@ -37,4 +37,5 @@ dependencies {
 	implementation(project(":core:network-manager:external"))
 	implementation(project(":core:domain"))
 	implementation(project(":core:util"))
+	implementation(project(":core:notification:chat:external"))
 }

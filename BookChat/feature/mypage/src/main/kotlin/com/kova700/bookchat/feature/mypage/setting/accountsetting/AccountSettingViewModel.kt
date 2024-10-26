@@ -2,10 +2,9 @@ package com.kova700.bookchat.feature.mypage.setting.accountsetting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kova700.bookchat.core.chatclient.ChatClient
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.mypage.setting.accountsetting.AccountSettingUiState.UiState
-import com.kova700.core.domain.usecase.client.LogoutUseCase
-import com.kova700.core.domain.usecase.client.WithdrawUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AccountSettingViewModel @Inject constructor(
-	private val logoutUseCase: LogoutUseCase,
-	private val withdrawUseCase: WithdrawUseCase,
+	private val chatClient: ChatClient,
 ) : ViewModel() {
 
 	private val _uiState = MutableStateFlow<AccountSettingUiState>(AccountSettingUiState.DEFAULT)
@@ -30,7 +28,7 @@ class AccountSettingViewModel @Inject constructor(
 	private fun logout() = viewModelScope.launch {
 		if (_uiState.value.isLoading) return@launch
 		updateState { copy(uiState = UiState.LOADING) }
-		runCatching { logoutUseCase() }
+		runCatching { chatClient.logout() }
 			.onSuccess { startEvent(AccountSettingUiEvent.StartOAuthLogout) }
 			.onFailure {
 				startEvent(AccountSettingUiEvent.ShowSnackBar(R.string.sign_out_fail))
@@ -41,7 +39,7 @@ class AccountSettingViewModel @Inject constructor(
 	private fun withdraw() = viewModelScope.launch {
 		if (_uiState.value.isLoading) return@launch
 		updateState { copy(uiState = UiState.LOADING) }
-		runCatching { withdrawUseCase() }
+		runCatching { chatClient.withdraw() }
 			.onSuccess { startEvent(AccountSettingUiEvent.StartOAuthWithdraw) }
 			.onFailure {
 				startEvent(AccountSettingUiEvent.ShowSnackBar(R.string.withdraw_fail))

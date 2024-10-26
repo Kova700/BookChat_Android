@@ -5,7 +5,7 @@
     <string name="error_network_error">네트워크가 불안정합니다.\n잠시 후 다시 시도해주세요.</string>
     <string name="error_kakao_login">Kakao 로그인을 실패했습니다.</string>
     <string name="error_google_login">Google 로그인을 실패했습니다.</string>
-    <string name="error_socket_connect">서버와의 연결을 실패했습니다. 잠시 후 다시 시도해주세요.</string>
+    <string name="error_socket_connect">서버와의 연결을 실패했습니다.</string>
     <string name="error_else">데이터 가져오기를 실패했습니다. 잠시 후 다시 시도해주세요.</string>
     <string name="error_else_2_line">데이터 가져오기를 실패했습니다.\n잠시 후 다시 시도해주세요.</string>
 
@@ -274,6 +274,8 @@
     <string name="channel_drawer_book">도서</string>
     <string name="channel_drawer_channel_title">방 제목</string>
     <string name="channel_drawer_channel_member">대화상대</string>
+    <string name="channel_chat_sync_fail">채팅 동기화를 실패했습니다.</string>
+    <string name="channel_info_sync_fail">채팅방 동기화를 실패했습니다.</string>
 
     <!--channel setting-->
     <string name="channel_setting_title">채팅방 설정</string>

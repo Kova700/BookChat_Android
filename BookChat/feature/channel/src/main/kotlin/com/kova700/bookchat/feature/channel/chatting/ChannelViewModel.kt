@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kova700.bookchat.core.chatclient.ChannelSyncManger
+import com.kova700.bookchat.core.chatclient.ChatClient
 import com.kova700.bookchat.core.data.channel.external.model.Channel
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelTempMessageRepository
 import com.kova700.bookchat.core.data.chat.external.model.Chat
@@ -12,12 +14,10 @@ import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
 import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.design_system.R
-import com.kova700.bookchat.core.network_manager.external.NetworkManager
-import com.kova700.bookchat.core.network_manager.external.model.NetworkState
 import com.kova700.bookchat.core.notification.chat.external.ChatNotificationHandler
 import com.kova700.bookchat.core.remoteconfig.RemoteConfigManager
-import com.kova700.bookchat.core.stomp.chatting.external.StompHandler
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
+import com.kova700.bookchat.core.stomp.chatting.external.model.SubscriptionState
 import com.kova700.bookchat.feature.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
 import com.kova700.bookchat.feature.channel.chatting.ChannelUiState.LoadState
 import com.kova700.bookchat.feature.channel.chatting.ChannelUiState.UiState
@@ -30,7 +30,6 @@ import com.kova700.core.domain.usecase.channel.GetClientChannelInfoUseCase
 import com.kova700.core.domain.usecase.channel.GetClientChannelUseCase
 import com.kova700.core.domain.usecase.channel.LeaveChannelUseCase
 import com.kova700.core.domain.usecase.chat.GetChatsFlowUseCase
-import com.kova700.core.domain.usecase.chat.SyncChannelChatsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -47,27 +46,21 @@ import kotlin.math.abs
 
 // TODO : [FixWaiting] 유저 프로필 변경 시 drawerItem에 바로 반영안됨 수정 필요
 
-// TODO : [Version 2] FCM 안오다가 채팅방 들어갔다 나오면 FCM 받아지는 현상이 있음
-//  아마 서버에서 disconnected 상태 업데이트가 아직 안되어서 FCM 수신이 안되는 듯하다
-//  추후 앱 단위에서 소켓 연결하고 모든 소켓 Frame에 ChannelId, ChatId를 포함하여
-//  모든 채팅방이 자동 subscribe된 채로 사용되는 형식으로 수정하해야 할듯하다.
-
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
-	private val stompHandler: StompHandler,
+	private val chatClient: ChatClient,
 	private val getClientChannelInfoUseCase: GetClientChannelInfoUseCase,
 	private val getClientChannelUseCase: GetClientChannelUseCase,
 	private val getClientChannelFlowUseCase: GetClientChannelFlowUseCase,
-	private val syncChannelChatsUseCase: SyncChannelChatsUseCase,
 	private val getChatsFlowUserCase: GetChatsFlowUseCase,
 	private val leaveChannelUseCase: LeaveChannelUseCase,
 	private val channelTempMessageRepository: ChannelTempMessageRepository,
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
-	private val networkManager: NetworkManager,
 	private val chatNotificationHandler: ChatNotificationHandler,
 	private val remoteConfigManager: RemoteConfigManager,
+	private val channelSyncManger: ChannelSyncManger,
 ) : ViewModel() {
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
 
@@ -86,7 +79,15 @@ class ChannelViewModel @Inject constructor(
 		initUiState()
 	}
 
+	//TODO : 여기 로직들 소켓 연결이랑 시간차 나지않을까?
+	//  chatClient에서 합쳐야될거같은데
+	// chatClient에서 소켓 연결하는거 기다리던지 혹은 라이프 사이클에따라 연결되는건
+	// init같은 Flag가 안되면 호출안되게 하던가 해야될듯?
+	// 아 그리고 노티피케이션 눌렀을때, 로그인 안되어있거나 클라이언트 정보 없어서 로그인 안된경우는
+	// 화면이동을 막던지 화면에 띄워지는걸 막던지 해야될듯
+	// (노티 누르고 ChannelActivity로 들어오면 유저 정보 요청을 하지 않아서 클라이언트 정보가 없을 수도 있겠네)
 	private fun initUiState() = viewModelScope.launch {
+		Log.d(TAG, "ChannelViewModel: initUiState() - channelId: $channelId")
 		if (isBookChatAvailable().not()) return@launch
 		val originalChannel = getClientChannelUseCase(channelId)
 		val shouldLastReadChatScroll = originalChannel.isExistNewChat
@@ -99,7 +100,6 @@ class ChannelViewModel @Inject constructor(
 				needToScrollToLastReadChat = shouldLastReadChatScroll,
 			)
 		}
-		observeNetworkState()
 		observeChats()
 		getOfflineNewestChats()
 		getChannelInfo(channelId)
@@ -108,16 +108,7 @@ class ChannelViewModel @Inject constructor(
 		observeChannel()
 		observeChatsLoadState()
 		observeSocketState()
-	}
-
-	private fun observeNetworkState() = viewModelScope.launch {
-		networkManager.observeNetworkState().collect { state ->
-			updateState { copy(networkState = state) }
-			when (state) {
-				NetworkState.CONNECTED -> connectSocket()
-				NetworkState.DISCONNECTED -> Unit
-			}
-		}
+		observeChannelSubscriptionState()
 	}
 
 	private suspend fun getOfflineNewestChats() {
@@ -128,7 +119,6 @@ class ChannelViewModel @Inject constructor(
 		getClientChannelFlowUseCase(channelId)
 			.onEach { chatNotificationHandler.dismissChannelNotifications(it) }
 			.collect { channel ->
-				if (channel.isAvailable.not()) disconnectSocket()
 				handleChannelNewChat(channel)
 				updateState {
 					copy(
@@ -188,18 +178,31 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun observeSocketState() = viewModelScope.launch {
-		stompHandler.getSocketStateFlow().collect { state -> handleSocketState(state) }
+		chatClient.getSocketStateFlow().collect { state ->
+			updateState { copy(socketState = state) }
+			if (state == SocketState.CONNECTED) subscribeChannelIfNeeded()
+		}
 	}
 
-	private fun handleSocketState(state: SocketState) {
-		updateState { copy(socketState = state) }
-		when (state) {
-			SocketState.DISCONNECTED -> Unit
-			SocketState.CONNECTING -> Unit
-			SocketState.CONNECTED -> onChannelConnected()
-			SocketState.FAILURE -> onChannelConnectFail()
-			SocketState.NEED_RECONNECTION -> connectSocket()
+	private fun observeChannelSubscriptionState() = viewModelScope.launch {
+		chatClient.getChannelSubscriptionStateFlow(channelId).collect { state ->
+			if (state == SubscriptionState.SUBSCRIBED) {
+				when {
+					uiState.value.isFirstConnection.not() -> syncChannelsIfNeeded()
+					else -> {
+						getInitChats()
+						updateState { copy(isFirstConnection = false) }
+					}
+				}
+			}
 		}
+	}
+
+	//TODO : [Version 2] 현재 보고 있는 채팅방에 한해서만 동기화 요청되게 사용하고 있지만,
+	// 			추후 EventHistory를 통해 모든 채팅방에 대한 동기화 요청으로 수정하고 ChatClient로 이전
+	private fun syncChannelsIfNeeded() = viewModelScope.launch {
+		runCatching { channelSyncManger.sync(listOf(channelId)) }
+			.onFailure { ChannelEvent.ShowSnackBar(R.string.channel_info_sync_fail) }
 	}
 
 	private suspend fun isBookChatAvailable(): Boolean {
@@ -228,22 +231,6 @@ class ChannelViewModel @Inject constructor(
 
 	private fun getRemoteConfig() = viewModelScope.async {
 		runCatching { remoteConfigManager.getRemoteConfig() }.getOrNull()
-	}
-
-	private fun onChannelConnected() {
-		when {
-			uiState.value.isFirstConnection -> {
-				getInitChats()
-				updateState { copy(isFirstConnection = false) }
-			}
-
-			else -> syncChannelState()
-		}
-	}
-
-	private fun onChannelConnectFail() = viewModelScope.launch {
-		updateState { copy(uiState = UiState.ERROR) }
-		startEvent(ChannelEvent.ShowSnackBar(R.string.error_socket_connect))
 	}
 
 	/** 마지막으로 읽었던 채팅이 getNewestChats 결과에 포함되어있다면 getChatsAroundId는 호출하지 않음 */
@@ -336,38 +323,34 @@ class ChannelViewModel @Inject constructor(
 			}
 	}
 
-	private fun connectSocket() = viewModelScope.launch {
-		if (uiState.value.isNetworkDisconnected
-			|| uiState.value.channel.isAvailable.not()
-		) return@launch
-		runCatching { stompHandler.connectSocket(uiState.value.channel) }
-			.onFailure {
-				Log.d(TAG, "ChannelViewModel: connectSocket() - throwable: $it")
-				updateState { copy(uiState = UiState.ERROR) }
-				startEvent(ChannelEvent.ShowSnackBar(R.string.error_network_error))
-			}
+	private fun subscribeChannelIfNeeded() {
+		if (uiState.value.channel.isAvailable.not()) return
+		runCatching {
+			chatClient.subscribeChannelIfNeeded( //TODO : 내부에서 코루틴 스코프 써서 호출만 하고 결과 안기다릴거 같은데..?
+				channelId = channelId,
+				channelSId = uiState.value.channel.roomSid
+			)
+		}.onFailure {
+			Log.d(TAG, "ChannelViewModel: subscribeChannel() - throwable: $it")
+			updateState { copy(uiState = UiState.ERROR) }
+			startEvent(ChannelEvent.ShowSnackBar(R.string.error_socket_connect))
+		}
 	}
 
-	private fun sendMessage(text: String? = null) {
+	private fun sendMessage() {
 		if (uiState.value.channel.isAvailable.not()) return
-		if (uiState.value.socketState != SocketState.CONNECTED) connectSocket()
-
-		val message = text ?: uiState.value.enteredMessage
+		val message = uiState.value.enteredMessage
 		if (message.isBlank()) return
-
 		updateState { copy(enteredMessage = "") }
 		clearTempSavedMessage()
-
-		viewModelScope.launch {
-			runCatching {
-				stompHandler.sendMessage(
-					channelId = channelId,
-					message = message,
-				)
-			}.onFailure {
-				//TODO : [FixWaiting] 소켓 닫혔을 때, 메세지 보내면 StompErrorFrameReceived 넘어옴
-				Log.d(TAG, "ChannelViewModel: sendMessage() - throwable: $it")
-			}
+		runCatching {
+			chatClient.sendMessage(
+				channelId = channelId,
+				message = message,
+			)
+		}.onFailure {
+			//TODO : [FixWaiting] 소켓 닫혔을 때, 메세지 보내면 StompErrorFrameReceived 넘어옴
+			Log.d(TAG, "ChannelViewModel: sendMessage() - throwable: $it")
 		}
 	}
 
@@ -377,8 +360,7 @@ class ChannelViewModel @Inject constructor(
 
 	private fun retryFailedChat(chatId: Long) = viewModelScope.launch {
 		if (uiState.value.channel.isAvailable.not()) return@launch
-		if (uiState.value.socketState != SocketState.CONNECTED) connectSocket()
-		stompHandler.retrySendMessage(chatId)
+		chatClient.retrySendMessage(chatId)
 	}
 
 	private fun exitChannel() = viewModelScope.launch {
@@ -393,36 +375,6 @@ class ChannelViewModel @Inject constructor(
 			|| uiState.value.socketState != SocketState.CONNECTED
 		) return
 		updateState { copy(needToScrollToLastReadChat = false) }
-	}
-
-	private fun disconnectSocket() = viewModelScope.launch {
-		stompHandler.disconnectSocket()
-	}
-
-	fun onStartScreen() {
-		if (uiState.value.channel.isAvailable.not()) return
-		connectSocket()
-	}
-
-	fun onStopScreen() {
-		if (uiState.value.channel.isAvailable.not()) return
-		disconnectSocket()
-		updateState { copy(socketState = SocketState.DISCONNECTED) }
-	}
-
-	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트간의 채널 데이터 불일치 동기화*/
-	private fun syncChannelState() {
-		if (uiState.value.isNetworkDisconnected
-			|| uiState.value.channel.isAvailable.not()
-		) return
-		getChannelInfo(channelId)
-		syncChats(channelId)
-	}
-
-	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트간의 채팅 불일치 동기화 */
-	private fun syncChats(channelId: Long) = viewModelScope.launch {
-		runCatching { syncChannelChatsUseCase(channelId) }
-			.onFailure { startEvent(ChannelEvent.ShowSnackBar(R.string.error_network_error)) }
 	}
 
 	private fun scrollToBottom() {
@@ -462,7 +414,6 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	fun onClickBackBtn() {
-		disconnectSocket()
 		startEvent(ChannelEvent.MoveBack)
 	}
 

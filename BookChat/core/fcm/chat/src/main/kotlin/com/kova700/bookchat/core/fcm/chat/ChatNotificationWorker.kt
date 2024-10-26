@@ -1,6 +1,7 @@
 package com.kova700.bookchat.core.fcm.chat
 
 import android.content.Context
+import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
@@ -12,7 +13,6 @@ import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookCha
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
 import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.notification.chat.external.ChatNotificationHandler
-import com.kova700.core.data.appsetting.external.repository.AppSettingRepository
 import com.kova700.core.domain.usecase.channel.GetClientChannelUseCase
 import com.kova700.core.domain.usecase.chat.GetChatUseCase
 import dagger.assisted.Assisted
@@ -20,10 +20,9 @@ import dagger.assisted.AssistedInject
 
 @HiltWorker
 class ChatNotificationWorker @AssistedInject constructor(
-	@Assisted appContext: Context,
-	@Assisted workerParams: WorkerParameters,
+	@Assisted private val appContext: Context,
+	@Assisted private val workerParams: WorkerParameters,
 	private val channelRepository: ChannelRepository,
-	private val appSettingRepository: AppSettingRepository,
 	private val clientRepository: ClientRepository,
 	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val chatNotificationHandler: ChatNotificationHandler,
@@ -32,6 +31,7 @@ class ChatNotificationWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
 	override suspend fun doWork(): Result {
+		Log.d("ㄺ", "ChatNotificationWorker: doWork() - just called")
 		if (bookChatTokenRepository.isBookChatTokenExist().not()) return Result.success()
 
 		val channelId: Long = inputData.getLong(EXTRA_CHANNEL_ID, -1)
@@ -42,14 +42,13 @@ class ChatNotificationWorker @AssistedInject constructor(
 			val channel = getClientChannelUseCase(channelId)
 			val chat = getChatUseCase(chatId)
 			val client = clientRepository.getClientProfile()
-
+			Log.d("ㄺ", "ChatNotificationWorker: doWork() - real Work")
 			channelRepository.updateChannelLastChatIfValid(chat.channelId, chat.chatId)
 			Triple(channel, chat, client)
 		}.getOrNull() ?: return Result.failure()
 
 		val (channel, chat, client) = apiResult
 		if (chat.sender?.id == client.id) return Result.success()
-		if (appSettingRepository.isPushNotificationEnabled().not()) return Result.success()
 
 		chatNotificationHandler.showNotification(
 			channel = channel,

@@ -1,5 +1,6 @@
 package com.kova700.bookchat.core.data.chat.internal
 
+import android.util.Log
 import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
 import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
@@ -9,6 +10,7 @@ import com.kova700.bookchat.core.database.chatting.external.chat.mapper.toChatEn
 import com.kova700.bookchat.core.network.bookchat.chat.ChatApi
 import com.kova700.bookchat.core.network.bookchat.chat.model.mapper.toChat
 import com.kova700.bookchat.core.network.bookchat.common.model.SearchSortOptionNetwork
+import com.kova700.bookchat.util.Constants.TAG
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,6 +52,7 @@ class ChatRepositoryImpl @Inject constructor(
 		initFlag: Boolean,
 		channelId: Long,
 	): Flow<List<Chat>> {
+		Log.d(TAG, "ChatRepositoryImpl: getChatsFlow() - channelId: $channelId, initFlag : $initFlag")
 		if (initFlag) clearCachedData()
 		return sortedChats
 	}
@@ -67,11 +70,12 @@ class ChatRepositoryImpl @Inject constructor(
 	/** 소켓이 끊긴 사이 발생한 채팅들을 서버와 동기화하기 위해서 호출하는 함수
 	 * 마지막 load된 채팅을 기준으로 최대 2번 getNewerChats 호출 후, 남은 채팅을 전부 load하지 못했다면,
 	 * 가장 최근 채팅만 가져와서 channelLastChat만 갱신하여 유저에게 새로운 채팅이 있음을 알림
-	 * (유저가 스크롤해서 이동하지 않는 이상, 중간에 load되지 않은 채팅을 남겨둔다는 의미)*/
+	 * (동기화 실패 시, 굳이 유저가 스크롤해서 이동하지 않는 이상, 중간에 load되지 않은 채팅을 남겨둔다는 의미)*/
 	override suspend fun syncChats(
 		channelId: Long,
 		maxAttempts: Int,
 	): List<Chat> {
+		Log.d(TAG, "ChatRepositoryImpl: syncChats() - called")
 		_isNewerChatFullyLoaded.value = false
 
 		for (i in 0 until 2) {
@@ -200,6 +204,7 @@ class ChatRepositoryImpl @Inject constructor(
 
 		cachedChannelId = channelId
 		_isNewerChatFullyLoaded.value = response.cursorMeta.last
+		Log.d(TAG, "ChatRepositoryImpl: getNewerChats() - _isNewerChatFullyLoaded : ${_isNewerChatFullyLoaded.value}")
 		currentNewerChatPage =
 			if (newChats.isEmpty()) currentNewerChatPage else response.cursorMeta.nextCursorId
 

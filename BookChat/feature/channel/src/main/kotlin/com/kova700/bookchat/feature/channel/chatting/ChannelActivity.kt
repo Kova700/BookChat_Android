@@ -90,16 +90,6 @@ class ChannelActivity : AppCompatActivity() {
 		observeCaptureIds()
 	}
 
-	override fun onStart() {
-		super.onStart()
-		channelViewModel.onStartScreen()
-	}
-
-	override fun onStop() {
-		super.onStop()
-		channelViewModel.onStopScreen()
-	}
-
 	private fun observeUiState() = lifecycleScope.launch {
 		channelViewModel.uiState.collect { uiState ->
 			chatItemAdapter.submitList(uiState.chats)
@@ -144,6 +134,9 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun initViewState() {
+		watchingChannelId =
+			if (intent.hasExtra(EXTRA_CHANNEL_ID)) intent.getLongExtra(EXTRA_CHANNEL_ID, -1)
+			else null
 		initLayoutManager()
 		initAdapter()
 		initRcv()
@@ -704,6 +697,8 @@ class ChannelActivity : AppCompatActivity() {
 		}
 	}
 
+	//TODO : [FixWaiting] mainNavigator에 isMainActivityRunning()을 넣어서 사용하도록 변경
+	// MainActivity텍스트에 직접적인 접근 X
 	private fun isMainActivityRunning(): Boolean {
 		val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 		return activityManager.appTasks.any { task ->
@@ -731,6 +726,8 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	companion object {
+		var watchingChannelId: Long? = -1
+			private set
 		const val EXTRA_USER_ID = "EXTRA_USER_ID"
 		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
 		private const val CLIPBOARD_LABEL = "CLIPBOARD_LABEL"

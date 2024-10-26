@@ -17,4 +17,5 @@ dependencies {
 	implementation(project(":core:network-manager:external"))
 	implementation(project(":core:notification:chat:external"))
 	implementation(project(":core:remote-config"))
+	implementation(project(":core:chat-client"))
 }

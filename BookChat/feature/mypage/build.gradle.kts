@@ -15,4 +15,5 @@ dependencies {
 	implementation(project(":core:data:client:external"))
 	implementation(project(":core:domain"))
 	implementation(project(":core:data:appsetting:external"))
+	implementation(project(":core:chat-client"))
 }
