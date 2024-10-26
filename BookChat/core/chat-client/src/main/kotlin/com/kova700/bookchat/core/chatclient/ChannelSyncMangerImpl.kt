@@ -5,7 +5,6 @@ import com.kova700.core.domain.usecase.channel.GetClientChannelInfoUseCase
 import com.kova700.core.domain.usecase.chat.SyncChannelChatsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,7 +18,6 @@ class ChannelSyncMangerImpl @Inject constructor(
 	private val getClientChannelInfoUseCase: GetClientChannelInfoUseCase,
 	private val networkManager: NetworkManager,
 ) : ChannelSyncManger {
-	//TODO : [FixWaiting] 스코프 뭔가 이렇게 사용해도 되나 싶은
 	private val channelSyncScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
 	override fun sync(channelIds: Collection<Long>) {
@@ -32,14 +30,14 @@ class ChannelSyncMangerImpl @Inject constructor(
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트간의 채팅 불일치 동기화 */
 	private fun syncChats(channelId: Long) = channelSyncScope.launch {
 		if (networkManager.isNetworkAvailable().not()) return@launch
-		runCatching { syncChannelChatsUseCase(channelId) }
+		syncChannelChatsUseCase(channelId)
 	}
 
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트 간의 데이터 불일치를 메우기 위해서
 	 * 리커넥션 시마다 호출 (이벤트 History받는 로직 구현 이전까지 임시로 사용)*/
 	private fun getChannelInfo(channelId: Long) = channelSyncScope.launch {
 		if (networkManager.isNetworkAvailable().not()) return@launch
-		runCatching { getClientChannelInfoUseCase.invoke(channelId) }
+		getClientChannelInfoUseCase.invoke(channelId)
 	}
 
 }

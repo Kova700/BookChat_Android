@@ -89,7 +89,8 @@ class ChatClientImpl @Inject constructor(
 		}
 	}
 
-	//TODO : [FixWaiting] 채팅 전송중 생명주기 ClientScope로 만들기 (ChannelActivity에서 채팅 전송중에 화면을 나가도 전송중인 채팅 취소되지 않게)
+	//TODO : [FixWaiting] 채팅 전송중 생명주기 ClientScope로 만들기
+	// (ChannelActivity에서 채팅 전송중에 화면을 나가도 전송중인 채팅 취소되지 않게)
 	override fun retrySendMessage(chatId: Long) {
 		chatClientScope.launch {
 			stompHandler.retrySendMessage(chatId)

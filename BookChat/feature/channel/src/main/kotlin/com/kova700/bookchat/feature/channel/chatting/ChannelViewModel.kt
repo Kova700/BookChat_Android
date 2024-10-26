@@ -200,7 +200,7 @@ class ChannelViewModel @Inject constructor(
 
 	//TODO : [Version 2] 현재 보고 있는 채팅방에 한해서만 동기화 요청되게 사용하고 있지만,
 	// 			추후 EventHistory를 통해 모든 채팅방에 대한 동기화 요청으로 수정하고 ChatClient로 이전
-	private fun syncChannelsIfNeeded() = viewModelScope.launch {
+	private fun syncChannelsIfNeeded() {
 		runCatching { channelSyncManger.sync(listOf(channelId)) }
 			.onFailure { ChannelEvent.ShowSnackBar(R.string.channel_info_sync_fail) }
 	}
