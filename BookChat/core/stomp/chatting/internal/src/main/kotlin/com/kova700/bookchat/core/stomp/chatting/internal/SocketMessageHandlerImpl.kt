@@ -7,6 +7,7 @@ import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
 import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.data.user.external.repository.UserRepository
+import com.kova700.bookchat.core.notification.chat.external.ChatNotificationHandler
 import com.kova700.bookchat.core.stomp.chatting.external.SocketMessageHandler
 import com.kova700.bookchat.core.stomp.chatting.external.model.CommonMessage
 import com.kova700.bookchat.core.stomp.chatting.external.model.NotificationMessage
@@ -14,6 +15,7 @@ import com.kova700.bookchat.core.stomp.chatting.external.model.NotificationMessa
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketMessage
 import com.kova700.bookchat.core.stomp.chatting.internal.mapper.toChat
 import com.kova700.bookchat.util.Constants.TAG
+import com.kova700.core.domain.usecase.channel.GetClientChannelUseCase
 import javax.inject.Inject
 
 class SocketMessageHandlerImpl @Inject constructor(
@@ -21,30 +23,23 @@ class SocketMessageHandlerImpl @Inject constructor(
 	private val channelRepository: ChannelRepository,
 	private val clientRepository: ClientRepository,
 	private val userRepository: UserRepository,
+	private val chatNotificationHandler: ChatNotificationHandler,
+	private val getClientChannelUseCase: GetClientChannelUseCase,
 ) : SocketMessageHandler {
-	override suspend fun handleSocketMessage(
-		socketMessage: SocketMessage,
-		channelId: Long,
-	) {
-		when (socketMessage) {
-			is CommonMessage -> handleCommonMessage(
-				socketMessage = socketMessage,
-				channelId = channelId
-			)
 
-			is NotificationMessage -> handleNoticeMessage(
-				socketMessage = socketMessage,
-				channelId = channelId
-			)
+	override suspend fun handleSocketMessage(socketMessage: SocketMessage) {
+		when (socketMessage) {
+			is CommonMessage -> handleCommonMessage(socketMessage)
+			is NotificationMessage -> handleNoticeMessage(socketMessage)
 		}
 	}
 
 	private suspend fun handleCommonMessage(
 		socketMessage: CommonMessage,
-		channelId: Long,
 	) {
 		val clientId = clientRepository.getClientProfile().id
 		val receiptId = socketMessage.receiptId
+		val channelId = socketMessage.channelId
 
 		val chat = socketMessage.toChat(
 			channelId = channelId,
@@ -59,12 +54,18 @@ class SocketMessageHandlerImpl @Inject constructor(
 
 		insertNewChat(chat)
 		updateChannelLastChat(chat)
+
+		chatNotificationHandler.showNotification(
+			channel = getClientChannelUseCase(channelId),
+			chat = chat
+		)
 	}
 
 	private suspend fun handleNoticeMessage(
 		socketMessage: NotificationMessage,
-		channelId: Long,
 	) {
+		val channelId = socketMessage.channelId
+
 		val chat = socketMessage.toChat(
 			channelId = channelId,
 		)
@@ -120,7 +121,6 @@ class SocketMessageHandlerImpl @Inject constructor(
 					targetUserId = socketMessage.targetUserId ?: return,
 					channelMemberAuthority = ChannelMemberAuthority.GUEST,
 				)
-
 		}
 		insertNewChat(chat)
 		updateChannelLastChat(chat)
