@@ -2,7 +2,7 @@ package com.kova700.bookchat.core.stomp.chatting.internal
 
 import android.util.Log
 import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
-import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
+import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
 import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.network_manager.external.NetworkManager
@@ -89,8 +89,6 @@ class StompHandlerImpl @Inject constructor(
 	override val isSocketConnected
 		get() = _socketState.value == SocketState.CONNECTED
 
-	//TODO: 이걸 observing 해서 완료되면 initChat가져오는 방식으로 해야될듯
-	// 구독 되어있고 소켓 연결되어있다면 getInitChat같은 소켓 연결된후 해야되는 작업들 하면될듯
 	private val subscriptionStates =
 		MutableStateFlow<Map<Long, SubscriptionState>>(emptyMap()) // (channelId, SubscriptionState)
 
@@ -156,10 +154,6 @@ class StompHandlerImpl @Inject constructor(
 	//TODO: [FixWaiting] 지수백오프 엄청 빨리 끝나는 현상이있음
 	// (최대 5번 시도하는데 1초만에 끝남 코루틴 Context때문일 수도 있음)
 	/** LostReceiptException으로 실패 시에만 지수백오프 구독 요청 */
-	//TODO :
-	// 구독은 멀티구독방식으로하고, 페이징 덜된 채팅방들은 Notification오면 구독하거나 채팅방 들어가면 구독하는 방식으로
-	// 그리고 구독은 멀티방식이지만 동기화는 현재 보고 있는 채팅방이 있는경우 그 채팅방 단 한개만 동기화되게 막아두자
-	// 함수 하나만 지우면 되거나 Flag 변경하면 바로 작동되게 만들어두자
 	override suspend fun subscribeChannel(
 		channelId: Long,
 		channelSId: String,
@@ -215,7 +209,7 @@ class StompHandlerImpl @Inject constructor(
 
 	private suspend fun retrySendFailedChats(channelId: Long) {
 		val retryRequiredChats = chatRepository.getFailedChats(channelId)
-			.filter { it.status == ChatStatus.RETRY_REQUIRED }.reversed()
+			.filter { it.state == ChatState.RETRY_REQUIRED }.reversed()
 		for (chat in retryRequiredChats) retrySendMessage(chat.chatId)
 	}
 
@@ -259,7 +253,7 @@ class StompHandlerImpl @Inject constructor(
 			insertWaitingChat(
 				channelId = channelId,
 				message = message,
-				chatStatus = ChatStatus.RETRY_REQUIRED
+				chatState = ChatState.RETRY_REQUIRED
 			)
 			return
 		}
@@ -267,7 +261,7 @@ class StompHandlerImpl @Inject constructor(
 		val receiptId = insertWaitingChat(
 			channelId = channelId,
 			message = message,
-			chatStatus = ChatStatus.LOADING
+			chatState = ChatState.LOADING
 		)
 
 		runCatching {
@@ -286,14 +280,14 @@ class StompHandlerImpl @Inject constructor(
 	private suspend fun insertWaitingChat(
 		channelId: Long,
 		message: String,
-		chatStatus: ChatStatus,
+		chatState: ChatState,
 	): Long {
 		val clientId = clientRepository.getClientProfile().id
 		return chatRepository.insertWaitingChat(
 			channelId = channelId,
 			message = message,
 			clientId = clientId,
-			chatStatus = chatStatus
+			chatState = chatState
 		)
 	}
 

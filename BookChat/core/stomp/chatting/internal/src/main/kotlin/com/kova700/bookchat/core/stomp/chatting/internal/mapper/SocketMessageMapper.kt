@@ -1,6 +1,7 @@
 package com.kova700.bookchat.core.stomp.chatting.internal.mapper
 
 import com.kova700.bookchat.core.data.chat.external.model.Chat
+import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.stomp.chatting.external.model.CommonMessage
 import com.kova700.bookchat.core.stomp.chatting.external.model.NotificationMessage
@@ -16,6 +17,7 @@ fun SocketMessage.toChat(
 				chatId = chatId,
 				channelId = channelId,
 				message = message,
+				state = ChatState.SUCCESS,
 				dispatchTime = dispatchTime,
 				sender = sender,
 			)
@@ -24,6 +26,7 @@ fun SocketMessage.toChat(
 			Chat(
 				chatId = chatId,
 				channelId = channelId,
+				state = ChatState.SUCCESS,
 				dispatchTime = dispatchTime,
 				message = message,
 				sender = null,

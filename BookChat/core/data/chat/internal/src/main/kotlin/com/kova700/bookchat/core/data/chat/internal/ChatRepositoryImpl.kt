@@ -2,7 +2,7 @@ package com.kova700.bookchat.core.data.chat.internal
 
 import android.util.Log
 import com.kova700.bookchat.core.data.chat.external.model.Chat
-import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
+import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
 import com.kova700.bookchat.core.database.chatting.external.chat.ChatDAO
 import com.kova700.bookchat.core.database.chatting.external.chat.mapper.toChat
@@ -32,10 +32,10 @@ class ChatRepositoryImpl @Inject constructor(
 		MutableStateFlow<Map<Long, Chat>>(emptyMap()) //(chatId, Chat)
 	private val sortedChats = mapChats.map { it.values }
 		.map { chats ->
-			//ORDER BY status ASC, chat_id DESC
+			//ORDER BY state ASC, chat_id DESC
 			chats.sortedWith(
 				compareBy(
-					{ chat -> chat.status.code },
+					{ chat -> chat.state.code },
 					{ chat -> chat.chatId.unaryMinus() }
 				))
 		}
@@ -155,7 +155,7 @@ class ChatRepositoryImpl @Inject constructor(
 	override suspend fun getFailedChats(channelId: Long): List<Chat> {
 		return chatDAO.getChannelsFailedChats(channelId)
 			.map {
-				if (it.isRetryRequired.not()) it.toChat().copy(status = ChatStatus.FAILURE)
+				if (it.isRetryRequired.not()) it.toChat().copy(state = ChatState.FAILURE)
 				else it.toChat()
 			}
 	}
@@ -293,13 +293,13 @@ class ChatRepositoryImpl @Inject constructor(
 		channelId: Long,
 		message: String,
 		clientId: Long,
-		chatStatus: ChatStatus,
+		chatState: ChatState,
 	): Long {
 		val chatId = chatDAO.insertWaitingChat(
 			channelId = channelId,
 			message = message,
 			clientId = clientId,
-			chatStatus = chatStatus
+			chatState = chatState
 		)
 		if (channelId != cachedChannelId
 			|| _isNewerChatFullyLoaded.value.not()

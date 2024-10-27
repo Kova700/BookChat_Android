@@ -6,7 +6,7 @@ data class Chat(
 	val chatId: Long,
 	val channelId: Long,
 	val message: String,
-	val status: ChatStatus = ChatStatus.SUCCESS,
+	val state: ChatState,
 	val dispatchTime: String,
 	val sender: User?,
 ) {
@@ -23,7 +23,7 @@ data class Chat(
 			chatId = -1,
 			channelId = -1,
 			message = "",
-			status = ChatStatus.SUCCESS,
+			state = ChatState.SUCCESS,
 			dispatchTime = "",
 			sender = null
 		)

@@ -3,7 +3,7 @@ package com.kova700.bookchat.feature.channel.chatting.adapter
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
+import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
 import javax.inject.Inject
 import com.kova700.bookchat.feature.channel.R as channelR
@@ -28,7 +28,7 @@ class ChatItemAdapter @Inject constructor() :
 		get() = currentList.indexOfFirst { chatItem ->
 			chatItem is ChatItem.AnotherUser ||
 							chatItem is ChatItem.Notification ||
-							((chatItem is ChatItem.MyChat) && chatItem.status == ChatStatus.SUCCESS)
+							((chatItem is ChatItem.MyChat) && chatItem.state == ChatState.SUCCESS)
 		}
 
 	val newestChatNotMineIndex

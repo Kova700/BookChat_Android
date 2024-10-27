@@ -1,6 +1,7 @@
 package com.kova700.bookchat.core.network.bookchat.search.model.channel.response
 
 import com.kova700.bookchat.core.data.chat.external.model.Chat
+import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.network.bookchat.channel.model.both.ChannelDefaultImageTypeNetwork
 import com.kova700.bookchat.core.network.bookchat.user.model.both.UserDefaultProfileTypeNetwork
@@ -64,6 +65,7 @@ data class ChannelSearchResponse(
 				chatId = it,
 				channelId = roomId,
 				message = lastChatMessage!!,
+				state = ChatState.SUCCESS,
 				dispatchTime = lastChatDispatchTime!!,
 				sender = lastChatSenderId?.let { senderId -> User.DEFAULT.copy(id = senderId) }
 			)

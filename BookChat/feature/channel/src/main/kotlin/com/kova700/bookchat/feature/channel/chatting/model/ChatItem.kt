@@ -1,7 +1,7 @@
 package com.kova700.bookchat.feature.channel.chatting.model
 
 import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
-import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
+import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import com.kova700.bookchat.core.data.user.external.model.User
 
 sealed class ChatItem(
@@ -29,7 +29,7 @@ sealed class ChatItem(
 		override val chatId: Long,
 		override val message: String,
 		val channelId: Long,
-		val status: ChatStatus,
+		val state: ChatState,
 		val dispatchTime: String,
 		val sender: User?,
 		override val isCaptureHeader: Boolean,

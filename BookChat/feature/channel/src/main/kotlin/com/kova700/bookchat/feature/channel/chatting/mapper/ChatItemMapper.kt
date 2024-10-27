@@ -3,7 +3,7 @@ package com.kova700.bookchat.feature.channel.chatting.mapper
 import com.kova700.bookchat.core.data.channel.external.model.Channel
 import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.data.chat.external.model.Chat
-import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
+import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import com.kova700.bookchat.core.data.chat.external.model.ChatType
 import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
 import com.kova700.bookchat.util.date.isSameDate
@@ -26,7 +26,7 @@ fun List<Chat>.toChatItems(
 		val chat = this[index]
 		if (isVisibleLastReadChatNotice
 			&& (chat.chatId == focusTargetId)
-			&& ((index != 0) && (this[index - 1].status == ChatStatus.SUCCESS))
+			&& ((index != 0) && (this[index - 1].state == ChatState.SUCCESS))
 		) {
 			val isCaptureBottom = captureBottomItemId == ChatItem.LAST_READ_ITEM_STABLE_ID
 			val isCaptureHeader = captureHeaderItemId == ChatItem.LAST_READ_ITEM_STABLE_ID
@@ -54,7 +54,7 @@ fun List<Chat>.toChatItems(
 					chatId = chat.chatId,
 					channelId = chat.channelId,
 					message = chat.message,
-					status = chat.status,
+					state = chat.state,
 					dispatchTime = chat.dispatchTime,
 					sender = chat.sender,
 					isCaptureBottom = isCaptureBottom,
@@ -100,7 +100,7 @@ fun List<Chat>.toChatItems(
 			)
 		}
 
-		if (chat.status != ChatStatus.SUCCESS) continue
+		if (chat.state != ChatState.SUCCESS) continue
 
 		if (index == lastIndex) {
 			val date = chat.dispatchTime.toDateKoreanString()

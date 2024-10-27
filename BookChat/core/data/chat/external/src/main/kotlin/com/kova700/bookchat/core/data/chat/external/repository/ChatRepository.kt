@@ -1,7 +1,7 @@
 package com.kova700.bookchat.core.data.chat.external.repository
 
 import com.kova700.bookchat.core.data.chat.external.model.Chat
-import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
+import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -48,7 +48,7 @@ interface ChatRepository {
 		channelId: Long,
 		message: String,
 		clientId: Long,
-		chatStatus: ChatStatus,
+		chatState: ChatState,
 	): Long
 
 	suspend fun updateWaitingChat(
