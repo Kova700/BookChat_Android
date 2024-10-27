@@ -238,6 +238,7 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	override suspend fun disconnectSocket() {
+		if (::stompSession.isInitialized.not()) return
 		Log.d(TAG, "StompHandlerImpl: disconnectSocket() - called")
 		setSocketState(SocketState.DISCONNECTED)
 		runCatching { stompSession.disconnect() }
@@ -350,9 +351,6 @@ class StompHandlerImpl @Inject constructor(
 				subscriptionStates.update { emptyMap() }
 				_socketState.emit(SocketState.NEED_RECONNECTION)
 			}
-
-			/** 최초 connection시, stompSession가 연결되어있지 않을 떄, disconnect호출되면 발생 */
-			is UninitializedPropertyAccessException -> Unit
 
 			else -> {
 				Log.d(TAG, "StompHandlerImpl: handleSocketError() - else throwable :$throwable")
