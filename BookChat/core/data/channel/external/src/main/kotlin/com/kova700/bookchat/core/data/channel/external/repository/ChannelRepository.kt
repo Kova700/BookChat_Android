@@ -89,6 +89,7 @@ interface ChannelRepository {
 	)
 
 	suspend fun updateChannelLastChatIfValid(channelId: Long, chatId: Long)
+	suspend fun insertChannels(channels: List<Channel>)
 
 	suspend fun clear()
 
@@ -96,4 +97,5 @@ interface ChannelRepository {
 		private const val REMOTE_CHANNELS_LOAD_SIZE = 15
 		private const val DEFAULT_RETRY_MAX_ATTEMPTS = 5
 	}
+
 }

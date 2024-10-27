@@ -4,6 +4,7 @@ import android.util.Log
 import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
+import com.kova700.bookchat.core.data.common.model.network.BookChatApiResult
 import com.kova700.bookchat.core.database.chatting.external.chat.ChatDAO
 import com.kova700.bookchat.core.database.chatting.external.chat.mapper.toChat
 import com.kova700.bookchat.core.database.chatting.external.chat.mapper.toChatEntity
@@ -204,7 +205,10 @@ class ChatRepositoryImpl @Inject constructor(
 
 		cachedChannelId = channelId
 		_isNewerChatFullyLoaded.value = response.cursorMeta.last
-		Log.d(TAG, "ChatRepositoryImpl: getNewerChats() - _isNewerChatFullyLoaded : ${_isNewerChatFullyLoaded.value}")
+		Log.d(
+			TAG,
+			"ChatRepositoryImpl: getNewerChats() - _isNewerChatFullyLoaded : ${_isNewerChatFullyLoaded.value}"
+		)
 		currentNewerChatPage =
 			if (newChats.isEmpty()) currentNewerChatPage else response.cursorMeta.nextCursorId
 
@@ -245,7 +249,7 @@ class ChatRepositoryImpl @Inject constructor(
 	}
 
 	/** 로컬에 있는 채팅 우선적으로 쿼리 */
-	override suspend fun getChat(chatId: Long): Chat {
+	override suspend fun getChat(chatId: Long): Chat? {
 		return mapChats.value[chatId]
 			?: getOfflineChat(chatId)
 			?: getOnlineChat(chatId)
@@ -255,9 +259,11 @@ class ChatRepositoryImpl @Inject constructor(
 		return chatDAO.getChat(chatId)?.toChat()
 	}
 
-	private suspend fun getOnlineChat(chatId: Long): Chat {
-		return chatApi.getChat(chatId).toChat()
-			.also { insertChat(it) }
+	private suspend fun getOnlineChat(chatId: Long): Chat? {
+		return when (val response = chatApi.getChat(chatId)) {
+			is BookChatApiResult.Success -> response.data.toChat().also { insertChat(it) }
+			is BookChatApiResult.Failure -> null
+		}
 	}
 
 	override suspend fun insertChat(chat: Chat) {

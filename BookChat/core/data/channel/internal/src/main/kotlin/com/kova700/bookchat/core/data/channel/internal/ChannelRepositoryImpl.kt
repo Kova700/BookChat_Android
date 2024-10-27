@@ -479,17 +479,14 @@ class ChannelRepositoryImpl @Inject constructor(
 			}.onFailure { delay((DEFAULT_RETRY_ATTEMPT_DELAY_TIME * (1.5).pow(attempt))) }
 				.getOrNull() ?: continue
 
-			channelDAO.upsertAllChannels(response.channels.toChannelEntity())
 			isEndPage = response.cursorMeta.last
 			currentPage = response.cursorMeta.nextCursorId
-			val newChannels = response.channels.map { getOfflineChannel(it.roomId) ?: it.toChannel() }
-			setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
 			return response.channels.map { it.toChannel() }
 		}
 		throw IOException("failed to retrieve most active channels")
 	}
 
-	//TODO : 서버 측에서 lastChat.dispatchedAt ?: channel.createdAt으로 정렬되도록 수정대기
+	//TODO : [Version 2 ]서버 측에서 lastChat.dispatchedAt ?: channel.createdAt으로 정렬되도록 수정대기
 	/** Channel 세부 정보는 getChannelInfo에 의해 갱신될 예정 */
 	override suspend fun getChannels(loadSize: Int): List<Channel>? {
 		if (isEndPage) return null
@@ -498,13 +495,15 @@ class ChannelRepositoryImpl @Inject constructor(
 			postCursorId = currentPage,
 			size = loadSize
 		)
-
-		channelDAO.upsertAllChannels(response.channels.toChannelEntity())
 		isEndPage = response.cursorMeta.last
 		currentPage = response.cursorMeta.nextCursorId
-		val newChannels = response.channels.map { getOfflineChannel(it.roomId) ?: it.toChannel() }
-		setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
 		return response.channels.map { it.toChannel() }
+	}
+
+	override suspend fun insertChannels(channels: List<Channel>) {
+		channelDAO.upsertAllChannels(channels.map { it.toChannelEntity() })
+		val newChannels = channels.map { getOfflineChannel(it.roomId) ?: it }
+		setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
 	}
 
 	private suspend fun getOfflineMostActiveChannels(loadSize: Int): List<Channel> {

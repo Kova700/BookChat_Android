@@ -19,5 +19,6 @@ class GetClientMostActiveChannelsUseCase @Inject constructor(
 			}
 			channel.host?.let { user -> userRepository.upsertUser(user) }
 		}
+		channelRepository.insertChannels(channels)
 	}
 }

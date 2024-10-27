@@ -13,4 +13,5 @@ dependencies {
 	implementation(project(":core:database:chatting:external"))
 	implementation(project(":core:network:bookchat"))
 	implementation(project(":core:util"))
+	implementation(project(":core:data:common"))
 }

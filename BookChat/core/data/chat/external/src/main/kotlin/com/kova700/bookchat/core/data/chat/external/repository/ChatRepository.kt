@@ -63,7 +63,7 @@ interface ChatRepository {
 
 	suspend fun deleteChannelAllChat(channelId: Long)
 
-	suspend fun getChat(chatId: Long): Chat
+	suspend fun getChat(chatId: Long): Chat?
 
 	fun getOlderChatIsEndFlow(): StateFlow<Boolean>
 	fun getNewerChatIsEndFlow(): StateFlow<Boolean>

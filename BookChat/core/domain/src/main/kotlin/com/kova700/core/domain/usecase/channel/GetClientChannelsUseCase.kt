@@ -11,13 +11,14 @@ class GetClientChannelsUseCase @Inject constructor(
 	private val chatRepository: ChatRepository,
 ) {
 	suspend operator fun invoke() {
-		val channels = channelRepository.getChannels()
-		channels?.forEach { channel ->
+		val channels = channelRepository.getChannels() ?: return
+		channels.forEach { channel ->
 			channel.lastChat?.let { chat ->
 				chatRepository.insertChat(chat)
 				chat.sender?.let { user -> userRepository.upsertUser(user) }
 			}
 			channel.host?.let { user -> userRepository.upsertUser(user) }
 		}
+		channelRepository.insertChannels(channels)
 	}
 }

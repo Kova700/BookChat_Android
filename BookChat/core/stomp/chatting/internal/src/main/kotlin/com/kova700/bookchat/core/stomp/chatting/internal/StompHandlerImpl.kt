@@ -70,7 +70,7 @@ class StompHandlerImpl @Inject constructor(
 	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val socketMessageHandler: SocketMessageHandler,
 	private val renewBookChatTokenUseCase: RenewBookChatTokenUseCase,
-	private val getChatUserCase: GetChatUseCase,
+	private val getChatUseCase: GetChatUseCase,
 	private val networkManager: NetworkManager,
 	private val jsonSerializer: Json,
 ) : StompHandler {
@@ -213,12 +213,13 @@ class StompHandlerImpl @Inject constructor(
 		for (chat in retryRequiredChats) retrySendMessage(chat.chatId)
 	}
 
+	//TODO : 왜 가져와놓고 Chat전달 안하고 다시 UseCase로 가져가는지 확인필요
 	override suspend fun retrySendMessage(chatId: Long) {
 		if (_socketState.value != SocketState.CONNECTED) {
 			connectSocket()
 			return
 		}
-		val chat = getChatUserCase(chatId)
+		val chat = getChatUseCase(chatId) ?: return
 		runCatching {
 			stompSession.sendText(
 				destination = "$SEND_MESSAGE_DESTINATION${chat.channelId}",
