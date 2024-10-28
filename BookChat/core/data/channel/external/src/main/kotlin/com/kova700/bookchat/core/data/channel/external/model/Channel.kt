@@ -30,8 +30,8 @@ data class Channel(
 
 	val isExistNewChat
 		get() = when {
-			lastReadChatId == null -> false
 			lastChat?.chatId == null -> false
+			lastReadChatId == null -> true
 			lastReadChatId < lastChat.chatId -> true
 			else -> false
 		}
