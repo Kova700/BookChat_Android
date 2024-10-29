@@ -59,12 +59,12 @@ class ChatRepositoryImpl @Inject constructor(
 	}
 
 	override fun getOlderChatIsEndFlow(): StateFlow<Boolean> {
-		_isOlderChatFullyLoaded.value = false
+		_isOlderChatFullyLoaded.update { false}
 		return _isOlderChatFullyLoaded.asStateFlow()
 	}
 
 	override fun getNewerChatIsEndFlow(): StateFlow<Boolean> {
-		_isNewerChatFullyLoaded.value = true
+		_isNewerChatFullyLoaded.update { true }
 		return _isNewerChatFullyLoaded.asStateFlow()
 	}
 
@@ -77,7 +77,7 @@ class ChatRepositoryImpl @Inject constructor(
 		maxAttempts: Int,
 	): List<Chat> {
 		Log.d(TAG, "ChatRepositoryImpl: syncChats() - called")
-		_isNewerChatFullyLoaded.value = false
+		_isNewerChatFullyLoaded.update { false }
 
 		for (i in 0 until 2) {
 			runCatching { getNewerChats(channelId) }
@@ -122,8 +122,8 @@ class ChatRepositoryImpl @Inject constructor(
 					.map { it.toChat(channelId = channelId) }
 
 				clearCachedData()
-				_isOlderChatFullyLoaded.value = newChats.size < size
-				_isNewerChatFullyLoaded.value = true
+				_isOlderChatFullyLoaded.update { newChats.size < size }
+				_isNewerChatFullyLoaded.update { true }
 				cachedChannelId = channelId
 				currentOlderChatPage = newChats.lastOrNull()?.chatId
 				currentNewerChatPage = newChats.firstOrNull()?.chatId
@@ -179,8 +179,8 @@ class ChatRepositoryImpl @Inject constructor(
 
 		clearCachedData()
 		cachedChannelId = channelId
-		_isOlderChatFullyLoaded.value = false
-		_isNewerChatFullyLoaded.value = response.cursorMeta.last
+		_isOlderChatFullyLoaded.update { false }
+		_isNewerChatFullyLoaded.update { response.cursorMeta.last }
 		currentOlderChatPage = baseChatId
 		currentNewerChatPage =
 			if (newChats.isEmpty()) currentNewerChatPage else response.cursorMeta.nextCursorId
@@ -204,10 +204,11 @@ class ChatRepositoryImpl @Inject constructor(
 		val newChats = response.chatResponseList.map { it.toChat(channelId = channelId) }
 
 		cachedChannelId = channelId
-		_isNewerChatFullyLoaded.value = response.cursorMeta.last
+		_isNewerChatFullyLoaded.update { response.cursorMeta.last }
 		Log.d(
 			TAG,
-			"ChatRepositoryImpl: getNewerChats() - _isNewerChatFullyLoaded : ${_isNewerChatFullyLoaded.value}"
+			"ChatRepositoryImpl: getNewerChats() - response : $response \n" +
+							"_isNewerChatFullyLoaded : ${_isNewerChatFullyLoaded.value}"
 		)
 		currentNewerChatPage =
 			if (newChats.isEmpty()) currentNewerChatPage else response.cursorMeta.nextCursorId
@@ -235,7 +236,7 @@ class ChatRepositoryImpl @Inject constructor(
 		val newChats = response.chatResponseList.map { it.toChat(channelId = channelId) }
 
 		cachedChannelId = channelId
-		_isOlderChatFullyLoaded.value = response.cursorMeta.last
+		_isOlderChatFullyLoaded.update { response.cursorMeta.last }
 		currentOlderChatPage =
 			if (newChats.isEmpty()) currentNewerChatPage else response.cursorMeta.nextCursorId
 
@@ -339,8 +340,8 @@ class ChatRepositoryImpl @Inject constructor(
 		cachedChannelId = null
 		currentOlderChatPage = null
 		currentNewerChatPage = null
-		_isOlderChatFullyLoaded.value = false
-		_isNewerChatFullyLoaded.value = true
+		_isOlderChatFullyLoaded.update { false }
+		_isNewerChatFullyLoaded.update { true }
 	}
 
 	/** 로그아웃 + 회원탈퇴시에 모든 repository 일괄 호출 */
