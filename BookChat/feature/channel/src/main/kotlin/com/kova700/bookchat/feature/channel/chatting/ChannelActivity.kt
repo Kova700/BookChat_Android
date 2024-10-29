@@ -182,7 +182,7 @@ class ChannelActivity : AppCompatActivity() {
 		setCaptureMode(uiState)
 		with(binding) {
 			channelTitle.text = uiState.channel.roomName
-			roomMemberCount.text = uiState.channel.roomMemberCount.toString()
+			roomMemberCount.text = uiState.channel.roomMemberCount.takeIf { it != 0 }?.toString() ?: ""
 		}
 		binding.progressBar.visibility = if (uiState.isInitLoading) View.VISIBLE else View.GONE
 	}
