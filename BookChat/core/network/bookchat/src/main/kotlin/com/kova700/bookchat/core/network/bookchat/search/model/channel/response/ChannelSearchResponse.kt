@@ -35,7 +35,7 @@ data class ChannelSearchResponse(
 	@SerialName("hostDefaultProfileImageType")
 	val hostDefaultProfileImageType: UserDefaultProfileTypeNetwork,
 	@SerialName("hostProfileImageUri")
-	val hostProfileImageUri: String,
+	val hostProfileImageUri: String? = null,
 	@SerialName("defaultRoomImageType")
 	val defaultRoomImageType: ChannelDefaultImageTypeNetwork,
 	@SerialName("tags")
