@@ -13,11 +13,15 @@ import com.kova700.bookchat.util.date.getCurrentDateTimeString
 @Dao
 interface ChatDAO {
 
-	@Query("SELECT * FROM Chat WHERE chat_id = :chatId")
+	@Query(
+		"SELECT * FROM Chat " +
+						"WHERE chat_id = :chatId"
+	)
 	suspend fun getChat(chatId: Long): ChatEntity?
 
 	@Query(
-		"SELECT * FROM Chat WHERE chat_id IN (:chatIds) " +
+		"SELECT * FROM Chat " +
+						"WHERE chat_id IN (:chatIds) " +
 						"ORDER BY state ASC, chat_id DESC "
 	)
 	suspend fun getChats(chatIds: List<Long>): List<ChatEntity>
@@ -70,6 +74,13 @@ interface ChatDAO {
 		)
 		return insertChat(chat)
 	}
+
+	@Query(
+		"UPDATE Chat " +
+						"SET state = :chatStateCode " +
+						"WHERE chat_id = :chatId"
+	)
+	suspend fun updateChatState(chatId: Long, chatStateCode: Int)
 
 	@Query(
 		"DELETE FROM Chat " +
