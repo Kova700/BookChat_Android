@@ -14,6 +14,7 @@ import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
 import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.core.network_manager.external.NetworkManager
 import com.kova700.bookchat.core.notification.chat.external.ChatNotificationHandler
 import com.kova700.bookchat.core.remoteconfig.RemoteConfigManager
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
@@ -45,6 +46,9 @@ import javax.inject.Inject
 import kotlin.math.abs
 
 // TODO : [FixWaiting] 유저 프로필 변경 시 drawerItem에 바로 반영안됨 수정 필요
+// TODO : [FixWaiting] 채팅방 화면에서 홀드 버튼 누르거나 화면 꺼지면 Notification이 안뜨는 현상있음
+// TODO : [FixWaiting] 소켓 끊김 사이에 발생한 수정사항 동기화 테스트 필요함
+// TODO : [FixWaiting] ChannelMember 리스트가 텅빈채로 보이는 현상이 있음
 
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
@@ -58,6 +62,7 @@ class ChannelViewModel @Inject constructor(
 	private val channelTempMessageRepository: ChannelTempMessageRepository,
 	private val chatRepository: ChatRepository,
 	private val clientRepository: ClientRepository,
+	private val networkManager: NetworkManager,
 	private val chatNotificationHandler: ChatNotificationHandler,
 	private val remoteConfigManager: RemoteConfigManager,
 	private val channelSyncManger: ChannelSyncManger,
@@ -79,13 +84,6 @@ class ChannelViewModel @Inject constructor(
 		initUiState()
 	}
 
-	//TODO : 여기 로직들 소켓 연결이랑 시간차 나지않을까?
-	//  chatClient에서 합쳐야될거같은데
-	// chatClient에서 소켓 연결하는거 기다리던지 혹은 라이프 사이클에따라 연결되는건
-	// init같은 Flag가 안되면 호출안되게 하던가 해야될듯?
-	// 아 그리고 노티피케이션 눌렀을때, 로그인 안되어있거나 클라이언트 정보 없어서 로그인 안된경우는
-	// 화면이동을 막던지 화면에 띄워지는걸 막던지 해야될듯
-	// (노티 누르고 ChannelActivity로 들어오면 유저 정보 요청을 하지 않아서 클라이언트 정보가 없을 수도 있겠네)
 	private fun initUiState() = viewModelScope.launch {
 		Log.d(TAG, "ChannelViewModel: initUiState() - channelId: $channelId")
 		if (isBookChatAvailable().not()) return@launch
@@ -180,18 +178,25 @@ class ChannelViewModel @Inject constructor(
 	private fun observeSocketState() = viewModelScope.launch {
 		chatClient.getSocketStateFlow().collect { state ->
 			updateState { copy(socketState = state) }
-			if (state == SocketState.CONNECTED) subscribeChannelIfNeeded()
 		}
 	}
 
 	private fun observeChannelSubscriptionState() = viewModelScope.launch {
 		chatClient.getChannelSubscriptionStateFlow(channelId).collect { state ->
-			if (state == SubscriptionState.SUBSCRIBED) {
-				when {
-					uiState.value.isFirstConnection.not() -> syncChannelsIfNeeded()
-					else -> {
-						getInitChats()
-						updateState { copy(isFirstConnection = false) }
+			Log.d(TAG, "ChannelViewModel: observeChannelSubscriptionState() - state : $state")
+			when (state) {
+				SubscriptionState.UNSUBSCRIBED -> subscribeChannelIfNeeded()
+
+				SubscriptionState.SUBSCRIBING,
+				SubscriptionState.FAILED -> Unit
+
+				SubscriptionState.SUBSCRIBED -> {
+					when {
+						uiState.value.isFirstConnection.not() -> syncChannelIfNeeded()
+						else -> {
+							getInitChats()
+							updateState { copy(isFirstConnection = false) }
+						}
 					}
 				}
 			}
@@ -200,7 +205,8 @@ class ChannelViewModel @Inject constructor(
 
 	//TODO : [Version 2] 현재 보고 있는 채팅방에 한해서만 동기화 요청되게 사용하고 있지만,
 	// 			추후 EventHistory를 통해 모든 채팅방에 대한 동기화 요청으로 수정하고 ChatClient로 이전
-	private fun syncChannelsIfNeeded() {
+	private fun syncChannelIfNeeded() {
+		Log.d(TAG, "ChannelViewModel: syncChannelsIfNeeded() - called")
 		runCatching { channelSyncManger.sync(listOf(channelId)) }
 			.onFailure { ChannelEvent.ShowSnackBar(R.string.channel_info_sync_fail) }
 	}
@@ -235,9 +241,10 @@ class ChannelViewModel @Inject constructor(
 
 	/** 마지막으로 읽었던 채팅이 getNewestChats 결과에 포함되어있다면 getChatsAroundId는 호출하지 않음 */
 	private fun getInitChats() = viewModelScope.launch {
-		if (uiState.value.isNetworkDisconnected
+		if (networkManager.isNetworkAvailable().not()
 			|| uiState.value.channel.isAvailable.not()
 		) return@launch
+		Log.d(TAG, "ChannelViewModel: getInitChats() - called")
 		val newestChats = getNewestChats().await() ?: emptyList()
 		val originalLastReadChatId = uiState.value.originalLastReadChatId ?: return@launch
 		val shouldLastReadChatScroll =
@@ -256,7 +263,9 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun getNewestChats(shouldBottomScroll: Boolean = false) = viewModelScope.async {
+		Log.d(TAG, "ChannelViewModel: getNewestChats() - called")
 		if (uiState.value.isInitLoading) return@async null
+		Log.d(TAG, "ChannelViewModel: getNewestChats() - 실제 API 호출")
 		updateState { copy(uiState = UiState.INIT_LOADING) }
 		runCatching { chatRepository.getNewestChats(channelId) }
 			.onSuccess {
@@ -275,6 +284,7 @@ class ChannelViewModel @Inject constructor(
 
 	private fun getNewerChats() = viewModelScope.launch {
 		if (uiState.value.isPossibleToLoadNewerChat.not()) return@launch
+		Log.d(TAG, "ChannelViewModel: getNewerChats() - called")
 		updateState { copy(newerChatsLoadState = LoadState.LOADING) }
 		runCatching { chatRepository.getNewerChats(channelId) }
 			.onSuccess { updateState { copy(newerChatsLoadState = LoadState.SUCCESS) } }
@@ -286,6 +296,7 @@ class ChannelViewModel @Inject constructor(
 
 	private fun getOlderChats() = viewModelScope.launch {
 		if (uiState.value.isPossibleToLoadOlderChat.not()) return@launch
+		Log.d(TAG, "ChannelViewModel: getOlderChats() - called")
 		updateState { copy(olderChatsLoadState = LoadState.LOADING) }
 		runCatching { chatRepository.getOlderChats(channelId) }
 			.onSuccess { updateState { copy(olderChatsLoadState = LoadState.SUCCESS) } }
@@ -313,10 +324,10 @@ class ChannelViewModel @Inject constructor(
 	/** 소켓이 끊긴 사이에 발생한 서버와 클라이언트 간의 데이터 불일치를 메우기 위해서
 	 * 리커넥션 시마다 호출 (이벤트 History받는 로직 구현 이전까지 임시로 사용)*/
 	private fun getChannelInfo(channelId: Long) = viewModelScope.launch {
-		if (uiState.value.isNetworkDisconnected
+		if (networkManager.isNetworkAvailable().not()
 			|| uiState.value.channel.isAvailable.not()
 		) return@launch
-		runCatching { getClientChannelInfoUseCase.invoke(channelId) }
+		runCatching { getClientChannelInfoUseCase(channelId) }
 			.onFailure {
 				updateState { copy(uiState = UiState.ERROR) }
 				startEvent(ChannelEvent.ShowSnackBar(R.string.error_network_error))
@@ -324,17 +335,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun subscribeChannelIfNeeded() {
-		if (uiState.value.channel.isAvailable.not()) return
-		runCatching {
-			chatClient.subscribeChannelIfNeeded( //TODO : 내부에서 코루틴 스코프 써서 호출만 하고 결과 안기다릴거 같은데..?
-				channelId = channelId,
-				channelSId = uiState.value.channel.roomSid
-			)
-		}.onFailure {
-			Log.d(TAG, "ChannelViewModel: subscribeChannel() - throwable: $it")
-			updateState { copy(uiState = UiState.ERROR) }
-			startEvent(ChannelEvent.ShowSnackBar(R.string.error_socket_connect))
-		}
+		chatClient.subscribeChannelIfNeeded(channelId)
 	}
 
 	private fun sendMessage() {
@@ -343,23 +344,18 @@ class ChannelViewModel @Inject constructor(
 		if (message.isBlank()) return
 		updateState { copy(enteredMessage = "") }
 		clearTempSavedMessage()
-		runCatching {
-			chatClient.sendMessage(
-				channelId = channelId,
-				message = message,
-			)
-		}.onFailure {
-			//TODO : [FixWaiting] 소켓 닫혔을 때, 메세지 보내면 StompErrorFrameReceived 넘어옴
-			Log.d(TAG, "ChannelViewModel: sendMessage() - throwable: $it")
-		}
+		chatClient.sendMessage(
+			channelId = channelId,
+			message = message,
+		)
 	}
 
 	private fun deleteFailedChat(chatId: Long) = viewModelScope.launch {
 		chatRepository.deleteChat(chatId)
 	}
 
-	private fun retryFailedChat(chatId: Long) = viewModelScope.launch {
-		if (uiState.value.channel.isAvailable.not()) return@launch
+	private fun retryFailedChat(chatId: Long) {
+		if (uiState.value.channel.isAvailable.not()) return
 		chatClient.retrySendMessage(chatId)
 	}
 
@@ -429,8 +425,8 @@ class ChannelViewModel @Inject constructor(
 
 	/** 리스트 상 내 채팅이 아닌 채팅 중 가장 최신 채팅이 화면 상에 나타나는 순간 호출 */
 	fun onReadNewestChatNotMineInList(chatItem: ChatItem.Message) {
-		val nowNewChatNotice = uiState.value.newChatNotice
-		if (chatItem.chatId != nowNewChatNotice?.chatId) return
+		val nowNewChatNotice = uiState.value.newChatNotice ?: return
+		if (chatItem.chatId < nowNewChatNotice.chatId) return
 		updateState { copy(newChatNotice = null) }
 	}
 
