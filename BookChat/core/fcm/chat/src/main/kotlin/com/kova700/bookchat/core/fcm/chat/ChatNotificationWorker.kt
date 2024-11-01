@@ -18,6 +18,8 @@ import com.kova700.core.domain.usecase.chat.GetChatUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
+//TODO : [Version 2] 구독(온라인) 상태임에도 FCM이 수신되는 현상이 있음 + 본인이 보낸 메세지임에도 FCM이 수신되는 상황
+//TODO : [FixWaiting] SenderId를 함께 넘겨 받아서 만약 Sender가 클라이언트라면 아래 API호출하지 않게 수정
 @HiltWorker
 class ChatNotificationWorker @AssistedInject constructor(
 	@Assisted private val appContext: Context,
@@ -33,15 +35,13 @@ class ChatNotificationWorker @AssistedInject constructor(
 	override suspend fun doWork(): Result {
 		Log.d("ㄺ", "ChatNotificationWorker: doWork() - just called")
 		if (bookChatTokenRepository.isBookChatTokenExist().not()) return Result.success()
-
 		val channelId: Long = inputData.getLong(EXTRA_CHANNEL_ID, -1)
 		val chatId: Long = inputData.getLong(EXTRA_CHAT_ID, -1)
 
-		//TODO : [FixWaiting] SenderId를 함께 넘겨 받아서 만약 Sender가 클라이언트라면 아래 API호출하지 않게 수정
 		val apiResult = runCatching {
 			val channel = getClientChannelUseCase(channelId)
 			val chat = getChatUseCase(chatId) ?: return Result.failure()
-			val client = clientRepository.getClientProfile()
+			val client = clientRepository.getClientProfile() //TODO : 이거도 로그인 데이터 없으면 서버 호출하겠네
 			Log.d("ㄺ", "ChatNotificationWorker: doWork() - real Work")
 			channelRepository.updateChannelLastChatIfValid(chat.channelId, chat.chatId)
 			Triple(channel, chat, client)

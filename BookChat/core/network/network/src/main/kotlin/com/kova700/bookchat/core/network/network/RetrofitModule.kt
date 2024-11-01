@@ -60,7 +60,7 @@ object RetrofitModule {
 		httpLoggingInterceptor: HttpLoggingInterceptor,
 	): OkHttpClient {
 		return OkHttpClient.Builder()
-			.addNetworkInterceptor(httpLoggingInterceptor)
+			.addNetworkInterceptor(httpLoggingInterceptor) //TODO : 릴리즈 버전에서는 제거해야함
 			.addInterceptor(interceptor)
 			.build()
 	}
