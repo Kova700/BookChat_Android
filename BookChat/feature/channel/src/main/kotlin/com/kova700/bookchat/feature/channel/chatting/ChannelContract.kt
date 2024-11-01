@@ -4,7 +4,6 @@ import com.kova700.bookchat.core.data.channel.external.model.Channel
 import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.user.external.model.User
-import com.kova700.bookchat.core.network_manager.external.model.NetworkState
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
 import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
 import com.kova700.bookchat.feature.channel.drawer.model.ChannelDrawerItem
@@ -18,7 +17,6 @@ data class ChannelUiState(
 	val chats: List<ChatItem>,
 	val newChatNotice: Chat?,
 	val socketState: SocketState,
-	val networkState: NetworkState,
 	val originalLastReadChatId: Long?,
 	val isVisibleLastReadChatNotice: Boolean,
 	val needToScrollToLastReadChat: Boolean,
@@ -29,9 +27,6 @@ data class ChannelUiState(
 	val isNewerChatFullyLoaded: Boolean,
 	val isCaptureMode: Boolean,
 ) {
-	val isNetworkDisconnected
-		get() = networkState == NetworkState.DISCONNECTED
-
 	val isPossibleToLoadOlderChat
 		get() = (olderChatsLoadState != LoadState.LOADING)
 						&& isOlderChatFullyLoaded.not()
@@ -76,7 +71,6 @@ data class ChannelUiState(
 			chats = emptyList(),
 			newChatNotice = null,
 			socketState = SocketState.DISCONNECTED,
-			networkState = NetworkState.DISCONNECTED,
 			isFirstConnection = true,
 			originalLastReadChatId = null,
 			isVisibleLastReadChatNotice = false,
