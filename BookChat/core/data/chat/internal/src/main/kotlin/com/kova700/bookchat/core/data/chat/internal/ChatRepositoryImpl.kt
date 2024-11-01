@@ -59,7 +59,7 @@ class ChatRepositoryImpl @Inject constructor(
 	}
 
 	override fun getOlderChatIsEndFlow(): StateFlow<Boolean> {
-		_isOlderChatFullyLoaded.update { false}
+		_isOlderChatFullyLoaded.update { false }
 		return _isOlderChatFullyLoaded.asStateFlow()
 	}
 
@@ -108,8 +108,8 @@ class ChatRepositoryImpl @Inject constructor(
 		size: Int,
 		maxAttempts: Int,
 	): List<Chat> {
+		Log.d(TAG, "ChatRepositoryImpl: getNewestChats() - called")
 		for (attempt in 0 until maxAttempts) {
-
 			runCatching {
 				chatApi.getChats(
 					roomId = channelId,
@@ -152,13 +152,11 @@ class ChatRepositoryImpl @Inject constructor(
 		cachedChannelId = channelId
 	}
 
-	//TODO : [Version 2] 추후 WorkManager로 ChatStatus.RETRY_REQUIRED인 채팅들 retry로직 앱 단위로 추가
 	override suspend fun getFailedChats(channelId: Long): List<Chat> {
-		return chatDAO.getChannelsFailedChats(channelId)
-			.map {
-				if (it.isRetryRequired.not()) it.toChat().copy(state = ChatState.FAILURE)
-				else it.toChat()
-			}
+		return chatDAO.getChannelsFailedChats(channelId).map {
+			if (it.isRetryRequired.not()) it.toChat().copy(state = ChatState.FAILURE)
+			else it.toChat()
+		}
 	}
 
 	/** 서버에 있는 채팅 우선적으로 쿼리 + API 실패시 로컬데이터 호출X (채팅 연속성을 보장하지못함)*/
@@ -167,7 +165,7 @@ class ChatRepositoryImpl @Inject constructor(
 		baseChatId: Long,
 		size: Int,
 	) {
-
+		Log.d(TAG, "ChatRepositoryImpl: getChatsAroundId() - called")
 		val response = chatApi.getChats(
 			roomId = channelId,
 			postCursorId = baseChatId - 1,
@@ -194,6 +192,7 @@ class ChatRepositoryImpl @Inject constructor(
 	/** 서버에 있는 채팅 우선적으로 쿼리 + API 실패시 로컬데이터 호출X (채팅 연속성을 보장하지못함)*/
 	override suspend fun getNewerChats(channelId: Long, size: Int) {
 		if (_isNewerChatFullyLoaded.value) return
+		Log.d(TAG, "ChatRepositoryImpl: getNewerChats() - called")
 
 		val response = chatApi.getChats(
 			roomId = channelId,
@@ -225,7 +224,7 @@ class ChatRepositoryImpl @Inject constructor(
 	/** 서버에 있는 채팅 우선적으로 쿼리 + API 실패시 로컬데이터 호출X (채팅 연속성을 보장하지못함)*/
 	override suspend fun getOlderChats(channelId: Long, size: Int) {
 		if (_isOlderChatFullyLoaded.value) return
-
+		Log.d(TAG, "ChatRepositoryImpl: getOlderChats() - called")
 		val response = chatApi.getChats(
 			roomId = channelId,
 			postCursorId = currentOlderChatPage,
@@ -238,7 +237,7 @@ class ChatRepositoryImpl @Inject constructor(
 		cachedChannelId = channelId
 		_isOlderChatFullyLoaded.update { response.cursorMeta.last }
 		currentOlderChatPage =
-			if (newChats.isEmpty()) currentNewerChatPage else response.cursorMeta.nextCursorId
+			if (newChats.isEmpty()) currentOlderChatPage else response.cursorMeta.nextCursorId
 
 		/** getNewestChats로 초기화된 경우 삽입 무시 */
 		if (currentOlderChatPage == null) return
@@ -329,6 +328,10 @@ class ChatRepositoryImpl @Inject constructor(
 	override suspend fun deleteChat(chatId: Long) {
 		chatDAO.deleteChat(chatId)
 		setChats(mapChats.value - (chatId))
+	}
+
+	override suspend fun updateChatState(chatId: Long, chatState: ChatState) {
+		chatDAO.updateChatState(chatId, chatState.code)
 	}
 
 	override suspend fun deleteChannelAllChat(channelId: Long) {
