@@ -1,5 +1,6 @@
 package com.kova700.bookchat.core.data.channel.internal
 
+import android.util.Log
 import com.kova700.bookchat.core.data.channel.external.model.Channel
 import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
 import com.kova700.bookchat.core.data.channel.external.model.ChannelInfo
@@ -8,7 +9,6 @@ import com.kova700.bookchat.core.data.channel.external.model.ChannelIsFullExcept
 import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.data.channel.external.model.UserIsBannedException
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
-import com.kova700.bookchat.core.data.channel.internal.mapper.toChannelEntity
 import com.kova700.bookchat.core.data.channel.internal.mapper.toDomain
 import com.kova700.bookchat.core.data.common.model.network.BookChatApiResult
 import com.kova700.bookchat.core.data.search.book.external.model.Book
@@ -25,6 +25,7 @@ import com.kova700.bookchat.core.network.bookchat.channel.model.request.RequestM
 import com.kova700.bookchat.core.network.bookchat.channel.model.response.BookChatFailResponseBody
 import com.kova700.bookchat.core.network.bookchat.common.mapper.toBookRequest
 import com.kova700.bookchat.core.network.util.multipart.toMultiPartBody
+import com.kova700.bookchat.util.Constants.TAG
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -92,12 +93,15 @@ class ChannelRepositoryImpl @Inject constructor(
 	 * + 해당 채팅방에 입장하지 않은 채로 해당 API 호출하면 예외 던짐
 	 * {"errorCode":"4040400","message":"채팅방을 찾을 수 없습니다."}*/
 	private suspend fun getOnlineChannel(channelId: Long): Channel {
+		Log.d(TAG, "ChannelRepositoryImpl: getOnlineChannel() - called")
 		val response = runCatching { channelApi.getChannel(channelId).toChannel() }
 			.getOrDefault(
 				Channel.DEFAULT.copy(
 					roomId = channelId,
 					roomName = "존재하지 않는 채팅방"
-				)
+				).also {
+					Log.d(TAG, "ChannelRepositoryImpl: getOnlineChannel() - api 실패 channelId : $channelId")
+				}
 			)
 		channelDAO.upsertChannel(response.toChannelEntity())
 		return response
@@ -109,6 +113,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		maxAttempts: Int,
 	): ChannelInfo? {
 		for (attempt in 0 until maxAttempts) {
+			Log.d(TAG, "ChannelRepositoryImpl: getChannelInfo() - attempt :$attempt")
 			val response = runCatching { channelApi.getChannelInfo(channelId) }
 				.onFailure { delay((DEFAULT_RETRY_ATTEMPT_DELAY_TIME * (1.5).pow(attempt))) }
 				.getOrNull() ?: continue
@@ -142,13 +147,13 @@ class ChannelRepositoryImpl @Inject constructor(
 						RESPONSE_CODE_CHANNEL_PARTICIPANT_NOT_FOUND,
 						RESPONSE_CODE_CHANNEL_IS_EXPLODED -> leaveChannelHost(channelId)
 
-						else -> throw Exception("failed to get channel info")
+						else -> throw IOException("failed to get channel info - unknown error code - failBody :$failBody ,message : ${response.message}")
 					}
 					return null
 				}
 			}
 		}
-		throw IOException("failed to get channel info")
+		throw IOException("failed to get channel info - Exponential backoff failure")
 	}
 
 	override suspend fun makeChannel(
@@ -223,7 +228,7 @@ class ChannelRepositoryImpl @Inject constructor(
 				when (failBody?.errorCode) {
 					RESPONSE_CODE_CHANNEL_PARTICIPANT_NOT_FOUND -> onSuccess()
 					RESPONSE_CODE_CHANNEL_IS_EXPLODED -> onSuccess()
-					else -> throw IOException("failed to leave channel")
+					else -> throw IOException("failed to leave channel, unknown error code - failBody :$failBody ,message : ${response.message}")
 				}
 			}
 		}
@@ -294,8 +299,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	override suspend fun enterChannel(channel: Channel) {
 		if (channelDAO.isChannelExist(channel.roomId)) return
 
-		val response = channelApi.enterChannel(channel.roomId)
-		when (response) {
+		when (val response = channelApi.enterChannel(channel.roomId)) {
 			is BookChatApiResult.Success -> {
 				channelDAO.upsertChannel(channel.toChannelEntity())
 				setChannels(mapChannels.value + mapOf(channel.roomId to channel))
@@ -309,7 +313,7 @@ class ChannelRepositoryImpl @Inject constructor(
 					RESPONSE_CODE_CHANNEL_IS_FULL -> throw ChannelIsFullException(failBody.message)
 					RESPONSE_CODE_CHANNEL_IS_BANNED -> throw UserIsBannedException(failBody.message)
 					RESPONSE_CODE_CHANNEL_IS_EXPLODED -> throw ChannelIsExplodedException(failBody.message)
-					else -> throw IOException("failed to enter channel")
+					else -> throw IOException("failed to enter channel ,unknown error code - failBody :$failBody ,message : ${response.message}")
 				}
 			}
 		}
@@ -486,7 +490,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		throw IOException("failed to retrieve most active channels")
 	}
 
-	//TODO : [Version 2 ]서버 측에서 lastChat.dispatchedAt ?: channel.createdAt으로 정렬되도록 수정대기
+	//TODO : [Version 2] 서버 측에서 lastChat.dispatchedAt ?: channel.createdAt으로 정렬되도록 수정대기
 	/** Channel 세부 정보는 getChannelInfo에 의해 갱신될 예정 */
 	override suspend fun getChannels(loadSize: Int): List<Channel>? {
 		if (isEndPage) return null

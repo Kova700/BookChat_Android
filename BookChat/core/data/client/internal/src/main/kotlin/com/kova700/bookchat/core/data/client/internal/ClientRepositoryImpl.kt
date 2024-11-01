@@ -106,7 +106,7 @@ class ClientRepositoryImpl @Inject constructor(
 					response.body?.let { jsonSerializer.decodeFromString<BookChatFailResponseBody>(it) }
 				when (failBody?.errorCode) {
 					RESPONSE_CODE_ALREADY_SIGNED_UP -> throw AlreadySignedUpException(failBody.message)
-					else -> throw IOException("failed to signUp")
+					else -> throw IOException("failed to signUp, unknown error code - failBody :$failBody ,message : ${response.message}")
 				}
 			}
 		}
