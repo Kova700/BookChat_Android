@@ -70,6 +70,7 @@ interface ChatRepository {
 
 	suspend fun getFailedChats(channelId: Long): List<Chat>
 	suspend fun deleteChat(chatId: Long)
+	suspend fun updateChatState(chatId: Long, chatState: ChatState)
 	suspend fun clear()
 
 	companion object {
