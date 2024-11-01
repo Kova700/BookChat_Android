@@ -8,6 +8,14 @@ fun Context.makeToast(stringId: Int) {
 	Toast.makeText(this, stringId, Toast.LENGTH_SHORT).show()
 }
 
+fun Context.makeToast(string: String) {
+	Toast.makeText(this, string, Toast.LENGTH_SHORT).show()
+}
+
 fun Fragment.makeToast(stringId: Int) {
-	Toast.makeText(requireContext(), stringId, Toast.LENGTH_SHORT).show()
+	requireContext().makeToast(stringId)
+}
+
+fun Fragment.makeToast(string: String) {
+	requireContext().makeToast(string)
 }

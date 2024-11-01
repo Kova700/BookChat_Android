@@ -1,5 +1,6 @@
 package com.kova700.bookchat.core.stomp.chatting.external
 
+import com.kova700.bookchat.core.stomp.chatting.external.model.SocketMessage
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
 import com.kova700.bookchat.core.stomp.chatting.external.model.SubscriptionState
 import kotlinx.coroutines.flow.Flow
@@ -16,9 +17,8 @@ interface StompHandler {
 
 	suspend fun subscribeChannel(
 		channelId: Long,
-		channelSId: String,
 		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS
-	)
+	): Flow<SocketMessage>
 
 	suspend fun disconnectSocket()
 	suspend fun sendMessage(

@@ -14,4 +14,5 @@ dependencies {
 	implementation(project(":core:data:client:external"))
 	implementation(project(":core:data:channel:external"))
 	implementation(project(":core:domain"))
+	implementation(project(":core:data:chat:external"))
 }

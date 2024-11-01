@@ -182,13 +182,17 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun observeChannelSubscriptionState() = viewModelScope.launch {
+ 		var isFirstFailed = true
 		chatClient.getChannelSubscriptionStateFlow(channelId).collect { state ->
 			Log.d(TAG, "ChannelViewModel: observeChannelSubscriptionState() - state : $state")
 			when (state) {
+				SubscriptionState.SUBSCRIBING -> Unit
 				SubscriptionState.UNSUBSCRIBED -> subscribeChannelIfNeeded()
-
-				SubscriptionState.SUBSCRIBING,
-				SubscriptionState.FAILED -> Unit
+				SubscriptionState.FAILED -> {
+					if (isFirstFailed.not()) return@collect
+					subscribeChannelIfNeeded()
+					isFirstFailed = false
+				}
 
 				SubscriptionState.SUBSCRIBED -> {
 					when {

@@ -2,15 +2,21 @@ package com.kova700.bookchat.core.stomp.chatting.internal
 
 import android.util.Log
 import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
+import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
 import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
 import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.network_manager.external.NetworkManager
 import com.kova700.bookchat.core.stomp.chatting.external.SocketMessageHandler
 import com.kova700.bookchat.core.stomp.chatting.external.StompHandler
+import com.kova700.bookchat.core.stomp.chatting.external.model.ChannelSubscriptionFailureException
 import com.kova700.bookchat.core.stomp.chatting.external.model.CommonMessage
+import com.kova700.bookchat.core.stomp.chatting.external.model.DuplicateSocketConnectionException
+import com.kova700.bookchat.core.stomp.chatting.external.model.DuplicateSubscriptionRequestException
+import com.kova700.bookchat.core.stomp.chatting.external.model.NetworkUnavailableException
 import com.kova700.bookchat.core.stomp.chatting.external.model.NotificationMessage
 import com.kova700.bookchat.core.stomp.chatting.external.model.RequestSendChat
+import com.kova700.bookchat.core.stomp.chatting.external.model.SocketConnectionFailureException
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketMessage
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
 import com.kova700.bookchat.core.stomp.chatting.external.model.SubscriptionState
@@ -23,7 +29,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -38,6 +47,7 @@ import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.StompErrorFrameReceived
 import org.hildan.krossbow.stomp.StompSession
 import org.hildan.krossbow.stomp.WebSocketClosedUnexpectedly
+import org.hildan.krossbow.stomp.frame.StompFrame
 import org.hildan.krossbow.stomp.headers.StompSubscribeHeaders
 import org.hildan.krossbow.stomp.sendText
 import org.hildan.krossbow.websocket.WebSocketException
@@ -66,6 +76,7 @@ import kotlin.time.Duration.Companion.seconds
 class StompHandlerImpl @Inject constructor(
 	private val stompClient: StompClient,
 	private val chatRepository: ChatRepository,
+	private val channelRepository: ChannelRepository,
 	private val clientRepository: ClientRepository,
 	private val bookChatTokenRepository: BookChatTokenRepository,
 	private val socketMessageHandler: SocketMessageHandler,
@@ -110,13 +121,18 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	override fun getChannelSubscriptionStateFlow(channelId: Long): Flow<SubscriptionState> {
-		return subscriptionStates.map { it[channelId] ?: SubscriptionState.UNSUBSCRIBED }
+		return subscriptionStates
+			.map { it[channelId] ?: SubscriptionState.UNSUBSCRIBED }
+			.distinctUntilChanged()
 	}
 
+	//TODO : 중복 호출 방지일 때, return 하는게 맞을까
+	// 맞긴할거 같은데 호출부에 runCatching을 사용하고 있어서 return 하면 onSuccess부가 불필요하게 지속적으로 호출됨
+	// 예외 던지고 onFailure에서 예외 종류에 맞게 진짜 실패면 토스트 띄우고, 중복 요청이라 무시된거면 거기서도 무시하면 될듯
 	/** 실패 시 지수백오프 커넥션 요청*/
 	override suspend fun connectSocket(maxAttempts: Int) {
 		socketConnectingMutex.withLock {
-			if (isAlreadyConnectedOrConnecting) return
+			if (isAlreadyConnectedOrConnecting) throw DuplicateSocketConnectionException()
 			setSocketState(SocketState.CONNECTING)
 		}
 		Log.d(TAG, "StompHandlerImpl: connectSocket() - called - 실제 연결 작업 시작")
@@ -126,7 +142,7 @@ class StompHandlerImpl @Inject constructor(
 			Log.d(TAG, "StompHandlerImpl: connectSocket() - attempt : $attempt")
 			if (networkManager.isNetworkAvailable().not()) {
 				setSocketState(SocketState.FAILURE)
-				return
+				throw NetworkUnavailableException()
 			}
 
 			runCatching {
@@ -147,25 +163,30 @@ class StompHandlerImpl @Inject constructor(
 			}
 			delay((DEFAULT_CONNECTION_ATTEMPT_DELAY_TIME * (1.5).pow(attempt)))
 		}
+
 		setSocketState(SocketState.FAILURE)
 		subscriptionStates.update { emptyMap() }
+		throw SocketConnectionFailureException()
 	}
 
-	//TODO: [FixWaiting] 지수백오프 엄청 빨리 끝나는 현상이있음
-	// (최대 5번 시도하는데 1초만에 끝남 코루틴 Context때문일 수도 있음)
+	//TODO : 중복 호출 방지일때 return null이 맞을까
 	/** LostReceiptException으로 실패 시에만 지수백오프 구독 요청 */
 	override suspend fun subscribeChannel(
 		channelId: Long,
-		channelSId: String,
 		maxAttempts: Int,
-	) {
+	): Flow<SocketMessage> {
 		fun setState(state: SubscriptionState) {
 			setSubscriptionStates(subscriptionStates.value + (channelId to state))
 		}
-		if (isSocketConnected.not()) return
+
+		val channel = channelRepository.getChannel(channelId)
+		val channelSId = channel.roomSid.takeIf { it.isNotBlank() }
+			?: throw ChannelSubscriptionFailureException()
+
+		if (isSocketConnected.not()) throw ChannelSubscriptionFailureException()
 
 		subscribingMutex.withLock {
-			if (isChannelAlreadySubscribedOrSubscribing(channelId)) return
+			if (isChannelAlreadySubscribedOrSubscribing(channelId)) throw DuplicateSubscriptionRequestException()
 			setState(SubscriptionState.SUBSCRIBING)
 		}
 
@@ -178,59 +199,39 @@ class StompHandlerImpl @Inject constructor(
 				|| isSocketConnected.not()
 			) {
 				subscriptionStates.update { emptyMap() }
-				return
+				throw NetworkUnavailableException()
 			}
 
-			runCatching {
-				stompSession.subscribe(
-					StompSubscribeHeaders(
-						destination = "$SUBSCRIBE_CHANNEL_DESTINATION${channelSId}",
-						receipt = UUID.randomUUID().toString()
-					)
-				)
-			}.onSuccess { messagesFlow ->
-				//TODO :[FixWaiting] 구독이 완벽하게 되지 않았더라도 소켓이 연결되어있다면 특정 토픽으로 메세지는 보낼 수 있음 (정상 작동하는 지 확인해볼 것)
-				// 이걸로도 타이밍이 완벽하지 않음 (소켓 연결이 완벽히 재연결 되었을 떄, 실패된 채팅들 전송되게)
-				Log.d(TAG, "StompHandlerImpl: subscribeChannel() - channelId : $channelId, success")
-				setState(SubscriptionState.SUBSCRIBED)
-				retrySendFailedChats(channelId) //TODO : 자동 재전송안되는 현상있음
-				messagesFlow
-					.catch { handleSocketError("subscribeChannel", it) }
-					.map { it.bodyAsText.parseToSocketMessage() }
-					.collect { socketMessage -> socketMessageHandler.handleSocketMessage(socketMessage) }
-				setSubscriptionStates(subscriptionStates.value - channelId)
-				return
-			}
-			/** Recipt 수신 대기 시간이 있음으로 Delay Time 불필요*/
+			runCatching { subscribe(channelSId) }
+				.onSuccess { messagesFlow ->
+					Log.d(TAG, "StompHandlerImpl: subscribeChannel() - channelId : $channelId, success")
+					setState(SubscriptionState.SUBSCRIBED)
+					return messagesFlow
+						.catch { handleSocketError("subscribeChannel", it) }
+						.map { it.bodyAsText.parseToSocketMessage() }
+						.onEach { socketMessage -> socketMessageHandler.handleSocketMessage(socketMessage) }
+						.onCompletion { setSubscriptionStates(subscriptionStates.value - channelId) }
+				}
+			delay((DEFAULT_CONNECTION_ATTEMPT_DELAY_TIME * (1.5).pow(attempt)))
 		}
+
 		Log.d(TAG, "StompHandlerImpl: subscribeChannel() - channelId : $channelId, failed")
 		setState(SubscriptionState.FAILED)
+		throw ChannelSubscriptionFailureException()
 	}
 
-	private suspend fun retrySendFailedChats(channelId: Long) {
-		val retryRequiredChats = chatRepository.getFailedChats(channelId)
-			.filter { it.state == ChatState.RETRY_REQUIRED }.reversed()
-		for (chat in retryRequiredChats) retrySendMessage(chat.chatId)
-	}
-
-	//TODO : 왜 가져와놓고 Chat전달 안하고 다시 UseCase로 가져가는지 확인필요
 	override suspend fun retrySendMessage(chatId: Long) {
-		if (_socketState.value != SocketState.CONNECTED) {
-			connectSocket()
-			return
-		}
 		val chat = getChatUseCase(chatId) ?: return
 		runCatching {
-			stompSession.sendText(
-				destination = "$SEND_MESSAGE_DESTINATION${chat.channelId}",
-				body = jsonSerializer.encodeToString(
-					RequestSendChat(
-						receiptId = chat.chatId,
-						message = chat.message
-					)
-				)
+			send(
+				channelId = chat.channelId,
+				receiptId = chat.chatId,
+				message = chat.message
 			)
-		}.onFailure { handleSocketError(caller = "retrySendMessage", it) }
+		}.onFailure {
+			if (chat.state != ChatState.FAILURE) chatRepository.updateChatState(chatId, ChatState.FAILURE)
+			handleSocketError(caller = "retrySendMessage", it)
+		}
 	}
 
 	override fun isChannelSubscribed(channelId: Long): Boolean {
@@ -250,8 +251,7 @@ class StompHandlerImpl @Inject constructor(
 		channelId: Long,
 		message: String,
 	) {
-		Log.d(TAG, "StompHandlerImpl: sendMessage() - called")
-		if (_socketState.value != SocketState.CONNECTED) {
+		if (isSocketConnected.not()) {
 			insertWaitingChat(
 				channelId = channelId,
 				message = message,
@@ -267,16 +267,37 @@ class StompHandlerImpl @Inject constructor(
 		)
 
 		runCatching {
-			stompSession.sendText(
-				destination = "$SEND_MESSAGE_DESTINATION$channelId",
-				body = jsonSerializer.encodeToString(
-					RequestSendChat(
-						receiptId = receiptId,
-						message = message
-					)
-				)
+			send(
+				channelId = channelId,
+				receiptId = receiptId,
+				message = message
 			)
 		}.onFailure { handleSocketError(caller = "sendMessage", it) }
+	}
+
+	private suspend fun send(
+		channelId: Long,
+		receiptId: Long,
+		message: String,
+	) {
+		stompSession.sendText(
+			destination = "$SEND_MESSAGE_DESTINATION$channelId",
+			body = jsonSerializer.encodeToString(
+				RequestSendChat(
+					receiptId = receiptId,
+					message = message
+				)
+			)
+		)
+	}
+
+	private suspend fun subscribe(channelSId: String): Flow<StompFrame.Message> {
+		return stompSession.subscribe(
+			StompSubscribeHeaders(
+				destination = "$SUBSCRIBE_CHANNEL_DESTINATION${channelSId}",
+				receipt = UUID.randomUUID().toString()
+			)
+		)
 	}
 
 	private suspend fun insertWaitingChat(
@@ -311,9 +332,7 @@ class StompHandlerImpl @Inject constructor(
 		}
 	}
 
-	//TODO : [FixWaiting] 데이터가 꺼지면 어떤 예외가 터질까?
-	// handleSocketError(caller :subscribeChannel) - throwable :org.hildan.krossbow.websocket.WebSocketException: Software caused connection abort
-	private suspend fun handleSocketError(caller: String, throwable: Throwable) {
+	private fun handleSocketError(caller: String, throwable: Throwable) {
 		Log.d(TAG, "StompHandlerImpl: handleSocketError(caller :$caller) - throwable :$throwable")
 		when (throwable) {
 
@@ -327,7 +346,7 @@ class StompHandlerImpl @Inject constructor(
 			 * (해당 Frame을 수신하면 자동으로 소켓은 닫힘)*/
 			is StompErrorFrameReceived -> { //TODO : 재연결하는게 맞겠지..?
 				subscriptionStates.update { emptyMap() }
-				_socketState.emit(SocketState.NEED_RECONNECTION)
+				_socketState.update { SocketState.NEED_RECONNECTION }
 			}
 
 			/** 기본 웹소켓 연결이 부적절한 시간에 닫힐 때 발생하는 예외입니다.
@@ -341,7 +360,7 @@ class StompHandlerImpl @Inject constructor(
 			 * (소켓이 타의적으로 끊기는 경우 발생) */
 			is MissingHeartBeatException -> {
 				subscriptionStates.update { emptyMap() }
-				_socketState.emit(SocketState.NEED_RECONNECTION)
+				_socketState.update { SocketState.NEED_RECONNECTION }
 			}
 
 			/** WebSocketException: 웹 소켓 수준에서 문제가 발생한 경우 발생하는 예외입니다. + 인터넷 연결을 끊어도 발생
@@ -350,7 +369,7 @@ class StompHandlerImpl @Inject constructor(
 			 * */
 			is WebSocketException -> {
 				subscriptionStates.update { emptyMap() }
-				_socketState.emit(SocketState.NEED_RECONNECTION)
+				_socketState.update { SocketState.NEED_RECONNECTION }
 			}
 
 			else -> {

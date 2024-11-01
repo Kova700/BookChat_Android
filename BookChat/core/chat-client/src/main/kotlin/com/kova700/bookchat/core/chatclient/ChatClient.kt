@@ -3,6 +3,7 @@ package com.kova700.bookchat.core.chatclient
 import androidx.lifecycle.DefaultLifecycleObserver
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
 import com.kova700.bookchat.core.stomp.chatting.external.model.SubscriptionState
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
 interface ChatClient : DefaultLifecycleObserver {
@@ -10,10 +11,7 @@ interface ChatClient : DefaultLifecycleObserver {
 	fun getSocketStateFlow(): Flow<SocketState>
 	fun getChannelSubscriptionStateFlow(channelId: Long): Flow<SubscriptionState>
 	fun connectSocketIfNeeded()
-	fun subscribeChannelIfNeeded(
-		channelId: Long,
-		channelSId: String,
-	)
+	fun subscribeChannelIfNeeded(channelId: Long): Job
 
 	fun sendMessage(
 		channelId: Long,

@@ -5,10 +5,14 @@ import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import com.kova700.bookchat.core.chat_client.R
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
+import com.kova700.bookchat.core.data.chat.external.model.ChatState
+import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
 import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.network_manager.external.NetworkManager
 import com.kova700.bookchat.core.network_manager.external.model.NetworkState
 import com.kova700.bookchat.core.stomp.chatting.external.StompHandler
+import com.kova700.bookchat.core.stomp.chatting.external.model.ChannelSubscriptionFailureException
+import com.kova700.bookchat.core.stomp.chatting.external.model.SocketConnectionFailureException
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
 import com.kova700.bookchat.core.stomp.chatting.external.model.SubscriptionState
 import com.kova700.bookchat.util.Constants.TAG
@@ -22,9 +26,11 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 //TODO : [Version 2] 소켓 관리 방식 수정
@@ -38,14 +44,21 @@ import javax.inject.Inject
 //TODO : [Version 2] 동기화 방식 수정
 //        기존 구조 : 소켓 재연결시 현재 보고 있는 채팅방에 한하여 getChannelInfo와 채팅방의 현재 마지막 채팅부터 채팅 내역 페이징 요청
 //        수정될 구조 : 페이징 되어있는 채팅방에 한하여 서버에게 ChattingHistory를 API로 가져오는 방식으로 수정
+
+//TODO : [FixWaiting] 채팅방 입장 헀는데 인원수 1명으로 그대로인 현상이 있음
+//TODO : [FixWaiting] 채팅방 퇴장 했는데, 채팅방 인원 수 갱신안되는 현상이 있음
+//TODO : [FixWaiting] ChannelMember 서랍에 채팅 참여 인원 표시 안되는 현상 있음
+//TODO : [FixWaiting] 홈 화면에선 예상대로 +New 되어있었는데 ChannelList가니까 +New가 사라져버리는 현상이 있음
+
 class ChatClientImpl @Inject constructor(
 	@ApplicationContext private val appContext: Context,
 	private val networkManager: NetworkManager,
 	private val stompHandler: StompHandler,
 	private val clientRepository: ClientRepository,
 	private val channelRepository: ChannelRepository,
+	private val chatRepository: ChatRepository,
 	private val logoutUseCase: LogoutUseCase,
-	private val withdrawUseCase: WithdrawUseCase
+	private val withdrawUseCase: WithdrawUseCase,
 ) : ChatClient {
 
 	private val chatClientScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -69,30 +82,29 @@ class ChatClientImpl @Inject constructor(
 		if (stompHandler.isSocketConnected.not()) connectSocket()
 	}
 
+	private val isSocketConnected
+		get() = stompHandler.isSocketConnected
+
 	/** 특정 채널에 입장했을때, 구독이 안되어있을 경우 사용 */
-	override fun subscribeChannelIfNeeded(
-		channelId: Long,
-		channelSId: String
-	) {
-		chatClientScope.launch {
-			if (stompHandler.isSocketConnected.not()) connectSocket().join()
-			stompHandler.subscribeChannel(channelId, channelSId)
-		}
+	override fun subscribeChannelIfNeeded(channelId: Long) = chatClientScope.launch {
+		if (isSocketConnected.not()) connectSocket().join()
+		if (isChannelSubscribed(channelId).not()) subscribeChannel(
+			channelId = channelId,
+			shouldShowToast = true
+		).join()
 	}
 
-	//TODO : [FixWaiting] 소켓이 연결된 채로 채팅이 왔는데,
-	// 아래 알림만 나오고 아래 새로운 채팅을 로드 하지 않는 현상이 있음
-	// + 아래 채팅 공지를 눌러야 로드하고 있음
 	override fun sendMessage(channelId: Long, message: String) {
 		chatClientScope.launch {
+			subscribeChannelIfNeeded(channelId).join()
 			stompHandler.sendMessage(channelId, message)
 		}
 	}
 
-	//TODO : [FixWaiting] 채팅 전송중 생명주기 ClientScope로 만들기
-	// (ChannelActivity에서 채팅 전송중에 화면을 나가도 전송중인 채팅 취소되지 않게)
 	override fun retrySendMessage(chatId: Long) {
 		chatClientScope.launch {
+			val chat = chatRepository.getChat(chatId) ?: return@launch
+			subscribeChannelIfNeeded(chat.channelId).join()
 			stompHandler.retrySendMessage(chatId)
 		}
 	}
@@ -107,21 +119,56 @@ class ChatClientImpl @Inject constructor(
 		withdrawUseCase()
 	}
 
-	//요구사항
-	// 1. 소켓이 끊기면 자동으로 재연결되어야함                                                (O)
-	// 2. 클라이언트가 로그인 되어있지 않다면(본인 프로필을 가지고 있지 않다면) 소켓이 연결되어선 안됨   (O)
-	// 3. 소켓 재연결된다면, 현재 로드되어있는 모든 채팅방에 대한 구독을 자동으로 해야함               (O)
-	// 4. 채팅방이 추가로 로드된다면 구독도 추가로 자동으로 되어야함                               (O)
-	// 5. 소켓 재연결 시 구독함수를 호출해도 상관은 없으나 중복 재구독만큼은 되어선 안됨               (O)
-	// etc. 사실상 스톰프에서 모든 채널을 구독해야 일반 소켓처럼 사용가능함으로
-	// 소켓 연결과 모든 채널 구독은 하나의 트랜젝션으로 수행되어야함 (그냥 StompHandler에서 소켓 연결이랑 전부 묶어서 하자)
-	// 그 채널 중 하나의 채널이라도 구독을 실패한다면..?
-	// (실패한 놈은 그냥 일단 두자, 되면 이득 안되면 말고 식) + 채팅방 들어가면 자동으로 다시 구독요청되게
 	private fun connectSocket() = chatClientScope.launch {
 		if (clientRepository.isClientLoggedIn().not()) return@launch
 		runCatching { stompHandler.connectSocket() }
 			.onSuccess { subscribeAllChannels() }
-			.onFailure { appContext.makeToast(R.string.error_socket_connect) }
+			.onFailure { throwable ->
+				if (throwable is SocketConnectionFailureException) {
+					showToast(R.string.error_socket_connect)
+				}
+			}
+	}
+
+	private fun subscribeAllChannels() = chatClientScope.launch {
+		if (isSocketConnected.not()) return@launch
+		val loadedChannelIds = channelRepository.getChannelsFlow()
+			.firstOrNull()?.map { it.roomId } ?: return@launch
+		subscribeChannels(loadedChannelIds)
+	}
+
+	private fun subscribeChannels(channelIds: List<Long>) {
+		channelIds.forEach { channelId ->
+			if (isSocketConnected.not()) return
+			subscribeChannel(channelId)
+		}
+	}
+
+	private fun subscribeChannel(
+		channelId: Long,
+		shouldShowToast: Boolean = false
+	) = chatClientScope.launch {
+		if (isSocketConnected.not()) return@launch
+		val channel = channelRepository.getChannel(channelId)
+		if (channel.isAvailable.not()) return@launch
+		runCatching { stompHandler.subscribeChannel(channelId) }
+			.onSuccess { messageFlow ->
+				chatClientScope.launch { messageFlow.collect {} }
+				retryChannelFailedChats(channelId)
+			}
+			.onFailure { throwable ->
+				if (throwable is ChannelSubscriptionFailureException && shouldShowToast) {
+					showToast(appContext.getString(R.string.error_channel_subscribe, channel.roomName))
+				}
+			}
+	}
+
+	/** 소켓이 끊긴 사이에 발생한 전송 실패 상태 채팅들을 구독 성공 시 일괄 재전송 */
+	private suspend fun retryChannelFailedChats(channelId: Long) {
+		chatRepository.getFailedChats(channelId)
+			.filter { it.state == ChatState.RETRY_REQUIRED }
+			.reversed()
+			.forEach { chat -> retrySendMessage(chat.chatId) }
 	}
 
 	private fun disconnectSocket() = chatClientScope.launch {
@@ -129,30 +176,11 @@ class ChatClientImpl @Inject constructor(
 		stompHandler.disconnectSocket()
 	}
 
-	private fun subscribeAllChannels() = chatClientScope.launch {
-		if (stompHandler.isSocketConnected.not()) return@launch
-		val loadedChannels = channelRepository.getChannelsFlow()
-			.firstOrNull() ?: return@launch
-		loadedChannels.forEach { channel ->
-			if (stompHandler.isSocketConnected.not()) return@launch
-			chatClientScope.launch {
-				stompHandler.subscribeChannel(channel.roomId, channel.roomSid)
-			}
-		}
-	}
-
 	private fun observeChannelList() = chatClientScope.launch {
 		channelRepository.getChannelsFlow()
-			.map { channels -> channels.map { it.roomId to it.roomSid } }
+			.map { channels -> channels.map { it.roomId } }
 			.distinctUntilChanged()
-			.collect {
-				it.forEach { (channelId, channelSId) ->
-					if (stompHandler.isSocketConnected.not()) return@forEach
-					chatClientScope.launch {
-						stompHandler.subscribeChannel(channelId, channelSId)
-					}
-				}
-			}
+			.collect { channelIds -> subscribeChannels(channelIds) }
 	}
 
 	private fun observeNetworkState() = chatClientScope.launch {
@@ -165,11 +193,9 @@ class ChatClientImpl @Inject constructor(
 	}
 
 	private fun observeSocketState() = chatClientScope.launch {
-		stompHandler.getSocketStateFlow().collect(::handleSocketState)
-	}
-
-	private fun handleSocketState(state: SocketState) {
-		if (state == SocketState.NEED_RECONNECTION) connectSocket()
+		stompHandler.getSocketStateFlow()
+			.filter { it == SocketState.NEED_RECONNECTION }
+			.collect { connectSocket() }
 	}
 
 	override fun onResume(owner: LifecycleOwner) {
@@ -185,6 +211,14 @@ class ChatClientImpl @Inject constructor(
 	override fun onDestroy(owner: LifecycleOwner) {
 		super.onDestroy(owner)
 		chatClientScope.cancel()
+	}
+
+	private suspend fun showToast(messageId: Int) {
+		withContext(Dispatchers.Main) { appContext.makeToast(messageId) }
+	}
+
+	private suspend fun showToast(message: String) {
+		withContext(Dispatchers.Main) { appContext.makeToast(message) }
 	}
 
 }
