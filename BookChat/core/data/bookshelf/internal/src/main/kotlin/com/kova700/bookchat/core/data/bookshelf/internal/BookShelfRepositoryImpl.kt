@@ -39,7 +39,7 @@ class BookShelfRepositoryImpl @Inject constructor(
 
 	override fun getBookShelfFlow(bookShelfState: BookShelfState): Flow<List<BookShelfItem>> {
 		return mapBookShelfItems.map { items ->
-			items.values.toList()
+			items.values
 				.filter { it.state == bookShelfState }
 				//ORDER BY last_updated_at DESC, bookshelf_id DESC
 				.sortedWith(compareBy(
