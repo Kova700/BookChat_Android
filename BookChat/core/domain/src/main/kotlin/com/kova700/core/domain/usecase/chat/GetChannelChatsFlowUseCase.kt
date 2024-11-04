@@ -31,7 +31,7 @@ class GetChannelChatsFlowUseCase @Inject constructor(
 				val newestChatInList =
 					chats.firstOrNull { chat -> chat.state == ChatState.SUCCESS }
 				newestChatInList?.let { chat ->
-					channelRepository.updateChannelLastChatIfValid(channelId, chat, "GetChatsFlowUseCase")
+					channelRepository.updateChannelLastChatIfValid(channelId, chat)
 					channelRepository.updateLastReadChatIdIfValid(channelId, chat)
 				}
 			}

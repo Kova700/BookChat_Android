@@ -141,7 +141,7 @@ class SocketMessageHandlerImpl @Inject constructor(
 	private suspend fun updateChannelLastChat(chat: Chat) {
 		channelRepository.updateChannelLastChatIfValid(
 			channelId = chat.channelId,
-			chatId = chat.chatId
+			chat = chat,
 		)
 	}
 

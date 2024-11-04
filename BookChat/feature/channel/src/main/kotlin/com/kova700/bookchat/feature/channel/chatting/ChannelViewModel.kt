@@ -30,7 +30,7 @@ import com.kova700.core.domain.usecase.channel.GetClientChannelFlowUseCase
 import com.kova700.core.domain.usecase.channel.GetClientChannelInfoUseCase
 import com.kova700.core.domain.usecase.channel.GetClientChannelUseCase
 import com.kova700.core.domain.usecase.channel.LeaveChannelUseCase
-import com.kova700.core.domain.usecase.chat.GetChatsFlowUseCase
+import com.kova700.core.domain.usecase.chat.GetChannelChatsFlowUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -57,7 +57,7 @@ class ChannelViewModel @Inject constructor(
 	private val getClientChannelInfoUseCase: GetClientChannelInfoUseCase,
 	private val getClientChannelUseCase: GetClientChannelUseCase,
 	private val getClientChannelFlowUseCase: GetClientChannelFlowUseCase,
-	private val getChatsFlowUserCase: GetChatsFlowUseCase,
+	private val getChatsFlowUserCase: GetChannelChatsFlowUseCase,
 	private val leaveChannelUseCase: LeaveChannelUseCase,
 	private val channelTempMessageRepository: ChannelTempMessageRepository,
 	private val chatRepository: ChatRepository,
@@ -110,6 +110,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private suspend fun getOfflineNewestChats() {
+		Log.d(TAG, "ChannelViewModel: getOfflineNewestChats(channelId : $channelId) - called")
 		chatRepository.getOfflineNewestChats(channelId)
 	}
 
@@ -182,7 +183,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun observeChannelSubscriptionState() = viewModelScope.launch {
- 		var isFirstFailed = true
+		var isFirstFailed = true
 		chatClient.getChannelSubscriptionStateFlow(channelId).collect { state ->
 			Log.d(TAG, "ChannelViewModel: observeChannelSubscriptionState() - state : $state")
 			when (state) {
@@ -248,7 +249,7 @@ class ChannelViewModel @Inject constructor(
 		if (networkManager.isNetworkAvailable().not()
 			|| uiState.value.channel.isAvailable.not()
 		) return@launch
-		Log.d(TAG, "ChannelViewModel: getInitChats() - called")
+		Log.d(TAG, "ChannelViewModel: getInitChats(channelId : $channelId) - called")
 		val newestChats = getNewestChats().await() ?: emptyList()
 		val originalLastReadChatId = uiState.value.originalLastReadChatId ?: return@launch
 		val shouldLastReadChatScroll =
@@ -427,10 +428,14 @@ class ChannelViewModel @Inject constructor(
 		getNewerChats()
 	}
 
+	//TODO : getAroundId로 채팅 중앙에 있다가 아래로 내리는 과정에 새로운 채팅이 생기면 아래에 NewChatNotice가 생김
+	// 그 상황에 새로운 채팅을 Load하기 위해서 채팅 하단으로 스크롤을 내리면 채팅 최하단에 왔다고 인식하고 Noti를 지우는 상황이 생겨버림
+	// 테스트 해보고 아래 각주가 필요하다면 추가 하기
 	/** 리스트 상 내 채팅이 아닌 채팅 중 가장 최신 채팅이 화면 상에 나타나는 순간 호출 */
 	fun onReadNewestChatNotMineInList(chatItem: ChatItem.Message) {
 		val nowNewChatNotice = uiState.value.newChatNotice ?: return
 		if (chatItem.chatId < nowNewChatNotice.chatId) return
+//		if (uiState.value.isNewerChatFullyLoaded.not()) return
 		updateState { copy(newChatNotice = null) }
 	}
 

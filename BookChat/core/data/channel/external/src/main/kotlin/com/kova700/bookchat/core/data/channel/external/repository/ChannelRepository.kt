@@ -4,6 +4,7 @@ import com.kova700.bookchat.core.data.channel.external.model.Channel
 import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
 import com.kova700.bookchat.core.data.channel.external.model.ChannelInfo
 import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
+import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.search.book.external.model.Book
 import kotlinx.coroutines.flow.Flow
 
@@ -85,10 +86,14 @@ interface ChannelRepository {
 
 	suspend fun updateLastReadChatIdIfValid(
 		channelId: Long,
-		chatId: Long,
+		chat: Chat,
 	)
 
-	suspend fun updateChannelLastChatIfValid(channelId: Long, chatId: Long)
+	suspend fun updateChannelLastChatIfValid(
+		channelId: Long,
+		chat: Chat,
+	)
+
 	suspend fun insertChannels(channels: List<Channel>)
 
 	suspend fun clear()

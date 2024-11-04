@@ -10,6 +10,7 @@ import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthor
 import com.kova700.bookchat.core.data.channel.external.model.UserIsBannedException
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
 import com.kova700.bookchat.core.data.channel.internal.mapper.toDomain
+import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.common.model.network.BookChatApiResult
 import com.kova700.bookchat.core.data.search.book.external.model.Book
 import com.kova700.bookchat.core.data.user.external.model.User
@@ -452,14 +453,28 @@ class ChannelRepositoryImpl @Inject constructor(
 		setChannels(mapChannels.value + mapOf(channelId to newChannel))
 	}
 
-	override suspend fun updateLastReadChatIdIfValid(channelId: Long, chatId: Long) {
+	override suspend fun updateLastReadChatIdIfValid(channelId: Long, chat: Chat) {
+		if (channelId != chat.channelId) return
+
 		val isValid = channelDAO.updateLastReadChatIdIfValid(
 			channelId = channelId,
-			chatId = chatId
+			chatId = chat.chatId
 		)
 		if (isValid.not()) return
 		val updatedChannel = getOfflineChannel(channelId) ?: return
 		setChannels(mapChannels.value + mapOf(channelId to updatedChannel))
+	}
+
+	override suspend fun updateChannelLastChatIfValid(channelId: Long, chat: Chat) {
+		if (channelId != chat.channelId) return
+
+		val isValid = channelDAO.updateChannelLastChatIfValid(
+			channelId = channelId,
+			chatId = chat.chatId
+		)
+		if (isValid.not()) return
+		val updatedChannel = getOfflineChannel(channelId) ?: return
+		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
 	/** 지수 백오프 적용 */
@@ -513,16 +528,6 @@ class ChannelRepositoryImpl @Inject constructor(
 	private suspend fun getOfflineMostActiveChannels(loadSize: Int): List<Channel> {
 		return channelDAO.getMostActiveChannels(loadSize, 0)
 			.map { it.toChannel() }
-	}
-
-	override suspend fun updateChannelLastChatIfValid(channelId: Long, chatId: Long) {
-		val isValid = channelDAO.updateChannelLastChatIfValid(
-			channelId = channelId,
-			chatId = chatId,
-		)
-		if (isValid.not()) return
-		val updatedChannel = getOfflineChannel(channelId) ?: return
-		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
 	private fun clearCachedData() {
