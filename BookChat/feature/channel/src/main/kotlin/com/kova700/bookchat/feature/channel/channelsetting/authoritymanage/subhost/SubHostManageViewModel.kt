@@ -44,7 +44,7 @@ class SubHostManageViewModel @Inject constructor(
 	}
 
 	private fun initUiState() = viewModelScope.launch {
-		updateState { copy(channel = getClientChannelUseCase(channelId)) }
+		updateState { copy(channel = getClientChannelUseCase(channelId) ?: return@launch) }
 		observeChannel()
 	}
 

@@ -42,7 +42,7 @@ class UserProfileViewModel @Inject constructor(
 	private fun initUiState() = viewModelScope.launch {
 		updateState {
 			copy(
-				channel = getClientChannelUseCase(channelId),
+				channel = getClientChannelUseCase(channelId) ?: return@launch,
 				targetUser = userRepository.getUser(targetUserId),
 				client = clientRepository.getClientProfile()
 			)

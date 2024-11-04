@@ -64,15 +64,6 @@ import kotlin.time.Duration.Companion.seconds
 // 소켓 끊기면 재연결 되고, 예외터져도 앱이 안죽는지 Check,
 // 홈 나갔다와도 리커넥션 잘 되는지 동기화는 잘 되는지
 
-// TODO : [FixWaiting] 다른 채팅방에서 채팅을 보고 있을때, Notification눌러서 다른 채팅방으로 가면 소켓연결이 안됨
-// TODO : [FixWaiting] 위 상황대로 다른 채팅방 갔다가 다시 이전 채팅방으로 가면 채팅이 보였다가 사라지는 현상이 있음
-
-// TODO : [FixWaiting] "존재하지 않는 채팅방" 저장되는 현상있고 로그도 찍힘
-//  방장의 채팅방 나가기 시, 목록에서도 사라지지 않음
-
-// TODO : [FixWaiting] FCM 수신안되는 이슈
-//  빌드를 좀 많이 하다보면 어느순간 FCM 수신이 안되는 현상이 있음
-
 class StompHandlerImpl @Inject constructor(
 	private val stompClient: StompClient,
 	private val chatRepository: ChatRepository,
@@ -126,9 +117,6 @@ class StompHandlerImpl @Inject constructor(
 			.distinctUntilChanged()
 	}
 
-	//TODO : 중복 호출 방지일 때, return 하는게 맞을까
-	// 맞긴할거 같은데 호출부에 runCatching을 사용하고 있어서 return 하면 onSuccess부가 불필요하게 지속적으로 호출됨
-	// 예외 던지고 onFailure에서 예외 종류에 맞게 진짜 실패면 토스트 띄우고, 중복 요청이라 무시된거면 거기서도 무시하면 될듯
 	/** 실패 시 지수백오프 커넥션 요청*/
 	override suspend fun connectSocket(maxAttempts: Int) {
 		socketConnectingMutex.withLock {
@@ -169,7 +157,6 @@ class StompHandlerImpl @Inject constructor(
 		throw SocketConnectionFailureException()
 	}
 
-	//TODO : 중복 호출 방지일때 return null이 맞을까
 	/** LostReceiptException으로 실패 시에만 지수백오프 구독 요청 */
 	override suspend fun subscribeChannel(
 		channelId: Long,
@@ -180,6 +167,7 @@ class StompHandlerImpl @Inject constructor(
 		}
 
 		val channel = channelRepository.getChannel(channelId)
+			?: throw ChannelSubscriptionFailureException()
 		val channelSId = channel.roomSid.takeIf { it.isNotBlank() }
 			?: throw ChannelSubscriptionFailureException()
 
@@ -344,7 +332,7 @@ class StompHandlerImpl @Inject constructor(
 			/** STOMP ERROR 프레임이 수신되면 예외가 발생합니다. 일반적으로 구독 채널을 통해 발생합니다.
 			 * 브로커와의 연결이 끊겼을 때, 메세지를 보내는등의 어떤 행위를 하면 발생 (Connection to broker closed.)
 			 * (해당 Frame을 수신하면 자동으로 소켓은 닫힘)*/
-			is StompErrorFrameReceived -> { //TODO : 재연결하는게 맞겠지..?
+			is StompErrorFrameReceived -> {
 				subscriptionStates.update { emptyMap() }
 				_socketState.update { SocketState.NEED_RECONNECTION }
 			}

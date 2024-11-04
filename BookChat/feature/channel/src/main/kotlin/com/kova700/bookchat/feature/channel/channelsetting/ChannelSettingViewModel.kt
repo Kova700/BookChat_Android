@@ -40,7 +40,7 @@ class ChannelSettingViewModel @Inject constructor(
 	}
 
 	private fun initUiState() = viewModelScope.launch {
-		val originChannel = getClientChannelUseCase(channelId)
+		val originChannel = getClientChannelUseCase(channelId) ?: return@launch
 		updateState {
 			copy(
 				channel = originChannel,

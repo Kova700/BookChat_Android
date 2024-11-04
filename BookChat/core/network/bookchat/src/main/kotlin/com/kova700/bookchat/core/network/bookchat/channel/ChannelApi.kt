@@ -28,7 +28,7 @@ interface ChannelApi {
 	@GET("/v1/api/users/chatrooms/{roomId}")
 	suspend fun getChannel(
 		@Path("roomId") channelId: Long,
-	): ChannelSingleSearchResponse
+	): BookChatApiResult<ChannelSingleSearchResponse>
 
 	@Multipart
 	@POST("/v1/api/chatrooms")

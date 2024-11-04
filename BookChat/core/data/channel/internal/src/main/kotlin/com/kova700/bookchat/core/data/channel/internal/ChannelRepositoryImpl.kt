@@ -78,9 +78,10 @@ class ChannelRepositoryImpl @Inject constructor(
 
 	/** 로컬에 있는 채널 우선적으로 쿼리
 	 * (API를 통해 받아온 Channel에는 LastChat을 비롯한 detail정보가 없음) */
-	override suspend fun getChannel(channelId: Long): Channel {
+	override suspend fun getChannel(channelId: Long): Channel? {
 		mapChannels.value[channelId]?.let { return it }
 		val channel = getOfflineChannel(channelId) ?: getOnlineChannel(channelId)
+		?: return null
 		return channel.also { setChannels(mapChannels.value + (channelId to it)) }
 	}
 
@@ -93,19 +94,27 @@ class ChannelRepositoryImpl @Inject constructor(
 	/** LastChat을 비롯한 Channel detail 정보가 없음
 	 * + 해당 채팅방에 입장하지 않은 채로 해당 API 호출하면 예외 던짐
 	 * {"errorCode":"4040400","message":"채팅방을 찾을 수 없습니다."}*/
-	private suspend fun getOnlineChannel(channelId: Long): Channel {
+	private suspend fun getOnlineChannel(channelId: Long): Channel? {
 		Log.d(TAG, "ChannelRepositoryImpl: getOnlineChannel() - called")
-		val response = runCatching { channelApi.getChannel(channelId).toChannel() }
-			.getOrDefault(
-				Channel.DEFAULT.copy(
-					roomId = channelId,
-					roomName = "존재하지 않는 채팅방"
-				).also {
-					Log.d(TAG, "ChannelRepositoryImpl: getOnlineChannel() - api 실패 channelId : $channelId")
+		val channel = when (val response = channelApi.getChannel(channelId)) {
+			is BookChatApiResult.Success -> response.data.toChannel()
+
+			is BookChatApiResult.Failure -> {
+				val failBody =
+					response.body?.let { jsonSerializer.decodeFromString<BookChatFailResponseBody>(it) }
+				when (failBody?.errorCode) {
+					RESPONSE_CODE_CHANNEL_IS_EXPLODED ->
+						Channel.DEFAULT.copy(
+							roomId = channelId,
+							roomName = "존재하지 않는 채팅방"
+						)
+
+					else -> return null
 				}
-			)
-		channelDAO.upsertChannel(response.toChannelEntity())
-		return response
+			}
+		}
+		channelDAO.upsertChannel(channel.toChannelEntity())
+		return channel
 	}
 
 	/** 지수 백오프 적용 */
@@ -181,8 +190,9 @@ class ChannelRepositoryImpl @Inject constructor(
 			),
 		)
 		val createdChannelId = response.locationHeader
-			?: throw Exception("ChannelId does not exist in Http header.")
+			?: throw IOException("ChannelId does not exist in Http header.")
 		return getChannel(createdChannelId)
+			?: throw IOException("The channel was created, but failed to retrieve the channel from the server.")
 	}
 
 	override suspend fun changeChannelSetting(
@@ -236,7 +246,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun leaveChannelMember(channelId: Long, targetUserId: Long) {
-		val channel = getChannel(channelId)
+		val channel = getChannel(channelId) ?: return
 		val newParticipants = channel.participants?.filter { it.id != targetUserId }
 		val newParticipantAuthorities = channel.participantAuthorities?.minus(targetUserId)
 
@@ -321,7 +331,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun enterChannelMember(channelId: Long, targetUserId: Long) {
-		val channel = getChannel(channelId)
+		val channel = getChannel(channelId) ?: return
 		val targetUser = User.DEFAULT.copy(id = targetUserId)
 		val newParticipants = channel.participants?.plus(targetUser)
 		val newParticipantAuthorities = channel.participantAuthorities
@@ -342,7 +352,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun banChannelClient(channelId: Long) {
-		val channel = getChannel(channelId)
+		val channel = getChannel(channelId) ?: return
 
 		val newChannel = channel.copy(
 			participants = emptyList(),
@@ -365,7 +375,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		targetUserId: Long,
 		needServer: Boolean,
 	) {
-		val channel = getChannel(channelId)
+		val channel = getChannel(channelId) ?: return
 
 		if (needServer) {
 			channelApi.banChannelMember(
@@ -407,7 +417,7 @@ class ChannelRepositoryImpl @Inject constructor(
 			)
 		}
 
-		val channel = getChannel(channelId)
+		val channel = getChannel(channelId) ?: return
 		val newParticipantAuthorities = channel.participantAuthorities
 			?.plus(targetUserId to channelMemberAuthority)
 		val newChannel = channel.copy(
@@ -434,7 +444,7 @@ class ChannelRepositoryImpl @Inject constructor(
 			)
 		}
 
-		val channel = getChannel(channelId)
+		val channel = getChannel(channelId) ?: return
 		val previousHostId = channel.host?.id ?: throw IOException("hostId does not exist")
 		val newParticipantAuthorities = channel.participantAuthorities
 			?.plus(previousHostId to ChannelMemberAuthority.GUEST)

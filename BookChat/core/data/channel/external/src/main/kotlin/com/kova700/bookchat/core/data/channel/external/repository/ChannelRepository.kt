@@ -21,7 +21,7 @@ interface ChannelRepository {
 		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS,
 	): List<Channel>
 
-	suspend fun getChannel(channelId: Long): Channel
+	suspend fun getChannel(channelId: Long): Channel?
 	suspend fun getChannelInfo(
 		channelId: Long,
 		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS,

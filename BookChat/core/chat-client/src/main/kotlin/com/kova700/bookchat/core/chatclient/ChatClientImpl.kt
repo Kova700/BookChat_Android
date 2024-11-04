@@ -149,7 +149,7 @@ class ChatClientImpl @Inject constructor(
 		shouldShowToast: Boolean = false
 	) = chatClientScope.launch {
 		if (isSocketConnected.not()) return@launch
-		val channel = channelRepository.getChannel(channelId)
+		val channel = channelRepository.getChannel(channelId) ?: return@launch
 		if (channel.isAvailable.not()) return@launch
 		runCatching { stompHandler.subscribeChannel(channelId) }
 			.onSuccess { messageFlow ->

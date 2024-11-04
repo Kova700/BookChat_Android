@@ -87,7 +87,7 @@ class ChannelViewModel @Inject constructor(
 	private fun initUiState() = viewModelScope.launch {
 		Log.d(TAG, "ChannelViewModel: initUiState() - channelId: $channelId")
 		if (isBookChatAvailable().not()) return@launch
-		val originalChannel = getClientChannelUseCase(channelId)
+		val originalChannel = getClientChannelUseCase(channelId) ?: return@launch
 		val shouldLastReadChatScroll = originalChannel.isExistNewChat
 		updateState {
 			copy(
@@ -428,7 +428,7 @@ class ChannelViewModel @Inject constructor(
 		getNewerChats()
 	}
 
-	//TODO : getAroundId로 채팅 중앙에 있다가 아래로 내리는 과정에 새로운 채팅이 생기면 아래에 NewChatNotice가 생김
+	//TODO : [FixWaiting] getAroundId로 채팅 중앙에 있다가 아래로 내리는 과정에 새로운 채팅이 생기면 아래에 NewChatNotice가 생김
 	// 그 상황에 새로운 채팅을 Load하기 위해서 채팅 하단으로 스크롤을 내리면 채팅 최하단에 왔다고 인식하고 Noti를 지우는 상황이 생겨버림
 	// 테스트 해보고 아래 각주가 필요하다면 추가 하기
 	/** 리스트 상 내 채팅이 아닌 채팅 중 가장 최신 채팅이 화면 상에 나타나는 순간 호출 */

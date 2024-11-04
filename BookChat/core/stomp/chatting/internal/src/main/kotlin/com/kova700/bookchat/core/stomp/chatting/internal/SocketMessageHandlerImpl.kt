@@ -56,7 +56,7 @@ class SocketMessageHandlerImpl @Inject constructor(
 		updateChannelLastChat(chat)
 
 		chatNotificationHandler.showNotification(
-			channel = getClientChannelUseCase(channelId),
+			channel = getClientChannelUseCase(channelId) ?: return,
 			chat = chat
 		)
 	}
