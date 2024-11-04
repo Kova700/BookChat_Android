@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface ChatRepository {
-	fun getChatsFlow(
+	fun getChannelChatsFlow(
 		initFlag: Boolean = false,
 		channelId: Long,
 	): Flow<List<Chat>>
@@ -24,7 +24,7 @@ interface ChatRepository {
 
 	suspend fun getNewerChats(
 		channelId: Long,
-		size: Int = CHAT_DEFAULT_LOAD_SIZE,
+		size: Int = CHAT_DEFAULT_LOAD_SIZE * 2,
 	)
 
 	suspend fun getNewestChats(
