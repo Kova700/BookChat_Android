@@ -142,7 +142,7 @@ class ChatRepositoryImpl @Inject constructor(
 		channelId: Long,
 		size: Int,
 	) {
-		clearCachedData("getOfflineNewestChats") //TODO : 이거 왜 필요함..?
+		clearCachedData("getOfflineNewestChats")
 		Log.d(TAG, "ChannelViewModel: getOfflineNewestChats() - called")
 		val offlineNewestChats = chatDAO.getNewestChats(
 			channelId = channelId,

@@ -60,10 +60,6 @@ import kotlin.time.Duration.Companion.seconds
 //	      (모든 채널을 구독하게 되는 경우 구독 형식을 사용할 필요가 없어짐)
 //	      subscribedChannelInfos 제거
 
-//TODO : [FixWaiting] 최종적으로 채팅 무식하게 계속 쳐보고 실패한 채팅도 재전송되고,
-// 소켓 끊기면 재연결 되고, 예외터져도 앱이 안죽는지 Check,
-// 홈 나갔다와도 리커넥션 잘 되는지 동기화는 잘 되는지
-
 class StompHandlerImpl @Inject constructor(
 	private val stompClient: StompClient,
 	private val chatRepository: ChatRepository,

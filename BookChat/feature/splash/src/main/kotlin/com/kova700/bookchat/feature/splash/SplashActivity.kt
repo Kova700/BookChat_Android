@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.kova700.bookchat.feature.splash.R as splashR
 
-//TODO : [FixWaiting] SplashScreen 적용
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 	private val splashViewModel: SplashViewModel by viewModels()

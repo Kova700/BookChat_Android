@@ -41,7 +41,7 @@ class ChatNotificationWorker @AssistedInject constructor(
 		val apiResult = runCatching {
 			val channel = getClientChannelUseCase(channelId) ?: return Result.failure()
 			val chat = getChatUseCase(chatId) ?: return Result.failure()
-			val client = clientRepository.getClientProfile() //TODO : 이거도 로그인 데이터 없으면 서버 호출하겠네
+			val client = clientRepository.getClientProfile() //TODO : [FixWaiting] 이거도 로그인 데이터 없으면 서버 호출하겠네
 			Log.d("ㄺ", "ChatNotificationWorker: doWork() - real Work")
 			channelRepository.updateChannelLastChatIfValid(chat.channelId, chat)
 			Triple(channel, chat, client)

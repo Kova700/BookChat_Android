@@ -45,11 +45,6 @@ import javax.inject.Inject
 //        기존 구조 : 소켓 재연결시 현재 보고 있는 채팅방에 한하여 getChannelInfo와 채팅방의 현재 마지막 채팅부터 채팅 내역 페이징 요청
 //        수정될 구조 : 페이징 되어있는 채팅방에 한하여 서버에게 ChattingHistory를 API로 가져오는 방식으로 수정
 
-//TODO : [FixWaiting] 채팅방 입장 헀는데 인원수 1명으로 그대로인 현상이 있음
-//TODO : [FixWaiting] 채팅방 퇴장 했는데, 채팅방 인원 수 갱신안되는 현상이 있음
-//TODO : [FixWaiting] ChannelMember 서랍에 채팅 참여 인원 표시 안되는 현상 있음
-//TODO : [FixWaiting] 홈 화면에선 예상대로 +New 되어있었는데 ChannelList가니까 +New가 사라져버리는 현상이 있음
-
 class ChatClientImpl @Inject constructor(
 	@ApplicationContext private val appContext: Context,
 	private val networkManager: NetworkManager,
