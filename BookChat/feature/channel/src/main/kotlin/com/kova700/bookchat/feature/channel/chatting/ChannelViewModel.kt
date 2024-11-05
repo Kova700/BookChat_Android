@@ -52,7 +52,6 @@ import kotlin.math.abs
 
 // TODO : [FixWaiting] 소켓 끊김 사이에 발생한 수정사항 동기화 테스트 필요함
 // TODO : [FixWaiting] 채팅방 화면에서 홀드 버튼 누르거나 화면 꺼지면 Notification이 안뜨는 현상있음
-// TODO : [FixWaiting] 홈 화면에선 예상대로 +New 되어있었는데 ChannelList가니까 +New가 사라져버리는 현상이 있음
 
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
