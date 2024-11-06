@@ -40,6 +40,10 @@ class NetworkManagerImpl @Inject constructor(
 		override fun onLost(network: Network) {
 			_networkState.update { NetworkState.DISCONNECTED }
 		}
+
+		override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
+			updateState()
+		}
 	}
 
 	init {
