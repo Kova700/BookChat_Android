@@ -9,8 +9,8 @@ import com.kova700.bookchat.core.data.channel.external.model.ChannelIsFullExcept
 import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.data.channel.external.model.UserIsBannedException
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
-import com.kova700.bookchat.core.data.channel.internal.mapper.toChannelEntity
 import com.kova700.bookchat.core.data.channel.internal.mapper.toDomain
+import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.common.model.network.BookChatApiResult
 import com.kova700.bookchat.core.data.search.book.external.model.Book
 import com.kova700.bookchat.core.data.user.external.model.User
@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.json.Json
@@ -41,13 +40,16 @@ import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.time.Duration.Companion.seconds
 
-//TODO : 채팅방 정보 조회 API 실패 시 재시도 로직 필요함 (채팅 전송 재시도 로직같은)
 class ChannelRepositoryImpl @Inject constructor(
 	private val channelApi: ChannelApi,
 	private val channelDAO: ChannelDAO,
 	private val jsonSerializer: Json,
 ) : ChannelRepository {
 
+	//TODO : [Version 2]
+	// TopPinNum 내림 차순 정렬
+	//  lastMessageAt(Date Type) 내림 차순 정렬 ?: createdAt(Date Type) 내림 차순 정렬로 추후 수정
+	//  (lastChatId가 null인 신생 채널보다, 더 최신에 채팅이 발생한 채팅방이 더 아래에 노출되는 상황이 생김)
 	private val mapChannels = MutableStateFlow<Map<Long, Channel>>(emptyMap())//(channelId, Channel)
 	private val sortedChannels = mapChannels.map { it.values }
 		.map { channels ->
@@ -76,14 +78,15 @@ class ChannelRepositoryImpl @Inject constructor(
 
 	/** 로컬에 있는 채널 우선적으로 쿼리
 	 * (API를 통해 받아온 Channel에는 LastChat을 비롯한 detail정보가 없음) */
-	override suspend fun getChannel(channelId: Long): Channel {
-		val cachedChannel = mapChannels.value[channelId]
-		if (cachedChannel != null) return cachedChannel
-
+	override suspend fun getChannel(channelId: Long): Channel? {
+		mapChannels.value[channelId]?.let { return it }
 		val channel = getOfflineChannel(channelId) ?: getOnlineChannel(channelId)
+		?: return null
 		return channel.also { setChannels(mapChannels.value + (channelId to it)) }
 	}
 
+	/** DB에 갱신된 LastChat, Participants와 기존에 존재하던
+	 * 채널 부가 정보들을 반영해서 반환 (ex : topPin, roomTags, ..) */
 	private suspend fun getOfflineChannel(channelId: Long): Channel? {
 		return channelDAO.getChannel(channelId)?.toChannel()
 	}
@@ -91,47 +94,76 @@ class ChannelRepositoryImpl @Inject constructor(
 	/** LastChat을 비롯한 Channel detail 정보가 없음
 	 * + 해당 채팅방에 입장하지 않은 채로 해당 API 호출하면 예외 던짐
 	 * {"errorCode":"4040400","message":"채팅방을 찾을 수 없습니다."}*/
-	private suspend fun getOnlineChannel(channelId: Long): Channel {
-		return channelApi.getChannel(channelId).toChannel()
-			.also { channelDAO.upsertChannel(it.toChannelEntity()) }
-	}
-
-	override suspend fun getChannelInfo(channelId: Long): ChannelInfo? {
-		Log.d(TAG, "ChannelRepositoryImpl: getChannelInfo() - called")
-		val response = channelApi.getChannelInfo(channelId)
-		when (response) {
-			is BookChatApiResult.Success -> {
-				val channelInfo = response.data.toDomain()
-
-				channelDAO.updateDetailInfo(
-					roomId = channelId,
-					roomName = channelInfo.roomName,
-					roomHostId = channelInfo.roomHost.id,
-					roomMemberCount = channelInfo.participants.size,
-					participantIds = channelInfo.participantIds,
-					participantAuthorities = channelInfo.participantAuthorities,
-					bookTitle = channelInfo.bookTitle,
-					bookAuthors = channelInfo.bookAuthors,
-					bookCoverImageUrl = channelInfo.bookCoverImageUrl,
-					roomTags = channelInfo.roomTags,
-					roomCapacity = channelInfo.roomCapacity,
-				)
-				setChannels(mapChannels.value + (channelId to getChannelWithUpdatedData(channelId)))
-				return channelInfo
-			}
+	private suspend fun getOnlineChannel(channelId: Long): Channel? {
+		Log.d(TAG, "ChannelRepositoryImpl: getOnlineChannel() - called")
+		val channel = when (val response = channelApi.getChannel(channelId)) {
+			is BookChatApiResult.Success -> response.data.toChannel()
 
 			is BookChatApiResult.Failure -> {
 				val failBody =
 					response.body?.let { jsonSerializer.decodeFromString<BookChatFailResponseBody>(it) }
 				when (failBody?.errorCode) {
-					RESPONSE_CODE_CHANNEL_PARTICIPANT_NOT_FOUND -> Unit
-					RESPONSE_CODE_CHANNEL_IS_BANNED -> banChannelClient(channelId = channelId)
-					RESPONSE_CODE_CHANNEL_IS_EXPLODED -> leaveChannelHost(channelId)
-					else -> throw Exception("failed to get channel info")
+					RESPONSE_CODE_CHANNEL_IS_EXPLODED ->
+						Channel.DEFAULT.copy(
+							roomId = channelId,
+							roomName = "존재하지 않는 채팅방"
+						)
+
+					else -> return null
 				}
-				return null
 			}
 		}
+		channelDAO.upsertChannel(channel.toChannelEntity())
+		return channel
+	}
+
+	/** 지수 백오프 적용 */
+	override suspend fun getChannelInfo(
+		channelId: Long,
+		maxAttempts: Int,
+	): ChannelInfo? {
+		for (attempt in 0 until maxAttempts) {
+			Log.d(TAG, "ChannelRepositoryImpl: getChannelInfo() - attempt :$attempt")
+			val response = runCatching { channelApi.getChannelInfo(channelId) }
+				.onFailure { delay((DEFAULT_RETRY_ATTEMPT_DELAY_TIME * (1.5).pow(attempt))) }
+				.getOrNull() ?: continue
+
+			when (response) {
+				is BookChatApiResult.Success -> {
+					val channelInfo = response.data.toDomain()
+					channelDAO.updateDetailInfo(
+						roomId = channelId,
+						roomName = channelInfo.roomName,
+						roomHostId = channelInfo.roomHost.id,
+						roomMemberCount = channelInfo.participants.size,
+						participantIds = channelInfo.participantIds,
+						participantAuthorities = channelInfo.participantAuthorities,
+						bookTitle = channelInfo.bookTitle,
+						bookAuthors = channelInfo.bookAuthors,
+						bookCoverImageUrl = channelInfo.bookCoverImageUrl,
+						roomTags = channelInfo.roomTags,
+						roomCapacity = channelInfo.roomCapacity,
+					)
+					val updatedChannel = getOfflineChannel(channelId) ?: return null
+					setChannels(mapChannels.value + (channelId to updatedChannel))
+					return channelInfo
+				}
+
+				is BookChatApiResult.Failure -> {
+					val failBody =
+						response.body?.let { jsonSerializer.decodeFromString<BookChatFailResponseBody>(it) }
+					when (failBody?.errorCode) {
+						RESPONSE_CODE_CHANNEL_IS_BANNED -> banChannelClient(channelId = channelId)
+						RESPONSE_CODE_CHANNEL_PARTICIPANT_NOT_FOUND,
+						RESPONSE_CODE_CHANNEL_IS_EXPLODED -> leaveChannelHost(channelId)
+
+						else -> throw IOException("failed to get channel info - unknown error code - failBody :$failBody ,message : ${response.message}")
+					}
+					return null
+				}
+			}
+		}
+		throw IOException("failed to get channel info - Exponential backoff failure")
 	}
 
 	override suspend fun makeChannel(
@@ -158,17 +190,18 @@ class ChannelRepositoryImpl @Inject constructor(
 			),
 		)
 		val createdChannelId = response.locationHeader
-			?: throw Exception("ChannelId does not exist in Http header.")
+			?: throw IOException("ChannelId does not exist in Http header.")
 		return getChannel(createdChannelId)
+			?: throw IOException("The channel was created, but failed to retrieve the channel from the server.")
 	}
 
-	//TODO : 기존 사이즈보다 더 작은 수용인원으로 줄이려고한다면 안된다고 경고 UI 추가 필요
 	override suspend fun changeChannelSetting(
 		channelId: Long,
 		channelTitle: String,
 		channelCapacity: Int,
 		channelTags: List<String>,
 		channelImage: ByteArray?,
+		isProfileChanged: Boolean,
 	) {
 		channelApi.changeChannelSetting(
 			channelId = channelId,
@@ -176,7 +209,8 @@ class ChannelRepositoryImpl @Inject constructor(
 				channelId = channelId,
 				channelTitle = channelTitle,
 				channelCapacity = channelCapacity,
-				channelTags = channelTags
+				channelTags = channelTags,
+				isProfileChanged = isProfileChanged
 			),
 			chatRoomImage = channelImage?.toMultiPartBody(
 				contentType = CONTENT_TYPE_IMAGE_WEBP,
@@ -188,15 +222,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		getOnlineChannel(channelId)
 	}
 
-	/** DB에 갱신된 LastChat, Participants와 기존에 존재하던
-	 * 채널 부가 정보들을 반영해서 반환 (ex : topPin, roomTags, ..) */
-	private suspend fun getChannelWithUpdatedData(channelId: Long): Channel {
-		return getOfflineChannel(channelId) ?: getOnlineChannel(channelId)
-	}
-
-	//TODO : 방장 나갈 경우 받는 메세지에 넘어오는 메세지 nullable타입 서버 수정 대기 중
 	override suspend fun leaveChannel(channelId: Long) {
-		Log.d(TAG, "ChannelRepositoryImpl: leaveChannel() - called")
 		val response = channelApi.leaveChannel(channelId)
 
 		suspend fun onSuccess() {
@@ -213,14 +239,14 @@ class ChannelRepositoryImpl @Inject constructor(
 				when (failBody?.errorCode) {
 					RESPONSE_CODE_CHANNEL_PARTICIPANT_NOT_FOUND -> onSuccess()
 					RESPONSE_CODE_CHANNEL_IS_EXPLODED -> onSuccess()
-					else -> throw IOException("failed to leave channel")
+					else -> throw IOException("failed to leave channel, unknown error code - failBody :$failBody ,message : ${response.message}")
 				}
 			}
 		}
 	}
 
 	override suspend fun leaveChannelMember(channelId: Long, targetUserId: Long) {
-		val channel = getChannel(channelId)
+		val channel = getChannel(channelId) ?: return
 		val newParticipants = channel.participants?.filter { it.id != targetUserId }
 		val newParticipantAuthorities = channel.participantAuthorities?.minus(targetUserId)
 
@@ -240,7 +266,7 @@ class ChannelRepositoryImpl @Inject constructor(
 
 	override suspend fun leaveChannelHost(channelId: Long) {
 		channelDAO.updateExploded(channelId)
-		val updatedChannel = getChannelWithUpdatedData(channelId)
+		val updatedChannel = getOfflineChannel(channelId) ?: return
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
@@ -249,7 +275,7 @@ class ChannelRepositoryImpl @Inject constructor(
 			channelId = channelId,
 			isNotificationOn = false
 		)
-		val updatedChannel = getChannelWithUpdatedData(channelId)
+		val updatedChannel = getOfflineChannel(channelId) ?: return
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
@@ -258,7 +284,7 @@ class ChannelRepositoryImpl @Inject constructor(
 			channelId = channelId,
 			isNotificationOn = true
 		)
-		val updatedChannel = getChannelWithUpdatedData(channelId)
+		val updatedChannel = getOfflineChannel(channelId) ?: return
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
@@ -268,7 +294,7 @@ class ChannelRepositoryImpl @Inject constructor(
 			channelId = channelId,
 			isTopPinNum = maxTopPinNum + 1
 		)
-		val updatedChannel = getChannelWithUpdatedData(channelId)
+		val updatedChannel = getOfflineChannel(channelId) ?: return
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
@@ -277,13 +303,14 @@ class ChannelRepositoryImpl @Inject constructor(
 			channelId = channelId,
 			isTopPinNum = 0
 		)
-		val updatedChannel = getChannelWithUpdatedData(channelId)
+		val updatedChannel = getOfflineChannel(channelId) ?: return
 		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
 	override suspend fun enterChannel(channel: Channel) {
-		val response = channelApi.enterChannel(channel.roomId)
-		when (response) {
+		if (channelDAO.isChannelExist(channel.roomId)) return
+
+		when (val response = channelApi.enterChannel(channel.roomId)) {
 			is BookChatApiResult.Success -> {
 				channelDAO.upsertChannel(channel.toChannelEntity())
 				setChannels(mapChannels.value + mapOf(channel.roomId to channel))
@@ -297,15 +324,15 @@ class ChannelRepositoryImpl @Inject constructor(
 					RESPONSE_CODE_CHANNEL_IS_FULL -> throw ChannelIsFullException(failBody.message)
 					RESPONSE_CODE_CHANNEL_IS_BANNED -> throw UserIsBannedException(failBody.message)
 					RESPONSE_CODE_CHANNEL_IS_EXPLODED -> throw ChannelIsExplodedException(failBody.message)
-					else -> throw IOException("failed to enter channel")
+					else -> throw IOException("failed to enter channel ,unknown error code - failBody :$failBody ,message : ${response.message}")
 				}
 			}
 		}
 	}
 
 	override suspend fun enterChannelMember(channelId: Long, targetUserId: Long) {
-		val channel = getChannel(channelId)
-		val targetUser = User.Default.copy(id = targetUserId)
+		val channel = getChannel(channelId) ?: return
+		val targetUser = User.DEFAULT.copy(id = targetUserId)
 		val newParticipants = channel.participants?.plus(targetUser)
 		val newParticipantAuthorities = channel.participantAuthorities
 			?.plus(targetUser.id to ChannelMemberAuthority.GUEST)
@@ -325,7 +352,7 @@ class ChannelRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun banChannelClient(channelId: Long) {
-		val channel = getChannel(channelId)
+		val channel = getChannel(channelId) ?: return
 
 		val newChannel = channel.copy(
 			participants = emptyList(),
@@ -348,7 +375,7 @@ class ChannelRepositoryImpl @Inject constructor(
 		targetUserId: Long,
 		needServer: Boolean,
 	) {
-		val channel = getChannel(channelId)
+		val channel = getChannel(channelId) ?: return
 
 		if (needServer) {
 			channelApi.banChannelMember(
@@ -390,7 +417,7 @@ class ChannelRepositoryImpl @Inject constructor(
 			)
 		}
 
-		val channel = getChannel(channelId)
+		val channel = getChannel(channelId) ?: return
 		val newParticipantAuthorities = channel.participantAuthorities
 			?.plus(targetUserId to channelMemberAuthority)
 		val newChannel = channel.copy(
@@ -417,14 +444,14 @@ class ChannelRepositoryImpl @Inject constructor(
 			)
 		}
 
-		val channel = getChannel(channelId)
+		val channel = getChannel(channelId) ?: return
 		val previousHostId = channel.host?.id ?: throw IOException("hostId does not exist")
 		val newParticipantAuthorities = channel.participantAuthorities
 			?.plus(previousHostId to ChannelMemberAuthority.GUEST)
 			?.plus(targetUserId to ChannelMemberAuthority.HOST)
 
 		val newChannel = channel.copy(
-			host = User.Default.copy(id = targetUserId),
+			host = User.DEFAULT.copy(id = targetUserId),
 			participantAuthorities = newParticipantAuthorities
 		)
 
@@ -436,24 +463,34 @@ class ChannelRepositoryImpl @Inject constructor(
 		setChannels(mapChannels.value + mapOf(channelId to newChannel))
 	}
 
-	override suspend fun updateLastReadChatIdIfValid(channelId: Long, chatId: Long) {
-		val channel = channelDAO.getChannel(channelId)
-		val existingLastReadChatId = channel?.lastReadChatId
-		if (existingLastReadChatId != null && existingLastReadChatId >= chatId) return
+	override suspend fun updateLastReadChatIdIfValid(channelId: Long, chat: Chat) {
+		if (channelId != chat.channelId) return
 
-		channelDAO.updateLastReadChat(
+		val isValid = channelDAO.updateLastReadChatIdIfValid(
 			channelId = channelId,
-			lastReadChatId = chatId
+			chatId = chat.chatId
 		)
-		val newChannel = getChannelWithUpdatedData(channelId)
-		setChannels(mapChannels.value + mapOf(channelId to newChannel))
+		if (isValid.not()) return
+		val updatedChannel = getOfflineChannel(channelId) ?: return
+		setChannels(mapChannels.value + mapOf(channelId to updatedChannel))
+	}
+
+	override suspend fun updateChannelLastChatIfValid(channelId: Long, chat: Chat) {
+		if (channelId != chat.channelId) return
+
+		val isValid = channelDAO.updateChannelLastChatIfValid(
+			channelId = channelId,
+			chatId = chat.chatId
+		)
+		if (isValid.not()) return
+		val updatedChannel = getOfflineChannel(channelId) ?: return
+		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
 	/** 지수 백오프 적용 */
 	override suspend fun getMostActiveChannels(
 		loadSize: Int,
 		maxAttempts: Int,
-		isOfflineOnly: Boolean,
 	): List<Channel> {
 
 		setChannels(
@@ -461,10 +498,8 @@ class ChannelRepositoryImpl @Inject constructor(
 				loadSize = loadSize
 			).associateBy { it.roomId }
 		)
-		if (isOfflineOnly) return sortedChannels.first()
 
 		for (attempt in 0 until maxAttempts) {
-			Log.d(TAG, "ChannelRepositoryImpl: getMostActiveChannels() - attempt : $attempt")
 			val response = runCatching {
 				channelApi.getChannels(
 					postCursorId = null,
@@ -473,52 +508,36 @@ class ChannelRepositoryImpl @Inject constructor(
 			}.onFailure { delay((DEFAULT_RETRY_ATTEMPT_DELAY_TIME * (1.5).pow(attempt))) }
 				.getOrNull() ?: continue
 
-			channelDAO.upsertAllChannels(response.channels.toChannelEntity())
 			isEndPage = response.cursorMeta.last
 			currentPage = response.cursorMeta.nextCursorId
-			val newChannels = response.channels.map { getChannelWithUpdatedData(it.roomId) }
-			setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
 			return response.channels.map { it.toChannel() }
 		}
 		throw IOException("failed to retrieve most active channels")
 	}
 
-	//TODO : 서버측에서 lastChatID가 가장 높은 순으로 쿼리되게 혹은 쿼리 옵션을 주게 수정 대기
-	//  페이징 방식 수정되면 수정된 offset방식으로 getMostActiveChannels처럼 로컬 우선 쿼리로 수정
-	/** 로컬 데이터 우선적으로 쿼리 */
-	/** Channel 세부 정보는 채팅방 들어 가면 getChannelInfo에 의해 갱신될 예정 */
-	override suspend fun getChannels(loadSize: Int): List<Channel> {
-		if (isEndPage) return sortedChannels.first()
+	//TODO : [Version 2] 서버 측에서 lastChat.dispatchedAt ?: channel.createdAt으로 정렬되도록 수정대기
+	/** Channel 세부 정보는 getChannelInfo에 의해 갱신될 예정 */
+	override suspend fun getChannels(loadSize: Int): List<Channel>? {
+		if (isEndPage) return null
 
 		val response = channelApi.getChannels(
 			postCursorId = currentPage,
 			size = loadSize
 		)
-
-		channelDAO.upsertAllChannels(response.channels.toChannelEntity())
 		isEndPage = response.cursorMeta.last
 		currentPage = response.cursorMeta.nextCursorId
-		val newChannels = response.channels.map { getChannelWithUpdatedData(it.roomId) }
-		setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
 		return response.channels.map { it.toChannel() }
+	}
+
+	override suspend fun insertChannels(channels: List<Channel>) {
+		channelDAO.upsertAllChannels(channels.map { it.toChannelEntity() })
+		val newChannels = channels.map { getOfflineChannel(it.roomId) ?: it }
+		setChannels(mapChannels.value + newChannels.associateBy { it.roomId })
 	}
 
 	private suspend fun getOfflineMostActiveChannels(loadSize: Int): List<Channel> {
 		return channelDAO.getMostActiveChannels(loadSize, 0)
 			.map { it.toChannel() }
-	}
-
-	override suspend fun updateChannelLastChatIfValid(channelId: Long, chatId: Long) {
-		val existingLastChatId = channelDAO.getChannel(channelId)?.lastChatId
-		if (existingLastChatId != null && chatId <= existingLastChatId) return
-
-		channelDAO.updateLastChat(
-			channelId = channelId,
-			lastChatId = chatId,
-		)
-
-		val updatedChannel = getChannelWithUpdatedData(channelId)
-		setChannels(mapChannels.value + (channelId to updatedChannel))
 	}
 
 	private fun clearCachedData() {

@@ -8,7 +8,6 @@ android {
 }
 
 dependencies {
-	implementation(libs.generativeai)
 	implementation(project(":core:data:user:external"))
 	implementation(project(":core:data:chat:external"))
 	implementation(project(":core:data:channel:external"))

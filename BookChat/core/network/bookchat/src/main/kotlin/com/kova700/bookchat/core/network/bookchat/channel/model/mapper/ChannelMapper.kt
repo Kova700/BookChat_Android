@@ -13,10 +13,14 @@ fun ChannelResponse.toChannel(): Channel {
 		defaultRoomImageType = defaultRoomImageType.toDomain(),
 		roomImageUri = roomImageUri,
 		lastChat = lastChat,
+		host = host,
+		bookTitle = bookTitle,
+		bookAuthors = bookAuthors,
+		bookCoverImageUrl = bookCoverImageUrl,
 	)
 }
 
-//TODO : lastChatId 추가되면 상당히 편할 듯
+//TODO : [NotUrgent] lastChatId 추가되면 상당히 편할 듯
 fun ChannelSingleSearchResponse.toChannel(): Channel {
 	return Channel(
 		roomId = roomId,

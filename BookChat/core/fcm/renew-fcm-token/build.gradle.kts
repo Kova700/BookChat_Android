@@ -9,6 +9,7 @@ android {
 
 dependencies {
 	implementation(libs.bundles.workmanager)
+	ksp(libs.androidx.hilt.compiler)
 	implementation(project(":core:data:bookchat-token:external"))
 	implementation(project(":core:data:fcm-token:external"))
 }

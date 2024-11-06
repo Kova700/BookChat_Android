@@ -3,8 +3,8 @@ package com.kova700.bookchat.feature.signup.signup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kova700.bookchat.core.data.client.external.ClientRepository
-import com.kova700.bookchat.core.data.common.model.network.ForbiddenException
 import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.feature.signup.signup.SignUpState.UiState
 import com.kova700.bookchat.util.user.namecheck.NicknameCheckState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -26,7 +26,9 @@ class SignUpViewModel @Inject constructor(
 	private val _uiState = MutableStateFlow<SignUpState>(SignUpState.DEFAULT)
 	val uiState = _uiState.asStateFlow()
 
-	private fun verifyNickname() = viewModelScope.launch {
+
+	//Loading Ui 추가 및 중복 API 방지
+	private fun verifyNickname() {
 		val nickName = uiState.value.nickname
 		val userProfile = uiState.value.clientNewImageUri
 		val nameCheckStatus = uiState.value.nicknameCheckState
@@ -43,20 +45,25 @@ class SignUpViewModel @Inject constructor(
 	}
 
 	private fun checkNicknameDuplication(nickName: String) = viewModelScope.launch {
+		if (uiState.value.isLoading) return@launch
+		updateState { copy(uiState = UiState.LOADING) }
 		runCatching { clientRepository.isDuplicatedUserNickName(nickName) }
 			.onSuccess { isDuplicated ->
+				updateState { copy(uiState = UiState.SUCCESS) }
 				updateState {
 					copy(
 						nicknameCheckState =
 						if (isDuplicated) NicknameCheckState.IsDuplicate else NicknameCheckState.IsPerfect,
 					)
 				}
+			}.onFailure {
+				updateState { copy(uiState = UiState.ERROR) }
+				startEvent(SignUpEvent.ErrorEvent(R.string.error_else))
 			}
-			.onFailure { failHandler(it) }
 	}
 
 	fun onClickStartBtn() {
-		if (uiState.value.uiState == SignUpState.UiState.LOADING
+		if (uiState.value.isLoading
 			|| uiState.value.nicknameCheckState == NicknameCheckState.IsShort
 			|| uiState.value.nickname.length < 2
 		) return
@@ -72,22 +79,24 @@ class SignUpViewModel @Inject constructor(
 	}
 
 	private fun updateUserNicknameIfValid(text: String) {
-
-		if (text.length < 2) {
-			updateState {
-				copy(
-					nickname = text,
-					nicknameCheckState = NicknameCheckState.IsShort
-				)
+		when {
+			text.length < 2 -> {
+				updateState {
+					copy(
+						nickname = text,
+						nicknameCheckState = NicknameCheckState.IsShort
+					)
+				}
 			}
-			return
-		}
 
-		updateState {
-			copy(
-				nickname = text,
-				nicknameCheckState = NicknameCheckState.Default
-			)
+			else -> {
+				updateState {
+					copy(
+						nickname = text,
+						nicknameCheckState = NicknameCheckState.Default
+					)
+				}
+			}
 		}
 	}
 
@@ -114,16 +123,4 @@ class SignUpViewModel @Inject constructor(
 	private fun startEvent(event: SignUpEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
 	}
-
-	private fun failHandler(exception: Throwable) {
-		when (exception) {
-			is ForbiddenException -> startEvent(SignUpEvent.ErrorEvent(R.string.login_forbidden_user))
-			else -> {
-				val errorMessage = exception.message
-				if (errorMessage.isNullOrBlank()) startEvent(SignUpEvent.ErrorEvent(R.string.error_else))
-				else startEvent(SignUpEvent.UnknownErrorEvent(errorMessage))
-			}
-		}
-	}
-
 }

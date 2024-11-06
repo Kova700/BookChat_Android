@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_socket_connect">서버와의 연결을 실패했습니다.</string>
+    <string name="error_channel_subscribe">채팅방 연결을 실패했습니다. - %1$s </string>
+</resources>

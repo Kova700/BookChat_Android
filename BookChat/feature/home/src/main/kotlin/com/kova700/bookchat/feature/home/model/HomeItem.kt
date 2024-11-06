@@ -51,7 +51,7 @@ sealed interface HomeItem {
 		val roomSid: String,
 		val roomMemberCount: Int,
 		val defaultRoomImageType: ChannelDefaultImageType,
-		val notificationFlag: Boolean = true,
+		val isNotificationOn: Boolean = true,
 		val topPinNum: Int = 0,
 		val isBanned: Boolean = false,
 		val isExploded: Boolean = false,
@@ -65,8 +65,8 @@ sealed interface HomeItem {
 
 		val isExistNewChat
 			get() = when {
-				lastReadChatId == null -> false
 				lastChat?.chatId == null -> false
+				lastReadChatId == null -> true
 				lastReadChatId < lastChat.chatId -> true
 				else -> false
 			}

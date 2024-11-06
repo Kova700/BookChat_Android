@@ -35,7 +35,7 @@
             android:id="@+id/user_profile_iv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:scaleType="fitXY"
+            android:scaleType="centerCrop"
             android:src="@drawable/loading_img" />
     </androidx.cardview.widget.CardView>
 
@@ -61,28 +61,30 @@
         android:textSize="12sp"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/sub_host_delete_chip"
+        app:layout_constraintEnd_toStartOf="@+id/sub_host_delete_btn"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/user_profile_cv"
         app:layout_constraintTop_toTopOf="@+id/user_profile_cv" />
 
-    <com.google.android.material.chip.Chip
-        android:id="@+id/sub_host_delete_chip"
-        style="@style/Widget.MaterialComponents.Chip.Choice"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/sub_host_delete_btn"
         android:layout_width="40dp"
         android:layout_height="20dp"
-        android:background="@android:color/transparent"
         android:backgroundTint="#FFFFFF"
-        android:text="해제"
+        android:gravity="center"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:padding="0dp"
+        android:text="@string/channel_member_authority_delete"
         android:textColor="#4D4D4D"
         android:textSize="12sp"
-        app:chipEndPadding="0dp"
-        app:chipMinTouchTargetSize="0dp"
-        app:chipStartPadding="0dp"
-        app:chipStrokeColor="#E2E2E2"
-        app:chipStrokeWidth="1dp"
+        app:cornerRadius="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline_end"
         app:layout_constraintTop_toTopOf="parent"
-        app:rippleColor="@android:color/transparent" />
+        app:rippleColor="@android:color/transparent"
+        app:strokeColor="#E2E2E2"
+        app:strokeWidth="1dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

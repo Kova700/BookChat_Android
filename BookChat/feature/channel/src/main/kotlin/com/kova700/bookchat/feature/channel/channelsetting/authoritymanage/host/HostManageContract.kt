@@ -13,6 +13,9 @@ data class HostManageUiState(
 	val isExistSelectedMember
 		get() = selectedMember != null
 
+	val isLoading
+		get() = uiState == UiState.LOADING
+
 	enum class UiState {
 		SUCCESS,
 		LOADING,

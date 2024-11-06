@@ -111,7 +111,7 @@ class SearchBookDialogViewModel @Inject constructor(
 	fun onClickChatBtn() {
 		startEvent(
 			SearchTapDialogEvent.MoveToChannelSearchWithSelectedBook(
-				searchKeyword = uiState.value.book.title,
+				searchKeyword = uiState.value.book.isbn,
 				searchTarget = SearchTarget.CHANNEL,
 				searchPurpose = SearchPurpose.SEARCH_CHANNEL,
 				searchFilter = SearchFilter.BOOK_ISBN

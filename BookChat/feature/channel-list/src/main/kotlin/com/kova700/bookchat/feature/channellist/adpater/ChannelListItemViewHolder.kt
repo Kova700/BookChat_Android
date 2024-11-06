@@ -78,13 +78,13 @@ class ChannelListDataViewHolder(
 			dispatchTimeTv.text = item.lastChat?.dispatchTime?.toFormattedDetailDateTimeText()
 			uncheckedChatCountTv.text = if (item.isExistNewChat) "New+" else ""
 			muteChannelIcon.visibility =
-				if ((item.notificationFlag.not()) && item.isAvailableChannel) View.VISIBLE else View.GONE
+				if ((item.isNotificationOn.not()) && item.isAvailableChannel) View.VISIBLE else View.GONE
 			topPinChannelIcon.visibility =
 				if ((item.isTopPined) && item.isAvailableChannel) View.VISIBLE else View.GONE
 			unavailableChannelStateGroup.visibility =
 				if (item.isAvailableChannel.not()) View.VISIBLE else View.GONE
 			channelListSwipeBackground.channelMuteBtn.setIconResource(
-				if (channelListItem.notificationFlag) R.drawable.mute_channel_icon
+				if (channelListItem.isNotificationOn) R.drawable.mute_channel_icon
 				else R.drawable.un_mute_channel_icon
 			)
 			channelListSwipeBackground.channelTopPinBtn.setIconResource(

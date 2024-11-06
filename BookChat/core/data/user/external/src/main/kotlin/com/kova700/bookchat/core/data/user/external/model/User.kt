@@ -7,7 +7,7 @@ data class User(
 	val defaultProfileImageType: UserDefaultProfileType,
 ) {
 	companion object {
-		val Default = User(
+		val DEFAULT = User(
 			id = -1L,
 			nickname = "",
 			profileImageUrl = null,

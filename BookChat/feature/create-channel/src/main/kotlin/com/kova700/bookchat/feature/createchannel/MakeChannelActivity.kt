@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import com.kova700.bookchat.feature.createchannel.MakeChannelUiState.UiState
 import android.text.Editable
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -104,7 +105,7 @@ class MakeChannelActivity : AppCompatActivity() {
 				closeKeyboard()
 			}
 			textClearBtn.setOnClickListener { makeChannelViewModel.onClickTextClearBtn() }
-			selectBootBtn.setOnClickListener { makeChannelViewModel.onClickSelectBookBtn() }
+			selectBookBtn.setOnClickListener { makeChannelViewModel.onClickSelectBookBtn() }
 			deleteSelectedBookBtn.setOnClickListener { makeChannelViewModel.onClickDeleteSelectedBookBtn() }
 			cameraBtn.setOnClickListener { makeChannelViewModel.onClickCameraBtn() }
 		}
@@ -148,11 +149,12 @@ class MakeChannelActivity : AppCompatActivity() {
 			channelTagCountTv.text =
 				getString(R.string.make_chat_room_tags_length, uiState.channelTag.length)
 			selectedBookCv.visibility =
-				if (uiState.selectedBook != null) View.VISIBLE else View.GONE //TODO : INVISIBLE 해야되는지 테스트
-			selectBootBtn.visibility =
-				if (uiState.selectedBook == null) View.VISIBLE else View.GONE //TODO : INVISIBLE 해야되는지 테스트
+				if (uiState.selectedBook != null) View.VISIBLE else View.GONE
+			selectBookBtn.visibility =
+				if (uiState.selectedBook == null) View.VISIBLE else View.GONE
 			deleteSelectedBookBtn.visibility =
-				if (uiState.selectedBook != null) View.VISIBLE else View.GONE //TODO : INVISIBLE 해야되는지 테스트
+				if (uiState.selectedBook != null) View.VISIBLE else View.GONE
+			progressBar.visibility = if (uiState.isLoading) View.VISIBLE else View.GONE
 		}
 	}
 

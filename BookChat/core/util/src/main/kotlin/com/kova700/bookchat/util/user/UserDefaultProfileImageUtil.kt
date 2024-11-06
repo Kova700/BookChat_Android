@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import com.kova700.bookchat.core.data.user.external.model.UserDefaultProfileType
 import com.kova700.bookchat.core.design_system.R
-import com.kova700.bookchat.util.dp.dpToPx
 import com.kova700.bookchat.util.image.bitmap.getImageBitmap
 
 fun UserDefaultProfileType?.getResId() =
@@ -19,15 +18,6 @@ fun UserDefaultProfileType?.getResId() =
 		UserDefaultProfileType.FIVE -> R.drawable.default_profile_img5
 	}
 
-suspend fun UserDefaultProfileType?.getBitmap(
-	context: Context,
-	imageSizePx: Int = 35.dpToPx(context),
-	roundedCornersRadiusPx: Int = 14.dpToPx(context),
-): Bitmap {
-	return getResId().getImageBitmap(
-		context = context,
-		imageWidthPx = imageSizePx,
-		imageHeightPx = imageSizePx,
-		roundedCornersRadiusPx = roundedCornersRadiusPx
-	)!!
+suspend fun UserDefaultProfileType?.getBitmap(context: Context): Bitmap {
+	return getResId().getImageBitmap(context)
 }

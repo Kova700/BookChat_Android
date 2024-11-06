@@ -65,6 +65,5 @@ interface MainNavigator {
 		currentActivity: Activity,
 		intentAction: Intent.() -> Intent = { this },
 		shouldFinish: Boolean = false,
-		newChatChannelId: Long? = null,
 	)
 }

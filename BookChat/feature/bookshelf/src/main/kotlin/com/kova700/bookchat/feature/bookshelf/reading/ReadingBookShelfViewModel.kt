@@ -80,8 +80,9 @@ class ReadingBookShelfViewModel @Inject constructor(
 	}
 
 	fun loadNextBookShelfItems(lastVisibleItemPosition: Int) {
-		if (uiState.value.readingItems.size - 1 > lastVisibleItemPosition ||
-			uiState.value.isLoading
+		if (uiState.value.readingItems.size - 1 > lastVisibleItemPosition
+			|| uiState.value.isLoading
+			|| uiState.value.isPagingError
 		) return
 		getBookShelfItems()
 	}

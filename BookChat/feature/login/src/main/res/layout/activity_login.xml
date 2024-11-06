@@ -137,9 +137,10 @@
             app:srcCompat="@drawable/ic_lightning" />
 
         <TextView
-            android:id="@+id/textView3"
-            android:layout_width="87dp"
-            android:layout_height="24dp"
+            android:id="@+id/fest_login_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="2dp"
             android:layout_marginStart="5dp"
             android:elegantTextHeight="true"
             android:fontFamily="@font/notosanskr_regular"

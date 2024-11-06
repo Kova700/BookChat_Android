@@ -12,6 +12,9 @@ data class MakeChannelUiState(
 	val defaultProfileImageType: ChannelDefaultImageType,
 	val selectedBook: Book?,
 ) {
+	val isLoading
+		get() = uiState == UiState.LOADING
+
 	val channelTagList
 		get() = channelTag.trim().split(" ").filter { it.isNotBlank() }
 			.map { it.split("#") }.flatten().filter { it.isNotBlank() }
@@ -24,8 +27,6 @@ data class MakeChannelUiState(
 	enum class UiState {
 		SUCCESS,
 		LOADING,
-		ERROR,
-		EMPTY,
 	}
 
 	companion object {

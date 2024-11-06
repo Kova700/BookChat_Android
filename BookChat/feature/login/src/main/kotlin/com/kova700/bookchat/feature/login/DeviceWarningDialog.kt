@@ -7,14 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
 import com.kova700.bookchat.feature.login.databinding.DialogDeviceWarningBinding
 
-class DeviceWarningDialog : DialogFragment() {
+class DeviceWarningDialog(
+	private val onClickOkBtn: () -> Unit,
+) : DialogFragment() {
 
 	private var _binding: DialogDeviceWarningBinding? = null
 	private val binding get() = _binding!!
-	private val loginViewModel: LoginViewModel by viewModels({ requireActivity() })
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -44,7 +44,7 @@ class DeviceWarningDialog : DialogFragment() {
 	}
 
 	private fun onClickOkBtn() {
-		loginViewModel.onClickDeviceWarningOk()
+		onClickOkBtn.invoke()
 		dismiss()
 	}
 }

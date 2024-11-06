@@ -13,7 +13,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
-import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.navigation.ImageCropNavigator
 import com.kova700.bookchat.core.navigation.ImageCropNavigator.Companion.EXTRA_CROPPED_IMAGE_CACHE_URI
@@ -50,7 +49,6 @@ class ChannelSettingActivity : AppCompatActivity() {
 
 	@Inject
 	lateinit var makeChannelImgSizeManager: MakeChannelImgSizeManager
-	//TODO : 기본이미지 채널 기본이미지 맞는지 확인
 
 	private val permissionsLauncher = this.getPermissionsLauncher(
 		onSuccess = { moveToImageCrop() },
@@ -86,11 +84,13 @@ class ChannelSettingActivity : AppCompatActivity() {
 	}
 
 	private fun initViewState() {
-		binding.channelTitleEt.addTextChangedListener { text ->
-			channelSettingViewModel.onChangeChannelTitle(text.toString())
-		}
-		binding.channelTagEt.addTextChangedListener { text ->
-			channelSettingViewModel.onChangeChannelTags(text.toString())
+		with(binding) {
+			channelTitleEt.addTextChangedListener { text ->
+				channelSettingViewModel.onChangeChannelTitle(text.toString())
+			}
+			channelTagEt.addTextChangedListener { text ->
+				channelSettingViewModel.onChangeChannelTags(text.toString())
+			}
 		}
 		makeChannelImgSizeManager.setMakeChannelImgSize(binding.channelImgIv)
 		with(binding) {
@@ -118,6 +118,7 @@ class ChannelSettingActivity : AppCompatActivity() {
 				getString(R.string.channel_setting_new_title_length, uiState.newTitle.length)
 			channelTagsCountTv.text =
 				getString(R.string.channel_setting_new_tags_length, uiState.newTags.length)
+			progressBar.visibility = if (uiState.isLoading) View.VISIBLE else View.GONE
 		}
 	}
 
@@ -221,19 +222,19 @@ class ChannelSettingActivity : AppCompatActivity() {
 
 	private fun showChannelExitWarningDialog() {
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_EXIT_WARNING)
+			supportFragmentManager.findFragmentByTag(ChannelExitWarningDialog.TAG)
 		if (existingFragment != null) return
 
 		val dialog = ChannelExitWarningDialog(
-			clientAuthority = ChannelMemberAuthority.HOST,
+			isClientHost = true,
 			onClickOkBtn = { channelSettingViewModel.onClickChannelExitDialogBtn() }
 		)
-		dialog.show(supportFragmentManager, DIALOG_TAG_CHANNEL_EXIT_WARNING)
+		dialog.show(supportFragmentManager, ChannelExitWarningDialog.TAG)
 	}
 
 	private fun showChannelCapacityDialog() {
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_CAPACITY_DIALOG)
+			supportFragmentManager.findFragmentByTag(ChannelCapacitySettingDialog.TAG)
 		if (existingFragment != null) return
 
 		val dialog = ChannelCapacitySettingDialog(
@@ -242,7 +243,7 @@ class ChannelSettingActivity : AppCompatActivity() {
 				channelSettingViewModel.onClickChannelCapacityDialogBtn(newCapacity)
 			}
 		)
-		dialog.show(supportFragmentManager, DIALOG_TAG_CHANNEL_CAPACITY_DIALOG)
+		dialog.show(supportFragmentManager, ChannelCapacitySettingDialog.TAG)
 	}
 
 	private fun exitChannel() {
@@ -276,8 +277,6 @@ class ChannelSettingActivity : AppCompatActivity() {
 	}
 
 	companion object {
-		private const val DIALOG_TAG_CHANNEL_EXIT_WARNING = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
-		private const val DIALOG_TAG_CHANNEL_CAPACITY_DIALOG = "DIALOG_TAG_CHANNEL_CAPACITY_DIALOG"
 		private const val DIALOG_TAG_PROFILE_EDIT = "DIALOG_TAG_USER_PROFILE_EDIT"
 		const val RESULT_CODE_USER_CHANNEL_EXIT = 100
 		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"

@@ -10,6 +10,7 @@ interface ChannelSearchRepository {
 	suspend fun search(
 		keyword: String,
 		searchFilter: SearchFilter,
+		initFlag: Boolean = false,
 		size: Int = SIMPLE_SEARCH_CHANNELS_LOAD_SIZE,
 	): List<ChannelSearchResult>
 

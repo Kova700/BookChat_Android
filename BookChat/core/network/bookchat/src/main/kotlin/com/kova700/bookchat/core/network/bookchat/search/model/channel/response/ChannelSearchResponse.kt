@@ -1,6 +1,7 @@
 package com.kova700.bookchat.core.network.bookchat.search.model.channel.response
 
 import com.kova700.bookchat.core.data.chat.external.model.Chat
+import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.network.bookchat.channel.model.both.ChannelDefaultImageTypeNetwork
 import com.kova700.bookchat.core.network.bookchat.user.model.both.UserDefaultProfileTypeNetwork
@@ -8,7 +9,7 @@ import com.kova700.bookchat.core.network.bookchat.user.model.mapper.toDomain
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-//TODO : tags 타입 List로 반환해서 받으면 좋을 듯
+//TODO : [NotUrgent] tags 타입 List로 반환해서 받으면 좋을 듯
 @Serializable
 data class ChannelSearchResponse(
 	@SerialName("roomId")
@@ -34,7 +35,7 @@ data class ChannelSearchResponse(
 	@SerialName("hostDefaultProfileImageType")
 	val hostDefaultProfileImageType: UserDefaultProfileTypeNetwork,
 	@SerialName("hostProfileImageUri")
-	val hostProfileImageUri: String,
+	val hostProfileImageUri: String? = null,
 	@SerialName("defaultRoomImageType")
 	val defaultRoomImageType: ChannelDefaultImageTypeNetwork,
 	@SerialName("tags")
@@ -64,8 +65,9 @@ data class ChannelSearchResponse(
 				chatId = it,
 				channelId = roomId,
 				message = lastChatMessage!!,
+				state = ChatState.SUCCESS,
 				dispatchTime = lastChatDispatchTime!!,
-				sender = lastChatSenderId?.let { senderId -> User.Default.copy(id = senderId) }
+				sender = lastChatSenderId?.let { senderId -> User.DEFAULT.copy(id = senderId) }
 			)
 		}
 

@@ -54,8 +54,7 @@ class MakeChannelViewModel @Inject constructor(
 				selectedBook = uiState.value.selectedBook!!,
 				channelImage = uiState.value.channelProfileImage?.compressToByteArray()
 			)
-		}
-			.onSuccess { channel -> enterChannel(channel) }
+		}.onSuccess { channel -> enterChannel(channel) }
 			.onFailure { startEvent(MakeChannelEvent.ShowSnackBar(R.string.make_chat_room_fail)) }
 			.also { updateState { copy(uiState = UiState.SUCCESS) } }
 	}
@@ -64,13 +63,13 @@ class MakeChannelViewModel @Inject constructor(
 		runCatching { channelRepository.enterChannel(channel) }
 			.onSuccess { startEvent(MakeChannelEvent.MoveToChannel(channel.roomId)) }
 			.onFailure { startEvent(MakeChannelEvent.ShowSnackBar(R.string.enter_chat_room_fail)) }
+			.also { updateState { copy(uiState = UiState.SUCCESS) } }
 	}
 
 	fun onClickFinishBtn() {
-		if (uiState.value.isPossibleMakeChannel.not() ||
-			uiState.value.uiState == UiState.LOADING
+		if (uiState.value.isPossibleMakeChannel.not()
+			|| uiState.value.isLoading
 		) return
-
 		makeChannel()
 	}
 

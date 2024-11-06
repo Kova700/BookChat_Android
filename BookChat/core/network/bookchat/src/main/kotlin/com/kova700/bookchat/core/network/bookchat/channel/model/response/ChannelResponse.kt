@@ -1,19 +1,13 @@
 package com.kova700.bookchat.core.network.bookchat.channel.model.response
 
 import com.kova700.bookchat.core.data.chat.external.model.Chat
+import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.network.bookchat.channel.model.both.ChannelDefaultImageTypeNetwork
 import com.kova700.bookchat.core.network.bookchat.user.model.both.UserDefaultProfileTypeNetwork
 import com.kova700.bookchat.core.network.bookchat.user.model.mapper.toDomain
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
-//TODO : Host 정보가 필요함
-//  val id: Long,
-//	val nickname: String,
-//	val profileImageUrl: String?,
-//	val defaultProfileImageType: UserDefaultProfileType
-// 채팅방 목록 꾹 눌러서 뜨는 dialog에서 나가기 누르면 경고 띄워야하는데 방장 유무를 몰라서 빨간글씨 띄울지 말지를 모름
 
 @Serializable
 data class ChannelResponse(
@@ -27,6 +21,20 @@ data class ChannelResponse(
 	val roomMemberCount: Int,
 	@SerialName("defaultRoomImageType")
 	val defaultRoomImageType: ChannelDefaultImageTypeNetwork,
+	@SerialName("hostId")
+	val hostId: Long,
+	@SerialName("hostNickname")
+	val hostNickname: String,
+	@SerialName("hostProfileImageUrl")
+	val hostProfileImageUrl: String?,
+	@SerialName("hostDefaultProfileImageType")
+	val hostDefaultProfileImageType: UserDefaultProfileTypeNetwork,
+	@SerialName("bookTitle")
+	val bookTitle: String,
+	@SerialName("bookAuthors")
+	val bookAuthors: List<String>,
+	@SerialName("bookCoverImageUrl")
+	val bookCoverImageUrl: String?,
 	@SerialName("lastChatId")
 	val lastChatId: Long? = null,
 	@SerialName("lastChatContent")
@@ -44,6 +52,13 @@ data class ChannelResponse(
 	@SerialName("roomImageUri")
 	val roomImageUri: String? = null,
 ) {
+	val host: User
+		get() = User(
+			id = hostId,
+			nickname = hostNickname,
+			profileImageUrl = hostProfileImageUrl,
+			defaultProfileImageType = hostDefaultProfileImageType.toDomain()
+		)
 
 	val lastChat: Chat?
 		get() {
@@ -53,6 +68,7 @@ data class ChannelResponse(
 				channelId = roomId,
 				message = lastChatContent!!,
 				dispatchTime = lastChatDispatchTime!!,
+				state = ChatState.SUCCESS,
 				sender = senderId?.let { id ->
 					User(
 						id = id,

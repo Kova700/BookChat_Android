@@ -10,6 +10,7 @@ import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.channel.channelsetting.ChannelSettingActivity
 import com.kova700.bookchat.feature.channel.channelsetting.authoritymanage.mapper.toMemberItems
 import com.kova700.bookchat.feature.channel.channelsetting.authoritymanage.model.MemberItem
+import com.kova700.bookchat.feature.channel.channelsetting.authoritymanage.subhost.SubHostManageUiState.UiState
 import com.kova700.core.domain.usecase.channel.GetClientChannelFlowUseCase
 import com.kova700.core.domain.usecase.channel.GetClientChannelUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,7 +44,7 @@ class SubHostManageViewModel @Inject constructor(
 	}
 
 	private fun initUiState() = viewModelScope.launch {
-		updateState { copy(channel = getClientChannelUseCase(channelId)) }
+		updateState { copy(channel = getClientChannelUseCase(channelId) ?: return@launch) }
 		observeChannel()
 	}
 
@@ -70,6 +71,8 @@ class SubHostManageViewModel @Inject constructor(
 		authority: ChannelMemberAuthority,
 		onSuccess: (() -> Unit)? = null,
 	) = viewModelScope.launch {
+		if (uiState.value.isLoading) return@launch
+		updateState { copy(uiState = UiState.LOADING) }
 		runCatching {
 			channelRepository.updateChannelMemberAuthority(
 				channelId = channelId,
@@ -77,9 +80,13 @@ class SubHostManageViewModel @Inject constructor(
 				channelMemberAuthority = authority,
 				needServer = true
 			)
+		}.onSuccess {
+			updateState { copy(uiState = UiState.SUCCESS) }
+			onSuccess?.invoke()
+		}.onFailure {
+			updateState { copy(uiState = UiState.ERROR) }
+			startEvent(SubHostManageUiEvent.ShowSnackBar(R.string.change_channel_sub_host_fail))
 		}
-			.onSuccess { onSuccess?.invoke() }
-			.onFailure { startEvent(SubHostManageUiEvent.ShowSnackBar(R.string.change_channel_sub_host_fail)) }
 	}
 
 	fun onClickSubHostDeleteBtn(user: User) {

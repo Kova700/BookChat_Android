@@ -87,6 +87,7 @@ class HostManageActivity : AppCompatActivity() {
 		setSearchEtState(state)
 		setSearchKeywordClearBtnState(state)
 		setApplyBtnState(state)
+		binding.progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
 	}
 
 	private fun setSearchEtState(state: HostManageUiState) {

@@ -21,8 +21,9 @@ data class UserEditUiState(
 	private val isNicknameChanged
 		get() = newNickname != client.nickname
 
-	private val isProfileChanged
-		get() = clientNewImage != null
+	val isProfileChanged
+		get() = (clientNewImage != null)
+						|| isSelectedDefaultImage
 
 	val isNeedDuplicatesNicknameCheck
 		get() = isNicknameChanged
@@ -40,7 +41,7 @@ data class UserEditUiState(
 			newNickname = "",
 			clientNewImage = null,
 			nicknameCheckState = NicknameCheckState.Default,
-			client = User.Default,
+			client = User.DEFAULT,
 			isSelectedDefaultImage = false
 		)
 	}

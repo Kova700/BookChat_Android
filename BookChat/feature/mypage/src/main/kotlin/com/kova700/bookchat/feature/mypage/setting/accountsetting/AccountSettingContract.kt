@@ -9,6 +9,7 @@ data class AccountSettingUiState(
 	enum class UiState {
 		SUCCESS,
 		LOADING,
+		ERROR,
 	}
 
 	companion object {

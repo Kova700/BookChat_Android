@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
 import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.feature.channel.channelsetting.ChannelSettingUiState.UiState
 import com.kova700.bookchat.feature.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
 import com.kova700.bookchat.util.image.bitmap.compressToByteArray
 import com.kova700.core.domain.usecase.channel.GetClientChannelUseCase
@@ -39,7 +40,7 @@ class ChannelSettingViewModel @Inject constructor(
 	}
 
 	private fun initUiState() = viewModelScope.launch {
-		val originChannel = getClientChannelUseCase(channelId)
+		val originChannel = getClientChannelUseCase(channelId) ?: return@launch
 		updateState {
 			copy(
 				channel = originChannel,
@@ -52,27 +53,39 @@ class ChannelSettingViewModel @Inject constructor(
 	}
 
 	private fun exitChannel() = viewModelScope.launch {
+		if (uiState.value.isLoading) return@launch
+		updateState { copy(uiState = UiState.LOADING) }
 		runCatching { leaveChannelUseCase(channelId) }
-			.onSuccess { startEvent(ChannelSettingUiEvent.ExitChannel) }
-			.onFailure { startEvent(ChannelSettingUiEvent.ShowSnackBar(R.string.channel_exit_fail)) }
+			.onSuccess {
+				updateState { copy(uiState = UiState.SUCCESS) }
+				startEvent(ChannelSettingUiEvent.ExitChannel)
+			}
+			.onFailure {
+				updateState { copy(uiState = UiState.ERROR) }
+				startEvent(ChannelSettingUiEvent.ShowSnackBar(R.string.channel_exit_fail))
+			}
 	}
 
-	//TODO :{"errorCode":"500","message":"예상치 못한 예외가 발생했습니다."} 서버 수정 대기중
 	private fun changeChannelSetting() = viewModelScope.launch {
+		if (uiState.value.isLoading) return@launch
+		updateState { copy(uiState = UiState.LOADING) }
 		runCatching {
 			channelRepository.changeChannelSetting(
 				channelId = channelId,
 				channelTitle = uiState.value.newTitle,
 				channelTags = uiState.value.tagList,
 				channelCapacity = uiState.value.newCapacity,
-				channelImage = uiState.value.newProfileImage?.compressToByteArray()
+				channelImage = uiState.value.newProfileImage?.compressToByteArray(),
+				isProfileChanged = uiState.value.isProfileChanged
 			)
+		}.onSuccess {
+			updateState { copy(uiState = UiState.SUCCESS) }
+			startEvent(ChannelSettingUiEvent.MoveBack)
+		}.onFailure {
+			updateState { copy(uiState = UiState.ERROR) }
+			startEvent(ChannelSettingUiEvent.CloseKeyboard)
+			startEvent(ChannelSettingUiEvent.ShowSnackBar(R.string.change_channel_setting_fail))
 		}
-			.onSuccess { startEvent(ChannelSettingUiEvent.MoveBack) }
-			.onFailure {
-				startEvent(ChannelSettingUiEvent.CloseKeyboard)
-				startEvent(ChannelSettingUiEvent.ShowSnackBar(R.string.change_channel_setting_fail))
-			}
 	}
 
 	fun onClickChannelCapacityBtn() {

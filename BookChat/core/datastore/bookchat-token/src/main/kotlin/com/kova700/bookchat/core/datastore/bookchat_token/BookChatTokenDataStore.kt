@@ -7,6 +7,7 @@ import com.kova700.bookchat.core.data.bookchat_token.external.model.BookChatToke
 import com.kova700.bookchat.core.datastore.bookchat_token.mapper.toDomain
 import com.kova700.bookchat.core.datastore.bookchat_token.mapper.toEntity
 import com.kova700.bookchat.core.datastore.bookchat_token.model.BookChatTokenEntity
+import com.kova700.bookchat.core.datastore.datastore.CryptographyManager
 import com.kova700.bookchat.core.datastore.datastore.clearData
 import com.kova700.bookchat.core.datastore.datastore.getDataFlow
 import com.kova700.bookchat.core.datastore.datastore.setData
@@ -18,21 +19,26 @@ import javax.inject.Inject
 class BookChatTokenDataStore @Inject constructor(
 	private val dataStore: DataStore<Preferences>,
 	private val jsonSerializer: Json,
+	private val cryptographyManager: CryptographyManager
 ) {
 	private val bookChatTokenKey = stringPreferencesKey(BOOKCHAT_TOKEN_KEY)
 
-	//TODO : 토큰 암호화 추가
 	suspend fun getBookChatToken(): BookChatToken? {
-		val tokenString = dataStore.getDataFlow(bookChatTokenKey).firstOrNull()
-		if (tokenString.isNullOrBlank()) return null
-		return jsonSerializer.decodeFromString<BookChatTokenEntity>(tokenString).toDomain()
+		val encryptedTokenString = dataStore.getDataFlow(bookChatTokenKey).firstOrNull()
+			.takeUnless { it.isNullOrBlank() } ?: return null
+		val decryptedTokenString = cryptographyManager.decrypt(encryptedTokenString)
+		return jsonSerializer.decodeFromString<BookChatTokenEntity>(decryptedTokenString).toDomain()
 	}
 
 	suspend fun saveBookChatToken(token: BookChatToken) {
-		val newToken = if (token.accessToken.startsWith(TOKEN_PREFIX).not())
-			token.copy(accessToken = "$TOKEN_PREFIX ${token.accessToken}")
-		else token
-		dataStore.setData(bookChatTokenKey, jsonSerializer.encodeToString(newToken.toEntity()))
+		val isTokenPrefixExist = token.accessToken.startsWith(TOKEN_PREFIX)
+		val newToken = when {
+			isTokenPrefixExist -> token
+			else -> token.copy(accessToken = "$TOKEN_PREFIX ${token.accessToken}")
+		}
+		val tokenString = jsonSerializer.encodeToString(newToken.toEntity())
+		val encryptedTokenString = cryptographyManager.encrypt(tokenString)
+		dataStore.setData(bookChatTokenKey, encryptedTokenString)
 	}
 
 	suspend fun saveBookChatToken(accessToken: String, refreshToken: String) {

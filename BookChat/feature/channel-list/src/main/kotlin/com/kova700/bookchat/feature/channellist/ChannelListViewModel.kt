@@ -2,8 +2,8 @@ package com.kova700.bookchat.feature.channellist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
+import com.kova700.bookchat.core.data.client.external.ClientRepository
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.network_manager.external.NetworkManager
 import com.kova700.bookchat.core.network_manager.external.model.NetworkState
@@ -31,6 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ChannelListViewModel @Inject constructor(
 	private val channelRepository: ChannelRepository,
+	private val clientRepository: ClientRepository,
 	private val networkManager: NetworkManager,
 	private val getClientChannelsUseCase: GetClientChannelsUseCase,
 	private val getClientMostActiveChannelsUseCase: GetClientMostActiveChannelsUseCase,
@@ -52,12 +53,17 @@ class ChannelListViewModel @Inject constructor(
 
 	private fun initUiState() {
 		getInitChannels()
+		getClientProfile()
 		observeChannels()
 		observeNetworkState()
 	}
 
+	private fun getClientProfile() = viewModelScope.launch {
+		updateState { copy(client = clientRepository.getClientProfile()) }
+	}
+
 	private fun observeNetworkState() = viewModelScope.launch {
-		networkManager.getStateFlow()
+		networkManager.observeNetworkState()
 			.onEach { updateState { copy(networkState = it) } }
 			.drop(1)
 			.collect { state ->
@@ -98,13 +104,17 @@ class ChannelListViewModel @Inject constructor(
 		updateState { copy(uiState = UiState.PAGING_LOADING) }
 		runCatching { getClientChannelsUseCase() }
 			.onSuccess { updateState { copy(uiState = UiState.SUCCESS) } }
-			.onFailure { updateState { copy(uiState = UiState.PAGING_ERROR) } }
+			.onFailure {
+				updateState { copy(uiState = UiState.PAGING_ERROR) }
+				startEvent(ChannelListUiEvent.ShowSnackBar(R.string.error_else))
+			}
 	}
 
 	fun loadNextChannels(lastVisibleItemPosition: Int) {
 		if (uiState.value.channelListItem.size - 1 > lastVisibleItemPosition
 			|| uiState.value.networkState == NetworkState.DISCONNECTED
 			|| uiState.value.isLoading
+			|| uiState.value.isPagingError
 		) return
 		getChannels()
 	}
@@ -150,11 +160,10 @@ class ChannelListViewModel @Inject constructor(
 		startEvent(ChannelListUiEvent.MoveToChannel(channelId))
 	}
 
-	//TODO : ChannelResponse에 호스트 정보 반영되면 호스트 유무 반영해서 전달
 	fun onLongClickChannelItem(channel: ChannelListItem.ChannelItem) {
 		startEvent(
 			ChannelListUiEvent.ShowChannelSettingDialog(
-				clientAuthority = ChannelMemberAuthority.GUEST,
+				isClientHost = channel.host?.id == uiState.value.client.id,
 				channel = channel
 			)
 		)
@@ -169,7 +178,7 @@ class ChannelListViewModel @Inject constructor(
 	}
 
 	fun onClickMuteRelatedBtn(channel: ChannelListItem.ChannelItem) {
-		if (channel.notificationFlag) muteChannel(channel.roomId)
+		if (channel.isNotificationOn) muteChannel(channel.roomId)
 		else unMuteChannel(channel.roomId)
 	}
 

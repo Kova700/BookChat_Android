@@ -13,4 +13,6 @@ dependencies {
 	implementation(project(":feature:channel-list"))
 	implementation(project(":feature:mypage"))
 	implementation(project(":feature:login"))
+	implementation(project(":core:network-manager:external"))
+	implementation(project(":core:chat-client"))
 }

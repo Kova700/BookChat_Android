@@ -6,7 +6,7 @@ data class Chat(
 	val chatId: Long,
 	val channelId: Long,
 	val message: String,
-	val status: ChatStatus = ChatStatus.SUCCESS,
+	val state: ChatState,
 	val dispatchTime: String,
 	val sender: User?,
 ) {
@@ -17,12 +17,13 @@ data class Chat(
 			else -> ChatType.Other
 		}
 	}
-	companion object{
+
+	companion object {
 		val DEFAULT = Chat(
-			chatId = 0,
-			channelId = 0,
+			chatId = -1,
+			channelId = -1,
 			message = "",
-			status = ChatStatus.SUCCESS,
+			state = ChatState.SUCCESS,
 			dispatchTime = "",
 			sender = null
 		)

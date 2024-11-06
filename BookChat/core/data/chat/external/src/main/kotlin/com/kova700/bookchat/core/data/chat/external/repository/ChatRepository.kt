@@ -1,12 +1,12 @@
 package com.kova700.bookchat.core.data.chat.external.repository
 
 import com.kova700.bookchat.core.data.chat.external.model.Chat
-import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
+import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface ChatRepository {
-	fun getChatsFlow(
+	fun getChannelChatsFlow(
 		initFlag: Boolean = false,
 		channelId: Long,
 	): Flow<List<Chat>>
@@ -24,7 +24,7 @@ interface ChatRepository {
 
 	suspend fun getNewerChats(
 		channelId: Long,
-		size: Int = CHAT_DEFAULT_LOAD_SIZE,
+		size: Int = CHAT_DEFAULT_LOAD_SIZE * 2,
 	)
 
 	suspend fun getNewestChats(
@@ -48,7 +48,7 @@ interface ChatRepository {
 		channelId: Long,
 		message: String,
 		clientId: Long,
-		chatStatus: ChatStatus,
+		chatState: ChatState,
 	): Long
 
 	suspend fun updateWaitingChat(
@@ -63,13 +63,14 @@ interface ChatRepository {
 
 	suspend fun deleteChannelAllChat(channelId: Long)
 
-	suspend fun getChat(chatId: Long): Chat
+	suspend fun getChat(chatId: Long): Chat?
 
 	fun getOlderChatIsEndFlow(): StateFlow<Boolean>
 	fun getNewerChatIsEndFlow(): StateFlow<Boolean>
 
 	suspend fun getFailedChats(channelId: Long): List<Chat>
 	suspend fun deleteChat(chatId: Long)
+	suspend fun updateChatState(chatId: Long, chatState: ChatState)
 	suspend fun clear()
 
 	companion object {

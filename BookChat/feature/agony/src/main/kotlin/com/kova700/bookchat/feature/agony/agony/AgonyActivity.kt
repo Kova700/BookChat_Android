@@ -2,6 +2,7 @@ package com.kova700.bookchat.feature.agony.agony
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
@@ -47,6 +48,7 @@ class AgonyActivity : AppCompatActivity() {
 		initAdapter()
 		initRecyclerView()
 		initViewState()
+		setBackPressedDispatcher()
 	}
 
 	private fun observeUiState() = lifecycleScope.launch {
@@ -160,6 +162,10 @@ class AgonyActivity : AppCompatActivity() {
 
 	private fun renewItemViewMode() {
 		agonyAdapter.notifyItemRangeChanged(1, agonyAdapter.itemCount - 1)
+	}
+
+	private fun setBackPressedDispatcher() {
+		onBackPressedDispatcher.addCallback { agonyViewModel.onClickBackBtn() }
 	}
 
 	private fun handleEvent(event: AgonyEvent) {

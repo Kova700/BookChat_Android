@@ -20,6 +20,9 @@ data class ReadingBookShelfUiState(
 	val isInitError: Boolean
 		get() = uiState == UiState.INIT_ERROR
 
+	val isPagingError: Boolean
+		get() = uiState == UiState.PAGING_ERROR
+
 	val isEmpty: Boolean
 		get() = readingItems.isEmpty()
 						&& isInitLoading.not()

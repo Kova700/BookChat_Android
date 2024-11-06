@@ -1,6 +1,5 @@
 package com.kova700.bookchat.feature.channellist
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,13 +10,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
-import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.navigation.ChannelNavigator
 import com.kova700.bookchat.core.navigation.MainNavigationViewModel
 import com.kova700.bookchat.core.navigation.MainRoute
 import com.kova700.bookchat.core.navigation.MakeChannelActivityNavigator
-import com.kova700.bookchat.core.network_manager.external.model.NetworkState
 import com.kova700.bookchat.feature.channel.drawer.dialog.ChannelExitWarningDialog
 import com.kova700.bookchat.feature.channellist.adpater.ChannelListAdapter
 import com.kova700.bookchat.feature.channellist.databinding.FragmentChannelListBinding
@@ -91,7 +87,6 @@ class ChannelListFragment : Fragment() {
 	}
 
 	private fun setViewState(uiState: ChannelListUiState) {
-		setNetworkStateBarUiState(uiState)
 		setViewVisibility(uiState)
 		binding.retryChannelLayout.retryBtn.setOnClickListener { channelListViewModel.onClickInitRetry() }
 	}
@@ -104,19 +99,6 @@ class ChannelListFragment : Fragment() {
 				if (uiState.isNotEmpty) View.VISIBLE else View.GONE
 			retryChannelLayout.root.visibility =
 				if (uiState.isInitError) View.VISIBLE else View.GONE
-		}
-	}
-
-	private fun setNetworkStateBarUiState(uiState: ChannelListUiState) {
-		with(binding) {
-			when (uiState.networkState) {
-				NetworkState.CONNECTED -> networkStateBar.visibility = View.GONE
-				NetworkState.DISCONNECTED -> {
-					networkStateBar.setText(R.string.please_connect_the_network)
-					networkStateBar.setBackgroundColor(Color.parseColor("#666666"))
-					networkStateBar.visibility = View.VISIBLE
-				}
-			}
 		}
 	}
 
@@ -187,35 +169,35 @@ class ChannelListFragment : Fragment() {
 	}
 
 	private fun showChannelSettingDialog(
-		clientAuthority: ChannelMemberAuthority,
+		isClientHost: Boolean,
 		channel: ChannelListItem.ChannelItem,
 	) {
 		val existingFragment =
-			childFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_SETTING)
+			childFragmentManager.findFragmentByTag(ChannelSettingDialog.TAG)
 		if (existingFragment != null) return
 
 		val dialog = ChannelSettingDialog(
 			channel = channel,
-			onClickOkExitBtn = { showChannelExitWarningDialog(clientAuthority, channel) },
+			onClickOkExitBtn = { showChannelExitWarningDialog(isClientHost, channel) },
 			onClickMuteRelatedBtn = { channelListViewModel.onClickMuteRelatedBtn(channel) },
 			onClickTopPinRelatedBtn = { channelListViewModel.onClickTopPinRelatedBtn(channel) },
 		)
-		dialog.show(childFragmentManager, DIALOG_TAG_CHANNEL_SETTING)
+		dialog.show(childFragmentManager, ChannelSettingDialog.TAG)
 	}
 
 	private fun showChannelExitWarningDialog(
-		clientAuthority: ChannelMemberAuthority,
+		isClientHost: Boolean,
 		channel: ChannelListItem.ChannelItem,
 	) {
 		val existingFragment =
-			childFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_EXIT_WARNING)
+			childFragmentManager.findFragmentByTag(ChannelExitWarningDialog.TAG)
 		if (existingFragment != null) return
 
 		val dialog = ChannelExitWarningDialog(
-			clientAuthority = clientAuthority,
+			isClientHost = isClientHost,
 			onClickOkBtn = { channelListViewModel.onClickChannelExit(channel.roomId) }
 		)
-		dialog.show(childFragmentManager, DIALOG_TAG_CHANNEL_EXIT_WARNING)
+		dialog.show(childFragmentManager, ChannelExitWarningDialog.TAG)
 	}
 
 	private fun handleEvent(event: ChannelListUiEvent) {
@@ -224,16 +206,11 @@ class ChannelListFragment : Fragment() {
 			is ChannelListUiEvent.MoveToChannel -> moveToChannel(event.channelId)
 			is ChannelListUiEvent.MoveToSearchChannelPage -> moveToSearchChannelPage()
 			is ChannelListUiEvent.ShowChannelSettingDialog -> showChannelSettingDialog(
-				clientAuthority = event.clientAuthority,
+				isClientHost = event.isClientHost,
 				channel = event.channel
 			)
 
 			is ChannelListUiEvent.ShowSnackBar -> binding.root.showSnackBar(event.stringId)
 		}
-	}
-
-	companion object {
-		private const val DIALOG_TAG_CHANNEL_SETTING = "DIALOG_TAG_CHANNEL_SETTING"
-		private const val DIALOG_TAG_CHANNEL_EXIT_WARNING = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
 	}
 }

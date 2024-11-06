@@ -21,7 +21,7 @@ data class BookShelfItemResponse(
 	@SerialName("publishAt")
 	val publishAt: String,
 	@SerialName("pages")
-	val pages: Int? = 0, //TODO : 서버 수정을 위해 임시로 nullable 처리 + default value 추가
+	val pages: Int,
 	@SerialName("star")
 	val star: StarRating?,
 	@SerialName("lastUpdatedAt")

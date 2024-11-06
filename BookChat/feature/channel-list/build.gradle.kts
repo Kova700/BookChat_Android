@@ -10,5 +10,6 @@ dependencies {
 	implementation(project(":core:network-manager:external"))
 	implementation(project(":core:data:channel:external"))
 	implementation(project(":core:data:user:external"))
+	implementation(project(":core:data:client:external"))
 	implementation(project(":core:data:chat:external"))
 }

@@ -9,6 +9,7 @@ fun RecyclerView.isScrolling(): Boolean {
 }
 
 fun LinearLayoutManager.isVisiblePosition(itemPosition: Int): Boolean {
+	if (itemPosition < 0) return false
 	val fvip = findFirstVisibleItemPosition()
 	if (fvip == RecyclerView.NO_POSITION) return false
 	val lvip = findLastVisibleItemPosition()

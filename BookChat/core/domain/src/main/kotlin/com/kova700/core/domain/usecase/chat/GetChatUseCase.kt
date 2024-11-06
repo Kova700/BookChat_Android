@@ -14,7 +14,7 @@ class GetChatUseCase @Inject constructor(
 
 	suspend operator fun invoke(
 		chatId: Long,
-	): Chat {
-		return chatRepository.getChat(chatId).attachUser()
+	): Chat? {
+		return chatRepository.getChat(chatId)?.attachUser()
 	}
 }

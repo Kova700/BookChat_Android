@@ -1,5 +1,6 @@
 package com.kova700.bookchat.core.network.bookchat.chat
 
+import com.kova700.bookchat.core.data.common.model.network.BookChatApiResult
 import com.kova700.bookchat.core.network.bookchat.common.model.SearchSortOptionNetwork
 import com.kova700.bookchat.core.network.bookchat.chat.model.response.RespondGetChat
 import com.kova700.bookchat.core.network.bookchat.chat.model.response.RespondGetChats
@@ -19,6 +20,6 @@ interface ChatApi {
 	@GET("/v1/api/chats/{chatId}")
 	suspend fun getChat(
 		@Path("chatId") chatId: Long,
-	): RespondGetChat
+	): BookChatApiResult<RespondGetChat>
 
 }

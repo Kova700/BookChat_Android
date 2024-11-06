@@ -3,10 +3,10 @@ package com.kova700.bookchat.feature.channel.chatting.adapter
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.kova700.bookchat.core.data.chat.external.model.ChatStatus
+import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
-import com.kova700.bookchat.feature.channel.chatting.util.setCaptureViewState
+import com.kova700.bookchat.feature.channel.chatting.capture.setCaptureViewState
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingDateBinding
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingLastReadNoticeBinding
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingMineBinding
@@ -81,11 +81,11 @@ class MyChatViewHolder(
 			failedChatRetryBtn.isClickable = isCaptureMode.not()
 			failedChatDeleteBtn.isClickable = isCaptureMode.not()
 			failedChatBtnLayout.visibility =
-				if (item.status == ChatStatus.FAILURE) View.VISIBLE else View.GONE
+				if (item.state == ChatState.FAILURE) View.VISIBLE else View.GONE
 			chatDispatchTimeTv.visibility =
-				if (item.status != ChatStatus.FAILURE) View.VISIBLE else View.INVISIBLE
+				if (item.state != ChatState.FAILURE) View.VISIBLE else View.INVISIBLE
 			chatLoadingIcon.visibility =
-				if (item.status == ChatStatus.LOADING || item.status == ChatStatus.RETRY_REQUIRED)
+				if (item.state == ChatState.LOADING || item.state == ChatState.RETRY_REQUIRED)
 					View.VISIBLE else View.GONE
 			chatDispatchTimeTv.text =
 				if (item.dispatchTime.isNotBlank()) item.dispatchTime.toFormattedTimeText()

@@ -1,16 +1,24 @@
 package com.kova700.bookchat.core.stomp.chatting.external
 
-import com.kova700.bookchat.core.data.channel.external.model.Channel
+import com.kova700.bookchat.core.stomp.chatting.external.model.SocketMessage
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
-import kotlinx.coroutines.flow.StateFlow
+import com.kova700.bookchat.core.stomp.chatting.external.model.SubscriptionState
+import kotlinx.coroutines.flow.Flow
 
 interface StompHandler {
-	fun getSocketStateFlow(): StateFlow<SocketState>
+	val isSocketConnected: Boolean
+
+	fun getSocketStateFlow(): Flow<SocketState>
+	fun getChannelSubscriptionStateFlow(channelId: Long): Flow<SubscriptionState>
 
 	suspend fun connectSocket(
-		channel: Channel,
 		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS,
 	)
+
+	suspend fun subscribeChannel(
+		channelId: Long,
+		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS
+	): Flow<SocketMessage>
 
 	suspend fun disconnectSocket()
 	suspend fun sendMessage(
@@ -20,7 +28,7 @@ interface StompHandler {
 
 	suspend fun retrySendMessage(chatId: Long)
 
-	fun isSocketConnected(channelId: Long): Boolean
+	fun isChannelSubscribed(channelId: Long): Boolean
 
 	companion object {
 		private const val DEFAULT_RETRY_MAX_ATTEMPTS = 5

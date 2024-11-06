@@ -19,6 +19,7 @@ import retrofit2.http.Query
 
 interface ClientApi {
 
+	//TODO : [FixWaiting] 가끔씩 최초 1번 실패함 400넘어오는데 이유를 모르겠음
 	@GET("/v1/api/users/profile/nickname")
 	suspend fun requestNameDuplicateCheck(
 		@Query("nickname") nickname: String,
@@ -30,7 +31,7 @@ interface ClientApi {
 		@Header("OIDC") idToken: String,
 		@Part userProfileImage: MultipartBody.Part? = null,
 		@Part("userSignUpRequest") requestUserSignUp: RequestUserSignUp,
-	)
+	): BookChatApiResult<Unit>
 
 	@PUT("/v1/api/devices/fcm-token")
 	suspend fun renewFcmToken(

@@ -31,7 +31,7 @@ class ChatWholeTextViewmodel @Inject constructor(
 
 	private fun initUiState() = viewModelScope.launch {
 		val chat = getChatUseCase(chatId)
-		updateState { copy(chatMessage = chat.message) }
+		updateState { copy(chatMessage = chat?.message ?: "채팅을 가져오지 못했습니다.") }
 	}
 
 	fun onClickBackBtn() {

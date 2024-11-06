@@ -1,4 +1,4 @@
-package com.kova700.bookchat.core.fcm.forced_logout.dialog
+package com.kova700.bookchat.core.remoteconfig.dialog
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -7,27 +7,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import com.kova700.bookchat.core.fcm.forcedLogout.databinding.DialogForcedLogoutNoticeBinding
-import com.kova700.bookchat.util.dialog.DialogSizeManager
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import com.kova700.bookchat.core.remoteconfig.databinding.DialogServerUnderMaintenanceNoticeBinding
 
-@AndroidEntryPoint
-class ForcedLogoutNoticeDialog(
+class ServerUnderMaintenanceNoticeDialog(
 	private val onClickOkBtn: () -> Unit,
-) : DialogFragment() {
-	private var _binding: DialogForcedLogoutNoticeBinding? = null
-	private val binding get() = _binding!!
+	private val noticeMessage: String,
 
-	@Inject
-	lateinit var dialogSizeManager: DialogSizeManager
+	) : DialogFragment() {
+	private var _binding: DialogServerUnderMaintenanceNoticeBinding? = null
+	private val binding get() = _binding!!
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedInstanceState: Bundle?,
 	): View {
-		_binding = DialogForcedLogoutNoticeBinding.inflate(inflater, container, false)
+		_binding = DialogServerUnderMaintenanceNoticeBinding.inflate(inflater, container, false)
 		return binding.root
 	}
 
@@ -43,12 +38,18 @@ class ForcedLogoutNoticeDialog(
 	}
 
 	private fun initViewState() {
-		binding.okBtn.setOnClickListener { onClickOkBtn() }
-		dialogSizeManager.setDialogSize(binding.root)
+		with(binding) {
+			noticeContentTv.text = noticeMessage
+			okBtn.setOnClickListener { onClickOkBtn() }
+		}
 	}
 
 	private fun onClickOkBtn() {
-		dismiss()
 		onClickOkBtn.invoke()
+		dismiss()
+	}
+
+	companion object {
+		const val TAG = "DIALOG_TAG_SERVER_DOWN_NOTICE"
 	}
 }

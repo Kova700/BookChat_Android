@@ -74,12 +74,15 @@ class ChannelSettingDialog(
 
 	private fun initDialogText() {
 		binding.channelMuteTv.setText(
-			if (channel.notificationFlag) R.string.channel_mute
+			if (channel.isNotificationOn) R.string.channel_mute
 			else R.string.channel_turn_on_notification
 		)
 		binding.channelTopPinTv.setText(
 			if (channel.isTopPined) R.string.channel_un_pin_
 			else R.string.channel_top_pin
 		)
+	}
+	companion object {
+		const val TAG = "DIALOG_TAG_CHANNEL_SETTING"
 	}
 }

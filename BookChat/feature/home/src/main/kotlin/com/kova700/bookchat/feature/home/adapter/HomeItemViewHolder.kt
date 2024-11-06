@@ -137,7 +137,7 @@ class HomeChannelViewHolder(
 				channel.lastChat?.dispatchTime?.toFormattedDetailDateTimeText()
 			uncheckedChatCountTv.text = if (channel.isExistNewChat) "New+" else ""
 			muteChannelIcon.visibility =
-				if ((channel.notificationFlag.not()) && channel.isAvailableChannel) View.VISIBLE else View.GONE
+				if ((channel.isNotificationOn.not()) && channel.isAvailableChannel) View.VISIBLE else View.GONE
 			topPinChannelIcon.visibility =
 				if ((channel.isTopPined) && channel.isAvailableChannel) View.VISIBLE else View.GONE
 			unavailableChannelStateGroup.visibility =

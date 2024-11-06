@@ -7,6 +7,7 @@ import okio.Timeout
 import retrofit2.Call
 import retrofit2.CallAdapter
 import retrofit2.Callback
+import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.Retrofit
 import java.lang.reflect.ParameterizedType
@@ -67,7 +68,14 @@ private class BookChatApiCall<R>(
 			}
 
 			override fun onFailure(call: Call<R?>, throwable: Throwable) {
-				throw throwable
+				val errorCode = if (throwable is HttpException) throwable.code() else -1
+				val error = BookChatApiResult.Failure<R>(
+					code = errorCode,
+					locationHeader = null,
+					message = throwable.message,
+					body = null
+				)
+				callback.onResponse(this@BookChatApiCall, Response.success(error))
 			}
 		}
 	)

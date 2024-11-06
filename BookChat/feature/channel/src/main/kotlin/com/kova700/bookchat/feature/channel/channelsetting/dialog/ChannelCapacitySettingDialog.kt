@@ -22,7 +22,7 @@ class ChannelCapacitySettingDialog(
 
 	private val selectableValues = arrayOf(
 		"10", "20", "30", "40", "50", "60", "70", "80", "90", "100", "200", "300"
-	)
+	).filter { it.toInt() >= currentCapacity }
 
 	@Inject
 	lateinit var dialogSizeManager: DialogSizeManager
@@ -61,14 +61,15 @@ class ChannelCapacitySettingDialog(
 		}
 	}
 
-	//TODO : 현재 방 최대 용량 말고 현재 인원 수 보다 적은 용량으로 선택한다면 "현재 인원보다 적은 인원으로는 설정할 수 없습니다" 알림
-	//TODO : binding.channelCapacityNp.value = currentCapacity //기본값으로 0 넘어오는데 수정해야될듯
 	private fun initNumberPickerState() {
 		with(binding) {
 			channelCapacityNp.minValue = 0
-			channelCapacityNp.maxValue = selectableValues.size - 1
-			channelCapacityNp.displayedValues = selectableValues
+			channelCapacityNp.maxValue = selectableValues.lastIndex
+			channelCapacityNp.displayedValues = selectableValues.toTypedArray()
 			channelCapacityNp.value = selectableValues.indexOfFirst { it.toInt() == currentCapacity }
 		}
+	}
+	companion object{
+		const val TAG = "DIALOG_TAG_CHANNEL_CAPACITY_DIALOG"
 	}
 }

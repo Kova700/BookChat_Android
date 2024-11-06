@@ -1,9 +1,11 @@
 package com.kova700.bookchat.feature.main
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -12,8 +14,8 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.kova700.bookchat.core.design_system.R
-import com.kova700.bookchat.core.navigation.ChannelNavigator
 import com.kova700.bookchat.core.navigation.MainNavigationViewModel
+import com.kova700.bookchat.core.network_manager.external.model.NetworkState
 import com.kova700.bookchat.feature.main.databinding.ActivityMainBinding
 import com.kova700.bookchat.feature.main.navigation.getResId
 import com.kova700.bookchat.util.permissions.getPermissionsLauncher
@@ -21,7 +23,6 @@ import com.kova700.bookchat.util.permissions.notificationPermission
 import com.kova700.bookchat.util.toast.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import com.kova700.bookchat.feature.main.R as mainR
 
 @AndroidEntryPoint
@@ -31,9 +32,7 @@ class MainActivity : AppCompatActivity() {
 	private lateinit var navController: NavController
 
 	private val mainNavigationViewmodel by viewModels<MainNavigationViewModel>()
-
-	@Inject
-	lateinit var channelNavigator: ChannelNavigator
+	private val mainViewmodel by viewModels<MainViewModel>()
 
 	private val notificationPermissionLauncher = getPermissionsLauncher(
 		onSuccess = {},
@@ -52,9 +51,15 @@ class MainActivity : AppCompatActivity() {
 		binding = ActivityMainBinding.inflate(layoutInflater)
 		setContentView(binding.root)
 		initNavigation()
-		moveToChannelIfNeed()
 		requestNotificationPermission()
 		observeNavigationEvents()
+		observeUiState()
+	}
+
+	private fun observeUiState() = lifecycleScope.launch {
+		mainViewmodel.uiState.collect { uiState ->
+			setNetworkStateBarUiState(uiState)
+		}
 	}
 
 	private fun initNavigation() {
@@ -68,24 +73,24 @@ class MainActivity : AppCompatActivity() {
 		binding.bnvMain.setupWithNavController(navController)
 	}
 
+	private fun setNetworkStateBarUiState(uiState: MainUiState) {
+		with(binding) {
+			when (uiState.networkState) {
+				NetworkState.CONNECTED -> networkStateBar.visibility = View.GONE
+				NetworkState.DISCONNECTED -> {
+					networkStateBar.setText(R.string.please_connect_the_network)
+					networkStateBar.setBackgroundColor(Color.parseColor("#666666"))
+					networkStateBar.visibility = View.VISIBLE
+				}
+			}
+		}
+	}
+
 	private fun observeNavigationEvents() = lifecycleScope.launch {
 		mainNavigationViewmodel.navigateEvent.collect { route ->
 			val fragmentId = route.getResId()
 			binding.bnvMain.selectedItemId = fragmentId
 		}
-	}
-
-	private fun moveToChannelIfNeed() {
-		if (intent.hasExtra(EXTRA_NEW_CHAT_CHANNEL_ID).not()) return
-		val channelId = intent.getLongExtra(EXTRA_NEW_CHAT_CHANNEL_ID, -1)
-		moveToChannel(channelId)
-	}
-
-	private fun moveToChannel(channelId: Long) {
-		channelNavigator.navigate(
-			currentActivity = this,
-			channelId = channelId,
-		)
 	}
 
 	private fun requestNotificationPermission() {
@@ -94,6 +99,5 @@ class MainActivity : AppCompatActivity() {
 
 	companion object {
 		private const val SCHEME_PACKAGE = "package"
-		const val EXTRA_NEW_CHAT_CHANNEL_ID = "EXTRA_NEW_CHAT_CHANNEL_ID"
 	}
 }

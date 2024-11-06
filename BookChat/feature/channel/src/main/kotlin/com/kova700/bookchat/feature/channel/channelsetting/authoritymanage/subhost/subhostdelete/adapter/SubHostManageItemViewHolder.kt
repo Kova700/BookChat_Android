@@ -10,7 +10,7 @@ class SubHostManageItemViewHolder(
 	private val onClickDeleteBtn: ((Int) -> Unit)?,
 ) : RecyclerView.ViewHolder(binding.root) {
 	init {
-		binding.subHostDeleteChip.setOnClickListener {
+		binding.subHostDeleteBtn.setOnClickListener {
 			onClickDeleteBtn?.invoke(absoluteAdapterPosition)
 		}
 	}

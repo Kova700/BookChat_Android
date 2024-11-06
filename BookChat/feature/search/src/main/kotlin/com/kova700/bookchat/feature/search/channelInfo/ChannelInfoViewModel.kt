@@ -1,6 +1,5 @@
 package com.kova700.bookchat.feature.search.channelInfo
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,7 +11,7 @@ import com.kova700.bookchat.core.data.search.channel.external.ChannelSearchRepos
 import com.kova700.bookchat.core.data.search.channel.external.mapper.toChannel
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.feature.search.SearchFragment.Companion.EXTRA_CLICKED_CHANNEL_ID
-import com.kova700.bookchat.util.Constants.TAG
+import com.kova700.bookchat.feature.search.channelInfo.ChannelInfoUiState.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,17 +44,26 @@ class ChannelInfoViewModel @Inject constructor(
 	}
 
 	private fun enterChannel() = viewModelScope.launch {
+		if (uiState.value.isLoading) return@launch
+		updateState { copy(uiState = UiState.LOADING) }
 		runCatching { channelRepository.enterChannel(uiState.value.channel.toChannel()) }
-			.onSuccess { startEvent(ChannelInfoEvent.MoveToChannel(uiState.value.channel.roomId)) }
-			.onFailure {
-				failHandler(
-					throwable = it,
-					default = { startEvent(ChannelInfoEvent.ShowSnackBar(R.string.enter_chat_room_fail)) }
-				)
+			.onSuccess {
+				updateState { copy(uiState = UiState.SUCCESS) }
+				startEvent(ChannelInfoEvent.MoveToChannel(uiState.value.channel.roomId))
+			}
+			.onFailure { throwable ->
+				updateState { copy(uiState = UiState.ERROR) }
+				when (throwable) {
+					is ChannelIsFullException -> startEvent(ChannelInfoEvent.ShowFullChannelNoticeDialog)
+					is ChannelIsExplodedException -> startEvent(ChannelInfoEvent.ShowExplodedChannelDialog)
+					is UserIsBannedException -> updateState { copy(isBannedChannel = true) }
+					else -> startEvent(ChannelInfoEvent.ShowSnackBar(R.string.enter_chat_room_fail))
+				}
 			}
 	}
 
 	fun onClickEnterBtn() {
+		if (uiState.value.isBannedChannel) return
 		enterChannel()
 	}
 
@@ -69,18 +77,5 @@ class ChannelInfoViewModel @Inject constructor(
 
 	private inline fun updateState(block: ChannelInfoUiState.() -> ChannelInfoUiState) {
 		_uiState.update { _uiState.value.block() }
-	}
-
-	private fun failHandler(
-		throwable: Throwable,
-		default: (() -> Unit)? = null,
-	) {
-		Log.d(TAG, "ChannelInfoViewModel: failHandler() -  throwable :$throwable")
-		when (throwable) {
-			is ChannelIsFullException -> startEvent(ChannelInfoEvent.ShowFullChannelNoticeDialog)
-			is ChannelIsExplodedException -> startEvent(ChannelInfoEvent.ShowExplodedChannelDialog)
-			is UserIsBannedException -> updateState { copy(isBannedChannel = true) }
-			else -> default?.invoke()
-		}
 	}
 }

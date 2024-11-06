@@ -1,5 +1,6 @@
 package com.kova700.bookchat.core.notification.chat.internal
 
+import android.app.ActivityManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -18,26 +19,26 @@ import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.design_system.R
 import com.kova700.bookchat.core.notification.chat.external.ChatNotificationHandler
 import com.kova700.bookchat.core.notification.util.iconbuilder.IconBuilder
-import com.kova700.bookchat.core.stomp.chatting.external.StompHandler
-import com.kova700.bookchat.feature.main.MainActivity
-import com.kova700.bookchat.feature.main.MainActivity.Companion.EXTRA_NEW_CHAT_CHANNEL_ID
+import com.kova700.bookchat.feature.channel.chatting.ChannelActivity
+import com.kova700.bookchat.feature.channel.chatting.ChannelActivity.Companion.EXTRA_CHANNEL_ID
 import com.kova700.bookchat.util.channel.getBitmap
 import com.kova700.bookchat.util.date.toDate
 import com.kova700.bookchat.util.user.getBitmap
+import com.kova700.core.data.appsetting.external.repository.AppSettingRepository
 import com.kova700.core.data.notificationinfo.external.repository.ChattingNotificationInfoRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Date
 import javax.inject.Inject
 
 class ChatNotificationHandlerImpl @Inject constructor(
-	@ApplicationContext private val context: Context,
+	@ApplicationContext private val appContext: Context,
 	private val iconBuilder: IconBuilder,
-	private val stompHandler: StompHandler,
 	private val chattingNotificationInfoRepository: ChattingNotificationInfoRepository,
+	private val appSettingRepository: AppSettingRepository
 ) : ChatNotificationHandler {
 
 	private val notificationManager =
-		(context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+		(appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
 			.apply {
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 					val notificationChannel = NotificationChannel(
@@ -83,11 +84,33 @@ class ChatNotificationHandlerImpl @Inject constructor(
 		chat: Chat,
 		notificationId: Int,
 	): Boolean {
+		return appSettingRepository.isPushNotificationEnabled()
+						&& channel.isNotificationOn
+						&& chat.isNewerNotification(notificationId)
+						&& isChannelWatching(channel.roomId).not()
+	}
+
+	private suspend fun Chat.isNewerNotification(notificationId: Int): Boolean {
 		val previousTimeStamp =
 			chattingNotificationInfoRepository.getNotificationLastTimestamp(notificationId)
-		return (previousTimeStamp == null || previousTimeStamp < chat.timestamp)
-						&& channel.notificationFlag
-						&& stompHandler.isSocketConnected(channel.roomId).not()
+		return (previousTimeStamp == null || previousTimeStamp < timestamp)
+	}
+
+	private fun isChannelWatching(channelId: Long): Boolean {
+		val activityManager = appContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+		val isChannelActivityRunning = activityManager.appTasks
+			.any { task -> task.taskInfo.topActivity?.className == ChannelActivity::class.java.name }
+
+		val isAppInForeground = activityManager.runningAppProcesses.any { processInfo ->
+			processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+							&& processInfo.processName == appContext.packageName
+		}
+
+		val watchingChannelId = ChannelActivity.watchingChannelId ?: return false
+		return isChannelActivityRunning
+						&& isAppInForeground
+						&& watchingChannelId == channelId
 	}
 
 	private suspend fun getChatNotification(
@@ -99,10 +122,10 @@ class ChatNotificationHandlerImpl @Inject constructor(
 		val messagingStyle =
 			createMessagingStyle(sender, channel).addMessage(chat.toMessagingStyleMessage())
 
-		return NotificationCompat.Builder(context, CHATTING_NOTIFICATION_CHANNEL_ID)
+		return NotificationCompat.Builder(appContext, CHATTING_NOTIFICATION_CHANNEL_ID)
 			.setBadgeIconType(NotificationCompat.BADGE_ICON_LARGE)
 			.setSmallIcon(R.drawable.ic_notification)
-			.setColor(ContextCompat.getColor(context, R.color.notification_background_orange))
+			.setColor(ContextCompat.getColor(appContext, R.color.notification_background_orange))
 			.setStyle(messagingStyle)
 			.setShortcutId(getNotificationId(channel).toString())
 			.setGroup(CHATTING_NOTIFICATION_GROUP_KEY)
@@ -114,49 +137,49 @@ class ChatNotificationHandlerImpl @Inject constructor(
 	}
 
 	private fun getGroupNotification(): Notification {
-		return NotificationCompat.Builder(context, CHATTING_NOTIFICATION_CHANNEL_ID)
+		return NotificationCompat.Builder(appContext, CHATTING_NOTIFICATION_CHANNEL_ID)
 			.setSmallIcon(R.drawable.ic_notification)
-			.setColor(ContextCompat.getColor(context, R.color.notification_background_orange))
+			.setColor(ContextCompat.getColor(appContext, R.color.notification_background_orange))
 			.setAutoCancel(true)
 			.setGroup(CHATTING_NOTIFICATION_GROUP_KEY)
 			.setGroupSummary(true)
 			.setPriority(NotificationCompat.PRIORITY_HIGH)
-			.setSubText(context.getString(R.string.new_message))
+			.setSubText(appContext.getString(R.string.new_message))
 			.build()
 	}
 
 	private fun getPendingIntent(channel: Channel): PendingIntent {
+		val channelIntent = getChannelActivityIntent(channel)
+			.apply { flags = Intent.FLAG_ACTIVITY_CLEAR_TOP }
 		return PendingIntent.getActivity(
-			context,
+			appContext,
 			getNotificationId(channel),
-			getMainActivityIntent(channel),
-			PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+			channelIntent,
+			PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT
 		)
 	}
 
-	private fun getMainActivityIntent(channel: Channel): Intent {
-		return Intent(context, MainActivity::class.java).apply {
-			flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-			putExtra(EXTRA_NEW_CHAT_CHANNEL_ID, channel.roomId)
+	private fun getChannelActivityIntent(channel: Channel): Intent {
+		return Intent(appContext, ChannelActivity::class.java).apply {
+			putExtra(EXTRA_CHANNEL_ID, channel.roomId)
 		}
 	}
 
 	private suspend fun createDynamicShortcut(channel: Channel) {
 		val shortcutId = getNotificationId(channel).toString()
-		val intent = getMainActivityIntent(channel).setAction(Intent.ACTION_CREATE_SHORTCUT)
-
+		val intent = getChannelActivityIntent(channel).setAction(Intent.ACTION_CREATE_SHORTCUT)
 		val icon = iconBuilder.buildIcon(
 			imageUrl = channel.roomImageUri,
-			defaultImage = channel.defaultRoomImageType.getBitmap(context)
+			defaultImage = channel.defaultRoomImageType.getBitmap(appContext)
 		)
-		val shortcutBuilder = ShortcutInfoCompat.Builder(context, shortcutId)
+		val shortcutBuilder = ShortcutInfoCompat.Builder(appContext, shortcutId)
 			.setLongLived(true)
 			.setIntent(intent)
 			.setShortLabel(channel.roomName)
 			.setLongLabel(channel.roomName)
 			.setIcon(icon)
 			.build()
-		ShortcutManagerCompat.pushDynamicShortcut(context, shortcutBuilder)
+		ShortcutManagerCompat.pushDynamicShortcut(appContext, shortcutBuilder)
 	}
 
 	private suspend fun checkAndRemoveNotificationGroup() {
@@ -169,13 +192,13 @@ class ChatNotificationHandlerImpl @Inject constructor(
 
 	private fun checkAndRemoveShortcut(channel: Channel) {
 		val shortcutId = getNotificationId(channel).toString()
-		ShortcutManagerCompat.getDynamicShortcuts(context)
+		ShortcutManagerCompat.getDynamicShortcuts(appContext)
 			.find { it.id == shortcutId }
-			?.let { ShortcutManagerCompat.removeDynamicShortcuts(context, listOf(shortcutId)) }
+			?.let { ShortcutManagerCompat.removeDynamicShortcuts(appContext, listOf(shortcutId)) }
 	}
 
 	private fun clearShortcut() {
-		ShortcutManagerCompat.removeAllDynamicShortcuts(context)
+		ShortcutManagerCompat.removeAllDynamicShortcuts(appContext)
 	}
 
 	private suspend fun createMessagingStyle(
@@ -196,7 +219,7 @@ class ChatNotificationHandlerImpl @Inject constructor(
 	private suspend fun User.toPerson(): Person {
 		val icon = iconBuilder.buildIcon(
 			imageUrl = profileImageUrl,
-			defaultImage = defaultProfileImageType.getBitmap(context)
+			defaultImage = defaultProfileImageType.getBitmap(appContext)
 		)
 		return Person.Builder()
 			.setKey(id.toString())

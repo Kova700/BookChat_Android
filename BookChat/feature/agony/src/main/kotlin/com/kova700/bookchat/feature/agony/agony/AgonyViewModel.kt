@@ -91,6 +91,7 @@ class AgonyViewModel @Inject constructor(
 	fun loadNextAgonies(lastVisibleItemPosition: Int) {
 		if (uiState.value.agonies.size - 1 > lastVisibleItemPosition
 			|| uiState.value.isLoading
+			|| uiState.value.isPagingError
 		) return
 		getAgonies()
 	}
@@ -144,7 +145,8 @@ class AgonyViewModel @Inject constructor(
 	}
 
 	fun onClickBackBtn() {
-		startEvent(AgonyEvent.MoveToBack)
+		if (uiState.value.isEditing) onClickEditCancelBtn()
+		else startEvent(AgonyEvent.MoveToBack)
 	}
 
 	fun onClickFirstItem() {

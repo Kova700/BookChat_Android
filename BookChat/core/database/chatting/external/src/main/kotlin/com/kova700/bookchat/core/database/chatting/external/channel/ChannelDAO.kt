@@ -14,9 +14,9 @@ interface ChannelDAO {
 
 	@Query(
 		"SELECT * FROM Channel " +
-						"ORDER BY last_chat_id IS NULL DESC, " +
+						"ORDER BY top_pin_num DESC, " +
+						"last_chat_id IS NULL DESC, " +
 						"last_chat_id DESC, " +
-						"top_pin_num DESC, " +
 						"room_id DESC " +
 						"LIMIT :pageSize OFFSET :offset"
 	)
@@ -31,13 +31,17 @@ interface ChannelDAO {
 	)
 	suspend fun getChannel(channelId: Long): ChannelEntity?
 
+	@Query(
+		"SELECT EXISTS" +
+						"(SELECT * FROM Channel WHERE room_id = :channelId)"
+	)
+	suspend fun isChannelExist(channelId: Long): Boolean
+
 	@Insert(onConflict = OnConflictStrategy.IGNORE)
 	suspend fun insertIfNotPresent(channel: ChannelEntity): Long
 
 	suspend fun upsertAllChannels(channels: List<ChannelEntity>) {
-		for (channel in channels) {
-			upsertChannel(channel)
-		}
+		for (channel in channels) upsertChannel(channel)
 	}
 
 	suspend fun upsertChannel(channel: ChannelEntity) {
@@ -50,13 +54,13 @@ interface ChannelDAO {
 			roomSid = channel.roomSid,
 			roomMemberCount = channel.roomMemberCount,
 			defaultRoomImageType = channel.defaultRoomImageType,
-			roomImageUri = channel.roomImageUri
+			roomImageUri = channel.roomImageUri,
 		)
 
-		if (channel.lastChatId != null) {
-			updateLastChat(
+		channel.lastChatId?.let { lastChatId ->
+			updateChannelLastChatIfValid(
 				channelId = channel.roomId,
-				lastChatId = channel.lastChatId
+				chatId = lastChatId
 			)
 		}
 	}
@@ -78,6 +82,26 @@ interface ChannelDAO {
 		defaultRoomImageType: ChannelDefaultImageType,
 		roomImageUri: String?,
 	)
+
+	suspend fun updateLastReadChatIdIfValid(
+		channelId: Long,
+		chatId: Long
+	): Boolean {
+		val existingLastReadChatId = getChannel(channelId)?.lastReadChatId
+		if (existingLastReadChatId != null && chatId <= existingLastReadChatId) return false
+		updateLastReadChat(channelId, chatId)
+		return true
+	}
+
+	suspend fun updateChannelLastChatIfValid(
+		channelId: Long,
+		chatId: Long
+	): Boolean {
+		val existingLastChatId = getChannel(channelId)?.lastChatId
+		if (existingLastChatId != null && chatId <= existingLastChatId) return false
+		updateLastChat(channelId, chatId)
+		return true
+	}
 
 	@Query(
 		"UPDATE Channel SET " +

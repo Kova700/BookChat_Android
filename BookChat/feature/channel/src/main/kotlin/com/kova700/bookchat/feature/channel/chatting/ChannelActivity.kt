@@ -1,5 +1,6 @@
 package com.kova700.bookchat.feature.channel.chatting
 
+import android.app.ActivityManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -21,15 +22,18 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.user.external.model.User
 import com.kova700.bookchat.core.design_system.R
+import com.kova700.bookchat.core.navigation.MainNavigator
+import com.kova700.bookchat.core.remoteconfig.dialog.ServerDownNoticeDialog
+import com.kova700.bookchat.core.remoteconfig.dialog.ServerUnderMaintenanceNoticeDialog
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
+import com.kova700.bookchat.feature.channel.channelsetting.ChannelSettingActivity
 import com.kova700.bookchat.feature.channel.channelsetting.ChannelSettingActivity.Companion.RESULT_CODE_USER_CHANNEL_EXIT
 import com.kova700.bookchat.feature.channel.chatting.adapter.ChatItemAdapter
+import com.kova700.bookchat.feature.channel.chatting.capture.captureItems
 import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
-import com.kova700.bookchat.feature.channel.chatting.util.captureItems
 import com.kova700.bookchat.feature.channel.chatting.wholetext.ChatWholeTextActivity
 import com.kova700.bookchat.feature.channel.chatting.wholetext.ChatWholeTextViewmodel
 import com.kova700.bookchat.feature.channel.databinding.ActivityChannelBinding
@@ -52,8 +56,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO : 폭발한 채팅방 나가기 할 때, 서버 요청 실패하더라도 괜찮게 예외처리 (soft삭제라 서버에 없는 채팅방 일 수도 있음)
-//TODO : 유저가 해당 채팅방을 안보고 채널 목록을 보고 있는 상황에서 채팅방에 강퇴당한 후, 채팅방을 누르고 들어오면 아무 UI가 안뜸 (강퇴당했다는 UI 마저도 안뜸)
 @AndroidEntryPoint
 class ChannelActivity : AppCompatActivity() {
 
@@ -65,6 +67,9 @@ class ChannelActivity : AppCompatActivity() {
 
 	@Inject
 	lateinit var channelDrawerAdapter: ChannelDrawerAdapter
+
+	@Inject
+	lateinit var mainNavigator: MainNavigator
 
 	private lateinit var linearLayoutManager: LinearLayoutManager
 
@@ -85,16 +90,6 @@ class ChannelActivity : AppCompatActivity() {
 		observeUiState()
 		observeUiEvent()
 		observeCaptureIds()
-	}
-
-	override fun onStart() {
-		super.onStart()
-		channelViewModel.onStartScreen()
-	}
-
-	override fun onStop() {
-		super.onStop()
-		channelViewModel.onStopScreen()
 	}
 
 	private fun observeUiState() = lifecycleScope.launch {
@@ -141,11 +136,14 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun initViewState() {
+		watchingChannelId =
+			if (intent.hasExtra(EXTRA_CHANNEL_ID)) intent.getLongExtra(EXTRA_CHANNEL_ID, -1)
+			else null
 		initLayoutManager()
 		initAdapter()
 		initRcv()
 		with(binding.chatInputEt) {
-			if (channelViewModel.uiState.value.channel.isAvailableChannel) isEnabled = true
+			if (channelViewModel.uiState.value.channel.isAvailable) isEnabled = true
 			addTextChangedListener { text ->
 				val message = text?.toString() ?: return@addTextChangedListener
 				channelViewModel.onChangeEnteredMessage(message)
@@ -186,8 +184,9 @@ class ChannelActivity : AppCompatActivity() {
 		setCaptureMode(uiState)
 		with(binding) {
 			channelTitle.text = uiState.channel.roomName
-			roomMemberCount.text = uiState.channel.roomMemberCount.toString()
+			roomMemberCount.text = uiState.channel.roomMemberCount.takeIf { it != 0 }?.toString() ?: ""
 		}
+		binding.progressBar.visibility = if (uiState.isInitLoading) View.VISIBLE else View.GONE
 	}
 
 	private fun setCaptureMode(uiState: ChannelUiState) {
@@ -267,16 +266,16 @@ class ChannelActivity : AppCompatActivity() {
 				setSelection(uiState.enteredMessage.length)
 			}
 		}
-		with(binding.chatSendBtn) {
-			visibility =
-				if (uiState.enteredMessage.isBlank()) View.GONE else View.VISIBLE //TODO : GONE OR INVISIBLE 테스트 필요
-		}
+		binding.chatSendBtn.visibility =
+			if (uiState.enteredMessage.isBlank()) View.GONE else View.VISIBLE
 	}
 
 	private fun setNewChatNoticeState(uiState: ChannelUiState) {
 		with(binding.newChatNoticeLayout) {
 			root.visibility =
 				if (uiState.newChatNotice != null) View.VISIBLE else View.INVISIBLE
+			userProfileCv.visibility =
+				if (uiState.newChatNotice?.sender == null) View.INVISIBLE else View.VISIBLE
 			userProfileIv.loadUserProfile(
 				imageUrl = uiState.newChatNotice?.sender?.profileImageUrl,
 				userDefaultProfileType = uiState.newChatNotice?.sender?.defaultProfileImageType
@@ -334,7 +333,11 @@ class ChannelActivity : AppCompatActivity() {
 			super.onItemRangeInserted(positionStart, itemCount)
 			scrollToLastReadNoticeIfExists()
 			if (itemCount <= 2) scrollToBottomIfOnBottom()
-			removeNewChatNoticeIfAppearsOnScreen()
+			/** Paging 데이터 삽입시 NewChatNotice가 사라지는 현상이 있어서 delayTime 추가 */
+			lifecycleScope.launch {
+				delay(500)
+				removeNewChatNoticeIfAppearsOnScreen()
+			}
 			removeLastReadNoticeScrollFlagIfAppearsOnScreen()
 		}
 	}
@@ -365,7 +368,7 @@ class ChannelActivity : AppCompatActivity() {
 	private var isGoneAnimatingBottomScrollBtn = false
 	private fun setBottomScrollBtnState() {
 		fun setVisible() {
-			with(binding.bottomScrollBtn) {
+			with(binding.chatBottomScrollBtnCv) {
 				if (isGoneAnimatingBottomScrollBtn.not() && visibility == View.VISIBLE) return
 				isGoneAnimatingBottomScrollBtn = false
 				bottomScrollBtnAnimation?.cancel()
@@ -386,7 +389,7 @@ class ChannelActivity : AppCompatActivity() {
 		}
 
 		fun setGone() {
-			with(binding.bottomScrollBtn) {
+			with(binding.chatBottomScrollBtnCv) {
 				if (visibility != View.VISIBLE) return
 				isGoneAnimatingBottomScrollBtn = true
 				bottomScrollBtnAnimation?.cancel()
@@ -446,9 +449,10 @@ class ChannelActivity : AppCompatActivity() {
 
 	private fun removeNewChatNoticeIfAppearsOnScreen() {
 		if (channelViewModel.uiState.value.newChatNotice == null) return
-		val newestChatNotMineIndex = chatItemAdapter.newestChatNotMineIndex
-		if (linearLayoutManager.isVisiblePosition(newestChatNotMineIndex).not()) return
+		val newestChatNotMineIndex =
+			chatItemAdapter.newestChatNotMineIndex.takeIf { it != -1 } ?: return
 		val item = chatItemAdapter.currentList[newestChatNotMineIndex] as ChatItem.Message
+		if (linearLayoutManager.isVisiblePosition(newestChatNotMineIndex).not()) return
 		channelViewModel.onReadNewestChatNotMineInList(item)
 	}
 
@@ -474,10 +478,7 @@ class ChannelActivity : AppCompatActivity() {
 
 	private fun moveChannelSetting() {
 		val channelId = channelViewModel.uiState.value.channel.roomId
-		val intent = Intent(
-			this,
-			_root_ide_package_.com.kova700.bookchat.feature.channel.channelsetting.ChannelSettingActivity::class.java
-		)
+		val intent = Intent(this, ChannelSettingActivity::class.java)
 			.putExtra(EXTRA_CHANNEL_ID, channelId)
 		channelSettingResultLauncher.launch(intent)
 	}
@@ -517,33 +518,30 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	private fun showBannedClientNoticeDialog() {
-		Log.d(TAG, "ChannelActivity: showBannedClientNoticeDialog() - called")
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE)
+			supportFragmentManager.findFragmentByTag(ChannelBannedUserNoticeDialog.TAG)
 		if (existingFragment != null) return
 		val dialog = ChannelBannedUserNoticeDialog()
-		dialog.show(supportFragmentManager, DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE)
+		dialog.show(supportFragmentManager, ChannelBannedUserNoticeDialog.TAG)
 	}
 
 	private fun showExplodedChannelNoticeDialog() {
-		Log.d(TAG, "ChannelActivity: showExplodedChannelNoticeDialog() - called")
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_EXPLODED_CHANNEL_NOTICE)
+			supportFragmentManager.findFragmentByTag(ExplodedChannelNoticeDialog.TAG)
 		if (existingFragment != null) return
 		val dialog = ExplodedChannelNoticeDialog()
-		dialog.show(supportFragmentManager, DIALOG_TAG_EXPLODED_CHANNEL_NOTICE)
+		dialog.show(supportFragmentManager, ExplodedChannelNoticeDialog.TAG)
 	}
 
-	private fun showChannelExitWarningDialog(clientAuthority: ChannelMemberAuthority) {
-		Log.d(TAG, "ChannelActivity: showChannelExitWarningDialog() - called")
+	private fun showChannelExitWarningDialog(isClientHost: Boolean) {
 		val existingFragment =
-			supportFragmentManager.findFragmentByTag(DIALOG_TAG_CHANNEL_EXIT_WARNING)
+			supportFragmentManager.findFragmentByTag(ChannelExitWarningDialog.TAG)
 		if (existingFragment != null) return
 		val dialog = ChannelExitWarningDialog(
-			clientAuthority = clientAuthority,
+			isClientHost = isClientHost,
 			onClickOkBtn = { channelViewModel.onClickChannelExitDialogBtn() }
 		)
-		dialog.show(supportFragmentManager, DIALOG_TAG_CHANNEL_EXIT_WARNING)
+		dialog.show(supportFragmentManager, ChannelExitWarningDialog.TAG)
 	}
 
 	private fun setBackPressedDispatcher() {
@@ -559,6 +557,7 @@ class ChannelActivity : AppCompatActivity() {
 					return@addCallback
 				}
 			}
+			Log.d(TAG, "ChannelActivity: setBackPressedDispatcher() - called")
 			channelViewModel.onClickBackBtn()
 		}
 	}
@@ -583,7 +582,7 @@ class ChannelActivity : AppCompatActivity() {
 	 * FailedChat으로 화면이 가득찬 경우로 인지하고 띄우지 않음 */
 	private fun checkIfNewChatNoticeIsRequired(channelLastChat: Chat) {
 		val newestChatNotFailedIndex = chatItemAdapter.newestChatNotFailedIndex
-		val lvip = linearLayoutManager.findLastVisibleItemPosition()
+		val lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition()
 
 		if (channelViewModel.uiState.value.isNewerChatFullyLoaded.not()) {
 			channelViewModel.onNeedNewChatNotice(channelLastChat)
@@ -591,7 +590,7 @@ class ChannelActivity : AppCompatActivity() {
 		}
 
 		if (linearLayoutManager.isVisiblePosition(newestChatNotFailedIndex)
-			|| (lvip <= newestChatNotFailedIndex)
+			|| (lastVisibleItemPosition <= newestChatNotFailedIndex)
 		) return
 
 		channelViewModel.onNeedNewChatNotice(channelLastChat)
@@ -629,8 +628,7 @@ class ChannelActivity : AppCompatActivity() {
 				headerIndex = headerIndex,
 				bottomIndex = bottomIndex
 			)
-		}
-			.onSuccess { channelViewModel.onCompletedCapture() }
+		}.onSuccess { channelViewModel.onCompletedCapture() }
 			.onFailure { channelViewModel.onFailedCapture() }
 	}
 
@@ -646,9 +644,33 @@ class ChannelActivity : AppCompatActivity() {
 		channelViewModel.onCopiedToClipboard()
 	}
 
+	private fun showServerDisabledDialog(noticeMessage: String?) {
+		val existingFragment =
+			supportFragmentManager.findFragmentByTag(ServerDownNoticeDialog.TAG)
+		if (existingFragment != null) return
+		val dialog = ServerDownNoticeDialog(
+			onClickOkBtn = { finish() },
+			noticeMessage = noticeMessage.takeUnless { it.isNullOrBlank() }
+				?: getString(R.string.splash_server_down),
+		)
+		dialog.show(supportFragmentManager, ServerDownNoticeDialog.TAG)
+	}
+
+	private fun showServerMaintenanceDialog(noticeMessage: String?) {
+		val existingFragment =
+			supportFragmentManager.findFragmentByTag(ServerUnderMaintenanceNoticeDialog.TAG)
+		if (existingFragment != null) return
+		val dialog = ServerUnderMaintenanceNoticeDialog(
+			onClickOkBtn = { finish() },
+			noticeMessage = noticeMessage.takeUnless { it.isNullOrBlank() }
+				?: getString(R.string.splash_server_under_maintenance),
+		)
+		dialog.show(supportFragmentManager, ServerUnderMaintenanceNoticeDialog.TAG)
+	}
+
 	private fun handleEvent(event: ChannelEvent) {
 		when (event) {
-			ChannelEvent.MoveBack -> finish()
+			ChannelEvent.MoveBack -> moveBack()
 			ChannelEvent.OpenOrCloseDrawer -> openOrCloseDrawer()
 			ChannelEvent.ScrollToBottom -> scrollToBottom()
 			ChannelEvent.MoveChannelSetting -> moveChannelSetting()
@@ -660,7 +682,7 @@ class ChannelActivity : AppCompatActivity() {
 
 			is ChannelEvent.NewChatOccurEvent -> checkIfNewChatNoticeIsRequired(event.chat)
 			is ChannelEvent.ShowChannelExitWarningDialog ->
-				showChannelExitWarningDialog(event.clientAuthority)
+				showChannelExitWarningDialog(event.isClientHost)
 
 			is ChannelEvent.MakeCaptureImage -> makeCaptureImage(
 				headerIndex = event.headerIndex, bottomIndex = event.bottomIndex
@@ -668,6 +690,25 @@ class ChannelActivity : AppCompatActivity() {
 
 			is ChannelEvent.MoveToWholeText -> moveToWholeText(event.chatId)
 			is ChannelEvent.CopyChatToClipboard -> copyTextToClipboard(event.message)
+			is ChannelEvent.ShowServerDisabledDialog -> showServerDisabledDialog(event.message)
+			is ChannelEvent.ShowServerMaintenanceDialog -> showServerMaintenanceDialog(event.message)
+		}
+	}
+
+	private fun moveBack() {
+		when {
+			isPreviousActivityExists() -> finish()
+			else -> mainNavigator.navigate(
+				currentActivity = this,
+				shouldFinish = true
+			)
+		}
+	}
+
+	private fun isPreviousActivityExists(): Boolean {
+		val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+		return activityManager.appTasks.any { task ->
+			task.taskInfo.baseActivity != task.taskInfo.topActivity
 		}
 	}
 
@@ -691,13 +732,11 @@ class ChannelActivity : AppCompatActivity() {
 	}
 
 	companion object {
+		var watchingChannelId: Long? = -1
+			private set
 		const val EXTRA_USER_ID = "EXTRA_USER_ID"
-		internal const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
+		const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
 		private const val CLIPBOARD_LABEL = "CLIPBOARD_LABEL"
-		private const val DIALOG_TAG_CHANNEL_EXIT_WARNING = "DIALOG_TAG_CHANNEL_EXIT_WARNING"
-		private const val DIALOG_TAG_EXPLODED_CHANNEL_NOTICE = "DIALOG_TAG_EXPLODED_CHANNEL_NOTICE"
-		private const val DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE =
-			"DIALOG_TAG_CHANNEL_BANNED_USER_NOTICE"
 		private const val SOCKET_CONNECTION_SUCCESS_BAR_EXPOSURE_TIME = 1500L
 		private const val BOTTOM_SCROLL_BTN_REFERENCE_POSITION = 3
 	}

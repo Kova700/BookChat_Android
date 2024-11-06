@@ -16,7 +16,9 @@ dependencies {
 	implementation(project(":core:data:user:external"))
 	implementation(project(":core:data:notificationinfo:external"))
 	implementation(project(":core:stomp:chatting:external"))
-	implementation(project(":feature:main"))
 	implementation(project(":core:util"))
 	implementation(project(":core:navigation"))
+	implementation(project(":feature:channel"))
+	implementation(project(":core:chat-client"))
+	implementation(project(":core:data:appsetting:external"))
 }

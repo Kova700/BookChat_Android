@@ -56,8 +56,7 @@ class LoginActivity : AppCompatActivity() {
 	}
 
 	private fun setViewState(uiState: LoginUiState) {
-		binding.progressbar.visibility =
-			if (uiState.uiState == LoginUiState.UiState.LOADING) View.VISIBLE else View.GONE
+		binding.progressbar.visibility = if (uiState.isLoading) View.VISIBLE else View.GONE
 	}
 
 	private fun startKakaoLogin() = lifecycleScope.launch {
@@ -88,7 +87,9 @@ class LoginActivity : AppCompatActivity() {
 	private fun showDeviceChangeWarning() {
 		val existingFragment = supportFragmentManager.findFragmentByTag(DIALOG_TAG_DEVICE_WARNING)
 		if (existingFragment != null) return
-		val deviceWarningDialog = DeviceWarningDialog()
+		val deviceWarningDialog = DeviceWarningDialog(
+			onClickOkBtn = { loginViewModel.onClickDeviceWarningOk() },
+		)
 		deviceWarningDialog.show(supportFragmentManager, DIALOG_TAG_DEVICE_WARNING)
 	}
 
@@ -97,8 +98,7 @@ class LoginActivity : AppCompatActivity() {
 			is LoginEvent.MoveToMain -> moveToMain()
 			is LoginEvent.MoveToSignUp -> moveToSignUp()
 			is LoginEvent.ShowDeviceWarning -> showDeviceChangeWarning()
-			is LoginEvent.ErrorEvent -> binding.loginLayout.showSnackBar(event.stringId)
-			is LoginEvent.UnknownErrorEvent -> binding.loginLayout.showSnackBar(event.message)
+			is LoginEvent.ShowSnackBar -> binding.loginLayout.showSnackBar(event.stringId)
 			is LoginEvent.StartKakaoLogin -> startKakaoLogin()
 			LoginEvent.StartGoogleLogin -> startGoogleLogin()
 		}

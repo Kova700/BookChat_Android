@@ -20,8 +20,13 @@ android {
 
 dependencies {
 	implementation(libs.bundles.androidx.default)
-// WorkManager
+	// WorkManager
 	implementation(libs.bundles.workmanager)
+	implementation(project(":core:stomp:chatting:external"))
+	implementation(project(":core:util"))
+	implementation(project(":core:network-manager:external"))
+	implementation(project(":core:chat-client"))
+	ksp(libs.androidx.hilt.compiler)
 
 	//splash는 default Activity라서 지우면 안됨
 	implementation(project(":feature:splash"))
@@ -38,6 +43,7 @@ dependencies {
 	implementation(project(":core:design-system"))
 	implementation(project(":core:fcm:forced-logout"))
 	implementation(project(":core:fcm:service"))
+	implementation(project(":core:remote-config"))
 	implementation(project(":core:stomp:chatting:internal"))
 	implementation(project(":core:network-manager:internal"))
 	implementation(project(":core:oauth:external"))

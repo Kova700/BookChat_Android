@@ -1,4 +1,4 @@
-package com.kova700.bookchat.feature.channel.chatting.util
+package com.kova700.bookchat.feature.channel.chatting.capture
 
 import android.view.View
 import com.kova700.bookchat.core.design_system.R

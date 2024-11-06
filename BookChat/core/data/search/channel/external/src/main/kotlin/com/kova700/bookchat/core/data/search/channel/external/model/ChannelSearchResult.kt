@@ -36,7 +36,7 @@ data class ChannelSearchResult(
 			defaultRoomImageType = ChannelDefaultImageType.ONE,
 			roomImageUri = null,
 			lastChat = null,
-			host = User.Default,
+			host = User.DEFAULT,
 			roomTags = emptyList(),
 			bookTitle = "",
 			bookAuthors = emptyList(),

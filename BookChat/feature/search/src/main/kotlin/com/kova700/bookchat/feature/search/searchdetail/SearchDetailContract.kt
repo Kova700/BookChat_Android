@@ -26,6 +26,9 @@ data class SearchDetailUiState(
 	val isInitError: Boolean
 		get() = uiState == UiState.INIT_ERROR
 
+	val isPagingError: Boolean
+		get() = uiState == UiState.PAGING_ERROR
+
 	val isEmpty: Boolean
 		get() = searchItems.isEmpty()
 						&& isInitLoading.not()

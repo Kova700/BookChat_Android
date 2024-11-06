@@ -24,9 +24,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AgonyRecordActivity : AppCompatActivity() {
 
-	//TODO: AgonyRecord 생성 시, Content 내용이 엄청 길다면 400 넘어오는 현상이 있음
-	// {"errorCode":"500","message":"예상치 못한 예외가 발생했습니다."}
-	// 길이 문제인줄 알았지만 수정시에는 더 긴 길이도 등록됨으로 길이 문제는 아닌 듯 (등록 API측에 문제가 있나봄)
 	private lateinit var binding: ActivityAgonyRecordBinding
 
 	@Inject

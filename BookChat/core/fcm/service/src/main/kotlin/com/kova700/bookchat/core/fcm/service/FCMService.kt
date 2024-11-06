@@ -5,7 +5,9 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.kova700.bookchat.core.fcm.chat.ChatNotificationWorker
 import com.kova700.bookchat.core.fcm.forced_logout.ForcedLogoutWorker
+import com.kova700.bookchat.core.fcm.forced_logout.model.ForcedLogoutReason
 import com.kova700.bookchat.core.fcm.renew_fcm_token.RenewFcmTokenWorker
+import com.kova700.bookchat.core.fcm.service.model.ChatFcmBody
 import com.kova700.bookchat.core.fcm.service.model.FcmMessage
 import com.kova700.bookchat.core.fcm.service.model.PushType
 import com.kova700.bookchat.util.Constants.TAG
@@ -21,7 +23,6 @@ class FCMService : FirebaseMessagingService() {
 
 	override fun onNewToken(token: String) {
 		super.onNewToken(token)
-		Log.d(TAG, "FCMService: onNewToken() - token :$token")
 		startRenewFcmTokenWorker(token)
 	}
 
@@ -31,8 +32,9 @@ class FCMService : FirebaseMessagingService() {
 	}
 
 	private fun handleMessage(message: RemoteMessage) {
-		val messageBody = message.data["body"]
-		val fcmMessage = jsonSerializer.decodeFromString<FcmMessage>(messageBody ?: return)
+		val messageBody = message.data["body"] ?: return
+		val fcmMessage = jsonSerializer.decodeFromString<FcmMessage>(messageBody)
+		Log.d(TAG, "FCMService: handleMessage() - fcmMessage : $fcmMessage")
 		when (fcmMessage.pushType) {
 			PushType.LOGIN -> startForcedLogoutWorker()
 			PushType.CHAT -> handleChatMessage(fcmMessage)
@@ -40,7 +42,7 @@ class FCMService : FirebaseMessagingService() {
 	}
 
 	private fun handleChatMessage(fcmMessage: FcmMessage) {
-		if (fcmMessage.body == null) return
+		if (fcmMessage.body !is ChatFcmBody) return
 		startChatNotificationWorker(
 			channelId = fcmMessage.body.channelId,
 			chatId = fcmMessage.body.chatId
@@ -63,7 +65,10 @@ class FCMService : FirebaseMessagingService() {
 	}
 
 	private fun startForcedLogoutWorker() {
-		ForcedLogoutWorker.start(applicationContext)
+		ForcedLogoutWorker.start(
+			context = applicationContext,
+			reason = ForcedLogoutReason.CHANGE_DEVICE
+		)
 	}
 
 }

@@ -40,10 +40,12 @@ class ChannelSearchRepositoryImpl @Inject constructor(
 	override suspend fun search(
 		keyword: String,
 		searchFilter: SearchFilter,
+		initFlag: Boolean,
 		size: Int,
 	): List<ChannelSearchResult> {
 		if (cachedSearchKeyword != keyword
 			|| cachedSearchFilter != searchFilter
+			|| initFlag
 		) clear()
 		if (isEndPage) return channels.firstOrNull() ?: emptyList()
 

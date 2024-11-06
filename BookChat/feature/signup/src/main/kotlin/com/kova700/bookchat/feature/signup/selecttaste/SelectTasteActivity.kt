@@ -3,6 +3,8 @@ package com.kova700.bookchat.feature.signup.selecttaste
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -78,6 +80,7 @@ class SelectTasteActivity : AppCompatActivity() {
 
 	private fun setViewState(uiState: SelectTasteState) {
 		setStartButtonState(uiState)
+		binding.progressBar.visibility = if (uiState.isLoading) VISIBLE else GONE
 	}
 
 	private fun setStartButtonState(uiState: SelectTasteState) {

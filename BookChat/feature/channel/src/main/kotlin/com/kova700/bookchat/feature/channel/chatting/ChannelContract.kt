@@ -4,7 +4,6 @@ import com.kova700.bookchat.core.data.channel.external.model.Channel
 import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.user.external.model.User
-import com.kova700.bookchat.core.network_manager.external.model.NetworkState
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
 import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
 import com.kova700.bookchat.feature.channel.drawer.model.ChannelDrawerItem
@@ -18,7 +17,6 @@ data class ChannelUiState(
 	val chats: List<ChatItem>,
 	val newChatNotice: Chat?,
 	val socketState: SocketState,
-	val networkState: NetworkState,
 	val originalLastReadChatId: Long?,
 	val isVisibleLastReadChatNotice: Boolean,
 	val needToScrollToLastReadChat: Boolean,
@@ -29,20 +27,17 @@ data class ChannelUiState(
 	val isNewerChatFullyLoaded: Boolean,
 	val isCaptureMode: Boolean,
 ) {
-	val isNetworkDisconnected
-		get() = networkState == NetworkState.DISCONNECTED
-
 	val isPossibleToLoadOlderChat
 		get() = (olderChatsLoadState != LoadState.LOADING)
 						&& isOlderChatFullyLoaded.not()
 						&& socketState == SocketState.CONNECTED
-						&& channel.isAvailableChannel
+						&& channel.isAvailable
 
 	val isPossibleToLoadNewerChat
 		get() = (newerChatsLoadState != LoadState.LOADING)
 						&& isNewerChatFullyLoaded.not()
 						&& socketState == SocketState.CONNECTED
-						&& channel.isAvailableChannel
+						&& channel.isAvailable
 
 	val clientAuthority
 		get() = channel.participantAuthorities?.get(client.id)
@@ -51,9 +46,12 @@ data class ChannelUiState(
 	val isClientHost
 		get() = clientAuthority == ChannelMemberAuthority.HOST
 
+	val isInitLoading
+		get() = uiState == UiState.INIT_LOADING
+
 	enum class UiState {
 		SUCCESS,
-		LOADING,
+		INIT_LOADING,
 		ERROR,
 	}
 
@@ -67,13 +65,12 @@ data class ChannelUiState(
 		val DEFAULT = ChannelUiState(
 			enteredMessage = "",
 			channel = Channel.DEFAULT,
-			client = User.Default,
+			client = User.DEFAULT,
 			uiState = UiState.SUCCESS,
 			drawerItems = listOf(ChannelDrawerItem.Header.DEFAULT),
 			chats = emptyList(),
 			newChatNotice = null,
 			socketState = SocketState.DISCONNECTED,
-			networkState = NetworkState.DISCONNECTED,
 			isFirstConnection = true,
 			originalLastReadChatId = null,
 			isVisibleLastReadChatNotice = false,
@@ -111,7 +108,15 @@ sealed class ChannelEvent {
 	) : ChannelEvent()
 
 	data class ShowChannelExitWarningDialog(
-		val clientAuthority: ChannelMemberAuthority,
+		val isClientHost: Boolean,
+	) : ChannelEvent()
+
+	data class ShowServerDisabledDialog(
+		val message: String
+	) : ChannelEvent()
+
+	data class ShowServerMaintenanceDialog(
+		val message: String
 	) : ChannelEvent()
 
 	data class NewChatOccurEvent(

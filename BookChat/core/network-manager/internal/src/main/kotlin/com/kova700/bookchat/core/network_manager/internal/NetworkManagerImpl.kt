@@ -17,6 +17,7 @@ import javax.inject.Inject
 class NetworkManagerImpl @Inject constructor(
 	@ApplicationContext applicationContext: Context,
 ) : NetworkManager {
+
 	private val connectivityManager: ConnectivityManager =
 		applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
@@ -39,22 +40,30 @@ class NetworkManagerImpl @Inject constructor(
 		override fun onLost(network: Network) {
 			_networkState.update { NetworkState.DISCONNECTED }
 		}
+
+		override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
+			updateState()
+		}
 	}
 
 	init {
 		connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
 	}
 
-	override fun getStateFlow(): StateFlow<NetworkState> {
-		updateState()
-		return _networkState.asStateFlow()
+	override fun observeNetworkState(): StateFlow<NetworkState> {
+		return _networkState.asStateFlow().also { updateState() }
+	}
+
+	override fun isNetworkAvailable(): Boolean {
+		return _networkState.value == NetworkState.CONNECTED
 	}
 
 	private fun updateState() {
 		val networkCapabilities =
-			connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork) ?: return
+			connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
 
 		val currentState = when {
+			networkCapabilities == null -> NetworkState.DISCONNECTED
 			networkCapabilities.isConnected() -> NetworkState.CONNECTED
 			else -> NetworkState.DISCONNECTED
 		}

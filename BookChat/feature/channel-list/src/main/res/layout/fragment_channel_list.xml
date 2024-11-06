@@ -26,19 +26,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/channel_list_header_layout"/>
 
-    <TextView
-        android:id="@+id/network_state_bar"
-        android:layout_width="0dp"
-        android:layout_height="18dp"
-        android:background="#666666"
-        android:gravity="center"
-        android:textColor="#FFFFFF"
-        android:textSize="10sp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/channel_list_header_layout"
         android:layout_width="0dp"

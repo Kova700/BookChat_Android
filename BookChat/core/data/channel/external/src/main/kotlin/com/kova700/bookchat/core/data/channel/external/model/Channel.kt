@@ -9,7 +9,7 @@ data class Channel(
 	val roomSid: String,
 	val roomMemberCount: Int,
 	val defaultRoomImageType: ChannelDefaultImageType,
-	val notificationFlag: Boolean = true,
+	val isNotificationOn: Boolean = true,
 	val topPinNum: Int = 0,
 	val isBanned: Boolean = false,
 	val isExploded: Boolean = false,
@@ -30,13 +30,13 @@ data class Channel(
 
 	val isExistNewChat
 		get() = when {
-			lastReadChatId == null -> false
 			lastChat?.chatId == null -> false
+			lastReadChatId == null -> true
 			lastReadChatId < lastChat.chatId -> true
 			else -> false
 		}
 
-	val isAvailableChannel
+	val isAvailable
 		get() = isBanned.not() && isExploded.not()
 
 	val bookAuthorsString

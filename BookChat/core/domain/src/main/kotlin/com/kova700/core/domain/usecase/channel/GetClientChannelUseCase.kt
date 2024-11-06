@@ -12,9 +12,7 @@ class GetClientChannelUseCase @Inject constructor(
 	private val getChatUseCase: GetChatUseCase,
 ) : BaseGetClientChannelUseCase(userRepository, getChatUseCase) {
 
-	suspend operator fun invoke(
-		channelId: Long,
-	): Channel {
-		return channelRepository.getChannel(channelId).attachUserAndChat()
+	suspend operator fun invoke(channelId: Long): Channel? {
+		return channelRepository.getChannel(channelId)?.attachUserAndChat()
 	}
 }

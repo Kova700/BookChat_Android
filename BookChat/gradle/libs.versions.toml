@@ -61,8 +61,8 @@ org-jetbrains-kotlin-jvm = "2.0.10"
 kotlinGradlePlugin = "1.9.0"
 kotlinGradlePluginVersion = "1.9.0"
 
-firebaseBom = "33.2.0"
-firebaseMessagingKtx = "24.0.1"
+firebaseBom = "33.4.0"
+firebaseMessagingKtx = "24.0.2"
 fcmPlugin = "4.4.2"
 
 workManagerRuntimeKtx = "2.9.1"
@@ -70,8 +70,7 @@ workManagerHilt = "1.2.0"
 
 flexbox = "3.0.0"
 jetbrainsKotlinGradlePlugin = "1.9.0"
-firebaseFirestoreKtx = "25.1.0"
-generativeai = "0.9.0"
+lifecycleProcess = "2.8.6"
 
 [libraries]
 ## AndroidX Default
@@ -83,6 +82,7 @@ androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview"
 androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacySupportV4" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
 androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidxLifecycle" }
+androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleProcess" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
@@ -101,6 +101,7 @@ androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-analytics-ktx = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
 firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
+firebase-config-ktx = { group = "com.google.firebase", name = "firebase-config-ktx" }
 
 # Hilt
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
@@ -131,6 +132,7 @@ androidx-room-paging = { group = "androidx.room", name = "room-paging", version.
 ## WorkManager
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManagerRuntimeKtx" }
 androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "workManagerHilt" }
+androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "workManagerHilt" }
 
 ## About Libraries
 aboutlibraries = { group = "com.mikepenz", name = "aboutlibraries", version.ref = "aboutlibraries" }
@@ -173,9 +175,6 @@ gradle-plugin-kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-p
 gradle-plugin-ksp = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 gradle-plugin-android = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 gradle-plugin-hilt = { group = "com.google.dagger", name = "hilt-android-gradle-plugin", version.ref = "hilt" }
-kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "jetbrainsKotlinGradlePlugin" }
-firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
-generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -199,6 +198,7 @@ androidx-default = [
     "androidx-legacy-support-v4",
     "androidx-lifecycle-runtime-ktx",
     "androidx-lifecycle-viewmodel",
+    "androidx-lifecycle-process",
     "androidx-appcompat",
     "material"
 ]
@@ -238,7 +238,7 @@ room = [
 ]
 workmanager = [
     "androidx-work-runtime-ktx",
-    "androidx-hilt-work"
+    "androidx-hilt-work",
 ]
 google-login = [
     "androidx-credentials",

@@ -37,7 +37,7 @@
             android:id="@+id/user_profile_iv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:scaleType="fitXY"
+            android:scaleType="centerCrop"
             android:src="@drawable/loading_img" />
     </androidx.cardview.widget.CardView>
 

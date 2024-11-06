@@ -24,7 +24,7 @@ sealed interface ChannelListItem {
 		val roomMemberCount: Int,
 		val defaultRoomImageType: ChannelDefaultImageType,
 		val isExistNewChat: Boolean = false,
-		val notificationFlag: Boolean = true,
+		val isNotificationOn: Boolean = true,
 		val topPinNum: Int = 0,
 		val isExploded: Boolean = false,
 		val isBanned: Boolean = false,

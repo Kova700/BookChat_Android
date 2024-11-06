@@ -4,6 +4,7 @@ import com.kova700.bookchat.core.data.channel.external.model.Channel
 import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
 import com.kova700.bookchat.core.data.channel.external.model.ChannelInfo
 import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
+import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.search.book.external.model.Book
 import kotlinx.coroutines.flow.Flow
 
@@ -13,16 +14,18 @@ interface ChannelRepository {
 
 	suspend fun getChannels(
 		loadSize: Int = REMOTE_CHANNELS_LOAD_SIZE,
-	): List<Channel>
+	): List<Channel>?
 
 	suspend fun getMostActiveChannels(
 		loadSize: Int = REMOTE_CHANNELS_LOAD_SIZE,
 		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS,
-		isOfflineOnly: Boolean = false,
 	): List<Channel>
 
-	suspend fun getChannel(channelId: Long): Channel
-	suspend fun getChannelInfo(channelId: Long): ChannelInfo?
+	suspend fun getChannel(channelId: Long): Channel?
+	suspend fun getChannelInfo(
+		channelId: Long,
+		maxAttempts: Int = DEFAULT_RETRY_MAX_ATTEMPTS,
+	): ChannelInfo?
 
 	suspend fun makeChannel(
 		channelTitle: String,
@@ -39,6 +42,7 @@ interface ChannelRepository {
 		channelCapacity: Int,
 		channelTags: List<String>,
 		channelImage: ByteArray?,
+		isProfileChanged: Boolean,
 	)
 
 	suspend fun leaveChannel(channelId: Long)
@@ -82,10 +86,15 @@ interface ChannelRepository {
 
 	suspend fun updateLastReadChatIdIfValid(
 		channelId: Long,
-		chatId: Long,
+		chat: Chat,
 	)
 
-	suspend fun updateChannelLastChatIfValid(channelId: Long, chatId: Long)
+	suspend fun updateChannelLastChatIfValid(
+		channelId: Long,
+		chat: Chat,
+	)
+
+	suspend fun insertChannels(channels: List<Channel>)
 
 	suspend fun clear()
 
@@ -93,4 +102,5 @@ interface ChannelRepository {
 		private const val REMOTE_CHANNELS_LOAD_SIZE = 15
 		private const val DEFAULT_RETRY_MAX_ATTEMPTS = 5
 	}
+
 }
