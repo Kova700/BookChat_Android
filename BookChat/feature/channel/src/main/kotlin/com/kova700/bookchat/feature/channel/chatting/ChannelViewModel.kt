@@ -49,12 +49,6 @@ import kotlin.math.abs
 // TODO : [FixWaiting] 채팅방 입장 헀는데 인원수 1명으로 그대로인 현상이 있음
 // TODO : [FixWaiting] 채팅방 퇴장 했는데, 채팅방 인원 수 갱신안되는 현상이 있음
 
-// TODO : [FixWaiting] 소켓 끊김 사이에 발생한 수정사항 동기화 테스트 필요함
-//        1. 채팅 동기화 테스트 (O)
-//        2. 부방장 방장 수정 정보 동기화 테스트 (getChannelInfo 잘 가져오는지) + 가져온 정보 잘 반영되는지 (채팅을 가져오긴 하지만 목록에 갱신되지는 않음)
-//				3. 채팅방 소켓 재연결 + 재구독 상태가 좀 이상함 (재구독 되지않았음에도 상단바가 나타나지 않음)
-// TODO : [FixWaiting] 채팅방 화면에서 홀드 버튼 누르거나 화면 꺼지면 Notification이 안뜨는 현상있음
-
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,

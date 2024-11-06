@@ -449,7 +449,8 @@ class ChannelActivity : AppCompatActivity() {
 
 	private fun removeNewChatNoticeIfAppearsOnScreen() {
 		if (channelViewModel.uiState.value.newChatNotice == null) return
-		val newestChatNotMineIndex = chatItemAdapter.newestChatNotMineIndex
+		val newestChatNotMineIndex =
+			chatItemAdapter.newestChatNotMineIndex.takeIf { it != -1 } ?: return
 		val item = chatItemAdapter.currentList[newestChatNotMineIndex] as ChatItem.Message
 		if (linearLayoutManager.isVisiblePosition(newestChatNotMineIndex).not()) return
 		channelViewModel.onReadNewestChatNotMineInList(item)

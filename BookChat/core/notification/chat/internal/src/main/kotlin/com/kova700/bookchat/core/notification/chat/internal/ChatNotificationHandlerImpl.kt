@@ -98,10 +98,18 @@ class ChatNotificationHandlerImpl @Inject constructor(
 
 	private fun isChannelWatching(channelId: Long): Boolean {
 		val activityManager = appContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
 		val isChannelActivityRunning = activityManager.appTasks
 			.any { task -> task.taskInfo.topActivity?.className == ChannelActivity::class.java.name }
+
+		val isAppInForeground = activityManager.runningAppProcesses.any { processInfo ->
+			processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+							&& processInfo.processName == appContext.packageName
+		}
+
 		val watchingChannelId = ChannelActivity.watchingChannelId ?: return false
 		return isChannelActivityRunning
+						&& isAppInForeground
 						&& watchingChannelId == channelId
 	}
 
