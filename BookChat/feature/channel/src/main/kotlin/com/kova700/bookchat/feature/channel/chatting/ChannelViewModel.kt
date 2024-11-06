@@ -45,7 +45,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.abs
 
-// TODO : [FixWaiting] 유저 프로필 변경 시 drawerItem에 바로 반영안됨 수정 필요
 // TODO : [FixWaiting] ChannelMember 리스트가 텅빈채로 보이는 현상이 있음
 // TODO : [FixWaiting] 채팅방 입장 헀는데 인원수 1명으로 그대로인 현상이 있음
 // TODO : [FixWaiting] 채팅방 퇴장 했는데, 채팅방 인원 수 갱신안되는 현상이 있음
