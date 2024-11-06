@@ -333,7 +333,11 @@ class ChannelActivity : AppCompatActivity() {
 			super.onItemRangeInserted(positionStart, itemCount)
 			scrollToLastReadNoticeIfExists()
 			if (itemCount <= 2) scrollToBottomIfOnBottom()
-			removeNewChatNoticeIfAppearsOnScreen()
+			/** Paging 데이터 삽입시 NewChatNotice가 사라지는 현상이 있어서 delayTime 추가 */
+			lifecycleScope.launch {
+				delay(500)
+				removeNewChatNoticeIfAppearsOnScreen()
+			}
 			removeLastReadNoticeScrollFlagIfAppearsOnScreen()
 		}
 	}
@@ -446,8 +450,8 @@ class ChannelActivity : AppCompatActivity() {
 	private fun removeNewChatNoticeIfAppearsOnScreen() {
 		if (channelViewModel.uiState.value.newChatNotice == null) return
 		val newestChatNotMineIndex = chatItemAdapter.newestChatNotMineIndex
-		if (linearLayoutManager.isVisiblePosition(newestChatNotMineIndex).not()) return
 		val item = chatItemAdapter.currentList[newestChatNotMineIndex] as ChatItem.Message
+		if (linearLayoutManager.isVisiblePosition(newestChatNotMineIndex).not()) return
 		channelViewModel.onReadNewestChatNotMineInList(item)
 	}
 

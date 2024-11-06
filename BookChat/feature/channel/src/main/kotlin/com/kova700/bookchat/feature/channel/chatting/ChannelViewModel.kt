@@ -50,6 +50,9 @@ import kotlin.math.abs
 // TODO : [FixWaiting] 채팅방 퇴장 했는데, 채팅방 인원 수 갱신안되는 현상이 있음
 
 // TODO : [FixWaiting] 소켓 끊김 사이에 발생한 수정사항 동기화 테스트 필요함
+//        1. 채팅 동기화 테스트 (O)
+//        2. 부방장 방장 수정 정보 동기화 테스트 (getChannelInfo 잘 가져오는지) + 가져온 정보 잘 반영되는지 (채팅을 가져오긴 하지만 목록에 갱신되지는 않음)
+//				3. 채팅방 소켓 재연결 + 재구독 상태가 좀 이상함 (재구독 되지않았음에도 상단바가 나타나지 않음)
 // TODO : [FixWaiting] 채팅방 화면에서 홀드 버튼 누르거나 화면 꺼지면 Notification이 안뜨는 현상있음
 
 @HiltViewModel
@@ -430,14 +433,10 @@ class ChannelViewModel @Inject constructor(
 		getNewerChats()
 	}
 
-	//TODO : [FixWaiting] getAroundId로 채팅 중앙에 있다가 아래로 내리는 과정에 새로운 채팅이 생기면 아래에 NewChatNotice가 생김
-	// 그 상황에 새로운 채팅을 Load하기 위해서 채팅 하단으로 스크롤을 내리면 채팅 최하단에 왔다고 인식하고 Noti를 지우는 상황이 생겨버림
-	// 테스트 해보고 아래 각주가 필요하다면 추가 하기
 	/** 리스트 상 내 채팅이 아닌 채팅 중 가장 최신 채팅이 화면 상에 나타나는 순간 호출 */
 	fun onReadNewestChatNotMineInList(chatItem: ChatItem.Message) {
 		val nowNewChatNotice = uiState.value.newChatNotice ?: return
 		if (chatItem.chatId < nowNewChatNotice.chatId) return
-//		if (uiState.value.isNewerChatFullyLoaded.not()) return
 		updateState { copy(newChatNotice = null) }
 	}
 
@@ -449,12 +448,21 @@ class ChannelViewModel @Inject constructor(
 		scrollToBottom()
 	}
 
+	private var testCount = 0
 	fun onClickCaptureBtn() {
-		if (uiState.value.channel.isAvailable.not()
-			|| uiState.value.chats.isEmpty()
-		) return
-		updateState { copy(isCaptureMode = true) }
-		_captureIds.update { null }
+//		if (uiState.value.channel.isAvailable.not()
+//			|| uiState.value.chats.isEmpty()
+//		) return
+//		updateState { copy(isCaptureMode = true) }
+//		_captureIds.update { null }
+
+		List(100) { "${testCount}번째 테스트 item $it" }.forEach { message ->
+			chatClient.sendMessage(
+				channelId = channelId,
+				message = message,
+			)
+		}
+		testCount++
 	}
 
 	fun onClickMenuBtn() {
