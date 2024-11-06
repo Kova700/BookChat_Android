@@ -442,21 +442,12 @@ class ChannelViewModel @Inject constructor(
 		scrollToBottom()
 	}
 
-	private var testCount = 0
 	fun onClickCaptureBtn() {
-//		if (uiState.value.channel.isAvailable.not()
-//			|| uiState.value.chats.isEmpty()
-//		) return
-//		updateState { copy(isCaptureMode = true) }
-//		_captureIds.update { null }
-
-		List(100) { "${testCount}번째 테스트 item $it" }.forEach { message ->
-			chatClient.sendMessage(
-				channelId = channelId,
-				message = message,
-			)
-		}
-		testCount++
+		if (uiState.value.channel.isAvailable.not()
+			|| uiState.value.chats.isEmpty()
+		) return
+		updateState { copy(isCaptureMode = true) }
+		_captureIds.update { null }
 	}
 
 	fun onClickMenuBtn() {
