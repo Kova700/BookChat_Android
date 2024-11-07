@@ -15,6 +15,12 @@ import com.kova700.bookchat.feature.imagecrop.model.ImageCropAspectRatio
 import com.kova700.bookchat.util.image.image.saveImageToCacheAndGetUri
 import kotlinx.coroutines.launch
 
+//TODO: [FixWaiting] 이미지 선택하고 확인 누르고 채팅방 생성하면 실패하는 이슈 있음
+//  잘라서 전달하면 성공하고 있음
+// 문제되는 사진
+// END POST (1272336-byte body) (크롭해서 전달하면 성공하는데 차이를 모르겠음)
+// 문제 안되는 사진
+// END POST (710175-byte body)
 class ImageCropActivity : AppCompatActivity() {
 
 	private lateinit var binding: ActivityImageCropBinding
