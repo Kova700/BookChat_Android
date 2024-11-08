@@ -136,7 +136,7 @@ class ImageCropViewModel @Inject constructor(
 		}
 	}
 
-	fun startEvent(event: ImageCropUiEvent) = viewModelScope.launch {
+	private fun startEvent(event: ImageCropUiEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
 	}
 
