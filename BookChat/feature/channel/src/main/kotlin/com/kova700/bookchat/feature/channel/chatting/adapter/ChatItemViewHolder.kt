@@ -5,8 +5,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import com.kova700.bookchat.core.design_system.R
-import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
 import com.kova700.bookchat.feature.channel.chatting.capture.setCaptureViewState
+import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingDateBinding
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingLastReadNoticeBinding
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingMineBinding
@@ -46,11 +46,14 @@ class MyChatViewHolder(
 			failedChatDeleteBtn.setOnClickListener {
 				onClickFailedChatDeleteBtn?.invoke(absoluteAdapterPosition)
 			}
+			moveToWholeTextBtn.setOnClickListener {
+				onClickMoveToWholeText?.invoke(absoluteAdapterPosition)
+			}
 			root.setOnClickListener {
 				onSelectCaptureChat?.invoke(absoluteAdapterPosition)
 			}
-			moveToWholeTextBtn.setOnClickListener {
-				onClickMoveToWholeText?.invoke(absoluteAdapterPosition)
+			chattingLayout.setOnClickListener {
+				onSelectCaptureChat?.invoke(absoluteAdapterPosition)
 			}
 			chattingLayout.setOnLongClickListener {
 				onLongClickChatItem?.invoke(absoluteAdapterPosition)
@@ -123,11 +126,14 @@ class AnotherUserChatViewHolder(
 			userProfileIv.setOnClickListener {
 				onClickUserProfile?.invoke(absoluteAdapterPosition)
 			}
+			moveToWholeTextBtn.setOnClickListener {
+				onClickMoveToWholeText?.invoke(absoluteAdapterPosition)
+			}
 			root.setOnClickListener {
 				onSelectCaptureChat?.invoke(absoluteAdapterPosition)
 			}
-			moveToWholeTextBtn.setOnClickListener {
-				onClickMoveToWholeText?.invoke(absoluteAdapterPosition)
+			chattingLayout.setOnClickListener {
+				onSelectCaptureChat?.invoke(absoluteAdapterPosition)
 			}
 			chattingLayout.setOnLongClickListener {
 				onLongClickChatItem?.invoke(absoluteAdapterPosition)
