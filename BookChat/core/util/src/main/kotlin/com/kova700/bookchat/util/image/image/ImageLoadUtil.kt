@@ -2,7 +2,9 @@ package com.kova700.bookchat.util.image.image
 
 import android.graphics.Bitmap
 import android.widget.ImageView
-import com.bumptech.glide.Glide
+import coil3.load
+import coil3.request.error
+import coil3.request.placeholder
 import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
 import com.kova700.bookchat.core.data.user.external.model.UserDefaultProfileType
 import com.kova700.bookchat.core.design_system.R
@@ -19,11 +21,14 @@ fun ImageView.loadUrl(
 		return
 	}
 
-	Glide.with(context)
-		.load(url)
-		.placeholder(placeholderResId)
-		.error(errorResId)
-		.into(this)
+	val key = url
+	if (tag == key) return
+	tag = key
+
+	load(url) {
+		placeholder(placeholderResId)
+		error(errorResId)
+	}
 }
 
 fun ImageView.loadBitmap(
@@ -32,12 +37,14 @@ fun ImageView.loadBitmap(
 	errorResId: Int = R.drawable.error_img,
 ) {
 	if (bitmap == null) return
+	val key = bitmap.hashCode()
+	if (tag == key) return
+	tag = key
 
-	Glide.with(context)
-		.load(bitmap)
-		.placeholder(placeholderResId)
-		.error(errorResId)
-		.into(this)
+	load(bitmap) {
+		placeholder(placeholderResId)
+		error(errorResId)
+	}
 }
 
 fun ImageView.loadByteArray(
@@ -48,14 +55,12 @@ fun ImageView.loadByteArray(
 	if (byteArray == null || byteArray.isEmpty()) return
 	val key = byteArray.contentHashCode()
 	if (tag == key) return
-
 	tag = key
-	Glide.with(context)
-		.asBitmap()
-		.load(byteArray)
-		.placeholder(placeholderResId)
-		.error(errorResId)
-		.into(this)
+
+	load(byteArray) {
+		placeholder(placeholderResId)
+		error(errorResId)
+	}
 }
 
 fun ImageView.loadResId(
@@ -63,11 +68,14 @@ fun ImageView.loadResId(
 	placeholderResId: Int = R.drawable.loading_img,
 	errorResId: Int = R.drawable.error_img,
 ) {
-	Glide.with(context)
-		.load(resId)
-		.placeholder(placeholderResId)
-		.error(errorResId)
-		.into(this)
+	val key = resId
+	if (tag == key) return
+	tag = key
+
+	load(resId) {
+		placeholder(placeholderResId)
+		error(errorResId)
+	}
 }
 
 fun ImageView.loadUserProfile(

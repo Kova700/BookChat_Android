@@ -36,7 +36,7 @@ kakaoSDK = "2.11.0"
 credentials = "1.2.2"
 googleIdentityGoogleId = "1.1.1"
 
-glide = "4.16.0"
+coil = "3.0.1"
 
 room = "2.6.1"
 datastorePreferences = "1.1.1"
@@ -108,8 +108,8 @@ hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref
 hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 
 ## Image loader
-glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
-glide-compiler = { group = "com.github.bumptech.glide", name = "compiler", version.ref = "glide" }
+coil = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coil" }
+coil-network = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
 
 ## Network
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
@@ -235,6 +235,10 @@ room = [
     "androidx-room-runtime",
     "androidx-room-ktx",
     "androidx-room-paging"
+]
+coil = [
+    "coil",
+    "coil-network"
 ]
 workmanager = [
     "androidx-work-runtime-ktx",
