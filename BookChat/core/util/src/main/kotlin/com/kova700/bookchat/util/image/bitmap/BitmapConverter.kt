@@ -2,6 +2,9 @@ package com.kova700.bookchat.util.image.bitmap
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Bitmap.CompressFormat.WEBP
+import android.graphics.Bitmap.CompressFormat.WEBP_LOSSLESS
+import android.graphics.Bitmap.CompressFormat.WEBP_LOSSY
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -15,25 +18,27 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 
 private const val BITMAP_COMPRESS_QUALITY_DEFAULT = 80
 
-//MAX_IMAGE_SIZE = 100KB
-private const val MAX_IMAGE_SIZE_BYTES = 100 * 1024
+/** MAX_IMAGE_SIZE = 100KB */
+private const val MAX_IMAGE_SIZE_BYTES = 1000 * 1024
 
 suspend fun Bitmap.compressToByteArray(compressQuality: Int = BITMAP_COMPRESS_QUALITY_DEFAULT): ByteArray {
-	fun compress(quality: Int): ByteArray {
+	fun compress(quality: Int, isRetry: Boolean = false): ByteArray {
 		val stream = ByteArrayOutputStream()
 		return when {
 			Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-				compress(Bitmap.CompressFormat.WEBP_LOSSLESS, quality, stream)
+				val format = if (isRetry.not()) WEBP_LOSSLESS else WEBP_LOSSY
+				compress(format, quality, stream)
 				stream.toByteArray()
 			}
 
 			else -> {
-				compress(Bitmap.CompressFormat.WEBP, quality, stream)
+				compress(WEBP, quality, stream)
 				stream.toByteArray()
 			}
 		}
@@ -42,9 +47,10 @@ suspend fun Bitmap.compressToByteArray(compressQuality: Int = BITMAP_COMPRESS_QU
 	return withContext(Dispatchers.IO) {
 		var quality = compressQuality
 		var byteArray = compress(quality)
-		quality -= 5
 		while (byteArray.size > MAX_IMAGE_SIZE_BYTES) {
-			byteArray = compress(quality)
+			ensureActive()
+			quality = maxOf(quality - 5, 1)
+			byteArray = compress(quality, true)
 		}
 		byteArray
 	}
