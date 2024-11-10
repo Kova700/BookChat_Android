@@ -9,7 +9,8 @@ android {
 
 dependencies {
 	implementation(libs.bundles.androidx.default)
-	implementation(libs.bundles.coil)
+	implementation(libs.glide)
+	ksp(libs.glide.compiler)
 	implementation(project(":core:design-system"))
 	implementation(project(":core:data:user:external"))
 	implementation(project(":core:data:channel:external"))

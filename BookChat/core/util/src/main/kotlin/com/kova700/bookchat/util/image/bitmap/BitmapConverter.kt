@@ -14,9 +14,9 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Build
 import androidx.annotation.DrawableRes
-import coil3.imageLoader
-import coil3.request.ImageRequest
-import coil3.toBitmap
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.drawable.toBitmap
+import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
@@ -65,11 +65,14 @@ suspend fun @receiver:DrawableRes Int.getImageBitmap(
 	context: Context,
 ): Bitmap {
 	return withContext(Dispatchers.IO) {
-		context.imageLoader.execute(
-			ImageRequest.Builder(context)
-				.data(this@getImageBitmap)
-				.build()
-		).image?.toBitmap()!!
+		Glide.with(context)
+			.asBitmap()
+			.load(
+				AppCompatResources
+					.getDrawable(context, this@getImageBitmap)
+					?.toBitmap(config = Bitmap.Config.ARGB_8888)
+			).submit()
+			.get()
 	}
 }
 
@@ -79,11 +82,11 @@ suspend fun String.getImageBitmap(
 ): Bitmap? {
 	return withContext(Dispatchers.IO) {
 		runCatching {
-			context.imageLoader.execute(
-				ImageRequest.Builder(context)
-					.data(this@getImageBitmap)
-					.build()
-			).image?.toBitmap()
+			Glide.with(context)
+				.asBitmap()
+				.load(this@getImageBitmap)
+				.submit()
+				.get()
 		}.getOrNull()
 	}
 }

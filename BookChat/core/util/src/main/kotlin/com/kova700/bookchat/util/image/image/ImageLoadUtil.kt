@@ -2,9 +2,8 @@ package com.kova700.bookchat.util.image.image
 
 import android.graphics.Bitmap
 import android.widget.ImageView
-import coil3.load
-import coil3.request.error
-import coil3.request.placeholder
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
 import com.kova700.bookchat.core.data.user.external.model.UserDefaultProfileType
 import com.kova700.bookchat.core.design_system.R
@@ -25,10 +24,12 @@ fun ImageView.loadUrl(
 	if (tag == key) return
 	tag = key
 
-	load(url) {
-		placeholder(placeholderResId)
-		error(errorResId)
-	}
+	Glide.with(context)
+		.load(url)
+		.placeholder(placeholderResId)
+		.error(errorResId)
+		.transition(DrawableTransitionOptions.withCrossFade())
+		.into(this)
 }
 
 fun ImageView.loadBitmap(
@@ -41,10 +42,12 @@ fun ImageView.loadBitmap(
 	if (tag == key) return
 	tag = key
 
-	load(bitmap) {
-		placeholder(placeholderResId)
-		error(errorResId)
-	}
+	Glide.with(context)
+		.load(bitmap)
+		.placeholder(placeholderResId)
+		.error(errorResId)
+		.transition(DrawableTransitionOptions.withCrossFade())
+		.into(this)
 }
 
 fun ImageView.loadByteArray(
@@ -57,10 +60,12 @@ fun ImageView.loadByteArray(
 	if (tag == key) return
 	tag = key
 
-	load(byteArray) {
-		placeholder(placeholderResId)
-		error(errorResId)
-	}
+	Glide.with(context)
+		.load(byteArray)
+		.placeholder(placeholderResId)
+		.error(errorResId)
+		.transition(DrawableTransitionOptions.withCrossFade())
+		.into(this)
 }
 
 fun ImageView.loadResId(
@@ -72,10 +77,12 @@ fun ImageView.loadResId(
 	if (tag == key) return
 	tag = key
 
-	load(resId) {
-		placeholder(placeholderResId)
-		error(errorResId)
-	}
+	Glide.with(context)
+		.load(resId)
+		.placeholder(placeholderResId)
+		.error(errorResId)
+		.transition(DrawableTransitionOptions.withCrossFade())
+		.into(this)
 }
 
 fun ImageView.loadUserProfile(
