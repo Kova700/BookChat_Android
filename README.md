@@ -55,7 +55,7 @@
 
 </br>
 
-### Whole ([크게보기](https://github.com/user-attachments/assets/c77bf141-cb87-45ad-97d2-b57ece050535))
+### Detail ([크게보기](https://github.com/user-attachments/assets/c77bf141-cb87-45ad-97d2-b57ece050535))
 ![project dot](https://github.com/user-attachments/assets/c77bf141-cb87-45ad-97d2-b57ece050535)
 
 </br>
@@ -75,8 +75,39 @@
 <img src="https://github.com/Kova700/BookChat_Android/assets/81726145/fb61738a-00c2-45cf-bea5-68b7aca0a1b6" width="25%"/>
 </p>
 
-***
-### Video
+</br>
+
+## *****Primary Feature summary***** 
+- WebSocket을 이용한 다수 사용자가 참여할 수 있는 오픈 채팅방
+  - 소켓 끊김 사이에 발생한 채팅방 변경사항 및 채팅 동기화 기능
+  - 전송 실패한 채팅 자동 재전송 기능
+  - 방장/ 부방장 권한 위임 및 박탈 기능
+  - 유저 강퇴 기능
+  - ID 매핑 방식을 통한 서비스 내 유저 닉네임 변경 시 모든 메시지에 실시간 반영
+  - RoomDB를 이용한 채팅방 및 채팅 Offline Data 구성
+  - 채팅 내 상하 방향 Paging 기능
+  - 주요했던 채팅을 이미지로 저장할 수 있는 채팅 캡처 기능
+- FCM을 이용한 채팅 Notification
+- 단일 기기만 허용하는 서비스 구조
+  - FCM을 이용한 강제 로그아웃기능 
+- OAuth2.0를 이용한 Google/ Kakao 소셜로그인
+- JWT 토큰을 이용한 유저 인가 (Authorization)
+  - OIDC를 통해 가져온 유저정보를 바탕으로 만든 서비스 자체 JWT 토큰
+  - OkHttp3의 Http Interceptor를 이용한 토큰 자동 갱신
+  - KeyStore에 저장된 Key를 이용한 토큰 대칭키 암호화
+- 도서, 채팅방 검색 기능
+- 도서의 독서상태를 기억할 수 있는 서재 기능 
+  - ViewPager2를 이용한 독서예정, 독서중, 독서완료 각 페이지 구성
+  - Coroutine을 활용한 LongClick Swipe Animation
+  - BottomSheet를 이용한 도서의 읽고 있던 페이지를 기록할 수 있는 책갈피 기능
+- 도서 별점 등록 및 독후감 기능
+- 독서 중에 생겼던 고민을 기록할 수 있는 고민기록 기능
+  - ItemTouchHelper를 이용한 Item Swipe Animation
+- 서버 점검 시 Remote-Config를 이용한 일시적 서비스 접속 제한 기능
+
+</br>
+
+## *****Video***** 
 로그인
 |카카오 로그인|구글 로그인|
 |:-----:|:-----:|
