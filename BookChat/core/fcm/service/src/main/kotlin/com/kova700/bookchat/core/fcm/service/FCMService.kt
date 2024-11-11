@@ -45,15 +45,21 @@ class FCMService : FirebaseMessagingService() {
 		if (fcmMessage.body !is ChatFcmBody) return
 		startChatNotificationWorker(
 			channelId = fcmMessage.body.channelId,
-			chatId = fcmMessage.body.chatId
+			chatId = fcmMessage.body.chatId,
+			senderId = fcmMessage.body.senderId
 		)
 	}
 
-	private fun startChatNotificationWorker(channelId: Long, chatId: Long) {
+	private fun startChatNotificationWorker(
+		channelId: Long,
+		chatId: Long,
+		senderId: Long
+	) {
 		ChatNotificationWorker.start(
 			context = applicationContext,
 			channelId = channelId,
-			chatId = chatId
+			chatId = chatId,
+			senderId = senderId
 		)
 	}
 

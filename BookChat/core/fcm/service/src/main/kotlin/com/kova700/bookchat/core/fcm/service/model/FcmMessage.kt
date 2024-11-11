@@ -36,8 +36,9 @@ data class ChatFcmBody(
 	val chatId: Long,
 	@SerialName("chatRoomId")
 	val channelId: Long,
+	@SerialName("senderId")
+	val senderId: Long,
 ) : FcmBody
-
 
 
 object FcmMessageSerializer : KSerializer<FcmMessage> {
