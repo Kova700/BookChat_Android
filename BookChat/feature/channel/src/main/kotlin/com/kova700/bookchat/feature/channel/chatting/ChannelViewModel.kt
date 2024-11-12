@@ -176,9 +176,19 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun observeSocketState() = viewModelScope.launch {
-		chatClient.getSocketStateFlow().collect { state ->
-			updateState { copy(socketState = state) }
-		}
+		combine(
+			chatClient.getSocketStateFlow(),
+			chatClient.getChannelSubscriptionStateFlow(channelId)
+		) { socketState, subscriptionState ->
+			when {
+				socketState == SocketState.CONNECTED -> {
+					if (subscriptionState == SubscriptionState.SUBSCRIBED) SocketState.CONNECTED
+					else SocketState.CONNECTING
+				}
+
+				else -> socketState
+			}
+		}.collect { updateState { copy(socketState = it) } }
 	}
 
 	private fun observeChannelSubscriptionState() = viewModelScope.launch {
