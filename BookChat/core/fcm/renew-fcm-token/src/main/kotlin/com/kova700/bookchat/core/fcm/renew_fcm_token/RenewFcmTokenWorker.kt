@@ -26,9 +26,9 @@ class RenewFcmTokenWorker @AssistedInject constructor(
 		if (bookChatTokenRepository.isBookChatTokenExist().not()) return Result.success()
 
 		val fcmTokenString: String = inputData.getString(EXTRA_FCM_TOKEN) ?: return Result.failure()
-		return runCatching { fcmTokenRepository.renewFCMToken(FCMToken(fcmTokenString)) }
-			.map { Result.success() }
-			.getOrElse { return Result.failure() }
+		runCatching { fcmTokenRepository.renewFCMToken(FCMToken(fcmTokenString)) }
+			.getOrNull() ?: return Result.failure()
+		return Result.success()
 	}
 
 	companion object {
