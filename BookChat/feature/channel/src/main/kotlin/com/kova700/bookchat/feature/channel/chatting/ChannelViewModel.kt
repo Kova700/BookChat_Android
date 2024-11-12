@@ -49,9 +49,6 @@ import kotlin.math.abs
 // TODO : [FixWaiting] 채팅방 입장 헀는데 인원수 1명으로 그대로인 현상이 있음
 // TODO : [FixWaiting] 채팅방 퇴장 했는데, 채팅방 인원 수 갱신안되는 현상이 있음
 
-// TODO : [FixWaiting] 채팅 전송 후, 하나는 대기 상태지만 같은 내용의 채팅이 완료상태로 중복 생성되는 현상이 있음
-//        아마도 소켓 통해서 보낸 메세지를 FCM으로 받아서 중복 생성되는 것 같음
-
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
