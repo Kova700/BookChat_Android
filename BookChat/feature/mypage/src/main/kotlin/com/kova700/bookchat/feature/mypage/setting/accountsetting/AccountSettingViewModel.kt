@@ -67,6 +67,11 @@ class AccountSettingViewModel @Inject constructor(
 		startEvent(AccountSettingUiEvent.ShowWithdrawWarningDialog)
 	}
 
+	fun onClickBackBtn() {
+		if (_uiState.value.isLoading) return
+		startEvent(AccountSettingUiEvent.MoveToBack)
+	}
+
 	private fun startEvent(event: AccountSettingUiEvent) = viewModelScope.launch {
 		_eventFlow.emit(event)
 	}

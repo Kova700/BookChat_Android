@@ -20,6 +20,7 @@ data class AccountSettingUiState(
 }
 
 sealed class AccountSettingUiEvent {
+	data object MoveToBack : AccountSettingUiEvent()
 	data object MoveToLoginPage : AccountSettingUiEvent()
 	data object ShowWithdrawWarningDialog : AccountSettingUiEvent()
 	data object StartOAuthLogout : AccountSettingUiEvent()
