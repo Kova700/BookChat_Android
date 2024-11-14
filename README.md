@@ -109,19 +109,19 @@
 
 ## *****Video***** 
 로그인
-|카카오 로그인|구글 로그인|
-|:-----:|:-----:|
-|||
+|화면|
+|:-----:|
+|<img width="240" src="https://github.com/user-attachments/assets/be2e4cfb-5b13-45e7-92f3-9bb5c01d5d14">|
 
 회원가입
-|프로필 설정|닉네임 중복 체크|이미지 선택|독서 취향 선택|
-|:-----:|:-----:|:-----:|:-----:|
-|||||
+|닉네임 중복 체크|이미지 선택|독서 취향 선택|
+|:-----:|:-----:|:-----:|
+|<img width="240" src="https://github.com/user-attachments/assets/d83e36a5-7634-4a38-b775-e0df5f1620a3">|<img width="240" src="https://github.com/user-attachments/assets/87f96fe0-25de-44fe-9517-87a1cec198f9">|<img width="240" src="https://github.com/user-attachments/assets/8698dc39-2031-49f1-991d-12d7d9d3ef27">|
 
 메인 화면
 |화면|
 |:-----:|
-||
+|<img width="240" src="https://github.com/user-attachments/assets/3910f47d-94a9-414c-a13e-0db78bc83511">|
 
 서재 [독서 예정]
 |[독서예정] 삭제|[독서중]으로 이동|
@@ -189,9 +189,9 @@
 ||||
 
 마이페이지
-|프로필 변경|앱 설정|
-|:-----:|:-----:|
-|||
+|화면|
+|:-----:|
+|<img width="240" src="https://github.com/user-attachments/assets/aa73ba9c-25ce-44f5-bb93-41bdc62c7969">|
 
 </br>
 
