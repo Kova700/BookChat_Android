@@ -46,6 +46,7 @@ data class AgonyRecordUiState(
 
 sealed class AgonyRecordEvent {
 	data object MoveToBack : AgonyRecordEvent()
+	data object CloseKeyboard : AgonyRecordEvent()
 	data class MoveToAgonyTitleEdit(
 		val agonyId: Long,
 		val bookshelfItemId: Long,

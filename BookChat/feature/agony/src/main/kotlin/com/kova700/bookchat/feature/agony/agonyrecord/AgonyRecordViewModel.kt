@@ -108,6 +108,7 @@ class AgonyRecordViewModel @Inject constructor(
 		}.onSuccess {
 			updateFirstItemState(ItemState.Success())
 			updateState { copy(uiState = UiState.SUCCESS) }
+			startEvent(AgonyRecordEvent.CloseKeyboard)
 		}.onFailure {
 			startEvent(AgonyRecordEvent.ShowSnackBar(R.string.agony_record_make_fail))
 			updateFirstItemState(
@@ -136,6 +137,7 @@ class AgonyRecordViewModel @Inject constructor(
 		}.onSuccess {
 			_itemState.update { _itemState.value + (recordItem.recordId to ItemState.Success()) }
 			updateState { copy(uiState = UiState.SUCCESS) }
+			startEvent(AgonyRecordEvent.CloseKeyboard)
 		}.onFailure { startEvent(AgonyRecordEvent.ShowSnackBar(R.string.agony_record_revise_fail)) }
 	}
 
