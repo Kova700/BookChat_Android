@@ -151,7 +151,7 @@
 고민기록
 |고민 기록 추가|고민 기록 삭제|고민 기록 수정|
 |:-----:|:-----:|:-----:|
-||||
+|<img width="240" src="https://github.com/user-attachments/assets/4f88b6d0-3fdf-4d2a-b63d-458a1b5efeb8">|<img width="240" src="https://github.com/user-attachments/assets/aed57e93-36b0-4c7f-87d1-b0fcd06de5a2">|<img width="240" src="https://github.com/user-attachments/assets/7334093f-0b8e-4569-95e4-26a461f843ff">|
 
 검색
 |검색 기록|종합 검색 결과|
