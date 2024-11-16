@@ -13,7 +13,7 @@ import com.kova700.bookchat.feature.channel.databinding.ItemChattingMineBinding
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingNoticeBinding
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingOtherBinding
 import com.kova700.bookchat.util.date.toFormattedTimeText
-import com.kova700.bookchat.util.emoji.isSingleTextOrEmoji
+import com.kova700.bookchat.util.emoji.isSingleEmoji
 import com.kova700.bookchat.util.image.image.loadUserProfile
 
 sealed class ChatItemViewHolder(
@@ -105,8 +105,8 @@ class MyChatViewHolder(
 	private fun setMessageTextState(message: String) {
 		with(binding) {
 			chattingLayout.background =
-				if (message.isSingleTextOrEmoji()) null else root.context.getDrawable(R.drawable.chat_bubble_blue)
-			chatTv.textSize = if (message.isSingleTextOrEmoji()) 70f else 12f
+				if (message.isSingleEmoji()) null else root.context.getDrawable(R.drawable.chat_bubble_blue)
+			chatTv.textSize = if (message.isSingleEmoji()) 70f else 12f
 			chatTv.text =
 				if (message.length > MAX_MESSAGE_LENGTH) message.substring(0, MAX_MESSAGE_LENGTH) + "..."
 				else message
@@ -184,8 +184,8 @@ class AnotherUserChatViewHolder(
 	private fun setMessageTextState(message: String) {
 		with(binding) {
 			chattingLayout.background =
-				if (message.isSingleTextOrEmoji()) null else root.context.getDrawable(R.drawable.chat_bubble_gray)
-			chatTv.textSize = if (message.isSingleTextOrEmoji()) 70f else 12f
+				if (message.isSingleEmoji()) null else root.context.getDrawable(R.drawable.chat_bubble_gray)
+			chatTv.textSize = if (message.isSingleEmoji()) 70f else 12f
 			chatTv.text =
 				if (message.length > MAX_MESSAGE_LENGTH) message.substring(0, MAX_MESSAGE_LENGTH) + "..."
 				else message
