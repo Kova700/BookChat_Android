@@ -176,7 +176,7 @@
 실시간 채팅
 |송신|수신-채팅방|수신-Notification|수신-Notification-음소거|
 |:-----:|:-----:|:-----:|:-----:|
-|||<img width="240" src="https://github.com/user-attachments/assets/1696c652-7f40-4bd5-acf1-cc058ccf6cfd">|<img width="240" src="https://github.com/user-attachments/assets/943dd1b1-c60b-49f6-89b6-74bfe22b5040">|
+|<img width="240" src="https://github.com/user-attachments/assets/f8cadda9-f445-4dee-8d8d-b02834d60e36">|<img width="240" src="https://github.com/user-attachments/assets/b738773c-e99c-4a81-b4b1-744124037281">|<img width="240" src="https://github.com/user-attachments/assets/1696c652-7f40-4bd5-acf1-cc058ccf6cfd">|<img width="240" src="https://github.com/user-attachments/assets/943dd1b1-c60b-49f6-89b6-74bfe22b5040">|
 
 채팅방 설정
 |채팅방 세팅|방장 변경|부방장 변경|
