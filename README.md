@@ -164,9 +164,34 @@
 |||||
 
 채팅방 생성
-|이미지 선택|도서 선택|생성|추가된 목록|
-|:-----:|:-----:|:-----:|:-----:|
-|<img width="240" src="https://github.com/user-attachments/assets/039ab941-ffd9-4f07-a2f1-1a6d935ffee4">|<img width="240" src="https://github.com/user-attachments/assets/a5e79ae5-cbba-4e66-b422-8cefd37d5191">|<img width="240" src="https://github.com/user-attachments/assets/576f3d65-2d32-430e-86d5-fa757a35c312">|<img width="240" src="https://github.com/user-attachments/assets/5f922ca0-cadb-4c5f-8ea0-edc757b2799b">|
+|이미지 선택|도서 선택|생성|
+|:-----:|:-----:|:-----:|
+|<img width="240" src="https://github.com/user-attachments/assets/039ab941-ffd9-4f07-a2f1-1a6d935ffee4">|<img width="240" src="https://github.com/user-attachments/assets/a5e79ae5-cbba-4e66-b422-8cefd37d5191">|<img width="240" src="https://github.com/user-attachments/assets/b1709920-52c6-4a0b-8acf-eb504c1e3354">|
+
+<table width="100%">
+   <tr>
+    <td width="25%">이미지 선택</td>
+    <td width="25%">도서 선택</td>
+    <td width="25%">생성</td>
+    <td width="25%">추가된 목록</td>
+  </tr>
+  <tr>
+    <td width="25%">
+      <img src="https://github.com/user-attachments/assets/039ab941-ffd9-4f07-a2f1-1a6d935ffee4" style="width:100%; height:auto;" alt="이미지 선택">
+    </td>
+    <td width="25%">
+      <img src="https://github.com/user-attachments/assets/a5e79ae5-cbba-4e66-b422-8cefd37d5191" style="width:100%; height:auto;" alt="도서 선택">
+    </td>
+    <td width="25%">
+      <img src="https://github.com/user-attachments/assets/576f3d65-2d32-430e-86d5-fa757a35c312" style="width:100%; height:auto;" alt="생성">
+    </td>
+    <td width="25%">
+      <img src="https://github.com/user-attachments/assets/5f922ca0-cadb-4c5f-8ea0-edc757b2799b" style="width:100%; height:auto;" alt="추가된 목록">
+    </td>
+  </tr>
+</table>
+
+
 
 채팅방
 |채팅 캡처|읽었던 영역 표시|하단 스크롤 버튼|
