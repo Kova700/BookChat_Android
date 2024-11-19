@@ -171,7 +171,7 @@
 채팅방
 |채팅 캡처|읽었던 영역 표시|하단 스크롤 버튼|
 |:-----:|:-----:|:-----:|
-|<img width="240" src="https://github.com/user-attachments/assets/5011bdd6-944a-4aa6-bf78-1355f811e16f">|||
+|<img width="240" src="https://github.com/user-attachments/assets/5011bdd6-944a-4aa6-bf78-1355f811e16f">|<img width="240" src="https://github.com/user-attachments/assets/d786f465-1006-4456-b8ae-ceb05078df88">|<img width="240" src="https://github.com/user-attachments/assets/6b2d441a-b07e-4d95-ba26-d588e179cfd4">|
 
 실시간 채팅
 |송신|수신-채팅방|수신-Notification|수신-Notification-음소거|
