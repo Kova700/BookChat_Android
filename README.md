@@ -169,9 +169,9 @@
 |<img width="240" src="https://github.com/user-attachments/assets/039ab941-ffd9-4f07-a2f1-1a6d935ffee4">|<img width="240" src="https://github.com/user-attachments/assets/a5e79ae5-cbba-4e66-b422-8cefd37d5191">|<img width="240" src="https://github.com/user-attachments/assets/b1709920-52c6-4a0b-8acf-eb504c1e3354">|
 
 채팅방
-|채팅 캡처|읽었던 영역 표시|하단 스크롤 버튼|
-|:-----:|:-----:|:-----:|
-|<img width="240" src="https://github.com/user-attachments/assets/5011bdd6-944a-4aa6-bf78-1355f811e16f">|<img width="240" src="https://github.com/user-attachments/assets/d786f465-1006-4456-b8ae-ceb05078df88">|<img width="240" src="https://github.com/user-attachments/assets/6b2d441a-b07e-4d95-ba26-d588e179cfd4">|
+|채팅 캡처|읽었던 영역 표시|하단 스크롤 버튼|장문 채팅|
+|:-----:|:-----:|:-----:|:-----:|
+|<img width="240" src="https://github.com/user-attachments/assets/5011bdd6-944a-4aa6-bf78-1355f811e16f">|<img width="240" src="https://github.com/user-attachments/assets/d786f465-1006-4456-b8ae-ceb05078df88">|<img width="240" src="https://github.com/user-attachments/assets/6b2d441a-b07e-4d95-ba26-d588e179cfd4">|<img width="240" src="">|
 
 실시간 채팅
 |송신|수신-채팅방|수신-Notification|수신-Notification-음소거|
@@ -179,9 +179,9 @@
 |<img width="240" src="https://github.com/user-attachments/assets/f8cadda9-f445-4dee-8d8d-b02834d60e36">|<img width="240" src="https://github.com/user-attachments/assets/b738773c-e99c-4a81-b4b1-744124037281">|<img width="240" src="https://github.com/user-attachments/assets/1696c652-7f40-4bd5-acf1-cc058ccf6cfd">|<img width="240" src="https://github.com/user-attachments/assets/943dd1b1-c60b-49f6-89b6-74bfe22b5040">|
 
 채팅방 설정
-|채팅방 세팅|방장 변경|부방장 변경|
-|:-----:|:-----:|:-----:|
-||||
+|채팅방 세팅|부방장 변경|방장 변경|유저 강퇴-관리자|유저 강퇴-유저|
+|:-----:|:-----:|:-----:|:-----:|:-----:|
+|<img width="240" src="https://github.com/user-attachments/assets/9b58da3a-32ab-455e-8346-a2e0fb9f962d">|<img width="240" src="https://github.com/user-attachments/assets/d12e212f-4c70-40b8-9495-9acadfeacf68">|<img width="240" src="https://github.com/user-attachments/assets/b6e8f6a8-cccf-4668-96e0-5f3621624cd6">|<img width="240" src="https://github.com/user-attachments/assets/d35afdbd-889f-4382-918a-ac2199c5f844">|<img width="240" src="https://github.com/user-attachments/assets/749029b5-dee8-4244-931f-cb277a8dabcc">|
 
 마이페이지
 |화면|
