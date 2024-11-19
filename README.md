@@ -159,14 +159,14 @@
 |||||
 
 채팅방 목록
-|꾹누르기|스와이프|상단고정|삭제된 채팅방|
+|꾹누르기|스와이프|상단고정|방장이 삭제한 채팅방|
 |:-----:|:-----:|:-----:|:-----:|
 |||||
 
 채팅방 생성
-|이미지 선택|도서 선택|생성|
-|:-----:|:-----:|:-----:|
-||||
+|이미지 선택|도서 선택|생성|추가된 목록|
+|:-----:|:-----:|:-----:|:-----:|
+|<img width="240" src="https://github.com/user-attachments/assets/039ab941-ffd9-4f07-a2f1-1a6d935ffee4">|<img width="240" src="https://github.com/user-attachments/assets/a5e79ae5-cbba-4e66-b422-8cefd37d5191">|<img width="240" src="https://github.com/user-attachments/assets/576f3d65-2d32-430e-86d5-fa757a35c312">|<img width="240" src="https://github.com/user-attachments/assets/5f922ca0-cadb-4c5f-8ea0-edc757b2799b">|
 
 채팅방
 |채팅 캡처|읽었던 영역 표시|하단 스크롤 버튼|
