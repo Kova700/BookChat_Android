@@ -154,44 +154,34 @@
 |<img width="240" src="https://github.com/user-attachments/assets/4f88b6d0-3fdf-4d2a-b63d-458a1b5efeb8">|<img width="240" src="https://github.com/user-attachments/assets/aed57e93-36b0-4c7f-87d1-b0fcd06de5a2">|<img width="240" src="https://github.com/user-attachments/assets/7334093f-0b8e-4569-95e4-26a461f843ff">|
 
 검색
-|검색 기록|종합 검색 결과|
-|:-----:|:-----:|
-|||||
-
-검색[도서]
-|도서 검색 결과|독서 예정|독서 중|독서 완료|
+|검색 필터|검색|도서 클릭|채팅방 클릭|
 |:-----:|:-----:|:-----:|:-----:|
 |||||
 
-검색[채팅방]
-|채팅 검색 결과|채팅방 입장|
-|:-----:|:-----:|
-|||
-
 채팅방 목록
-|페이징|꾹누르기|스와이프|
-|:-----:|:-----:|:-----:|
-||||
+|꾹누르기|스와이프|상단고정|삭제된 채팅방|
+|:-----:|:-----:|:-----:|:-----:|
+|||||
 
 채팅방 생성
-|기본|이미지 선택|도서 선택|
+|이미지 선택|도서 선택|생성|
 |:-----:|:-----:|:-----:|
 ||||
 
-채팅방 
-|채팅 캡처|
-|:-----:|
-|<img width="240" src="https://github.com/user-attachments/assets/5011bdd6-944a-4aa6-bf78-1355f811e16f">|
+채팅방
+|채팅 캡처|읽었던 영역 표시|하단 스크롤 버튼|
+|:-----:|:-----:|:-----:|
+|<img width="240" src="https://github.com/user-attachments/assets/5011bdd6-944a-4aa6-bf78-1355f811e16f">|||
+
+실시간 채팅
+|송신|수신-채팅방|수신-Notification|수신-Notification-음소거|
+|:-----:|:-----:|:-----:|:-----:|
+|||<img width="240" src="https://github.com/user-attachments/assets/1696c652-7f40-4bd5-acf1-cc058ccf6cfd">|<img width="240" src="https://github.com/user-attachments/assets/943dd1b1-c60b-49f6-89b6-74bfe22b5040">|
 
 채팅방 설정
 |채팅방 세팅|방장 변경|부방장 변경|
 |:-----:|:-----:|:-----:|
 ||||
-
-채팅 Notification
-|화면|
-|:-----:|
-||
 
 마이페이지
 |화면|
