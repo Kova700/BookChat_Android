@@ -159,9 +159,9 @@
 |||||
 
 채팅방 목록
-|꾹누르기|스와이프|상단고정|강퇴 혹은 삭제된 채팅방|
-|:-----:|:-----:|:-----:|:-----:|
-|||||
+|꾹누르기|스와이프|
+|:-----:|:-----:|
+|<img width="240" src="https://github.com/user-attachments/assets/74319422-7e6f-4be2-ac6f-c96b9aa7b6fd">|<img width="240" src="https://github.com/user-attachments/assets/af1cd74b-a4fd-4323-8d06-be56ea41b695">|
 
 채팅방 생성
 |이미지 선택|도서 선택|생성|
