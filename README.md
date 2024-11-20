@@ -159,7 +159,7 @@
 |||||
 
 채팅방 목록
-|꾹누르기|스와이프|상단고정|방장이 삭제한 채팅방|
+|꾹누르기|스와이프|상단고정|강퇴 혹은 삭제된 채팅방|
 |:-----:|:-----:|:-----:|:-----:|
 |||||
 
@@ -169,9 +169,9 @@
 |<img width="240" src="https://github.com/user-attachments/assets/039ab941-ffd9-4f07-a2f1-1a6d935ffee4">|<img width="240" src="https://github.com/user-attachments/assets/a5e79ae5-cbba-4e66-b422-8cefd37d5191">|<img width="240" src="https://github.com/user-attachments/assets/b1709920-52c6-4a0b-8acf-eb504c1e3354">|
 
 채팅방
-|채팅 캡처|읽었던 영역 표시|하단 스크롤 버튼|장문 채팅|
-|:-----:|:-----:|:-----:|:-----:|
-|<img width="240" src="https://github.com/user-attachments/assets/5011bdd6-944a-4aa6-bf78-1355f811e16f">|<img width="240" src="https://github.com/user-attachments/assets/d786f465-1006-4456-b8ae-ceb05078df88">|<img width="240" src="https://github.com/user-attachments/assets/6b2d441a-b07e-4d95-ba26-d588e179cfd4">|<img width="240" src="">|
+|채팅 캡처|읽었던 영역 표시|하단 스크롤 버튼|장문 채팅-송신|장문 채팅-수신|
+|:-----:|:-----:|:-----:|:-----:|:-----:|
+|<img width="240" src="https://github.com/user-attachments/assets/5011bdd6-944a-4aa6-bf78-1355f811e16f">|<img width="240" src="https://github.com/user-attachments/assets/d786f465-1006-4456-b8ae-ceb05078df88">|<img width="240" src="https://github.com/user-attachments/assets/6b2d441a-b07e-4d95-ba26-d588e179cfd4">|<img width="240" src="https://github.com/user-attachments/assets/04b0fd5b-0711-4489-b618-d229b08c823c">|<img width="240" src="https://github.com/user-attachments/assets/54387460-bbd9-440e-aa79-8c7affa5d253">|
 
 실시간 채팅
 |송신|수신-채팅방|수신-Notification|수신-Notification-음소거|
