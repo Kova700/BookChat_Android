@@ -1,6 +1,5 @@
 package com.kova700.bookchat.core.data.channel.internal
 
-import android.util.Log
 import com.kova700.bookchat.core.data.channel.external.model.Channel
 import com.kova700.bookchat.core.data.channel.external.model.ChannelDefaultImageType
 import com.kova700.bookchat.core.data.channel.external.model.ChannelInfo
@@ -26,7 +25,6 @@ import com.kova700.bookchat.core.network.bookchat.channel.model.request.RequestM
 import com.kova700.bookchat.core.network.bookchat.channel.model.response.BookChatFailResponseBody
 import com.kova700.bookchat.core.network.bookchat.common.mapper.toBookRequest
 import com.kova700.bookchat.core.network.util.multipart.toMultiPartBody
-import com.kova700.bookchat.util.Constants.TAG
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -95,7 +93,6 @@ class ChannelRepositoryImpl @Inject constructor(
 	 * + 해당 채팅방에 입장하지 않은 채로 해당 API 호출하면 예외 던짐
 	 * {"errorCode":"4040400","message":"채팅방을 찾을 수 없습니다."}*/
 	private suspend fun getOnlineChannel(channelId: Long): Channel? {
-		Log.d(TAG, "ChannelRepositoryImpl: getOnlineChannel() - called")
 		val channel = when (val response = channelApi.getChannel(channelId)) {
 			is BookChatApiResult.Success -> response.data.toChannel()
 
@@ -123,7 +120,6 @@ class ChannelRepositoryImpl @Inject constructor(
 		maxAttempts: Int,
 	): ChannelInfo? {
 		for (attempt in 0 until maxAttempts) {
-			Log.d(TAG, "ChannelRepositoryImpl: getChannelInfo() - attempt :$attempt")
 			val response = runCatching { channelApi.getChannelInfo(channelId) }
 				.onFailure { delay((DEFAULT_RETRY_ATTEMPT_DELAY_TIME * (1.5).pow(attempt))) }
 				.getOrNull() ?: continue

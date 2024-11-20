@@ -1,6 +1,5 @@
 package com.kova700.bookchat.core.data.chat.internal
 
-import android.util.Log
 import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import com.kova700.bookchat.core.data.chat.external.repository.ChatRepository
@@ -11,7 +10,6 @@ import com.kova700.bookchat.core.database.chatting.external.chat.mapper.toChatEn
 import com.kova700.bookchat.core.network.bookchat.chat.ChatApi
 import com.kova700.bookchat.core.network.bookchat.chat.model.mapper.toChat
 import com.kova700.bookchat.core.network.bookchat.common.model.SearchSortOptionNetwork
-import com.kova700.bookchat.util.Constants.TAG
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,13 +54,11 @@ class ChatRepositoryImpl @Inject constructor(
 	}
 
 	override fun getOlderChatIsEndFlow(): StateFlow<Boolean> {
-		Log.d(TAG, "ChatRepositoryImpl: getOlderChatIsEndFlow() - called")
 		_isOlderChatFullyLoaded.update { false }
 		return _isOlderChatFullyLoaded.asStateFlow()
 	}
 
 	override fun getNewerChatIsEndFlow(): StateFlow<Boolean> {
-		Log.d(TAG, "ChatRepositoryImpl: getNewerChatIsEndFlow() - called")
 		_isNewerChatFullyLoaded.update { true }
 		return _isNewerChatFullyLoaded.asStateFlow()
 	}
@@ -75,7 +71,6 @@ class ChatRepositoryImpl @Inject constructor(
 		channelId: Long,
 		maxAttempts: Int,
 	): List<Chat> {
-		Log.d(TAG, "ChatRepositoryImpl: syncChats() - called")
 		_isNewerChatFullyLoaded.update { false }
 
 		for (i in 0 until 2) {
@@ -107,7 +102,6 @@ class ChatRepositoryImpl @Inject constructor(
 		size: Int,
 		maxAttempts: Int,
 	): List<Chat> {
-		Log.d(TAG, "ChatRepositoryImpl: getNewestChats() - called")
 		for (attempt in 0 until maxAttempts) {
 			runCatching {
 				chatApi.getChats(
@@ -143,7 +137,6 @@ class ChatRepositoryImpl @Inject constructor(
 		size: Int,
 	) {
 		clearCachedData("getOfflineNewestChats")
-		Log.d(TAG, "ChannelViewModel: getOfflineNewestChats() - called")
 		val offlineNewestChats = chatDAO.getNewestChats(
 			channelId = channelId,
 			size = size
@@ -153,7 +146,6 @@ class ChatRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun getFailedChats(channelId: Long): List<Chat> {
-		Log.d(TAG, "ChatRepositoryImpl: getFailedChats() - called")
 		return chatDAO.getChannelsFailedChats(channelId).map {
 			if (it.isRetryRequired.not()) it.toChat().copy(state = ChatState.FAILURE)
 			else it.toChat()
@@ -166,7 +158,6 @@ class ChatRepositoryImpl @Inject constructor(
 		baseChatId: Long,
 		size: Int,
 	) {
-		Log.d(TAG, "ChatRepositoryImpl: getChatsAroundId() - called")
 		val response = chatApi.getChats(
 			roomId = channelId,
 			postCursorId = baseChatId - 1,
@@ -193,7 +184,6 @@ class ChatRepositoryImpl @Inject constructor(
 	/** 서버에 있는 채팅 우선적으로 쿼리 + API 실패시 로컬데이터 호출X (채팅 연속성을 보장하지못함)*/
 	override suspend fun getNewerChats(channelId: Long, size: Int) {
 		if (_isNewerChatFullyLoaded.value) return
-		Log.d(TAG, "ChatRepositoryImpl: getNewerChats() - called")
 
 		val response = chatApi.getChats(
 			roomId = channelId,
@@ -205,11 +195,6 @@ class ChatRepositoryImpl @Inject constructor(
 
 		cachedChannelId = channelId
 		_isNewerChatFullyLoaded.update { response.cursorMeta.last }
-		Log.d(
-			TAG,
-			"ChatRepositoryImpl: getNewerChats() - response : $response \n" +
-							"_isNewerChatFullyLoaded : ${_isNewerChatFullyLoaded.value}"
-		)
 		currentNewerChatPage =
 			if (newChats.isEmpty()) currentNewerChatPage else response.cursorMeta.nextCursorId
 
@@ -225,7 +210,6 @@ class ChatRepositoryImpl @Inject constructor(
 	/** 서버에 있는 채팅 우선적으로 쿼리 + API 실패시 로컬데이터 호출X (채팅 연속성을 보장하지못함)*/
 	override suspend fun getOlderChats(channelId: Long, size: Int) {
 		if (_isOlderChatFullyLoaded.value) return
-		Log.d(TAG, "ChatRepositoryImpl: getOlderChats() - called")
 		val response = chatApi.getChats(
 			roomId = channelId,
 			postCursorId = currentOlderChatPage,
@@ -251,19 +235,16 @@ class ChatRepositoryImpl @Inject constructor(
 
 	/** 로컬에 있는 채팅 우선적으로 쿼리 */
 	override suspend fun getChat(chatId: Long): Chat? {
-		Log.d(TAG, "ChatRepositoryImpl: getChat() - called")
 		return mapChats.value[chatId]
 			?: getOfflineChat(chatId)
 			?: getOnlineChat(chatId)
 	}
 
 	private suspend fun getOfflineChat(chatId: Long): Chat? {
-		Log.d(TAG, "ChatRepositoryImpl: getOfflineChat() - called")
 		return chatDAO.getChat(chatId)?.toChat()
 	}
 
 	private suspend fun getOnlineChat(chatId: Long): Chat? {
-		Log.d(TAG, "ChatRepositoryImpl: getOnlineChat() - called")
 		return when (val response = chatApi.getChat(chatId)) {
 			is BookChatApiResult.Success -> response.data.toChat().also { insertChat(it) }
 			is BookChatApiResult.Failure -> null
@@ -271,7 +252,6 @@ class ChatRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun insertChat(chat: Chat) {
-		Log.d(TAG, "ChatRepositoryImpl: insertChat() - called")
 		val chatId = chatDAO.insertChat(chat.toChatEntity())
 
 		if ((chat.channelId != cachedChannelId)
@@ -290,7 +270,6 @@ class ChatRepositoryImpl @Inject constructor(
 		channelId: Long,
 		chats: List<Chat>,
 	) {
-		Log.d(TAG, "ChatRepositoryImpl: insertAllChats() - called")
 		chatDAO.insertChats(chats.toChatEntity())
 		if (channelId != cachedChannelId) return
 
@@ -307,7 +286,6 @@ class ChatRepositoryImpl @Inject constructor(
 		clientId: Long,
 		chatState: ChatState,
 	): Long {
-		Log.d(TAG, "ChatRepositoryImpl: insertWaitingChat() - called")
 		val chatId = chatDAO.insertWaitingChat(
 			channelId = channelId,
 			message = message,
@@ -327,30 +305,25 @@ class ChatRepositoryImpl @Inject constructor(
 		newChat: Chat,
 		receiptId: Long,
 	) {
-		Log.d(TAG, "ChatRepositoryImpl: updateWaitingChat() - called")
 		deleteChat(receiptId)
 		chatDAO.insertChat(newChat.toChatEntity())
 		setChats(mapChats.value + (newChat.chatId to newChat))
 	}
 
 	override suspend fun deleteChat(chatId: Long) {
-		Log.d(TAG, "ChatRepositoryImpl: deleteChat() - called")
 		chatDAO.deleteChat(chatId)
 		setChats(mapChats.value - (chatId))
 	}
 
 	override suspend fun updateChatState(chatId: Long, chatState: ChatState) {
-		Log.d(TAG, "ChatRepositoryImpl: updateChatState() - called")
 		chatDAO.updateChatState(chatId, chatState.code)
 	}
 
 	override suspend fun deleteChannelAllChat(channelId: Long) {
-		Log.d(TAG, "ChatRepositoryImpl: deleteChannelAllChat() - called")
 		chatDAO.deleteChannelAllChat(channelId)
 	}
 
 	private fun clearCachedData(caller: String) {
-		Log.d(TAG, "ChatRepositoryImpl: clearCachedData() - caller : $caller")
 		mapChats.update { emptyMap() }
 		cachedChannelId = null
 		currentOlderChatPage = null

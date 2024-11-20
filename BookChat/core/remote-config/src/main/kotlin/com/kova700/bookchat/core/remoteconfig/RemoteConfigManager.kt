@@ -1,6 +1,5 @@
 package com.kova700.bookchat.core.remoteconfig
 
-import android.util.Log
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ConfigUpdate
 import com.google.firebase.remoteconfig.ConfigUpdateListener
@@ -59,8 +58,6 @@ class RemoteConfigManager @Inject constructor() {
 		remoteConfig.addOnConfigUpdateListener(object : ConfigUpdateListener {
 			override fun onUpdate(configUpdate: ConfigUpdate) {
 				val updatedKeys = configUpdate.updatedKeys
-				Log.d("ㄺ", "RemoteConfigManager: onUpdate() - updatedKeys : $updatedKeys")
-
 				if (updatedKeys.contains(IS_SERVER_ENABLED_KEY)
 					|| updatedKeys.contains(IS_SERVER_UNDER_MAINTENANCE_KEY)
 					|| updatedKeys.contains(SERVER_DOWN_NOTICE_TEXT_KEY)

@@ -1,7 +1,6 @@
 package com.kova700.bookchat.core.chatclient
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import com.kova700.bookchat.core.chat_client.R
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
@@ -15,7 +14,6 @@ import com.kova700.bookchat.core.stomp.chatting.external.model.ChannelSubscripti
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketConnectionFailureException
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
 import com.kova700.bookchat.core.stomp.chatting.external.model.SubscriptionState
-import com.kova700.bookchat.util.Constants.TAG
 import com.kova700.bookchat.util.toast.makeToast
 import com.kova700.core.domain.usecase.client.LogoutUseCase
 import com.kova700.core.domain.usecase.client.WithdrawUseCase
@@ -167,7 +165,6 @@ class ChatClientImpl @Inject constructor(
 	}
 
 	private fun disconnectSocket() = chatClientScope.launch {
-		Log.d(TAG, "ChatClientImpl: disconnectSocket() - called")
 		stompHandler.disconnectSocket()
 	}
 

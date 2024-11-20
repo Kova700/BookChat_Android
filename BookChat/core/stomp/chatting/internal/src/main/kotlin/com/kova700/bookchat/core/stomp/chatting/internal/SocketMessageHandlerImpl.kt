@@ -1,6 +1,5 @@
 package com.kova700.bookchat.core.stomp.chatting.internal
 
-import android.util.Log
 import com.kova700.bookchat.core.data.channel.external.model.ChannelMemberAuthority
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
 import com.kova700.bookchat.core.data.chat.external.model.Chat
@@ -14,7 +13,6 @@ import com.kova700.bookchat.core.stomp.chatting.external.model.NotificationMessa
 import com.kova700.bookchat.core.stomp.chatting.external.model.NotificationMessageType
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketMessage
 import com.kova700.bookchat.core.stomp.chatting.internal.mapper.toChat
-import com.kova700.bookchat.util.Constants.TAG
 import com.kova700.core.domain.usecase.channel.GetClientChannelUseCase
 import javax.inject.Inject
 
@@ -131,7 +129,6 @@ class SocketMessageHandlerImpl @Inject constructor(
 	}
 
 	private suspend fun updateWaitingChat(chat: Chat, receiptId: Long) {
-		Log.d(TAG, "SocketMessageHandlerImpl: updateWaitingChat() - receiptId :$receiptId")
 		chatRepository.updateWaitingChat(
 			newChat = chat,
 			receiptId = receiptId

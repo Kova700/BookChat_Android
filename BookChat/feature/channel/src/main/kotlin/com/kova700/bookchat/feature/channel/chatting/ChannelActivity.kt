@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.ViewPropertyAnimator
 import android.view.animation.OvershootInterpolator
@@ -44,7 +43,6 @@ import com.kova700.bookchat.feature.channel.drawer.dialog.ExplodedChannelNoticeD
 import com.kova700.bookchat.feature.channel.drawer.mapper.toUser
 import com.kova700.bookchat.feature.channel.drawer.model.ChannelDrawerItem
 import com.kova700.bookchat.feature.channel.userprofile.UserProfileActivity
-import com.kova700.bookchat.util.Constants.TAG
 import com.kova700.bookchat.util.image.image.loadUserProfile
 import com.kova700.bookchat.util.recyclerview.isOnHigherPosition
 import com.kova700.bookchat.util.recyclerview.isOnListBottom
@@ -557,7 +555,6 @@ class ChannelActivity : AppCompatActivity() {
 					return@addCallback
 				}
 			}
-			Log.d(TAG, "ChannelActivity: setBackPressedDispatcher() - called")
 			channelViewModel.onClickBackBtn()
 		}
 	}

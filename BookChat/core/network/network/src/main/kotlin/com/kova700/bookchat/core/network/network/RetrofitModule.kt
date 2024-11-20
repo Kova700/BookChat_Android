@@ -57,10 +57,10 @@ object RetrofitModule {
 	@Singleton
 	fun provideOkHttpClient(
 		interceptor: Interceptor,
-		httpLoggingInterceptor: HttpLoggingInterceptor,
+//		httpLoggingInterceptor: HttpLoggingInterceptor,
 	): OkHttpClient {
 		return OkHttpClient.Builder()
-			.addNetworkInterceptor(httpLoggingInterceptor) //TODO : [FixWaiting] 릴리즈 버전에서는 제거해야함
+//			.addNetworkInterceptor(httpLoggingInterceptor)
 			.addInterceptor(interceptor)
 			.build()
 	}

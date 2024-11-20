@@ -1,7 +1,6 @@
 package com.kova700.bookchat.core.fcm.chat
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
@@ -32,7 +31,6 @@ class ChatNotificationWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
 	override suspend fun doWork(): Result {
-		Log.d("ㄺ", "ChatNotificationWorker: doWork() - just called")
 		if (bookChatTokenRepository.isBookChatTokenExist().not()) return Result.success()
 		val channelId: Long = inputData.getLong(EXTRA_CHANNEL_ID, -1)
 		val chatId: Long = inputData.getLong(EXTRA_CHAT_ID, -1)
@@ -45,7 +43,6 @@ class ChatNotificationWorker @AssistedInject constructor(
 		val apiResult = runCatching {
 			val channel = getClientChannelUseCase(channelId) ?: return Result.failure()
 			val chat = getChatUseCase(chatId) ?: return Result.failure()
-			Log.d("ㄺ", "ChatNotificationWorker: doWork() - real Work")
 			channelRepository.updateChannelLastChatIfValid(chat.channelId, chat)
 			Pair(channel, chat)
 		}.getOrNull() ?: return Result.failure()
