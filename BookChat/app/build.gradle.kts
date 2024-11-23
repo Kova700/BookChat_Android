@@ -20,17 +20,14 @@ android {
 
 dependencies {
 	implementation(libs.bundles.androidx.default)
-	// WorkManager
 	implementation(libs.bundles.workmanager)
 	implementation(project(":core:stomp:chatting:external"))
 	implementation(project(":core:util"))
 	implementation(project(":core:network-manager:external"))
 	implementation(project(":core:chat-client"))
-	ksp(libs.androidx.hilt.compiler)
 
-	//splash는 default Activity라서 지우면 안됨
+	/** 아래 feature 지우면 Navigation 에러남 */
 	implementation(project(":feature:splash"))
-	//아래 feature 지우면 Navigation 에러남
 	implementation(project(":feature:agony"))
 	implementation(project(":feature:bookreport"))
 	implementation(project(":feature:channel"))
