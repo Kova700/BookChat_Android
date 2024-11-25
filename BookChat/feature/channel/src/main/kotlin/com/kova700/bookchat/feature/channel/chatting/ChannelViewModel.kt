@@ -33,6 +33,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -47,6 +48,7 @@ import kotlin.math.abs
 // TODO : [FixWaiting] 채팅방 입장 헀는데 인원수 1명으로 그대로인 현상이 있음
 // TODO : [FixWaiting] 채팅방 퇴장 했는데, 채팅방 인원 수 갱신안되는 현상이 있음
 // TODO : [FixWaiting] 오랫동안 채팅 화면 켜둔채로 화면 잠금 걸어두고 돌아오면 재연결 안되는 현상이 있음
+// TODO : [FixWaiting] 코드 난독화 추가
 
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
@@ -68,7 +70,7 @@ class ChannelViewModel @Inject constructor(
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
 
 	private val _eventFlow = MutableSharedFlow<ChannelEvent>()
-	val eventFlow get() = _eventFlow
+	val eventFlow = _eventFlow.asSharedFlow()
 
 	private val _uiState = MutableStateFlow<ChannelUiState>(ChannelUiState.DEFAULT)
 	val uiState = _uiState.asStateFlow()
@@ -583,7 +585,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun startEvent(event: ChannelEvent) = viewModelScope.launch {
-		eventFlow.emit(event)
+		_eventFlow.emit(event)
 	}
 
 	private inline fun updateState(block: ChannelUiState.() -> ChannelUiState) {
