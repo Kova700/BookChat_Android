@@ -5,15 +5,15 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.kova700.bookchat.core.data.chat.external.model.ChatState
 import com.kova700.bookchat.core.design_system.R
-import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
 import com.kova700.bookchat.feature.channel.chatting.capture.setCaptureViewState
+import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingDateBinding
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingLastReadNoticeBinding
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingMineBinding
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingNoticeBinding
 import com.kova700.bookchat.feature.channel.databinding.ItemChattingOtherBinding
 import com.kova700.bookchat.util.date.toFormattedTimeText
-import com.kova700.bookchat.util.emoji.isSingleTextOrEmoji
+import com.kova700.bookchat.util.emoji.isSingleEmoji
 import com.kova700.bookchat.util.image.image.loadUserProfile
 
 sealed class ChatItemViewHolder(
@@ -46,11 +46,14 @@ class MyChatViewHolder(
 			failedChatDeleteBtn.setOnClickListener {
 				onClickFailedChatDeleteBtn?.invoke(absoluteAdapterPosition)
 			}
+			moveToWholeTextBtn.setOnClickListener {
+				onClickMoveToWholeText?.invoke(absoluteAdapterPosition)
+			}
 			root.setOnClickListener {
 				onSelectCaptureChat?.invoke(absoluteAdapterPosition)
 			}
-			moveToWholeTextBtn.setOnClickListener {
-				onClickMoveToWholeText?.invoke(absoluteAdapterPosition)
+			chattingLayout.setOnClickListener {
+				onSelectCaptureChat?.invoke(absoluteAdapterPosition)
 			}
 			chattingLayout.setOnLongClickListener {
 				onLongClickChatItem?.invoke(absoluteAdapterPosition)
@@ -102,8 +105,8 @@ class MyChatViewHolder(
 	private fun setMessageTextState(message: String) {
 		with(binding) {
 			chattingLayout.background =
-				if (message.isSingleTextOrEmoji()) null else root.context.getDrawable(R.drawable.chat_bubble_blue)
-			chatTv.textSize = if (message.isSingleTextOrEmoji()) 70f else 12f
+				if (message.isSingleEmoji()) null else root.context.getDrawable(R.drawable.chat_bubble_blue)
+			chatTv.textSize = if (message.isSingleEmoji()) 70f else 12f
 			chatTv.text =
 				if (message.length > MAX_MESSAGE_LENGTH) message.substring(0, MAX_MESSAGE_LENGTH) + "..."
 				else message
@@ -123,11 +126,14 @@ class AnotherUserChatViewHolder(
 			userProfileIv.setOnClickListener {
 				onClickUserProfile?.invoke(absoluteAdapterPosition)
 			}
+			moveToWholeTextBtn.setOnClickListener {
+				onClickMoveToWholeText?.invoke(absoluteAdapterPosition)
+			}
 			root.setOnClickListener {
 				onSelectCaptureChat?.invoke(absoluteAdapterPosition)
 			}
-			moveToWholeTextBtn.setOnClickListener {
-				onClickMoveToWholeText?.invoke(absoluteAdapterPosition)
+			chattingLayout.setOnClickListener {
+				onSelectCaptureChat?.invoke(absoluteAdapterPosition)
 			}
 			chattingLayout.setOnLongClickListener {
 				onLongClickChatItem?.invoke(absoluteAdapterPosition)
@@ -178,8 +184,8 @@ class AnotherUserChatViewHolder(
 	private fun setMessageTextState(message: String) {
 		with(binding) {
 			chattingLayout.background =
-				if (message.isSingleTextOrEmoji()) null else root.context.getDrawable(R.drawable.chat_bubble_gray)
-			chatTv.textSize = if (message.isSingleTextOrEmoji()) 70f else 12f
+				if (message.isSingleEmoji()) null else root.context.getDrawable(R.drawable.chat_bubble_gray)
+			chatTv.textSize = if (message.isSingleEmoji()) 70f else 12f
 			chatTv.text =
 				if (message.length > MAX_MESSAGE_LENGTH) message.substring(0, MAX_MESSAGE_LENGTH) + "..."
 				else message

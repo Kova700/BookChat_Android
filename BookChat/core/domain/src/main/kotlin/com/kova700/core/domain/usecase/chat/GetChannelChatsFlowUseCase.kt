@@ -1,6 +1,5 @@
 package com.kova700.core.domain.usecase.chat
 
-import android.util.Log
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
 import com.kova700.bookchat.core.data.chat.external.model.Chat
 import com.kova700.bookchat.core.data.chat.external.model.ChatState
@@ -27,7 +26,6 @@ class GetChannelChatsFlowUseCase @Inject constructor(
 			channelId = channelId
 		).map { chats -> chats.map { it.attachUser() } }
 			.onEach { chats ->
-				Log.d("ㄺ", "GetChatsFlowUseCase: invoke(channelId : $channelId) - chats :$chats")
 				val newestChatInList =
 					chats.firstOrNull { chat -> chat.state == ChatState.SUCCESS }
 				newestChatInList?.let { chat ->

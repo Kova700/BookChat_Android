@@ -44,13 +44,15 @@ class ImageCropActivity : AppCompatActivity() {
 
 	private fun setViewState(uiState: ImageCropUiState) {
 		setCropImageViewState(uiState)
-		binding.defaultStateGroup.visibility =
-			if (uiState.isDefault) View.VISIBLE else View.GONE
-		binding.imageCropStateGroup.visibility =
-			if (uiState.isImageCropping) View.VISIBLE else View.GONE
-		binding.imageCropTitle.text =
-			if (uiState.isImageCropping) getString(R.string.image_crop_title)
-			else getString(R.string.select_image)
+		with(binding) {
+			defaultStateGroup.visibility =
+				if (uiState.isDefault) View.VISIBLE else View.GONE
+			imageCropStateGroup.visibility =
+				if (uiState.isImageCropping) View.VISIBLE else View.GONE
+			imageCropTitle.text =
+				if (uiState.isImageCropping) getString(R.string.image_crop_title)
+				else getString(R.string.select_image)
+		}
 	}
 
 	private fun setCropImageViewState(uiState: ImageCropUiState) {

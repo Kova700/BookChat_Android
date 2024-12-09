@@ -1,6 +1,5 @@
 package com.kova700.bookchat.core.stomp.chatting.internal
 
-import android.util.Log
 import com.kova700.bookchat.core.data.bookchat_token.external.repository.BookChatTokenRepository
 import com.kova700.bookchat.core.data.channel.external.repository.ChannelRepository
 import com.kova700.bookchat.core.data.chat.external.model.ChatState
@@ -21,7 +20,6 @@ import com.kova700.bookchat.core.stomp.chatting.external.model.SocketMessage
 import com.kova700.bookchat.core.stomp.chatting.external.model.SocketState
 import com.kova700.bookchat.core.stomp.chatting.external.model.SubscriptionState
 import com.kova700.bookchat.core.stomp.internal.BuildConfig
-import com.kova700.bookchat.util.Constants.TAG
 import com.kova700.core.domain.usecase.chat.GetChatUseCase
 import com.kova700.core.domain.usecase.client.RenewBookChatTokenUseCase
 import kotlinx.coroutines.delay
@@ -119,11 +117,8 @@ class StompHandlerImpl @Inject constructor(
 			if (isAlreadyConnectedOrConnecting) throw DuplicateSocketConnectionException()
 			setSocketState(SocketState.CONNECTING)
 		}
-		Log.d(TAG, "StompHandlerImpl: connectSocket() - called - 실제 연결 작업 시작")
-
 		var haveTriedRenewingToken = false
 		for (attempt in 0 until maxAttempts) {
-			Log.d(TAG, "StompHandlerImpl: connectSocket() - attempt : $attempt")
 			if (networkManager.isNetworkAvailable().not()) {
 				setSocketState(SocketState.FAILURE)
 				throw NetworkUnavailableException()
@@ -143,7 +138,6 @@ class StompHandlerImpl @Inject constructor(
 					runCatching { renewBookChatTokenUseCase() }
 						.onSuccess { haveTriedRenewingToken = true }
 				}
-				Log.d(TAG, "StompHandlerImpl: connectSocket().onFailure() - throwable :$throwable")
 			}
 			delay((DEFAULT_CONNECTION_ATTEMPT_DELAY_TIME * (1.5).pow(attempt)))
 		}
@@ -175,10 +169,6 @@ class StompHandlerImpl @Inject constructor(
 		}
 
 		for (attempt in 0 until maxAttempts) {
-			Log.d(
-				TAG, "StompHandlerImpl: subscribeChannel() - " +
-								"channelId : $channelId, attempt : $attempt"
-			)
 			if (networkManager.isNetworkAvailable().not()
 				|| isSocketConnected.not()
 			) {
@@ -188,7 +178,6 @@ class StompHandlerImpl @Inject constructor(
 
 			runCatching { subscribe(channelSId) }
 				.onSuccess { messagesFlow ->
-					Log.d(TAG, "StompHandlerImpl: subscribeChannel() - channelId : $channelId, success")
 					setState(SubscriptionState.SUBSCRIBED)
 					return messagesFlow
 						.catch { handleSocketError("subscribeChannel", it) }
@@ -199,7 +188,6 @@ class StompHandlerImpl @Inject constructor(
 			delay((DEFAULT_CONNECTION_ATTEMPT_DELAY_TIME * (1.5).pow(attempt)))
 		}
 
-		Log.d(TAG, "StompHandlerImpl: subscribeChannel() - channelId : $channelId, failed")
 		setState(SubscriptionState.FAILED)
 		throw ChannelSubscriptionFailureException()
 	}
@@ -225,7 +213,6 @@ class StompHandlerImpl @Inject constructor(
 
 	override suspend fun disconnectSocket() {
 		if (::stompSession.isInitialized.not()) return
-		Log.d(TAG, "StompHandlerImpl: disconnectSocket() - called")
 		setSocketState(SocketState.DISCONNECTED)
 		runCatching { stompSession.disconnect() }
 			.onFailure { handleSocketError("disconnectSocket", it) }
@@ -317,7 +304,6 @@ class StompHandlerImpl @Inject constructor(
 	}
 
 	private fun handleSocketError(caller: String, throwable: Throwable) {
-		Log.d(TAG, "StompHandlerImpl: handleSocketError(caller :$caller) - throwable :$throwable")
 		when (throwable) {
 
 			/** 일부 소비자가 더 많은 프레임을 기대하는 동안 STOMP 프레임 Flow가 Complete되면 예외가 발생합니다.
@@ -356,10 +342,7 @@ class StompHandlerImpl @Inject constructor(
 				_socketState.update { SocketState.NEED_RECONNECTION }
 			}
 
-			else -> {
-				Log.d(TAG, "StompHandlerImpl: handleSocketError() - else throwable :$throwable")
-				Unit
-			}
+			else -> Unit
 		}
 	}
 

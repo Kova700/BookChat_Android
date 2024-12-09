@@ -93,6 +93,7 @@ class MakeChannelViewModel @Inject constructor(
 	}
 
 	fun onClickTextClearBtn() {
+		if (uiState.value.isLoading) return
 		updateState { copy(channelTitle = "") }
 	}
 
@@ -105,10 +106,12 @@ class MakeChannelViewModel @Inject constructor(
 	}
 
 	fun onClickDeleteSelectedBookBtn() {
+		if (uiState.value.isLoading) return
 		updateState { copy(selectedBook = null) }
 	}
 
 	fun onClickCameraBtn() {
+		if (uiState.value.isLoading) return
 		startEvent(MakeChannelEvent.ShowChannelImageSelectDialog)
 	}
 

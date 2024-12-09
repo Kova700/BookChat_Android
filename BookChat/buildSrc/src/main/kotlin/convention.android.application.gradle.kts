@@ -1,4 +1,5 @@
 import gradle.configure.configureKotlinAndroid
+import gradle.configure.libs
 
 plugins {
 	id("com.android.application")
@@ -7,7 +8,7 @@ plugins {
 
 android {
 	configureKotlinAndroid(this)
-	defaultConfig.targetSdk = 34
+	defaultConfig.targetSdk = libs.findVersion("targetSdk").get().requiredVersion.toInt()
 
 	buildTypes {
 		release {

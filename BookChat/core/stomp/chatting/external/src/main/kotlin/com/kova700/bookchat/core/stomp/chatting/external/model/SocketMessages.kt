@@ -3,11 +3,12 @@ package com.kova700.bookchat.core.stomp.chatting.external.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-// TODO : [Version 2] FCM 안오다가 채팅방 들어갔다 나오면 FCM 받아지는 현상이 있음
-//  아마 서버에서 disconnected 상태 업데이트가 아직 안되어서 FCM 수신이 안되는 듯하다
-//  추후 앱 단위에서 소켓 연결하고 모든 소켓 Frame에 ChannelId, ChatId를 포함하여
-//  모든 채팅방이 자동 subscribe된 채로 사용되는 형식으로 수정하해야 할듯하다.
-//  connect 보내면 서버에서 subscribeAllChannels로 모든 채팅방을 subscribe되게도 가능하겠다.(어차피 모든 채팅방 구독해야하니까)
+// TODO : [Version 2] ChatId를 Long타입이 아닌 String타입으로 클라이언트에서 "UUID-UserID" 형식으로
+//      서버로 전송하는 구조를 사용하면 receiptId를 굳이 사용하지 않아도 되게 수정이 가능해보임
+//      (하지만 쿼리 속도가 좀 느려지는 단점이 존재하긴 함)
+//      현재 구조에서 메세지의 전송은 완료되었는데 소켓 끊김으로 해당 채팅을 수신하지 않으면
+//      해당 채팅의 receiptId에 해당하는 전송 대기 채팅이 전송 완료 상태로 수정되지 않기 때문에
+//      같은 채팅에 대한 중복 생성이 발생할 가능성이 있음
 
 sealed interface SocketMessage
 

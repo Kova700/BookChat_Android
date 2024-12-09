@@ -1,7 +1,6 @@
 package com.kova700.bookchat.core.fcm.chat
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
@@ -19,7 +18,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 //TODO : [Version 2] 구독(온라인) 상태임에도 FCM이 수신되는 현상이 있음 + 본인이 보낸 메세지임에도 FCM이 수신되는 상황
-//TODO : [FixWaiting] SenderId를 함께 넘겨 받아서 만약 Sender가 클라이언트라면 아래 API호출하지 않게 수정
 @HiltWorker
 class ChatNotificationWorker @AssistedInject constructor(
 	@Assisted private val appContext: Context,
@@ -33,21 +31,23 @@ class ChatNotificationWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
 	override suspend fun doWork(): Result {
-		Log.d("ㄺ", "ChatNotificationWorker: doWork() - just called")
 		if (bookChatTokenRepository.isBookChatTokenExist().not()) return Result.success()
 		val channelId: Long = inputData.getLong(EXTRA_CHANNEL_ID, -1)
 		val chatId: Long = inputData.getLong(EXTRA_CHAT_ID, -1)
+		val senderId: Long = inputData.getLong(EXTRA_SENDER_ID, -1)
+
+		val client = runCatching { clientRepository.getClientProfile() }
+			.getOrNull() ?: return Result.failure()
+		if (senderId == client.id) return Result.success()
 
 		val apiResult = runCatching {
 			val channel = getClientChannelUseCase(channelId) ?: return Result.failure()
 			val chat = getChatUseCase(chatId) ?: return Result.failure()
-			val client = clientRepository.getClientProfile() //TODO : [FixWaiting] 이거도 로그인 데이터 없으면 서버 호출하겠네
-			Log.d("ㄺ", "ChatNotificationWorker: doWork() - real Work")
 			channelRepository.updateChannelLastChatIfValid(chat.channelId, chat)
-			Triple(channel, chat, client)
+			Pair(channel, chat)
 		}.getOrNull() ?: return Result.failure()
 
-		val (channel, chat, client) = apiResult
+		val (channel, chat) = apiResult
 		if (chat.sender?.id == client.id) return Result.success()
 
 		chatNotificationHandler.showNotification(
@@ -61,17 +61,20 @@ class ChatNotificationWorker @AssistedInject constructor(
 	companion object {
 		private const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
 		private const val EXTRA_CHAT_ID = "EXTRA_CHAT_ID"
+		private const val EXTRA_SENDER_ID = "EXTRA_SENDER_ID"
 
 		fun start(
 			context: Context,
 			channelId: Long,
 			chatId: Long,
+			senderId: Long
 		) {
 			val loadChatDataWork = OneTimeWorkRequestBuilder<ChatNotificationWorker>()
 				.setInputData(
 					workDataOf(
 						EXTRA_CHANNEL_ID to channelId,
-						EXTRA_CHAT_ID to chatId
+						EXTRA_CHAT_ID to chatId,
+						EXTRA_SENDER_ID to senderId
 					)
 				).build()
 

@@ -1,9 +1,11 @@
 package com.kova700.bookchat.feature.agony.agonyrecord
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -33,6 +35,10 @@ class AgonyRecordActivity : AppCompatActivity() {
 	lateinit var agonyRecordSwipeHelper: AgonyRecordSwipeHelper
 
 	private val agonyRecordViewModel: AgonyRecordViewModel by viewModels()
+
+	private val imm by lazy {
+		getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -148,6 +154,13 @@ class AgonyRecordActivity : AppCompatActivity() {
 		onBackPressedDispatcher.addCallback { agonyRecordViewModel.onBackBtnClick() }
 	}
 
+	private fun closeKeyboard() {
+		imm.hideSoftInputFromWindow(
+			currentFocus?.windowToken,
+			InputMethodManager.HIDE_NOT_ALWAYS
+		)
+	}
+
 	private fun handleEvent(event: AgonyRecordEvent) {
 		when (event) {
 			is AgonyRecordEvent.MoveToBack -> finish()
@@ -158,6 +171,7 @@ class AgonyRecordActivity : AppCompatActivity() {
 
 			is AgonyRecordEvent.ShowEditCancelWarning -> showEditCancelWarning()
 			is AgonyRecordEvent.ShowSnackBar -> binding.root.showSnackBar(textId = event.stringId)
+			AgonyRecordEvent.CloseKeyboard -> closeKeyboard()
 		}
 	}
 

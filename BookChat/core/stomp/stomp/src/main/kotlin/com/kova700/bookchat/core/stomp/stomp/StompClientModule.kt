@@ -1,6 +1,5 @@
 package com.kova700.bookchat.core.stomp.stomp
 
-import android.util.Log
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,10 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
 import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.config.HeartBeat
-import org.hildan.krossbow.stomp.frame.StompFrame
-import org.hildan.krossbow.stomp.instrumentation.KrossbowInstrumentation
 import org.hildan.krossbow.websocket.WebSocketClient
-import org.hildan.krossbow.websocket.WebSocketFrame
 import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
@@ -46,39 +42,33 @@ object StompClientModule {
 					expectedPeriod = 10.seconds
 				)
 				defaultSessionCoroutineContext = Dispatchers.IO
-				instrumentation = debugInstrumentation
+//				instrumentation = debugInstrumentation
 			})
 	}
 
-	private val debugInstrumentation = object : KrossbowInstrumentation {
-		val TAG = "Stomp"
-		override suspend fun onWebSocketFrameReceived(frame: WebSocketFrame) {
-			super.onWebSocketFrameReceived(frame)
-			Log.d(TAG, "StompModule: onWebSocketFrameReceived() - frame : $frame")
-		}
-
-		override suspend fun onWebSocketClosed(cause: Throwable?) {
-			super.onWebSocketClosed(cause)
-			Log.d(TAG, "StompModule: onWebSocketClosed() - cause : $cause")
-		}
-
-		override suspend fun onWebSocketClientError(exception: Throwable) {
-			super.onWebSocketClientError(exception)
-			Log.d(TAG, "StompModule: onWebSocketClientError() - exception : $exception")
-		}
-
-		override suspend fun onStompFrameSent(frame: StompFrame) {
-			super.onStompFrameSent(frame)
-			Log.d(TAG, "StompModule: onStompFrameSent() - frame : $frame")
-		}
-
-		override suspend fun onFrameDecoded(
-			originalFrame: WebSocketFrame,
-			decodedFrame: StompFrame,
-		) {
-			super.onFrameDecoded(originalFrame, decodedFrame)
-			Log.d(TAG, "StompModule: onFrameDecoded() - originalFrame : $originalFrame")
-			Log.d(TAG, "StompModule: onFrameDecoded() - decodedFrame : $decodedFrame")
-		}
-	}
+//	private val debugInstrumentation = object : KrossbowInstrumentation {
+//		val TAG = "Stomp"
+//		override suspend fun onWebSocketFrameReceived(frame: WebSocketFrame) {
+//			super.onWebSocketFrameReceived(frame)
+//		}
+//
+//		override suspend fun onWebSocketClosed(cause: Throwable?) {
+//			super.onWebSocketClosed(cause)
+//		}
+//
+//		override suspend fun onWebSocketClientError(exception: Throwable) {
+//			super.onWebSocketClientError(exception)
+//		}
+//
+//		override suspend fun onStompFrameSent(frame: StompFrame) {
+//			super.onStompFrameSent(frame)
+//		}
+//
+//		override suspend fun onFrameDecoded(
+//			originalFrame: WebSocketFrame,
+//			decodedFrame: StompFrame,
+//		) {
+//			super.onFrameDecoded(originalFrame, decodedFrame)
+//		}
+//	}
 }

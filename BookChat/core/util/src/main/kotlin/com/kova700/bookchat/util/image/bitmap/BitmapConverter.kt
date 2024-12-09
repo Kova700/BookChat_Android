@@ -2,6 +2,9 @@ package com.kova700.bookchat.util.image.bitmap
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Bitmap.CompressFormat.WEBP
+import android.graphics.Bitmap.CompressFormat.WEBP_LOSSLESS
+import android.graphics.Bitmap.CompressFormat.WEBP_LOSSY
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -15,20 +18,41 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 
 private const val BITMAP_COMPRESS_QUALITY_DEFAULT = 80
 
+/** MAX_IMAGE_SIZE = 100KB */
+private const val MAX_IMAGE_SIZE_BYTES = 1000 * 1024
+
 suspend fun Bitmap.compressToByteArray(compressQuality: Int = BITMAP_COMPRESS_QUALITY_DEFAULT): ByteArray {
-	return withContext(Dispatchers.IO) {
+	fun compress(quality: Int, isRetry: Boolean = false): ByteArray {
 		val stream = ByteArrayOutputStream()
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-			compress(Bitmap.CompressFormat.WEBP_LOSSLESS, compressQuality, stream)
-			stream.toByteArray()
+		return when {
+			Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+				val format = if (isRetry.not()) WEBP_LOSSLESS else WEBP_LOSSY
+				compress(format, quality, stream)
+				stream.toByteArray()
+			}
+
+			else -> {
+				compress(WEBP, quality, stream)
+				stream.toByteArray()
+			}
 		}
-		compress(Bitmap.CompressFormat.WEBP, BITMAP_COMPRESS_QUALITY_DEFAULT, stream)
-		stream.toByteArray()
+	}
+
+	return withContext(Dispatchers.IO) {
+		var quality = compressQuality
+		var byteArray = compress(quality)
+		while (byteArray.size > MAX_IMAGE_SIZE_BYTES) {
+			ensureActive()
+			quality = maxOf(quality - 5, 1)
+			byteArray = compress(quality, true)
+		}
+		byteArray
 	}
 }
 
@@ -68,7 +92,7 @@ suspend fun String.getImageBitmap(
 }
 
 /** 기본적으로 가로,세로 최대 길이를 제한하지 않고
- * 총 픽셀 수 ( 가로 x 세로 ) 가 최대 치 이상인 경우에만 제한
+ * 총 픽셀 수 (가로 x 세로) 가 최대 치 이상인 경우에만 제한
  * 이미지 축소를 할 때는 (가로 , 세로) 중 더 긴 길이를 기준으로 축소 */
 suspend fun Bitmap.scaleDownWithAspectRatio(
 	maxWidth: Int,

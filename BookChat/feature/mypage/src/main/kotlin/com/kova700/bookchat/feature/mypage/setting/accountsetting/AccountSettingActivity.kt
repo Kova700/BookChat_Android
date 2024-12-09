@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -31,6 +32,7 @@ class AccountSettingActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		binding = ActivityAccountSettingBinding.inflate(layoutInflater)
+		setBackPressedDispatcher()
 		setContentView(binding.root)
 		initViewState()
 		observeUiState()
@@ -51,7 +53,7 @@ class AccountSettingActivity : AppCompatActivity() {
 
 	private fun initViewState() {
 		with(binding) {
-			backBtn.setOnClickListener { finish() }
+			backBtn.setOnClickListener { accountSettingViewModel.onClickBackBtn() }
 			logoutBtn.setOnClickListener { accountSettingViewModel.onClickLogoutBtn() }
 			withdrawBtn.setOnClickListener { accountSettingViewModel.onClickWithdrawBtn() }
 		}
@@ -95,6 +97,13 @@ class AccountSettingActivity : AppCompatActivity() {
 			AccountSettingUiEvent.ShowWithdrawWarningDialog -> showWithdrawWarningDialog()
 			AccountSettingUiEvent.StartOAuthLogout -> startOAuthLogout()
 			AccountSettingUiEvent.StartOAuthWithdraw -> startOAuthWithdraw()
+			AccountSettingUiEvent.MoveToBack -> finish()
+		}
+	}
+
+	private fun setBackPressedDispatcher() {
+		onBackPressedDispatcher.addCallback {
+			accountSettingViewModel.onClickBackBtn()
 		}
 	}
 

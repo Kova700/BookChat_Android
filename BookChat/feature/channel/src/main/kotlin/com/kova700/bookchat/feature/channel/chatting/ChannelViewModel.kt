@@ -1,6 +1,5 @@
 package com.kova700.bookchat.feature.channel.chatting
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -25,7 +24,6 @@ import com.kova700.bookchat.feature.channel.chatting.ChannelUiState.UiState
 import com.kova700.bookchat.feature.channel.chatting.mapper.toChatItems
 import com.kova700.bookchat.feature.channel.chatting.model.ChatItem
 import com.kova700.bookchat.feature.channel.drawer.mapper.toDrawerItems
-import com.kova700.bookchat.util.Constants.TAG
 import com.kova700.core.domain.usecase.channel.GetClientChannelFlowUseCase
 import com.kova700.core.domain.usecase.channel.GetClientChannelInfoUseCase
 import com.kova700.core.domain.usecase.channel.GetClientChannelUseCase
@@ -35,6 +33,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -48,6 +47,8 @@ import kotlin.math.abs
 // TODO : [FixWaiting] ChannelMember 리스트가 텅빈채로 보이는 현상이 있음
 // TODO : [FixWaiting] 채팅방 입장 헀는데 인원수 1명으로 그대로인 현상이 있음
 // TODO : [FixWaiting] 채팅방 퇴장 했는데, 채팅방 인원 수 갱신안되는 현상이 있음
+// TODO : [FixWaiting] 오랫동안 채팅 화면 켜둔채로 화면 잠금 걸어두고 돌아오면 재연결 안되는 현상이 있음
+// TODO : [FixWaiting] 코드 난독화 추가
 
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
@@ -69,7 +70,7 @@ class ChannelViewModel @Inject constructor(
 	private val channelId = savedStateHandle.get<Long>(EXTRA_CHANNEL_ID)!!
 
 	private val _eventFlow = MutableSharedFlow<ChannelEvent>()
-	val eventFlow get() = _eventFlow
+	val eventFlow = _eventFlow.asSharedFlow()
 
 	private val _uiState = MutableStateFlow<ChannelUiState>(ChannelUiState.DEFAULT)
 	val uiState = _uiState.asStateFlow()
@@ -84,7 +85,6 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun initUiState() = viewModelScope.launch {
-		Log.d(TAG, "ChannelViewModel: initUiState() - channelId: $channelId")
 		if (isBookChatAvailable().not()) return@launch
 		val originalChannel = getClientChannelUseCase(channelId) ?: return@launch
 		val shouldLastReadChatScroll = originalChannel.isExistNewChat
@@ -109,7 +109,6 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private suspend fun getOfflineNewestChats() {
-		Log.d(TAG, "ChannelViewModel: getOfflineNewestChats(channelId : $channelId) - called")
 		chatRepository.getOfflineNewestChats(channelId)
 	}
 
@@ -176,15 +175,24 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun observeSocketState() = viewModelScope.launch {
-		chatClient.getSocketStateFlow().collect { state ->
-			updateState { copy(socketState = state) }
-		}
+		combine(
+			chatClient.getSocketStateFlow(),
+			chatClient.getChannelSubscriptionStateFlow(channelId)
+		) { socketState, subscriptionState ->
+			when {
+				socketState == SocketState.CONNECTED -> {
+					if (subscriptionState == SubscriptionState.SUBSCRIBED) SocketState.CONNECTED
+					else SocketState.CONNECTING
+				}
+
+				else -> socketState
+			}
+		}.collect { updateState { copy(socketState = it) } }
 	}
 
 	private fun observeChannelSubscriptionState() = viewModelScope.launch {
 		var isFirstFailed = true
 		chatClient.getChannelSubscriptionStateFlow(channelId).collect { state ->
-			Log.d(TAG, "ChannelViewModel: observeChannelSubscriptionState() - state : $state")
 			when (state) {
 				SubscriptionState.SUBSCRIBING -> Unit
 				SubscriptionState.UNSUBSCRIBED -> subscribeChannelIfNeeded()
@@ -210,7 +218,6 @@ class ChannelViewModel @Inject constructor(
 	//TODO : [Version 2] 현재 보고 있는 채팅방에 한해서만 동기화 요청되게 사용하고 있지만,
 	// 			추후 EventHistory를 통해 모든 채팅방에 대한 동기화 요청으로 수정하고 ChatClient로 이전
 	private fun syncChannelIfNeeded() {
-		Log.d(TAG, "ChannelViewModel: syncChannelsIfNeeded() - called")
 		runCatching { channelSyncManger.sync(listOf(channelId)) }
 			.onFailure { ChannelEvent.ShowSnackBar(R.string.channel_info_sync_fail) }
 	}
@@ -248,7 +255,6 @@ class ChannelViewModel @Inject constructor(
 		if (networkManager.isNetworkAvailable().not()
 			|| uiState.value.channel.isAvailable.not()
 		) return@launch
-		Log.d(TAG, "ChannelViewModel: getInitChats(channelId : $channelId) - called")
 		val newestChats = getNewestChats().await() ?: emptyList()
 		val originalLastReadChatId = uiState.value.originalLastReadChatId ?: return@launch
 		val shouldLastReadChatScroll =
@@ -267,9 +273,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun getNewestChats(shouldBottomScroll: Boolean = false) = viewModelScope.async {
-		Log.d(TAG, "ChannelViewModel: getNewestChats() - called")
 		if (uiState.value.isInitLoading) return@async null
-		Log.d(TAG, "ChannelViewModel: getNewestChats() - 실제 API 호출")
 		updateState { copy(uiState = UiState.INIT_LOADING) }
 		runCatching { chatRepository.getNewestChats(channelId) }
 			.onSuccess {
@@ -288,7 +292,6 @@ class ChannelViewModel @Inject constructor(
 
 	private fun getNewerChats() = viewModelScope.launch {
 		if (uiState.value.isPossibleToLoadNewerChat.not()) return@launch
-		Log.d(TAG, "ChannelViewModel: getNewerChats() - called")
 		updateState { copy(newerChatsLoadState = LoadState.LOADING) }
 		runCatching { chatRepository.getNewerChats(channelId) }
 			.onSuccess { updateState { copy(newerChatsLoadState = LoadState.SUCCESS) } }
@@ -300,7 +303,6 @@ class ChannelViewModel @Inject constructor(
 
 	private fun getOlderChats() = viewModelScope.launch {
 		if (uiState.value.isPossibleToLoadOlderChat.not()) return@launch
-		Log.d(TAG, "ChannelViewModel: getOlderChats() - called")
 		updateState { copy(olderChatsLoadState = LoadState.LOADING) }
 		runCatching { chatRepository.getOlderChats(channelId) }
 			.onSuccess { updateState { copy(olderChatsLoadState = LoadState.SUCCESS) } }
@@ -442,21 +444,12 @@ class ChannelViewModel @Inject constructor(
 		scrollToBottom()
 	}
 
-	private var testCount = 0
 	fun onClickCaptureBtn() {
-//		if (uiState.value.channel.isAvailable.not()
-//			|| uiState.value.chats.isEmpty()
-//		) return
-//		updateState { copy(isCaptureMode = true) }
-//		_captureIds.update { null }
-
-		List(100) { "${testCount}번째 테스트 item $it" }.forEach { message ->
-			chatClient.sendMessage(
-				channelId = channelId,
-				message = message,
-			)
-		}
-		testCount++
+		if (uiState.value.channel.isAvailable.not()
+			|| uiState.value.chats.isEmpty()
+		) return
+		updateState { copy(isCaptureMode = true) }
+		_captureIds.update { null }
 	}
 
 	fun onClickMenuBtn() {
@@ -592,7 +585,7 @@ class ChannelViewModel @Inject constructor(
 	}
 
 	private fun startEvent(event: ChannelEvent) = viewModelScope.launch {
-		eventFlow.emit(event)
+		_eventFlow.emit(event)
 	}
 
 	private inline fun updateState(block: ChannelUiState.() -> ChannelUiState) {
